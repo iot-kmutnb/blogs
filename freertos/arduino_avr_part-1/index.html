@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/freertos/arduino_avr_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino-FreeRTOS for AVR (Part 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-freertos-for-avr-part-1" class="nav-link">Arduino-FreeRTOS for AVR (Part 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#freertos-arduino" class="nav-link">&#9655; การเรียนรู้ FreeRTOS ด้วยบอร์ด Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#freertos-arduino_1" class="nav-link">&#9655; ข้อดีและข้อเสียของการเรียนรู้ FreeRTOS ด้วยบอร์ด Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#freertos-arduino-ide" class="nav-link">&#9655; การติดตั้ง FreeRTOS สำหรับ Arduino IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#blinking-leds" class="nav-link">&#9655; ตัวอย่างโค้ด: Blinking LEDs</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink-with-single-freertos-task" class="nav-link">&#9655; ตัวอย่างโค้ด: LED Blink with Single FreeRTOS Task</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator" class="nav-link">&#9655; การจำลองการทำงานด้วย Wokwi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink-with-multiple-tasks" class="nav-link">&#9655; ตัวอย่างโค้ด: LED Blink with Multiple Tasks</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-freertos-for-avr-part-1">Arduino-FreeRTOS for AVR (Part 1)<a class="headerlink" href="#arduino-freertos-for-avr-part-1" title="Permanent link">#</a></h1>
+<p>บทความนี้ (ตอนที่ 1) แนะนำการเริ่มต้นใช้งาน <a href="https://www.freertos.org/"><strong>FreeRTOS Library</strong></a>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino</strong> ที่ใช้ชิป <strong>8-bit Atmel AVR</strong> 
+(เช่น บอร์ด <strong>Uno</strong> | <strong>Nano</strong> | <strong>MEGA2560</strong>) และใช้ซอฟต์แวร์ <strong>Arduino IDE</strong>
+ในการเขียนโค้ด รวมถึงสาธิตการจำลองการทำงานด้วย <strong>Web-based Wokwi AVR Simulator</strong></p>
+<p><strong>Keywords:</strong> <em>Arduino</em>, <em>8-bit AVR</em>, <em>RTOS</em>, <em>FreeRTOS</em>, <em>Wokwi Simulator</em></p>
+<hr />
+<h2 id="freertos-arduino">&#9655; <strong>การเรียนรู้ FreeRTOS ด้วยบอร์ด Arduino</strong><a class="headerlink" href="#freertos-arduino" title="Permanent link">#</a></h2>
+<p>โดยทั่วไปแล้ว ระบบปฏิบัติการเวลาจริง หรือ "เรียลไทม์-โอเอส" (<a href="../../rtos/"><strong>Real-Time OS: RTOS</strong></a>)
+จะเหมาะสำหรับการนำไปใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ 32 บิต แต่ก็มี <strong>RTOS</strong> 
+ที่มีขนาดเล็ก (<strong>Small Memory Footprint</strong>) 
+และใช้งานกับชิปไมโครคอนโทรลเลอร์ขนาด 8 บิต ได้เช่นกัน หนึ่งในตัวเลือกก็คือ <strong>FreeRTOS</strong>
+และก็เป็น <strong>RTOS</strong> ประเภท <strong>Open Source</strong> ที่ได้รับความนิยมแพร่หลาย</p>
+<p>เนื่องด้วยอุปกรณ์ฮาร์ดแวร์และซอฟต์แวร์ของ <strong>Arduino</strong> ที่เข้าถึงได้ง่าย และมีการใช้งานอย่างแพร่หลายสำหรับคนทั่วไป 
+จึงเหมาะสำหรับผู้ที่สนใจอยากจะลองศึกษาการหลักการทำงาน และฝึกใช้งานระบบปฏิบัติการแบบ <strong>RTOS</strong></p>
+<p>ถัดไปจะกล่าวถึง ขั้นตอนการติดตั้ง <strong>FreeRTOS</strong> (ทดลองใช้เวอร์ชัน <strong>v10.4.4</strong>) สำหรับ <strong>Arduino IDE</strong> 
+และการเขียนโปรแกรมแบบมัลติทาสก์ในเบื้องต้น เพื่อนำไปทดลองกับบอร์ดไมโครคอนโทรลเลอร์ หรือจำลองการทำงานของโค้ดตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="freertos-arduino_1">&#9655; <strong>ข้อดีและข้อเสียของการเรียนรู้ FreeRTOS ด้วยบอร์ด Arduino</strong><a class="headerlink" href="#freertos-arduino_1" title="Permanent link">#</a></h2>
+<p>การเลือกใช้บอร์ด <strong>Arduino</strong> ที่ใช้ชิปไมโครคอนโทรลเลอร์ 8 บิต  <strong>AVR</strong> อย่างเช่น บอร์ด <strong>Arduino Uno</strong> 
+หรือ <strong>Arduino Nano</strong> เพื่อนำมาใช้สำหรับการเรียนรู้และเขียนโค้ดทดลองใช้คำสั่ง <strong>FreeRTOS API</strong> มีข้อดีดังนี้</p>
+<ul>
+<li>สามารถใช้ซอฟต์แวร์อย่างเช่น <strong>WokWi AVR Simulator</strong> ซึ่งเป็น <strong>Web-based App</strong>
+  สำหรับการเขียนโค้ดและจำลองการทำงานเสมือนจริงได้ และรองรับการนำเข้าไลบรารี <strong>FreeRTOS</strong> สำหรับ <strong>AVR</strong> ได้ด้วย</li>
+<li>สามารถซื้อบอร์ดไมโครคอนโทรลเลอร์ดังกล่าวได้ทั่วไป ราคาไม่แพงนัก หากต้องการทดสอบการทำงานของโค้ดกับอุปกรณ์จริง</li>
+<li>สามารถเขียนโปรแกรมโดยใช้คำสั่งต่าง ๆ ของ <strong>Arduino API</strong> ทำให้ง่ายต่อการเขียนโค้ด
+  มากกว่าการใช้คำสั่งของ <strong>API</strong> จากไลบรารี หรือ <strong>C/C++ SDK</strong> ของผู้ผลิตชิปไมโครคอนโทรลเลอร์ 
+  หรือเขียนโค้ดแบบ <strong>Bare-Metal</strong></li>
+<li>สามารถเขียนโค้ด <strong>Arduino Sketch</strong> เพื่อคอมไพล์และแปลงให้เป็นไฟล์ .hex โดยใช้ซอฟต์แวร์ <strong>IDE</strong>
+  ที่เป็น <strong>Open Source</strong> เช่น <strong>Arduino IDE</strong> หรือ <strong>VS Code IDE</strong> + <strong>PlatformIO</strong> 
+  และนำเข้า <strong>FreeRTOS</strong> เหมือนไลบรารีสำหรับ <strong>Arduino</strong> โดยทั่วไป</li>
+</ul>
+<p>แต่หากจะเลือกใช้บอร์ดไมโครคอนโทรลเลอร์อย่างเช่น <strong>ESP32</strong> แทนบอร์ด <strong>Arduino</strong> ก็มีข้อดี ดังนี้</p>
+<ul>
+<li><strong>WokWi AVR Simulator</strong> รองรับการใช้งานบอร์ด <strong>ESP32</strong> ดังนั้นจึงจำลองการทำงานของโค้ด 
+   รวมถึงการใช้คำสั่งของ <strong>FreeRTOS</strong> ได้ด้วย</li>
+<li>สามารถเขียนโค้ดโดยใช้คำสั่งพื้นฐานของ <strong>Arduino API</strong> ได้เช่นกัน</li>
+<li>ตัวชิปไมโครคอนโทรลเลอร์ <strong>Espressif ESP32 SoC</strong> มีความเร็วในการประมวลผลสูงกว่า และมีหน่วยความจำมากกว่า <strong>AVR</strong>
+ดังนั้นจึงรองรับการเขียนโค้ดที่มีความซับซ้อน หรือกรณีที่โค้ดมีขนาดใหญ่ขึ้น  แต่บอร์ด <strong>ESP32</strong> ก็อาจมีราคาที่สูงกว่าบอร์ด <strong>Arduino</strong> </li>
+</ul>
+<hr />
+<h2 id="freertos-arduino-ide">&#9655; <strong>การติดตั้ง FreeRTOS สำหรับ Arduino IDE</strong><a class="headerlink" href="#freertos-arduino-ide" title="Permanent link">#</a></h2>
+<p>ในการเตรียมซอฟต์แวร์เพื่อเขียนโค้ด ขั้นตอนแรกให้เปิดใช้งาน <strong>Arduino IDE</strong> 
+(หากยังไม่เคยใช้งาน ให้ดาวน์โหลดและติดตั้งซอฟต์แวร์ก่อน) แล้วไปที่เมนู 
+<strong>Sketch &gt; Include Library &gt; Manage Libraries</strong>
+ค้นหาไลบรารีด้วยคำว่า <code>freertos</code> จะปรากฏรายการตามรูปภาพตัวอย่าง 
+จากนั้นเลือกเวอร์ชันล่าสุดแล้วกดปุ่มคลิก <strong>Install</strong></p>
+<p><img alt="" src="../avr/images/arduino_lib_manager_freertos.png" /></p>
+<p>รูป: ตัวอย่างการค้นหาและติดตั้ง <strong>FreeRTOS library</strong></p>
+<p>ไลบรารีสำหรับ <strong>FreeRTOS</strong> มีหลายตัวเลือก 
+แต่เราจะเลือกใช้ไลบรารีที่ใช้งานได้สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino</strong> ซึ่งใช้ชิป <strong>Atmel AVR</strong> 
+(ผู้พัฒนาไลบรารีคือ <a href="https://www.freertos.org/author/ribarry/"><strong>Richard Barry</strong></a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="blinking-leds">&#9655; <strong>ตัวอย่างโค้ด: Blinking LEDs</strong><a class="headerlink" href="#blinking-leds" title="Permanent link">#</a></h2>
+<p>การใช้งานในระดับพื้นฐานที่เกี่ยวข้องกับ <strong>RTOS</strong> คือ การเขียนโปรแกรมแบบมัลติทาสก์ (<strong>Multi-Tasking</strong>)
+คือ มีการแบ่งงานของโปรแกรมออกเป็นงานย่อย หรือ ทาสก์ (<strong>Tasks</strong>) ให้ทำงานอิสระจากกัน หรือทำงานร่วมกันก็ได้</p>
+<p>แต่ก่อนที่จะสาธิตการสร้างทาสก์โดยใช้ <strong>FreeRTOS API</strong> ลองมาดูโค้ดตัวอย่างแรกก่อนซึ่งเป็น
+<strong>Arduino Sketch</strong> ที่มีเพียงทาสก์หลัก (<strong>Main Task</strong>) 
+ที่ทำให้เกิดการสลับสถานะลอจิก <strong>LOW</strong> และ <strong>HIGH</strong> 
+ที่ขาเอาต์พุต <strong>D12</strong> และ <strong>D13</strong> ตามลำดับ (มี 2 ช่องสัญญาณเอาต์พุต) </p>
+<p>ในโค้ดตัวอย่างนี้ ได้ใช้คำสั่ง <code>millis()</code> ของ <strong>Arduino API</strong> 
+เพื่อคอยอ่านเวลาของระบบ (หน่วยเป็นมิลลิวินาที) จากนั้นจะนำไปเทียบกับเวลาอ้างอิงที่บันทึกเอาไว้ 
+(เรียกว่า <strong>Saved Timestamp:</strong> ตัวแปร <code>ts</code>)</p>
+<p>ถ้าอ่านเวลาปัจจุบัน (ได้ตัวเลขในหน่วยเป็น <strong>ms</strong> และเก็บค่าไว้ในตัวแปร <code>now</code>) 
+ลบด้วยเวลาอ้างอิงที่ได้บันทึกไว้ (<code>ts</code>) จะได้ค่าผลต่างในเชิงเวลา 
+หากผลต่างที่ได้มากกว่าหรือเท่ากับช่วงเวลาที่กำหนดไว้ (<code>INTERVAL_ms</code>) ในกรณีนี้คือ 17 มิลลิวินาที 
+จะต้องสลับสถานะลอจิกของเอาต์พุตหนึ่งครั้ง </p>
+<p>การสลับสถานะลอจิกสำหรับขา <strong>I/O</strong> (ใช้เป็นเอาต์พุต) จะเกิดขึ้นกับหนึ่งขาเอาต์พุตเท่านั้นในแต่ละครั้ง และสลับช่วงเวลากัน 
+และให้อัปเดทและบันทึกเวลาอ้างอิงล่าสุดไว้ในตัวแปร <code>ts</code></p>
+<pre><code class="language-c++">#define NUM_LEDS       (2) // number of LEDs
+#define INTERVAL_ms   (17) // delay in msec
+
+// global constants / variables
+const int LED_PINS[ NUM_LEDS ] = { 12, 13 }; // D12 and D13
+uint32_t ts, now;
+uint8_t cnt = 0;
+
+void setup() {
+  for ( int i=0; i &lt; NUM_LEDS; i++ ) { // configure output pins
+     pinMode( LED_PINS[i], OUTPUT );   // LED output
+     digitalWrite( LED_PINS[i], LOW ); // output LOW
+  }
+  ts = millis(); // save the current timestamp
+}
+
+void loop() {
+  now = millis(); // get the current timestamp (in ms)
+  // Do we need to update output now ?
+  if ( now - ts &gt;= INTERVAL_ms ) { // check next update time
+     // keep the timestamp 
+     ts = now;
+     // select the pin
+     int pin = LED_PINS[ cnt ]; 
+     // increment the counter variable by 1
+     cnt = (cnt + 1) % NUM_LEDS;
+     // toggle the selected pin either D12 or D13
+     digitalWrite( pin, !digitalRead( pin ) );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าทดสอบกับฮาร์ดแวร์จริง ใช้บอร์ด <strong>Arduino</strong> เช่น <strong>Uno</strong> หรือ <strong>Nano</strong> 
+และวัดสัญญาณเอาต์พุตด้วยเครื่องออสซิลโลสโคป จะเห็นว่า คลื่นสัญญาณเอาต์พุตที่ขา 
+<code>D12</code> และ <code>D13</code> จะเป็นคลื่นสี่เหลี่ยม มีความกว้างของพัลส์ (<strong>Pulse Widths</strong>) 
+ค่อนข้างคงที่ ครึ่งหนึ่งของคาบ (<strong>Half Period</strong>) ของแต่ละสัญญาณกว้าง <strong>~34 ms</strong> (มิลลิวินาที)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part1_ex1_osc-1.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ได้จากการทำงานของโค้ดตัวอย่างแรก (<strong>TIME/DIV = 20 ms</strong>)</p>
+<p>&nbsp;</p>
+<p><strong>คำถาม:</strong> ทำไมจึงเลือกการทำให้ <strong>LED</strong> กระพริบ มาเป็นตัวอย่าง ?</p>
+<ul>
+<li><strong>I/O Toggle</strong> เป็นการทำงานที่จะเกิดขึ้นซ้ำ
+ดังนั้นจึงเป็นตัวแทนของการทำงานเสมือนโปรแกรมย่อย หรือ ทาสก์ (<strong>Task</strong>) ที่เกิดซ้ำต่อเนื่องกันไป 
+(<strong>Cyclic</strong>) และมีการเว้นช่วงเวลาคงที่ หรือเกิดขึ้นตามคาบเวลาคงที่ (<strong>Periodic</strong>)</li>
+<li>ถ้ามีมากกว่าหนึ่งงาน เช่น ทำให้เกิดการสลับสถานะที่ขาเอาต์พุตมากกว่าหนึ่งขา 
+ก็เป็นการกำหนดงานย่อยหลายงาน (<strong>Multi-Tasking</strong>) ที่ทำงานอิสระจากกัน 
+และอาจเกิดขึ้นไปพร้อม ๆ กันได้ (<strong>Concurrent Independent Tasks</strong>)</li>
+<li>พฤติกรรมการทำงานของทาสก์ สามารถสังเกตได้ที่ขา <strong>I/O</strong> เช่น สามารถดูว่า เกิดการเปลี่ยนสถานะหรือไม่ 
+และถ้าใช้เครื่องออสซิลโลสโคปวัดสัญญาณเอาต์พุต ก็จะเห็นการเปลี่ยนแปลงเชิงเวลาที่ขา <strong>I/O</strong> แต่ละขาได้ในรูปของกราฟสัญญาณ เช่น 
+สามารถทราบได้ว่า ขอบขาขึ้นหรือขาลง (<strong>Rising or Falling Edge</strong>) เกิดขึ้นเมื่อใด 
+และสามารถวัดความกว้างของพัลส์หรือคาบได้ เป็นต้น</li>
+</ul>
+<hr />
+<h2 id="led-blink-with-single-freertos-task">&#9655; <strong>ตัวอย่างโค้ด: LED Blink with Single FreeRTOS Task</strong><a class="headerlink" href="#led-blink-with-single-freertos-task" title="Permanent link">#</a></h2>
+<p>ในตัวอย่างนี้ ถ้าเราลองเขียนโค้ด <strong>Arduino Sketch</strong> ใหม่ โดยใช้วิธีการสร้างทาสก์ขึ้นมาใหม่
+จำนวน 1 ทาสก์ และใช้คำสั่งต่าง ๆ ของ <strong>FreeRTOS Library</strong> แทนการทำงานในฟังก์ชัน <code>loop(){…}</code> 
+ก็สามารถทำได้ดังนี้</p>
+<pre><code class="language-c++">// include the FreeRTOS library for AVR
+#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define NUM_LEDS  (2)
+const int LED_PINS[ NUM_LEDS ] = { 12, 13 };
+
+void task( void *pvParameters ); // task entry function
+
+void setup() {
+   for ( int i=0; i &lt; NUM_LEDS; i++ ) {
+     pinMode( LED_PINS[i], OUTPUT ); // configure output pins
+     digitalWrite( LED_PINS[i], LOW ); // LED output LOW
+   } 
+   // create a new task
+   // see: https://www.freertos.org/a00125.html
+   xTaskCreate( task, &quot;Task&quot;, 128, NULL, tskIDLE_PRIORITY+1, NULL );
+   // Note the task scheduler is started automatically.  
+}
+
+void loop() {
+  /* empty */
+}
+
+void task( void *pvParameters ) { // task-entry function
+   uint8_t cnt = 0; // a counter variable, increment by 1
+   while(1) { 
+     int pin = LED_PINS[ cnt ]; // select the pin
+     cnt = (cnt+1) % NUM_LEDS;
+     // toggle the selected pin 
+     digitalWrite( pin, !digitalRead( pin ) );
+     vTaskDelay( pdMS_TO_TICKS(17) ); // task delay for 1 tick
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ฟังก์ชันสำหรับการทำงานของทาสก์ดังกล่าว ซึ่งก็คือ 
+<code>void task( void * ){…}</code> 
+ทำหน้าที่สลับสถานะของเอาต์พุตที่ขาหมายเลข <code>D12</code> หรือ <code>D13</code> และมีการกำหนดคุณสมบัติเพื่อสร้างทาสก์ดังนี้</p>
+<ul>
+<li>ชื่อทาสก์ (<strong>Task Name</strong>) ที่เป็นข้อความแบบ <strong>String</strong> ในภาษา <strong>C</strong></li>
+<li>ขนาดของหน่วยความจำแบบ <strong>Stack</strong> สำหรับของแต่ละทาสก์ (<strong>Task Stack Depth</strong>)
+(ไม่ใช่จำนวนไบต์ และเป็นความจุสำหรับการเก็บพอยน์เตอร์) ถ้าตั้งค่าไว้น้อยเกินไป 
+และฟังก์ชันของทาสก์ทำงานแล้วเรียกฟังก์ชันซ้อนกันหลายครั้ง อาจจะทำให้เกิด <strong>Stack Overflow</strong> ได้ 
+แต่ถ้าตั้งค่ามากเกินไป ก็อาจเป็นใช้ <strong>SRAM</strong> ไม่เหมาะสม</li>
+<li>พารามิเตอร์สำหรับทาสก์ (<strong>Task Parameter</strong>) ที่จะนำไปใช้กับฟังก์ชันของทาสก์ได้ 
+ถ้าไม่มี ก็ให้ระบุเป็น <code>NULL</code></li>
+<li>ระดับความสำคัญของทาสก์ (<strong>Task Priority Level</strong>) เป็นเลขจำนวนเต็มบวก 
+โดยทั่วไปก็จะให้มีค่าสูงกว่า ระดับความสำคัญของทาสก์ที่เรียกว่า  <strong>Idle Task</strong>
+ของ <strong>FreeRTOS</strong> (<code>tskIDLE_PRIORITY</code> ซึ่งมีค่าเท่ากับ 0)</li>
+<li>ในฟังก์ชัน <code>loop(){...}</code> ไม่มีคำสั่งใด ๆ และส่งต่อการทำงานให้ <strong>Idle Task</strong></li>
+</ul>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li><strong>Idle Task</strong> เป็นทาสก์ที่จะถูกเรียกโดยตัวจัดการงานของ <strong>FreeRTOS</strong> 
+เมื่อไม่มีทาสก์ใดพร้อมที่จะทำงาน</li>
+<li>พอยน์เตอร์สำหรับทาสก์ (เรียกว่า <strong>Task Handle</strong>) ใช้อ้างอิงทาสก์ที่จะถูกสร้างขึ้นใหม่ 
+ถ้าไม่ต้องการ ก็ให้ระบุเป็น <code>NULL</code></li>
+<li>ภายในฟังก์ชันสำหรับทาสก์ มีประโยคคำสั่ง <code>while(1){…}</code> ดังนั้นทาสก์จะทำงานซ้ำไปเรื่อย ๆ 
+และทาสก์ก็สามารถหยุดการทำงานชั่วคราวได้ตามระยะเวลาที่ต้องการ เช่น ถ้ามีการทำคำสั่ง <code>vTaskDelay()</code></li>
+</ul>
+<p>การหน่วงเวลาของทาสก์ จะใช้วิธีเรียกฟังก์ชัน <code>vTaskDelay()</code> ของ <strong>FreeRTOS</strong> 
+และระบุค่าเป็นจำนวนครั้งของการนับโดย <strong>Tick Timer</strong> ของ <strong>FreeRTOS</strong> 
+และเมื่อเกิด <strong>Tick Event</strong> ในแต่ละครั้ง จะเกิดการจัดลำดับทาสก์ที่พร้อมจะทำงาน 
+และเลือกทาสก์ที่จะได้ช่วงเวลาในการทำงานถัดไป 
+การตัดสินใจและกำหนดว่าทาสก์ใดจะได้ทำงานเป็นหน้าที่ของ <strong>Task Scheduler</strong> ของ <strong>FreeRTOS</strong></p>
+<p>ในกรณีของ <strong>Arduino (Atmel AVR)</strong> อัตราการนับขึ้นหรือความถี่ของ <strong>Tick Timer</strong> 
+จะถูกตั้งค่าไว้เท่ากับ <strong>62 Hz (default)</strong> หรือมีคาบในการนับแต่ละครั้งเท่ากับ <strong>16 มิลลิวินาที (ms)</strong> โดยประมาณ
+และอาศัยการทำงานของวงจรภายใน <strong>WDT</strong> (<em>Watchdog Timer</em>) ทำหน้าที่เป็น <strong>OS Timer</strong></p>
+<p>ดังนั้นการทำคำสั่ง <code>vTaskDelay( pdMS_TO_TICKS(17) )</code> เป็นการหน่วงเวลาไว้เท่ากับ 
+<strong>1 OS Tick</strong> และคำสั่ง <code>pdMS_TO_TICKS(..)</code> จะใช้สำหรับแปลงช่วงเวลา
+(หน่วยเป็นมิลลิวินาที)  ให้เป็นจำนวนนับตามจังหวะของ <strong>Tick Timer</strong> ในกรณีนี้ 17 มิลลิวินาที จะได้เท่ากับ 
+<strong>1 OS Tick</strong> (= <code>(int)(17/16)</code> ได้ค่าเลขจำนวนเต็มเท่ากับ <code>1</code>)</p>
+<p>การทำคำสั่ง <code>vTaskDelay()</code> จะทำให้ทาสก์ดังกล่าวหยุดทำงานชั่วคราว 
+โดยเปลี่ยนจากสถานะ "กำลังทำงาน" (<strong>RUNNING</strong>) ไปเป็นสถานะ "หยุด" (<strong>BLOCKED</strong>) 
+และจะกลับมาอยู่ในสถานะ "พร้อมทำงาน" (<strong>READY</strong>)
+เมื่อเวลาผ่านไปตามที่กำหนดไว้ เพื่อรอจัดลำดับให้ทำงานอีกครั้งในสถานะ "กำลังทำงาน" (<strong>RUNNING</strong>) ตามลำดับ</p>
+<p><img alt="" src="../avr/images/freertos_state_diagram.png" /></p>
+<p>รูป: ผังแสดงการเปลี่ยนสถานะของทาสก์สำหรับ <strong>FreeRTOS</strong> (<strong>State Transition Diagram</strong>)</p>
+<p>&nbsp;</p>
+<p>ทาสก์ที่ถูกสร้างและจัดการโดย <strong>FreeRTOS Kernel</strong> จะอยู่ในสถานะได้แก่ 
+{ <strong>READY</strong>, <strong>RUNNING</strong>, <strong>BLOCKED</strong>, <strong>SUSPENDED</strong> }</p>
+<p>เมื่อทาสก์ถูกสร้างขึ้นแล้ว จะอยู่ในสถานะ <strong>READY</strong> และถ้าได้รับการเลือกจาก <strong>Task Scheduler</strong> 
+ให้ทำงานในลำดับถัดไป ทาสก์ก็จะเปลี่ยนเป็นสถานะ <strong>RUNNING</strong> หรือเปลี่ยนเป็นสถานะอื่นได้หลังจากนั้น เช่น</p>
+<ul>
+<li>เปลี่ยนเป็น <strong>BLOCKED</strong> เช่น เมื่อทำสั่ง <code>vTaskDelay()</code>
+ หรือ รอเงื่อนไขเหตุการณ์บางอย่างที่จะเกิดจากการประสานการทำงานระหว่างทาสก์</li>
+<li>เปลี่ยนเป็น <strong>READY</strong> เช่น เมื่อทำคำสั่ง <code>taskYIELD()</code> หรือ ถูกหยุดโดยการแทรกกลางคัน</li>
+<li>เปลี่ยนเป็น <strong>SUSPENDED</strong> เช่น เมื่อมีการทำคำสั่ง <code>vTaskSuspened()</code> เป็นต้น</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/freertos_avr_part1_ex1_osc-2.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ได้จากการทำงานของโค้ดตัวอย่างที่ 2</p>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>ระยะเวลาของ <strong>1 OS Tick</strong> ที่เกิดจากการทำงานของวงจร <strong>WDT Oscillator</strong> 
+ภายในชิป <strong>AVR</strong>  ซึ่งถูกตั้งค่าการทำงานไว้โดย <strong>FreeRTOS</strong> อาจมีความกว้างไม่เท่ากับ <strong>16ms</strong>
+(<strong>WDT Period</strong> เมื่อให้บิต <code>WDP[3..1]="000"</code> สำหรับ <strong>WDT Prescaler</strong>) 
+ตามที่ระบุไว้ใน <strong>Datasheet</strong> ซึ่งเกิดจากความไม่แม่นยำของวงจร (<strong>Watchdog Timer Inaccuracy</strong>)</li>
+<li>จากรูปสัญญาณที่ได้จากการวัดด้วยเครื่องออสซิลสลโคป หนึ่งคาบของสัญญาณได้เท่ากับ <strong>67.60ms</strong> 
+ดังนั้นจะได้ค่าประมาณ <strong>16.9ms per tick (= 67.60ms / 4 ticks)</strong> 
+ซึ่งใกล้เคียงกับค่าของ <strong>1 OS Tick</strong></li>
+</ul>
+<p>วงจร <strong>WDT</strong> ของ <strong>AVR</strong> ทำงานที่ความถี่ <strong>128kHz</strong> 
+แต่ความถี่จริง อาจอยู่ที่ประมาณ <strong>120kHz</strong> (5Vdc / 25 deg.C)
+การเกิดอินเทอร์รัพท์ จะต้องนับครบรอบเท่ากับ <strong>2048 cycles</strong>
+หรือประมาณ <strong>~17ms</strong> (<strong>= 2048 / 120kHz</strong>)</p>
+<p><strong>FreeRTOS</strong> มีการทำงานแบบ <strong>Preemptive Scheduling</strong> 
+นอกจากจะต้องมีการกำหนดระดับความสำคัญของทาสก์แล้ว จะต้องมีการใช้งาน <strong>Hardware Timer</strong> 
+เป็นตัวนับตามจังหวะของสัญญาณ <strong>Clock</strong> และเมื่อทำงานจะสร้างอินเทอร์รัพท์ให้เกิดขึ้น (<strong>Tick Interrupt</strong>) 
+เช่น ทุก 1 มิลลิวินาที หรือความถี่ <strong>1kHz</strong> (เรียกว่า <strong>Tick Rate</strong>) 
+และมีการอัปเดทตัวแปร <strong>Tick Counter</strong> (เพิ่มค่าตัวแปรครั้งละหนึ่ง) </p>
+<p>ถ้าใช้ไมโครคอนโทรลเลอร์ที่มีซีพียู 32 บิต ตระกูล <strong>ARM Cortex-M</strong> วงจรภายใน <strong>SysTick Timer</strong> ขนาด 24 บิต 
+จะถูกใช้เป็นตัวนับตามจังหวะ แต่ในกรณีของ <strong>AVR</strong> เนื่องจากไม่มี <strong>SysTick Timer</strong> </p>
+<p>ถ้าไม่ต้องการใช้ <strong>Timer</strong> ขนาด 8 บิต หรือ 16 บิต (<strong>Timer0</strong>, <strong>Timer1</strong>, <strong>Timer2</strong>) 
+ซึ่งอาจจะถูกใช้งานไปแล้วสำหรับการทำงานของ <strong>Arduino</strong> ก็สามารถใช้ <strong>Watchdog Timer (WDT)</strong> เป็นตัวนับ</p>
+<p>ในกรณี <strong>Arduino port of FreeRTOS (ported by Richard Barry)</strong> 
+แต่มีข้อเสียคือ ค่าของ <strong>Tick Rate</strong> ในการทำงานของ <strong>Task Scheduler</strong> จึงไม่สูงมาก 
+และมีค่าประมาณ <strong>1000ms / 16ms = ~62Hz</strong> (โดยประมาณ)</p>
+<hr />
+<h2 id="wokwi-simulator">&#9655; <strong>การจำลองการทำงานด้วย Wokwi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
+<p>หากต้องการทดลองรันโค้ดโดยไม่ใช้อุปกรณ์ฮาร์ดแวร์จริง 
+ก็สามารถใช้งาน <strong>Wokwi Simulator</strong> โดยเปิดเว็บเบราว์เซอร์ไปที่
+<a href="https://Wokwi.com/arduino/projects">https://Wokwi.com/arduino/projects</a></p>
+<p>เริ่มต้นด้วยการสมัครเข้าใช้งาน (<strong>SignIn</strong>) 
+จากนั้นให้สร้างโปรเจกต์ใหม่ <strong>"YOUR PROJECTS &gt; + NEW PROJECT"</strong>
+เลือกบอร์ดที่จะใช้งาน เช่น <strong>Arduino Uno</strong> | <strong>Nano</strong> | <strong>MEGA2560</strong> เป็นต้น
+เมื่อเลือกบอร์ดที่จะใช้งานแล้ว จะมีการสร้างโปรเจกต์ใหม่ โดยใช้ <strong>Arduino Template</strong>
+ของ <strong>Wokwi</strong> จากนั้นให้บันทึกการเปลี่ยนแปลง โดยกดปุ่ม <strong>"SAVE"</strong> ก่อนทำขั้นตอนถัดไป</p>
+<p><img alt="" src="../avr/images/wokwi_nano-1.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ในหน้าต่างของ <strong>Wokwi Simulator</strong> เพื่อเขียนโค้ด <strong>Arduino Sketch</strong>
+สำหรับบอร์ด <strong>Arduino Nano (328P)</strong></p>
+<p>หากสังเกตดู จะเห็นว่า มี <strong>Tab</strong> ที่เปิดไฟล์ไว้แล้ว เช่น 
+ไฟล์ <code>sketch.ino</code> สำหรับเขียนโค้ด และไฟล์ <code>diagram.json</code> 
+สำหรับกำหนดคุณสมบัติต่าง ๆ ของ <strong>Circuit Diagram</strong> 
+ผู้ใช้สามารถเปลี่ยนชื่อไฟล์  <code>sketch.ino</code> โดยเลือกจากเมนูคำสั่ง <strong>"Rename"</strong> 
+หรือ สร้างไฟล์เพิ่มสำหรับโปรเจกต์ จากเมนูคำสั่ง <strong>"+ New file..."</strong> เป็นต้น</p>
+<p>ในบริเวณสำหรับการต่อวงจรเสมือนจริง ให้กดปุ่ม <strong>+</strong> เพื่อเพิ่มตัวต้านทาน 
+(<strong>Register</strong>) และไดโอดเปล่งแสง (<strong>LED</strong>)
+ให้นำมาต่ออนุกรมกัน จำนวน 2 ชุด แล้วลากสายไฟ (<strong>Wiring</strong>) เชื่อมต่อขาของอุปกรณ์เหล่านั้น
+และขา <strong>I/O</strong> และ <strong>GND</strong> ของบอร์ด <strong>Arduino</strong> 
+เพื่อให้เป็นวงจรอิเล็กทรอนิกส์ที่ทำงานได้อย่างถูกต้อง</p>
+<p><img alt="" src="../avr/images/wokwi_nano-2.png" /></p>
+<p>รูป: การเพิ่มอุปกรณ์ <strong>LED</strong> และตัวต้านทานสำหรับการต่อวงจรเพิ่ม</p>
+<p>ผู้ใช้สามารถเปลี่ยนหรือตั้งค่าคุณสมบัติของอุปกรณ์ (<strong>Component Attributes</strong>)
+ในไฟล์ <code>diagram.json</code> เช่น การกำหนดสีของ <strong>LED</strong> และกำหนดค่าของตัวต้านทานแต่ละตัว</p>
+<p><img alt="" src="../avr/images/wokwi_nano-3.png" /></p>
+<p>รูป: การตั้งค่าคุณสมบัติของอุปกรณ์ เช่น เปลี่ยนสีของ <strong>LED</strong></p>
+<p><img alt="" src="../avr/images/wokwi_nano-4.png" /></p>
+<p>รูป: การตั้งค่าคุณสมบัติของอุปกรณ์ เช่น เปลี่ยนค่าความต้านทาน</p>
+<p><img alt="" src="../avr/images/wokwi_nano-5.png" /></p>
+<p>รูป: การเชื่อมต่อขาอุปกรณ์ให้เป็นวงจรโดยสมบูรณ์</p>
+<p><img alt="" src="../avr/images/wokwi_nano-6.png" /></p>
+<p>รูป: การจำลองการทำงาน (<strong>Simulation</strong>) สำหรับโค้ดตัวอย่างแรก</p>
+<p>&nbsp;</p>
+<p>หากต้องการจำลองการทำงานนของโค้ดที่มีการใช้ไลบรารี <strong>FreeRTOS</strong> ใน <strong>Wokwi Simulator</strong>
+จะต้องมีการเพิ่มไฟล์ <code>libraries.txt</code> แล้ว ระบุชื่อของไลบรารีที่จะใช้งานในไฟล์ดังกล่าว ในกรณีนี้คือ <code>FreeRTOS</code></p>
+<p>ถ้าต้องการดูการเปลี่ยนแปลงค่าลอจิกที่ขาเอาต์พุต เช่น <code>D12</code> และ <code>D13</code> ของบอร์ด <strong>Arduino Nano</strong>
+ให้เพิ่มอุปกรณ์เสมือนจริงที่เรียกว่า <strong>8-channel Logic Analyzer</strong> มีขาอินพุต 8 ขา (<code>D0</code>..<code>D7</code>)
+ให้นำมาเชื่อมต่อสายสัญญาณกับขา <code>D12</code> และ <code>D13</code> ตามลำดับ</p>
+<p>เมื่อเริ่มต้นทำขั้นตอน <strong>Simulation</strong> ให้จำลองการทำงานในช่วงเวลาสั้น ๆ แล้วหยุด<br />
+จะมีการสร้างไฟล์ <code>Wokwi-logic.vcd</code> แล้วดาวน์โหลดมายังคอมพิวเตอร์ของผู้ใช้โดยอัตโนมัติ </p>
+<p><img alt="" src="../avr/images/wokwi_nano-7.png" /></p>
+<p>รูป: การต่ออุปกรณ์ <strong>Logic Analyzer</strong> เพิ่ม</p>
+<p><img alt="" src="../avr/images/wokwi_nano-9.png" /></p>
+<p>รูป: การจำลองการทำงานและบันทึกการเปลี่ยนแปลงของสัญญาณด้วย <strong>Logic Analyzer</strong>
+(หากต่ออุปกรณ์จริง ให้ต่อขา <strong>GND</strong> ร่วมกันด้วย ระหว่างบอร์ด <strong>Arduino</strong> และอุปกรณ์วัดสัญญาณ)</p>
+<p>&nbsp;</p>
+<p>หากต้องการเปิดดูไฟล์ประเภท <strong>.VCD</strong> แนะนำให้ดาวน์โหลดโปรแกรมฟรีที่มีชื่อว่า 
+<a href="https://sourceforge.net/projects/gtkwave/"><strong>GTKWave</strong></a> 
+หรือ <a href="https://sigrok.org/wiki/Windows"><strong>Sigrok PulseView</strong></a>
+ซึ่งจะแสดงผลข้อมูลในรูปของกราฟแบบสัญญาณดิจิทัล สามารถซูมเข้าหรือออกได้</p>
+<p><img alt="" src="../avr/images/wokwi_nano-8.png" /></p>
+<p>รูป: คลื่นสัญญาณจากไฟล์ <code>.vcd</code> สำหรับผลการจำลองของโค้ดตัวอย่างแรก</p>
+<p>จากรูปตัวอย่าง มีการวัดระยะเวลาระหว่างสองเหตุการณ์คือ การเปลี่ยนแปลงที่ขา <code>D12</code> และ <code>D13</code> ตามลำดับ
+และได้ค่าเท่ากับ <strong>17.4 ms</strong> โดยประมาณ</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/wokwi_nano-10.png" /></p>
+<p><img alt="" src="../avr/images/wokwi_nano-11.png" /></p>
+<p>รูป: คลื่นสัญญาณจากไฟล์ <code>.vcd</code> เมื่อแสดงผลด้วย <strong>GTKWave</strong> 
+สำหรับผลการจำลองของโค้ดตัวอย่างที่ 2 และสาธิตการใช้ <strong>Markers</strong> เพื่อวัดความกว้างช่วงเวลาระหว่างสองเหตุการณ์</p>
+<p>จากรูปตัวอย่าง เป็นการทำงานของ <strong>FreeRTOS Task</strong> ในตัวอย่างที่ 2
+และมีการวัดระยะเวลาระหว่างสองเหตุการณ์คือ การเปลี่ยนแปลงที่ขา <code>D12</code> และ <code>D13</code> ของบอร์ด <strong>Arduino</strong>
+(ตรงกับขาอินพุตของ <strong>Logic Analyzer</strong> ที่หมายเลข <code>D0</code> และ <code>D1</code>) ตามลำดับ
+และได้ค่าเท่ากับ <strong>16ms</strong> ซึ่งเท่ากับ <strong>1 Tick Period</strong> ของ <strong>FreeRTOS</strong> ที่ใช้กับ <strong>AVR</strong>
+ถ้าหากวัดความกว้างของพัลส์ช่วงที่เป็น <strong>High</strong> จะได้ประมาณ <strong>32ms</strong> 
+(<strong>= 2 ticks &times; 16ms per OS tick</strong>)</p>
+<p>&nbsp;</p>
+<p><strong>คำถาม</strong> </p>
+<ul>
+<li>หากต้องการจะเพิ่มจำนวนของวงจร <strong>LED</strong> ให้มี 4 ชุด 
+และใช้ขา <strong>I/O</strong> ของบอร์ด <strong>Arduino</strong>
+จำนวน 4 ขา ให้แตกต่างกัน (เช่น <code>D5</code> .. <code>D8</code>) 
+ทำให้ในแต่ละช่วงเวลา มีเพียง <strong>LED</strong> ดวงเดียวที่อยู่ในสถานะ <strong>ON</strong> เท่านั้น 
+และมีระยะเวลาประมาณ <strong>1000 ms</strong> แล้วสลับกันไปตามลำดับ 
+จะต้องแก้ไขโค้ดตัวอย่างอย่างไร โดยใช้เพียงทาสก์เดียวเหมือนเดิม ?</li>
+</ul>
+<p><img alt="" src="../avr/images/wokwi_nano-12.png" /></p>
+<p>รูป: ตัวอย่างวงจรที่มี <strong>LED</strong> และตัวต้านทาน 4 ชุด</p>
+<p><img alt="" src="../avr/images/wokwi_nano-13.png" /></p>
+<p>รูป: ตัวอย่างการตั้งชื่อสัญญาณใหม่ (<strong>Alias</strong>) ใน <strong>GTKWave</strong></p>
+<p><img alt="" src="../avr/images/wokwi_nano-14.png" /></p>
+<p>รูป:  การวัดความกว้างของพัลส์ช่วงที่เป็น <strong>HIGH</strong> ของแต่ละสัญญาณ 
+(วัดค่าได้ประมาณ <strong>992ms</strong> หรือเท่ากับ <strong>992/16 = 62 Tick Counts</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink-with-multiple-tasks">&#9655; <strong>ตัวอย่างโค้ด: LED Blink with Multiple Tasks</strong><a class="headerlink" href="#led-blink-with-multiple-tasks" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปนี้ มีการสร้างทาสก์ ตามจำนวนของ <strong>LED</strong> (<code>NUM_LEDS</code> เท่ากับ 4) 
+สำหรับขาของ <strong>Arduino</strong> ตามที่ระบุไว้ในอาร์เรย์ <code>{ 5, 6, 7,8 }</code>
+เมื่อสร้างทาสก์ จะมีการป้อนพารามิเตอร์ให้ฟังก์ชันของทาสก์ <code>task(){…}</code> 
+โดยใช้เลขจำนวนเต็ม (<code>id</code> มีค่าเป็นจำนวนเต็มตั้งแต่ 0) ในการอ้างอิงว่า เป็นทาสก์หมายเลขใด
+เช่น ถ้าค่า <code>id</code> เป็น 0  จะใช้ขาแรกในอาร์เรย์สำหรับเอาต์พุต เป็นต้น
+เมื่อฟังก์ชันเริ่มต้นทำงานโดยทาสก์ จะถูกหน่วงเวลาไว้ด้วยคำสั่ง <code>vTaskDelay()</code> ตามจำนวน <code>Ticks</code> 
+ซึ่งขึ้นอยู่กับค่าของ <code>id</code> ก่อนทำงานลำดับถัดไป </p>
+<p>ฟังก์ชัน <code>task(){…}</code> ทำหน้าที่เป็นฟังก์ชันสำหรับทาสก์ (<strong>Task-entry function</strong>) 
+มีเพียงฟังก์ชันเดียว แต่ก็สามารถใช้ร่วมกันระหว่างทาสก์ได้ เนื่องจากฟังก์ชันนี้ มีคุณสมบัติที่เรียกว่า 
+<strong>Function Reentrancy</strong> ไม่มีการใช้ตัวแปรภายนอกร่วมกัน 
+ตัวแปรภายในฟังก์ชันของทาสก์  (<strong>Task Local Variables</strong>)
+เป็นส่วนหนึ่งของบริบทในการทำงานเป็นของทาสก์ (<strong>Task Context</strong> หรือ <strong>Task Control Block</strong>) 
+และจะใช้พื้นที่ใน <strong>Task Stack</strong> ของแต่ละทาสก์ในการเก็บข้อมูล เมื่อทาสก์ไม่อยู่ในสถานะกำลังทำงาน</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define NUM_LEDS   (4) // the number of LEDs
+
+const uint8_t LED_PINS[ NUM_LEDS ] = { 5,6,7,8 }; // pin arrays
+const char *TASK_NAMES[ NUM_LEDS ] = { &quot;T0&quot;,&quot;T1&quot;,&quot;T2&quot;,&quot;T3&quot; };
+
+void task( void *pvParameters ); // task entry function
+
+void setup() {
+  for ( int id=0; id &lt; NUM_LEDS; id++ ) {
+    // see: https://www.freertos.org/a00125.html
+    xTaskCreate(
+      task,                 /* task function */
+      TASK_NAMES[ id ],     /* task name */ 
+      128,                  /* task size */
+      (void *)id,           /* task argument */
+      tskIDLE_PRIORITY + 1, /* task priority */
+      NULL                  /* task handle */ 
+    );
+  }
+  // Note the task scheduler is started automatically.  
+}
+
+void loop() {} 
+
+void task( void *pvParameters ) {
+   int id = (int)pvParameters;
+   uint8_t pin = LED_PINS[ id ];
+   pinMode( pin, OUTPUT );
+   digitalWrite( pin, LOW ); 
+   vTaskDelay( id /*ticks*/ );
+   while(1) {
+     // toggle LED output
+     digitalWrite( pin, !digitalRead( pin ) ); 
+     // delay for a number of ticks = the number of LEDs (NUM_LEDs)
+     vTaskDelay( NUM_LEDS /*ticks*/ );
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>พฤติกรรมการทำงานของโปรแกรมตัวอย่างนี้ สามารถดูได้จากการเปลี่ยนแปลงสถานะลอจิกที่ขา <strong>I/O</strong> 
+รูปต่อไปนี้แสดงตัวอย่างคลื่นสัญญาณดิจิทัลที่ขา <strong>I/O</strong> ที่ขาเอาต์พุตทั้ง 4 ขา
+เมื่อจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> </p>
+<p><img alt="" src="../avr/images/wokwi_nano-15.png" /></p>
+<p>รูป: คลื่นสัญญาณดิจิทัลที่ขาเอาต์พุตทั้ง 4 ขา มีการเปลี่ยนแปลงลอจิกไม่พร้อมกัน</p>
+<p><img alt="" src="../avr/images/wokwi_nano-16.png" /></p>
+<p>รูป: การเปลี่ยนสถานะลอจิกของแต่ละสัญญาณ มีการเลื่อนเวลาไปตามลำดับ
+ทีละ <strong>16 ms (1 Tick)</strong></p>
+<p><img alt="" src="../avr/images/wokwi_nano-17.png" /></p>
+<p>รูป: สลับสถานะลอจิกที่ขาเอาต์พุตแต่ละขาเท่ากับ <strong>4 Ticks = 4 &times; 16 ms = 64 ms</strong>
+(1/2 คาบ)</p>
+<p><img alt="" src="../avr/images/wokwi_nano-18.png" /></p>
+<p>รูป: หนึ่งคาบของสัญญาณที่ขาเอาต์พุตแต่ละขาเท่ากับ <strong>2 &times; 64 ms = 128 ms</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการใช้งานไลบรารี <strong>FreeRTOS</strong> สำหรับบอร์ด <strong>Arduino</strong> ที่ใช้ชิป <strong>AVR</strong>
+และใช้ซอฟต์แวร์ <strong>Arduino IDE</strong> ทดลองเขียนโค้ดตามตัวอย่าง และได้ใช้ <strong>Wokwi Simulator</strong> 
+สำหรับการเขียนโค้ดและจำลองการทำงานหากยังไม่มีอุปกรณ์ฮาร์ดแวร์จริง</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2021-12-27 | Last Updated: 2022-02-13</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

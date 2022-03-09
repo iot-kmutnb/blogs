@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-stm32-part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ARM Mbed OS for STM32: Code Examples (Part 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-for-stm32-code-examples-part-3" class="nav-link">ARM Mbed OS for STM32: Code Examples (Part 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#thread" class="nav-link">&#9655; การสร้างเธรดใหม่จากคลาส Thread</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#thread_1" class="nav-link">&#9655; การกำหนดระดับความสำคัญของ Thread</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การใช้เธรดสร้างสัญญาณพัลส์หลายขาเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#stack-thread" class="nav-link">&#9655; การตรวจสอบการใช้งาน Stack ของ Thread</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#threadflags" class="nav-link">&#9655; การใช้งาน ThreadFlags</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#binary-semaphore" class="nav-link">&#9655; การใช้งาน Binary Semaphore</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#eventflags" class="nav-link">&#9655; การใช้งาน EventFlags</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mutex" class="nav-link">&#9655; การใช้งาน Mutex</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sleep-mode" class="nav-link">&#9655; การทำให้ซีพียูเข้าสู่ Sleep Mode</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#bare-metal-profile" class="nav-link">&#9655; การใช้งาน Bare-Metal Profile</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-for-stm32-code-examples-part-3">ARM Mbed OS for STM32: Code Examples (Part 3)<a class="headerlink" href="#arm-mbed-os-for-stm32-code-examples-part-3" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Mbed OS</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ 
+เช่น บอร์ด <strong>STM32 NUCLEO</strong> เป็นต้น โดยนำเสนอเป็น  <strong>ตอนที่ 3</strong>
+(ต่อจาก <a href="../mbed-stm32-part-1/"><strong>ตอนที่ 1</strong></a> และ <a href="../mbed-stm32-part-2/"><strong>ตอนที่ 2</strong></a>)</p>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>STM32 Nucleo</em>, <em>Mbed-enabled Platforms</em>, 
+<em>RTOS Programming</em></p>
+<hr />
+<h2 id="thread">&#9655; <strong>การสร้างเธรดใหม่จากคลาส Thread</strong><a class="headerlink" href="#thread" title="Permanent link">#</a></h2>
+<p>ถ้าลองศึกษาดู <a href="https://os.mbed.com/docs/mbed-os/latest/mbed-os-api-doxy/classrtos_1_1_thread.html"><strong>Thread API</strong></a> 
+ในส่วนที่เป็น <strong>Thread Constructor</strong> จะมีรูปแบบดังนี้</p>
+<pre><code class="language-c++">Thread  (
+  osPriority    priority = osPriorityNormal,
+  uint32_t      stack_size = OS_STACK_SIZE,
+  unsigned char *stack_mem = nullptr,
+  const char    *name = nullptr 
+)
+</code></pre>
+<p>มีอาร์กิวเมนต์ตามลำดับดังนี้</p>
+<ul>
+<li>ตัวแรกคือ ระดับความสำคัญของเธรด ถ้าไม่กำหนดค่า จะได้ค่าเป็น <code>osPriorityNormal</code> (ระดับกลางหรือปรกติ)</li>
+<li>ตัวที่สองคือ ขนาดของ <strong>Stack</strong> สำหรับเธรด ถ้าไม่กำหนดค่า ก็จะได้ค่าเป็น <code>OS_STACK_SIZE</code></li>
+<li>ตัวที่สามคือ พอยน์เตอร์ที่ชี้ไปยังหน่วยความจำ <strong>Stack</strong> สำหรับเธรด ถ้ามีการจองพื้นที่เอาไว้ใช้งาน
+แต่ถ้าไม่ระบุ จะได้เป็น <code>NULL</code> (<strong>Null Pointer</strong>) ซึ่งตัว <strong>RTOS</strong> จะจัดการให้</li>
+<li>ตัวที่สี่คือ การตั้งชื่อให้เธรด ถ้ามี แต่ถ้าไม่ระบุ จะได้เป็น <code>NULL</code></li>
+</ul>
+<p>ตัวอย่างนี้สาธิตการใช้คำสั่ง เพื่อสร้างเธรดใหม่ (<strong>Thread</strong>) จากเธรดหลัก 
+และมีการกำหนดรูปแบบของอาร์กิวเมนต์ เพื่อใช้กับเธรดดังกล่าว โดยใช้คำสั่ง
+<code>callback(...)</code> เมื่อสั่งให้เธรดเริ่มต้นทำงาน <code>thread.start(...)</code></p>
+<p>รูปแบบของอาร์กิวเมนต์สำหรับเธรดในตัวอย่างนี้ เป็นแบบ <code>struct</code> (<code>thread_args_t</code>) 
+และมีการสร้างฟังก์ชันสำหรับเธรดคือ <code>led_update()</code> ซึ่งจะทำให้ <code>LED1</code> 
+เปลี่ยนสถานะลอจิก ทุก ๆ 100 มิลลิวินาที</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+
+using namespace std::chrono; // for  milliseconds()
+
+DigitalOut led( LED1 ); // use onboard LED1
+Thread     thread( osPriorityNormal ); // create a Thread
+
+// user-defined struct for a thread argument
+typedef struct thread_args {
+  DigitalOut *led;
+  uint32_t    delay_ms;
+} thread_args_t;
+
+thread_args_t thread_args = {
+   .led      = &amp;led,
+   .delay_ms = 100
+};
+
+void led_update( thread_args_t *args ) {
+   uint32_t delay_ms = args-&gt;delay_ms;
+   while (1) {
+      *args-&gt;led = ! (*args-&gt;led); // toggle LED
+      ThisThread::sleep_for( milliseconds(delay_ms) );
+   }
+}
+
+int main() {
+   // start thread
+   thread.start( callback(led_update,&amp;thread_args) );
+   while(1) { // the main thread waits forever...
+     osDelay( osWaitForever );
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นการสร้างเธรดจำนวน 2 ชุด โดยให้มีฟังก์ชันการทำงานเหมือนกัน
+ใช้ชื่อฟังก์ชันเป็น <code>led_update(...)</code> 
+และคอยทำหน้าที่เปลี่ยนสถานะของขา <strong>GPIO</strong> เดียวกัน แต่ให้มีสถานะแตกต่างกัน
+ขึ้นอยู่กับค่า <code>id</code> ของเธรดในขณะที่ทำงาน
+และเธรดที่มีค่า <code>id</code> เท่ากับ 0 เมื่อเริ่มต้นทำงาน จะหยุดรอเวลาก่อน</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+
+#define SLEEP_MS  (500ms)
+
+DigitalOut led( LED1 ); // use the onboard LED1
+Thread     thread1( osPriorityNormal );
+Thread     thread2( osPriorityNormal );
+
+typedef struct thread_args {
+  uint32_t    id;
+  DigitalOut *led;
+} thread_args_t;
+
+void led_update( thread_args_t *args ) {
+   uint32_t id = args-&gt;id;
+   if ( !id ) {
+      // if thread ID=0, wait before entering the loop
+      ThisThread::sleep_for( SLEEP_MS/2 );
+   }
+   while (1) {
+      printf( &quot;Thread ID=%d @%06lu msec\n&quot;, args-&gt;id,
+               us_ticker_read()/1000  );
+      *(args-&gt;led) = (id==0) ? 0 : 1;
+      ThisThread::sleep_for( SLEEP_MS );
+   }
+}
+
+// thread arguments
+thread_args_t args1 = { 0, &amp;led };
+thread_args_t args2 = { 1, &amp;led };
+
+int main() {
+   // start thread1 and thread 2
+   thread1.start( callback(led_update, &amp;args1) );
+   thread2.start( callback(led_update, &amp;args2) );
+   while(1) {
+     osDelay( osWaitForever );
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="Mbed OS STM32 Outputs" src="../images/mbed_stm32_led_threads_toggle.png" /></p>
+<p>รูปภาพ: ข้อความเอาต์พุตจากการทำงานของเธรดสองชุดสลับกัน</p>
+<p>&nbsp;</p>
+<p>จากโค้ดที่แล้ว ถ้าลองเปลี่ยนรูปแบบการเขียนโค้ดเพื่อสร้างเธรดหลายชุดตามจำนวนที่ต้องการ 
+แต่มีฟังก์ชันสำหรับเธรดเหมือนกัน มีอาร์กิวเมนต์ต่างกันสำหรับเธรด เช่น
+การระบุหมายเลขขา <strong>GPIO</strong> ที่เกี่ยวข้องไว้ในอาร์เรย์ ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+
+#define NUM_THREADS  (2)
+
+DigitalOut  led1(D4), led2(D7); 
+DigitalOut *leds[ NUM_THREADS ] = { &amp;led1, &amp;led2 };
+Thread     *threads[ NUM_THREADS ]; // array of threads
+
+void thread_func( void *arg ) {
+  DigitalOut *led = (DigitalOut *)arg;
+  printf( &quot;thread started\r\n&quot; );
+  while(1) {
+    *led = !*led; // toggle LED
+    ThisThread::yield();
+  }
+}
+
+int main() {
+  // create threads
+  for ( uint32_t i=0; i &lt; NUM_THREADS; i++ ) {
+     threads[i] = new Thread( osPriorityNormal );
+  }
+  // start threads
+  for ( uint32_t i=0; i &lt; NUM_THREADS; i++ ) {
+     threads[i]-&gt;start( 
+        callback(thread_func,(void *)leds[i]) );
+  }
+  while(1){
+     osDelay( osWaitForever );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="thread_1">&#9655; <strong>การกำหนดระดับความสำคัญของ Thread</strong><a class="headerlink" href="#thread_1" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการสร้างเธรดแต่ให้มีระดับความสำคัญ (<strong>Priority Level</strong>) 
+แตกต่างกัน เมื่อมีระดับความสำคัญไม่เท่ากัน ก็ส่งผลต่อพฤติกรรมการทำงานของเธรดทั้งสอง 
+และสามารถสังเกตและวัดสัญญาณได้ที่ขา <strong>I/O</strong> ที่เกี่ยวข้องกับการทำงาน
+(ในตัวอย่างนี้เลือกใข้ขา <code>D4</code> และ<code>D7</code> ของบอร์ด <strong>NUCLEO</strong> สำหรับเอาต์พุต)</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+
+#define NUM_THREADS  (2)
+
+DigitalOut led1(D4), led2(D7);
+
+Thread thread1( osPriorityNormal );
+Thread thread2( osPriorityAboveNormal );
+
+typedef struct thread_args {
+  uint32_t    id;
+  DigitalOut *led;
+} thread_args_t;
+
+thread_args_t args[ NUM_THREADS ] = {
+   { 0, &amp;led1 }, { 1, &amp;led2 }
+};
+
+// thread-entry function (function prototype)
+void led_update( thread_args_t *args );
+
+int main() {
+   Thread *threads[] = { &amp;thread1, &amp;thread2 };
+   for (int i=0; i &lt; NUM_THREADS; i++) {
+     threads[i]-&gt;start( 
+       callback(led_update, &amp;args[i]) );
+   }
+   while(1) { // The main thread waits forever.
+     osDelay( osWaitForever );
+   }
+}
+
+void led_update( thread_args_t *args ) {
+   DigitalOut *led = args-&gt;led;
+   uint32_t id = args-&gt;id;
+   *led = 0;
+   for ( uint32_t i=0; i &lt; 4*(id+1); i++ ) {
+      *led = !*led; // LED output toggle
+      ThisThread::yield();
+   }
+   // thread finished
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> เธรดที่สอง (id=1) จะเริ่มทำงานก่อน เพราะมีระดับความสำคัญสูงกว่าเธรดแรก
+และทำให้เกิดการเปลี่ยนสถานะที่ขาเอาต์พุต <code>D7</code> ทั้งหมด 8 ครั้ง  (จำนวนพัลส์เท่ากับ 4) 
+จากนั้นจึงจบการทำงานของเธรด ถัดไปเธรดแรก (id=0) จึงได้เวลาทำงานต่อ 
+และทำให้เกิดการเปลี่ยนสถานะที่ขาเอาต์พุต <code>D4</code>
+ทั้งหมด 4 ครั้ง (จำนวนพัลส์เท่ากับ 2) แล้วจบการทำงานของเธรด</p>
+<p>&nbsp;</p>
+<p><img alt="Mbed OS STM32 Outputs" src="../images/mbed_stm32_led_output_pulses.png" /></p>
+<p>รูปภาพ: ตัวอย่างการวัดสัญญาณเอาต์ฑุตด้วยออสซิลโลสโคป 
+(สัญญาณสีเหลือง <strong>CH1</strong> และ สีฟ้า <strong>CH2</strong> ตรงกับ <code>led1</code> และ <code>led2</code> ตามลำดับ)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การใช้เธรดสร้างสัญญาณพัลส์หลายขาเอาต์พุต</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ดเพื่อสร้างเธรดตามจำนวนที่ต้องการ (<code>NUM_THREADS</code>) เช่น
+จำนวน 4 เธรด และแต่ละเธรดจะทำให้เกิดสัญญาณพัลส์ด้วยอัตราคงที่ มีคาบคงที่ 
+แต่มีความกว้างแตกต่างกันได้ และ <strong>Duty Cycle 50%</strong> เหมือนกัน</p>
+<pre><code>#include &quot;mbed.h&quot;
+
+#define THREAD_STACK_SIZE  (512)
+#define NUM_THREADS        (4)
+
+const PinName pins[]   = { D10, D11, D12, D13 }; /* Arduino-style pins */
+const int wait_times[] = {  5, 10, 50, 100 }; /* msec */
+
+typedef struct _params {
+  DigitalOut  *led;
+  int  wait_ms;
+} Parameters;
+
+void thread_func( void *arg ) {
+   Parameters *params = (Parameters *)arg;
+   DigitalOut *led = params-&gt;led;
+   int wait_time = params-&gt;wait_ms;
+   while (1) {
+      *led = ! *led; // toggle LED
+      ThisThread::sleep_for( wait_time * 1ms );
+   }
+}
+
+int main() {
+   Thread *threads[ NUM_THREADS ];
+   Parameters params[ NUM_THREADS ];
+
+   // create and start threads
+   for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+      params[i].led     = new DigitalOut( pins[i] );
+      params[i].wait_ms = wait_times[i];
+      threads[i] = new Thread( osPriorityNormal, THREAD_STACK_SIZE );
+      threads[i]-&gt;start( callback( thread_func, (void*)&amp;params[i]) );
+   }
+
+   while (true) {
+      osDelay(osWaitForever);
+   }
+}
+</code></pre>
+<p><img alt="" src="../images/mbed_nucleo_thread_output_measurement-1.jpg" /></p>
+<p>รูปภาพ: การวัดสัญญาณเอาต์พุตของบอร์ด <strong>NUCLEO</strong> โดยใช้เครื่องออสซิลโลสโคป</p>
+<p><img alt="" src="../images/mbed_nucleo_thread_output_measurement-2.jpg" /></p>
+<p>รูปภาพ: ตัวอย่างรูปคลื่นสัญญาณเอาต์พุต 4 ช่องสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="stack-thread">&#9655; <strong>การตรวจสอบการใช้งาน Stack ของ Thread</strong><a class="headerlink" href="#stack-thread" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการสร้างเธรดใหม่จากเธรดหลัก เมื่อเริ่มต้นทำงาน จะแสดงขนาดของหน่วยความจำ
+<strong>Stack</strong> ของเธรด เช่น ขนาดที่เหลืออยู่และที่ใช้ไปแล้ว จากนั้นจะแสดงข้อความเอาต์พุตเป็นตัวเลขนับถอยหลัง จาก 9 ถึง 0 
+ตามลำดับและมีการเว้นระยะเวลา 100 มิลลิวินาทีในแต่ละครั้ง จากนั้นจะจบการทำงานของเธรด</p>
+<p>เมื่อเธรดหลักสร้างเธรดใหม่แล้ว จะต้องรอให้เธรดดังกล่าวจบการทำงานก่อนแล้วจึงทำงานต่อ แล้วจะเห็นว่า
+มี <strong>LED</strong> บนบอร์ด <strong>NUCLEO</strong> กระพริบ </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &lt;Thread.h&gt;
+
+DigitalOut led(LED1);
+
+Thread *thread = NULL;
+
+void thread_func( void *arg ) {
+   int32_t  cnt = 10;
+   ThisThread::sleep_for( 100ms );
+
+   // show free and used stack sizes
+   printf( &quot;Thread free stack: %lu\n&quot;, thread-&gt;free_stack() );
+   printf( &quot;Thread used stack: %lu\n&quot;, thread-&gt;used_stack() );
+
+   while ( cnt &gt; 0 ) {
+      printf( &quot;count down: %d\n&quot;, --cnt );
+      ThisThread::sleep_for( 100ms );
+   }
+}
+
+int main() {
+   printf( &quot;Mbed Thread Demo\n&quot; );
+   // create a new thread object
+   thread = new Thread( osPriorityNormal, OS_STACK_SIZE );
+   // start the thread
+   thread-&gt;start ( callback(thread_func, (void *)NULL) );
+
+   // show thread's priority and stack size
+   printf( &quot;Thread priority: %d\n&quot;,    thread-&gt;get_priority() );
+   printf( &quot;Thread stack size: %lu\n&quot;, thread-&gt;stack_size() );
+
+   // sleep for 2 seconds
+   ThisThread::sleep_for( 2000ms );
+   // terminate the thread
+   thread-&gt;terminate();
+   // wait for the thread to terminate
+   thread-&gt;join();
+   // delete thread object
+   delete thread;
+
+   while (true) {
+      led = !led;
+      ThisThread::sleep_for( 500ms );
+   }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตมีดังนี้</p>
+<pre><code class="language-text">Mbed Thread Demo
+Thread priority: 24
+Thread stack size: 4096
+Thread free stack: 3992
+Thread used stack: 104
+count down: 9
+count down: 8
+count down: 7
+count down: 6
+count down: 5
+count down: 4
+count down: 3
+count down: 2
+count down: 1
+count down: 0
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="threadflags">&#9655; <strong>การใช้งาน ThreadFlags</strong><a class="headerlink" href="#threadflags" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการสร้างเธรดใหม่ ซึ่งเป็นอ็อบเจกต์สำหรับตัวแปรชื่อ <code>thread</code> จากคลาส <strong><code>Thread</code></strong> 
+และตั้งชื่อเธรดเป็น <code>blink</code> มีการสร้างฟังก์ชัน <code>blink()</code> ให้ทำหน้าที่เป็น 
+<strong>Thread-entry function</strong> สำหรับเธรดดังกล่าว </p>
+<p>ในการสร้างเธรดใหม่ ได้มีการกำหนดความสำคัญของเธรดให้เท่ากับ <code>osPriorityNormal</code> (ระดับกลางหรือปรกติ) 
+และขนาดของ <strong>Stack</strong> เท่ากับ <code>OS_STACK_SIZE</code> หรือ <strong>4KB (default)</strong></p>
+<p>นอกจากนั้นยังสาธิตการใช้คำสั่ง <code>thread.flags_set(...)</code>
+เพื่อให้เธรดรอดูและคอยตรวจสอบเงื่อนไขการเซตค่าของ <code>STOP_FLAG</code> สำหรับเธรดดังกล่าว โดยใช้คำสั่ง
+<code>thread.flags_wait_any_for(...)</code>
+และได้กำหนดระยะเวลาในการรอเงื่อนไขดังกล่าวหรือ <strong>TimeOut</strong> ครั้งละ 100 มิลลิวินาที </p>
+<p>ถ้าตรวจสอบแล้วว่า เงื่อนไขเป็นจริง ให้จบการทำงานของเธรดดังกล่าว 
+โดยเธรดหลักจะทำให้ <strong>Flag</strong> เปลี่ยนจาก 0 เป็น 1 เมื่อเวลาผ่านไป 5 วินาที</p>
+<p>แต่ถ้าเกิดเหตุการณ์ <strong>TimeOut</strong> ในการรอแต่ละรอบ แต่ค่าของ <strong>Flag</strong> ยังไม่ถูกเซต 
+จะทำให้เงื่อนของ <code>while</code> เป็นจริง และทำคำสั่งเพื่อการสลับสถานะของ <strong>LED</strong> หนึ่งครั้ง</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+
+#define STOP_FLAG   (1 &lt;&lt; 0)
+#define TIMEOUT     (100ms)
+
+DigitalOut led( LED1 ); // use the onboard LED1
+Thread     thread( osPriorityNormal, OS_STACK_SIZE, NULL, &quot;blink&quot; );
+
+// Blink function toggles the led in a long running loop
+void blink( DigitalOut *led ) { // use a pointer for argument
+   printf( &quot;Thread: %s, id=%lu\r\n&quot;, ThisThread::get_name(),
+            (uint32_t) ThisThread::get_id() );
+
+   while ( !ThisThread::flags_wait_any_for(STOP_FLAG,TIMEOUT,true) ) {
+      // note: The stop flag is cleared automatically if it is set.
+      *led = !*led; // toggle the LED
+   }
+   printf( &quot;Thread: '%s' finished\r\n&quot;, ThisThread::get_name() );
+   fflush( stdout );
+}
+
+int main() {
+   printf( &quot;Mbed ThreadFlags Demo\n&quot; );
+   fflush( stdout );
+   thread.start( callback(blink, &amp;led) ); // start the thread
+   ThisThread::sleep_for( 5000ms ); // sleep for 5 seconds
+   thread.flags_set( STOP_FLAG );   // set the stop flag
+   thread.join(); // wait until the thread is finished.
+   led = 1;
+   while(1) {
+      osDelay( osWaitForever );
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="binary-semaphore">&#9655; <strong>การใช้งาน Binary Semaphore</strong><a class="headerlink" href="#binary-semaphore" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งานเซมาฟอร์แบบไบนารี 
+(<strong>Binary Semaphore</strong>) สำหรับการสื่อสารกันระหว่างฟังก์ชันที่ทำหน้าที่เป็น 
+<strong>Interrupt Handler (ISR)</strong> กับเธรดหลัก</p>
+<p>ตัวแปร <code>sem</code> เป็นอ็อบเจกต์ที่สร้างจากคลาส <strong><code>Semaphore</code></strong> และมีค่าเริ่มต้นเป็น 0 
+เมื่อเธรดหลักทำคำสั่ง <code>sem.acquire()</code> ในฟังก์ชัน <code>main()</code> 
+จะทำให้เธรดดังกล่าวหยุดรอ (เปลี่ยนไปเป็นสถานะ <code>WAITING</code>) 
+จนกว่าเซมาฟอร์จะมีค่าเปลี่ยนจาก 0 เป็น 1</p>
+<p>เมื่อเกิดเหตุการณ์อินเทอร์รัพท์จากปุ่มกด จะทำให้ฟังก์ชัน <code>button_callback()</code>
+ทำงาน และมีการทำคำสั่ง  <code>sem.release()</code> เซมาฟอร์จะมีค่าเพิ่มขึ้นจาก 0 เป็น 1
+และเหตุการณ์นี้จะทำให้เธรดที่รอเซมาฟอร์อยู่ในขณะนั้น ทำงานต่อไปได้ 
+และเมื่อเข้าถึงเซมาฟอร์ได้แล้ว ค่าของเซมาฟอร์ ก็จะลดลงเป็น 0 </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+InterruptIn button( BUTTON1 );
+DigitalOut  led( LED1 );
+Semaphore   sem(0); // create a binary semaphore
+
+void button_callback() { // interrupt handler
+  // disable interrupt on button pin
+  button.fall( NULL );
+  // release the semaphore
+  sem.release();
+}
+
+int main() {
+  printf( &quot;Please press the button..\r\n&quot; );
+  fflush( stdout );
+
+  // enable interrupt on button pin
+  button.fall( &amp;button_callback ); // falling edge
+  wait_us(10);
+
+  while (1) {
+    // acquire the semaphore
+    sem.acquire();
+    // toggle the LED status
+    led = !led;
+    // print the LED status
+    printf( &quot;LED: %d @%lu (msec)\n&quot;,
+            (int)led.read(), us_ticker_read()/1000 );
+    // sleep for 100 msec
+    ThisThread::sleep_for( 100ms );
+    // re-enable interrupt on button pin
+    button.fall( &amp;button_callback );
+  }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตเมื่อมีการกดปุ่ม แต่ละบรรทัดบอกสถานะของ LED และเวลาของระบบ
+เมื่อเกิดการกดปุ่มในแต่ละครั้ง</p>
+<pre><code class="language-text">Please press the button..
+LED: 1 @13429 (msec)
+LED: 0 @14192 (msec)
+LED: 1 @14546 (msec)
+LED: 0 @14788 (msec)
+LED: 1 @14979 (msec)
+LED: 0 @15160 (msec)
+LED: 1 @15348 (msec)
+...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="eventflags">&#9655; <strong>การใช้งาน EventFlags</strong><a class="headerlink" href="#eventflags" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการใช้คลาส <strong><code>EventFlags</code></strong> แทนการใช้งานเซมาฟอร์แบบไบนารี 
+เพื่อสื่อสารกันระหว่างฟังก์ชันที่ถูกกำหนดให้ทำงานที่เป็น <strong>Interrupt Handler (ISR)</strong> 
+กับเธรดของฟังก์ชัน <code>main()</code>หรือ เธรดหลัก</p>
+<p>ตัวแปรภายนอก <code>event_flags</code> ถูกสร้างมาจากคลาส 
+<strong><code>EventFlags</code></strong> สามารถเก็บค่าบิตได้ถึง 31 บิต แต่ในกรณีนี้ 
+จะใช้เพียงบิตเดียว (บิตตำแหน่งที่ 0) 
+เมื่อเริ่มต้นการทำงานของฟังก์ชัน <code>main()</code> เธรดหลัก ก็จะทำคำสั่ง <code>events_flag.wait_any(...)</code> 
+เพื่อรอให้ตัวแปร <code>event_flags</code> มีการเซตค่าบิต และเป็นรอแบบไม่มีเวลาจำกัด (<strong>TimeOut</strong>)</p>
+<p>เมื่อเกิดเหตุการณ์กดปุ่มแต่ละครั้ง ในฟังก์ชัน <code>button_callback()</code> จะมีการทำคำสั่ง
+เพื่อเซตค่าบิตของ <code>event_flags</code> ในตำแหน่งบิตที่ 0 ให้มีค่าเป็น 1</p>
+<p>เธรดที่รอการเซตบิตในตัวแปร <code>event_flags</code> จึงเปลี่ยนจากสถานะรอ (<code>WAITING</code>) 
+มาทำงานอีกครั้ง (เป็นสถานะ <code>RUNNING</code>) แล้วจะต้องรอการเซตบิตในครั้งถัดไป</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+#define EVENT_FLAG1 (1UL &lt;&lt; 0)  // use flag at bit 0
+
+InterruptIn button( BUTTON1 );
+DigitalOut  led( LED1 );
+EventFlags  event_flags;
+
+void button_callback() {
+   // disable interrupt on button pin
+   button.disable_irq( );
+   // set event flag
+   event_flags.set( EVENT_FLAG1 );
+}
+
+int main() {
+   printf( &quot;Mbed Thread EventFlags Demo\r\n&quot; );
+   printf( &quot;Please press the button..\r\n&quot; );
+   fflush( stdout );
+
+   // enable interrupt on button pin
+   button.fall( &amp;button_callback ); // falling edge
+
+   while (1) {
+     // wait for the event flag
+     uint32_t flags = event_flags.wait_any(
+                        EVENT_FLAG1,   // check flag at bit 0
+                        osWaitForever, // wait forever
+                        true );        // clear flag
+
+     if (flags) { // check returned flags
+        // toggle the LED
+        led = !led;
+        // print the LED status
+        printf( &quot;LED: %d @%lu (msec)\n&quot;,
+                (int)led.read(),
+                 us_ticker_read()/1000 );
+        // sleep for 100 msec
+        ThisThread::sleep_for( 100ms );
+        // re-enable interrupt on button pin
+        button.enable_irq();
+     }
+   }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">Mbed Thread EventFlags Demo
+Please press the button..
+LED: 1 @1215 (msec)
+LED: 0 @1780 (msec)
+LED: 1 @2223 (msec)
+LED: 0 @2400 (msec)
+LED: 1 @2992 (msec)
+LED: 0 @3213 (msec)
+LED: 1 @3378 (msec)
+....
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mutex">&#9655; <strong>การใช้งาน Mutex</strong><a class="headerlink" href="#mutex" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการสร้างเธรด เช่น <code>threadA</code> และ <code>threadB</code> ที่มีระดับความสำคัญเท่ากัน
+(ในระดับ <code>osPriorityNormal</code>) และให้ทำหน้าที่กำหนดสถานะของ <strong>LED</strong> ที่แตกต่างกัน คือ 0 และ 1 ตามลำดับ 
+แต่สลับช่วงเวลากัน </p>
+<p>ในกรณีนี้เราสามารถใช้ <strong>Mutex</strong> ป้องกันและควบคุมการเข้าถึงทรัพยากรร่วม 
+เพื่อให้มีเพียงเธรดเดียวในแต่ละช่วงเวลาที่เข้าถึงและกำหนดสถานะของ <strong>LED</strong> ได้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+#include &lt;string&gt;
+
+using std::chrono::milliseconds;
+
+DigitalOut led( LED1 ); // use onboard LED
+
+// create two thread objects
+Thread threadA( osPriorityNormal ),
+       threadB( osPriorityNormal );
+
+// create a mutex object
+Mutex  mutex;
+
+typedef struct _thread_arg {
+  DigitalOut *pin;
+  uint32_t   id;
+  uint32_t   sleep_ms;
+} thread_arg_t;
+
+// used to pass thread's arguments
+thread_arg_t thread_args[] = {
+  { .pin = &amp;led, .id = 0, .sleep_ms = 500 },
+  { .pin = &amp;led, .id = 1, .sleep_ms = 500 },
+};
+
+void led_update( thread_arg_t *args ) {
+  std::string s;
+  auto sleep_ms = milliseconds( args-&gt;sleep_ms );
+  while(1) {
+    mutex.lock();   // acquire mutex
+    args-&gt;pin-&gt;write( args-&gt;id );
+    s = &quot;thread id &quot;;
+    s += std::to_string( args-&gt;id );
+    s += &quot; @&quot;;
+    s += std::to_string( us_ticker_read()/1000 );
+    s += &quot; msec&quot;;
+    printf( &quot;running %s\n&quot;, s.c_str() );
+    ThisThread::sleep_for( sleep_ms );
+    mutex.unlock(); // release mutex
+  }
+}
+
+int main() {
+   printf( &quot;Mbed Mutex Demo\n&quot; );
+   // start thread A and B
+   threadA.start( callback(led_update, &amp;thread_args[0]) );
+   threadB.start( callback(led_update, &amp;thread_args[1]) );
+   while(1) {
+      osDelay( osWaitForever ); // the main thread will wait forever
+   }
+}
+</code></pre>
+<p><img alt="" src="../images/mbed_stm32_thread_mutex_leds.png" /></p>
+<p>รูปภาพ: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sleep-mode">&#9655; <strong>การทำให้ซีพียูเข้าสู่ Sleep Mode</strong><a class="headerlink" href="#sleep-mode" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการทำให้ซีพียูเข้าสู่สภาวะหลับ (<strong>Sleep Mode</strong>) แล้วรอจนกว่าจะถูกปลุกให้ตื่นขึ้นมาทำงานต่อ
+เมื่อเกิดอินเทอร์รัพท์ในระบบ เช่น อินเทอร์รัพท์จากภายนอกเมื่อมีการกดปุ่ม
+การใช้คำสั่ง <code>sleep()</code> จะทำให้ซีพียูเข้าสู่ประหยัดพลังงาน หยุดการทำงานของสัญญาณ <strong>Clock</strong> ของระบบ</p>
+<p>เมื่อซีพียูถูกปลุกให้ตื่นมาทำงานอีกครั้งเมื่อมีการกดปุ่ม ตามโค้ดตัวอย่างนี้ จะทำให้ <strong>LED</strong> กระพริบ 3 ครั้ง 
+ก่อนจะเข้าสู่โหมดประหยัดพลังงานอีกครั้ง</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+DigitalOut  led( LED1 );
+InterruptIn btn( BUTTON1 );
+
+void btn_callback() {
+   led = 1; // turn on LED
+   btn.disable_irq(); // disable interrupt
+}
+
+int main() {
+   // turn off LED
+   led = 0; 
+   // set interrupt callback for rising-edge event
+   btn.rise( &amp;btn_callback );
+   // enable interrupt for onboard push button
+   btn.enable_irq();
+
+   while(1) {
+      // enter sleep mode and the system clock is stopped.
+      // sleep() will return after any interrupt has occurred.
+      sleep();
+
+      // Once woken up, the CPU execution resumes.
+      // toggle the LED for 6 times (3 short pulses)
+      for ( int i=0; i &lt; 6; i++ ) {
+         led = !led;
+         ThisThread::sleep_for( 50ms );
+      }
+      // re-enable the interrupt
+      btn.enable_irq();
+      // turn off led
+      led = 0;
+   }
+}
+</code></pre>
+<p><strong>คำถาม:</strong> ถ้าตัดบรรทัดที่มีคำสั่ง <code>sleep();</code> ออกจากโค้ด แล้วทดลองโปรแกรมหลังจากคอมไพล์ใหม่แล้วกับฮาร์ดแวร์จริง
+โปรแกรมจะมีพฤติกรรมแตกต่างจากเดิมอย่างไร ?</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="bare-metal-profile">&#9655; <strong>การใช้งาน Bare-Metal Profile</strong><a class="headerlink" href="#bare-metal-profile" title="Permanent link">#</a></h2>
+<p>ถ้าเลือกใช้งาน <strong>Bare-Metal Profile</strong> แทน <strong>Full RTOS</strong>
+จะไม่สามารถใช้ <strong>RTOS API</strong> ของ <strong>Mbed OS</strong> ในการเขียนโค้ดได้ เช่น 
+ไม่สามารถสร้างเธรดใหม่นอกเหนือจากเธรดหลัก เป็นต้น </p>
+<p>การเปิดใช้งานโปรไฟล์นี้ จะต้องมีการระบุไว้ในไฟล์ <code>mbed_app.json</code> ตามตัวอย่างต่อไปนี้ 
+เช่น การเปลี่ยนจาก <code>full</code> ไปเป็น <code>bare-metal</code> และเลือกใช้ <code>target.c_lib</code> จาก
+<code>std</code> ไปเป็น <code>small</code></p>
+<pre><code class="language-json">{
+    &quot;requires&quot;: [&quot;bare-metal&quot;],
+    &quot;target_overrides&quot;: {
+       &quot;*&quot;: {
+          &quot;platform.stdio-baud-rate&quot;: 115200,
+          &quot;target.c_lib&quot;: &quot;small&quot;,
+          &quot;target.printf_lib&quot;: &quot;minimal-printf&quot;,
+          &quot;platform.minimal-printf-enable-floating-point&quot;: false,
+          &quot;platform.stdio-minimal-console-only&quot;: true
+       }
+    }
+}
+</code></pre>
+<p>มาลองดูตัวอย่างโค้ดสำหรับการใช้งานในโปรไฟล์ <strong>Bare-Metal</strong></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &lt;stdio.h&gt;
+
+DigitalOut  led( LED1 ); // onboard LED
+InterruptIn btn( BUTTON1 ); // onboard push button
+
+volatile bool flag = false; // event flag
+
+void btn_callback( void ) {
+   flag = true;       // set event flag 
+   btn.disable_irq(); // disable interrupt for button input
+}
+
+int main() {
+   uint32_t btn_press_cnt = 0; // button press count
+   btn.fall( &amp;btn_callback );  // set callback function for button
+   btn.enable_irq();           // enable interrupt from button
+   printf( &quot;Mbed OS bare-metal profile\n&quot; );
+
+   while(1) {
+      if ( flag ) {
+        flag = false; // clear event flag
+        led = !led;   // toggle LED
+        // show the total number of button clicks
+        // and the current LED state
+        printf( &quot;#Presses: %lu, LED: %d\n&quot;,
+                ++btn_press_cnt, led.read() );
+        // re-enable interrupt from button input
+        btn.enable_irq();
+      }
+      thread_sleep_for( 50 /*msec*/ ); 
+   }
+   return 0;
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตจากการคอมไพล์มีดังนี้ (<strong>Bare-Metal Profile</strong>)</p>
+<pre><code>| Module           |     .text |    .data |     .bss |
+|------------------|-----------|----------|----------|
+| [fill]           |    96(-4) |    4(+0) |   38(+0) |
+| [lib]/c.a        |  7684(+0) | 2108(+0) |   58(+0) |
+| [lib]/gcc.a      |  4452(+0) |    0(+0) |    0(+0) |
+| [lib]/misc       |   188(+0) |    4(+0) |   25(+0) |
+| [lib]/nosys.a    |    48(+0) |    0(+0) |    0(+0) |
+| main.cpp.obj     |   220(+4) |    0(+0) |  109(+0) |
+| mbed-os/drivers  |   712(+0) |    0(+0) |    0(+0) |
+| mbed-os/hal      |  2616(+0) |    8(+0) |  231(+0) |
+| mbed-os/platform |  4870(+0) |    4(+0) |  306(+0) |
+| mbed-os/targets  | 10462(+0) |    8(+0) | 1185(+0) |
+| Subtotals        | 31348(+0) | 2136(+0) | 1952(+0) |
+Total Static RAM memory (data + bss): 4088(+0) bytes
+Total Flash memory (text + data): 33484(+0) bytes
+</code></pre>
+<p>แต่ถ้าเปลี่ยนไปใช้โปรไฟล์แบบ <strong>Full RTOS</strong> และดูจากข้อความเอาต์พุตที่ได้จากการทำคำสั่งคอมไพล์
+จะเห็นได้ว่า โปรแกรมที่ได้ใช้ <strong>SRAM</strong> มากขึ้น และมีขนาดของโปรแกรมใน <strong>Flash Memory</strong> ใหญ่ขึ้น</p>
+<pre><code>| Module           |       .text |      .data |       .bss |
+|------------------|-------------|------------|------------|
+| [fill]           |    120(+30) |      0(+0) |     31(-2) |
+| [lib]/c.a        |    7684(+0) |   2108(+0) |     58(+0) |
+| [lib]/gcc.a      |    4452(+0) |      0(+0) |      0(+0) |
+| [lib]/misc       |     188(+0) |      4(+0) |     25(+0) |
+| [lib]/nosys.a    |     48(+16) |      0(+0) |      0(+0) |
+| main.cpp.obj     |     220(+0) |      0(+0) |    109(+0) |
+| mbed-os/cmsis    |    6610(+0) |    168(+0) |   5953(+0) |
+| mbed-os/drivers  |    302(-58) |      0(+0) |      0(+0) |
+| mbed-os/hal      |    1058(+0) |      4(+0) |     58(+0) |
+| mbed-os/platform |  3952(-524) |    4(-256) |  222(-126) |
+| mbed-os/rtos     |      32(+0) |      0(+0) |      0(+0) |
+| mbed-os/targets  |    8026(+0) |      8(+0) |   1136(+0) |
+| Subtotals        | 32692(-536) | 2296(-256) | 7592(-128) |
+Total Static RAM memory (data + bss): 9888(-384) bytes
+Total Flash memory (text + data): 34988(-792) bytes
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-11-23 | Last Updated: 2021-11-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

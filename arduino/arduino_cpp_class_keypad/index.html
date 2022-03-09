@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/arduino_cpp_class_keypad/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการสร้างคลาส C++ เพื่อใช้งานสำหรับ Arduino: 4x4 Keypad - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-arduino-4x4-keypad" class="nav-link">ตัวอย่างการสร้างคลาส C++ เพื่อใช้งานสำหรับ Arduino: 4x4 Keypad</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#keypad-scan" class="nav-link">&#9655; การตรวจสอบสถานะปุ่มกด: Keypad Scan</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-keypad-library" class="nav-link">&#9655; การใช้ไลบรารี: Arduino Keypad Library</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-avr-simulator" class="nav-link">&#9655; การจำลองการทำงานด้วย Wokwi AVR Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การตรวจสอบการกดปุ่มโดยไม่ใช้ไลบรารี</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#keypad" class="nav-link">&#9655; ตัวอย่างการสร้างคลาสสำหรับ Keypad</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-arduino-4x4-keypad">ตัวอย่างการสร้างคลาส C++ เพื่อใช้งานสำหรับ Arduino: 4x4 Keypad<a class="headerlink" href="#c-arduino-4x4-keypad" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino</em>, <em>AVR</em>, <em>Object-Oriented Programming</em>, 
+<em>User-defined C++ Class</em>, <em>4x4 Keypad</em>, <em>Membrane Keypad</em></p>
+<hr />
+<h2 id="keypad-scan">&#9655; <strong>การตรวจสอบสถานะปุ่มกด: Keypad Scan</strong><a class="headerlink" href="#keypad-scan" title="Permanent link">#</a></h2>
+<p>บทความนี้กล่าวถึงตัวอย่างการสร้างคลาสในภาษา <strong>C++</strong> สำหรับใช้งานร่วมกับ <strong>Arduino</strong> เพื่อนำมาใช้ในการตรวจสอบดูว่า มีการกดปุ่มคีย์ (<strong>Keypass</strong>) บนโมดูลที่มีลักษณะเป็นแผ่นปุ่มกดขนาด 4x4 ในรูปแบบที่เรียกว่า <strong>Membrane Keypad</strong> และมีข้อดีคือ
+มีความทนทาน กันน้ำกันฝุ่นได้ดี และผู้ใช้จะสามารถกดปุ่มได้เพียงครั้งละหนึ่งปุ่มเท่านั้น ซึ่งมีความแตกต่างจากแป้นคีย์ที่เป็นปุ่มกดแบบ <strong>Tactile / Mechanical Keypad</strong> โดยทั่วไป</p>
+<p><img alt="" src="images/mechanical_4x4_keypad.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>Mechanical 4x4 Keypad (Alphanumeric)</strong> สำหรับการเปรียบเทียบ (Source: Sparkfun)</p>
+<p><img alt="" src="images/keypad_membrane_4x4-1.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>4x4 Membrane Keypad</strong> ที่ได้นำมาทดลองใช้งาน พร้อม <strong>Male Pin Headers</strong> แบบขายาว
+สำหรับการแปลงคอนเนกเตอร์แบบตัวเมียให้เป็นตัวผู้ (<strong>Female-to-Male</strong>)</p>
+<p>ขาสัญญาณ <strong>I/O</strong> ของโมดูล <strong>4x4 Membrane Keypad</strong> มี 8 ขา แบ่งเป็น 4 ขา สำหรับขาสัญญาณในแต่ละแถวแนวนอน
+(<strong>Rows: R0..R3</strong>) และขาสำหรับสัญญาณในแต่ละแถวแนวตั้งหรือคอลัมน์ (<strong>Columns: C0..C3</strong>)
+หากดูรูปตัวอย่างของโมดูล จะเห็นว่า ตำแหน่ง <strong>R0C0</strong> ก็คือ ปุ่ม <code>'1'</code>  เรียงไปตามลำดับจนถึง <strong>R3C3</strong> ซึ่งก็คือ ปุ่ม <code>'D'</code></p>
+<p><img alt="" src="images/keypad_membrane_4x4-2.jpg" /></p>
+<p>รูป: ขาสัญญาณ <strong>I/O</strong> ของโมดูล <strong>4x4 Membrane Keypad</strong> </p>
+<p>การสแกนแป้นปุ่มกด (<strong>Keypad</strong>) ก็คือ การตรวจสอบว่า มีการกดปุ่มใด ๆ หรือไม่ โดยจะทำไปทีละแถวในแนวนอน หรือแนวตั้งก็ได้ 
+โดยเลือกแบบใดแบบหนึ่ง</p>
+<ul>
+<li>รูปแบบที่ 1) ให้ <strong>R0..R3</strong> ต่อขากับอินพุต-ดิจิทัลของไมโครคอนโทรลเลอร์ ซึ่งจะต้องมีการต่อตัวต้านแบบ <strong>Pull-up</strong> ทั้งหมด 4 ตัว ที่ขาสัญญาณดังกล่าว
+และให้ <strong>C0..C3</strong> ต่อกับขาเอาต์พุต-ดิจิทัลของไมโครคอนโทรลเลอร์</li>
+<li>รูปแบบที่ 2) ให้ <strong>C0..C3</strong> ต่อขากับอินพุต-ดิจิทัลของไมโครคอนโทรลเลอร์ ซึ่งจะต้องมีการต่อตัวต้านแบบ <strong>Pull-up</strong> ทั้งหมด 4 ตัว ที่ขาสัญญาณดังกล่าว
+และให้ <strong>R0..R3</strong> ต่อกับขาเอาต์พุต-ดิจิทัลของไมโครคอนโทรลเลอร์</li>
+</ul>
+<p>ในบทความนี้ จะเลือกใช้รูปแบบที่ 1 ในการต่อวงจร และเขียนโค้ดเพื่อตรวจสอบการกดปุ่ม</p>
+<ul>
+<li>การตรวจสอบจะเริ่มต้นที่คอลัมน์ <strong>C0</strong> แล้วเรียงตามลำดับไปถึง <strong>C3</strong> จนครบหนึ่งรอบ </li>
+<li>ในแต่ละแถวแนวคอลัมน์ จะมีการกำหนดค่าเอาต์พุตให้ขา <strong>C0..C3</strong> ดังนี้ หากกำลังตรวจสอบคอลัมน์ใด ก็ให้เอาต์พุตคอลัมน์นั้นเป็น 0 (Low)
+และให้เอาต์พุตของคอลัมน์อื่นเป็น 1 (High) แล้วจึงอ่านค่าอินพุตที่ขา <strong>R0..R3</strong> จำนวน 4 บิต (สามารถอ่านค่าไปทีละขาได้)</li>
+<li>ค่าของเอาต์พุตที่ขา <strong>C0..C3</strong> จะมีรูปแบบดังนี้: "0111" -&gt; "1011" -&gt; "1101" -&gt; "1110" ไปตามลำดับ</li>
+<li>ถ้าขาอินพุตใด (<strong>R0..R3</strong>) มีค่าเป็น 0 แสดงว่า ในขณะนั้นมีการกดปุ่มตรงกับแถวนอนและคอลัมน์ที่กำลังตรวจสอบอยู่
+ค่าพิกัดหรือหมายเลขแถวแนวนอนและแนวตั้ง จะถูกนำไปใช้สำหรับระบุว่าเป็นคีย์ในที่มีทั้งหมด 16 กรณี </li>
+<li>หากตรวจสอบแล้วว่า ไม่มีการกดปุ่มใด ๆ ในระหว่างการสแกนตรวจสอบหนึ่งรอบ ก็จะได้ค่าเป็น <code>'\0'</code> (<code>NO_KEY</code>)</li>
+</ul>
+<hr />
+<h2 id="arduino-keypad-library">&#9655; <strong>การใช้ไลบรารี: Arduino Keypad Library</strong><a class="headerlink" href="#arduino-keypad-library" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการสาธิตการใช้งานไลบรารีสำหรับ <strong>Arduino</strong> เพื่อตรวจสอบสถานะการกดปุ่ม ในตัวอย่างนี้ได้เลือกใช้ไลบรารีที่มีชื่อว่า
+<a href="https://github.com/Chris--A/Keypad"><code>Keypad</code></a> ดังนั้นจะต้องมีการติดตั้งไลบรารีดังกล่าวใน <strong>Arduino IDE</strong> ก่อน
+โดยใช้ <strong>Arduino Library Manager</strong> (ไปที่เมนู <strong>Tools &gt; Manage Libraries</strong> )</p>
+<p>ในไฟล์ <strong>Arduino Sketch</strong> สำหรับทดลองใช้งานไลบรารีดังกล่าว จะต้องมีคำสั่ง <code>#include &lt;Keypad.h&gt;</code>
+จากนั้นจึงสามารถใช้งานคลาสที่มีชื่อว่า <code>Keypad</code> ได้ </p>
+<p>เริ่มต้นจะต้องมีการอ็อบเจกต์จากคลาส <code>Keypad</code> (อ้างอิงโดยตัวแปรชื่อ <code>keypad</code> ในโค้ดตัวอย่าง)
+และจะต้องมีการกำหนดรายการขาหรือพินของ <strong>Arduino</strong>จำนวน 8 ขา แบ่งเป็น 2 อาร์เรย์ 
+สำหรับแถวแนวนอนและแถวแนวตั้ง (คอลัมน์) ซึ่งอ้างอิงโดยตัวแปร <code>ROW_PINS[]</code>
+และ <code>COL_PINS[]</code> ตามลำดับ ขาสำหรับ <strong>R0..R3</strong> คือ <strong>{D9, D8, D7, D6}</strong> และขาสำหรับ
+<strong>C0..C3</strong> คือ <strong>{D5, D4, D3, D2}</strong> ตามลำดับ </p>
+<p>นอกจากนั้นแล้วยังต้องระบุอาร์เรย์แบบ 2 มิติ (อ้างอิงโดยตัวแปร <code>keys[][]</code> ในโค้ดตัวอย่าง)
+เพื่อใช้ระบุค่าของคีย์ในแต่ละตำแหน่งของปุ่มกด</p>
+<p>เนื่องจากว่า ขาสำหรับแถวแนวนอน (<strong>Rows: R0..R3</strong>) ได้ถูกกำหนดให้เป็นขาอินพุต ดังนั้นจึงต้องต่อตัวต้านทานแบบ <strong>Pull-up</strong>
+แต่ในตัวอย่างนี้ได้เลือกการใช้งานแบบ <strong>Internal Pull-up</strong> จึงไม่จำเป็นต้องต่อตัวต้านทานภายนอก</p>
+<pre><code class="language-c++">// source: https://github.com/Chris--A/Keypad
+#include &lt;Keypad.h&gt; // use the Arduino Keypad library
+
+#define NUM_ROWS (4)
+#define NUM_COLS (4)
+
+const byte ROW_PINS[] = {9,8,7,6};
+const byte COL_PINS[] = {5,4,3,2};
+
+const char keys[NUM_ROWS][NUM_COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+
+// create a Keypad object
+Keypad keypad = Keypad( (char *)keys, 
+                 ROW_PINS, COL_PINS, 
+                 NUM_ROWS, NUM_COLS );
+
+void setup(){
+  Serial.begin( 115200 );
+  for (int i=0; i &lt; NUM_ROWS; i++ ) { 
+    // enable internal pullup on input pins for R0..R3
+    pinMode( ROW_PINS[i], INPUT_PULLUP );
+  }
+}
+
+char sbuf[32]; // string buffer for sprintf()
+char key;      // keypress
+
+void loop(){
+  if ( (key=keypad.getKey()) != NO_KEY ) { // get key
+    sprintf( sbuf, &quot;Key: '%c' @%lu msec&quot;, key, millis() );
+    Serial.println( sbuf );
+  } 
+}
+</code></pre>
+<hr />
+<h2 id="wokwi-avr-simulator">&#9655; <strong>การจำลองการทำงานด้วย Wokwi AVR Simulator</strong><a class="headerlink" href="#wokwi-avr-simulator" title="Permanent link">#</a></h2>
+<p>การตรวจสอบหรือทดลองการทำงานของโค้ดตัวอย่าง สามารถทำได้ในเบื้องต้นโดยใช้ซอฟต์แวร์จำลองการทำงาน
+และยังไม่จำเป็นต้องมีอุปกรณ์จริง ถัดไปให้สร้างโปรเจกต์ใหม่บนหน้าเว็บของ  <a href="https://wokwi.com/arduino/projects"><strong>WokWi AVR Simulator</strong></a> และต่อวงจรตามรูปตัวอย่าง</p>
+<p><img alt="" src="images/wokwi_keypad-1.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรเสมือนจริงโดยใช้บอร์ด <strong>Arduino Nano v3</strong> และโมดูล <strong>4x4 Membrane Keypad</strong></p>
+<p><img alt="" src="images/wokwi_keypad-2.png" /></p>
+<p>รูป: ในส่วนที่เรียกว่า <strong>Library Manager</strong> ของ <strong>WokWi Simulator</strong> ให้ค้นหาไลบรารีตามชื่อ <code>Keypad</code>
+แล้วกดปุ่มเพิ่มไลบรารีเพื่อใช้งานในโปรเจกต์ (จากนั้นจะมีรายการเพิ่มในไฟล์ <code>libraries.txt</code>)</p>
+<p><img alt="" src="images/wokwi_keypad-3.png" /></p>
+<p>รูป: แสดงผลการจำลองการทำงานของโค้ดตัวอย่าง เมื่อมีการกดปุ่มต่าง ๆ บน <strong>Keypad</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การตรวจสอบการกดปุ่มโดยไม่ใช้ไลบรารี</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างที่แล้วซึ่งได้แสดงให้เห็นตัวอย่างการใช้งานไลบรารีสำหรับ <strong>Arduino</strong> เพื่ออ่านค่าจาก <strong>Keypad</strong>
+ถัดไปเป็นการสาธิตการเขียนโค้ด โดยไม่ใช้ไลบรารีดังกล่าว ทั้งนี้ก็เพื่อเป็นการฝึกเขียนโค้ด และจะทำให้เข้าใจวิธีการสแกนปุ่มกดสำหรับ <strong>Keypad</strong></p>
+<p>ในตัวอย่างนี้ มีการสร้างฟังก์ชัน <code>getKey()</code> เพื่อใช้สำหรับการสแกนปุ่มกดในหนึ่งรอบซึ่งจะมีการตรวจสอบไปทีละคอลัมน์ (<strong>C0..C3</strong>)
+โดยจะทำทุก ๆ  20 มิลลิวินาทีต่อหนึ่งรอบ (กำหนดค่าโดยใช้สัญลักษณ์ <code>SCAN_INTERVAL_MS</code>) </p>
+<p>หากพบว่ามีปุ่มกดในตำแหน่งใดถูกกดอยู่ในขณะนั้น ฟังก์ชันนี้จะให้ค่าของปุ่มกดดังกล่าวเป็นข้อมูลแบบ <code>char</code> ตามที่กำหนดไว้ในอาร์เรย์
+<code>KEY_MAP[][]</code> แต่ถ้าไม่มีการกดปุ่มหรือไม่มีการเปลี่ยนแปลงการกดปุ่มเกิดขึ้น จะให้ค่าเป็น <code>NO_KEY</code></p>
+<pre><code class="language-c++">#define NUM_ROWS (4)
+#define NUM_COLS (4)
+
+#define SCAN_INTERVAL_MS (20)
+#define NO_KEY           ('\0')
+
+const uint8_t ROW_PINS[] = {9,8,7,6};
+const uint8_t COL_PINS[] = {5,4,3,2};
+
+const char KEY_MAP[NUM_ROWS][NUM_COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+
+char getKey(); // function prototype
+
+void setup(){
+  Serial.begin( 115200 );
+  for ( uint8_t i=0; i &lt; NUM_ROWS; i++ ) {
+    // enable internal pullup on input pins for R0..R3
+    pinMode( ROW_PINS[i], INPUT_PULLUP );
+  }
+  for ( uint8_t i=0; i &lt; NUM_COLS; i++ ) {
+    uint8_t col = COL_PINS[i];
+    pinMode( col, OUTPUT );
+    digitalWrite( col, HIGH );
+  }
+}
+
+// global variables
+char sbuf[32]; // string buffer for sprintf()
+char key;      // keypress
+
+void loop(){
+  if ( (key=getKey()) != NO_KEY ) { // get key
+    sprintf( sbuf, &quot;Key: '%c' @%lu msec&quot;, key, millis() );
+    Serial.println( sbuf );
+  } 
+}
+
+// global variables
+uint32_t ts = 0; // used to save the timestamp for keypad scan
+char prev_key = NO_KEY; // used to save the keypress 
+
+char getKey() {
+  uint32_t now = millis();
+  char new_key = NO_KEY;
+  if ( now - ts &gt;= SCAN_INTERVAL_MS ) {
+    ts = now; // saved timestamp
+    // scan column by column
+    for ( uint8_t c=0; c &lt; NUM_COLS; c++ ) {
+      for ( uint8_t i=0; i &lt; NUM_COLS; i++) {
+        // pull only one column to LOW, the rest to HIGH
+        digitalWrite( COL_PINS[i], (c==i) ? LOW : HIGH );
+      }
+      uint8_t row_input;
+      // read the row inputs one by one
+      for ( uint8_t r=0; r &lt; NUM_ROWS; r++) {
+        row_input = digitalRead( ROW_PINS[r] );
+        if ( row_input == 0 ) { // active
+          // get the associated key char 
+          new_key = KEY_MAP[r][c]; 
+        }
+      }
+      // relase the pulled-down column
+      digitalWrite( COL_PINS[c], HIGH );
+      if ( new_key != NO_KEY ) { 
+        if ( prev_key != new_key ) {
+          prev_key = new_key;
+          return new_key; // new keypress detected
+        } else {
+          return NO_KEY;
+        }
+      } 
+    }
+    prev_key = new_key;
+  }
+  return NO_KEY;
+}
+</code></pre>
+<p><img alt="" src="images/wokwi_keypad-4.png" /></p>
+<p>รูป: แสดงผลการจำลองการทำงานของโค้ดตัวอย่าง</p>
+<p><img alt="" src="images/nano_keypad-1.png" /></p>
+<p>รูป: คอมไพล์โค้ดตัวอย่างด้วย <strong>Arduino IDE</strong></p>
+<p><img alt="" src="images/nano_keypad-2.jpg" /></p>
+<p>รูป: ทดลองกับอุปกรณ์จริง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="keypad">&#9655; <strong>ตัวอย่างการสร้างคลาสสำหรับ Keypad</strong><a class="headerlink" href="#keypad" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการสร้างคลาส <strong>C++</strong> เพื่อนำมาใช้งานกับโมดูล <strong>Keypad</strong> ในเบื้องต้น แทนที่การใช้งานไลบรารี
+<a href="https://www.arduinolibraries.info/libraries/keypad"><strong>Arduino Keypad</strong></a>
+(ดาวน์โหลดไฟล์ <a href="keypad_demo.zip"><code>keypad_demo.zip</code></a>) โดยแบ่งออกเป็น 3 ส่วน คือ</p>
+<ul>
+<li>ไฟล์ <code>Keypad.h</code> ซึ่งเป็นการกำหนดรูปแบบของคลาส</li>
+<li>ไฟล์ <code>Keypad.cpp</code> เป็นส่วนที่สร้างคลาสตามรูปแบบที่กำหนด และ </li>
+<li>ไฟล์ <code>keypad_demo.ino</code> เป็นตัวอย่างการใช้งานคลาสดังกล่าว </li>
+</ul>
+<p>File: <code>Keypad.h</code> (<strong>C++ Header File</strong>)</p>
+<pre><code class="language-c++">#ifndef _KEYPAD_H
+#define _KEYPAD_H
+
+#include &lt;Arduino.h&gt;
+#include &lt;inttypes.h&gt;
+
+#define SCAN_INTERVAL_MS (20)
+#define NO_KEY           ('\0')
+
+class Keypad {
+  public:
+    Keypad( const char *keymap, 
+      const uint8_t *rowPins, const uint8_t *colPins, 
+      uint8_t numRows, uint8_t numCols );
+    char  getKey();
+
+  private:
+    char * _keymap;
+    uint8_t * _row_pins;
+    uint8_t * _col_pins;
+    uint8_t _num_rows;
+    uint8_t _num_cols;
+    char _prev_key;
+    uint32_t _ts;
+};
+#endif // _KEYPAD_H
+</code></pre>
+<p>File: <code>Keypad.cpp</code> (<strong>C++ Class Implementation File</strong>)</p>
+<pre><code class="language-c++">#include &quot;Keypad.h&quot;
+
+Keypad::Keypad( const char *keymap, 
+     const uint8_t *rowPins,
+     const uint8_t *colPins, 
+    uint8_t numRows, uint8_t numCols ) 
+{
+  _keymap   = keymap;   
+  _row_pins = rowPins;
+  _col_pins = colPins;  
+  _num_rows = numRows;
+  _num_cols = numCols;
+  _prev_key = NO_KEY;
+  _ts = 0;
+
+  for ( uint8_t i=0; i &lt; _num_rows; i++ ) {
+    // enable internal pullup on input pins for R0..R3
+    pinMode( _row_pins[i], INPUT_PULLUP );
+  }
+  for ( uint8_t i=0; i &lt; _num_cols; i++ ) {
+    uint8_t col = _col_pins[i];
+    pinMode( col, OUTPUT );
+    digitalWrite( col, HIGH );
+  }
+}
+
+char Keypad::getKey() {
+  uint32_t now = millis();
+  char new_key = NO_KEY;
+
+  if ( now - _ts &gt;= SCAN_INTERVAL_MS ) {
+    _ts = now; // saved timestamp
+    // scan column by column
+    for ( uint8_t c=0; c &lt; _num_cols; c++ ) {
+      for ( uint8_t i=0; i &lt; _num_cols; i++) {
+        // pull only one column to LOW, the rest to HIGH
+        digitalWrite( _col_pins[i], (c==i) ? LOW : HIGH );
+      }
+      uint8_t row_input;
+      // read the row inputs one by one
+      for ( uint8_t r=0; r &lt; _num_rows; r++) {
+        row_input = digitalRead( _row_pins[r] );
+        if ( row_input == 0 ) { // active
+          // get the associated key char 
+          new_key = _keymap[r*_num_rows + c]; 
+        }
+      }
+      // relase the pulled-down column
+      digitalWrite( _col_pins[c], HIGH );
+      if ( new_key != NO_KEY ) { 
+        if ( _prev_key != new_key ) {
+          _prev_key = new_key;
+          return new_key; // new keypress detected
+        } else {
+          return NO_KEY;
+        }
+      } 
+    }
+    _prev_key = new_key;
+  }
+  return NO_KEY;
+}
+</code></pre>
+<p>File: <code>keypad_demo.ino</code></p>
+<pre><code class="language-c++">#include &quot;Keypad.h&quot;
+
+#define NUM_ROWS (4)
+#define NUM_COLS (4)
+
+const byte ROW_PINS[] = {9,8,7,6};
+const byte COL_PINS[] = {5,4,3,2};
+
+const char keys[NUM_ROWS][NUM_COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+
+// create a Keypad object
+Keypad keypad = Keypad( (char *)keys, 
+                 ROW_PINS, COL_PINS, 
+                 NUM_ROWS, NUM_COLS );
+
+void setup(){
+  Serial.begin( 115200 );
+}
+
+char sbuf[32]; // string buffer for sprintf()
+char key;      // keypress
+
+void loop(){
+  if ( (key=keypad.getKey()) != NO_KEY ) { // get key
+    sprintf( sbuf, &quot;Key: '%c' @%lu msec&quot;, key, millis() );
+    Serial.println( sbuf );
+  } 
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการออกแบบและสร้างคลาสในภาษา <strong>C++</strong> ในเบื้องต้น เพื่อนำไปใช้งานกับบอร์ด <strong>Arduino</strong>
+โดยได้เลือกตัวอย่างเป็นโมดูล <strong>4x4 Membrane Keypad</strong> และเขียนโค้ดโดยใช้ไลบรารีที่มีอยู่แล้วสำหรับ <strong>Arduino</strong>
+เปรียบเทียบกับการลองสร้างไลบรารีที่มีฟังก์ชันการทำงานอย่างง่ายในรูปแบบของ <strong>C++ Class</strong> 
+ตรวจสอบผลการทำงานของโค้ดด้วยใช้ซอฟต์แวร์ <strong>WokWi Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-02-19 | Last Updated: 2022-02-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

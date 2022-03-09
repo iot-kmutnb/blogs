@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_asm_io/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโค้ด GCC AVR - Inline Assembly - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#gcc-avr-inline-assembly" class="nav-link">การเขียนโค้ด GCC AVR - Inline Assembly</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#gcc-avr-assembly-for-arduino" class="nav-link">&#9655; GCC-AVR Assembly for Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-io-toggle-using-arduino-functions" class="nav-link">&#9655; ตัวอย่างโค้ด 1: I/O Toggle using Arduino Functions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-register-based-io-programming" class="nav-link">&#9655; ตัวอย่างโค้ด 2: Register-based I/O Programming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-inline-avr-assembly" class="nav-link">&#9655; ตัวอย่างโค้ด 3: Inline AVR Assembly</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-io-read-modify-write" class="nav-link">&#9655; ตัวอย่างโค้ด 4: I/O Read-Modify-Write</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="gcc-avr-inline-assembly">การเขียนโค้ด GCC AVR - Inline Assembly<a class="headerlink" href="#gcc-avr-inline-assembly" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>AVR Assembly</em>, <em>Arduino Inline Assembly</em>, <em>I/O Toggle</em></p>
+<hr />
+<h2 id="gcc-avr-assembly-for-arduino">&#9655; <strong>GCC-AVR Assembly for Arduino</strong><a class="headerlink" href="#gcc-avr-assembly-for-arduino" title="Permanent link">#</a></h2>
+<p>บทความนี้กล่าวถึง การทดลองเขียนโค้ด  <strong>AVR Assembly</strong> สำหรับไมโครคอนโทรลเลอร์ที่ใช้ซีพียูตระกูล
+<strong>AVR</strong> เช่น ชิป <strong>ATmega328P</strong> ที่อยู่บนบอร์ด <strong>Arduino</strong> อย่างเช่น <strong>Uno R3</strong>
+และ <strong>Nano v3</strong> และใช้วิธีการแทรกโค้ดภาษา <strong>GCC AVR Assembly</strong> ("แอสเซมบลี") 
+ในโค้ด <strong>Arduino Sketch</strong> (ภาษา <strong>C/C++</strong>) และสามารถคอมไพล์โค้ดได้โดยใช้ซอฟต์แวร์
+<strong>Arduino IDE</strong> หรือจำลองการทำงานด้วย <strong>Wokwi AVR Simulator</strong></p>
+<p>โดยปรกติแล้ว การเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Arduino</strong> แบบต่างๆ 
+จะใช้ภาษา <strong>C/C++</strong> และเรียกใช้ฟังก์ชันหรือคำสั่งต่างๆ ของ <strong>Arduino API</strong> 
+หรือใช้คลาส (<strong>C++ Classes</strong>) เพื่อสร้างอ็อบเจกต์ (<strong>Objects</strong>) 
+และเรียกใช้เมธอดต่างๆ (<strong>Methods</strong>) ซึ่งทำให้สะดวกและง่ายในการเขียนโค้ด </p>
+<p>แต่การเขียนโปรแกรมในระดับล่างสำหรับ <strong>AVR</strong> จะเกี่ยวข้องกับการใช้งานชุดคำสั่ง 
+(<a href="http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf"><strong>AVR Instruction Set</strong></a>) จำแนกเป็น <strong>AVR</strong>, <strong>MegaAVR</strong>, <strong>TinyAVR</strong> เป็นต้น
+และจะต้องเขียนโค้ดโดยใช้ภาษาที่เรียกว่า <strong>GCC AVR Assembly</strong> ซึ่งเป็นภาษาคอมพิวเตอร์ในระดับล่าง 
+และการเขียนโค้ดด้วยภาษาดังกล่าว ต้องอาศัยความรู้ความเข้าใจเกี่ยวกับชุดคำสั่ง 
+สถาปัตยกรรมและการจัดการภายในชิปของไมโครคอนโทรลเลอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-io-toggle-using-arduino-functions">&#9655; <strong>ตัวอย่างโค้ด 1: I/O Toggle using Arduino Functions</strong><a class="headerlink" href="#1-io-toggle-using-arduino-functions" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรมเพื่อกำหนดสถานะการทำงานของขา <strong>GPIO</strong> (<em>General-Purpose I/O</em>) 
+ของชิปไมโครคอนโทรลเลอร์ ก็ถือว่าเป็นโจทย์ฝึกปฏิบัติในระดับพื้นฐาน
+ชิป <strong>AVR</strong> เป็นซีพียูขนาด 8 บิต ดังนั้นการจัดการและใช้งานข้อมูลจึงมีขนาด 8 บิต (แต่มีคำสั่งขนาด 16 บิต)</p>
+<p>ในส่วนที่เกี่ยวข้องกับขา <strong>I/O</strong> ก็มีการจัดแบ่งเป็นกลุ่มของขา หรือที่เรียกว่า "พอร์ต" (<strong>Port</strong>) 
+ตั้งชื่อเป็นพอร์ต <strong>A</strong>, <strong>B</strong>, <strong>C</strong> เป็นต้น
+แต่ละพอร์ตมีขนาด 8 บิต และมีขา <strong>I/O</strong> ที่เกี่ยวข้องจำนวน 8 ขา </p>
+<p>ในส่วนที่เกี่ยวข้องกับการทำงานของแต่ละพอร์ต ก็มีรีจิสเตอร์ที่เกี่ยวข้อง (<strong>I/O Registers</strong>) เช่น
+<code>DDRx</code>, <code>PORTx</code>, <code>PINx</code> (<code>x</code> แทนชื่อพอร์ต) เป็นต้น
+รีจิสเตอร์เหล่านี้ใช้สำหรับการกำหนดทิศทางของขา <strong>I/O</strong> ในพอร์ตเดียวกัน 
+การเขียนหรืออ่านค่าของพอร์ตครั้งละ 8 บิต การเปิดใช้งานวงจรตัวต้านทานภายในแบบ
+<strong>Pullup</strong> สำหรับขาอินพุต เป็นต้น</p>
+<p>สมมุติว่า เราต้องการสร้างสัญญาณเอาต์พุตที่ขา <strong>D13</strong> ของบอร์ด <strong>Arduino</strong> 
+(ตรงกับขา <strong>PORTB5</strong> หรือ <strong>PB5</strong>) ซึ่งมีวงจร <strong>LED</strong> อยู่บนบอร์ดแล้ว 
+และให้มีสถานะทางลอจิกสลับไปเรื่อย ๆ (<strong>I/O Toggle</strong>) แต่ต้องการให้ได้ความถี่สูงสุด 
+ก็อาจจะเขียนโค้ดแบบนี้โดยใช้คำสั่งของ <strong>Arduino API</strong> (ไม่มีการใช้คำสั่งสำหรับหน่วงเวลาการทำงาน)</p>
+<pre><code class="language-c++">void setup() {
+  pinMode( 13, OUTPUT );     // use D13 as an output pin
+  digitalWrite( 13, LOW );   // output low
+}
+
+void loop() { 
+  digitalWrite( 13, HIGH );  // output high
+  digitalWrite( 13, LOW );   // output low
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากทดสอบการทำงานของโค้ดตัวอย่างนี้โดยใช้บอร์ด <strong>Arduino</strong> และวัดสัญญาณที่ขาเอาต์พุต <strong>PB5</strong>
+จะได้รูปคลื่นสัญญาณดังนี้</p>
+<p><img alt="" src="images/wave-ex1-persistent.png" /></p>
+<p>รูป: แสดงคลื่นสัญญาณที่วัดด้วยเครื่องออสซิลโลสโคปแบบดิจิทัลสำหรับตัวอย่างโค้ด 1</p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า ความกว้างของพัลส์ช่วงที่เป็น HIGH ได้ประมาณ <strong>3.16 us</strong> และช่วงที่เป็น LOW
+ได้ประมาณ <strong>3.56 us</strong> หรือหนึ่งรอบการทำงานของลูปใช้เวลาประมาณ <strong>6.72 us (= 3.16 + 3.56 us)</strong>
+หากคำนวณความถี่จากส่วนกลับของหนึ่งคาบ จะได้ประมาณ <strong>149 kHz (= 1/6.72 us)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-register-based-io-programming">&#9655; <strong>ตัวอย่างโค้ด 2: Register-based I/O Programming</strong><a class="headerlink" href="#2-register-based-io-programming" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างโค้ดแรก ถ้าแก้ไขโค้ดใหม่ โดยการเข้าถึงรีจิสเตอร์ของ <strong>AVR / ATmega328P</strong> 
+(เรียกว่า <strong>Special Function Registers: SFRs</strong>) อย่างเช่น <code>DDRB</code> และ <code>PORTB</code>
+และไม่ใช้คำสั่ง <code>pinMode()</code> และ <code>digitalWrite()</code> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">void setup() {
+  DDRB  |=  (1 &lt;&lt; 5);  // set DDRB bit 5 = 1 (output direction)
+  PORTB &amp;= ~(1 &lt;&lt; 5);  // clear bit PB5 (output low at PB5)
+}
+
+void loop() { 
+  PORTB |=  (1 &lt;&lt; 5);  // set bit PB5 (output high at PB5)
+  PORTB &amp;= ~(1 &lt;&lt; 5);  // clear bit PB5 (output low at PB5)
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="images/wave-ex2_1.png" /></p>
+<p>รูป: แสดงคลื่นสัญญาณสำหรับตัวอย่างโค้ด 2 (เขียนค่าลงในรีจิสเตอร์ <code>PORTB</code>)</p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า ความกว้างของพัลส์ช่วงที่เป็น HIGH ได้ประมาณ <strong>128 ns</strong> และช่วงที่เป็น LOW
+ได้ประมาณ <strong>372 ns</strong> หรือได้หนึ่งคาบเท่ากับ <strong>500 ns</strong> (ความถี่ <strong>2MHz</strong>) หรือคิดเป็น 
+<strong>0.500 us / (1/16MHz) = 8 CPU cycles</strong> ต่อการวนลูปหนึ่งครั้ง</p>
+<p>เมื่อเปรียบเทียบกับตัวอย่างแรก จะเห็นได้ว่า โค้ดในตัวอย่างที่ 2 ได้สัญญาณเอาต์พุตที่มีความถี่สูงกว่า
+(ได้ <strong>2MHz</strong> ซึ่งสูงกว่า <strong>149kHz</strong>) </p>
+<p>&nbsp;</p>
+<p>หากศึกษาฟังก์ชันการทำงานของรีจิสเตอร์ <code>PINB</code> ที่เกี่ยวข้องกับพอร์ต <strong>B</strong> ของ <strong>AVR</strong>
+จะพบว่า การเขียนค่าบิตเป็น 1 ในตำแหน่งใด จะทำให้เกิดการเปลี่ยนสถานะบิตที่ตำแหน่งดังกล่าว
+เมื่อใช้งานเป็นขาเอาต์พุต ดังนั้นจึงเขียนโค้ดแบบใหม่ได้ดังนี้</p>
+<pre><code class="language-c++">void setup() {
+  DDRB  |= (1 &lt;&lt; 5);  // set DDRB bit 5 = 1
+  PORTB |= (1 &lt;&lt; 5);  // set PORTB bit 5 = 1
+}
+
+void loop() { 
+  PINB |= (1 &lt;&lt; 5);  // toggle PB5 by writing 1 to PINB at bit 5
+}
+</code></pre>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า ความกว้างของพัลส์ช่วงที่เป็น HIGH และ LOW ได้ประมาณ <strong>375 ns </strong>
+หรือได้หนึ่งคาบเท่ากับ <strong>750 ns</strong> (ความถี่ <strong>1.33MHz</strong>) หรือคิดเป็น
+<strong>0.750 us / (1/16MHz) = 12 cycles</strong> ต่อการวนลูปหนึ่งครั้ง</p>
+<p><img alt="" src="images/wave-ex2_2.png" /></p>
+<p>รูป: แสดงคลื่นสัญญาณสำหรับตัวอย่างโค้ด 2 (เขียนค่าลงในรีจิสเตอร์ <code>PINB</code>)</p>
+<p>&nbsp;</p>
+<p>หากตรวจสอบการทำงานของโค้ดด้วยวิธีการจำลองการทำงานของโปรแกรม เช่น 
+<a href="https://wokwi.com/arduino/projects"><strong>Wokwi AVR Simulator</strong></a>
+และบันทึกการเปลี่ยนแปลงลอจิกที่ขาเอาต์พุตลงในไฟล์ .vcd แล้วใช้โปรแกรม <strong>GTKWave</strong> แสดงผล
+ก็จะได้ตามรูปดังนี้</p>
+<p><img alt="" src="images/wokwi_arduino.png" /></p>
+<p>รูป: การจำลองการทำงานสำหรับบอร์ด <strong>Arduino Nano v3</strong> โดยใช้ <strong>Wokwi AVR Simulator</strong> </p>
+<p><img alt="" src="images/wokwi_avr_sim-1.png" /></p>
+<p>รูป: แสดงผลเป็นรูปคลื่นสัญญาณดิจิทัล และวัดความกว้างของพัลส์ระหว่างขอบขาขึ้นและขอบขาลงถัดไป
+ได้เท่ากับ <strong>375 ns</strong> หรือคิดเป็น <strong>0.375  us / (1/16MHz) = 6 cycles</strong></p>
+<p><img alt="" src="images/wokwi_avr_sim-2.png" /></p>
+<p>รูป: แสดงผลรูปคลื่นสัญญาณดิจิทัล และวัดความกว้างของหนึ่งคาบระหว่างขอบขาขึ้นสองครั้งถัดไป
+ได้เท่ากับ <strong>750 ns</strong> หรือได้ความถี่ของเอาต์พุตเท่ากับ <strong>1.333 MHz</strong>
+(หรือคิดเป็น <strong>12 cycles</strong>) ซึ่งตรงกับกรณีที่วัดได้ด้วยเครื่องออสซิลโลสโคป</p>
+<p>&nbsp;</p>
+<p>ข้อสังเกต: เราสามารถเขียนโค้ด <strong>AVR Assembly</strong> และจำลองการทำงานด้วย <strong>Wokwi AVR Simulator</strong>
+บนหน้าเว็บเบราว์เซอร์ได้เช่นกัน (ให้สร้างไฟล์ <strong>.S</strong> สำหรับเขียนโค้ด และในไฟล์ <strong>.ino</strong> ไม่ต้องมีโค้ดใด ๆ)</p>
+<p><img alt="" src="images/wokwi_avr_asm.png" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ด  <strong>AVR Assembly</strong> และจำลองการทำงานด้วย <strong>Wokwi AVR Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-inline-avr-assembly">&#9655; <strong>ตัวอย่างโค้ด 3: Inline AVR Assembly</strong><a class="headerlink" href="#3-inline-avr-assembly" title="Permanent link">#</a></h2>
+<p>ลองดูตัวอย่างการเขียนโค้ด  <strong>Inline Assembly</strong> สำหรับ <strong>GCC AVR</strong> 
+โดยใช้ประโยคคำสั่ง เช่น <code>asm volatile(...)</code> และมีการสร้าง <strong>C Macros</strong> เช่น</p>
+<ul>
+<li><code>led_output()</code> ให้ขา <strong>I/O</strong> สำหรับ <strong>LED</strong> เป็นขาเอาต์พุต</li>
+<li><code>led_high()</code> ให้ขาสำหรับ <strong>LED</strong> มีสถานะลอจิกเป็น HIGH (1)</li>
+<li><code>led_out()</code> ให้ขาสำหรับ <strong>LED</strong> มีสถานะลอจิกเป็น LOW (0)</li>
+</ul>
+<p>เริ่มต้นมีการกำหนดให้ขา <strong>Arduino D13</strong> ซึ่งตรงกับ <strong>PORTB</strong> บิตที่ 5 ให้เป็นเอาต์พุต ดังนั้นจึงเขียนค่าเป็น 1 
+ให้บิตที่ 5 ในรีจิสเตอร์ <code>DDRB</code> (ใช้สัญลักษณ์แทนด้วย <code>DDB5</code> ซึ่งหมายถึง ค่าคงที่เท่ากับ 5) 
+สำหรับระบุทิศทางของขาดังกล่าวให้เป็นเอาต์พุต โดยใช้คำสั่ง <code>sbi</code> (<strong>set bit</strong>)</p>
+<p>การกำหนดให้ขาเอาต์พุตดังกล่าว (บิตที่ 5 ของรีจิสเตอร์ <code>PORTB</code>) 
+มีสถานะลอจิกเป็น 1 ก็ใช้คำสั่ง <code>sbi</code> (<strong>set bit</strong>) หรือเป็น 0 ก็ใช้คำสั่ง <code>cbi</code> (<strong>clear bit</strong>) </p>
+<pre><code class="language-c++">#define led_output() \
+   asm volatile(&quot;sbi %0,%1&quot; :: &quot;I&quot; (_SFR_IO_ADDR(DDRB)),  &quot;I&quot; (DDB5))
+
+#define led_high()   \
+   asm volatile(&quot;sbi %0,%1&quot; :: &quot;I&quot; (_SFR_IO_ADDR(PORTB)), &quot;I&quot; (PORTB5))
+
+#define led_low()    \
+   asm volatile(&quot;cbi %0,%1&quot; :: &quot;I&quot; (_SFR_IO_ADDR(PORTB)), &quot;I&quot; (PORTB5))
+
+void setup() {
+  led_output();
+}
+
+void loop() {
+  led_high();
+  led_low();
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ลองมาดูอีกรูปแบบหนึ่งในการเขียนโค้ดในภาษา <strong>GCC AVR Assembly</strong></p>
+<pre><code class="language-c++">// cpu_freq. 16MHz / clock cycle = 1/16 usec
+// =&gt; 1/16 usec x 6 cycles = 0.375 usec or 2.667 MHz
+
+void setup() {
+  // set DDB5 as output
+  asm volatile(&quot;sbi %0,%1&quot; :: &quot;I&quot; (_SFR_IO_ADDR(DDRB)), &quot;I&quot; (DDB5));
+}
+
+void loop() {
+  asm volatile (
+    &quot;L0: sbi %0,%1   \n\t&quot;   // [2C] set bit 5 in register PORTB
+    &quot;    cbi %0,%1   \n\t&quot;   // [2C] clear bit 5 in register PORTB
+    &quot;    rjmp L0     \n\t&quot;   // [2C] relative jump (backward) to label 0:
+    :: &quot;I&quot; (_SFR_IO_ADDR(PORTB)), &quot;I&quot; (PORTB5) 
+  );
+ // &quot;I&quot;: used as input arguments %0 and %1 respectively
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>การทำงานของโค้ดในฟังก์ชัน <code>loop()</code> ก็มีเพียง 3 คำสั่ง คือ <code>sbi</code> ที่ทำให้บิตที่ 5 ของรีจิสเตอร์ <code>PORTB</code> เป็น 1 
+ตามด้วย<code>cbi</code> ที่ทำให้บิตที่ 5 ของรีจิสเตอร์ <code>PORTB</code> เป็น 0 
+คำสั่ง <code>rjmp</code> เป็นคำสั่งสุดท้าย เพื่อกระโดด (<strong>Relative Jump</strong>) ย้อนกลับไปทำคำสั่งแรก (ทำซ้ำ) 
+ที่มีสัญลักษณ์ <code>L0:</code> เขียนกำกับเอาไว้
+แต่ละคำสั่งใช้เวลาในการทำงานของซีพียูเท่ากับ 2 ไซเคิล  [<strong>2C</strong>] (หนึ่งไซเคิลเท่ากับ <strong>1/16MHz = 62.5 ns</strong>)</p>
+<p><img alt="" src="images/wave-ex3_1.png" /></p>
+<p>รูป: แสดงรูปคลื่นสัญญาณที่ได้จากการทดลอง</p>
+<p>เมื่อใช้ความถี่ <strong>16MHz</strong> การทำงานหนึ่งรอบ จะใช้เวลาเท่ากับ 6 ไซเคิล หรือ
+เท่ากับ <strong>6 x 62.5 ns = 375 ns</strong> จะได้อัตราการกระพริบติดดับของ <strong>LED</strong> 
+เท่ากับ <strong>2.667 MHz</strong> และช่วง HIGH (1) จะมีระยะเวลา <strong>125 ns</strong> (2 ไซเคิล)
+แต่ช่วง LOW (0) จะมีระยะเวลา <strong>250 ns</strong> (4 ไซเคิล)</p>
+<p>&nbsp;</p>
+<p>ลองมาเปรียบเทียบกับผลการจำลองการทำงานด้วย <strong>Wokwi AVR Simulator</strong> ดังนี้</p>
+<p><img alt="" src="images/wokwi_avr_sim-3.png" /></p>
+<p>รูป: ความกว้างของพัลส์ช่วงที่เป็น High ซึ่งได้จากการวัดระยะห่างระหว่างขอบขาขึ้นและขอบขาลงถัดไป
+ได้เท่ากับ <strong>125 ns</strong> หรือคิดเป็น 2 ไซเคิล [<strong>2C</strong>]</p>
+<p><img alt="" src="images/wokwi_avr_sim-4.png" /></p>
+<p>รูป: ความกว้างของหนึ่งคาบเท่ากับ <strong>375 ns</strong> ซึ่งได้จากการวัดระยะห่างระหว่างขอบขาขึ้นสองครั้งถัดไป
+หรือคิดเป็น 6 ไซเคิล</p>
+<p>&nbsp;</p>
+<p>ลองมาดูอีกตัวอย่างหนึ่งที่ได้มีการเพิ่มคำสั่ง <code>nop</code> อีก 2 คำสั่ง เพื่อทำให้เอาต์พุตที่ขา <strong>PORTB5</strong>
+มีช่วง HIGH และ LOW มีความกว้างเท่ากันคือ 4 ไซเคิล (ได้ <strong>Duty Cycle</strong> เท่ากับ 50%) 
+และใช้เวลาทำหนึ่งรอบของลูปเท่ากับ 8 ไซเคิล แต่จะได้ความถี่ลดลง</p>
+<pre><code class="language-c++">// cpu_freq. 16MHz and clock cycle = 1/16 usec
+// =&gt; 1/16 usec x 8 cycles = 0.500 usec or 2MHz
+void loop() {
+  asm volatile (
+    &quot;L0: sbi %0,%1     \n\t&quot;    // [2C]
+    &quot;    nop           \n\t&quot;    // [1C]
+    &quot;    nop           \n\t&quot;    // [1C]
+    &quot;    cbi %0,%1     \n\t&quot;    // [2C]
+    &quot;    rjmp L0       \n\t&quot;    // [2C]
+    :: &quot;I&quot; (_SFR_IO_ADDR(PORTB)), &quot;I&quot; (PORTB5)
+  );
+}
+</code></pre>
+<p><img alt="" src="images/wave-ex3_2.png" /></p>
+<p>รูป: แสดงสัญญาณเอาต์พุตที่ได้ ซึ่งมีความถี่ <strong>2 MHz</strong> (มีคาบกว้าง <strong>500 ns</strong> หรือ 8 ไซเคิล)</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างถัดไป เป็นการใช้วิธีเขียนค่าบิตเป็น 1 ลงในรีจิสเตอร์ <code>PINB</code> ในตำแหน่งบิตที่ 5 
+ซึ่งจะทำให้เกิดการสลับสถานะลอจิกที่ขา <strong>PB5</strong> ได้เช่นกัน</p>
+<pre><code class="language-c++">// cpu_freq. 16MHz and clock cycle = 1/16 us
+// loop execution time = 1/16 us x 4 cycles x 2 = 0.5 us or 2 MHz
+void loop() {
+  asm volatile (
+    &quot;L0: sbi %0,%1    \n\t&quot;   // [2C]
+    &quot;    rjmp L0      \n\t&quot;   // [2C]
+    :: &quot;I&quot; (_SFR_IO_ADDR(PINB)), &quot;I&quot; (PINB5)
+  );
+}
+</code></pre>
+<p><img alt="" src="images/wave-ex3_3.png" /></p>
+<p>รูป: แสดงสัญญาณเอาต์พุตที่มีความถี่ <strong>2 MHz</strong> (มีคาบเท่ากับ <strong>500 ns</strong>)</p>
+<p>ลองเปรียบเทียบกับผลการจำลองการทำงานดังนี้</p>
+<p><img alt="" src="images/wokwi_avr_sim-5.png" /></p>
+<p>รูป: วัดความกว้างของพัลส์ได้เท่ากับ <strong>250 ns</strong> (คิดเป็น 4 ไซเคิล)</p>
+<p><img alt="" src="images/wokwi_avr_sim-6.png" /></p>
+<p>รูป: วัดความกว้างของคาบได้เท่ากับ <strong>500 ns</strong> (คิดเป็น 8 ไซเคิล)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-io-read-modify-write">&#9655; <strong>ตัวอย่างโค้ด 4: I/O Read-Modify-Write</strong><a class="headerlink" href="#4-io-read-modify-write" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการอ่านค่าจากรีจิสเตอร์ <code>PORTB</code> เข้ามาแล้ว มาเก็บไว้ในรีจิสเตอร์
+แล้วจึงสลับค่าของบิตที่ 5 จากนั้นจึงเขียนค่าใหม่ออกไป 
+(เป็นการทำขั้นตอนที่เรียกว่า <strong>read-modify-write</strong>)</p>
+<pre><code class="language-c++">// cpu_freq=16MHz and clock cycle = 1/16 us
+// loop execution time = 1/16 us x 5 cycles x 2 = 0.625 us or 1.6 MHz
+void loop() {
+  asm volatile (
+    &quot;    ldi r17,0x20  \n\t&quot;      // [1C]
+    &quot;L0: in  r16,%0    \n\t&quot;      // [1C] read 
+    &quot;    eor r16,r17   \n\t&quot;      // [1C] modify
+    &quot;    out %0, r16   \n\t&quot;      // [1C] write
+    &quot;    rjmp L0       \n\t&quot;      // [2C]
+    ::  &quot;I&quot; (_SFR_IO_ADDR(PORTB)) // passed as the first argument (%0)
+        : &quot;r16&quot;,&quot;r17&quot;   // use the general-purpose registers r16 and r17
+  );
+}
+</code></pre>
+<p><img alt="" src="images/wokwi_avr_sim-7.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุตที่ได้จากการจำลองการทำงาน (หนึ่งคาบเท่ากับ <strong>0.625 us</strong>)</p>
+<p>&nbsp;</p>
+<p>ถ้าต้องการเว้นช่วงเวลาในการสลับสถานะลอจิกที่ขาเอาต์พุต ก็สามารถทำได้ โดยใช้เทคนิคที่เรียกว่า
+<strong>Software delay loop</strong> แต่เขียนเป็นโค้ด <strong>Assembly</strong> และตัวอย่างถัดไป เป็นการเว้นระยะเวลา
+เท่ากับ <strong>4000 cycles = 250 us</strong> สำหรับการสลับสถานะหนึ่งครั้ง</p>
+<pre><code class="language-c++">// 2 + 1 + 1 + 998*(2+2)-1 + 3 + 2 = 4000 cycles 
+// =&gt; 1/16 us x 4000 = 250 us
+void loop() {
+ asm volatile (
+   &quot;L0: sbi %0,%1           \n\t&quot;  // [2C] set bit PINB5 
+   &quot;    ldi r24, lo8(998)   \n\t&quot;  // [1C] r24 = low_byte(998)
+   &quot;    ldi r25, hi8(998)   \n\t&quot;  // [1C] r25 = high_byte(998)
+   &quot;L1: sbiw r24, 1         \n\t&quot;  // [2C] (r25:r24) = (r25:r24) - 1 
+   &quot;    brne L1             \n\t&quot;  // [2C/1C] if Z=0 (not zero) goto L1
+   &quot;    nop                 \n\t&quot;  // [1C] no operation
+   &quot;    nop                 \n\t&quot;  // [1C] no operation
+   &quot;    nop                 \n\t&quot;  // [1C] no operation
+   &quot;    rjmp L0             \n\t&quot;  // [2C] relative jumpt to L0
+   :: &quot;I&quot; (_SFR_IO_ADDR(PINB)), &quot;I&quot; (PINB5)
+  );
+}
+</code></pre>
+<p><img alt="" src="images/wokwi_avr_sim-8.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุตเมื่อจำลองการทำงาน (ครึ่งคาบ <strong>250 us</strong> และหนึ่งคาบ <strong>500 us</strong>)</p>
+<p><img alt="" src="images/wave-ex4_2.png" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่วัดได้ความถี่ <strong>2 kHz</strong> (ครึ่งคาบ <strong>250 us</strong> และหนึ่งคาบ <strong>500 us</strong> ) </p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างโค้ดในบทความนี้ จะเห็นได้ว่า เราสามารถใช้วิธีการแทรกโค้ด <strong>GCC AVR Assembly</strong> 
+ในโค้ดภาษา <strong>C/C++</strong> ของ <strong>Arduino Sketch</strong> ได้ 
+มีตัวอย่างการใช้คำสั่งของชุดคำสั่งของ <strong>AVR Instruction Set</strong>
+อย่างไรก็ตามการเขียนโค้ดด้วยวิธีดังกล่าว ต้องอาศัยความเข้าใจเกี่ยวกับชุดคำสั่งของ <strong>AVR</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>(<em>บทความนี้มีเนื้อหาบางส่วนที่ได้มีการเผยแพร่ครั้งแรกบนเว็บไซต์เก่า เมื่อวันที่ 8 พฤศจิกายน พ.ศ. 2557 /  November 8, 2014</em>)</p>
+<p>Created: 2022-01-11 | Last Updated: 2022-01-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

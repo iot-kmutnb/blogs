@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/freertos/arduino_avr_part-5/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino-FreeRTOS for AVR (Part 5) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-freertos-for-avr-part-5" class="nav-link">Arduino-FreeRTOS for AVR (Part 5)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การประสานเวลาและสื่อสารกันระหว่างทาสก์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#semaphores" class="nav-link">&#9655; หลักการทำงานของเซมาฟอร์ (Semaphores)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-binary-semaphore" class="nav-link">&#9655; ตัวอย่างที่ 1: การใช้งาน Binary Semaphore</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-binary-semaphore-isr" class="nav-link">&#9655; ตัวอย่างที่ 2: การใช้งาน Binary Semaphore ร่วมกับการทำงานของ ISR</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-counting-semaphore" class="nav-link">&#9655; ตัวอย่างที่ 3: การใช้งาน Counting Semaphore</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-task-notification" class="nav-link">&#9655; ตัวอย่างที่ 4: การใช้งาน Task Notification</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5-event-group" class="nav-link">&#9655; ตัวอย่างที่ 5: การใช้งาน Event Group</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-freertos-for-avr-part-5">Arduino-FreeRTOS for AVR (Part 5)<a class="headerlink" href="#arduino-freertos-for-avr-part-5" title="Permanent link">#</a></h1>
+<p>ถัดจากบทความตอนที่แล้ว (ตอนที่ <a href="../../freertos/arduino_avr_part-1/">1</a> | <a href="../../freertos/arduino_avr_part-2/">2</a> | <a href="../../freertos/arduino_avr_part-3/">3</a> | <a href="../../freertos/arduino_avr_part-4">4</a>)
+บทความนี้เป็นตอนที่ 5 และนำเสนอเนื้อหาเกี่ยวกับวิธีการประสานเวลา หรือ "ซิงโครไนซ์"
+ในการทำงานระหว่างทาสก์  (<strong>Task Synchronization</strong>) โดยใช้คำสั่งของ <strong>FreeRTOS</strong>
+เช่น การใช้สิ่งที่เรียกว่า "เซมาฟอร์" (<strong>Semaphores</strong>)
+และการส่งสัญญาณไปยังทาสก์  (<strong>Task Notifications</strong>)</p>
+<p><strong>Keywords:</strong> <em>Arduino</em>, <em>8-bit AVR MCU</em>, <em>FreeRTOS</em>, <em>Wokwi AVR Simulator</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การประสานเวลาและสื่อสารกันระหว่างทาสก์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>โดยทั่วไปแล้ว <strong>RTOS</strong> จะมีคำสั่งต่าง ๆ ไว้เพื่อใช้ในการประสานเวลาและการส่งต่อข้อมูลกันระหว่างฟังก์ชันการทำงานของทาสก์ 
+(<strong>Inter-Task Synchronization &amp; Communication</strong>)
+และรวมถึงการทำงานของฟังก์ชันที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>) ด้วย</p>
+<ul>
+<li>การประสานเวลา (<strong>Synchronization</strong>) เช่น ทาสก์หนึ่งรอเหตุการณ์หรือสัญญาณจากอีกทาสก์หนึ่ง หรือรอต่อคิวการใช้ทรัพยากรร่วมกัน
+ซึ่งมีหลายวิธีให้เลือกทำได้ เช่น <ul>
+<li>"เซมาฟอร์" (<strong>Semaphores</strong>)</li>
+<li>"มิวเทค" (<strong>Mutex = Mutual Exclusion</strong>) </li>
+<li>"บิตเหตุการณ์" (<strong>Event Bits</strong> หรือ <strong>Event Flags</strong>) หากรวมกันเป็นกลุ่ม ก็เรียกว่า กลุ่มของบิตเหตุการณ์ (<strong>Event Groups</strong>)</li>
+<li>"การส่งสัญญาณไปยังทาสก์" (<strong>Task Notification</strong>) เป็นต้น</li>
+</ul>
+</li>
+<li>การสื่อสารด้วยข้อมูล (<strong>Communication</strong>) เช่น ทาสก์หนึ่งรอข้อมูลจากอีกทาสก์หนึ่ง โดยอาศัยรูปแบบของหน่วยความจำที่เรียกว่า
+"คิวข้อความ" (<strong>Message Queues</strong> / <strong>FIFOs</strong>) และ "กล่องจดหมาย" (<strong>Mailboxes</strong>) เป็นต้น</li>
+</ul>
+<p>ในปัจจุบันก็มีตัวเลือกสำหรับซอฟต์แวร์ในประเภท <strong>RTOS</strong> อยู่หลายรายการ
+และแต่ละตัวเลือกก็มีคำสั่งที่เกี่ยวข้องกับการประสานเวลาและการสื่อสารด้วยข้อมูลระหว่างทาสก์ แตกต่างกันไปบ้าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="semaphores">&#9655; <strong>หลักการทำงานของเซมาฟอร์ (Semaphores)</strong><a class="headerlink" href="#semaphores" title="Permanent link">#</a></h2>
+<p>เซมาฟอร์แบ่งออกได้เป็นสองประเภทคือ</p>
+<ul>
+<li>เซมาฟอร์แบบไบนารี (<strong>Binary Semaphores</strong>) ซึ่งสามารถใช้ได้สำหรับการประสานเวลาระหว่างทาสก์โดยทั่วไป
+และ (ในบางกรณี) การบังคับให้มีลำดับการทำงานของทาสก์ เมื่อมีการใช้ทรัพยากรร่วมกัน (<strong>Shared Resources</strong>)
+โดยให้เข้ามาใช้ได้ทีละทาสก์เท่านั้นและกันทาสก์อื่นไม่ให้เข้ามาแทรก (<strong>Mutual Exclusion</strong>) </li>
+<li>เซมาฟอร์ตัวนับ  (<strong>Counting Semaphores</strong>)</li>
+</ul>
+<p>เราอาจมองว่าเซมาฟอร์แบบไบนารีเป็นกรณีหนึ่งของเซมาฟอร์ตัวนับ กล่าวคือ เซมาฟอร์แบบไบนารีมีค่าสูงสุดได้ไม่เกิน 1 
+แต่เซมาฟอร์ตัวนับสามารถมีค่าสูงสุดได้มากกว่าหนึ่ง</p>
+<p>การทำงานของเซมาฟอร์ อาจเปรียบเทียบได้กับกล่องที่มีโทเคน (<strong>Token</strong>) จำนวนจำกัด 
+เช่น ถ้ามีความจุเท่ากับ 1 ก็จะเป็นแบบไบนารี (คือ มีจำนวนเป็น 0 หรือ 1 เท่านั้น)
+ทาสก์จะต้องขอโทเคนที่มีอยู่ในเซมาฟอร์มาใช้ และได้ครั้งละหนึ่ง หากจำนวนโทเคนลดลงเหลือเป็น 0 ในขณะนั้น ทาสก์ดังกล่าวจะต้องหยุดรอ 
+ซึ่งหมายถึง การเปลี่ยนสถานะจาก <strong>RUNNING</strong> ไปเป็น <strong>BLOCKED</strong>
+และรอไปจนกว่า จะมีการนำโทเคนกลับมาใส่คืน</p>
+<p>เมื่อมีโทเคนถูกนำกลับมาใส่เพิ่ม ทาสก์ที่ถูกหยุดรออยู่นั้น จะถูกเปลี่ยนเป็นสถานะ <strong>READY</strong> และ <strong>RUNNING</strong> ตามลำดับ 
+เมื่อได้ทำงาน ก็จะต้องตรวจสอบดูอีกครั้งว่า จะขอโทเคนได้หรือไม่ ถ้าขอได้ ก็จะได้ทำงานต่อไป</p>
+<p>การนำโทเคนกลับมาคืน จะไม่ทำให้ทาสก์ต้องหยุดรอ แต่หากมีการนำโทเคนกลับมาใส่จนครบแล้วตามความจุ
+จำนวนของโทเคนจะไม่เพิ่มขึ้นเกินกว่าความจุ (ค่าสูงสุด)</p>
+<p><strong>FreeRTOS API</strong> มีคำสั่งที่เกี่ยวข้องกับการใช้งาน <a href="https://www.freertos.org/a00113.html"><strong>Semaphores</strong></a> ยกมาเป็นตัวอย่างดังนี้</p>
+<ul>
+<li><a href="https://www.freertos.org/xSemaphoreCreateBinary.html"><code>xSemaphoreCreateBinary()</code></a>
+สร้างเซมาฟอร์แบบไบนารี</li>
+<li><a href="https://www.freertos.org/xSemaphoreCreateBinaryStatic.html"><code>xSemaphoreCreateBinaryStatic()</code></a>
+สร้างเซมาฟอร์แบบไบนารี และใช้ตลอดไป ไม่มีการยกเลิกการใช้งาน</li>
+<li><a href="https://www.freertos.org/CreateCounting.html"><code>xSemaphoreCreateCounting()</code></a>
+สร้างเซมาฟอร์แบบตัวนับ</li>
+<li><a href="https://www.freertos.org/xSemaphoreCreateCountingStatic.html"><code>xSemaphoreCreateCountingStatic()</code></a>
+สร้างเซมาฟอร์แบบตัวนับ  และใช้ตลอดไป ไม่มีการยกเลิกการใช้งาน</li>
+<li><a href="https://www.freertos.org/a00113.html#vSemaphoreDelete"><code>vSemaphoreDelete()</code></a> 
+เมื่อต้องการเลิกใช้งานเซมาฟอร์ที่ถูกสร้างขึ้นมา</li>
+<li><a href="https://www.freertos.org/a00122.html"><code>xSemaphoreTake()</code></a>
+ขอใช้เซมาฟอร์ และกำหนดเวลา <strong>Timeout</strong> ในการรอได้ (นับตามจำนวน <strong>OS Ticks</strong> หรือจะให้รอแบบไม่มีระยะเวลาจำกัด
+ให้ใช้ค่าเป็น <code>portMAX_DELAY</code>)</li>
+<li><a href="https://www.freertos.org/xSemaphoreTakeFromISR.html"><code>xSemaphoreTakeFromISR()</code></a> 
+ขอใช้เซมาฟอร์ โดยเรียกใช้จาก <strong>ISR</strong></li>
+<li><a href="https://www.freertos.org/a00123.html"><code>xSemaphoreGive()</code></a> 
+ขอคืนเซมาฟอร์</li>
+<li><a href="https://www.freertos.org/a00124.html"><code>xSemaphoreGiveFromISR()</code></a> 
+ขอคืนเซมาฟอร์ โดยเรียกใช้จาก <strong>ISR</strong></li>
+<li><a href="https://www.freertos.org/uxSemaphoreGetCount.html"><code>uxSemaphoreGetCount()</code></a> 
+ตรวจสอบค่าของเซมาฟอร์ที่เหลืออยู่ในขณะนั้น</li>
+</ul>
+<p>ตัวอย่างรูปแบบของฟังก์ชันสำหรับขอใช้และขอคืนเซมาฟอร์ เช่น</p>
+<pre><code class="language-c++">BaseType_t xSemaphoreTake( SemaphoreHandle_t xSemaphore,
+                           TickType_t xTicksToWait );
+
+BaseType_t xSemaphoreGive( SemaphoreHandle_t xSemaphore );
+</code></pre>
+<p>ทั้งสองฟังก์ชันนี้จะให้ค่ากลับคืนมาเป็น <code>pdTRUE</code> หรือ <code>pdFALSE</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-binary-semaphore">&#9655; <strong>ตัวอย่างที่ 1: การใช้งาน Binary Semaphore</strong><a class="headerlink" href="#1-binary-semaphore" title="Permanent link">#</a></h2>
+<p>ตัวอย่างแรกสาธิตการสร้างและใช้งานเซมาฟอร์แบบไบนารีและมีค่าเริ่มต้นเป็น 1 (<strong>Initial Count</strong>)
+เพื่อใช้ในการประสานเวลาการทำงานของทาสก์ <strong>T1</strong> และ <strong>T2</strong>
+ทั้งสองทาสก์จะทำหน้าที่สลับสถานะลอจิกที่ขาเอาต์พุตของแต่ละทาสก์ตามที่กำหนดไว้ (ขา <strong>D11</strong> และ <strong>D12</strong> ตามลำดับ)</p>
+<p>ก่อนที่จะสลับสถานะลอจิกที่ขาเอาต์พุตในแต่ละครั้ง ทาสก์จะต้องพยายามเข้าถึงเซมาฟอร์ให้ได้ก่อน โดยใช้คำสั่ง <code>xSemaphoreTake(...)</code>
+ถ้าไม่สามารถขอใช้เซมาฟอร์ได้ (เนื่องจากค่าของเซมาฟอร์ในขณะนั้นเป็น 0) ทาสก์จะต้องหยุดรอและถูกเปลี่ยนสถานะเป็น <strong>BLOCKED</strong>
+ให้รอไปจนกว่าจะมีโอกาสได้เข้าใช้งานอีกครั้ง </p>
+<p>แต่ถ้าเข้าถึงเซมาฟอร์ได้แล้ว จะทำให้ค่าของเซมาฟอร์ลดลงจาก 1 เป็น 0 
+แล้วทาสก์จึงสลับค่าลอจิกที่ขาเอาต์พุต ตามด้วยคำสั่ง <code>vTaskDelay(1)</code>
+ซึ่งจะทำให้ทาสก์หยุดรอเป็นเวลาเท่ากับ <strong>1 OS Tick</strong>
+จากนั้นจึงทำคำสั่ง <code>xSemaphoreGive(...)</code>
+เพื่อทำให้ค่าของเซมาฟอร์เปลี่ยนจาก 0 กลายเป็น 1 และตามด้วยคำสั่ง
+<code>taskYIELD()</code> คำสั่งสุดท้ายนี้จะทำให้อีกทาสก์หนึ่งได้มีโอกาสทำงานในลำดับถัดไปทันที</p>
+<p>ถ้าทาสก์ <strong>T1</strong> ขอใช้เซมาฟอร์ได้ก่อน ทาสก์ <strong>T2</strong> จะได้ใช้เซมาฟอร์ในลำดับถัดไป 
+หลังจากที่ <strong>T1</strong> ได้นำกลับมาคืน และสลับกันไป เนื่องจากทั้งสองทาสก์
+มีระดับความสำคัญเท่ากัน และมีการใช้คำสั่ง <code>taskYIELD()</code> หลังจากทำคำสั่ง <code>xSemaphoreGive(...)</code></p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+#include &quot;task.h&quot;
+#include &quot;semphr.h&quot;
+
+const int LED_PINS[] = {11, 12};
+
+// a binary semaphore
+SemaphoreHandle_t xSemaphore = NULL;
+
+void setup() {
+  // create a binary semaphore (with the capacity of 1)
+  // and 1 as initial count
+  xSemaphore = xSemaphoreCreateCounting( 1, 1 );
+  // create two tasks &quot;T1&quot; and &quot;T2&quot;
+  xTaskCreate( led_task, &quot;T1&quot;, 128, (void*)0, 1, NULL );
+  xTaskCreate( led_task, &quot;T2&quot;, 128, (void*)1, 1, NULL );
+}
+
+void led_task( void *pvParameters ) {
+  int pin = LED_PINS[ (int)pvParameters ];
+  pinMode( pin, OUTPUT );
+  while(1) { 
+    // try to take the semaphore without timeout
+    if ( xSemaphoreTake(xSemaphore, portMAX_DELAY)==pdTRUE ) {
+       // toggle the LED output
+       digitalWrite( pin, !digitalRead(pin) );
+       vTaskDelay( 1 /*tick*/ );
+       xSemaphoreGive( xSemaphore );
+       taskYIELD(); // yield to the next ready task of the same priority
+    }
+  }
+}
+
+void loop() {} // idle
+</code></pre>
+<p>ลองมาดูตัวอย่างการจำลองการทำงานโดย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/avr_wokwi_bin_semaphore-1.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรเสมือนจริงเพื่อจำลองการทำงาน</p>
+<p><img alt="" src="../avr/images/avr_wokwi_bin_semaphore-2.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ขาเอาต์พุต <strong>D11</strong> และ <strong>D12</strong> ซึ่งจะเห็นได้ว่า
+มีการสร้างสัญญาณเอาต์พุตจากทาสก์ทั้งสองสลับกันไป (เว้นช่วงเวลาเท่ากับ <strong>1 OS Tick</strong> หรือประมาณ <strong>16ms</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-binary-semaphore-isr">&#9655; <strong>ตัวอย่างที่ 2: การใช้งาน Binary Semaphore ร่วมกับการทำงานของ ISR</strong><a class="headerlink" href="#2-binary-semaphore-isr" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างแรกที่ได้สาธิตการใช้งานเซมาฟอร์แบบไบนารี ในตัวอย่างที่สองนี้
+จะแสดงให้เห็นข้อแตกต่าง หากต้องการนำไปใช้กับฟังก์ชันที่ทำหน้าที่เป็น
+<strong>ISR</strong> (<em>Interrupt Service Routine</em>) เช่น การใช้คำสั่ง
+<code>xSemaphoreGiveFromISR(...)</code> แทนที่คำสั่ง <code>xSemaphoreGive()</code>
+สำหรับการทำให้เซมาฟอร์ มีค่าเพิ่มขึ้นจาก 0 เป็น 1 เมื่อใช้คำสั่งนี้ภายใน <strong>ISR()</strong></p>
+<p>ในตัวอย่างนี้ ฟังก์ชัน <code>trig_isr()</code> ทำหน้าที่เป็น <strong>ISR</strong>
+สำหรับเหตุการณ์อินเทอร์รัพท์ภายนอก (<strong>External Interrupt</strong>)
+ที่ขา <strong>D2</strong> (กำหนดประเภทของเหตุการณ์ให้เป็นทั้งแบบขาขึ้นและขาลง)
+เหตุการณ์ดังกล่าวจะเกิดขึ้นได้โดยอาศัยสัญญาณ <strong>PWM</strong> (<em>Pulse Width Modulation</em>)
+จากขา <strong>D5</strong> ป้อนเข้าที่ขาอินพุต <strong>D2</strong></p>
+<p>ในการใช้คำสั่ง <a href="https://www.freertos.org/a00124.html"><code>xSemaphoreGiveFromISR(...)</code></a>
+นอกจากอาร์กิวเมนต์แรกที่ต้องระบุเซมาฟอร์แล้ว
+ยังมีอาร์กิวเมนต์ที่สองซึ่งเป็นตัวแปรที่มีชนิดข้อมูลเป็น <code>BaseType_t</code> เช่น ตัวแปร <code>xHigherPriorityTaskWoken</code>
+ในโค้ดตัวอย่าง อาจมีค่าเป็น <code>pdTRUE</code> (จริง) หรือ <code>pdFALSE</code> (เท็จ) ได้หลังจากทำคำสั่งเพื่อเพิ่มค่าให้แก่เซมาฟอร์</p>
+<p>ผลของการทำคำสั่งนี้ อาจส่งผลให้บางทาสก์ที่มีความสำคัญสูงกว่าทาสก์ที่ทำงานอยู่ในช่วงเวลานั้น
+(แต่ถูกหยุดชั่วคราวโดยการทำงานของ <strong>ISR</strong>)
+ได้มีการเปลี่ยนสถานะมาเป็น <strong>READY</strong> และพร้อมทำงาน
+ดังนั้นสำหรับกรณีนี้ จะมีการใช้คำสั่ง <code>portYIELD_FROM_ISR()</code>
+เพื่อทำให้เกิดการเปลี่ยนบริบทของทาสก์หลังจบการทำงานของ <strong>ISR</strong></p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+#include &quot;task.h&quot;
+#include &quot;semphr.h&quot;
+
+#define TRIG_PIN  (2)    // D2 = trigger input pin
+#define PWM_PIN   (5)    // D5 = PWM output pin
+#define LED_PIN   (LED_BUILTIN) // D13 = onboard LED pin
+
+// a binary semaphore
+SemaphoreHandle_t xSemaphore = NULL;
+
+void trig_isr() { // ISR for the external interrupt 0
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  xSemaphoreGiveFromISR( xSemaphore, &amp;xHigherPriorityTaskWoken );
+  if (xHigherPriorityTaskWoken) {
+    // yield to the next ready task with higher priority
+    portYIELD_FROM_ISR(); 
+  }
+}
+
+void setup() {
+  pinMode( PWM_PIN, OUTPUT );
+  pinMode( LED_PIN, OUTPUT );
+  pinMode( TRIG_PIN, INPUT );
+
+  // create a binary semaphore (with the capacity of 1)
+  // and 0 as initial count
+  xSemaphore = xSemaphoreCreateCounting( 1, 0 );
+  // create two tasks &quot;T1&quot; and &quot;T2&quot;
+  xTaskCreate( led_task, &quot;LED&quot;, 128, NULL, 1, NULL );
+
+  // enable external interrupt, triggered on both edges
+  attachInterrupt( digitalPinToInterrupt(TRIG_PIN), 
+                   trig_isr, CHANGE );
+
+  // generate a PWM signal (50% duty cycle, period: 1024us)
+  analogWrite( PWM_PIN, 127 );
+}
+
+void led_task( void *pvParameters ) {
+  digitalWrite( LED_PIN, digitalRead(TRIG_PIN) );  
+  while(1) { 
+    // try to take the semaphore without timeout
+    if ( xSemaphoreTake(xSemaphore, portMAX_DELAY)==pdTRUE ) {
+       // update the LED output
+       digitalWrite( LED_PIN, digitalRead(TRIG_PIN) );
+    }
+  }
+}
+
+void loop() {} // idle
+</code></pre>
+<p>&nbsp;</p>
+<p>ในการจำลองการทำงาน จะต้องต่อขาสัญญาณจาก <strong>D5</strong> (<strong>PWM</strong>) ซึ่งเป็นเอาต์พุต 
+ไปยังขา <strong>D2</strong> (<strong>TRIG</strong>) สำหรับสัญญาณอินพุต</p>
+<p><img alt="" src="../avr/images/avr_wokwi_binary_semaphore_isr-1.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริงเพื่อจำลองการทำงาน</p>
+<p><img alt="" src="../avr/images/avr_wokwi_binary_semaphore_isr-2.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ขา <strong>D2/D5</strong> และขา <strong>D13</strong> ซึ่งจะสังเกตเห็นได้ว่า
+หากเกิดขอบขาขึ้นหรือขาลงที่สัญญาณ <strong>D5</strong> 
+จะมีการเปลี่ยนแปลงลอจิกที่สัญญาณตามมาที่ขา <strong>D13</strong> (ระยะห่างประมาณ <strong>50us</strong>)</p>
+<p><img alt="" src="../avr/images/avr_wokwi_binary_semaphore_isr-3.png" /></p>
+<p>รูป: แสดงการวัดคาบของสัญญาณ <strong>PWM</strong> ที่ขา <strong>D5</strong> ซึ่งได้เท่ากับ <strong>1024us</strong> (หรือความถี่ <strong>976.6 Hz</strong>)</p>
+<p>แต่ถ้าไม่มีการตรวจสอบค่าของตัวแปรและทำคำสั่ง <code>portYIELD_FROM_ISR()</code> ภายในฟังก์ชัน <strong>ISR</strong>
+ผลการทำงานที่ได้จะแตกต่างออกไป ซึ่งดูได้จากรูปสัญญาณจากการจำลองการทำงานดังนี้</p>
+<p><img alt="" src="../avr/images/avr_wokwi_binary_semaphore_isr-4.png" /></p>
+<p>รูป: สัญญาณที่ขา <strong>D13</strong> จะมีการเปลี่ยนแปลงลอจิกทุก ๆ <strong>16 ms</strong> โดยประมาณ (<strong>1 OS Tick</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-counting-semaphore">&#9655; <strong>ตัวอย่างที่ 3: การใช้งาน Counting Semaphore</strong><a class="headerlink" href="#3-counting-semaphore" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการใช้งานเซมาฟอร์แบบตัวนับ โดยมีการสร้างเซมาฟอร์มาไว้ใช้งาน (อ้างอิงโดยตัวแปร <code>xSemaphore</code>)
+และให้มีความจุเท่ากับ 2 และมีค่าเริ่มต้นเป็น 0 </p>
+<p>เซมาฟอร์นี้จะถูกเพิ่มค่าให้เป็น 2 (และไม่เกิน 2) โดยฟังก์ชันการทำงานของทาสก์แรกที่มีชื่อว่า <code>button_task()</code>
+เมื่อตรวจสอบได้ว่า มีการกดปุ่ม (<strong>Active-low</strong>) เกิดขึ้น
+การกดปุ่มจะทำให้เกิดเหตุการณ์ขอบขาลงที่สัญญาณอินพุตที่ขา <strong>D2</strong> และเมื่อเกิดเหตุการณ์นี้ 
+ก็ให้ทาสก์เดียวกันสร้างสัญญาณพัลส์ที่ขา <strong>D13</strong> อีกด้วย </p>
+<p>อีกสองทาสก์ซึ่งถูกสร้างขึ้นมาและทำคำสั่งโดยฟังก์ชัน <code>led_task()</code> และ <code>buzzer_task()</code> 
+ตามลำดับ จะคอยขอใช้เซมาฟอร์ ถ้าเซมาฟอร์มีค่าเป็น 0 ทาสก์จะต้องหยุดรอ แต่ถ้าทาสก์ใดสามารถขอใช้เซมาฟอร์ได้
+ก็จะสร้างสัญญาณแจ้งเตือนให้ <strong>LED</strong> กระพริบ  หรือสร้างสัญญาณเสียง (เป็นสัญญาณ <strong>PWM</strong> สำหรับโมดูลบัซเซอร์เสียง)
+แจ้งเตือนในช่วงเวลาสั้น ๆ ทุกครั้งที่มีการกดปุ่ม</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+#include &quot;task.h&quot;
+#include &quot;semphr.h&quot;
+
+#define BUTTON_PIN  (2)  // use Arduino D2 pin
+#define LED_PIN     (10) // use Arduino D10 pin
+#define BUZZER_PIN  (11) // use Arduino D11 pin (PWM)
+
+// a counting semaphore
+SemaphoreHandle_t xSemaphore = NULL;
+
+void setup() {
+  // create a counting semaphore with the capacity of 2
+  // and zero as initial count
+  xSemaphore = xSemaphoreCreateCounting( 2, 0 );
+  // create three tasks
+  xTaskCreate(    led_task,    &quot;LED&quot;, 128, NULL, 1, NULL );
+  xTaskCreate( buzzer_task, &quot;BUZZER&quot;, 128, NULL, 1, NULL );
+  xTaskCreate( button_task, &quot;BUTTON&quot;, 128, NULL, 2, NULL );
+}
+
+void led_task( void *pvParameters ) {
+  pinMode( LED_PIN, OUTPUT );
+  while(1) { 
+    // try to take the semaphore without timeout
+    if ( xSemaphoreTake(xSemaphore, portMAX_DELAY)==pdTRUE ) {
+      for ( uint8_t i=0; i&lt;10; i++ ) { // blink LED (10 pulses)
+        digitalWrite( LED_PIN, !digitalRead(LED_PIN) );
+        vTaskDelay( 2 /*ticks*/ );
+      }
+    }
+  }
+}
+
+void buzzer_task( void *pvParameters ) {
+  pinMode( BUZZER_PIN, OUTPUT );
+  analogWrite( BUZZER_PIN, 0 ); 
+  while(1) { 
+    // try to take the semaphore without timeout
+    if ( xSemaphoreTake(xSemaphore, portMAX_DELAY)==pdTRUE ) {
+      analogWrite( BUZZER_PIN, 127 ); // generate PWM signal
+      vTaskDelay( 20 /*ticks*/ );
+      analogWrite( BUZZER_PIN, 0 ); // turn off PWM signall
+    }
+  }
+}
+
+void button_task( void *pvParameters ) {
+  uint8_t bits = 0xff;
+  pinMode( BUTTON_PIN, INPUT_PULLUP );
+  pinMode( LED_BUILTIN, OUTPUT );
+  while(1) { 
+    // sample the logic value on the button pin and 
+    // shift it into a 8-bit register
+    bits = (bits &lt;&lt; 1) | digitalRead( BUTTON_PIN );
+    if ( (bits &amp; 0x0f) == 0x08 ) { // a falling edge has occurred.
+      digitalWrite( LED_BUILTIN, HIGH );
+      xSemaphoreGive( xSemaphore );
+      xSemaphoreGive( xSemaphore );
+      digitalWrite( LED_BUILTIN, LOW );
+    }
+    vTaskDelay(1);
+  }
+}
+
+void loop() {}
+</code></pre>
+<p><img alt="" src="../avr/images/avr_wokwi_counting_semaphore-1.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริงเพื่อทดสอบการทำงานของโค้ด</p>
+<p><img alt="" src="../avr/images/avr_wokwi_counting_semaphore-2.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ขา <strong>D2</strong> (<strong>Button</strong>), <strong>D10</strong> (<strong>LED</strong>), <strong>D11</strong> (<strong>Buzzer</strong>), 
+<strong>D13</strong> (<strong>Onboard LED</strong>) ตามลำดับ</p>
+<p><img alt="" src="../avr/images/avr_wokwi_counting_semaphore-3.png" /></p>
+<p>รูป: เมื่อลองขยายดูคลื่นสัญญาณในแกนเวลา และวัดช่วงเวลาตั้งแต่ขอบขาลงที่ขา <strong>D13</strong> 
+ไปจนถึงขอบขาขึ้นของสัญญาณที่ขา <strong>D10</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-task-notification">&#9655; <strong>ตัวอย่างที่ 4: การใช้งาน Task Notification</strong><a class="headerlink" href="#4-task-notification" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างที่แล้วที่ได้มีการใช้งานเซมาฟอร์แบบตัวนับ ในตัวอย่างนี้จะใช้วิธีแจ้งเตือนทาสก์
+โดยใช้คำสั่ง <a href="https://www.freertos.org/xTaskNotifyGive.html"><code>xTaskNotifyGive()</code></a> และ <a href="https://www.freertos.org/ulTaskNotifyTake.html"><code>ulTaskNotifyTake()</code></a> ของ <strong>FreeRTOS</strong>
+ซึ่งจะทำงานได้มีประสิทธิภาพกว่าการใช้เซมาฟอร์ ตามที่ผู้พัฒนา <strong>FreeRTOS</strong> ได้เขียนแนะนำไว้ในหัวข้อ
+<a href="https://www.freertos.org/RTOS-task-notifications.html"><strong>"RTOS Task Notification API"</strong></a></p>
+<p>ตัวอย่างคำสั่งที่เกี่ยวข้องกับการใช้งาน <strong>Task Notifications</strong> เช่น</p>
+<ul>
+<li><code>xTaskNotifyGive()</code> ทาสก์ส่งสัญญาณไปยังอีกทาสก์หนึ่งที่รออยู่ โดยจะเพิ่มค่าของ <strong>Notification Count</strong>
+  สำหรับทาสก์เป้าหมาย ครั้งละ 1</li>
+<li><code>vTaskNotifyGiveFromISR()</code> ทาสก์ส่งสัญญาณไปยังอีกทาสก์หนึ่งที่รออยู่ แต่คำสั่งนี้จะใช้ภายในฟังก์ชันที่เป็น <strong>ISR</strong></li>
+<li><code>ulTaskNotifyTake()</code> ทาสก์รอจนกว่าจะได้รับการส่งสัญญาณมาจากอีกทาสก์หนึ่ง หรือ หมดเวลารอ (<strong>Timeout</strong>)
+  ถ้าทำได้สำเร็จ จะลดค่าของ <strong>Notification Count</strong> สำหรับทาสก์เป้าหมาย ครั้งละ 1 หรือจะให้เคลียร์ให้เป็น 0 ก็ได้ </li>
+</ul>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+#include &quot;task.h&quot;
+
+#define BUTTON_PIN  (2)  // use Arduino D2 pin
+#define LED_PIN     (10) // use Arduino D10 pin
+#define BUZZER_PIN  (11) // use Arduino D11 pin (PWM)
+
+// Task Handles
+TaskHandle_t buzzer_task_handle = NULL;
+TaskHandle_t led_task_handle    = NULL;
+
+void setup() {
+  // create three tasks
+  xTaskCreate(    led_task,    &quot;LED&quot;, 128, NULL, 1, &amp;led_task_handle );
+  xTaskCreate( buzzer_task, &quot;BUZZER&quot;, 128, NULL, 1, &amp;buzzer_task_handle );
+  xTaskCreate( button_task, &quot;BUTTON&quot;, 128, NULL, 2, NULL );
+}
+
+void led_task( void *pvParameters ) {
+  pinMode( LED_PIN, OUTPUT );
+  while(1) {
+    // wait for task notification and decrement notification count
+    if ( ulTaskNotifyTake(pdFALSE, portMAX_DELAY) &gt; 0 ) {
+      for ( uint8_t i=0; i &lt; 10; i++ ) { // blink LED
+        digitalWrite( LED_PIN, !digitalRead(LED_PIN) );
+        vTaskDelay( 2 /*ticks*/ );
+      }
+    }
+  }
+}
+
+void buzzer_task( void *pvParameters ) {
+  pinMode( BUZZER_PIN, OUTPUT );
+  analogWrite( BUZZER_PIN, 0 ); 
+  while(1) { 
+    // wait for task notification and decrement notification count
+    if ( ulTaskNotifyTake(pdFALSE, portMAX_DELAY) &gt; 0 ) {
+      analogWrite( BUZZER_PIN, 127 ); // generate PWM signal
+      vTaskDelay( 20 /*ticks*/ );
+      analogWrite( BUZZER_PIN, 0 ); // turn off PWM signall
+    }
+  }
+}
+
+void button_task( void *pvParameters ) {
+  uint8_t bits = 0xff;
+  pinMode( BUTTON_PIN, INPUT_PULLUP );
+  pinMode( LED_BUILTIN, OUTPUT );
+  while(1) { 
+    // sample the logic value on the button pin and 
+    // shift it into a 8-bit register
+    bits = (bits &lt;&lt; 1) | digitalRead( BUTTON_PIN );
+    if ( (bits &amp; 0x0f) == 0x08 ) { // a falling edge has occurred.
+      // output onboard LED high
+      digitalWrite( LED_BUILTIN, HIGH );
+      // send notification to the LED task
+      xTaskNotifyGive( led_task_handle );
+      // send notification to the BUZZER task
+      xTaskNotifyGive( buzzer_task_handle );
+      // output onboard LED low
+      digitalWrite( LED_BUILTIN, LOW );
+    }
+    vTaskDelay(1);
+  }
+}
+
+void loop() {}
+</code></pre>
+<p><img alt="" src="../avr/images/avr_wowki_task_notifiy-1a.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ขา <strong>D2</strong> (<strong>Button</strong>), <strong>D10</strong> (<strong>LED</strong>), <strong>D11</strong> (<strong>Buzzer</strong>), 
+<strong>D13</strong> (<strong>Onboard LED</strong>) ตามลำดับ ซึ่งได้ผลในลักษณะเดียวกันเหมือนตัวอย่างที่แล้ว</p>
+<p><img alt="" src="../avr/images/avr_wowki_task_notifiy-1b.png" /></p>
+<p>รูป: เมื่อลองขยายดูคลื่นสัญญาณในแกนเวลา และวัดช่วงเวลาตั้งแต่ขอบขาลงที่ขา <strong>D13</strong> 
+ไปจนถึงขอบขาขึ้นของสัญญาณที่ขา <strong>D10</strong> และจะเห็นได้ว่า มีค่าลดลงน้อยกว่าตัวอย่างที่แล้ว  คือ <strong>55.875us</strong> 
+(ลดลงจาก <strong>109.688us</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-event-group">&#9655; <strong>ตัวอย่างที่ 5: การใช้งาน Event Group</strong><a class="headerlink" href="#5-event-group" title="Permanent link">#</a></h2>
+<p>ในการส่งสัญญาณจากทาสก์หนึ่งไปยังทาสก์อื่นที่รออยู่ ยังมีวิธีอื่นอีกหากใช้ <strong>FreeRTOS</strong> 
+ตัวอย่างนี้สาธิตการใช้งาน "กลุ่มเหตุการณ์" หรือ
+<a href="https://www.freertos.org/event-groups-API.html"><strong>Event Group</strong></a>
+และมีคำสั่งที่เกี่ยวข้องดังนี้</p>
+<ul>
+<li><a href="https://www.freertos.org/xEventGroupCreate.html"><code>xEventGroupCreate()</code></a>
+สร้างกลุ่มเหตุการณ์ และยกเลิกการใช้งานในภายหลังได้</li>
+<li><a href="https://www.freertos.org/xEventGroupCreateStatic.html"><code>xEventGroupCreateStatic()</code></a>
+สร้างกลุ่มเหตุการณ์เพื่อใช้งานแบบถาวร จะไม่มีการยกเลิกการใช้งาน</li>
+<li><a href="https://www.freertos.org/xEventGroupWaitBits.html"><code>xEventGroupWaitBits()</code></a>
+รอจนกว่าจะมีการเซตบิตให้มีค่าเป็น 1 ในกลุ่มเหตุการณ์ตามตำแหน่งบิตที่ระบุ (มีได้หลายตำแหน่งพร้อมกัน)</li>
+<li><a href="https://www.freertos.org/xEventGroupSetBits.html"><code>xEventGroupSetBits()</code></a>
+เซตบิตให้มีค่าเป็น 1 ในกลุ่มเหตุการณ์ในตำแหน่งบิตที่ระบุ (มีได้หลายตำแหน่งพร้อมกัน)</li>
+<li><a href="https://www.freertos.org/xEventGroupClearBits.html"><code>xEventGroupClearBits()</code></a>
+เคลียร์บิตให้มีค่าเป็น 0 ในกลุ่มเหตุการณ์ในตำแหน่งบิตที่ระบุ (มีได้หลายตำแหน่งพร้อมกัน)</li>
+<li><a href="https://www.freertos.org/xEventGroupGetBits.html"><code>xEventGroupGetBits()</code></a>
+อ่านค่าบิตในกลุ่มเหตุการณ์ในตำแหน่งบิตที่ระบุ</li>
+<li><a href="https://www.freertos.org/xEventGroupSetBitsFromISR.html"><code>xEventGroupSetBitsFromISR()</code></a>
+-- ใช้กับฟังก์ชันประเภท <strong>ISR</strong></li>
+<li><a href="https://www.freertos.org/xEventGroupClearBitsFromISR.html"><code>xEventGroupClearBitsFromISR()</code></a>
+-- ใช้กับฟังก์ชันประเภท <strong>ISR</strong></li>
+<li><a href="https://www.freertos.org/xEventGroupGetBitsFromISR.html"><code>xEventGroupGetBitsFromISR()</code></a>
+-- ใช้กับฟังก์ชันประเภท <strong>ISR</strong></li>
+<li><a href="https://www.freertos.org/xEventGroupSync.html"><code>xEventGroupSync()</code></a>
+ใช้กับกรณีที่เรียกว่า <strong>Task Rendezvous</strong></li>
+<li><a href="https://www.freertos.org/vEventGroupDelete.html"><code>vEventGroupDelete()</code></a>
+ยกเลิกการใช้งานกลุ่มเหตุการณ์ที่ถูกสร้างขึ้นมา</li>
+</ul>
+<p>ทาสก์แรกคอยตรวจสอบการกดปุ่ม และเมื่อเกิดเหตุการณ์ดังกล่าว ทาสก์นี้จะเซตบิตในกลุ่มเหตุการณ์ที่อ้างอิงโดยตัวแปร 
+<code>evt_group</code> ให้มีค่าเป็น 1 ในตำแหน่งบิตที่ 0 และ 1</p>
+<p>ทาสก์ที่สองและสามจะรอจนกว่ามีการเซตค่าในกลุ่มเหตุการณ์ ในตำแหน่งบิตที่ 0  และ 1 จะถูกเซตให้มีค่าเป็น 1
+ตามลำดับ</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+#include &quot;task.h&quot;
+#include &quot;event_groups.h&quot;
+
+#define BUTTON_PIN  (2)  // use Arduino D2 pin
+#define LED_PIN     (10) // use Arduino D10 pin
+#define BUZZER_PIN  (11) // use Arduino D11 pin (PWM)
+
+#define BIT_0   (1 &lt;&lt; 0)
+#define BIT_1   (1 &lt;&lt; 1)
+
+// EventGroup Handle
+EventGroupHandle_t evt_group = NULL;
+
+void setup() {
+  //create an Event Group
+  evt_group = xEventGroupCreate();
+  // create three tasks
+  xTaskCreate(    led_task,    &quot;LED&quot;, 128, NULL, 1, NULL );
+  xTaskCreate( buzzer_task, &quot;BUZZER&quot;, 128, NULL, 1, NULL );
+  xTaskCreate( button_task, &quot;BUTTON&quot;, 128, NULL, 2, NULL );
+}
+
+void led_task( void *pvParameters ) {
+  EventBits_t evt_bits;
+  pinMode( LED_PIN, OUTPUT );
+  while(1) {
+    // wait for event bit 0
+    evt_bits = xEventGroupWaitBits(
+                 evt_group, BIT_0, 
+                 pdTRUE, pdFALSE, 
+                 portMAX_DELAY );
+    if ( evt_bits &amp; BIT_0 ) { // bit 0 in event group is set
+      for ( uint8_t i=0; i &lt; 10; i++ ) { // blink LED
+        digitalWrite( LED_PIN, !digitalRead(LED_PIN) );
+        vTaskDelay( 2 /*ticks*/ );
+      }
+    }
+  }
+}
+
+void buzzer_task( void *pvParameters ) {
+  EventBits_t evt_bits;
+  pinMode( BUZZER_PIN, OUTPUT );
+  analogWrite( BUZZER_PIN, 0 ); 
+  while(1) { 
+    // wait for event bit 1
+    evt_bits = xEventGroupWaitBits(
+                 evt_group, BIT_1, 
+                 pdTRUE, pdFALSE, 
+                 portMAX_DELAY );
+    if ( evt_bits &amp; BIT_1 ) { // bit 1 in event group is set
+      analogWrite( BUZZER_PIN, 127 ); // generate PWM signal
+      vTaskDelay( 20 /*ticks*/ );
+      analogWrite( BUZZER_PIN, 0 );   // turn off PWM signall
+    }
+  }
+}
+
+void button_task( void *pvParameters ) {
+  uint8_t bits = 0xff;
+  pinMode( BUTTON_PIN, INPUT_PULLUP );
+  pinMode( LED_BUILTIN, OUTPUT );
+  while(1) { 
+    // sample the logic value on the button pin and 
+    // shift it into a 8-bit register
+    bits = (bits &lt;&lt; 1) | digitalRead( BUTTON_PIN );
+    if ( (bits &amp; 0x0f) == 0x08 ) { // a falling edge has occurred.
+      // output onboard LED high
+      digitalWrite( LED_BUILTIN, HIGH );
+      // set bits 0 and 1 in the Event Group
+      xEventGroupSetBits( evt_group, BIT_0 | BIT_1 );
+      // output onboard LED low
+      digitalWrite( LED_BUILTIN, LOW );
+    }
+    vTaskDelay(1);
+  }
+}
+
+void loop() {}
+</code></pre>
+<p>ผลการจำลองการทำงานมีดังนี้</p>
+<p><img alt="" src="../avr/images/avr_wokwi_event_group-1a.png" /></p>
+<p>รูป:  คลื่นสัญญาณที่ขา <strong>D2</strong> (<strong>Button</strong>), <strong>D10</strong> (<strong>LED</strong>), <strong>D11</strong> (<strong>Buzzer</strong>), 
+<strong>D13</strong> (<strong>Onboard LED</strong>) ตามลำดับ ซึ่งได้ผลในลักษณะเดียวกันเหมือนตัวอย่างที่แล้ว</p>
+<p><img alt="" src="../avr/images/avr_wokwi_event_group-1b.png" /></p>
+<p>รูป:  เมื่อลองขยายดูคลื่นสัญญาณในแกนเวลา และวัดช่วงเวลาตั้งแต่ขอบขาลงที่ขา <strong>D13</strong> 
+ไปจนถึงขอบขาขึ้นของสัญญาณที่ขา <strong>D10</strong> และจะเห็นได้ว่า มีค่าประมาณ <strong>56us</strong> 
+ใกล้เคียงกับกรณีที่ใช้วิธีส่งสัญญาณไปยังทาสก์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างโค้ด <strong>Arduino Sketches</strong> ที่มีการใช้คำสั่งของ <strong>FreeRTOS</strong>
+สำหรับการใช้งานเซมาฟอร์ในเบื้องต้นเพื่อการประสานเวลาการทำงานระหว่างทาสก์ 
+เปรียบเทียบกับตัวอย่างการส่งสัญญาณไปยังทาสก์แทนการใช้เซมาฟอร์
+หรือใช้วิธีการรอค่าบิตในกลุ่มเหตุการณ์</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-02-12 | Last Updated: 2022-02-13</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

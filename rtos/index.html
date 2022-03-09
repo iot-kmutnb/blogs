@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/rtos/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Real-Time Operating System (RTOS) - IoT Engineering Education</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../css/extra.css" rel="stylesheet">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#real-time-operating-system-rtos" class="nav-link">Real-Time Operating System (RTOS)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ความสำคัญของระบบปฏิบัติการ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; การทำงานแบบหลายงานได้พร้อมกัน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#os" class="nav-link">&#9655; OS สำหรับระบบสมองกลฝังตัว</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#polling-loop-superloop" class="nav-link">&#9655; การเขียนโค้ดแบบ Polling Loop / Superloop</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#os-rtos-iot" class="nav-link">&#9655; ตัวเลือก OS / RTOS สำหรับงาน IoT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rtos" class="nav-link">&#9655; ตัวเลือก RTOS แนะนำสำหรับการเรียนรู้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rt-kernel-rtos" class="nav-link">&#9655; ความแตกต่างระหว่าง RT Kernel และ RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rtos_1" class="nav-link">&#9655; การจัดลำดับการทำงานสำหรับ RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; บริบทสำหรับการทำงานของทาสก์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rtos_2" class="nav-link">&#9655; ประสิทธิภาพของ RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#os-rtos" class="nav-link">&#9655; แนวโน้มของการใช้งาน OS / RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rtos_3" class="nav-link">&#9655; คุณภาพและความปลอดภัยของ RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="real-time-operating-system-rtos">Real-Time Operating System (RTOS)<a class="headerlink" href="#real-time-operating-system-rtos" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Multitasking</em>, <em>Multithread Microcontroller Programming</em>, 
+<em>Open-Source RTOSes for MCUs</em>, <em>Real-Time Systems</em></p>
+<h2 id="_1">&#9655; <strong>ความสำคัญของระบบปฏิบัติการ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ระบบปฏิบัติการ (<strong>Operating System: OS</strong>) หรือที่มักเรียกอย่างย่อว่า "โอเอส" 
+เป็นซอฟต์แวร์ประเภทหนึ่งที่ช่วยจัดการทรัพยากรของคอมพิวเตอร์ในด้านต่าง ๆ เช่น 
+มีการแบ่งเวลาในการประมวลผลโดยซีพียูและใช้ทรัพยากรของระบบ 
+มีรูปแบบของการจัดการที่เรียกว่า "โพรเซส" (<strong>Process</strong>) 
+การทำงานของโอเอสช่วยให้หลายแอปพลิชันในระบบสามารถทำงานได้เสมือนว่าเกิดขึ้นได้พร้อมกัน 
+ในระบบที่มีผู้ใช้งานหลายคน (<strong>Multi-User Systems</strong>)
+ก็มีการป้องกันการเข้าถึงหน่วยความจำ โดยจำกัดสิทธิ์สำหรับผู้ใช้แต่ละคน
+หรือมีการแบ่งระดับของการทำงานแตกต่างกันระหว่างโอเอสและแอปพลิเคชันของผู้ใช้</p>
+<p>ตัวเลือกสำหรับระบบปฏิบัติการในปัจจุบัน มีความหลากหลายแตกต่างกันไป เช่น 
+<strong>Windows</strong>, <strong>Linux</strong>, <strong>Mac OS</strong> 
+สำหรับเครื่องคอมพิวเตอร์ทั่วไป หรือ ระบบปฏิบัติการ <strong>Android</strong> หรือ <strong>iOS</strong> 
+สำหรับโทรศัพท์มือถือ (<strong>Smart Phones</strong>) เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>การทำงานแบบหลายงานได้พร้อมกัน</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรมแบบมัลติทาสก์ <strong>(Multi-Task Programming</strong>) 
+เป็นรูปแบบหนึ่ง เพื่อจัดการการทำงานของโปรแกรม โดยมองว่า การทำงานของโปรแกรมหรือแอปพลิเคชัน 
+จะประกอบด้วยงานย่อย หรือ ทาสก์ (<strong>Tasks</strong>) หรือบางทีก็เรียกว่า "เธรด" (<strong>Threads</strong>)
+ได้หลาย ๆ งาน และทำงานไปได้พร้อม ๆ กัน โดยมีการแบ่งช่วงเวลาสลับกันในการทำงานของซีพียู 
+(<strong>CPU Time Sharing</strong>)</p>
+<p>ทาสก์จะทำงานตามไปทีละคำสั่งตามลำดับ (<strong>Flow of Execution</strong>)
+ทาสก์ที่มีอยู่ในระบบ ก็สามารถทำงานอิสระต่อกัน หรืออาจเกี่ยวข้องกันก็ได้ เช่น การสื่อสารข้อมูลกัน
+หรือรอจังหวะกันระหว่างทาสก์ (<strong>Inter-Task Communication &amp; Synchronization</strong>)</p>
+<p>ถ้าเราสามารถจัดสรร หรือแบ่งเวลาและทรัพยากร ให้ทาสก์เหล่านั้นได้สลับกันทำงาน 
+โดยใช้ซีพียูเดียวกัน ก็อาจมองเห็นได้ว่า ทาสก์ต่าง ๆ เหล่านั้นทำงานไปพร้อม ๆ กัน (<strong>Task Concurrency</strong>) 
+ไม่จำเป็นต้องรอให้ทาสก์ใดจบการทำงานก่อน</p>
+<p>ในปัจจุบันไมโครคอนโทรลเลอร์เริ่มมีการใช้ตัวประมวลผลที่มีแกนของซีพียู (<strong>CPU Cores</strong>) 
+ได้มากกว่าหนึ่งแกน (<strong>Multi-Core Processor</strong>) สามารถรันคำสั่งของซีพียูแบบขนานกันในระดับฮาร์ดแวร์ 
+ดังนั้นการทำงานแบบมัลติทาสก์ ก็สามารถใช้ประโยชน์จากการมีตัวประมวลผลแบบหลายแกนได้อย่างมีประสิทธิภาพมากขึ้น </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="os">&#9655; <strong>OS สำหรับระบบสมองกลฝังตัว</strong><a class="headerlink" href="#os" title="Permanent link">#</a></h2>
+<p>ระบบปฏิบัติการที่จะนำมาใช้ได้สำหรับระบบสมองกลฝังตัว (<strong>Embedded Systems</strong>)
+อาจมีข้อจำกัดของทรัพยากรด้านฮาร์ดแวร์ (<strong>Resource Constraints</strong>) 
+เช่น ขนาดของหน่วยความจำ <strong>RAM</strong> ที่ค่อนข้างน้อยสำหรับไมโครคอนโทรลบางรุ่นบางตระกูล 
+(มีความจุอยู่ในระดับหลักสิบหรือหลักร้อยกิโลไบต์ <strong>KB</strong>) และ
+ความสามารถหรือความเร็วของตัวประมวลผล (พิจารณาจากความถี่สำหรับการทำงานของซีพียู
+หรือ ความสามารถในการทำคำสั่งของซีพียูต่อวินาที) 
+อาจไม่สูงมากในระดับ <strong>High-End Processors</strong> เป็นต้น </p>
+<p>นอกจากนั้น อาจมีความจำเป็นต้องตอบสนองต่อเหตุการณ์ให้ทันเวลา 
+หรือทำงานบางอย่างให้เสร็จภายในระยะเวลาที่กำหนด (<strong>Deadlines</strong>) 
+หากเกินระยะเวลาที่กำหนดไว้ อาจทำให้เกิดความเสียหายตามมาได้ 
+ดังนั้นในมุมมองนี้ จึงมีการจำแนกระบบเวลาจริง (<strong>Real-Time Systems: RTS</strong>)
+ตามผลกระทบเชิงลบที่ตามมา หากทำงานไม่ทันเวลาตามข้อกำหนด เป็นได้สองประเภทหลักคือ</p>
+<ul>
+<li><strong>Soft real-time</strong>: มีผลกระทบที่เกิดจากความผิดพลาดอยู่ในระดับที่ไม่รุนแรง หรือยอมรับได้
+ หรือทำให้คุณภาพการบริการของระบบลดลง แต่ระบบยังทำงานต่อไปได้ เช่น 
+การส่งข้อมูลแบบสตรีมมิง (<strong>Real-Time Streaming</strong>)</li>
+<li><strong>Hard real-time</strong>: มีผลกระทบต่อการทำงานของระบบที่ทำให้เกิดความผิดพลาดหรือเสียหาย 
+และอาจรวมไปถึงความสูญเสียหรือเป็นอันตรายต่อผู้ใช้ เช่น ระบบการทำงานโดยอัตโนมัติของถุงลมนิรภัย 
+ระบบควบคุมความเร็วโดยอัตโนมัติในการขับขี่รถยนต์ เป็นต้น</li>
+</ul>
+<p>ดังนั้นเมื่อจะพัฒนาซอฟต์แวร์หรือระบบที่มีความต้องการในลักษณะนี้ (ความสามารถในการตอบสนองแบบเรียลไทม์) 
+ระบบปฏิบัติการเวลาจริง (<strong>Real-Time Operating System: RTOS</strong>) หรือเรียกย่อ ๆ ว่า 
+"อาร์ทอส" จึงเป็นตัวเลือกที่สำคัญสำหรับนักพัฒนา</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="polling-loop-superloop">&#9655; <strong>การเขียนโค้ดแบบ Polling Loop / Superloop</strong><a class="headerlink" href="#polling-loop-superloop" title="Permanent link">#</a></h2>
+<p>การพัฒนาซอฟต์แวร์สำหรับระบบสมองกลฝังตัว โดยทั่วไปแล้วก็ไม่จำเป็นต้องใช้ <strong>OS</strong> และ
+ส่วนใหญ่ก็ใช้วิธีการที่เรียกว่า <strong>Polling Loop</strong> หรือ <strong>Superloop</strong>
+เช่น มีการตรวจสอบอินพุตหรือเหตุการณ์ตามเงื่อนไขที่เกิดขึ้นในระบบ และเป็นการทำซ้ำไปเรื่อย ๆ ไปตามลำดับ
+เช่น การตรวจสอบดูว่า มีการกดปุ่มหรือไม่ หรือได้รับข้อมูลอินพุตเข้ามาจาก <strong>Serial/UART</strong>
+หรืออ่านค่าจากอินพุตของวงจร <strong>ADC</strong> (<strong>Analog-to-Digital Converter</strong>) 
+ตามคาบเวลาที่กำหนดไว้ เป็นต้น</p>
+<p>&nbsp;</p>
+<pre><code class="language-C">  void main() 
+  { 
+      // initialization code
+
+      // enter the main loop
+      while (1) { 
+          // perform task 1
+          task_function_1();
+          // perform task 2
+          task_function_2();
+          // ...
+          // perform task N
+          task_function_N();
+      }
+  }
+</code></pre>
+<p>ตัวอย่างโค้ดที่ 1: รูปแบบการเขียนโค้ดภาษา C ที่แสดงหลักการทำงาน <strong>Polling Loop</strong></p>
+<p>&nbsp;</p>
+<pre><code class="language-C">  #define T1_PERIOD  10 /*msec*/
+  #define T2_PERIOD  50 /*msec*/
+
+  void main() 
+  { 
+      // initialization code
+      uint32_t t_now, t1=0, t2=0;
+
+      // enter the main loop
+      while (1) { 
+          // get current time 
+          t_now = get_time_msec();   
+          // task 1
+          if ( t_now - t1 &gt;= T1_PERIOD ) {
+             perform_task_function_1();
+             t1 = t_now; // save current time to t1
+          }
+          // task 2
+          if ( t_now - t2 &gt;= T2_PERIOD ) {
+             perform_task_function_2();
+             t2 = t_now; // save current time to t2
+          }
+      }
+  }
+</code></pre>
+<p>ตัวอย่างโค้ดที่ 2: รูปแบบการเขียนโค้ดภาษา C สำหรับสองทาสก์ที่ทำงานซ้ำตามคาบเวลา</p>
+<p>&nbsp;</p>
+<p>หากมีอินพุตเข้ามา หรือเงื่อนไขสำหรับเหตุการณ์เป็นจริง ก็ให้ทำฟังก์ชันที่เกี่ยวข้อง (จะมองว่าเป็นทาสก์ก็ได้)
+ฟังก์ชันของแต่ละทาสก์ อาจใช้เวลาในการทำงาน (<strong>Execution Time</strong>) ไม่เท่ากัน 
+แต่ละทาสก์ก็ไม่ควรใช้เวลานานเกินไปในแต่ละรอบของการทำงาน และจะต้องไม่บล็อคการทำงาน
+(เช่น การวนไปเรื่อย ๆ เพื่อรอเหตุการณ์บางอย่าง หรือ การใช้คำสั่งประเภท 
+<code>delay</code> หรือ <code>sleep</code> เป็นต้น)</p>
+<p>ถ้าทาสก์ใดใช้เวลามาก (แต่อาจจะไม่จำเป็นต้องทำบ่อย) ก็ใช้วิธีการแบ่งการทำงาน 
+ให้เป็นงานย่อยหรือขั้นตอนย่อย และใช้โมเดลการทำงานที่เรียกว่า 
+"เครื่องสถานะจำกัด" (<strong>Finite State Machine: FSM)</strong> 
+เข้ามาช่วย ให้ทำงานในแต่ละขั้นตอนตามสถานะของทาสก์</p>
+<p>แม้ว่าการเขียนโค้ดแบบ <strong>Superloop</strong> จะสามารถทำงานร่วมกับอินเทอร์รัพท์ได้ 
+(เช่น การใช้ <strong>Timer Interrupt</strong> และ <strong>External Interrupt</strong> 
+ของไมโครคอนโทรลเลอร์) เพื่อตอบสนองต่อเหตุการณ์ที่เกิดขึ้นในระบบ 
+แต่ก็ยังมีข้อจำกัดในการตอบสนองแบบเรียลไทม์ 
+ลำดับการทำงานของฟังก์ชันหรือทาสก์ เป็นแบบเรียงลำดับตามที่เขียนไว้ในโค้ด 
+และไม่สามารถกำหนดความสำคัญหรือความเร่งด่วนของทาสก์ที่แตกต่างกันได้ 
+ซึ่งไม่เหมือนในกรณีที่ใช้เรียลไทม์เคอร์เนล หรีอ เรียลไทม์โอเอส</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="os-rtos-iot">&#9655; ตัวเลือก <strong>OS / RTOS สำหรับงาน IoT</strong><a class="headerlink" href="#os-rtos-iot" title="Permanent link">#</a></h2>
+<p>ในปัจจุบัน "อินเทอร์เน็ตของสรรพสิ่ง" หรือ "ไอโอที"  (<strong><em>Internet of Things: IoT</em></strong>)
+เป็นเทคโนโลยีที่กำลังได้รับความสนใจและมีการใช้งานแพร่หลาย 
+การพัฒนาระบบทั้งฮาร์ดแวร์และแอปพลิเคชันสำหรับ <strong>IoT</strong> จึงมีความสำคัญ</p>
+<p>ในส่วนของฮาร์ดแวร์ ก็มีความหลากหลาย อาจเป็นบอร์ดไมโครคอนโทรลเลอร์ขนาดเล็ก
+ซึ่งถูกจัดอยู่ในประเภท <strong>Low-end Devices</strong>) 
+หรือคอมพิวเตอร์บอร์ดเดี่ยว (<strong>Single Board Computer: SBC</strong>) 
+ในประเภท <strong>High-end Devices</strong>
+และมีการใช้งานร่วมกับระบบปฏิบัติการสำหรับฮาร์ดแวร์เหล่านี้ </p>
+<p>ถ้าใช้บอร์ดประเภท <strong>SBC</strong> อย่างเช่น 
+<a href="https://www.raspberrypi.com/"><strong>Raspberry Pi (RPi)</strong></a> หรือ
+บอร์ดอื่นที่ใช้ชิปประเภท <strong>SoC</strong> ซึ่งภายในมีตัวประมวลผล 
+<a href="https://developer.arm.com/ip-products/processors/cortex-a"><strong>ARM Cortex-A Series</strong></a>
+ทั้ง 32 บิต และ 64 บิต (เช่น <strong>ARM Cortex-A17 / A53 / A72</strong> ) ก็สามารถเลือกใช้ระบบปฏิบัติการ 
+<strong>Linux</strong> และ <strong>Distro</strong> อย่างเช่น </p>
+<ul>
+<li><a href="https://www.raspberrypi.com/software/"><strong>Raspbian / Raspberry OS</strong></a></li>
+<li><a href="https://ubuntu.com/embedded"><strong>Ubuntu Core / Embedded Linux</strong></a></li>
+<li><a href="https://www.armbian.com/"><strong>Armbian</strong></a>
+  &mdash; <a href="https://www.armbian.com/download/?device_support=Supported"><em>a list of supported boards</em></a></li>
+<li><a href="https://openwrt.org/"><strong>OpenWrt</strong></a></li>
+</ul>
+<p>ข้อสังเกต: โอเอสในประเภทนี้ตามที่ได้ยกตัวอย่างมา ไม่ได้ทำงานด้วยเรียลไทม์เคอร์เนล ดังนั้นจึงไม่ใช่ <strong>RTOS</strong>
+หรืออาจกล่าวได้ว่า โอเอสสำหรับงานด้านไอโอที ก็ไม่มีความจำเป็นต้องเป็นอาร์ทอส
+(ยกเว้นบางกรณีที่มีความจำเป็นต้องใช้อาร์ทอส)</p>
+<p>อย่างไรก็ตาม โอเอสสำหรับระบบสมองกลฝังตัวที่ใช้สำหรับงาน <strong>IoT</strong> 
+(<strong><em>Embedded OS for IoT devices</em></strong>) อาจจะไม่เน้นความเป็นเรียลไทม์ 
+แต่ให้ความสำคัญกับความยืดหยุ่นในการพัฒนาซอฟต์แวร์ 
+ความสามารถในการเชื่อมต่อด้วยโพรโทคอลสื่อสารแบบต่าง ๆ 
+การเชื่อมต่อกับบริการในระบบคลาวด์ รวมถึงความมั่นคงปลอดภัยในเครือข่ายหรือทางไซเบอร์ 
+(<strong>Cyber Security</strong>) เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rtos">&#9655; ตัวเลือก <strong>RTOS แนะนำสำหรับการเรียนรู้</strong><a class="headerlink" href="#rtos" title="Permanent link">#</a></h2>
+<p>ในปัจจุบัน ระบบปฏิบัติการเวลาจริง หรือ "เรียลไทม์โอเอส หรือ อาร์ทอส" (<strong>RTOS</strong>) 
+สำหรับไมโครคอนโทรลเลอร์  มีให้เลือกใช้อยู่หลายตัวเลือก 
+(ส่วนใหญ่จะเหมาะสมกับระบบที่มีตัวประมวผลหรือซีพียูขนาด 32 บิต) 
+จำแนกได้เป็น <strong>Open Source</strong> / <strong>Free</strong> / <strong>Commerical</strong> 
+ตัวอย่างที่มีการใช้งานแพร่หลาย เช่น</p>
+<ul>
+<li><strong>AWS FreeRTOS</strong>: open source 
+  (<a href="https://github.com/aws/amazon-freertos">Github repo</a>), 
+  MIT License (V10.0.0 or higher)</li>
+<li><strong>ARM mbed OS</strong>: open source 
+  (<a href="https://github.com/ARMmbed/mbed-os">Github repo</a>), 
+  Apache 2.0 License<ul>
+<li>based on <a href="https://www2.keil.com/mdk5/cmsis/rtx">ARM RTX Keil</a>, commercial</li>
+</ul>
+</li>
+<li><strong>Microsoft Azure RTOS ThreadX</strong>: open source 
+   (<a href="https://github.com/azure-rtos/threadx">Github repo</a>), 
+   commercial <ul>
+<li>free for 
+  <a href="https://github.com/azure-rtos/threadx/blob/master/LICENSED-HARDWARE.txt">pre-licensed devices</a></li>
+</ul>
+</li>
+<li><strong>Apache NuttX</strong>: open source 
+   (<a href="https://github.com/apache/incubator-nuttx">Github repo</a>), 
+   Apache License 2.0</li>
+<li><strong>Apache MyNewt</strong>: open source 
+   (<a href="https://mynewt.apache.org/download/">download</a>), 
+   Apache License 2.0</li>
+<li><strong>Zephyr OS</strong>: open source
+   (<a href="https://github.com/zephyrproject-rtos/zephyr">Github repo</a>), 
+   Apache License 2.0 </li>
+<li><strong>ChibiOS/RT</strong>: open source
+   (<a href="https://github.com/ChibiOS/ChibiOS">Github repo</a>), 
+   GPL3 License</li>
+<li><strong>RT-Thread</strong>: open source
+   (<a href="https://github.com/RT-Thread/rt-thread">Github repo</a>),
+   Apache License 2.0 </li>
+<li><strong>AliOS-Things / Rhino RT Kernel</strong>: open source
+   (<a href="https://github.com/alibaba/AliOS-Things">Github repo</a>),
+   Apache License 2.0 </li>
+<li><strong>Micrium / Silicon Labs μC/OS III</strong>: open source
+   (<a href="https://github.com/weston-embedded/uC-OS3">Github repo</a>), 
+   Apache License 2.0</li>
+<li><strong>WindRiver VxWorks</strong>: commercial</li>
+</ul>
+<p>จากรายการตัวเลือกนี้ จะเห็นได้ว่า  <strong>RTOS</strong> โดยส่วนใหญ่นั้นเป็นซอฟต์แวร์ประเภทโอเพนซอร์ส 
+(เลือกแผยแพร่โดยใช้ <strong>Apache License 2.0</strong> เป็นส่วนใหญ่) 
+และมีการนำไปปรับให้ใช้งานได้กับไมโครคอนโทรลเลอร์หลายตระกูล  (<strong>RTOS porting to target devices</strong>) 
+เช่น <strong>ARM Cortex-M Series</strong> และ <strong>RISC-V</strong> เป็นต้น
+บางตัวเลือก็สามารถใช้กับไมโครคอนโทรลเลอร์ขนาด 8 บิต ที่มีหน่วยความจำไม่มากได้ด้วย เนื่องจากตัว <strong>RTOS</strong>
+มีขนาดเล็กในหน่วยความจำ (<strong>Small Memory Footprint</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rt-kernel-rtos">&#9655; <strong>ความแตกต่างระหว่าง RT Kernel และ RTOS</strong><a class="headerlink" href="#rt-kernel-rtos" title="Permanent link">#</a></h2>
+<ul>
+<li>บ่อยครั้งที่เราอาจได้ยินคำว่า "เรียลไทม์โอเอส" และ "เรียลไทม์เคอร์เนล" (<strong>Real-Time Kernel: RT Kernel, RTK</strong>) 
+ซึ่งอาจใช้เรียกแทนกันได้ แต่สองอย่างนี้ก็มีความแตกต่างกันอยู่บ้าง กล่าวคือ เรียลไทม์เคอร์เนลเป็นส่วนหนึ่งของเรียลไทม์โอเอส 
+ทำหน้าที่จัดลำดับการทำงานแบบมัลติทาสก์ เช่น มีการกำหนดระดับความสำคัญ (<strong>Priority Level</strong>) 
+ของงานย่อยหรือทาสก์ และทำหน้าที่ตัดสินใจว่า ทาสก์ใดจะได้รับจัดสรรเวลาก่อนหลัง (<strong>Task Scheduling</strong>) เป็นต้น </li>
+<li>นอกเหนือจาก <strong>RTK</strong> ยังมีซอฟต์แวร์ส่วนอื่นอีกที่เกี่ยวข้องและทำงานอยู่บนชั้น <strong>RTOS</strong> 
+เช่น ซอฟต์แวร์หรือ <strong>Middleware / Software Packs</strong> 
+(เช่น <strong>IPv4/IPv6 Network Stack</strong>, <strong>MQTT</strong>, <strong>TLS</strong>, <strong>USB Stack</strong>, <strong>File System</strong>) 
+ไว้สำหรับเขียนโค้ดเข้าถึงฮาร์ดแวร์ต่าง ๆ และช่วยให้พัฒนาซอฟต์แวร์ได้ง่ายและสะดวกรวดเร็วขึ้น </li>
+</ul>
+<p><img alt="Keil MDK" src="images/keil_mdk5_components.png" /></p>
+<p>รูปภาพ: <a href="https://www2.keil.com/mdk5">Keil MDK / RTX</a> 
+(<em>Microcontroller Development Kit</em>) &amp; Software Components</p>
+<p><img alt="Azure RTOS" src="images/microsoft_iot_azure_model.png" /></p>
+<p>รูปภาพ:  RTOS Kernel &amp; Services (Source: Microsoft)</p>
+<p><img alt="Azure ThreadX" src="images/azure_threadx_core_functional_components.png" /></p>
+<p>รูปภาพ: Azure ThreadX Components (Source: STM32MCU Wiki)</p>
+<p><img alt="Azure IoT Middleware" src="images/azure_iot_freertos_components.png" /></p>
+<p>รูปภาพ:  <a href="https://github.com/Azure/azure-iot-middleware-freertos">Azure IoT Middleware</a> (Source: Microsoft)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rtos_1">&#9655; <strong>การจัดลำดับการทำงานสำหรับ RTOS</strong><a class="headerlink" href="#rtos_1" title="Permanent link">#</a></h2>
+<p>เมื่อมีการแบ่งการทำงานของระบบหรือโปรแกรม ออกเป็นงานย่อย หรือ ทากส์ 
+ก็จะต้องมีการจัดสรรเวลาสำหรับการทำงานของทาสก์ (เช่น ในกรณีที่มีเพียงซีพียูเดียว) 
+และมีวิธีการจัดการได้หลายแบบ ยกตัวอย่างหลักการพื้นฐาน เช่น </p>
+<ul>
+<li><strong>Round Robin Scheduling</strong>: มีการจัดลำดับการทำงานของทาสก์
+และให้ทำงานโดยการแบ่งช่วงเวลาต่อการทำงานหนึ่งทาสก์ (เรียกว่า <strong>Time Slice</strong> 
+หรือ <strong>Time Slot</strong>) แล้วให้วนไปตามลำดับ<ul>
+<li>การทำงานแบบนี้ไม่เหมาะสำหรับการทำงานแบบเรียลไทม์</li>
+</ul>
+</li>
+<li><strong>Cooperative Scheduling</strong>: มีการจัดลำดับการทำงานของทาสก์เหมือนกรณี
+<strong>Round-Robin</strong> แต่ไม่กำหนดเวลาทำงาน ทาสก์ที่ทำงานอยู่ในขณะนั้น 
+(<strong>Running Task</strong> หรือ <strong>Active Task</strong>)
+จะต้องยอมหยุดการทำงานชั่วคราว (แล้วคอยกลับมาทำต่อในครั้งถัดไป) 
+  เพื่อให้ทาสก์ถัดไปที่พร้อมจะทำงาน (<strong>Ready Task</strong>) ได้ถูกเรียกให้ทำงานในลำดับถัดไป</li>
+<li><strong>Priority-based Pre-emptive Scheduling</strong>: 
+มีการจัดลำดับความสำคัญของแต่ละทากส์  (<strong>Task Priority</strong>) 
+ทากส์ที่มีความสำคัญสูงกว่าจะได้ทำงานก่อนทาสก์ที่มีความสำคัญน้อยกว่า และการขัดจังหวะการทำงาน
+(<strong>Premption</strong>) อาจเกิดขึ้นได้ โดยทาสก์ที่พร้อมจะทำงานและมีความสำคัญสูงกว่าทาสก์ที่ทำงานในขณะนั้น <ul>
+<li>การทำงานแบบนี้เหมาะสำหรับการนำไปใช้กับ <strong>RTOS</strong> </li>
+</ul>
+</li>
+</ul>
+<p>องค์ประกอบหนึ่งของเคอร์เนล (<strong>Kernel</strong>) ที่เกี่ยวข้อง ได้แก่  <strong>Task Scheduler / Task Dispatcher</strong> 
+ทำหน้าที่จัดลำดับการทำงานของทาสก์และเลือกทาสก์ถัดไปตามอัลกอริทึมที่กำหนดไว้ 
+เมื่อถึงเวลาต้องสลับบริบทการทำงาน (<strong>Task Context Switching</strong>) </p>
+<p>การจัดการดังกล่าว จะต้องเกิดขึ้นอย่างรวดเร็ว มีระยะเวลาในการเปลี่ยนหรือสลับบริบทการทำงาน (<strong>Task Switching Latency</strong>) 
+ไม่เกินขอบเขตบน (<strong>Upper Bound</strong>) และควรจะให้สั้นที่สุดเท่าที่จะเป็นได้ 
+(แต่ก็ขึ้นอยู่กับปัจจัย เช่น ความเร็วในการประมวลผลและการจัดการภายในของซีพียูด้วย) 
+ซึ่งจะส่งผลต่อการตอบสนองแบบเรียลไทม์ที่มีต่อเหตุการณ์ของระบบ </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>บริบทสำหรับการทำงานของทาสก์</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>เมื่อมีหลายทาสก์ที่ต้องแชร์เวลาการทำงานและใช้ทรัพยากรของซีพียูร่วมกัน แต่ละทาสก์จะต้องมีการจัดเก็บข้อมูล
+ไว้ในหน่วยความจำเป็นของตัวเอง เพื่อใช้ในการทำงาน เรียกว่า บริบทการทำงานของทาสก์ (<strong>Task Context</strong>)</p>
+<p>ถ้ามองในรูปแบบของโครงสร้างข้อมูล ก็มักเรียกว่า (<strong>Task Control Block: TCB</strong>) ยกตัวอย่าง เช่น </p>
+<ul>
+<li>ค่าของรีจิสเตอร์ที่เรียกว่า <strong>Program Counter (PC)</strong> ซึ่งเป็นตัวระบุแอดเดรสของคำสั่งถัดไปสำหรับการทำงานของทาสก์ </li>
+<li>รีจิสเตอร์ชี้ตำแหน่งบนสุดของหน่วยความจำแบบกองซ้อน (หรือสแตก) สำหรับทาสก์ 
+  (<strong>Top of Stack / Task Stack Pointer</strong>)  </li>
+<li>ขนาดของสแตกสำหรับทาสก์ (<strong>Task Stack Size</strong>) </li>
+<li>ระดับความสำคัญของทาสก์  (<strong>Task Priority</strong>)</li>
+<li>ตัวระบุชื่อของทาสก์ (<strong>Task Name / Task ID</strong>) และ</li>
+<li>สถานะของทาสก์ (<strong>Task States</strong>) เป็นต้น </li>
+</ul>
+<p>การสลับบริบทของทาสก์ จะต้องมีการบันทึกบริบทของทาสก์ที่กำลังทำงานอยู่ในขณะนั้นไว้ในหน่วยความจำ
+ขั้นตอนนี้เรียกว่า การบันทึกบริบท (<strong>Context Save</strong>) จากนั้นแล้วจึงนำบริบทของทาสก์ถัดไปกลับมาเพื่อให้ทำงาน
+ต่อจากสถานะเดิมที่ได้หยุดเอาไว้ และขั้นตอนนี้เรียกว่า การเรียกคืนบริบท (<strong>Context Restore</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rtos_2">&#9655; <strong>ประสิทธิภาพของ RTOS</strong><a class="headerlink" href="#rtos_2" title="Permanent link">#</a></h2>
+<p>การตอบสนองแบบเรียลไทม์ของระบบ ก็ขึ้นอยู่กับประสิทธิภาพในการทำงานของ <strong>RTOS</strong>
+ดังนั้นผู้พัฒนา <strong>RTOS</strong> จะต้องให้ข้อมูลเกี่ยวกับระยะเวลาในการทำงาน 
+ อาจเป็นค่าที่มากสุด (<strong>Worst-Case Execution Time: WCET</strong>) 
+ของบริการพื้นฐานต่าง ๆ 
+(<strong>RTOS Services / Primitives</strong>) อย่างเช่น  </p>
+<ul>
+<li>การสลับบริบทของทาสก์ (<strong>Task Switch</strong>) </li>
+<li>การตอบสนองต่อเหตุการณ์ หรือ อินเทอร์รัพท์ของระบบ (<strong>Interrupt Latency</strong>) </li>
+<li>การสร้างทาสก์ใหม่ (<strong>Task Creation</strong>)</li>
+<li>การจัดการเข้าใช้งานทรัพยากรร่วมกันระหว่างทาสก์ โดยใช้สิ่งที่เรียกว่า "เซมาฟอร์" (<strong>Semaphore</strong>) </li>
+<li>การส่งข้อความไปยังแถวคอย (<strong>Message Queue</strong>) เพื่อสื่อสารข้อมูลกันระหว่างทาสก์ </li>
+<li>การเซตหรือเคลียร์บิตเหตุการณ์ (<strong>Event Flag</strong>) เป็นต้น </li>
+</ul>
+<p>โดยมีหน่วยการวัดระยะเวลาในการทำงาน เป็นไซเคิลของซีพียู (<strong>CPU Cycles</strong>) 
+หรืออาจระบุเป็นหน่วยเวลาก็ได้ เช่น ไมโครวินาที (ซึ่งก็ขึ้นอยู่กับความถี่ของซีพียูในการทำงานด้วย)</p>
+<p>&nbsp;</p>
+<p><img alt="Keil RTX Performance" src="images/keil_rtx_performance.png" /></p>
+<p>รูปภาพ: ตัวอย่างข้อมูลเกี่ยวกับ RTOS Performance ของ Keil RTX 
+(Source: <a href="https://www.keil.com/rl-arm/rtx_perf.asp">Keil</a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="os-rtos">&#9655; <strong>แนวโน้มของการใช้งาน OS / RTOS</strong><a class="headerlink" href="#os-rtos" title="Permanent link">#</a></h2>
+<p>จากการศึกษาด้วยวิธีการทำแบบสำรวจออนไลน์ 
+<a href="https://www.embedded.com/wp-content/uploads/2019/11/EETimes_Embedded_2019_Embedded_Markets_Study.pdf"><strong>"Embedded Markets Study 2019"</strong></a>
+(ไฟล์  <a href="files/eetimes_embedded_markets_study_2019.pdf"><em>local copy</em></a>) 
+โดย <strong> <a href="https://www.eetimes.com/">EETimes</a></strong> ของบริษัททำสื่อ <strong>AspenCore Media</strong> ในช่วงต้นปีค.ศ. 2019
+มีประเด็นหรือคำถามสำหรับผู้ทำแบบสำรวจ ที่น่าสนใจเกี่ยวกับการใช้งาน <strong>OS / RTOS</strong> ดังนี้</p>
+<ul>
+<li>โปรเจกต์ปัจจุบันได้มีการใช้งาน <strong>OS / RTOS / RT Kernel / RT Scheduler</strong> หรือไม่ ?
+จากข้อมูลแบบสำรวจในปีค.ศ. 2019 อยู่ที่ 65% ของผู้ตอบแบบสำรวจ และเปรียบเทียบกับข้อมูลย้อนหลัง (ค.ศ. 2013 / 2014 / 2015/ 2017) 
+ซึ่งอยู่ในช่วง 67% ถึง 72% อาจกล่าวได้ว่า เกินกึ่งหนึ่งได้มีการใช้งาน 
+ (<a href="images/eetimes_2019_survey_result-1.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>) </li>
+<li>โปรเจกต์ในปัจจุบันได้เลือกใช้ หรือในโปรเจกต์ถัดไป จะเลือกใช้ <strong>OS / RTOS</strong> แบบไหน 
+เช่น <strong>Open Source (no commercial support)</strong>, <strong>Commercial</strong>
+(มี <strong>Source Code</strong> หรือไม่ ) หรือพัฒนาขึ้นมาใช้งานเอง 
+จากผลสำรวจสามารถสรุปได้ว่า ประมาณ 40% เลือกใช้ <strong>Open Source</strong> 
+(<a href="images/eetimes_2019_survey_result-2.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>) </li>
+<li>คำถามว่า ในโปรเจกต์ปัจจุบันได้ใช้ <strong>RTOS หรือ RT Kernel</strong> เหมือนโปรเจกต์ที่แล้วหรือไม่ 
+(<a href="images/eetimes_2019_survey_result-4.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>)
+ แล้วด้วยเหตุผลใด เช่น ไม่มีความจำเป็นต้องเปลี่ยนจากตัวเลือกที่ใช้อยู่เดิมเพราะใช้ได้ดีอยู่แล้ว
+(<a href="images/eetimes_2019_survey_result-5.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>)
+ หรือถ้าได้เปลี่ยนตัวเลือก มีเหตุผลใด ? เช่น เนื่องจากมีการเปลี่ยนฮาร์ดแวร์หรือชิปตัวประมวลผล 
+(<a href="images/eetimes_2019_survey_result-6.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>)</li>
+<li>คำถามถึงเหตุผลว่า ทำไมจึงไม่เลือกใช้ <strong>Commercial OS / RTOS</strong> ซึ่งก็มีหลายเหตุผล
+ เช่น มองว่า มีราคาแพงเกินไป </li>
+<li>ปัจจัยใดที่สำคัญที่สุดในการเลือก <strong>OS / RTOS</strong> เช่น มีซอร์สโค้ดมาให้ด้วยถือว่าเป็นปัจจัยที่สำคัญสุดในการเลือกใช้งาน 
+  (<a href="images/eetimes_2019_survey_result-7.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>)</li>
+<li>คำถามว่า ผู้ตอบแบบสำรวจได้เลือกใช้งาน   <strong>OS / RTOS</strong> ใดบ้างในปัจจุบัน 
+  ซึ่งจากการสำรวจ <strong>Embedded Linux</strong> มาเป็นอันดับแรก และอันดับสองคือ <strong>Inhouse / custom</strong> หรือที่ได้พัฒนาเอง 
+ แต่ถ้าเป็นประเภท <strong>RTOS</strong>  ก็สรุปได้ว่า <strong>FreeRTOS</strong> เป็นตัวเลือกอันดับแรกสุด
+ (<a href="images/eetimes_2019_survey_result-8.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>)
+ และใน 12 เดือนข้างหน้า จะเลือกใช้  <strong>Commercial OS / RTOS</strong> ตัวเลือกใด 
+ (<a href="images/eetimes_2019_survey_result-9.png">ดูไฟล์รูปภาพแสดงผลสำรวจ</a>)</li>
+</ul>
+<p><img alt="eetimes_2019_rtos_summary" src="images/eetimes_2019_rtos_summary-2.png" />
+รูปภาพ: สรุปประเด็นสำคัญจากแบบสำรวจ Embedded Markets Study 2019 ในหัวข้อ OS</p>
+<p>&nbsp;</p>
+<p>อีกผลการสำรวจหนึ่งที่น่าสนใจคือ <strong>"IoT Developer Survey"</strong> 
+สำหรับปีค.ศ. <a href="https://iot.eclipse.org/community/resources/iot-surveys/assets/iot-developer-survey-2020.pdf"><strong>2020</strong></a> 
+(ไฟล์  <a href="files/eclipse_iot_developer_survey_2020.pdf"><em>local copy</em></a>) 
+นำเสนอโดย <a href="https://iot.eclipse.org/"><strong>Eclipse Foundation</strong></a> 
+ซึ่งมีประเด็นหรือคำถามเกี่ยวข้องกับหัวข้อ <strong>IoT</strong> แต่ขอยกตัวอย่างประเด็นที่เกี่ยวข้องกับ <strong>OS / RTOS</strong> ดังนี้</p>
+<ul>
+<li>จากผลการสำรวจพบว่า ในการใช้งาน <strong>OS / RTOS</strong> สำหรับงานด้าน <strong>IoT</strong> อันดับแรกเป็น 
+<strong>Linux</strong> มากถึง 43% อันดับสองคือ <strong>FreeRTOS</strong> (35%) และ <strong>Windows</strong> (31%) ตามลำดับ</li>
+<li>การใช้งาน <strong>Zephyr</strong> ซึ่งเป็น <strong>Open Source RTOS</strong> เพิ่มขึ้นจาก 3% ในปีค.ศ. 2019
+มาเป็น 8% ในปีค.ศ. 2020 </li>
+</ul>
+<p><img alt="Eclipse IoT Survey 2020 - OS Ranking for IoT" src="images/eclipse_iot_survey_2020_os.png" />
+รูปภาพ: ผลสำรวจโดย Eclipse Foundation เกี่ยวกับตัวเลือก OS สำหรับ IoT</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rtos_3">&#9655; <strong>คุณภาพและความปลอดภัยของ RTOS</strong><a class="headerlink" href="#rtos_3" title="Permanent link">#</a></h2>
+<p>อีกประเด็นหนึ่งที่สำคัญเกี่ยวกับการเลือกสำหรับใช้งานเชิงอุตสาหกรรม 
+คือ คุณภาพของซอร์สโค้ด ขบวนการพัฒนาซอฟต์แวร์
+และความปลอดภัยของฟังก์ชันการทำงาน และการเลือกใช้อาร์ทอสที่ได้รับการตรวจสอบยืนยันความปลอดภัย 
+(<strong>Safety-certified RTOS</strong>) ตัวอย่าง <strong>Functional Safety Certifications / Standards</strong> ได้แก่</p>
+<ul>
+<li><strong>IEC 61508 Safety Integrity Level (SIL) 3 or 4</strong> (<em>for industrial applications</em>)</li>
+<li><strong>IEC 62304 Class C</strong> (<em>for medical applications</em>)</li>
+<li><strong>ISO 26262 ASIL D</strong> (<em>for automotive applications</em>)</li>
+<li><strong>EN 50128 SW-SIL 4</strong> (<em>for railway applications</em>)</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>ระบบปฏิบัติการเวลาจริงหรือ เรียลไทม์โอเอส (<strong>RTOS</strong>) 
+เป็นซอฟต์แวร์ประเภทหนึ่งที่มีความสำคัญสำหรับการพัฒนาระบบสมองกลฝังตัว
+โดยเฉพาะอย่างยิ่ง เมื่อใช้ไมโครคอนโทรลเลอร์เป็นตัวประมวลผลหลัก 
+ดังนั้นการเรียนรู้ทำความเข้าใจหลักการทำงานของเรียลไทม์โอเอส และการฝึกปฏิบัติจริง 
+จึงถือว่าเป็นพื้นฐานและทักษะที่สำคัญสำหรับนักพัฒนาระบบสมองกลฝังตัว
+นอกจากนั้นแล้วในปัจจุบันเราก็มีตัวเลือกที่หลากหลายสำหรับเรียลไทม์โอเอส 
+และส่วนใหญ่ก็เป็นโอเพนซอร์สและนำมาใช้งานได้ฟรี</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2021-11-07 | Last Updated: 2022-01-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

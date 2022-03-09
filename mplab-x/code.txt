@@ -1,0 +1,49 @@
+//--------------------------------------------------------------
+
+#include <stddef.h>                     // Defines NULL
+#include <stdbool.h>                    // Defines true
+#include <stdint.h>                     // Defines uint32_t
+#include <stdlib.h>                     // Defines EXIT_FAILURE
+#include "definitions.h"                // SYS function prototypes
+#include "FreeRTOS.h"
+#include "task.h"
+
+#define NUM_TASKS  (2)
+
+uint32_t PINS[] = { PORT_PIN_PA19, PORT_PIN_PA18 };
+TaskHandle_t task_handles[ NUM_TASKS ] = { NULL };
+
+void task_func( void *pvParameters ) { 
+    uint32_t index = (uint32_t)pvParameters;
+    uint32_t pin = PINS[ index ];
+
+    PORT_PinOutputEnable( pin );
+    PORT_PinSet( pin );
+
+    if (index != 0) {
+        vTaskSuspend( NULL );      
+    }
+    while (1) { 
+        PORT_PinToggle( pin );
+        vTaskDelay( 250 );
+        PORT_PinToggle( pin );
+        vTaskResume( task_handles[ (index+1) % NUM_TASKS ] );
+        vTaskSuspend( NULL ); 
+    }
+}
+
+int main ( void ) {
+    // Initialize all modules 
+    SYS_Initialize( NULL );
+    // Create tasks
+    for ( uint32_t i=0; i < NUM_TASKS; i++ ) {
+       xTaskCreate( task_func, "LED_Blink", 192, 
+                    (void*)i, 1, &task_handles[i] );
+    }
+    // Start the FreeRTOS task scheduler
+    vTaskStartScheduler();
+    while ( true ) {}
+    return( EXIT_FAILURE );
+}
+
+//--------------------------------------------------------------

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-rp2040-part-4/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 4) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-4" class="nav-link">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 4)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#i2c-pcf8574" class="nav-link">&#9655; การใช้ไอซี I2C PCF8574 สำหรับเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-pcf8574-" class="nav-link">&#9655; การใช้งานโมดูล I2C PCF8574 สำหรับอินพุต-เอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-display-lcd16x2" class="nav-link">&#9655; การใช้งานโมดูล I2C Display LCD16x2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-mcp4725-dac" class="nav-link">&#9655; การใช้งานโมดูล I2C MCP4725 DAC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-4">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 4)<a class="headerlink" href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-4" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Mbed OS</strong> และ <strong>Arduino IDE</strong> 
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>RP2040</strong> เช่น <strong>Raspberry Pi Pico</strong> 
+โดยนำเสนอเป็น <strong>ตอนที่ 4</strong> 
+ต่อจาก <a href="../mbed-rp2040-part-1/"><strong>ตอนที่ 1</strong></a>
+|  <a href="../mbed-rp2040-part-2/"><strong>ตอนที่ 2</strong></a>
+|  <a href="../mbed-rp2040-part-3/"><strong>ตอนที่ 3</strong></a></p>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>Raspberry Pi Pico</em>, 
+ <em>RP2040</em>, <em>Mbed-enabled Platforms</em>, <em>RTOS Programming</em></p>
+<hr />
+<h2 id="i2c-pcf8574">&#9655; <strong>การใช้ไอซี I2C PCF8574 สำหรับเอาต์พุต</strong><a class="headerlink" href="#i2c-pcf8574" title="Permanent link">#</a></h2>
+<p>ไอซี <strong>PCF8574</strong> และ <strong>PCF8574A</strong> ทำหน้าที่เป็นอุปกรณ์ประเภท <strong>I2C Slave</strong>
+สำหรับการเพิ่มขา <strong>I/O</strong> จำนวน 8 ขา (<strong>8-bit I/O Expander</strong>) 
+ให้กับไมโครคอนโทรลเลอร์ที่ทำหน้าที่เป็น <strong>I2C Master</strong></p>
+<p>ไอซีตัวนี้มีขา <code>A2</code>, <code>A1</code>, <code>A0</code> เพื่อกำหนดค่าให้สามบิตแรกของแอดเดรส 7 บิต ของอุปกรณ์
+ดังนั้นถ้านำไอซีชนิดเดียวกันนี้มาต่อเข้ากับบัส <strong>I2C</strong> 
+จะต้องตั้งค่าให้แอดเดรสของไอซีแตกต่างกัน และได้สูงสุด 8 แอดเดรสที่แตกต่างกัน</p>
+<p><img alt="" src="../images/pcf8574_led_bar.png" />
+<br>รูป: ตัวอย่างโมดูล PCF8574 Breakout Board และโมดูล 8x LED Bar (Active-low)</p>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้คำสั่งของ <strong>Pico SDK</strong> และเขียนโค้ด <strong>Arduino Sketch</strong> 
+เพื่อตรวจสอบดูว่า มีอุปกรณ์ <strong>I2C Slave</strong> ใดบ้างที่เชื่อมต่ออยู่กับบัส <strong>I2C</strong> หรือไม่ 
+(ตรวจสอบและแสดงหมายเลขแอดเดรสของอุปกรณ์เหล่านั้น)
+โดยเลือกใช้ขา <strong>GP6</strong> และ <strong>GP7</strong> สำหรับ <strong>SDA</strong> และ <strong>SCL</strong> ของบัส <code>I2C1</code> ตามลำดับ</p>
+<pre><code class="language-c++">#include &quot;pico.h&quot;
+#include &quot;hardware/i2c.h&quot;
+
+#define SDA_PIN   (6)
+#define SCL_PIN   (7)
+#define PICO_I2C  (i2c1)  // use either i2c0 or i2c1
+
+void i2c_scan( i2c_inst_t *i2c ) { 
+  uint8_t val = 0x00;
+  char sbuf[8];
+  size_t num_devices_found = 0;
+  std::string strbuf = &quot;Found: &quot;;
+  for ( uint8_t addr=1; addr &lt;= 0x7f; addr++ ) {
+    int ret = i2c_read_blocking( i2c, addr, &amp;val, 1, false );
+    if (ret &gt;= 0) {
+      sprintf( sbuf, &quot;0x%02x&quot;, addr );
+      if ( num_devices_found &gt; 0 ) {
+         strbuf += &quot;, &quot;;
+      }
+      strbuf += sbuf;
+      num_devices_found++;
+    }
+  }
+  if (num_devices_found==0) {
+    strbuf += &quot;none&quot;;
+  } else {
+    sprintf( sbuf, &quot; (%i)&quot;, num_devices_found );
+    strbuf += sbuf;
+  }
+  SerialUSB.println( strbuf.c_str() );  
+}
+
+void pico_i2c_init() {
+  _i2c_init( PICO_I2C, 100000 );
+  gpio_set_function( SDA_PIN, GPIO_FUNC_I2C );
+  gpio_set_function( SCL_PIN, GPIO_FUNC_I2C );
+  gpio_pull_up( SDA_PIN );
+  gpio_pull_up( SCL_PIN );
+}
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}
+  SerialUSB.println(&quot;Pico RP2040 Demo...&quot;);  
+  SerialUSB.flush();
+  pico_i2c_init( );
+}
+
+void loop() {
+  SerialUSB.println(&quot;I2C Scanning...&quot;);
+  SerialUSB.flush();
+  i2c_scan( PICO_I2C );
+  delay(2000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าตรวจพบอุปกรณ์ <strong>I2C Slave</strong> ที่ต่อเข้ากับระบบบัส <strong>I2C</strong> 
+จะแสดงค่าแอดเดรสเป็นเลขฐานสิบหกของอุปกรณ์เหล่านั้น ยกตัวอย่างเช่น </p>
+<ul>
+<li><code>0x20</code> ตรงกับอุปกรณ์ <strong>PCF8574T</strong> (ต่อขา A2=A1=A0=0 ไปยัง GND)</li>
+<li><code>0x40</code> ตรงกับอุปกรณ์ <strong>HTU21D</strong></li>
+<li><code>0x48</code> ตรงกับอุปกรณ์ <strong>LM75A</strong></li>
+</ul>
+<p><img alt="" src="../images/pico_i2c_scan.png" />
+<br>รูป:  ตัวอย่างข้อความเอาต์พุตเมื่อตรวจสอบอุปกรณ์ที่เชื่อมต่อเข้ากับบัส I2C</p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างโค้ดสาธิตการเขียนข้อมูลขนาดหนึ่งไบต์ไปยังไอซี <strong>PCF8574T</strong> 
+และใช้ <strong>P0..P7</strong> ของอุปกรณ์ดังกล่าวในทิศทางเอาต์พุตทั้ง 8 ขา</p>
+<p>ข้อมูลที่ถูกส่งไปนั้น จะถูกใช้เพื่อกำหนดสถานะบิตที่ขาเอาต์พุตซึ่งต่อกับวงจร <strong>LED</strong> 
+จำนวน 8 ชุด และทำงานแบบ <strong>Active-Low</strong> โค้ดในตัวอย่างนี้จะทำให้ <strong>LED</strong> 
+เพียงหนึ่งดวงเท่านั้นที่อยู่ในสถานะ <strong>ON</strong> และเลื่อนตำแหน่งไปทางซ้าย (จาก <strong>P0</strong> ไปยัง <strong>P7</strong>)
+แล้ววนซ้ำไปเรื่อย ๆ </p>
+<p>ข้อสังเกต: ถ้าใช้ขาของไอซี <strong>PCF8574</strong> ในทิศทางเอาต์พุต ควรจะใช้แบบ <strong>Current Sink</strong>
+และไม่เหมาะกับ <strong>Current Source</strong> ดังนั้นถ้าจะทำให้ <strong>LED</strong> สว่าง จะต้องต่อวงจร <strong>LED</strong> 
+แบบ <strong>Active-Low</strong> และกำหนดค่าบิตสำหรับเอาต์พุตให้เป็น 0 จึงจะทำให้ <strong>LED</strong> สว่าง</p>
+<pre><code class="language-c++">#include &quot;Wire.h&quot;
+
+#define I2C_ADDR (0x20) // I2C address of PCF8574T
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}
+  Wire.begin(); // initialize the Wire object
+  Wire.setClock( 100000 ); // set I2C bus speed
+}
+
+void pcf8574_write_byte( uint8_t addr, uint8_t data ) {
+  Wire.beginTransmission( addr ); 
+  Wire.write( data ); // write a data byte
+  Wire.endTransmission(); 
+}
+
+uint8_t data = 0x01;
+
+void loop() {
+  // send the inverted data byte to the PCF8574 device
+  pcf8574_write_byte( I2C_ADDR, data^0xff ); 
+  // rotate-shift-left
+  data =(data &lt;&lt; 1) | (data &gt;&gt; 7); 
+  delay(125);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_i2c_pcf8574.png" />
+<br>รูป:  ตัวอย่างการต่อวงจโมดูล PCF8574 เพื่อกำหนดสถานะเอาต์พุตของ 8-bit LED bar</p>
+<hr />
+<h2 id="i2c-pcf8574-">&#9655; <strong>การใช้งานโมดูล I2C PCF8574 สำหรับอินพุต-เอาต์พุต</strong><a class="headerlink" href="#i2c-pcf8574-" title="Permanent link">#</a></h2>
+<p>ในตัวอย่างนี้สาธิตการใช้งานโมดูล <strong>PCF8574</strong> (<em>8-bit I/O Expander</em>) 
+โดยใช้ขา <strong>P7..P4</strong> ของไอซีสำหรับการรับอินพุตจากวงจรปุ่มกด (<strong>Active-Low Switch</strong>) 
+จำนวน 4 ชุด และใช้ขา <strong>P3..P0</strong> เป็นเอาต์พุตสำหรับ <strong>LED (Active-Low)</strong> จำนวน 4 ชุด 
+ดังนั้นจึงมีอุปกรณ์จับคู่กันแบบ I/O จำนวน 4 ชุด ตามลำดับ</p>
+<p>การทำงานของโค้ดตัวอย่างนี้ เมื่อเกิดอินเทอร์รัพท์ จะคอยตรวจสอบดูว่า มีการเปลี่ยนแปลงสถานะของอินพุต (4 บิต) หรือไม่ 
+ถ้าไม่มีการกดปุ่มใด ขาอินพุตของปุ่มกดนั้น จะมีค่าบิตเท่ากับ 1 แต่ถ้ามีกดปุ่มค้างไว้ในขณะนั้นจะได้ 0 
+เมื่อตรวจสอบพบว่า มีการกดปุ่มแล้วปล่อยในแต่ละครั้ง จะสลับสถานะ (<strong>Bit Toggle</strong>) ของ <strong>LED</strong>
+ในะตำแหน่งที่เกี่ยวข้องกับปุ่มดังกล่าว</p>
+<p>ไอซี <strong>PCF8574</strong> สร้างสัญญาณ <strong>IRQ</strong> (<em>Interrupt Request</em>) ที่ขา <em>INT</em> แบบ 
+<strong>Active-Low</strong> เมื่อมีการเปลี่ยนแปลงที่ขา <strong>I/O</strong> ใด ๆ ของไอซีดังกล่าว
+และจะเคลียร์อินเทอร์รัพท์ได้โดยอัตโนมัติ เมื่อไอซีมีการเขียนหรืออ่านค่าในครั้งถัดไป 
+ดังนั้นจึงสามารถนำมาใช้ในการตรวจสอบการเปลี่ยนแปลงของสถานะลอจิกที่ขา <strong>P7..P4</strong> สำหรับปุ่มกดได้</p>
+<pre><code class="language-c++">#include &quot;Wire.h&quot;
+
+#define I2C_ADDR        (0x20) // I2C address of PCF8574T
+#define IRQ_PIN         (15) // use GP15 for interrupt 
+
+volatile bool isr_flag = false;
+
+uint8_t update( ); // forward declaration
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}  
+  Wire.begin(); // initialize the Wire object
+  Wire.setClock( 100000 ); // set I2C bus speed
+  // enable interrupt (falling-edge) on IRQ_PIN
+  attachInterrupt( IRQ_PIN, [](){ isr_flag = true; }, FALLING );
+  pinMode( IRQ_PIN, INPUT_PULLUP ); // enable pullup on IRQ pin
+  update(); // update the I/O pins of PCF8574
+}
+
+bool pcf8574_transfer( uint8_t addr, uint8_t wdata, uint8_t *rdata ) {
+  Wire.beginTransmission( addr );
+  Wire.write( wdata ); // write one byte from PCF8574
+  Wire.endTransmission( false );
+  Wire.requestFrom( addr, 1, true ); // read one byte
+  bool ok = false;
+  if ( Wire.available() == 1 ){ // one incoming byte ?
+     *rdata = Wire.read(); // read the received byte
+     ok = true;
+  }
+  Wire.endTransmission();
+  return ok;
+}
+
+char sbuf[32];
+static uint8_t leds = 0x0F;
+
+const char *TO_BIN[] = { 
+  // used to convert a nibble (0..15) to a bin string
+  &quot;0000&quot;, &quot;0001&quot;, &quot;0010&quot;, &quot;0011&quot;,
+  &quot;0100&quot;, &quot;0101&quot;, &quot;0110&quot;, &quot;0111&quot;,
+  &quot;1000&quot;, &quot;1001&quot;, &quot;1010&quot;, &quot;1011&quot;,
+  &quot;1100&quot;, &quot;1101&quot;, &quot;1110&quot;, &quot;1111&quot;,
+};
+
+typedef enum { ST_S0=0, ST_S1 } state_t;
+static state_t state = ST_S0;
+static uint8_t new_inputs, inputs;
+
+uint8_t update( ) {
+  uint8_t wdata, rdata;
+  wdata = 0xF0 | leds;
+  bool ok = pcf8574_transfer( I2C_ADDR, wdata, &amp;rdata );
+  return (ok) ? ((rdata &gt;&gt; 4) &amp; 0x0F) : 0x0F;
+}
+
+void loop() {
+  switch (state) { // implements a finite-state machine
+     case ST_S0:
+       if ( isr_flag ) { // the ISR flag is set
+          isr_flag = false; // clear the ISR flag
+          inputs = update(); // read the button-input pins
+          if ( inputs==0x0E || inputs==0x0D ||
+               inputs==0x0B || inputs==0x07 ) {
+             state = ST_S1;
+             new_inputs = inputs; // save current inputs
+             sprintf( sbuf, &quot;[%8lu] Button pressed : %s&quot;,
+                            millis(), TO_BIN[inputs] );
+             SerialUSB.println( sbuf );
+             delay(50);
+          }
+       }
+       break;
+
+    case ST_S1:
+       inputs = update(); // read the button-input pins
+       if ( inputs == 0x0F ) { // no buttons pressed
+          isr_flag = false;
+          state = ST_S0;
+          leds ^= ~(0xF0 | new_inputs); // toggle LED bits
+          update(); // update output (leds)
+          sprintf( sbuf, &quot;[%8lu] Button released: %s&quot;,
+                         millis(), TO_BIN[inputs] );
+          Serial.println( sbuf );
+       }
+       break;
+
+     default:
+       state = ST_S0;
+  } // end-of-switch
+}
+</code></pre>
+<p><img alt="" src="../images/pico_pcf8574_io.png" />
+<br>รูป: การต่อวงจรทดลองบนเบรดบอร์ดเพื่อใช้งานโมดูล PCF8574 I/O</p>
+<p>&nbsp;</p>
+<p>อีกตัวอย่างหนึ่ง คือการเปลี่ยนวงจร <strong>LED</strong> แบบ 4 บิต
+ที่ใช้แสดงสถานะเอาต์พุตเป็นโมดูลรีเลย์ (<strong>Relay Module</strong>)
+จำนวน 4 ช่องสัญญาณ แต่จะต้องใช้โมดูลรีเลย์ที่รับสัญญาณควบคุบและทำงานแบบ <strong>Active-Low</strong></p>
+<p>โมดูลรีเลย์ที่ได้เลือกมาทดลองใช้งานนั้น มี <strong>Jumpers (S1..S4)</strong> ให้เลือกได้ว่า
+จะใช้สัญญาณควบคุบแบบ <strong>Active-High</strong> (เลือกตำแหน่ง <strong>H</strong>)
+หรือ <strong>Active-Low</strong> (เลือกตำแหน่ง <strong>L</strong>) </p>
+<p><img alt="" src="../images/relay_4-channels-1.png" />
+<br>รูป: แสดงตำแหน่งของ Jumper (S1..S4) สำหรับเลือกโหมดการทำงานแบบ Active-Low / Active-High
+และ Terminal Blocks สำหรับสัญญาณอินพุต 4 ช่อง (IN1..IN4) และการป้อนแรงดันไฟเลี้ยง DC</p>
+<p><img alt="" src="../images/relay_4-channels-2.png" />
+<br>รูป:  โมดูลรีเลย์แบบ 4 ช่องสัญญาณเอาต์พุต (3-position Terminal Blocks)</p>
+<p>โมดูลรีเลย์นี้ใช้แรงดันไฟเลี้ยง <strong>+5V</strong> สำหรับการทำงานของขดลวดภายใน (<strong>Coil</strong>) 
+เพื่อสร้างสนามแม่เหล็กไฟฟ้าให้เปลี่ยนตำแหน่งของหน้าสัมผัสที่เป็นโลหะ 
+และแยกสัญญาณภาคอินพุตจากวงจรรีเลย์โดยใช้ไอซี <strong>Optocoupler</strong> สำหรับแต่ละช่องสัญญาณ (มี 4 ช่อง)</p>
+<pre><code class="language-c++">#include &quot;Wire.h&quot;
+
+#define I2C_ADDR        (0x20) // I2C address of PCF8574T
+#define IRQ_PIN         (15) // use GP15 for interrupt 
+
+volatile bool isr_flag = false;
+
+uint8_t update( ); // forward declaration
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}  
+  Wire.begin(); // initialize the Wire object
+  Wire.setClock( 100000 ); // set I2C bus speed
+  // enable interrupt (falling-edge) on IRQ_PIN
+  attachInterrupt( IRQ_PIN, [](){ isr_flag = true; }, FALLING );
+  pinMode( IRQ_PIN, INPUT_PULLUP ); // enable pullup on IRQ pin
+  update(); // update the I/O pins of PCF8574
+}
+
+bool pcf8574_transfer( uint8_t addr, uint8_t wdata, uint8_t *rdata ) {
+  Wire.beginTransmission( addr );
+  Wire.write( wdata ); // write one byte from PCF8574
+  Wire.endTransmission( false );
+  Wire.requestFrom( addr, 1, true ); // read one byte
+  bool ok = false;
+  if ( Wire.available() == 1 ){ // one incoming byte ?
+     *rdata = Wire.read(); // read the received byte
+     ok = true;
+  }
+  Wire.endTransmission();
+  return ok;
+}
+
+char sbuf[32];
+static uint8_t leds = 0x0F;
+
+const char *TO_BIN[] = { 
+  // used to convert a nibble (0..15) to a bin string
+  &quot;0000&quot;, &quot;0001&quot;, &quot;0010&quot;, &quot;0011&quot;,
+  &quot;0100&quot;, &quot;0101&quot;, &quot;0110&quot;, &quot;0111&quot;,
+  &quot;1000&quot;, &quot;1001&quot;, &quot;1010&quot;, &quot;1011&quot;,
+  &quot;1100&quot;, &quot;1101&quot;, &quot;1110&quot;, &quot;1111&quot;,
+};
+
+typedef enum { ST_S0=0, ST_S1 } state_t;
+static state_t state = ST_S0;
+static uint8_t new_inputs, inputs;
+
+uint8_t update( ) {
+  uint8_t wdata, rdata;
+  wdata = 0xF0 | leds;
+  bool ok = pcf8574_transfer( I2C_ADDR, wdata, &amp;rdata );
+  return (ok) ? ((rdata &gt;&gt; 4) &amp; 0x0F) : 0x0F;
+}
+
+void loop() {
+  switch (state) { // implements a finite-state machine
+     case ST_S0:
+       if ( isr_flag ) { // the ISR flag is set
+          isr_flag = false; // clear the ISR flag
+          inputs = update(); // read the button-input pins
+          if ( inputs==0x0E || inputs==0x0D ||
+               inputs==0x0B || inputs==0x07 ) {
+             state = ST_S1;
+             new_inputs = inputs; // save current inputs
+             sprintf( sbuf, &quot;[%8lu] Button pressed : %s&quot;,
+                            millis(), TO_BIN[inputs] );
+             SerialUSB.println( sbuf );
+             delay(50);
+          }
+       }
+       break;
+
+    case ST_S1:
+       inputs = update(); // read the button-input pins
+       if ( inputs == 0x0F ) { // no buttons pressed
+          isr_flag = false;
+          state = ST_S0;
+          leds ^= ~(0xF0 | new_inputs); // toggle LED bits
+          update(); // update output (leds)
+          sprintf( sbuf, &quot;[%8lu] Button released: %s&quot;,
+                         millis(), TO_BIN[inputs] );
+          Serial.println( sbuf );
+       }
+       break;
+
+     default:
+       state = ST_S0;
+  } // end-of-switch
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_relays.png" />
+<br>รูป: การต่อวงจรทดลองเพื่อใช้งานโมดูล PCF8574
+ตรวจสอบสถานะของปุ่มกดและควบคุมการทำงานของรีเลย์ 4 ช่องสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-display-lcd16x2">&#9655; <strong>การใช้งานโมดูล I2C Display LCD16x2</strong><a class="headerlink" href="#i2c-display-lcd16x2" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>LCD</strong> ที่สามารถแสดงผลแบบ 16 ตัวอักษระในหนึ่งแถว และมี 2 สองแถว (<strong>LCD16x2</strong>)
+มีขาทั้งหมด 16 ขา แต่ถ้านำมาใช้ร่วมกับโมดูล <strong>PCF8574 Adapter</strong>
+จะใช้วิธีเชื่อมต่อกับไมโครคอนโทรลเลอร์ด้วยบัส <strong>I2C</strong>
+ทำให้ช่วยประหยัดการใช้สายไฟในการเชื่อมต่อ และสะดวกต่อการต่อวงจรใช้งาน</p>
+<p><img alt="" src="../images/lcd16x2_module-1.png" />
+<br>รูป: โมดูล LCD 16x2 และ PCF8574 I2C Adapter</p>
+<p><img alt="" src="../images/lcd16x2_i2c_module-1.png" />
+<br>รูป: โมดูล LCD 16x2 เมื่อเสียบขาใช้งานร่วมกับโมดูล PCF8574 I2C Adapter</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ดถัดไปสาธิตการสร้างคลาส <strong>C++</strong> ชื่อ <code>LCD_I2C</code> เพื่อใช้งานโมดูล
+<strong>LCD16x2</strong> ร่วมกับ <strong>PCF8574 Adapter</strong> (มีแอดเดรสเท่ากับ <code>0x3f</code>) 
+และสาธิตการใช้งานคลาสดังกล่าว โดยนำมาใช้แสดงค่าตัวเลขที่อ่านได้จากวงจรเซ็นเซอร์วัดอุณหภูมิภายใน <strong>RP2040</strong></p>
+<pre><code class="language-c++">// file LCD_I2C.h
+
+#ifndef __LCD_I2C__
+#define __LCD_I2C__
+
+#include &quot;Wire.h&quot;
+#include &quot;hardware/adc.h&quot;
+
+// PCF8574 P7..P0 = D7 | D6 | D5 | D4 | BL | EN | RW | RS
+
+class LCD_I2C {
+  public:
+    LCD_I2C( arduino::MbedI2C *_i2c, uint8_t _addr ) 
+      : addr(_addr), i2c(_i2c), bl_mask(0x08) { 
+      // empty
+    }
+    void begin() { 
+      write4bits( 0x03 &lt;&lt; 4 ); // 1. set 8-bit data interface
+      delay(5);
+      write4bits( 0x03 &lt;&lt; 4 ); // 2. set 8-bit data interface
+      delayMicroseconds(120);
+      write4bits( 0x03 &lt;&lt; 4 ); // 3. set 8-bit data interface
+      write4bits( 0x02 &lt;&lt; 4 ); // 4. change to 4-bit data interface 
+      lcd_cmd( 0x28 ); // function set: 2-line, 5x8 dots
+      lcd_cmd( 0x0c ); // display ctrl: display on, cursor off
+      lcd_cmd( 0x80 );
+    }
+    void clear() {
+      lcd_cmd( 0x01 );
+    }
+    void home() {
+      lcd_cmd( 0x02 );
+    }
+    void setCursor( int line, int pos=0 ) {
+      uint8_t val = (line==0) ? (0x80 + pos) : (0xC0 + pos);
+      lcd_cmd( val ); 
+    }
+    void print( const char *s ) {
+      uint8_t len = strlen(s);
+      for ( uint8_t i=0; i &lt; len; i++ ) {
+         lcd_data( s[i] );
+      }
+    }
+    void backlight( bool onoff ){
+      bl_mask = (onoff) ? 0x08 : 0x00;
+    }
+
+  protected:
+    void i2c_write_u8( uint8_t data ) {
+      data |= bl_mask;
+      i2c-&gt;beginTransmission( addr ); 
+      i2c-&gt;write( data ); // write a data byte
+      i2c-&gt;endTransmission();  
+    }
+    void write4bits( uint8_t wdata ) {
+      i2c_write_u8( wdata | (1&lt;&lt;2) ); // EN=1
+      delayMicroseconds(800);
+      i2c_write_u8( wdata );          // EN=0
+      delayMicroseconds(1200);
+    }
+    void lcd_write( uint8_t wdata, uint8_t cmd_mode ) {
+      uint8_t high_nibble = wdata &amp; 0xf0;
+      uint8_t low_nibble  = (wdata &lt;&lt; 4) &amp; 0xf0;
+      write4bits( high_nibble | cmd_mode );
+      write4bits( low_nibble  | cmd_mode ); 
+    }
+    void lcd_data( uint8_t wdata ) {
+      lcd_write( wdata, 1 ); // RS=1
+    }
+    void lcd_cmd( uint8_t wdata ) {
+      lcd_write( wdata, 0 ); // RS=0
+    }
+
+  private:
+    arduino::MbedI2C *i2c;
+    uint8_t addr;
+    uint8_t bl_mask; // backlight bitmask
+};
+
+#endif
+</code></pre>
+<p>ตัวอย่างโค้ดทดสอบการทำงานของคลาส <code>LCD_I2C</code></p>
+<pre><code class="language-c++">#include &quot;LCD_I2C.h&quot;
+
+#define I2C_ADDR (0x3f)
+#define SDA_PIN   p6   // p6 
+#define SCL_PIN   p7   // p7 
+
+#define ADC_VREF (3.3f)
+#define CONVERSION_FACTOR (ADC_VREF/(1&lt;&lt;ADC_RESOLUTION))
+
+void  pico_adc_init();
+float pico_adc_read_temp();
+
+arduino::MbedI2C i2c( SDA_PIN, SCL_PIN );
+LCD_I2C lcd( &amp;i2c, I2C_ADDR );
+char sbuf[32];
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}
+  SerialUSB.println(&quot;Pico RP2040 Demo...&quot;);
+  SerialUSB.flush();
+
+  pico_adc_init(); // initialize the ADC
+
+  i2c.begin(); // initialize the I2C
+  i2c.setClock( 100000 ); // set the I2C speed
+  lcd.begin(); // initalize the LCD 
+  lcd.clear(); // clear the LCD 
+
+  char *lines[] = {&quot;Pico RP2040&quot;, &quot;LCD16x2 PCF8574A&quot;};
+  for ( int i=0; i &lt; 2; i++ ) { // foreach of two lines
+    lcd.setCursor(i, (16-strlen(lines[i]))/2 );
+    lcd.print( lines[i] ); // show the text line
+    delay(1000);
+  }
+  delay(1000);
+  lcd.clear(); // clear the LCD 
+}
+
+void loop() {
+  lcd.clear();
+  lcd.setCursor(0, 0);  
+  lcd.print( &quot;Pico RP2040 ADC&quot; );
+  lcd.setCursor(1, 0);  
+  sprintf( sbuf, &quot;Temp: %.1f deg.C&quot;,  pico_adc_read_temp() );
+  lcd.print( sbuf );
+  Serial.println( sbuf );
+  delay(2000);
+}
+
+void pico_adc_init() {
+  adc_init();
+  adc_set_temp_sensor_enabled(true);
+  adc_select_input(4); // use ADC4 
+  delay(100);
+}
+
+float pico_adc_read_temp() {
+  uint32_t value = 0;
+  // read ADC value four times and accumulate values
+  for ( int i=0; i &lt; 4; i++ ) { 
+     value += adc_read();
+  }
+  value &gt;&gt;= 2; // use the average value
+  // convert the ADC value to voltage and 
+  // the corresponding temperature
+  float volt = value * CONVERSION_FACTOR;
+  float temp = (27 - (volt - 0.706)/0.001721);   
+  return temp;
+}
+</code></pre>
+<p>รูปแบบการเชื่อมต่อมีดังนี้</p>
+<pre><code class="language-text">Pico      LCD16x2_I2C
+GND  ---- GND
+3.3V ---- VCC
+GP6  &lt;--&gt; SDA
+GP7  &lt;--&gt; SCL
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_lcd16x2_i2c-1.png" />
+<br>รูป: การต่อวงจรเพื่อใช้งานโมดูล LCD16x2 I2C </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-mcp4725-dac">&#9655; <strong>การใช้งานโมดูล I2C MCP4725 DAC</strong><a class="headerlink" href="#i2c-mcp4725-dac" title="Permanent link">#</a></h2>
+<p>ไอซี <strong>MCP4725</strong> เป็นอุปกรณ์ประเภท <strong>DAC</strong>
+(<em>Digital-to-Analog Converter</em>) 
+มีวงจรอิเล็กทรอนิกส์อยู่ภายในสำหรับทำหน้าที่แปลงข้อมูลดิจิทัลให้เป็นสัญญาณแอนะล็อก และส่งออกที่ขา <strong>VOUT</strong> </p>
+<p>ข้อมูลมีขนาด 12 บิต (0..4096) และจะถูกแปลงแบบเชิงเส้น ให้เป็นแรงดันไฟฟ้าในช่วง <strong>0..VCC</strong> 
+โดยที่แรงดันไฟเลี้ยง <strong>VCC</strong> เลือกใช้งานได้ในช่วง <strong>+2.7V .. +5.5V</strong></p>
+<p>เนื่องจากไอซีนี้ทำงานเป็นอุปกรณ์ประเภท <strong>I2C Slave</strong> ดังนั้นการสื่อสารระหว่างไมโครคอนโทรลเลอร์กับไอซี 
+<strong>MCP4725</strong> จะต่อวงจรเพื่อสัญญาณด้วยบัส <strong>I2C</strong>
+และเพื่อความสะดวกในการต่อวงจรทดลอง ได้เลือกใช้โมดูล <strong>MCP4725 Breakout Board</strong>
+(หมายเลขแอดเดรสตรงกับ <code>0x62</code>)</p>
+<p>ตัวอย่างโค้ดต่อไปนี้ สาธิตการใช้ค่าของตัวนับ <code>dac_value</code> 
+ที่มีค่าเพิ่มขึ้นจาก 0 ถึง 4095 (แล้วเริ่มใหม่ที่ 0) เป็นข้อมูลเพื่อส่งไปยังโมดูล <strong>MCP4725</strong> และใช้เป็นค่าเอาต์พุต</p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+
+// The A0 address pin of MCP4725 is left unconnected.
+#define I2C_ADDR   (0x62)
+
+void writeDAC( uint8_t addr, uint16_t value );
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}
+  analogReadResolution( 12 );
+
+  Wire.begin(); // initialze the I2C1 bus
+  Wire.setClock( 400000 ); // set I2C bus speed
+  writeDAC( I2C_ADDR, 0 ); 
+}
+
+const uint16_t MAX_VALUE = (1&lt;&lt;12);
+char sbuf[32];
+
+void loop() {
+  uint16_t sum, dac_value, adc_value;
+  for ( uint16_t i=0; i &lt; MAX_VALUE; i+=8 ) {
+    dac_value = i;
+    writeDAC( I2C_ADDR, dac_value );
+    delayMicroseconds(10);
+    adc_value = analogRead( A0 );
+    sprintf( sbuf, &quot;%lu, %lu&quot;, dac_value, adc_value );
+    SerialUSB.println( sbuf );
+  }
+  delay(5000);
+}
+
+// Use Fast Mode / Normal (No PowerDown)
+// MSB..LSB = 0, 0, PD1=0, PD0=0, D11,..., D0
+void writeDAC( uint8_t addr, uint16_t value ) {
+  value &amp;= 0x0fff;
+  Wire.beginTransmission( addr );
+  Wire.write( (value &gt;&gt; 8) &amp; 0xff ); // high byte
+  Wire.write( value &amp; 0xff ); // low byte
+  Wire.endTransmission();
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>รูปแบบการเชื่อมต่อมีดังนี้</p>
+<pre><code class="language-text">Pico      MCP4725
+3.3V ---- VCC
+GND  ---- GND
+GP7  &lt;--&gt; SCL
+GP6  &lt;--&gt; SDA
+A0  (Not Connected)
+GP26 &lt;--- VOUT
+</code></pre>
+<p>&nbsp;</p>
+<p>สัญญาณเอาต์พุตที่ขา <strong>VOUT</strong> ของ <strong>MCP4725</strong> 
+จะถูกเชื่อมต่อด้วยสายไปกลับไปยังขา <strong>GP26 / ADC0</strong> บนบอร์ด <strong>Pico</strong>
+เพื่ออ่านค่าแรงดันอินพุตแล้วนำค่าที่ได้แปลงเป็นตัวเลข เก็บไว้ในตัวแปร <code>adc_value</code> 
+และส่งเป็นข้อความที่มีค่าของตัวแปรทั้งสอง ผ่านทาง <code>SerialUSB</code> 
+ไปยังคอมพิวเตอร์ของผู้ใช้ เพื่อแสดงเป็นรูปกราฟ (มีกราฟสองเส้นเปรียบเทียบกัน)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_mcp4725_i2c.png" />
+<br>รูป: การต่อวงจรทดลองใช้งานโมดูล MCP4725 I2C DAC</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_dac_mcp4725_adc_plot.png" />
+<br>รูป: การแสดงข้อมูลที่ได้รับมาในรูปของกราฟโดยใช้ Arduino Serial Plotter</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-12-16 | Last Updated: 2021-12-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

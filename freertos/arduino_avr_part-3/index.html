@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/freertos/arduino_avr_part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino-FreeRTOS for AVR (Part 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-freertos-for-avr-part-3" class="nav-link">Arduino-FreeRTOS for AVR (Part 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#gdb-wokwi-simulator" class="nav-link">&#9655; การใช้งาน GDB ร่วมกับ Wokwi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#breakpoints" class="nav-link">&#9655; การกำหนดตำแหน่ง Breakpoints</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การแสดงค่าตัวเลขในรีจิสเตอร์ของซีพียู</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#breakpoints_1" class="nav-link">&#9655; การจับเวลาระหว่างการเกิด Breakpoints</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-freertos-for-avr-part-3">Arduino-FreeRTOS for AVR (Part 3)<a class="headerlink" href="#arduino-freertos-for-avr-part-3" title="Permanent link">#</a></h1>
+<p>บทความนี้ (ตอนที่ 3) นำเสนอตัวอย่างการเขียนโค้ดโดยใช้ <a href="https://www.freertos.org/"><strong>FreeRTOS Library</strong></a>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino</strong> ที่ใช้ชิป <strong>8-bit Atmel AVR</strong> 
+(เช่น บอร์ด <strong>Uno</strong> | <strong>Nano</strong> | <strong>MEGA2560</strong>) และใช้ซอฟต์แวร์ <strong>Arduino IDE</strong>
+ในการเขียนโค้ด รวมถึงสาธิตการจำลองการทำงานด้วย <strong>Web-based Wokwi AVR Simulator</strong></p>
+<p><strong>Keywords:</strong> <em>Arduino</em>, <em>8-bit AVR</em>, <em>RTOS</em>, <em>FreeRTOS</em>, <em>Wokwi AVR Simulator</em></p>
+<hr />
+<h2 id="gdb-wokwi-simulator">&#9655; <strong>การใช้งาน GDB ร่วมกับ Wokwi Simulator</strong><a class="headerlink" href="#gdb-wokwi-simulator" title="Permanent link">#</a></h2>
+<p>จากเนื้อหาในบทความที่แล้ว (ตอนที่  <a href="../../freertos/arduino_avr_part-1/">1</a> | <a href="../../freertos/arduino_avr_part-2/">2</a>) เราได้เห็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong>
+โดยใช้งานร่วมกับไลบรารี <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library"><strong>Arduino-FreeRTOS Library</strong></a> 
+และได้เห็นตัวอย่างการใช้ <a href="https://wokwi.com/"><strong>Web-based Wokwi Simulator</strong></a>
+เพื่อจำลองการทำงานของโค้ด บันทึกและดูการเปลี่ยนของสัญญาณที่ขาเอาต์พุตของบอร์ด <strong>Arduino</strong> 
+โดยใช้ <strong>Virtual Logic Analyzer</strong> ในขณะที่จำลองการทำงานได้เสมือนจริง</p>
+<p>ในบทความนี้ เราจะมาเรียนรู้การใช้ <a href="https://www.sourceware.org/gdb/"><strong>GDB: The GNU Project Debugger</strong></a>
+แบบออนไลน์ร่วมกับ <strong>Wokwi Simulator</strong> เพื่อดีบักการทำงานของ <strong>Arduino Sketch</strong> (ภาษา <strong>C/C++</strong>) ในเบื้องต้น</p>
+<p>จากโค้ดตัวอย่างในบทความที่แล้ว เป็นการสาธิตการสร้างทาสก์ (<strong>Task Creation</strong>) 
+สำหรับ <strong>FreeRTOS</strong> จำนวน 2 ทาสก์ (<strong>T0</strong> และ <strong>T1</strong>) ซึ่งมีระดับความสำคัญเท่ากัน 
+และจะต้องมีการแบ่งและสลับช่วงเวลากันทำงานโดยซีพียู และจัดการโดย <strong>FreeRTOS Task Scheduler</strong></p>
+<p>ฟังก์ชันการทำงานของแต่ละทาสก์ จะมีการทำคำสั่ง  <code>taskYIELD()</code> 
+เพื่อให้มีการเปลี่ยนบริบทการทำงานของทาสก์ที่กำลังทำงานอยู่ 
+และให้ทาสก์อื่นที่พร้อมจะทำงาน ได้มีโอกาสทำงานเป็นลำดับถัดไปโดยทันที  (<strong>Task Context Switching</strong>)
+ดังนั้นในตัวอย่างนี้ <strong>T0</strong> และ <strong>T1</strong> จะสลับกันทำงานหลังจากทำคำสั่งดังกล่าว</p>
+<p>พฤติกรรมการทำงานของทาสก์ทั้งสอง สามารถมองเห็นได้จากการเปลี่ยนแปลงของสถานะลอจิกที่ขาเอาต์พุตที่เกี่ยวข้อง
+(ขา <code>D5</code> และ <code>D6</code> สำหรับทาสก์ <strong>T0</strong> และ <strong>T1</strong> ตามลำดับ) 
+และบันทึกการเปลี่ยนแปลงได้โดยใช้ <strong>Logic Analyzer</strong> ของ <strong>Wokwi Simulator</strong></p>
+<p>&nbsp;</p>
+<p><strong>ตัวอย่างโค้ด</strong></p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define LED0_PIN  5 // D5
+#define LED1_PIN  6 // D6
+
+void task0( void *pvParameters );
+void task1( void *pvParameters );
+
+void setup() {
+  xTaskCreate( task0, &quot;T0&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL ); 
+  xTaskCreate( task1, &quot;T1&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL );
+  // Note the FreeRTOS task scheduler is started automatically.  
+}
+
+void loop() {}
+
+// task entry function for T0
+void task0( void *pvParameters ) { 
+  DDRD |= _BV(DDD5); // output direction for PD5
+  while (1) { 
+    PIND |= _BV(PD5); // toggle PD5 output
+    taskYIELD(); // yield the CPU to the next ready task of the same priority
+  }
+}
+
+// task entry function for T1
+void task1( void *pvParameters ){ // task function for T1
+  DDRD |= _BV(DDD6); // output direction for PD6
+  while (1) { 
+    PIND |= _BV(PD6); // toggle PD6 output
+    taskYIELD(); // yield the CPU to the next ready task of the same priority
+  }
+}
+
+</code></pre>
+<p>&nbsp;</p>
+<p>จากตัวอย่างโค้ดจะเห็นได้ว่า ในแต่ละรอบของ <code>while(1){...}</code>
+ภายในฟังก์ชันของทาสก์ (<code>task0()</code> และ <code>task1()</code>)
+จะมีการทำ 2 คำสั่ง เท่านั้น
+คำสั่งแรกคือ การเปลี่ยนสถานะลอจิกของขาเอาต์พุตที่เกี่ยวข้อง 
+(การเขียนค่าบิต 1 ลงในรีจิสเตอร์ <code>PIND</code> จะทำให้เกิดการสลับสถานะลอจิกที่ขาเอาต์พุต) 
+และอีกคำสั่งหนึ่งคือ <code>taskYIELD()</code>
+ดังนั้นอัตราการเปลี่ยนสถานะลอจิกที่ขาเอาต์พุตของแต่ทาสก์ จะทำได้ช้าหรือเร็ว 
+ก็ขึ้นอยู่กับระยะเวลาที่ใช้ในการทำคำสั่งทั้งสองเป็นหลัก</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-1.png" /></p>
+<p>รูป: การเขียนโค้ดและจำลองการทำงานด้วย <strong>Wokwi Simulator</strong></p>
+<p>&nbsp;</p>
+<p>จากตัวอย่างโค้ดนี้ เมื่อได้สร้างโปรเจกต์พร้อมโค้ดตัวอย่าง <strong>Arduino Sketch</strong> และต่อวงจรตามรูปตัวอย่างแล้ว 
+เราจะจำลองการทำงานด้วย <a href="https://wokwi.com/arduino/projects"><strong>Wokwi Simulator</strong></a>
+และเปิดใช้งาน <a href="https://github.com/wokwi/browser-vm-gdb"><strong>Online GDB Debugger for AVR</strong></a>
+ไปพร้อมกัน เราสามารถดีบักการทำงานโค้ดได้ เช่น การกำหนดตำแหน่งหยุดชั่วคราวหรือที่เรียกว่า 
+<strong>Breakpoints</strong> ในซอร์สโค้ด การดูค่าของตัวแปร หรือรีจิสเตอร์ของซีพียู
+ในขณะที่จำลองการทำงาน เป็นต้น</p>
+<p>เริ่มต้นให้คลิกเมาส์บริเวณส่วนที่เขียนโค้ด แล้วกดปุ่ม<code>Fn</code> + <code>F1</code> 
+จากนั้นให้พิมพ์ค้นหาคำว่า <strong>GDB</strong> เลือกรายการ <strong>Start GDB Session (debug build)</strong>
+จากนั้นจะมีการเปิดหน้า <strong>Tab</strong> ใหม่ในเบราว์เซอร์ ตามรูปตัวอย่าง</p>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-2.png" /></p>
+<p>รูป: เริ่มต้น  <strong>Wokwi Web GDB</strong> เข้า <strong>Simulator-based  GDB Debug Session</strong>
+และ <code>(gdb)</code> เป็นสัญลักษณ์ <strong>GDB prompt</strong> เพื่อรับอินพุตสำหรับคำสั่งของ <strong>GDB</strong> โดยผู้ใช้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="breakpoints">&#9655; <strong>การกำหนดตำแหน่ง Breakpoints</strong><a class="headerlink" href="#breakpoints" title="Permanent link">#</a></h2>
+<p>เมื่อเข้าสู่ <strong>GDB session</strong> การทำคำสั่งของซีพียู จะมาหยุดอยู่ที่คำสั่งแรกที่แอดเดรส
+<code>0x00000000</code> ซึ่งเป็น <strong>Reset Vector</strong> ของ <strong>AVR</strong> ในบริเวณหน่วยความจำที่เรียกว่า
+<strong>Interrupt vector table</strong> ของหน่วยความจำสำหรับโปรแกรม (<strong>Program Memory</strong>)
+ถ้าพิมพ์คำสั่ง <code>where</code> จะให้ข้อความเอาต์พุตที่ระบุว่า โปรแกรมได้ทำงานมาหยุดในตำแหน่งใด</p>
+<p>ถัดไป เราจะลองมาเพิ่มตำแหน่งของ <strong>Breakpoints</strong> ในไฟล์ <code>sketch.ino</code> เช่น 
+ให้มี 3 ตำแหน่งดังนี้</p>
+<ul>
+<li>ตำแหน่งที่เป็นจุดเริ่มต้นของฟังก์ชัน <code>setup()</code> ของ <strong>Arduino Sketch</strong> ในไฟล์ <code>sketch.ino</code></li>
+<li>บรรทัดที่ <strong>22</strong> ในไฟล์ <code>sketch.ino</code> ซึ่งเป็นการเรียกใช้ฟังก์ชัน <code>taskYIELD()</code> ในฟังก์ชันของทาสก์ <strong>T0</strong></li>
+<li>บรรทัดที่ <strong>31</strong> ในไฟล์ <code>sketch.ino</code> ซึ่งเป็นการเรียกใช้ฟังก์ชัน <code>taskYIELD()</code> ในฟังก์ชันของทาสก์ <strong>T1</strong></li>
+</ul>
+<p>คำสั่งสำหรับ <strong>GDB</strong> เพื่อกำหนดตำแหน่ง <strong>Breakpoints</strong> ตามที่กล่าวไป มีดังนี้</p>
+<pre><code class="language-plain">break sketch.ino:setup()
+break sketch.ino:22
+break sketch.ino:31
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าต้องการทราบว่า มีการกำหนด <strong>Breakpoints</strong> ไว้อย่างไรบ้าง ให้ทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-plain">info breakpoints
+</code></pre>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-3.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งเพื่อเพิ่มและตรวจสอบตำแหน่ง <strong>Breakpoints</strong> ในไฟล์ <code>sketch.ino</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การแสดงค่าตัวเลขในรีจิสเตอร์ของซีพียู</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการดูค่าของตัวแปรในโค้ดหรือรีจิสเตอร์ของซีพียูในขณะนั้น 
+ก็สามารถใช้คำสั่ง <code>print</code> แล้วตามด้วยชื่อตัวแปรหรือรีจิสเตอร์</p>
+<p>การทำงานของโค้ดที่เขียนด้วย <strong>Arduino API</strong> จะมีการใช้วงจร <strong>Timer0</strong> 
+เป็นตัวนับตามจังหวะเพื่อใช้ในการอ่านค่าเวลาของระบบ เช่น คำสั่ง <code>millis()</code> และ <code>micros()</code></p>
+<p>สำหรับ <strong>Arduino Uno</strong> หรือ <strong>Nano</strong> 
+ซีพียูจะทำงานด้วยความถี่ <code>F_CPU</code> เท่ากับ <strong>16MHz</strong> และได้ตั้งค่าตัวหารความถี่  (<strong>Prescaler</strong>) ไว้เท่ากับ
+<strong>64</strong> สำหรับตัวนับ <strong>Timer0</strong></p>
+<p>ดังนั้นตัวนับนี้ จะมีค่าเพิ่มขึ้นทีละหนึ่ง ทุก ๆ 4 ไมโครวินาที 
+(<strong>= 64/16 MHz = 4 us per tick</strong>) 
+และมีความละเอียดในการอ่านค่า (<strong>Timer Resolution</strong>) 
+เท่ากับ 4 ไมโครวินาที ดังนั้น ค่าที่ได้กลับมา (<strong>Retun Value</strong>)
+จากการทำคำสั่ง <code>micros()</code> ของ <strong>Arduino API</strong> จะเป็นเลขจำนวนเต็มและหาร 4 ลงตัว </p>
+<p>เนื่องจากตัวนับ <code>TCNT0</code> ของ <strong>Timer0</strong> มีขนาด 8 บิต 
+ดังนั้นจะมีค่าในช่วง 0..255  แล้วไป เมื่อเพิ่มขึ้นจาก 0 ถึงค่าสูงสุดแล้ว จะเริ่มนับที่ค่า 0 ใหม่ และทำให้เกิด 
+<strong>Timer0 Overflow</strong> </p>
+<p>เหตุการณ์อินเทอร์รัพท์ที่เกี่ยวข้อง จะเกิดขึ้นทุก ๆ 
+<strong>1024 us</strong> (<strong>= 256 &times; 4 us</strong>) รวมถึงการเพิ่มค่าของตัวแปร
+ที่ใช้ระบุว่า มีการนับครบรอบไปแล้วกี่ครั้ง  </p>
+<p>การอ่านค่าเวลาของระบบในหน่วยเป็นไมโครวินาที อาจสร้างฟังก์ชันเป็นแนวทางได้ดังนี้
+(ดูโค้ดจริงที่ใช้กับ <strong>Arduino</strong> ได้ในไฟล์ 
+<a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c"><code>wiring.c</code></a>)
+โดยที่ตัวแปร <code>timer0_overflow_count</code> หมายถึง ตัวแปรที่ใช้นับจำนวนครั้งที่เกิด
+<strong>Timer0 Overflow</strong></p>
+<pre><code class="language-c++">unsigned long micros() {
+   ((timer0_overflow_count &lt;&lt; 8) + TCNT0) * (64/16);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากต้องการดูค่าในรีจิสเตอร์ของ <strong>AVR</strong> เช่น <code>TCNT0</code> | <code>DDRD</code> | <code>PORTD</code> ใน <strong>GDB</strong> ก็ให้ทำคำสั่งดังนี้
+ซึ่งจะแสดงเป็นตัวเลขฐานสิบ (<code>/d</code> <strong>Decimal</strong>)</p>
+<pre><code class="language-plain">print/d TCNT0
+print/d DDRD
+print/d PORTD
+</code></pre>
+<p>แต่ถ้าต้องการแสดงเป็นตัวเลขในฐานสิบหก (<code>/x</code> <strong>Hexademical</strong>) ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-plain">print/x TCNT0
+print/x DDRD
+print/x PORTD
+</code></pre>
+<p>หรือเป็นตัวเลขในฐานสอง ('/t` <strong>Binary</strong>) </p>
+<pre><code class="language-plain">print/t TCNT0
+print/t DDRD
+print/t PORTD
+</code></pre>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-4.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งเพื่อดูค่าของรีจิสเตอร์ <code>TCNT0</code> และทำคำสั่ง <code>continue</code> 
+เพื่อรันโค้ดจนกว่าจะไปหยุดที่ตำแหน่ง <strong>Breakpoint</strong> ถัดไป</p>
+<p>ถ้าทำคำสั่ง <code>continue</code> เป็นการรันโค้ดต่อไป จนกว่าจะหยุดเมื่อพบตำแหน่ง <strong>Breakpoint</strong>
+หากต้องการดูซอร์สโค้ดในขณะนั้นในบริเวณที่มีตำแหน่งของ <strong>Breakpoint</strong> ก็ให้ทำคำสั่งต่อไปนี้
+<code>layout src</code> (<strong>Display the source window</strong>) หรือ
+ทำคำสั่ง <code>layout asm</code> เพื่อดูโค้ดที่มีการคอมไพล์ให้เป็นภาษา <strong>AVR-Assembly</strong> แล้ว</p>
+<p>ให้สังเกตบรรทัดในโค้ดที่มีแถบสี <strong>Highlight</strong> และสัญลักษณ์ <strong>+B&gt;</strong> 
+ซึ่งก็คือ ตำแหน่งของ <strong>Breakpoint</strong> ในขณะนั้น (รันโค้ดแล้วมาหยุดที่ตำแหน่งดังกล่าว)</p>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-5.png" /></p>
+<p>รูป: ตัวอย่างการแสดงตำแหน่งของ <strong>Breakpoint</strong> ในไฟล์ซอร์สโค้ด</p>
+<p>&nbsp;</p>
+<p>หากต้องการให้มีการแสดงค่าของรีจิสเตอร์โดยอัตโนมัติ ทุกครั้งเมื่อหยุดการทำงานชั่วคราวในตำแหน่ง <strong>Breakpoint</strong> ใด ๆ
+ก็ให้ใช้คำสั่ง <code>display</code> ตามรูปแบบต่อไปนี้ เช่น แสดงค่าของ <code>TCNT0</code> เป็นเลขจำนวนเต็ม (<code>/u</code> <strong>Unsigned Integer</strong>)</p>
+<pre><code class="language-plain">display/u TCNT0
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-6.png" /></p>
+<p>รูป: การแสดงค่าตัวเลขของรีจิสเตอร์ <code>TCNT0</code> ในขณะนั้น</p>
+<p>&nbsp;</p>
+<p>หากต้องการรันคำสั่งถัดไป โดยเข้าไปสู่ภายในของฟังก์ชันเมื่ออยู่ในบรรทัดที่มีการเรียกใช้ฟังก์ชัน
+(<strong>Function Call</strong>) ให้ทำคำสั่งดังนี้</p>
+<pre><code class="language-plain">stepi
+</code></pre>
+<p>ถ้าทำคำสั่งในบรรทัดถัดไป  ก็ให้ใช้คำสั่งดังนี้</p>
+<pre><code class="language-plain">next
+</code></pre>
+<p>ในกรณีที่ได้เข้าไปทำคำสั่งในฟังก์ชัน แล้วจะออกจากฟังก์ชันดังกล่าว  (<strong>Return from function</strong>)
+ก็ให้ทำคำสั่งดังนี้</p>
+<pre><code class="language-plain">finish
+</code></pre>
+<p><img alt="" src="../avr/images/freertos_avr_wokwi_gdb-7.png" /></p>
+<p>รูป:  การรันคำสั่งเข้าไปในฟังก์ชัน <code>vPortYield()</code> ซึ่งก็คือ <code>taskYIELD()</code> เป็นฟังก์ชันเดียวกัน</p>
+<p>จากตัวอย่างการดีบัก จะเห็นได้ว่า การทำงานของฟังก์ชัน  <code>vPortYield()</code> 
+(ดูโค้ดที่เกี่ยวข้องได้ในไฟล์ <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/port.c"><code>port.c</code></a>)
+ประกอบด้วยการเรียกใช้ 3 ฟังก์ชัน ตามลำดับดังนี้</p>
+<ul>
+<li><code>portSAVE_CONTEXT()</code>
+ เป็นการบันทึกบริบทการทำงานของทาสก์ (<strong>Task Context</strong>) ในขณะนั้น ไปเก็บไว้ในหน่วยความจำสำหรับ <strong>Task Stack</strong><ul>
+<li>มีโค้ด (<strong>Inline AVR Assembly</strong>) ที่เกี่ยวข้องอยู่ในไฟล์ <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/port.c"><code>port.c</code></a></li>
+</ul>
+</li>
+<li><code>vTaskSwitchContext()</code> เป็นการเลือกทาสก์ถัดไปที่พร้อมจะทำงานและมีระดับความสำคัญสูงกว่าทาสก์อื่นเพื่อรับช่วงต่อ<ul>
+<li>มีโค้ดที่เกี่ยวข้องอยู่ในไฟล์ <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/tasks.c"><code>tasks.c</code></a></li>
+</ul>
+</li>
+<li><code>portRESTORE_CONTEXT()</code> เป็นการนำบริบทการทำงานของทาสก์ถัดไปที่ได้จาก <strong>Task Scheduler</strong>
+มาใส่ลงในรีจิสเตอร์ต่าง ๆ ของซีพียู เพื่อให้ทำงานในลำดับถัดไป <ul>
+<li>มีโค้ด (<strong>Inline AVR Assembly</strong>) ที่เกี่ยวข้องอยู่ในไฟล์ <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/port.c"><code>port.c</code></a></li>
+</ul>
+</li>
+</ul>
+<p>หากต้องการจะเริ่มต้นใหม่ และย้อนกลับไปเริ่มที่ <strong>Reset Vector</strong> โดยการกำหนดค่า
+<strong>PC (Program Counter)</strong> หรือ <code>$pc</code> ให้เป็น <code>0x0</code> ให้ทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-plain">set $pc=0x0
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="breakpoints_1">&#9655; <strong>การจับเวลาระหว่างการเกิด Breakpoints</strong><a class="headerlink" href="#breakpoints_1" title="Permanent link">#</a></h2>
+<p>ถ้าหากต้องการจับเวลาการทำงานของโค้ดระหว่างการเกิด <strong>Breakpoint</strong> ในแต่ละครั้ง จะมีแนวทางอย่างไร ? </p>
+<p>แนวทางหนึ่งคือ การใช้ค่าของรีจิสเตอร์ <code>TCNT0</code> เป็นตัวจับเวลา เนื่องจากค่าของรีจิสเตอร์นี้ จะถูกเพิ่มขึ้นทีละหนึ่ง
+ทุก ๆ 4 ไมโครวินาที ถ้าเราอ่านค่าของรีจิสเตอร์ก่อนและหลังจากที่ได้เรียกฟังก์ชัน <code>taskYIELD()</code> ซึ่งเป็นฟังก์ชันเดียวกันกับ <code>vPortYield()</code>
+แล้วนำไปคำนวณค่าผลต่างระหว่างสองครั้งดังกล่าว และคูณด้วย <strong>4 us</strong> ก็จะได้ระยะเวลาที่ต้องการทราบ</p>
+<p>จากการทดลองด้วยวิธีนี้พบว่า คำสั่ง  <code>taskYIELD()</code> จะใช้เวลาเท่ากับ <strong>4 ticks</strong> ของ <strong>Timer0</strong>
+หรือเท่ากับ <strong>16 us</strong> (<strong>= 4 ticks &times; 4 us per Timer0 tick</strong>) 
+และใกล้เคียงกับค่าที่วัดได้จากการจับเวลาของสัญญาณเอาต์พุตด้วย <strong>Virtual Logic Analyzer</strong>
+ในรูปคลื่นสัญญาณต่อไปนี้ (ได้ค่า <strong>~16.5 us</strong>)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex4_vcd-1.png" /></p>
+<p>รูป: ระยะเวลาในการเปลี่ยนบริบทจากทาสก์หนึ่งไปสู่อีกทาสก์หนึ่ง โดยดูจากการเปลี่ยนสถานะลอจิกของสัญญาณเอาต์พุต
+ของแต่ละทาสก์ (จาก <strong>T0</strong> ไปสู่ <strong>T1</strong> วัดค่าได้ <strong>~16.5 us</strong>)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex4_vcd-2.png" /></p>
+<p>รูป: ระยะเวลาในการเปลี่ยนบริบทจากทาสก์หนึ่งไปสู่อีกทาสก์หนึ่ง 
+โดยดูจากการเปลี่ยนสถานะลอจิกของสัญญาณเอาต์พุตของแต่ละทาสก์ 
+(จาก <strong>T1</strong> ไปสู่ <strong>T0</strong> วัดค่าได้ <strong>~17.1 us</strong> )</p>
+<p>การสลับสถานะลอจิกที่ขาเอาต์พุตของแต่ละทาสก์ จะใช้เวลาเท่ากับ <strong>9 ticks</strong> หรือ <strong>36 us</strong> 
+และนำไปเปรียบเทียบกับการวัดความกว้างของพัลส์ที่ขาเอาต์พุต ซึ่งได้ระยะเวลา <strong>~33.68 us</strong> จากรูปคลื่นสัญญาณต่อไปนี้</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex4_vcd-3.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ (ช่วงที่เป็น <strong>High</strong>) ของสัญญาณเอาต์พุตที่เกิดจากการทำงานของทาสก์ <strong>T0</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ในบทความนี้ เราได้เห็นวิธีการใช้งาน <strong>Online GDB Debugger</strong> ร่วมกับ <strong>Wokwi Simulator</strong>
+ในการตรวจสอบ (ดีบัก)  และศึกษาพฤติกรรมการทำงานของโค้ด <strong>Arduin Sketch</strong> ที่มีการใช้คำสั่งต่าง ๆ 
+ของ <strong>Arduino-FreeRTOS Library</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2021-12-27 | Last Updated: 2022-01-25</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

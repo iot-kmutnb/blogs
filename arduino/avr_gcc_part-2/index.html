@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR / ATmega328P (ตอนที่ 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-2" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR / ATmega328P (ตอนที่ 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-output-toggle" class="nav-link">&#9655; โค้ดตัวอย่างที่ 1: Output Toggle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-polling-based-io-follower" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2: Polling-based I/O Follower</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-external-interrupt" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3: External Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-interrupt-based-io-follower" class="nav-link">&#9655; โค้ดตัวอย่างที่ 4: Interrupt-based I/O Follower</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5-signal-copy-with-inverting-output" class="nav-link">&#9655; โค้ดตัวอย่างที่ 5: Signal Copy with Inverting Output</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#6-pin-change-interrupt" class="nav-link">&#9655; โค้ดตัวอย่างที่ 6: Pin Change Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-2">การเขียนโปรแกรมภาษา C สำหรับ AVR / ATmega328P (ตอนที่ 2)<a class="headerlink" href="#c-avr-atmega328p-2" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>จากบทความใน <a href="../avr_gcc_part-1/">ตอนที่ 1</a> ซึ่งกล่าวถึง ไมโครคอนโทรลเลอร์ขนาด 8 บิต
+ที่มีสถาปัตยกรรมและชุดคำสั่งแบบ <strong>AVR</strong> และได้เลือกใช้ชิป <strong>ATmega328P</strong> 
+นำมาใช้ในการทดลองเขียนโค้ดภาษา  <strong>C</strong> มีซอฟต์แวร์ประเภท <strong>IDE</strong> ให้เลือกใช้งานได้ เช่น</p>
+<ul>
+<li><a href="https://www.arduino.cc/en/software"><strong>Arduino IDE</strong></a></li>
+<li><a href="https://www.microchip.com/en-us/tools-resources/develop/microchip-studio"><strong>Microchip Studio IDE</strong></a></li>
+<li><a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-x-ide"><strong>MPLAB-X IDE</strong></a></li>
+<li><a href="https://www.tinkercad.com/dashboard?type=circuits&amp;collection=designs"><strong>AUTODESK TinkerCAD - Circuits (Cloud-based)</strong></a></li>
+<li><a href="https://wokwi.com/arduino/projects/"><strong>Wokwi AVR Simulator (Cloud-based, Open Source)</strong></a></li>
+</ul>
+<p>ในบทความตอนที่ 2 นี้ เราจะใช้ <strong>Wokwi AVR Simulator</strong> ในการเขียนโค้ดและจำลองการทำงานหรือดีบักโค้ดสำหรับ <strong>ATmega328P</strong></p>
+<p>รูปแบบการเขียนโค้ดเป็นแบบ <strong>Bare-Metal C Programming</strong> กล่าวคือ ไม่ได้เรียกใช้คำสั่งหรือฟังก์ชันในระดับสูงจากไลบรารี
+อย่างไรก็ตาม <strong>AVR-GCC Toolchain</strong> ก็มาพร้อมกับไลบรารีภาษา <strong>C</strong> ที่มีชื่อว่า <a href="https://www.nongnu.org/avr-libc/user-manual/modules.html"><strong>avr-libc</strong></a>
+ก็มีคำสั่งหรือฟังก์ชันพื้นฐานที่นำมาใช้ได้สำหรับการเขียนโค้ด แม้ว่าจะมีคำสั่งน้อยกว่ากรณีที่เขียนโปรแกรมด้วย
+<a href="https://www.arduino.cc/reference/en/"><strong>Arduino C/C++ API</strong></a></p>
+<p>การเขียนโปรแกรมเพื่อกำหนดรูปแบบฟังก์ชันหรือควบคุมการทำงานของวงจรภายในของไมโครคอนโทรลเลอร์
+(<strong>On-chip Peripherals</strong>) จะอาศัยวิธีการเข้าถึงรีจิสเตอร์ 
+(เรียกว่า <strong>Memory-mapped I/O Special-Function Registers</strong> สำหรับ <strong>AVR</strong>) 
+และเพื่อให้ง่ายต่อการใช้งาน จึงได้มีการกำหนดชื่อของรีจิสเตอร์เป็นสัญลักษณ์ หรือ เป็น <strong>C Macros</strong>
+ซึ่งตรงกับรายละเอียดในเอกสาร <strong>Datasheet</strong> ของผู้ผลิต </p>
+<p>รูปแบบการกำหนดสัญลักษณ์ต่าง ๆ  ดูได้จากไฟล์
+<a href="https://github.com/vancegroup-mirrors/avr-libc/blob/master/avr-libc/include/avr/iom328p.h"><code>&lt;avr/iom328p.h&gt;</code></a> ของ <strong>AVR-libc</strong> สำหรับชิป <strong>ATmega328P</strong> 
+และไฟล์นี้จะถูกนำเข้าโดยอัตโนมัติจากไฟล์ <code>&lt;avr/io.h&gt;</code>)</p>
+<p><a href="https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf"><img alt="" src="../avr/images/avr_atmega328p_datasheet.png" /></a></p>
+<p>รูป: <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf"><strong>Atmel ATmega328P Datasheet (.pdf)</strong></a> (คลิกที่รูปเพิ่มเปิดดูไฟล์ .pdf)</p>
+<p><img alt="" src="../avr/images/avr_libc_io328p.png" /></p>
+<p>รูป: ตัวอย่างเนื้อหาภายในบางส่วนของไฟล์ <code>&lt;avr/iom328p.h&gt;</code></p>
+<p>จากรูปจะเห็นได้ว่า มีการประกาศสัญลักษณ์ที่มีชื่อว่า <code>PINB</code>, <code>DDRB</code> และ <code>PORTB</code> 
+ด้วยคำสั่ง <code>#define</code> และเกี่ยวข้องกับรีจิสเตอร์สำหรับพอร์ต <strong>PORTB</strong> ของ <strong>ATmega328P</strong>
+อยู่ที่แอดเดรสสำหรับ <strong>I/O</strong> หมายเลข <code>0x03</code>, <code>0x04</code> และ <code>0x05</code> ตามลำดับ
+ (บวกกับค่า <strong>Address Offset</strong> อีก <code>0x20</code>) </p>
+<p>การเขียนหรืออ่านค่าสำหรับ <code>PINB</code>, <code>DDRB</code> และ <code>PORTB</code> ก็ทำได้เหมือนกับตัวแปรทั่วไปที่มีขนาดข้อมูล 8 บิต</p>
+<p><img alt="" src="../avr/images/avr_io_pin.png" /> </p>
+<p>รูป: แสดงผังวงจรดิจิทัลสำหรับ <strong>I/O Block</strong> ภายในชิป <strong>AVR MCU</strong></p>
+<p>หนึ่งพอร์ต (<strong>I/O Port</strong>) จะมีขา <strong>I/O Pin</strong> ที่เกี่ยวข้องหรือจัดรวมเป็นกลุ่มเดียวกัน สูงสุด 8 ขา 
+และมีการตั้งชื่อพอร์ตเป็น <strong>A</strong>, <strong>B</strong>, <strong>C</strong> และ <strong>D</strong> เป็นต้น
+โดยส่วนใหญ่แล้วจะใช้งานเป็นขาดิจิทัล หรือที่เรียกว่า <strong>General-Purpose I/O (GPIO)</strong> 
+บางขาอาจถูกตั้งค่าฟังก์ชันการทำงานให้เป็นแบบอื่นได้ เช่น เป็นขาอินพุตสำหรับสัญญาณแอนะล็อก เป็นต้น</p>
+<p>ในกรณีที่เป็นขาดิจิทัล ก็จะมีทิศทางของสัญญาณให้เลือกว่า จะเป็นอินพุตหรือเป็นเอาต์พุต ซึ่งฟังก์ขันการทำงานของขา <strong>I/O</strong>
+แบบดิจิทัล สามารถโปรแกรมได้ผ่านทางริจีสเตอร์ที่เกี่ยวข้อง</p>
+<p><img alt="" src="../avr/images/avr_port_config.png" /> </p>
+<p>รูป: ตารางแสดงค่าบิตที่เกี่ยวข้องกับการกำหนดรูปแบบการใช้งานของขา <strong>I/O</strong> ของพอร์ต 
+เช่น การกำหนดทิศทางของขาให้เป็นอินพุตหรือเอาต์พุต การเปิดหรือปิดการทำงานของวงจรตัวต้านทานภายในแบบ 
+<strong>Pullup</strong> เป็นต้น </p>
+<p>จากตาราง สัญลักษณ์ <code>x</code> หมายถึง พอร์ต และ <code>n</code> หมายถึง บิต เช่น <code>PORTB5</code> หมายถึง
+บิตที่ 5 ในริจิสเตอร์ <code>PORTB</code> ของพอร์ต <code>B</code> (ซึ่งตรงกับการทำงานของขา <strong>GPIO PB5</strong>) </p>
+<p><img alt="" src="../avr/images/ddrb_reg.png" /> </p>
+<p>รูป: ตารางแสดงรีจิสเตอร์ <code>DDRB</code>ขนาด  8 บิต สำหรับพอร์ต <strong>B</strong></p>
+<p><img alt="" src="../avr/images/portb_reg.png" /> </p>
+<p>รูป:  ตารางแสดงรีจิสเตอร์ <code>PORTB</code>ขนาด  8 บิต สำหรับพอร์ต <strong>B</strong></p>
+<p><img alt="" src="../avr/images/pinb_reg.png" /> </p>
+<p>รูป:  ตารางแสดงรีจิสเตอร์ <code>PINB</code>ขนาด  8 บิต สำหรับพอร์ต <strong>B</strong></p>
+<p><img alt="" src="../avr/images/mcucr_reg.png" /> </p>
+<p>รูป:  ตารางแสดงรีจิสเตอร์ <code>MCUCR</code> ที่มีบิต <code>PUD</code> สำหรับการเปิดหรือปิดฟังก์ชัน
+การใช้งาน <strong>Pullup</strong> ที่ขา <strong>I/O Pins</strong> ของทุกพอร์ต</p>
+<p>ถ้าต้องการให้ขา <strong>I/O</strong> ในตำแหน่งบิตที่ 5 ของพอร์ต <strong>B</strong> เป็นขาเอาต์พุต-ดิจิทัล 
+จะต้องทำให้ทำให้บิตที่ 5 ของรีจิสเตอร์ <code>DDRB</code> (<em>Data Direction Register for PORTB</em>) หรือ
+ให้บิต <code>DDB5</code> ของรีจิสเตอร์ดังกล่าว มีค่าเป็น 1</p>
+<p>เมื่อกำหนดให้ขาใดเป็นเอาต์พุตแล้ว เช่น ที่ขา <strong>PB5</strong> และจะทำให้ขาดังกล่าวมีสถานะเป็นลอจิก High หรือ Low 
+ก็ใช้วิธีการเซตบิตที่ 5 ของ <code>PORTB</code> ให้เป็น 1 หรือเคลียร์บิตดังกล่าว ให้เป็น 0 ตามลำดับ</p>
+<p>หากต้องการสลับสถานะลอจิก (<strong>Pin Toggle</strong>) ที่ขาเอาต์พุต เช่น <strong>PB5</strong> ก็สามารถทำได้ง่าย โดยการเขียน 1 ไปยัง 
+บิตที่ 5 ของรีจิสเตอร์ <code>PINB</code></p>
+<p><img alt="" src="../avr/images/avr_toggle_pin_ref_datasheet.png" /> </p>
+<p>รูป:  <strong>Pin Toggle</strong> อ้างอิงจาก <strong>Datasheet</strong></p>
+<p>แต่หากจะใช้ขา <strong>PB5</strong> เป็นขาอินพุต และต้องการเปิดใช้งาน <strong>Pullup</strong> ซึ่งเป็นตัวต้านทานภายในที่ขาดังกล่าว
+จะต้องทำให้บิตที่ 5 ของรีจิสเตอร์ <code>DDRB</code> (หมายถึง บิต <code>DDB5</code>) มีค่าเป็น 0 และให้บิตที่ 5 ของรีจิสเตอร์ <code>PORTB</code>
+(หมายถึงบิต <code>PORTB5</code>) เป็น 1 
+นอกจากนั้น ยังต้องดูอีกว่า บิต <code>PUD</code> (<strong>Pull-up Disabled Bit</strong>) ของรีจิสเตอร์ <code>MCUCR</code> 
+(<strong>MCU Control Register</strong>) ต้องมีค่าเป็น 0 </p>
+<p>เมื่อกำหนดให้ขาใดเป็นอินพุตแล้ว เช่น ที่ขา <strong>PB5</strong> และต้องการอ่านค่าอินพุต ก็อ่านค่าของบิตที่ 5 ของรีจิสเตอร์ <code>PINB</code></p>
+<p>หากใช้บอร์ด <strong>Arduino</strong> ที่มีชิป <strong>ATmega328P</strong> เป็นตัวประมวผล เช่น บอร์ด <strong>Arduino Uno</strong>
+หรือ <strong>Arduino Nano</strong> ก็ควรจะทราบตำแหน่งของขาต่าง ๆ และความเชื่อมโยงระหว่าง <strong>Arduino Pins</strong>
+กับ <strong>MCU Pins</strong> ตามรูปต่อไปนี้ ยกตัวอย่าง เช่น <strong>Arduino D5 pin</strong> ก็คือ <strong>PD5 Pin</strong></p>
+<p><img alt="" src="../avr/images/arduino_328p_pinmap.png" /> </p>
+<p>รูป:  <strong>ATmega328P - Arduino Pinmap</strong> (Source: Arduino.cc)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-output-toggle">&#9655; <strong>โค้ดตัวอย่างที่ 1: Output Toggle</strong><a class="headerlink" href="#1-output-toggle" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดแรกนี้ สาธิตการเขียนค่าลงในรีจิสเตอร์สำหรับ <strong>Arduino D5 pin</strong> และตรงกับขา <strong>PD5</strong> ของ <strong>ATmega328p</strong>
+การเขียนค่าจะทำให้ขาดังกล่าวเป็นเอาต์พุต และมีค่าเป็น 1 และ 0 สลับกันไป โดยเว้นระยะเวลาประมาณ 500 มิลลิวินาที (0.5 วินาที)
+โดยใช้คำสั่ง <code>_delay_ms()</code> ของไลบรารี <a href="http://savannah.nongnu.org/projects/avr-libc/"><strong>avr-libc</strong></a>
+หากขาดังกล่าวต่อกับวงจร <strong>LED</strong> ภายนอก ก็จะเห็นการกระพริบของแสงไฟเกิดขึ้น</p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;       // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;   // for _delay_ms();
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD |= (1&lt;&lt;5); // set DDD5 bit
+  while(1) {
+    PORTD |= (1&lt;&lt;5);  // output high to PD5 (set bit)
+    _delay_ms(500);
+    PORTD &amp;= ~(1&lt;&lt;5); // output low to PD5 (clear bit)
+    _delay_ms(500);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/avr_toggle_led-1.png" /> </p>
+<p>รูป:  การจำลองการทำงานของโค้ดตัวอย่างสำหรับบอร์ด <strong>Arduino Nano</strong> โดยใช้ซอฟต์แวร์ <strong>Wokwi AVR Simulator</strong></p>
+<p>ในเชิงเปรียบเทียบ การสลับสถานะของเอาต์พุตที่ขา <strong>PD5</strong> ก็สามารถใช้วิธีการเขียนค่าบิต 1 ลงในรีจิสเตอร์ <code>PIND</code>
+ในตำแหน่งบิตที่ 5 ได้เช่นกัน</p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;       // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;   // for _delay_ms();
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD |= (1&lt;&lt;5);  // set DDD5 bit
+  while(1) {
+    PIND = (1&lt;&lt;5); // toggle output at PD5 pin
+    _delay_ms(500);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-polling-based-io-follower">&#9655; <strong>โค้ดตัวอย่างที่ 2: Polling-based I/O Follower</strong><a class="headerlink" href="#2-polling-based-io-follower" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ดเพื่อให้ขา <strong>PD2</strong> เป็นอินพุตและเปิดใช้งานตัวต้านทาน <strong>Pullup</strong> ที่ขาดังกล่าว
+และใช้ขา <strong>PD5</strong> สำหรับเอาต์พุต สถานะของเอาต์พุตจะถูกอัปเดตตามค่าของอินพุตที่ขา <strong>PD2</strong> ที่อ่านได้ในขณะนั้น 
+ดังนั้นจึงทำงานในลักษณะที่เรียกว่า <strong>I/O Follower</strong></p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;       // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;   // for _delay_ms();
+
+#define OUT_MASK _BV(5)   // (1&lt;&lt;5)
+#define IN_MASK  _BV(2)   // (1&lt;&lt;2)
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD  |= OUT_MASK;   // set DDD5 bit
+  // set direction of PD2 pin to input with pullup
+  MCUCR  &amp;= ~(1&lt;&lt;PUD); // clear PUD bit
+  DDRD   &amp;= ~IN_MASK;  // clear DDD2 bit (PD2 input direction)
+  PORTD  |=  IN_MASK;  // enable internal pull-up on PD2 pin
+
+  // I/O follower
+  while(1) {
+    if (PIND &amp; IN_MASK) { // input high
+       PORTD |= OUT_MASK; // set bit of PORTD5        
+    } else { // input low
+       PORTD &amp;= ~OUT_MASK; // clear bit of PORTD5 
+    }
+  }
+}
+</code></pre>
+<p>การรับค่าจากอินพุตที่ขา <strong>PD2</strong> จะได้จากการต่อวงจรปุ่มกดภายนอก (ทำงานแบบ <strong>Active-Low</strong>)
+หากไม่มีการกดปุ่มค้างไว้ จะได้สถานะอินพุตเป็น <strong>High</strong> และที่ขาดังกล่าว ระดับแรงดันไฟฟ้าจะถูกดึงขึ้นผ่านตัวต้านทานภายในแบบ <strong>Pullup</strong> ให้มีสถานะลอจิกเป็น <strong>High</strong> แต่ถ้ากดปุ่มค้างไว้ จะถูดดึงลงมาโดยการทำงานของปุ่มกด ทำให้เชื่อมต่อกับ <strong>GND</strong>
+ของระบบ และได้สถานะเป็น <strong>Low</strong></p>
+<p>จากการจำลองการทำงาน เมื่อกดปุ่ม จะทำให้ <strong>LED</strong> ดับลง (<strong>OFF</strong>) แต่ถ้าปล่อยปุ่ม จะทำให้ <strong>LED</strong> อยู่ในสถานะ <strong>ON</strong>
+&nbsp;</p>
+<p><img alt="" src="../avr/images/avr_io_follower-1.png" /> </p>
+<p>รูป:  การจำลองการทำงานของโค้ดตัวอย่างที่ 2 </p>
+<p>ข้อสังเกต: ในการจำลองการทำงานของปุ่มโดยใช้ <strong>Wokwi Simulator</strong> ได้กำหนดให้ <code>"attrs": {"bounce":"0"}</code> 
+ในไฟล์ <code>diagram.json</code> เพื่อป้องกันการกระเด้งของปุ่มกด (<strong>No button bouncing</strong>) </p>
+<p>หากต้องการศึกษาพฤติกรรมการทำงานของโค้ด ด้วยวิธีการจำลองการทำงาน เช่น การเปลี่ยนแปลงในเชิงเวลาที่ขา <strong>I/O</strong> ของไมโครคอนโทรลเลอร์ ก็สามารถใช้ <strong>Virtual Logic Analyzer</strong> มาต่อเพิ่มได้  และวัดสัญญาณที่ขา <strong>PD2 (Button)</strong> 
+และ <strong>PD5 (LED)</strong> ตามลำดับ เมื่อจำลองการทำงานแล้วจะได้ไฟล์ <code>.vcd</code> แล้วนำไปเปิดในโปรแกรม เช่น <strong>GTKWave</strong>
+เพื่อแสดงรูปคลื่นสัญญาณ และวิเคราะห์การเปลี่ยนแปลงของสัญญาณที่เกิดขึ้น</p>
+<p>มาลองดูตัวอย่างการจำลองการทำงานดังต่อไปนี้</p>
+<p><img alt="" src="../avr/images/wokwi_io_follower-1.png" /> </p>
+<p>รูป: การจำลองการทำงาน และมี <strong>Virtual Logic Analyzer</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/wokwi_io_follower-2.png" /> </p>
+<p>รูป: รูปคลื่นสัญญาณที่ได้จากการจำลองการทำงาน และมีการกดปุ่มหลาย ๆ ครั้ง</p>
+<p><img alt="" src="../avr/images/wokwi_io_follower-3.png" /> </p>
+<p>รูป: ใช้เคอร์เซอร์ (<strong>Cursors</strong>) ในแนวตั้ง เพื่อวัดระยะห่างระหว่างสองเหตุการณ์ที่เกิดขึ้น เช่น ถ้ามีการเปลี่ยนแปลงที่ขาอินพุต
+แล้วจะเกิดการเปลี่ยนแปลงที่ขาเอาต์พุตตามมา  จากรูปตัวอย่างใช้เวลา <strong>0.438 usec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-external-interrupt">&#9655; <strong>โค้ดตัวอย่างที่ 3: External Interrupt</strong><a class="headerlink" href="#3-external-interrupt" title="Permanent link">#</a></h2>
+<p>ถัดไปมาลองเรียนรู้เกี่ยวกับอินเทอร์รัพท์ (<strong>Interrupt</strong>) ของไมโครคอนโทรลเลอร์ ซึ่งก็คือ การขัดจังหวะการคำสั่งของซีพียู เมื่อเกิดอินเทอร์รัพท์ ซีพียูจะหยุดการทำคำสั่งในขณะนั้น แล้วไปตอบสนองต่อเหตุการณ์อินเทอร์รัพท์ที่เกิดขึ้น โดยทำคำสั่งต่าง ๆ ในฟังก์ชันที่เรียกว่า <strong>ISR</strong> (<em>Interrupt Service Routine</em>) สำหรับเหตุการณ์ที่เกี่ยวข้อง เมื่อทำเสร็จแล้ว ก็กลับไปทำคำสั่งต่อจากเดิมที่หยุดค้างไว้ </p>
+<p>อินเทอร์รัพท์ที่เกิดขึ้นในระบบมีหลายกรณี หรือ มาจากแหล่งที่มาแตกต่างกัน เรียกว่า <strong>Interrupt Sources</strong> เช่น เกิดจากวงจรภายในของไมโครคอนโทรลเลอร์ก็ได้ หรือเกิดจากเหตุการณ์ภายนอกที่ขา <strong>GPIO</strong> (เรียกว่า <strong>External Interrupt Request</strong>)
+หรือ การกดปุ่มรีเซตของบอร์ด เป็นต้น
+การกดปุ่มรีเซตจะทำให้เกิด <strong>Reset Interrupt</strong> ซึ่งจะทำให้ซีพียู เริ่มต้นทำงานให้จากแอดเดรส 0x0000 เป็นต้น</p>
+<p><img alt="" src="../avr/images/avr_328p_interrupt_vector_table.png" /> </p>
+<p>รูป: ตาราง <strong>Interrupt Vector Table</strong> ของ <strong>ATmega328P</strong></p>
+<p>ขา <strong>GPIO</strong> ของ <strong>AVR</strong> สามารถสร้างสัญญาณอินเทอร์รัพท์ได้ เมื่อเปิดใช้งานและได้กำหนดเงื่อนไขสำหรับตรวจสอบเหตุการณ์จากภายนอก (<strong>External Interrupt</strong>) ที่เกิดขึ้นกับขาดังกล่าว เงื่อนไขแบบนี้เรียกว่า <strong>Trigger Type</strong> 
+(แบ่งเป็นสองประเภท คือ <strong>Level Type</strong> และ <strong>Edge Type</strong>)
+แต่สำหรับชิป <strong>ATmega328P</strong> แล้ว จะใช้อินเทอร์รัพท์ภายนอกได้เพียง 2 ช่อง คือ <strong>INT0</strong> และ <strong>INT1</strong> ตามลำดับ </p>
+<p>นอกจาก <strong>External Interrupts</strong> แล้วยังมี <strong>Pin Change Interrupts</strong>
+(<strong>PCINTx</strong>) ที่สามารถใช้ตรวจสอบการเปลี่ยนแปลงสถานะลอจิกที่ขาอินพุตได้ แต่เป็นการแชร์ใช้งานร่วมกันหลายขา
+(8 ขา ต่อหนึ่งอินเทอร์รัพท์) ซึ่งแตกต่างจากกรณีของ <strong>External Interrrupts</strong> ที่มีอินเทอร์รีพท์ต่อหนึ่งขาสัญญาณแยกกัน</p>
+<p><img alt="" src="../avr/images/avr_eicra_reg.png" /> </p>
+<p>รูป: ตารางรีจิสเตอร์ <strong>EICRA</strong> (<em>External Interrupt Control Register A</em>)</p>
+<p><img alt="" src="../avr/images/avr_eimsk_reg.png" /> </p>
+<p>รูป: ตารางรีจิสเตอร์  <strong>EIMSK</strong> (<em>External Interrupt Mask Register</em>) </p>
+<p><img alt="" src="../avr/images/avr_eifr_reg.png" /> </p>
+<p>รูป: ตารางรีจิสเตอร์  <strong>EIFR</strong> (<em>External Interrupt Flag Register</em>) </p>
+<p>&nbsp;</p>
+<p>หลังจากได้เปิดใช้งานอินเทอร์รัพท์ภายนอกแล้ว บิต <strong>Interrupt Flag</strong> (<code>INTF0</code> หรือ <code>INTF1</code>
+ ในรีจิสเตอร์ <code>EIFR</code> สำหรับอินเทอร์รัพท์หมายเลข <code>INT0</code> และ <code>INT1</code> ตามลำดับ)
+จะได้ค่าลอจิกเป็น 1 เมื่อเกิดอินเทอร์รัพท์ในแต่ละครั้ง </p>
+<p>หากมีการเปิดใช้งานอินเทอร์รัพท์ของระบบ (<strong>Global Interrupt</strong>) ซึ่งหมายถึง บิต <code>I</code> ในรีจิสเตอร์ <code>SREG</code> 
+จะต้องเป็น 1 ก็จะทำให้ซีพียูกระโดดไปทำคำสั่งที่อยูในตำแหน่งที่เรียกว่า <strong>Interrupt Vector</strong> สำหรับอินเทอร์รัพท์ภายนอก 
+และเรียกฟังก์ชันที่ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>) ให้ทำงาน
+บิต <strong>Interrupt Flag</strong> จะถูกเคลียร์โดยอัตโนมัติเมื่อจบการทำงานของฟังก์ชัน  แต่หากต้องการเคลียร์บิตนี้เอง ให้เขียนค่าลอจิก 1 สำหรับบิตดังกล่าว</p>
+<p>ตัวอย่างนี้สาธิตการใช้งานอินเทอร์รัพท์ภายนอก <strong>INT0</strong> ซึ่งตรงกับขา <strong>PD2</strong> ของ <strong>ATmega328p</strong> 
+และกำหนดเงื่อนไขในการเกิดอินเทอร์รัพท์ ให้เป็นขอบขาลง (<strong>Falling</strong>) ดังนั้นจะต้องกำหนดค่าบิตสำหรับ
+<strong>ISC01</strong> และ <strong>ISC00</strong> ในรีจิสเตอร์ <code>EICRA</code> (<em>External Interrupt 
+Control Register A</em>) และกำหนดค่าบิต <code>INT0</code> ในรีจิสเตอร์ 
+<code>EIMSK</code> (<em>External Interrupt Mask Register</em>) ให้ถูกต้อง</p>
+<p>เมื่อมีการกดปุ่มแล้วทำให้อินพุตที่ขา <strong>PD2</strong> เปลี่ยนจาก <strong>High</strong> เป็น <strong>Low</strong> จะเกิดเหตุการณ์ที่เรียกว่า
+<strong>Falling Edge</strong> หรือขอบขาลง ดังนั้นจะทำให้เกิดอินเทอร์รัพท์ <strong>INT0</strong> แล้วเรียกฟังก์ชัน <code>ISR(INT0_vect)</code>
+ให้ทำงานโดยอัตโนมัติ  ซึ่งจะทำให้มีการเปลี่ยนสถานะลอจิกที่ขาเอาต์พุตที่ขา <strong>PD5</strong> หนึ่งครั้ง</p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;        // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;    // for _delay_ms();
+#include &lt;avr/interrupt.h&gt; // for ISR(...)
+
+#define OUT_MASK _BV(5)   // (1&lt;&lt;5)
+#define IN_MASK  _BV(2)   // (1&lt;&lt;2)
+
+ISR (INT0_vect) { // ISR for INT0 interrupt
+  PIND |= OUT_MASK; // toggle PD2 pin
+}
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD  |= OUT_MASK;   // set bit
+  // set direction of PD2 pin to input with pullup
+  MCUCR  &amp;= ~(1&lt;&lt;PUD); // clear PUD bit
+  DDRD   &amp;= ~IN_MASK;  // clear DDD2 bit (PD2 input direction)
+  PORTD  |=  IN_MASK;  // enable internal pull-up on PD2 pin
+
+  // enable external interrupt INT0 (trigger type: falling edge)
+  EICRA |= _BV(ISC01);  // set ISC01 bit
+  EICRA &amp;= ~_BV(ISC00); // clear ISC00 bit 
+  EIMSK |= _BV(INT0);   // enable INT0
+  sei(); // enable global interrupt (set I-bit of SREG)
+
+  while(1);
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-interrupt-based-io-follower">&#9655; <strong>โค้ดตัวอย่างที่ 4: Interrupt-based I/O Follower</strong><a class="headerlink" href="#4-interrupt-based-io-follower" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้คล้ายกับตัวอย่างที่ 2 แต่เปลี่ยนมาใช้วิธีการเปิดอินเทอร์รัพท์ภายนอก ที่จะเกิดขึ้นเมื่อมีการเปลี่ยนแปลงระดับของอินพุตที่ขา <strong>PD2</strong>
+ทั้งขอบขาขึ้นและขาลง (<strong>Any Change / Both Edges</strong>) และฟังก์ชัน <strong>ISR</strong> จะตรวจสอบอินพุตที่ขา <strong>PD2</strong> ในขณะนั้น
+แล้วจะทำให้เอาต์พุตที่ขา  <strong>PD5</strong> เปลี่ยนแปลงตามค่าของอินพุต</p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;        // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;    // for _delay_ms();
+#include &lt;avr/interrupt.h&gt; // for ISR(...)
+
+#define OUT_MASK _BV(5)   // (1&lt;&lt;5)
+#define IN_MASK  _BV(2)   // (1&lt;&lt;2)
+
+ISR (INT0_vect) { // ISR for INT0 interrupt
+  if (PIND &amp; IN_MASK) {
+    PORTD |= OUT_MASK;  // PD2 pin high
+  } else {
+    PORTD &amp;= ~OUT_MASK; // PD2 pin low
+  }
+}
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD  |= OUT_MASK;   // set bit
+  PORTD |= OUT_MASK;   // output high on PD5 pin
+  // set direction of PD2 pin to input with pullup
+  MCUCR  &amp;= ~(1&lt;&lt;PUD); // clear PUD bit
+  DDRD   &amp;= ~IN_MASK;  // clear DDD2 bit (PD2 input direction)
+  PORTD  |=  IN_MASK;  // enable internal pull-up on PD2 pin
+
+  // enable external interrupt INT0 (trigger type: any change)
+  EICRA |= _BV(ISC00);  // set ISC00 bit 
+  EIMSK |= _BV(INT0);   // enable INT0
+  sei(); // enable global interrupt (set I-bit of SREG)
+
+  while(1);
+}
+</code></pre>
+<p>หากต้องการเปลี่ยนจาก <strong>INT0</strong> เป็น <strong>INT1</strong> ดังนั้นจะต้องเปลี่ยนจากขา <strong>PD2</strong> เป็น <strong>PD3</strong> สำหรับอินพุต
+และแก้ไขโค้ดใหม่ได้ดังนี้</p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;        // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;    // for _delay_ms();
+#include &lt;avr/interrupt.h&gt; // for ISR(...)
+
+#define OUT_MASK _BV(5)   // (1&lt;&lt;5)
+#define IN_MASK  _BV(3)   // (1&lt;&lt;3)
+
+ISR (INT1_vect) { // ISR for INT0 interrupt
+  if (PIND &amp; IN_MASK) {
+    PORTD |= OUT_MASK;  // output pin high
+  } else {
+    PORTD &amp;= ~OUT_MASK; // output pin low
+  }
+}
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD  |= OUT_MASK;   // set bit
+  PORTD |= OUT_MASK;   // output high on PD5 pin
+  // set direction of PD3 pin to input with pullup
+  MCUCR  &amp;= ~(1&lt;&lt;PUD); // clear PUD bit
+  DDRD   &amp;= ~IN_MASK;  // clear DDD3 bit (input direction)
+  PORTD  |=  IN_MASK;  // enable internal pull-up
+
+  // enable external interrupt INT0 (trigger type: any change)
+  EICRA |= _BV(ISC10);  // set ISC10 bit 
+  EIMSK |= _BV(INT1);   // enable INT1
+  sei(); // enable global interrupt (set I-bit of SREG)
+
+  while(1);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/avr_wokwi_isr_int0-1.png" /> </p>
+<p>รูป:  การจำลองการทำงานสำหรับโค้ดตัวอย่างที่ 4</p>
+<p><img alt="" src="../avr/images/avr_wokwi_isr_int0-2.png" /> </p>
+<p>รูป:  การวัดระยะเวลาจากการเกิดขอบขาลงที่ขาอินพุตไปจนถึงการเปลี่ยนแปลงที่ขาเอาต์พุต
+การจับเวลาในลักษณะนี้ จะได้ค่าประมาณของ <strong>Interrupt Latency</strong> ซึ่งก็คือ ระยะเวลาที่ซีพียู
+จะต้องใช้เพื่อตอบสนองต่อเหตุการณ์ที่เกิดขึ้นในแต่ละครั้ง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-signal-copy-with-inverting-output">&#9655; <strong>โค้ดตัวอย่างที่ 5: Signal Copy with Inverting Output</strong><a class="headerlink" href="#5-signal-copy-with-inverting-output" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการใช้อินเทอร์รัพท์ <strong>INT1</strong> กับขาที่เป็นเอาต์พุต (ปรกติจะใช้กับขาอินพุต) 
+เช่น ให้ขา <strong>PD3</strong> เป็นเอาต์พุต <strong>OUT1</strong>
+และเปิดใช้งาน <strong>INT1</strong> ที่ตรงกับขาดังกล่าว เลือกโหมดเป็น <strong>Both Edge</strong> และให้ฟังก์ชัน <strong>ISR</strong>
+ที่เกี่ยวข้องทำหน้าที่สลับสถานะของลอจิกที่ขาเอาต์พุตอีกขาหนึ่ง ( <strong>OUT2</strong>) เข่น <strong>PD5</strong> </p>
+<pre><code class="language-c++">#define F_CPU   16000000UL // set the CPU speed to 16MHz
+
+#include &lt;avr/io.h&gt;        // for PORTx, DDRx, ... I/O registers
+#include &lt;util/delay.h&gt;    // for _delay_ms();
+#include &lt;avr/interrupt.h&gt; // for ISR(...)
+
+#define OUT2_MASK _BV(5)   // (1&lt;&lt;5)
+#define OUT1_MASK _BV(3)   // (1&lt;&lt;3)
+
+volatile uint8_t flag = 0;
+
+ISR (INT1_vect) { // ISR for INT0 interrupt
+  PIND = OUT2_MASK; // toggle output 2 (PD5 pin)
+}
+
+int main(){
+  // set direction of PD5 pin to output 
+  DDRD  |= OUT2_MASK;   // set bit
+  PORTD |= OUT2_MASK;   // output high on PD5 pin
+  // set direction of PD3 pin to input with pullup
+  DDRD  |= OUT1_MASK;
+
+  // enable external interrupt INT0 (trigger type: any change)
+  EICRA |= _BV(ISC10);  // set ISC10 bit 
+  EIMSK |= _BV(INT1);   // enable INT1
+  sei(); // enable global interrupt (set I-bit of SREG)
+
+  while(1) {
+    PORTD ^= OUT1_MASK; // toggle ouput 1 (PD3 pin)
+    _delay_ms(100);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากจำลองการทำงาน จะได้รูปคลื่นสัญญาณดังนี้</p>
+<p><img alt="" src="../avr/images/avr_wokwi_int1_inverting.png" /> </p>
+<p>รูป:  สัญญาณเอาต์พุตที่ขา <strong>PD3 (OUT1)</strong> และ <strong>PD5 (OUT2)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6-pin-change-interrupt">&#9655; <strong>โค้ดตัวอย่างที่ 6: Pin Change Interrupt</strong><a class="headerlink" href="#6-pin-change-interrupt" title="Permanent link">#</a></h2>
+<p>หากต้องการตรวจสอบเหตุการณ์ที่เกิดจากการเปลี่ยนแปลงลอจิกที่ขา <strong>GPIO</strong> หลายขา 
+และไม่ใช้อินเทอร์รีพท์ <strong>INT0</strong> กับ <strong>INT1</strong>
+จะต้องเปลี่ยนไปใช้อินเทอร์รัพท์ที่เรียกว่า <strong>Pin Change Interrupt (PCI)</strong> ซึ่งมี 3 กลุ่ม ได้แก่ </p>
+<ul>
+<li><strong>PCI0</strong>: <code>PCINT7..0</code></li>
+<li><strong>PCI1</strong>: <code>PCINT15..8</code></li>
+<li><strong>PCI2</strong>: <code>PCINT23..16</code></li>
+</ul>
+<p>และมีชื่อฟังก์ชัน <strong>ISR</strong> ที่เกี่ยวข้องคือ <code>PCINT0_vect</code>, <code>PCINT1_vect</code>, <code>PCINT2_vect</code> ตามลำดับ และ
+รีจิสเตอร์ที่เกี่ยวข้อง ได้แก่</p>
+<ul>
+<li><strong>PCICR</strong> (<em>Pin Change Interrupt Control Register</em>)</li>
+<li><strong>PCMSKx</strong> (<em>Pin Change Mask Register x</em>)</li>
+<li><strong>PCIFR</strong> (<em>Pin Change Interrupt Flag Register</em>)</li>
+</ul>
+<p>ตาราง: แสดงความสัมพันธ์ระหว่างขา <strong>Arduino Pin</strong> กับขา <strong>MCU Pin</strong> และหมายเลขของ
+<strong>Pin Change Interrupts</strong> สำหรับแต่ละขา</p>
+<table>
+<thead>
+<tr>
+<th>Arduino Pin</th>
+<th>MCU Pin</th>
+<th>PCINTx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D0</td>
+<td>PD0</td>
+<td>PCINT16</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>PD1</td>
+<td>PCINT17</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>PD2</td>
+<td>PCINT18</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>PD3</td>
+<td>PCINT19</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>PD4</td>
+<td>PCINT20</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>PD5</td>
+<td>PCINT21</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>PD6</td>
+<td>PCINT22</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>PD7</td>
+<td>PCINT23</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>PB0</td>
+<td>PCINT0</td>
+</tr>
+<tr>
+<td>D9</td>
+<td>PB1</td>
+<td>PCINT1</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>PB2</td>
+<td>PCINT2</td>
+</tr>
+<tr>
+<td>D11</td>
+<td>PB3</td>
+<td>PCINT3</td>
+</tr>
+<tr>
+<td>D12</td>
+<td>PB4</td>
+<td>PCINT4</td>
+</tr>
+<tr>
+<td>D13</td>
+<td>PB5</td>
+<td>PCINT5</td>
+</tr>
+<tr>
+<td>D14/A0</td>
+<td>PC0</td>
+<td>PCINT8</td>
+</tr>
+<tr>
+<td>D15/A1</td>
+<td>PC1</td>
+<td>PCINT9</td>
+</tr>
+<tr>
+<td>D16/A2</td>
+<td>PC2</td>
+<td>PCINT10</td>
+</tr>
+<tr>
+<td>D17/A3</td>
+<td>PC3</td>
+<td>PCINT11</td>
+</tr>
+<tr>
+<td>D18/A4</td>
+<td>PC4</td>
+<td>PCINT12</td>
+</tr>
+<tr>
+<td>D19/A5</td>
+<td>PC5</td>
+<td>PCINT13</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="" src="../avr/images/avr_pcicr_pcifr_reg.png" /> </p>
+<p>รูป: รีจิสเตอร์ <strong>PCICR</strong> และ <strong>PCIFR</strong></p>
+<p><img alt="" src="../avr/images/avr_pcmsk_reg.png" /> </p>
+<p>รูป: รีจิสเตอร์ <strong>PCKMSK</strong></p>
+<p>มาลองดูตัวอย่างโค้ดต่อไปนี้ มีอินพุต 3 ขา และเอาต์พุต 3 ขา แล้วเปิดใช้งาน <strong>Pin Change Interrupt</strong> ที่ขาอินพุต</p>
+<ul>
+<li>ขาอินพุต: <strong>D4/PD4</strong>, <strong>D5/PD5</strong>, <strong>D6/PD6</strong> ซึ่งตรงกับ <strong>PCINT20</strong>, <strong>PCINT21</strong>,  <strong>PCINT22</strong>
+ตามลำดับ</li>
+<li>ขาเอาต์พุต: <strong>D8/PB0</strong>, <strong>D9/PB1</strong>, <strong>D10/PB2</strong> ซึ่งทำไปต่อกับวงจร <strong>RGB LED</strong> ที่ทำงานแบบ <strong>Active-Low</strong> หรือ <strong>Common Anode (CA)</strong></li>
+</ul>
+<p>ในตัวอย่างนี้ จะมีการจับคู่ระหว่างขาอินพุตกับเอาต์พุตตามลำดับ</p>
+<p>เมื่อมีการเกิดการเปลี่ยนแปลงที่ขาอินพุต ขาใดขาหนึ่งจากทั้งสามขาที่เลืกอใช้ จะทำให้เกิดอินเทอร์รัพท์ในกลุ่ม <strong>PCI2</strong>
+จากนั้นจะมีการทำคำสั่งของฟังก์ชัน <strong>ISR</strong> ที่มีชื่อว่า <code>PCINT2_vect</code></p>
+<p>หากกดปุ่มและเป็นขอบขาลงของสัญญาณที่ขาอินพุต เช่น <strong>D4</strong> จะทำให้ขาเอาต์พุต <strong>D8</strong> ปลี่ยนสถานะหนึ่งครั้ง</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/delay.h&gt;
+
+// RGB LED pins
+#define LED_B_MASK  (_BV(0))
+#define LED_G_MASK  (_BV(1))
+#define LED_R_MASK  (_BV(2))
+#define RGB_MASK    (LED_R_MASK | LED_G_MASK | LED_B_MASK)
+
+// Button pins
+#define BTN1_MASK   (_BV(4))
+#define BTN2_MASK   (_BV(5))
+#define BTN3_MASK   (_BV(6))
+#define BTN_MASK    (BTN3_MASK | BTN2_MASK | BTN1_MASK)
+
+ISR(PCINT2_vect) {  // Interrupt Service Routine for PCI2
+  uint8_t input_bits = PIND;
+  if ( !(input_bits &amp; BTN1_MASK) ) { // Button 1 is low.
+    PINB = LED_B_MASK; // toggle blue LED output
+  }
+  if ( !(input_bits &amp; BTN2_MASK) ) { // Button 2 is low.
+    PINB = LED_G_MASK; // toggle green LED output
+  }
+  if ( !(input_bits &amp; BTN3_MASK) ) { // Button 3 is low.
+    PINB = LED_R_MASK; // toggle red LED output
+  }
+}
+
+int main(void) {
+   // set pin direction for PB0, PB1, PB2 
+   DDRB  |= RGB_MASK; // output direction
+   PORTB |= RGB_MASK; // output high
+   // enable pullup on the PD4, PD5, PD6 pins
+   DDRD  &amp;= ~BTN_MASK; // input direction
+   PORTD |= BTN_MASK;  // enable pull-up  
+   // enable Pin Change Interrupt for PCINT22..20
+   PCMSK2 |= (_BV(PCINT20) | _BV(PCINT21) | _BV(PCINT22)); 
+   // enable PCINT2 interrupt for PCINT23..16
+   PCICR  |= _BV(PCIE2); 
+   sei();  // enable global interrupts
+   while(1);
+}
+</code></pre>
+<p><img alt="" src="../avr/images/avr_pcint_btn_rgb-1.png" /> </p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างโดยใช้ <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/avr_pcint_btn_rgb-2.png" /> </p>
+<p>รูป: การตั้งค่า  <code>"bounce"</code> ให้เป็น  <code>"0"</code> ในไฟล์ <code>diagram.json</code> และไม่ให้เกิดการกระเด้งของปุ่มกด เมื่อจำลองการทำงาน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรภายในของ <strong>AVR / ATmega328p</strong>
+เช่น <strong>GPIO</strong> และการเปิดใช้งานอินเทอร์รัพท์ที่ขา <strong>GPIO</strong> และจำลองการทำงานโดยใช้ <strong>Wokwi AVR Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-02-21 | Last Updated: 2022-03-08</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/arduino_nucleo_stm32/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Arduino สำหรับบอร์ด STM32 Nucleo - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-stm32-nucleo" class="nav-link">การเขียนโปรแกรม Arduino สำหรับบอร์ด STM32 Nucleo</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#stm32duino-arduino-ide" class="nav-link">&#9655; STM32Duino สำหรับ Arduino IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#stm32duino-arduino-ide_1" class="nav-link">&#9655; การติดตั้ง STM32Duino สำหรับ Arduino IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#nucleo-l432kc" class="nav-link">&#9655; บอร์ดไมโครคอนโทรลเลอร์ Nucleo L432KC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-blink-the-on-board-led" class="nav-link">&#9655; ตัวอย่างโค้ด 1:  Blink the on-board LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-press-the-button-to-toggle-the-led-interrupt-based-method" class="nav-link">&#9655;  ตัวอย่างโค้ด 2:  Press the button to toggle the LED (Interrupt-based Method)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-pwm-based-led-dimming" class="nav-link">&#9655; ตัวอย่างโค้ด 3:  PWM-based LED Dimming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-timer-based-led-toggle" class="nav-link">&#9655; ตัวอย่างโค้ด 4:  Timer-based LED Toggle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5-bh1750-light-sensor-reading-i2c" class="nav-link">&#9655;  ตัวอย่างโค้ด 5:  BH1750 Light Sensor Reading (I2C)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#6-sht3x-dis-sensor-reading-i2c" class="nav-link">&#9655; ตัวอย่างโค้ด 6:  SHT3x-DIS Sensor Reading (I2C)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#7-serial-bridge" class="nav-link">&#9655;  ตัวอย่างโค้ด 7:  Serial Bridge</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#8-rng" class="nav-link">&#9655;  ตัวอย่างโค้ด 8:  การอ่านตัวเลขสุ่มจากวงจร RNG</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#9-adafruit-dht-dht22" class="nav-link">&#9655;  ตัวอย่างโค้ด 9:  การใช้ไลบรารี Adafruit DHT เพื่ออ่านค่าจากโมดูล DHT22</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#10-virtual-usb" class="nav-link">&#9655;  ตัวอย่างโค้ด 10:  การใช้งาน Virtual USB</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-stm32-nucleo">การเขียนโปรแกรม Arduino สำหรับบอร์ด STM32 Nucleo<a class="headerlink" href="#arduino-stm32-nucleo" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino IDE</em>, <em>STM32duino</em>, <em>STM32 Nucleo</em>,
+<em>Nucleo-L432KC</em></p>
+<hr />
+<h2 id="stm32duino-arduino-ide">&#9655; <strong>STM32Duino สำหรับ Arduino IDE</strong><a class="headerlink" href="#stm32duino-arduino-ide" title="Permanent link">#</a></h2>
+<p>บทความนี้กล่าวถึง การทดลองใช้งาน <a href="https://github.com/stm32duino/"><strong>STM32duino</strong></a> 
+ซึ่งเป็น <strong>Arduino Core</strong> สำหรับไมโครคอนโทรลเลอร์ตระกูล <strong>STM32</strong>
+ที่นำมาติดตั้งและใช้งานได้ร่วมกับซอฟต์แวร์ <a href="https://www.arduino.cc/en/Main/Software"><strong>Arduino IDE</strong></a> </p>
+<p>การเลือกใช้เครื่องมือเหล่านี้ อาจช่วยให้ผู้ที่สนใจเริ่มต้นใช้งานบอร์ดไมโครคอนโทรลเลอร์ <strong>STM32</strong> ได้ง่ายขึ้น
+(โดยเฉพาะอย่างยิ่งผู้ที่คุ้นเคยกับการเขียนโปรแกรม <strong>Arduino</strong> มาก่อน) และยังสามารถใช้ได้กับบอร์ด
+<strong> Nucleo-32 / Nucleo-64 / Nucleo-144 / Discovery</strong>
+หลาย ๆ บอร์ดของบริษัท <strong>STMicroelectronics</strong> และบอร์ดของบริษัทอื่นที่ใช้ชิป <strong>STM32</strong></p>
+<p>อย่างไรก็ตาม ถ้าต้องการใช้งานบอร์ดหรือชิป <strong>MCU</strong> ของ <strong>STMicroelectronics</strong> ในเชิงลึก
+แนะนำให้ใช้ภาษา <strong>C/C++</strong> ร่วมกับ <strong>STM32Cube HAL (Hardware Abstraction Layer)</strong> 
+หรือจะฝึกเขียนโค้ดโดยใช้ <strong>RTOS</strong> อย่างเช่น <a href="https://os.mbed.com/"><strong>Mbed OS</strong></a> 
+หรือ <a href="https://zephyrproject.org/"><strong>Zephyr RTOS</strong></a> ก็ได้</p>
+<p><img alt="" src="../images/stm32_software.png" /></p>
+<p>รูป: ซอฟต์แวร์ที่เกี่ยวข้องกับการเขียนโปรแกรมไมโครคอนโทรลเลอร์ <strong>STM32</strong> (Source: STMicroelectronics)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="stm32duino-arduino-ide_1">&#9655; <strong>การติดตั้ง STM32Duino สำหรับ Arduino IDE</strong><a class="headerlink" href="#stm32duino-arduino-ide_1" title="Permanent link">#</a></h2>
+<p><strong>ขั้นตอนการติดตั้ง STM32Duino</strong></p>
+<ul>
+<li>เปิดใช้งาน <strong>Arduino IDE</strong> แล้วไปยังเมนู "<strong>File &gt; Preferences</strong>"</li>
+<li>เพิ่มรายการ <strong>URL</strong> ของไฟล์ <em>.json</em> ต่อไปนี้ ซึ่งจะใช้สำหรับ <strong>STM32 Core</strong> และอยู่ใน <strong>Github</strong>
+<a href="https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"><code>package_stmicroelectronics_index.json</code></a></li>
+<li>ไปยังเมนู "<strong>Tools &gt; Board: ... &gt; Boards Manager ...</strong>"</li>
+<li>ในหน้าต่าง <strong>Boards Manager</strong> จะมีรายการ <strong>STM32 MCU based Boards</strong> ให้เลือก <strong>Install</strong></li>
+<li>ติดตั้ง  <strong>STM32 Cores</strong> ซึ่งจะทำการดาวน์โหลดไฟล์ต่าง ๆ ที่เกี่ยวข้องจากอินเทอร์เน็ต</li>
+</ul>
+<p>แนะนำให้ศึกษาข้อมูลเพิ่มเติมจากไฟล์ <a href="https://github.com/stm32duino/Arduino_Core_STM32/blob/main/README.md"><strong>README.md</strong></a>
+ใน <strong>Github</strong> ของ <strong>STM32duino</strong> </p>
+<p><img alt="" src="../images/stm32duino_readme.png" /></p>
+<p>รูป:  เนื้อหาบางส่วนในไฟล์ <a href="https://github.com/stm32duino/Arduino_Core_STM32/blob/main/README.md"><strong>README.md</strong></a></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/stm32duino_json_file.png" /></p>
+<p>รูป: การเพิ่มรายการไฟล์ .json เพื่อติดตั้ง <strong>Arduino Boards Manager</strong> สำหรับ <strong>STM32duino</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/stm32duino_install-1.png" /></p>
+<p>รูป: การเลือกเวอร์ชันของ <strong>STM32duino</strong> เพื่อติดตั้งใช้งาน (เช่น <strong>2.2.0</strong> เป็นเวอร์ชันล่าสุดที่ได้ทดลองใช้งาน) </p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/stm32duino_install-2.png" /></p>
+<p>รูป: ขั้นตอนการดาวน์โหลดไฟล์ที่เกี่ยวข้องจากอินเทอร์เน็ตโดยอัตโนมัติเพื่อติดตั้ง <strong>STM32duio</strong></p>
+<p>ตัวอย่างโค้ดและการใช้งานไลบรารีของ <strong>STM32duino</strong> ได้จาก </p>
+<ul>
+<li><a href="https://github.com/stm32duino/STM32Examples">https://github.com/stm32duino/STM32Examples</a></li>
+<li><a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/main/libraries">https://github.com/stm32duino/Arduino_Core_STM32/tree/main/libraries</a></li>
+</ul>
+<p>ตัวอย่างไลบรารีสำหรับ <strong>STM32Duino</strong> เช่น</p>
+<ul>
+<li><a href="https://github.com/stm32duino/STM32FreeRTOS"><strong>STM32FreeRTOS</strong></a> สำหรับผู้ที่ต้องการใช้งาน <strong>FreeRTOS</strong></li>
+<li><a href="https://github.com/stm32duino/STM32Ethernet"><strong>STM32Ethernet</strong></a> สำหรับเขียนโค้ดเพื่อส่งข้อมูลในเครือข่ายด้วยโพรโทคอล <strong>TCP/IP Stack</strong> (ใช้ไลบรารี <strong>LwIP</strong> เป็นพื้นฐานในการทำงาน) หากใช้บอร์ด <strong>NUCLEO</strong> ที่รองรับการใช้งาน <strong>Ethernet</strong> เช่น <strong>Nucleo-F429ZI</strong> และไลบรารีใช้งานได้เหมือน <strong>Arduino Ethernet API</strong></li>
+<li><a href="https://github.com/stm32duino/STM32RTC"><strong>STM32RTC</strong></a> สำหรับการใช้งานวงจร <strong>RTC</strong> (<em>Real-Time Clock</em>) 
+ที่เป็นวงจรอยู่ภายในชิป <strong>STM32</strong></li>
+<li><a href="https://github.com/stm32duino/STM32SD"><strong>STM32SD</strong></a> สำหรับการเขียนอ่านข้อมูลลงใน <strong>MicroSD</strong> โดยใช้ไลบรารี <strong>FatFS</strong> (<em>FAT-based File System</em>) เป็นพื้นฐานในการทำงาน</li>
+</ul>
+<hr />
+<h2 id="nucleo-l432kc">&#9655; <strong>บอร์ดไมโครคอนโทรลเลอร์ Nucleo L432KC</strong><a class="headerlink" href="#nucleo-l432kc" title="Permanent link">#</a></h2>
+<p>บอร์ด <a href="https://www.st.com/en/evaluation-tools/nucleo-l432kc.html"><strong>Nucleo L432KC</strong></a>
+เป็นบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>STM32L432KC</strong> (<strong>32-bit ARM Cortex-M4F</strong>)
+เริ่มมีการจำหน่ายในปีค.ศ. 2016 (<strong>Initial release</strong>)</p>
+<p><strong> ข้อมูลเชิงเทคนิค</strong></p>
+<ul>
+<li>Package: UFQFPN32 </li>
+<li>CPU: ARM 32-bit Cortex-M4 CPU with FPU</li>
+<li>CPU frequency: 80MHz (max.)</li>
+<li>VDD: from 1.65V to 3.6V (3.3V typ.)</li>
+<li>On-chip memory<ul>
+<li>256 KB Flash</li>
+<li>64 KB SRAM</li>
+</ul>
+</li>
+<li>Peripherals<ul>
+<li>GPIO (20) with external interrupt capability</li>
+<li>General-Purpose Timers (4)</li>
+<li>SPI/I2S (2)</li>
+<li>I2C (2)</li>
+<li>USART (2)</li>
+<li>12-bit ADC with 10 channels (5 Msps)</li>
+<li>12-bit DAC with 2 channels</li>
+<li>RTC </li>
+<li>CAN Controller</li>
+<li>USB 2.0 full-speed (crystal less)</li>
+<li>Random Generator (TRNG for HW entropy)</li>
+</ul>
+</li>
+<li>Onboard ST-LINK/V2-1 debugger/programmer</li>
+<li>Board voltage supply: VUSB (5V), VIN (7 - 12V)</li>
+<li>Arm Mbed Enabled compliant</li>
+</ul>
+<p><img alt="" src="../images/nucleo_l432kc_pinmap.png" /></p>
+<p>รูป: บอร์ด <strong>Nucleo L432KC</strong> และ <strong>Pinmap</strong> ซึ่งเป็นแผนผังแสดงตำแหน่งของขาต่าง ๆ</p>
+<p><img alt="" src="../images/nucleo_l432kc_arduino_pins.png" /></p>
+<p>รูป: <strong>Nucleo L432KC - Arduino Pins</strong></p>
+<p><img alt="" src="../images/nucleo_l432kc_schematic.jpg" /></p>
+<p>รูป: ผังวงจรของบอร์ด <strong>Nucleo L432KC</strong> (ไม่รวมส่วนที่เป็นวงจร <strong>ST-Link/v2</strong>)</p>
+<p>อ้างอิงจาก: <a href="https://os.mbed.com/platforms/ST-Nucleo-L432KC/">https://os.mbed.com/platforms/ST-Nucleo-L432KC/</a></p>
+<p>บอร์ดในกลุ่มที่เรียกว่า <strong>STM32 Nucleo-32</strong> ใช้ชิปที่มี 32 ขา ตัวถังของไอซีแบบ  <strong>LQFP32</strong> หรือ <strong>UFQFPN32</strong> 
+มีการจัดวางขาบนบอร์ดเหมือน <strong>Arduino Nano</strong> และมีให้เลือกใช้งานอยู่หลายบอร์ด การออกแบบบอร์ดในกลุ่มนี้อ้างอิงตาม 
+<a href="https://www.st.com/resource/en/user_manual/dm00231744-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf"><strong>MB1180 Reference Board</strong></a> เช่น</p>
+<ul>
+<li><strong>NUCLEO-F031K6</strong></li>
+<li><strong>NUCLEO-F042K6</strong></li>
+<li><strong>NUCLEO-F301K8</strong></li>
+<li><strong>NUCLEO-F303K8</strong></li>
+<li><strong>NUCLEO-L011K4</strong></li>
+<li><strong>NUCLEOL031K6</strong></li>
+<li><strong>NUCLEO-L412KB</strong></li>
+<li><strong>NUCLEO-L432KC</strong></li>
+</ul>
+<p><img alt="" src="../images/stm32_nucleo_boards.jpg" /></p>
+<p>รูป: ตัวเลือกสำหรับบอร์ด <a href="https://www.st.com/en/evaluation-tools/stm32-nucleo-boards.html"><strong>NUCLEO</strong></a> ของบริษัท <strong>STMicroelectronics</strong></p>
+<p>บอร์ด <strong>Nucleo-32</strong> ได้รวมวงจร <strong>ST-LINK/V2 In-Circuit Debugger / Programmer</strong> 
+มาให้แล้ว (วงจรอยู่ด้านล่างของแผ่น <strong>PCB</strong> ส่วนด้านบนเป็นวงจรของ <strong>STM32L432KC</strong>) </p>
+<p>เมื่อเสียบสาย <strong>MicroUSB</strong> เชื่อมต่อบอร์ดกับคอมพิวเตอร์ของผู้ใช้
+บอร์ดจะได้รับการจ่ายแรงดันไฟเลี้ยง (<strong>VUSB=+5V</strong> และใช้กระแสไฟฟ้าไม่เกิน <strong>300 mA</strong>) 
+สังเกตที่ตัวไดโอดเปล่งแสง (<strong>LED</strong>) ซึ่งมีตัวหนังสือเขียนกำกับไว้ <strong>LD2</strong>
+จะสว่างขึ้น และในคอมพิวเตอร์ของผู้ใช้ จะมองเห็นอุปกรณ์ 3 กรณี ดังนี้</p>
+<ul>
+<li><strong>ST-Link Debugger</strong> ใช้สำหรับการอัปโหลดไฟล์ <strong>.bin</strong> หรือดีบักการทำงานของโปรแกรมโดยใช้ฮาร์ดแวร์ 
+วงจร <strong>ST-Link</strong> เชื่อมต่อกับขา <strong>SWCLK / SWDIO</strong> (<strong>SWD interface</strong>) ของชิป <strong>STM32</strong> 
+(<strong>Target Device</strong>) บนบอร์ด</li>
+<li><strong>Virtual COM port</strong> ใช้สำหรับสื่อสารข้อมูลผ่านพอร์ตอนุกรมที่ขา <strong>PA2 / PA15 (VCP_TX / VCP_RX)</strong> 
+ของชิป <strong>STM32</strong> ผ่านทางวงจร <strong>ST-Link</strong> ซึ่งทำหน้าที่เป็นวงจร <strong>USB-to-Serial</strong></li>
+<li><strong>Mass storage</strong> มองเห็นเป็นชื่อไดรฟ์ เช่น <code>NUCLEO_L432KC</code> ใช้สำหรับการอัปโหลดไฟล์ <strong>.bin</strong> 
+ไปชิปไมโครคอนโทรลเลอร์ โดยการลากไฟล์มาวาง (<strong>Drag &amp; Drop</strong>)</li>
+</ul>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>ขา <strong>VIN</strong> บนบอร์ด สามารถใช้สำหรับการป้อนแรงดันไฟเลี้ยงได้ และรับแรงดันได้ในช่วง <strong>7V</strong> ถึง <strong>12V</strong> 
+และมีวงจรแปลงแรงดันลง (เป็นแบบ <strong>Linear Voltage Regulator</strong>) ให้มีแรงดันคงที่ <strong>+5V</strong> (<em>regulated</em>)</li>
+<li>ถ้าจ่ายไฟ <strong>+5V</strong> เข้าที่ขา <strong>5V pin</strong> บนบอร์ด วงจร <strong>ST-Link</strong> จะไม่ทำงาน เพราะวงจรส่วนนี้ จะต้องใช้แรงดันไฟเลี้ยงจาก <strong>VUSB</strong> หรือขา <strong>VIN</strong> เท่านั้น</li>
+<li>บอร์ด <strong>Nucleo L432KC</strong> มีวงจรคริสตัลสำหรับสร้างความถี่ <strong>32.768 kHz (LSE)</strong> </li>
+<li>ขา <strong>PA9 / D1</strong> และ <strong>PA10 / D0</strong> ตรงกับขา <strong>USART1_TX</strong> และ <strong>USART1_RX</strong> ตามลำดับ </li>
+<li>ขา <strong>PA2</strong> และ <strong>PA15</strong> ตรงกับขา <strong>VCP_TX</strong> และ <strong>VCP_RX</strong> ตามลำดับ </li>
+<li>ที่ตำแหน่งขา <strong>D2</strong> กับขา <strong>GND</strong> บนบอร์ด <strong>Nucleo-32</strong> ได้มีการใส่ <strong>Jumper</strong> เอาไว้
+  ถ้าจะใช้งานบอร์ด ให้ถอด <strong>Jumper</strong> ดังกล่าวออกก่อน</li>
+</ul>
+<hr />
+<h2 id="1-blink-the-on-board-led">&#9655; <strong>ตัวอย่างโค้ด 1:  Blink the on-board LED</strong><a class="headerlink" href="#1-blink-the-on-board-led" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 1 สาธิตการทำให้ <strong>LED</strong> บนบอร์ด ซึ่งเป็นวงจรเอาต์พุตที่ต่ออยู่ที่ขา <strong>D13</strong> (<strong>Arduino Pin</strong>) 
+หรือขา <strong>PB_3</strong> (<strong>MCU Pin</strong>) เกิดการกระพริบ โดยกำหนดสถานะลอจิกเป็นเอาต์พุตสลับ LOW (0) และ HIGH (1) 
+โดยเว้นระยะประมาณ 100 มิลลิวินาที</p>
+<pre><code class="language-c++">#define LED_PIN   PB3  // PB_3 (MCU pin) or D13 (Arduino pin)
+#define DELAY_MS  100
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT ); // configure LED_PIN as output
+}
+
+void loop() {
+  static int state = 0;           // used to keep the LED state
+  digitalWrite( LED_PIN, state ); // update the output
+  state ^= 1;                     // toggle the LED state
+  delay( DELAY_MS );              // delay (in msec)
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ก่อนทำขั้นตอน <strong>Verify &amp; Upload</strong> เพื่อคอมไพล์และอัปโหลด <strong>Arduino Sketch</strong> ให้ตรวจสอบการตั้งค่าใช้งานดังนี้</p>
+<ul>
+<li>เลือกบอร์ด <strong>Nucleo-32 / Nucleo L432KC</strong></li>
+<li>เลือก <strong>U(S)ART Support: Enabled (generic Serial)</strong></li>
+<li>เลือก <strong>USB Support (if available): None</strong></li>
+<li>เลือก <strong>STM32CubeProgrammer (SWD)</strong> หรือเลือกวิธี <strong>Mass Storage</strong> (แนะนำวิธีนี้) สำหรับ <strong>Upload Method</strong></li>
+<li>เลือกพอร์ต <strong>Serial / COM port</strong> ที่ตรงกับบอร์ดในขณะที่เชื่อมต่อใช้งานผ่านทางพอร์ต <strong>USB</strong> </li>
+</ul>
+<p><strong>ข้อสังเกต:</strong> โปรแกรมต่าง ๆ ที่เกี่ยวข้องกับ <strong>STM32duino</strong> จะถูกติดตั้งไว้ในไดเรกทอรีสำหรับผู้ใช้ เช่น สำหรับ <strong>Windows</strong> ดังนี้</p>
+<p><code>C:\Users\%username%\AppData\Local\Arduino15\packages\STMicroelectronics</code></p>
+<p>ภายในไดเรกทอรีดังกล่าว หากดูในไดเรกทอรีย่อย <code>.\tools\STM32Tools\2.1.1</code> (เวอร์ชันล่าสุดที่ได้ทดลองใช้งาน)
+จะมีไฟล์ <code>stm32CubeProg.sh</code> ที่ใช้สำหรับการอัปโหลดไฟล์ <strong>.bin</strong> ไปยังบอร์ด <strong>STM32</strong></p>
+<p>ในการใช้งาน <strong>STM32CubeProgrammer (SWD)</strong> ภายในการทำงานของ <strong>Arduino IDE</strong> จะต้องมีการติดตั้ง
+ซอฟต์แวร์ <a href="https://www.st.com/en/development-tools/stm32cubeprog.html"><strong>STM32CubeProgrammer</strong></a> ก่อน และเพิ่มรายการ <code>PATH</code> ในระบบให้เรียกใช้ได้แบบ <strong>Command Line</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/nucleo_l432_settings-1.png" /></p>
+<p>รูป: ตรวจสอบการตั้งค่าสำหรับ <strong>Arduino Sketch</strong> เพื่อใช้งานกับบอร์ด <strong>Nucleo L432KC</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/arduino_stm32_swd_upload.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตเมื่อทำขั้นตอน <strong>Upload</strong> ได้สำเร็จแล้ว</p>
+<p>โค้ดตัวอย่างต่อไปนี้  แสดงข้อมูลเกี่ยวกับระบบ เช่น ความถี่ในการทำงานของซีพียู ความจุของหน่วยความจำ <strong>Flash</strong>
+และตัวเลข <strong>CPU ID (32-bit)</strong> และ <strong>Unique Device ID (96-bit)</strong> เป็นต้น</p>
+<pre><code class="language-c++">void sysinfo() {
+  pinMode( LED_BUILTIN, OUTPUT ); 
+
+  Serial.printf( &quot;CPU frequency: %lu MHz\n&quot;, SystemCoreClock/1000000UL );
+  Serial.printf( &quot;Flash size: %u KB\n&quot;, *(uint16_t *)FLASHSIZE_BASE );
+  Serial.printf( &quot;Unique device ID (96-bit): 0x%08X%08X%08X\n&quot;, 
+                 *(uint32_t *)(UID_BASE),
+                 *(uint32_t *)(UID_BASE+4),
+                 *(uint32_t *)(UID_BASE+8) );
+  Serial.printf( &quot;CPUID (32-bit): 0x%08X\n&quot;, 
+                 *(uint32_t *)(SCB_BASE) );
+  Serial.printf( &quot;LED_BUILTIN: %d (%d)\n\n&quot;, LED_BUILTIN, PB3 );
+}
+
+void setup() {
+  pinMode( LED_BUILTIN, OUTPUT ); // configure LED_PIN as output
+  Serial.begin( 115200 );
+  // 02020000 = v2.2.0
+  Serial.printf( &quot;STM32_CORE_VERSION: %08x&quot;, STM32_CORE_VERSION );
+}
+
+void loop() {
+  static int state = 0;
+  sysinfo();
+  digitalWrite( LED_BUILTIN, state ^= 1 );
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="../images/stm32l432kc_info.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตแสดงผลใน <strong>Arduino Serial Monitor</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-press-the-button-to-toggle-the-led-interrupt-based-method">&#9655; <strong> ตัวอย่างโค้ด 2:  Press the button to toggle the LED (Interrupt-based Method)</strong><a class="headerlink" href="#2-press-the-button-to-toggle-the-led-interrupt-based-method" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 2 สาธิตการใช้คำสั่ง <code>attachInterrupt()</code> ของ <strong>Arduino API</strong> 
+สำหรับเปิดใช้งานอินเทอร์รัพท์ภายนอก (<strong>External Interrupt</strong>)
+ร่วมกับขาอินพุตที่ต่อกับวงจรปุ่มกดภายนอก
+ซึ่งเป็นวงจรปุ่มกดแบบ <strong>Active-Low</strong> ที่ขา <strong>D12</strong> หรือ <strong>PB_4</strong></p>
+<p>เมื่อมีการกดปุ่มแต่ละครั้ง จะทำให้เกิดอินเทอร์รัพท์หนึ่งครั้ง และจะมีการทำคำสั่งต่าง ๆ ในฟังก์ชัน <code>irq_handler()</code>
+ซึ่งส่งผลให้มีการเปลี่ยนสถานะสำหรับเอาต์พุต <strong>LED</strong> ของบอร์ด </p>
+<pre><code class="language-c++">#define LED_PIN      PB3   // PB_3 or D13 pin 
+#define BTN_PIN      PB4   // PB_4 or D12 pin 
+
+#define COUNTDOWN_MAX  (16)
+
+volatile bool state_changed = false;
+char sbuf[64];  // string buffer (char array)
+
+void irq_handler( ) { // triggered on the falling edge
+  detachInterrupt( BTN_PIN );  // disable the interrupt
+  state_changed = true;        // set 'state_changed' flag
+}
+
+void setup() {
+  // configure the button pin as input
+  pinMode( BTN_PIN, INPUT_PULLUP ); // enable internal pull-up
+  // configure the LED pin as output
+  pinMode( LED_PIN, OUTPUT ); 
+  // update the LED output
+  digitalWrite( LED_PIN, LOW ); 
+  // specify the baudrate and start the serial
+  Serial.begin( 115200 );
+  // send a string to the serial
+  Serial.println( &quot;Arduino-STM32 Programming - Nucleo L432KC...&quot; );
+  // enable the external interrupt on the push button
+  attachInterrupt( BTN_PIN, irq_handler, FALLING );
+}
+
+void loop() {
+  // if an button-change event is detected
+  if ( state_changed ) {
+     uint16_t bits; // used to keep the input sample
+     // sample the button input pin
+     for ( int i=0; i &lt; 16; i++ ) {
+        bits = (bits &lt;&lt; 1) | digitalRead( BTN_PIN );
+        delay(2);
+     }
+     if (bits == 0) { // if the input pin is low and stable
+        // toggle and update the LED output
+        int state = !digitalRead(LED_PIN);
+        digitalWrite( LED_PIN, state ); 
+        sprintf( sbuf, &quot;LED state: %d @%lu&quot;, state, millis() );
+        Serial.println( sbuf );
+        Serial.flush();
+     }
+     uint32_t countdown = COUNTDOWN_MAX;
+     while ( countdown ) {
+        // decrement if the input button is high, 
+        // otherwise reset to initial value
+        if ( digitalRead(BTN_PIN) ) {
+          countdown--;
+        } else {
+          countdown = COUNTDOWN_MAX;
+        }
+        delay(2);
+     }
+     state_changed = false; // clear flag
+     // re-enable the external interrupt on the push button
+     attachInterrupt( BTN_PIN, irq_handler, FALLING ); 
+   }
+   else
+     delay(10);
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-pwm-based-led-dimming">&#9655; <strong>ตัวอย่างโค้ด 3:  PWM-based LED Dimming</strong><a class="headerlink" href="#3-pwm-based-led-dimming" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 3 สาธิตการปรับความสว่างของ <strong>LED</strong> เมื่อต่อกับขา <strong>D13</strong> หรือ <strong>PB_3</strong>
+โดยใช้เทคนิคที่เรียกว่า <strong>PWM (Pulse-Width Modulation)</strong>
+และสามารถทำได้โดยเรียกใช้คำสั่ง <code>analogWrite()</code></p>
+<pre><code class="language-c++">#define PWM_LED_PIN   PB3  // PB_3 or D13 pin 
+#define DELAY_MS      5
+
+uint8_t value = 0; // used to store the PWM duty cycle between 0..255
+int pm = 1; // 1 or -1
+
+void setup() {
+  pinMode( PWM_LED_PIN, OUTPUT );
+  analogWrite( PWM_LED_PIN, value );
+}
+
+void loop() {
+  if ( value == 255 &amp;&amp; pm == 1 ) {
+    pm = -1; // decrement
+  } else if ( value == 0 &amp;&amp; pm == -1 ) {
+    pm = 1;  // increment
+  }
+  value += pm;
+  analogWrite( PWM_LED_PIN, value ); 
+  delay( DELAY_MS );
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-timer-based-led-toggle">&#9655; <strong>ตัวอย่างโค้ด 4:  Timer-based LED Toggle</strong><a class="headerlink" href="#4-timer-based-led-toggle" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 4 สาธิตการใช้ไลบรารี <a href="https://github.com/stm32duino/wiki/wiki/HardwareTimer-library"><code>HardwareTimer</code></a> ของ <strong>STM32Duino</strong> 
+ซึ่งสามารถเลือกใช้กับวงจรตัวนับภายในได้ เช่น <strong>TIM1</strong> หรือ <strong>TIM2</strong> เป็นต้น
+เพื่อทำหน้าที่เป็นตัวนับตามจังหวะของสัญญาณ <strong>Clock</strong> เช่น <strong>10 Hz</strong>
+และมีการสร้างฟังก์ชันสำหรับ <strong>Callback</strong> ที่จะถูกเรียกทุก ๆ 0.1 วินาที 
+และนำมาใช้ในการสลับสถานะของ <strong>LED</strong> บนบอร์ดทดลอง</p>
+<pre><code class="language-c++">#define LED_PIN   PB3    // PB_5 or D13 pin 
+#define USE_TIM   TIM2
+
+HardwareTimer *timer = NULL;
+
+void timer_callback( void ) {
+   static int state = 0;
+   state ^= 1;                     // toggle the state
+   digitalWrite( LED_PIN, state ); // update the LED output
+}
+
+void setup() {
+   pinMode( LED_PIN, OUTPUT );
+   timer = new HardwareTimer( USE_TIM );
+   timer-&gt;setOverflow( 10, HERTZ_FORMAT ); // timer frequency = 10 Hz
+   timer-&gt;attachInterrupt( timer_callback );
+   timer-&gt;resume();
+}
+
+void loop() {}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-bh1750-light-sensor-reading-i2c">&#9655; <strong> ตัวอย่างโค้ด 5:  BH1750 Light Sensor Reading (I2C)</strong><a class="headerlink" href="#5-bh1750-light-sensor-reading-i2c" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 5 สาธิตการอ่านข้อมูลจากโมดูล  <a href="https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf"><strong>BH1750</strong></a> ซึ่งเป็นเซ็นเซอร์วัดความเข้มแสง
+โดยเชื่อมต่อกับบัส <strong>I2C</strong> ที่ขา <strong>PB_6 / I2C1_SCL</strong> และ <strong>PB_7 / I2C1_SDA</strong> 
+และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> และ <strong>GND</strong> ป้อนให้โมดูลเซ็นเซอร์</p>
+<p>ในกรณีนี้ <strong>STM32</strong> ทำหน้าที่เป็น <strong>I2C Master</strong> และในการเขียนโปรแกรมเราสามารถใช้ไลบรารี 
+<a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/master/libraries/Wire"><code>Wire</code></a>
+ของ <strong>STM32duino</strong> ได้ (ดูตัวอย่างการใช้งานไลบรารีนี้ได้จาก 
+<a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/main/libraries/Wire/examples">"<strong>STM32duino Wire Examples</strong>"</a>)</p>
+<p>ตัวอย่างนี้กำหนดค่าให้ <strong>BH1750</strong> ทำงานในโหมดที่เรียกว่า <strong>Continuously H-Resolution Mode</strong>
+โดยจะวัดค่าความเข้มแสงต่อเนื่องไปเรื่อย ๆ และจะมีการวัดและอัปเดทค่าทุก ๆ 120 มิลลิวินาที</p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt; // requires the Wire library
+
+#define SCL_PIN      PB6  // PB_6 or D5 pin
+#define SDA_PIN      PB7  // PB_7 or D4 pin
+
+#define BH1750_I2CADDR             0x23 // 0x23 or 0x5c
+#define BH1750_CONT_HIGH_RES_MODE  0x10 // Continuously H-Resolution Mode
+
+bool bh1750_init() {
+   Wire.beginTransmission( BH1750_I2CADDR );
+   Wire.write( (uint8_t) BH1750_CONT_HIGH_RES_MODE );
+   uint8_t error = Wire.endTransmission();
+   delay(120);
+   if ( error != 0 ) {
+      Serial.println( &quot;No ACK from sensor !!!&quot; );
+      return false;
+   }
+   return true;
+}
+
+boolean bh1750_read( uint16_t *lux_value ) {
+   uint16_t level;
+   boolean ok = true;
+   // Start transmission to the sensor (I2C slave)
+   Wire.beginTransmission( BH1750_I2CADDR ); 
+   // Read two bytes from sensor (MSB and LSB bytes)
+   Wire.requestFrom( BH1750_I2CADDR, 2 ); 
+   if ( Wire.available() == 2 ) {
+     level = Wire.read();
+     level &lt;&lt;= 8;
+     level |= Wire.read();
+   } else {
+     ok = false;
+   }
+   Wire.endTransmission();
+   // Divide the 16-bit raw value by 1.2 to get the value in Lux 
+   *lux_value = ok ? (10UL * level)/12 : 0; 
+   return ok;
+}
+
+void setup() {
+   Serial.begin( 115200 );
+   Wire.setSDA( SDA_PIN );
+   Wire.setSCL( SCL_PIN );
+   Wire.begin(); 
+   Wire.setClock( 400000 ); // 400kHz speed 
+   delay(10);
+   while( !bh1750_init() ) {
+     Serial.println( &quot;BH1750 initialization failed!&quot; );
+     delay(1000);
+   }
+   Serial.println( &quot;\n\nBH1750 initialization OK!\n&quot; );
+}
+
+void loop() {
+   uint16_t lux;
+   if ( bh1750_read( &amp;lux ) ) { // if sensor reading is OK
+     Serial.printf( &quot;Light: %5d Lux\n&quot;, lux );
+   } else {
+     Serial.printf( &quot;Light: ----- Lux\n&quot; );
+   }
+   delay(500); 
+}
+</code></pre>
+<p><img alt="" src="../images/l432kc_bh1750-1.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองร่วมกับโมดูล  <strong>BH1750</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6-sht3x-dis-sensor-reading-i2c">&#9655; <strong>ตัวอย่างโค้ด 6:  SHT3x-DIS Sensor Reading (I2C)</strong><a class="headerlink" href="#6-sht3x-dis-sensor-reading-i2c" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 6 สาธิตการอ่านข้อมูลจากโมดูลเซนเซอร์วัดอุณหภูมิและความชื้นสัมพัทธ์ <strong>SHT3x-DIS</strong> 
+โดยเชื่อมต่อกับบัส <strong>I2C</strong> ที่ขา <strong>PB_8 / I2C1_SCL</strong> และ <strong>PB_9 / I2C1_SDA</strong>
+และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong></p>
+<p>ในกรณีนี้ <strong>STM32</strong> ทำหน้าที่เป็น <strong>I2C Master</strong> และในการเขียนโปรแกรมเราสามารถใช้ไลบรารี 
+<a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/master/libraries/Wire"><code>Wire</code></a>
+ของ <strong>STM32duino</strong> ได้</p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+
+#define SCL_PIN      PB6   // PB_6 or D5 pin
+#define SDA_PIN      PB7   // PB_7 or D4 pin
+
+#define SHT3x_I2C_ADDR         0x44    // SHT3x-DIS (I2C)
+// single shot mode, no clock stretching
+#define SHT3x_ACCURACY_HIGH    0x2C06
+#define SHT3x_ACCURACY_MEDIUM  0x2C0D
+#define SHT3x_ACCURACY_LOW     0x2C10
+#define SHT3x_SOFT_RESET       0x30A2
+
+TwoWire i2c( SDA_PIN, SCL_PIN );
+
+char sbuf[64];
+uint32_t ts;
+float temp, humid;
+uint8_t data[6]; 
+
+// CRC-8, Polynomial: 0x31 = x^8 + x^5 + x^4 + 1, Initial value = 0xff
+uint8_t CRC8( uint8_t data[], uint8_t len ) {
+  uint8_t crc = 0xFF;
+  for ( uint8_t i=0; i &lt; len; i++ ) {
+    crc ^= data[i];
+    for ( uint8_t j=0; j &lt; 8; j++ ) {
+      crc = crc &amp; 0x80 ? (crc &lt;&lt; 1) ^ 0x31 : crc &lt;&lt; 1;
+    }
+  }
+  return crc;
+}
+
+void sht3x_init() {
+  // Start I2C Transmission
+  i2c.beginTransmission( SHT3x_I2C_ADDR );
+  // Send soft reset command
+  i2c.write( (SHT3x_SOFT_RESET &gt;&gt; 8) &amp; 0xff );
+  i2c.write( SHT3x_SOFT_RESET &amp; 0xff ); 
+  i2c.endTransmission();  // Stop I2C transmission
+  delay(10);
+  i2c.beginTransmission( SHT3x_I2C_ADDR );
+  // Send soft reset command
+  i2c.write( (SHT3x_ACCURACY_HIGH &gt;&gt; 8) &amp; 0xff );
+  i2c.write( SHT3x_ACCURACY_HIGH &amp; 0xff ); 
+  i2c.endTransmission();  // Stop I2C transmission
+}
+
+bool sht3x_read_sensor() {
+  memset( data, 0x00, 6 );
+  data[3] = data[5] = 0xff;
+  // Start I2C Transmission
+  i2c.beginTransmission( SHT3x_I2C_ADDR );
+  // Send measurement command
+  i2c.write( (SHT3x_ACCURACY_HIGH &gt;&gt; 8) &amp; 0xff );
+  i2c.write( SHT3x_ACCURACY_HIGH &amp; 0xff ); 
+  i2c.endTransmission();  // Stop I2C transmission
+  delay(20); // note: measurement time is about 15 msec
+  // Request 6 bytes of data
+  i2c.requestFrom( SHT3x_I2C_ADDR, 6 ); // request 6 bytes
+  if ( i2c.available() == 6 ) {
+    data[0] = i2c.read(); // temperature Celsius (MSB: high byte)
+    data[1] = i2c.read(); // temperature Celsius (LSB: low byte)
+    data[2] = i2c.read(); // temperature Celsius CRC
+    data[3] = i2c.read(); // relative humidty (%RH) (MSB: high byte)
+    data[4] = i2c.read(); // relative humidty (%RH) (LSB: low byte)
+    data[5] = i2c.read(); // relative humidty CRC
+  } else {
+    Serial.println(&quot;SHT3x sensor reading error\n&quot;);
+    return false;
+  }
+  // check CRC for both values
+  if ( CRC8(data,2)==data[2] &amp;&amp; CRC8(data+3,2)==data[5] ) {
+    uint16_t value;
+    value = (data[0] &lt;&lt; 8) + data[1];
+    temp  = ((value * 175.0) / 65535) - 45; // temperature in Celsius.
+    value = (data[3] &lt;&lt; 8) + data[4];
+    humid = ((value * 100.0) / 65535); // relative humidity
+    return true;
+  } 
+  Serial.println(&quot;Checksum error\n&quot;);
+  return false;  
+}
+
+void setup() {
+  Serial.begin( 115200 );  // set serial baudrate to 115200
+  i2c.begin( );            // start the I2C bus
+  i2c.setClock( 400000 );  // set I2C clock frequency to 400kHz
+  sht3x_init();            // initalize the SHT3x-DIS
+  ts = millis();
+}
+
+void loop() {
+  if ( millis() - ts &gt;= 1000 ) { // read sensor every 1000 msec
+    String str;
+    ts += 1000;
+    if ( sht3x_read_sensor() ) {
+      str = &quot;&quot;;
+      dtostrf( humid, 3, 1, sbuf );
+      str += &quot;Humidity: &quot;;
+      str += sbuf;
+      str += &quot; %RH, &quot;;
+      dtostrf( temp, 3, 1, sbuf );
+      str += &quot;Temperature: &quot;;
+      str += sbuf;
+      str += &quot; deg.C&quot;;
+      Serial.println( str.c_str() );
+    } 
+    else {
+      Serial.println( &quot;Sensor reading failed...&quot; );
+    }
+  }
+}
+</code></pre>
+<p><img alt="" src="../images/l432kc_sht3x-1_1600x900.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองร่วมกับโมดูล <strong>SHT3x</strong></p>
+<p><img alt="" src="../images/l432kc_sht3x_reading.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้จากการอ่านเซ็นเซอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="7-serial-bridge">&#9655; <strong> ตัวอย่างโค้ด 7:  Serial Bridge</strong><a class="headerlink" href="#7-serial-bridge" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างที่ 7 สาธิตการใช้ฮาร์ดแวร์ภายในที่เป็น <strong>USART</strong> จำนวน 2 ชุด พร้อมกัน (<code>Serial</code> และ <code>Serial1</code>) 
+โดยทำหน้าที่เป็น <strong>Serial Bridge</strong> คือ ถ้าได้รับข้อมูลจากขา <strong>RX</strong> ของ <code>Serial</code> 
+ก็จะส่งออกทางขา <strong>TX</strong> ของ <code>Serial1</code> หรือถ้ารับข้อมูลจากขา <strong>RX</strong> ของ <code>Serial1</code> 
+ก็จะส่งออกทางขา <strong>TX</strong> ของ <code>Serial</code> ในการทดลองนี้ จะต้องใช้โมดูล <strong>USB-to-Serial (3.3V logic level)</strong> 
+มาต่อกับขา <strong>RX</strong> / <strong>TX</strong> ของ <code>Serial1</code></p>
+<p><br>
+ข้อสังเกต:  <code>Serial</code> ตรงกับ <strong>USART2</strong> ซึ่งเป็นพอร์ตอนุกรมที่ต่อผ่าน <strong>ST-Link/V2</strong>
+บนบอร์ดทดลอง และ <code>Serial1</code> (ซึ่งสร้างจากคลาส 
+<a href="https://github.com/stm32duino/Arduino_Core_STM32/blob/main/cores/arduino/HardwareSerial.h"><code>HardwareSerial</code></a>) 
+ตรงกับ <strong>USART1</strong> ซึ่งจะใช้ต่อเข้ากับโมดูล <strong>USB-to-Serial</strong></p>
+<pre><code class="language-c++">// USART2: USART2_TX = PA2 / VCP_TX and USART2_RX = PA15 / VCP_RX 
+// USART1: USART1_TX = PA9 / D1 and USART1_RX = PA10 / D0
+
+HardwareSerial Serial1( PA10, PA9 );
+
+void setup() {
+  Serial.begin( 115200 );   // Serial = Serial2 for Nucleo L432KC Board
+  Serial1.begin( 115200 );  // PA_9/D1=TX, PA_10/D0=RX (USART1)
+}
+
+void loop() {
+  while ( Serial.available() &gt; 0 ) {
+     // read one char from Serial Rx and write it to Serial1 Tx
+     char ch = Serial.read(); 
+     Serial1.write( ch );
+  }
+  while ( Serial1.available() &gt; 0 ) {
+     // read one char from Serial1 Rx and write it to Serial Tx
+     char ch = Serial1.read();
+     Serial.write( ch );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="8-rng">&#9655; <strong> ตัวอย่างโค้ด 8:  การอ่านตัวเลขสุ่มจากวงจร RNG</strong><a class="headerlink" href="#8-rng" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ดด้วยวิธีเข้าถึงรีจิสเตอร์ของวงจรภายในชิป <strong>STM32L4</strong> ที่เรียกว่า
+<strong>Hardware-RNG</strong> (<em>Hardware Random Number Generator</em>) 
+เพื่อเปิดใช้งานวงจรดังกล่าวและอ่านค่าตัวเลขสุ่มขนาด 32 บิต
+ดังนั้นจึงเป็นตัวอย่างการเขียนโค้ดในรูปแบบที่เรียกว่า <strong>"Bare-Metal"</strong> </p>
+<pre><code class="language-c++">#include &quot;stm32l4xx.h&quot;
+
+void RNG_Config( void ) {
+  // enable peripheral clock for RNG
+  RCC-&gt;AHB2ENR |= RCC_AHB2ENR_RNGEN;
+  // reset the RNG peripheral
+  RCC-&gt;AHB2RSTR |=  RCC_AHB2RSTR_RNGRST;
+  RCC-&gt;AHB2RSTR &amp;= ~RCC_AHB2RSTR_RNGRST;
+  // enable RNG
+  RNG-&gt;CR |= RNG_CR_RNGEN;
+}
+
+boolean RNG_Read( uint32_t *value ) {
+  uint32_t timeout = 255;
+  // busy-wait until the RNG is ready (with timeout)
+  while ( !(RNG-&gt;SR &amp; RNG_SR_DRDY) ) { 
+    if (timeout == 0) break;
+    timeout--;
+  }
+  uint32_t is_error = (RNG-&gt;SR &amp; (RNG_SR_SECS|RNG_SR_CECS));
+  if ( (timeout&gt;0) &amp;&amp; (is_error==0) ) {
+    *value = (uint32_t)RNG-&gt;DR; // read the data register of RNG
+    return true; // success
+  }
+  *value = 0xffffffff;
+  return false; // error
+}
+
+void setup() {  
+  pinMode( LED_BUILTIN, OUTPUT ); 
+  Serial.begin( 115200 );  // the same as Serial when using USB CDC
+  Serial.printf( &quot;\n\nSTM32L432KC RNG Demo...\n&quot; );
+  RNG_Config();
+}
+
+void loop() {
+  // read four 32-bit random values from RNG
+  for ( int i=0; i &lt; 4; i++ ) {
+    uint32_t value;
+    if ( RNG_Read( &amp;value ) ) {
+       Serial.printf( &quot;%08X &quot;, value  );
+    } else {
+       Serial.print( &quot;-------- &quot; );
+    }
+  }
+  Serial.print( &quot;\n&quot; );
+  // toggle the LED
+  digitalWrite( LED_BUILTIN, !digitalRead( LED_BUILTIN ) );
+  delay(100);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/stm32l432kc_rng_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<p>แต่หากจะลองเขียนโค้ด โดยใช้ฟังก์ชันของ <strong>STM32L4-HAL (Hardware Abstraction Layer)</strong>
+เพื่อใช้งาน <strong>Hardware RNG</strong> ก็มีตัวอย่างดังนี้
+(ดูตัวอย่าง <a href="https://github.com/STMicroelectronics/STM32CubeL4/tree/master/Projects/NUCLEO-L432KC/Examples/RNG/RNG_MultiRNG"><strong>RNG_MultiRNG</strong></a> ที่ใช้ <strong>STM32-HAL API</strong> สำหรับ <strong>NUCLEO-L432KC</strong>
+ของ <a href="https://github.com/STMicroelectronics/STM32CubeL4/"><strong>STM32CubeL4</strong></a>)</p>
+<pre><code class="language-c++">#include &quot;stm32l4xx.h&quot;
+#include &quot;stm32l4xx_hal.h&quot;
+#include &quot;stm32l4xx_hal_rng.h&quot;
+
+RNG_HandleTypeDef hrng; // the Hardware RNG instance
+
+void RNG_Config( void ) {
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
+
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RNG;
+  // Choose the MSI as the clock source for the RNG peripheral
+  PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_MSI;
+  if (HAL_RCCEx_PeriphCLKConfig(&amp;PeriphClkInitStruct) != HAL_OK) {
+     Serial.println(&quot; RNG clock configuration error !!!\n&quot; );
+  }
+
+  // Enable the RNG peripheral clock 
+  __HAL_RCC_RNG_CLK_ENABLE();
+
+  // Activate the RNG peripheral 
+  hrng.Instance = RNG;
+  hrng.State = HAL_RNG_STATE_RESET;
+  hrng.Lock  = HAL_UNLOCKED;
+#ifdef RNG_CR_CED
+  hrng.Init.ClockErrorDetection = RNG_CED_ENABLE;
+#endif
+
+  if ( HAL_RNG_Init(&amp;hrng) != HAL_OK ) {
+    Serial.println( &quot;HAL_RNG_Init() failed !!!&quot; );
+    Serial.printf( &quot;RNG state: %lu\n&quot;, HAL_RNG_GetError(&amp;hrng) );
+  }
+}
+
+boolean RNG_Read( uint32_t *value ) {
+  *value = 0xffffffff;
+  if ( HAL_RNG_GenerateRandomNumber( &amp;hrng, value )==HAL_OK ) {
+     return true;
+  }
+  return false;
+}
+
+void setup() {  
+  pinMode( LED_BUILTIN, OUTPUT ); 
+  Serial.begin( 115200 );  // the same as Serial when using USB CDC
+  Serial.printf( &quot;\n\nSTM32L432KC Hardware RNG Demo...\n&quot; );
+  RNG_Config();
+}
+
+void loop() {
+  // read four 32-bit random values from RNG
+  for ( int i=0; i &lt; 4; i++ ) {
+    uint32_t value;
+    if ( RNG_Read( &amp;value ) ) {
+       Serial.printf( &quot;%08X &quot;, value  );
+    } else {
+       Serial.print( &quot;-------- &quot; );
+    }
+  }
+  Serial.print( &quot;\n&quot; );
+  // toggle the LED
+  digitalWrite( LED_BUILTIN, !digitalRead( LED_BUILTIN ) );
+  delay(500);
+}
+</code></pre>
+<p>หากจะคอมไพล์โค้ดตัวอย่างนี้ใน <strong>Arduino IDE</strong> ให้สร้างไฟล์ชื่อ <code>build_opt.h</code> เพิ่มในไดเรกทอรีของ 
+<strong>Arduino Sketch</strong> และใส่ข้อความดังนี้</p>
+<pre><code class="language-c++">-DHAL_RNG_MODULE_ENABLED
+-DRNG_CR_CED
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="9-adafruit-dht-dht22">&#9655; <strong> ตัวอย่างโค้ด 9:  การใช้ไลบรารี Adafruit DHT เพื่ออ่านค่าจากโมดูล DHT22 </strong><a class="headerlink" href="#9-adafruit-dht-dht22" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการใช้เขียนโค้ดโดยใช้ฟังก์ชันจากไลบรารีสำหรับ <strong>Arduino</strong>
+เพื่ออ่านค่าอุณหภูมิและความชื้นสัมพัทธ์จากโมดูล <strong>DHT22</strong></p>
+<p>ไปที่เมนูคำสั่ง "<strong>Tools &gt; Include Library &gt; Manage Libraries ...</strong>" 
+และเมื่อเปิดหน้าต่าง <strong>Library Manager</strong> ให้ค้นหาชื่อไลบรารี "<strong>DHT sensor library</strong>" ของ <strong>Adafruit</strong>
+แล้วเลือกเวอร์ชันล่าสุดและกดปุ่ม <strong>Install</strong> เพื่อติดตั้งไลบรารี </p>
+<p><img alt="" src="../images/adafruit_dht_lib_install.png" /></p>
+<p>รูป: ขั้นตอนการติดตั้งไลบรารี <strong>Adafruit DHT sensor library</strong></p>
+<p>&nbsp;</p>
+<pre><code class="language-c++">#include &lt;DHT.h&gt;  // Adafruit Unified Sensor (tested with version 1.4.3)
+
+#define DHTPIN    PB5      // use D11 pin on NUCEO-L432KC
+#define DHTTYPE   DHT22
+
+DHT dht(DHTPIN, DHTTYPE);  // Initilize object dht for class DHT 
+                           // with DHT pin with STM32 and DHT type as DHT22
+void setup() {
+  Serial.begin( 115200 );
+  Serial.flush();
+  Serial.println( &quot;STM32duino - DHT22 Demo...&quot; );
+  dht.begin();    // initialize the DHT22 sensor module                     
+  delay(2000);    // wait 2 seconds for it to stabilize
+}
+
+char sbuf[32];
+void loop() {
+  float h = dht.readHumidity();     // read humidity value
+  float t = dht.readTemperature() + 0.5;  // read temperature value
+
+  // T: -40 to +125 degrees Celsius
+  // H: 0 to 100%
+  dtostrf( t, 1, 1, sbuf ); // convert float to string
+  Serial.printf( &quot;T=%s deg.C, &quot;, sbuf );
+  dtostrf( h, 1, 1, sbuf ); // convert float to string
+  Serial.printf( &quot;H=%s %%\n&quot;, sbuf );
+  delay( 2000 );
+}
+</code></pre>
+<p><img alt="" src="../images/stm32l432kc_dht22.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองเพื่อใช้งานโมดูล <strong>DHT22</strong></p>
+<p><img alt="" src="../images/stm32l432kc_dht22_reading.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="10-virtual-usb">&#9655; <strong> ตัวอย่างโค้ด 10:  การใช้งาน Virtual USB</strong><a class="headerlink" href="#10-virtual-usb" title="Permanent link">#</a></h2>
+<p>ชิปไมโครคอนโทรลเลอร์ <strong>STM32L432KC</strong> รองรับการใช้งาน <strong>Native USB</strong> 
+และสามารถนำมาใช้งานเป็นอุปกรณ์ประเภท <strong>USB Device / FullSpeed</strong> ได้ 
+แต่บอร์ด <strong>NUCLEO-L432KC</strong> ไม่ได้ต่อขาสัญญาณ <strong>USB D+</strong> และ <strong>USB D-</strong> 
+กับคอนเนกเตอร์ <strong>MicroUSB</strong> สำหรับขาสัญญาณดังกล่าว
+ดังนั้นหากจะใช้งานในกรณีนี้ จะต้องใช้โมดูลคอนเนกเตอร์ <strong>5-pin MicroUSB Breakout</strong>
+นำมาต่อวงจรเพิ่ม ดังนี้ </p>
+<pre><code class="language-plain">5-pin MicroUSB  -- NUCLEO-L432KC
+1) VUSB (5V)    -- ไม่ต้องต่อสายไฟ
+2) D-           -- ต่อกับขา D10 / PA_11 ของบอร์ด NUCLEO-L432KC
+3) D+           -- ต่อกับขา D2  / PA_12 ของบอร์ด NUCLEO-L432KC 
+                -- และต่อตัวต้านทาน 1.5k Pull-up ไปยัง +3.3V (สำหรับ FullSpeed)
+4) ID (sense)   -- ไม่ต้องต่อสายไฟ (floating)
+5) GND          -- ต่อกับขา GND ของบอร์ด NUCLEO-L432KC
+</code></pre>
+<p><strong>ข้อสังเกต:</strong> บอร์ด <strong>NUCLEO-L432KC</strong> ได้รับแรงดันไฟเลี้ยง <strong>+5V</strong> จากพอร์ต 
+<strong>MicroUSB</strong> สำหรับวงจร <strong>onboard ST-Link/v2</strong> 
+ดังนั้น เมื่อต้องการใช้ขา <strong>USB D+/D-</strong> เพิ่ม ไม่จำเป็นต้องต่อแรงดันไฟเลี้ยง <strong>VUSB</strong> 
+จากพอร์ต <strong>MicroUSB</strong> ที่ได้นำมาต่อเพิ่ม</p>
+<p><img alt="" src="../images/stm32l432kc_usb_device.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ด </p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการเขียนโค้ดเพื่อส่งข้อมูลออกทาง <code>SerialUSB</code> (<strong>USB Serial</strong>) 
+และ <code>Serial2</code> (<strong>Hardware Serial</strong>)</p>
+<pre><code class="language-c++">void setup() {  
+  pinMode( LED_BUILTIN, OUTPUT ); 
+  Serial2.begin( 115200 ); // VCP -&gt; onboard ST-Link
+  SerialUSB.begin( 115200 );  // the same as Serial when using USB CDC
+  while (!SerialUSB) {} // wait until the virtual COM port is open
+  SerialUSB.printf( &quot;STM32L432KC - SerialUSB or Serial\n&quot; );
+  SerialUSB.printf( &quot;STM32L432KC - Serial2\n&quot; );
+}
+
+void loop() {
+  // toggle the LED
+  int state = !digitalRead( LED_BUILTIN);
+  digitalWrite( LED_BUILTIN, state );
+  Serial.printf(  &quot;LED: %d (Serial)\n&quot;, state );
+  Serial2.printf( &quot;LED: %d (Serial2)\n&quot;, state );
+  delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ก่อนทำขั้นตอนคอมไพล์โค้ด ให้เปลี่ยนการตั้งค่าดังนี้</p>
+<p><img alt="" src="../images/stm32l432kc_stm32duino_usb_serial.png" /></p>
+<p>รูป: การตั้งค่าใน <strong>Arduino IDE</strong> เพื่อเปิดใช้งาน <strong>USB Support &gt; USB CDC / Serial</strong></p>
+<p>&nbsp;</p>
+<p>เมื่ออัปโหลด <strong>Arduino Sketch</strong> แล้วเสียบสาย <strong>USB</strong> ครบทั้งสองเส้น 
+จะมองเห็นรายการอุปกรณ์ <strong>USB Serial Devices</strong> ดังนี้</p>
+<p><img alt="" src="../images/stm32l432kc_serial_ports.png" /></p>
+<p>รูป: ตัวอย่างรายการของพอร์ตอนุกรมที่มองเห็นในเครื่องของผู้ใช้ (<strong>Windows</strong>)
+เช่น <strong>COM4</strong> ตรงกับอุปกรณ์ <strong>ST-Link/v2</strong> ของบอร์ด <strong>NUCLEO-L432KC</strong>
+และ <strong>COM6</strong> ตรงกับอุปกรณ์ <strong>USB Serial Device</strong> ของ  <strong>NUCLEO-L432KC</strong></p>
+<p><img alt="" src="../images/stm32l432kc_serial_out-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ถูกส่งออกมาทาง <code>Serial</code> หรือ  <code>SerialUSB</code>
+(<strong>USB Serial Device</strong>)</p>
+<p><img alt="" src="../images/stm32l432kc_serial_out-2.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ถูกส่งออกมาทาง <code>Serial2</code> (<strong>VCP ST-Link/v2</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดโดยใช้ซอฟต์แวร์ <strong>Arduino IDE</strong> 
+และได้มีการติดตั้ง <strong>STM32duino - Arduino Boards Manager</strong> 
+เพื่อนำมาใช้งานกับบอร์ดไมโครคอนโทรลเลอร์  <strong>ST NUCLEO</strong> อย่างเช่น บอร์ด <strong>NUCLEO-L432KC</strong>
+ได้เห็นตัวอย่างการใช้คำสั่ง <strong>Arduino API</strong> และมีบางตัวอย่างได้เปรียบเทียบการเขียนโค้ดแบบ
+<strong>Bare-Metal</strong> การเขียนโค้ดโดยใช้ <strong>STM32-HAL API</strong> 
+รวมถึงการติดตั้งและใช้งานไลบรารีสำหรับ <strong>Arduino</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-01-01 | Last Updated: 2022-03-06</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

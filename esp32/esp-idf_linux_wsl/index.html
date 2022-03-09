@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/esp32/esp-idf_linux_wsl/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การติดตั้งและใช้งาน ESP-IDF สำหรับ WSL / Ubuntu - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#esp-idf-wsl-ubuntu" class="nav-link">การติดตั้งและใช้งาน ESP-IDF สำหรับ WSL / Ubuntu</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#esp-idf-esp32-cc" class="nav-link">&#9655; ESP-IDF สำหรับการเขียนโค้ด ESP32 ด้วยภาษา C/C++</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32" class="nav-link">&#9655; การสร้างโปรเจกต์จากตัวอย่างสำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink" class="nav-link">&#9655; ลองสร้างโปรเจกต์ใหม่: LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; แหล่งข้อมูลอ้างอิงและศึกษาเพิ่มเติม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp-idf-wsl-ubuntu">การติดตั้งและใช้งาน ESP-IDF สำหรับ WSL / Ubuntu<a class="headerlink" href="#esp-idf-wsl-ubuntu" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="esp-idf-esp32-cc">&#9655; <strong>ESP-IDF สำหรับการเขียนโค้ด ESP32 ด้วยภาษา C/C++</strong><a class="headerlink" href="#esp-idf-esp32-cc" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการติดตั้ง <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/"><strong>ESP-IDF</strong></a> ของบริษัท <strong>Espressif</strong> สำหรับ <strong>WSL - Ubuntu</strong> มีดังนี้</p>
+<p><img alt="" src="images/esp_idf_buid_process.png" /></p>
+<p>รูป: <strong>ESP-IDF</strong> ซอฟต์แวร์สำหรับการเขียนโปรแกรม <strong>C/C++</strong> เพื่อใช้งานกับ <strong>ESP32 SoCs</strong> (Source: Espressif)</p>
+<p>1) เริ่มต้นด้วยการเปิดใช้งาน <strong>Linux Terminal</strong> ของ <strong>WSL - Ubuntu</strong> แล้วทำคำสั่งต่อไปนี้
+เพื่อติดตั้งซอฟต์แวร์ ซึ่งมีหลายแพ็คเกจที่จำเป็นสำหรับการทำงานของ <strong>ESP-IDF</strong></p>
+<pre><code class="language-bash"># install software packages required before using the ESP-IDF
+$ sudo apt install git wget flex bison gperf \
+  python3 python3-pip python3-setuptools \
+  cmake ninja-build ccache \
+  libffi-dev libssl-dev dfu-util libusb-1.0-0
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="images/esp_idf_linux_install-1.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งเพื่อติดตั้งซอฟต์แวร์ใน <strong>Ubuntu</strong></p>
+<p>ตรวจสอบเวอร์ชันของ <strong>Python 3</strong> (ในตัวอย่างนี้ จะเห็นได้ว่าเป็น <strong>Python 3.8.10</strong>)</p>
+<pre><code class="language-bash"># check the version of Python3
+$ python3 --version
+Python 3.8.10
+</code></pre>
+<p>&nbsp;</p>
+<p>2) สร้างไดเรกทอรีใหม่สำหรับการติดตั้ง <strong>ESP-IDF</strong> ที่มีชื่อว่า <code>~/esp</code> อยู่ในไดเรกทอรีของผู้ใช้
+จากนั้นดาวน์โหลดไฟล์ของ <strong>ESP-IDF</strong> มาจาก <strong>Github</strong> เก็บไว้ใน  <code>~/esp/esp-idf</code></p>
+<pre><code class="language-bash"># create a new directory named 'esp' under the user's home directory
+$ mkdir -p ~/esp &amp;&amp; cd ~/esp
+# clone the esp-idf (latest version is 5.0) repo from github
+$ git clone --recursive git://github.com/espressif/esp-idf
+# change directory to '~/esp/esp-idf'
+$ cd ~/esp/esp-idf
+# update submodules (optional)
+$ git submodule update --init --recursive
+</code></pre>
+<p><img alt="" src="images/esp_idf_linux_install-2.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งเพื่อดาวน์โหลด <strong>ESP-IDF</strong> มาจาก <strong>Github</strong></p>
+<p>&nbsp;</p>
+<p>3) ถัดไปจะต้องดาวน์โหลดและติดตั้งไฟล์ที่เป็นโปรแกรมสำหรับการคอมไพล์โค้ด 
+(เช่น โปรแกรมที่ทำหน้าที่เป็น <strong>C/C++ Toolchains</strong>) ซึ่งแตกต่างกันไปตามชิปที่ใช้ เช่น
+<strong>ESP32</strong>, <strong>ESP32-S2</strong>, <strong>ESP32-S3</strong> และ <strong>ESP32-C3</strong></p>
+<pre><code class="language-bash"># Install tools for all supported targets:
+#  all = (esp32 esp32s2 esp32c3, esp32s3)
+$ export IDF_GITHUB_ASSETS=&quot;dl.espressif.com/github_assets&quot;
+$ ./install.sh all
+</code></pre>
+<p><img alt="" src="images/esp_idf_linux_install-3.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>./install.sh all</code></p>
+<p>รายการไฟล์ที่จะต้องมีการดาวน์โหลดเพื่อใช้เป็นเครื่องมือสำหรับ <strong>ESP-IDF</strong> (ติดตั้งไว้ใน  <code>~/.espressif/tools</code>) มีตัวอย่างดังนี้</p>
+<ul>
+<li><code>xtensa-esp32-elf-gcc8_4_0-esp-2021r2-patch3-linux-amd64.tar.gz</code></li>
+<li><code>xtensa-esp32s2-elf-gcc8_4_0-esp-2021r2-patch3-linux-amd64.tar.gz</code></li>
+<li><code>xtensa-esp32s3-elf-gcc8_4_0-esp-2021r2-patch3-linux-amd64.tar.gz</code></li>
+<li><code>riscv32-esp-elf-gcc8_4_0-esp-2021r2-patch3-linux-amd64.tar.gz</code></li>
+<li><code>binutils-esp32ulp-linux-amd64-2.28.51-esp-20191205.tar.gz</code></li>
+<li><code>binutils-esp32s2ulp-linux-amd64-2.28.51-esp-20191205.tar.gz</code></li>
+<li><code>openocd-esp32-linux-amd64-0.11.0-esp32-20211220.tar.gz</code></li>
+</ul>
+<p>ทุกครั้งที่จะใช้งาน <strong>ESP-IDF</strong> (เช่น การทำคำสั่ง <code>idf.py</code>) จะต้องมีการทำคำสั่งต่อไปนี้ก่อน เพื่อให้สามารถเรียกใช้คำสั่งต่าง ๆ ของ <strong>ESP-IDF Tools</strong> ได้</p>
+<pre><code class="language-bash"># Set up the environment variables for ESP-IDF tools
+$ . $HOME/esp/esp-idf/export.sh
+</code></pre>
+<p>ลองทำคำสั่ง <code>idf.py</code> เพื่อตรวจสอบเวอร์ชัน</p>
+<pre><code class="language-bash">$ idf.py --version
+ESP-IDF v5.0-dev-1662-g2ac0942dfb
+</code></pre>
+<p><img alt="" src="images/esp_idf_linux_install-5.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>. $HOME/esp/esp-idf/export.sh</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32">&#9655; <strong>การสร้างโปรเจกต์จากตัวอย่างสำหรับ ESP32</strong><a class="headerlink" href="#esp32" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการทดลองคอมไพล์โปรเจกต์ตัวอย่างที่มีชื่อว่า <code>hello_world</code> ซึ่งมีอยู่ใน <code>~/esp/esp-idf/examples</code></p>
+<pre><code class="language-bash"># make a new directory '~/esp/projects'
+$ mkdir -p ~/esp/projects &amp;&amp; cd ~/esp/projects 
+# copy the hello_world project example to '~/esp/projects'
+$ cp -r $IDF_PATH/examples/get-started/hello_world .
+# change working directory to './hello_world'
+$ cd ./hello_world
+</code></pre>
+<p>แสดงรายการตัวเลือกสำหรับชิปเป้าหมาย และให้เลือกชิปเป้าหมายเป็น <strong>ESP32</strong> สำหรับตัวอย่างนี้</p>
+<pre><code class="language-bash"># list all avaialble targets
+$ idf.py --list-targets
+# set the target such as esp32 | esp32s2 | esp32s3 | esp32c3
+# choose esp32 as the build target
+$ idf.py set-target esp32
+</code></pre>
+<p><img alt="" src="images/esp_idf_hello_world-4.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>idf.py --list-targets</code> และ <code>idf.py set-target esp32</code></p>
+<p>&nbsp;</p>
+<p>ก่อนทำขั้นตอน <strong>Build Target</strong> และหากต้องการแก้ไขการตั้งค่าสำหรับโปรเจกต์  (<strong>Project configuration / customization</strong>) เช่น </p>
+<ul>
+<li>การกำหนดขนาดของ <strong>Flash Size</strong> และการแบ่ง <strong>Flash Partitions</strong></li>
+<li>การกำหนดความถี่ของซีพียูในการทำงาน (<strong>Component config -&gt; ESP32-specific -&gt; CPU Frequency</strong>)</li>
+<li>การกำหนดค่า <strong>FreeRTOS Tick Rate</strong> (<strong>Component config -&gt; ESP32-specific -&gt; FreeRTOS</strong>)</li>
+</ul>
+<p>ก็ให้ทำคำสั่งต่อไปนี้ โดยจะเข้าสู่เมนูแบบกราฟิกที่เรียกว่า <strong>menuconfig</strong> </p>
+<pre><code class="language-bash"># start menuconfig
+$ idf.py menuconfig
+</code></pre>
+<p>เมื่อมีการแก้ไขแล้วให้บันทึกการเปลี่ยนแปลง ซึ่งจะถูกเก็บลงในไฟล์  <code>./sdkconfig</code> ในไดเรกทอรีของโปรเจกต์</p>
+<p><img alt="" src="images/esp_idf_hello_world-1.png" /></p>
+<p>รูป: รายการตัวเลือกใน <strong>menuconfig</strong></p>
+<p><img alt="" src="images/esp_idf_hello_world-2.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าความถี่สำหรับซีพียู (<strong>CPU Frequency</strong>) </p>
+<p><img alt="" src="images/esp_idf_hello_world-5.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>idf.py menuconfig</code> และ <code>idf.py build</code></p>
+<pre><code class="language-bash"># build the target
+$ idf.py build
+</code></pre>
+<p>ตัวอย่างการทำคำสั่ง <code>tree</code> เพื่อแสดงรายการไฟล์ภายในไดเรกทอรีของโปรเจกต์</p>
+<pre><code class="language-bash">$ tree -L 2
+.
+├── CMakeLists.txt
+├── README.md
+├── build
+│   ├── CMakeCache.txt
+│   ├── CMakeFiles
+│   ├── app-flash_args
+│   ├── bootloader
+│   ├── bootloader-flash_args
+│   ├── bootloader-prefix
+│   ├── build.ninja
+│   ├── cmake_install.cmake
+│   ├── compile_commands.json
+│   ├── config
+│   ├── config.env
+│   ├── esp-idf
+│   ├── flash_app_args
+│   ├── flash_args
+│   ├── flash_args.in
+│   ├── flash_bootloader_args
+│   ├── flash_project_args
+│   ├── flasher_args.json
+│   ├── hello_world.bin
+│   ├── hello_world.elf
+│   ├── hello_world.map
+│   ├── kconfigs.in
+│   ├── kconfigs_projbuild.in
+│   ├── ldgen_libraries
+│   ├── ldgen_libraries.in
+│   ├── partition-table-flash_args
+│   ├── partition_table
+│   ├── project_description.json
+│   ├── project_elf_src_esp32.c
+│   ├── rules.ninja
+│   └── x509_crt_bundle.S
+├── example_test.py
+├── main
+│   ├── CMakeLists.txt
+│   └── hello_world_main.c
+├── sdkconfig
+├── sdkconfig.ci
+└── sdkconfig.old
+
+8 directories, 33 files
+</code></pre>
+<p>หากใช้ระบบปฏิบัติการ <strong>Linux</strong> เช่น <strong>Ubuntu</strong> ตามปรกติ (ไม่ได้ใช้ผ่าน <strong>WSL</strong> ใน <strong>Windows</strong>)
+ให้ทำคำสั่งต่อไปนี้ เพื่อทำขั้นตอน <strong>ESP32 Flashing</strong> (เขียนไฟล์ <code>.bin</code> ไปยังหน่วยความจำแฟลชบนบอร์ด <strong>ESP32</strong>)
+และจะต้องระบุพอร์ตที่เชื่อมต่อกับบอร์ด <strong>ESP32</strong> เช่น <code>/dev/ttyUSB0</code></p>
+<pre><code class="language-bash">$ idf.py -p /dev/ttyUSB0 flash
+</code></pre>
+<p>หากมีปัญหาในการเขียนข้อมูลไปยังพอร์ตดังกล่าว ให้ทำคำสั่งดังนี้</p>
+<pre><code class="language-bash">## add the current user account to the 'dialout' group
+$ sudo usermod -a -G dialout &quot;$USER&quot;
+# show all groups the current user belongs to
+$ id -Gn | grep dialout
+</code></pre>
+<p>แต่ถ้าใช้งาน <strong>WSL - Ubuntu</strong> จะมองไม่เห็นพอร์ตอย่างเช่น <code>/dev/ttyUSB0</code> เหมือนใน <strong>Linux</strong> ทั่วไป
+และให้ติดตั้ง <a href="https://github.com/abobija/idfx"><strong>idfx</strong></a> ดังนี้</p>
+<pre><code class="language-bash"># install idfx - a tool for flashing ESP32 if using ESP-IDF on WSL
+$ wget https://raw.githubusercontent.com/abobija/idfx/main/idfx \
+  -O $HOME/.local/bin/idfx &amp;&amp; chmod u+x $HOME/.local/bin/idfx
+</code></pre>
+<p>ถ้าต้องการจะทำขั้นตอน <strong>ESP32 Flashing</strong> โดยใช้คำสั่ง <code>idfx</code> 
+ให้เชื่อมต่อบอร์ด <strong>ESP32</strong> กับคอมพิวเตอร์ของผู้ใช้ผ่านทาง <strong>USB</strong> 
+และจะต้องระบุชื่อของพอร์ตอนุกรมที่มองเห็นได้ในระบบ <strong>Windows</strong> </p>
+<pre><code class="language-bash">$ idfx flash &lt;COM port&gt;
+</code></pre>
+<p><img alt="" src="images/esp_idf_hello_world-6.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>idfx flash COM10</code></p>
+<p>หากต้องการจะรับข้อความจากพอร์ตอนุกรมมจากบอร์ด <strong>ESP32</strong> ให้ทำคำสั่ง <code>idfx</code> ตามตัวอย่างดังนี้</p>
+<pre><code class="language-bash"># start the serial monitor (press Ctrl-] to stop the monitor)
+$ idfx monitor &lt;COM port&gt;
+</code></pre>
+<p>ข้อสังเกต: เนื่องจาก <strong>ESP-IDF</strong> ตั้งแต่เวอร์ชัน <strong>4.0</strong> เป็นต้นมา ได้เลือกใช้ <strong>CMake</strong> เป็นตัวจัดการสำหรับขั้นตอนการคอมไพล์โค้ดในโปรเจกต์
+ดังนั้นก็สามารถนำไปใช้กับ <strong>VS Code IDE</strong> ซึ่งจะต้องมีการติดตั้ง <strong>Extensions</strong> เช่น
+<strong>C/C++ Extension</strong> และ <strong>CMake Tools Extension</strong> เป็นต้น ช่วยให้ผู้ใช้สามารถเขียนโค้ด
+และคอมไพล์โค้ดในโปรเจกต์ได้ยิ่งง่ายขึ้น</p>
+<p><img alt="" src="images/esp_idf_vscode_wsl-1.png" /></p>
+<p>รูป: ตัวอย่างการเปิดไดเรกทอรีของโปรเจกต์เพื่อเขียนโค้ดใน <strong>VS Code IDE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink">&#9655; <strong>ลองสร้างโปรเจกต์ใหม่: LED Blink</strong><a class="headerlink" href="#led-blink" title="Permanent link">#</a></h2>
+<p>ให้ทำขั้นตอนตามลำดับดังนี้</p>
+<ol>
+<li>สร้างโปรเจกต์ใหม่ที่มีชื่อว่า <code>led_blink</code></li>
+</ol>
+<pre><code class="language-bash">$ cd ~/esp/projects/
+$ idf.py create-project &quot;led_blink&quot;
+$ cd ./led_blink
+</code></pre>
+<p>เมื่อสร้างโปรเจกต์แล้ว ในไดเรกทอรี <code>led_blink</code> มีโครงสร้างไฟล์ใหม่ดังนี้</p>
+<pre><code class="language-bash">$ tree -L 2
+.
+├── CMakeLists.txt
+└── main
+    ├── CMakeLists.txt
+    └── led_blink.c
+
+1 directory, 3 files
+</code></pre>
+<ol>
+<li>แก้ไขโค้ดในไฟล์ <code>main/led_blink.c</code> ตามตัวอย่างดังนี้</li>
+</ol>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &quot;sdkconfig.h&quot;
+#include &quot;freertos/FreeRTOS.h&quot;
+#include &quot;freertos/task.h&quot;
+#include &quot;driver/gpio.h&quot;
+#include &quot;esp_system.h&quot;
+#include &quot;esp_spi_flash.h&quot;
+
+#define LED_GPIO  (2) // onboard LED
+
+void task_entry( void* pvParameters ) {
+  int state = 0;
+  gpio_reset_pin( LED_GPIO ); // reset pin to GPIO function
+  gpio_set_direction( LED_GPIO, GPIO_MODE_OUTPUT ); // output direction
+
+  for (;;) {
+    gpio_set_level( LED_GPIO, state = !state );
+    printf( &quot;LED: %d, ticks: %d\n&quot;, state, xTaskGetTickCount() );
+    fflush( stdout );
+    vTaskDelay( 1000 / portTICK_PERIOD_MS );
+  }
+}
+
+void app_main(void) {
+  esp_chip_info_t chip_info;
+  esp_chip_info( &amp;chip_info );
+  printf( &quot;This is %s chip with %d CPU core(s), WiFi%s%s\n&quot;,
+          CONFIG_IDF_TARGET, chip_info.cores,
+          (chip_info.features &amp; CHIP_FEATURE_BT)  ? &quot;/BT&quot;  : &quot;&quot;,
+          (chip_info.features &amp; CHIP_FEATURE_BLE) ? &quot;/BLE&quot; : &quot;&quot; );
+  printf( &quot;silicon revision %d\n&quot;, chip_info.revision );
+  printf( &quot;SPI flash: %d MB (%s)\n&quot;,
+          spi_flash_get_chip_size() /(1024*1024),
+          (chip_info.features &amp; CHIP_FEATURE_EMB_FLASH)
+           ? &quot;embedded&quot; : &quot;external&quot;);
+  printf( &quot;Minimum free heap size: %d bytes\n&quot;, 
+           esp_get_minimum_free_heap_size() );
+
+  printf( &quot;FreeRTOK Kernel: %s\n&quot;, tskKERNEL_VERSION_NUMBER );
+  vTaskDelay( 1000 / portTICK_PERIOD_MS );
+
+  // create a new task
+  if ( xTaskCreatePinnedToCore( task_entry,
+       &quot;led_task&quot;, 2048, NULL, 1,
+        NULL, tskNO_AFFINITY  ) != pdPASS )
+  {
+    printf(&quot;Cannot create a task!\n&quot;);
+  }
+  printf( &quot;app_main: Core %d\n&quot;, xPortGetCoreID() );
+  fflush(stdout);
+}
+</code></pre>
+<ol>
+<li>ทำคำสั่งเพื่อเลือกชิปเป้าหมาย กำหนดค่าสำหรับโปรเจกต์ในไฟล์ <code>sdkconfig</code> และทำขั้นตอน <strong>Build target</strong></li>
+</ol>
+<pre><code class="language-bash">$ idf.py set-target esp32
+$ idf.py menuconfig
+$ idf.py build
+</code></pre>
+<ol>
+<li>นำไฟล์เอาต์พุตที่ได้ไปทดสอบกับบอร์ด <strong>ESP32</strong></li>
+</ol>
+<p><img alt="" src="images/esp32_led_blink_vscode.png" /></p>
+<p>รูป: เปิดโปรเจกต์ใน <strong>VS Code IDE</strong> เพื่อลองแก้ไขโค้ดและทำขั้นตอน <strong>Build Target</strong> </p>
+<p><img alt="" src="images/esp32_led_blink_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ถูกส่งออกมาจากบอร์ด <strong>ESP</strong> ทาง <strong>Serial</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>แหล่งข้อมูลอ้างอิงและศึกษาเพิ่มเติม</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html"><strong>ESP-IDF Programming Guide - Get Started</strong></a></li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/index.html"><strong>ESP-IDF Programming Guide - API Reference</strong></a></li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/index.html"><strong>ESP-IDF API Guides</strong></a></li>
+</ul>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-02-23 | Last Updated: 2022-02-25</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

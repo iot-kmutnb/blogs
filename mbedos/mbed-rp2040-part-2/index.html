@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-rp2040-part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-2" class="nav-link">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#adc" class="nav-link">&#9655; การใช้งาน ADC เพื่ออ่านค่าจากสัญญาณแอนะล็อก</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-lm75a" class="nav-link">&#9655; การใช้งานบัส I2C เพื่อสื่อสารข้อมูลกับโมดูล LM75A</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-bh1750" class="nav-link">&#9655; การใช้งานบัส I2C เพื่อสื่อสารข้อมูลกับโมดูล BH1750</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การตรวจสอบสถานะของวงจรปุ่มกดโดยใช้อินเทอร์รัพท์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-2">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 2)<a class="headerlink" href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-2" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Mbed OS</strong> และ <strong>Arduino IDE</strong> 
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>RP2040</strong> เช่น <strong>Raspberry Pi Pico</strong> 
+โดยนำเสนอเป็น <strong>ตอนที่ 2</strong>
+ต่อจาก <a href="../mbed-rp2040-part-1/"><strong>ตอนที่ 1</strong></a></p>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>Raspberry Pi Pico</em>, 
+ <em>RP2040</em>, <em>Mbed-enabled Platforms</em>, <em>RTOS Programming</em></p>
+<hr />
+<h2 id="adc">&#9655; <strong>การใช้งาน ADC เพื่ออ่านค่าจากสัญญาณแอนะล็อก</strong><a class="headerlink" href="#adc" title="Permanent link">#</a></h2>
+<p>ไมโครคอนโทรลเลอร์ <strong>RP2040</strong> มีวงจร <strong>ADC</strong> (<em>Analog-to-Digital Converter</em>) 
+อยู่ภายในที่ใช้แปลงสัญญาณแอนะล็อก หรือแรงดันไฟฟ้าที่เป็นอินพุต ให้เป็นข้อมูขนาด 12 บิต</p>
+<p>บนบอร์ด <strong>Pico</strong> มีขา {<code>GP26</code>, <code>GP27</code>, <code>GP28</code>} สำหรับอินพุตช่อง 
+{<code>ADC0</code>, <code>ADC1</code>, <code>ADC2</code>} ตามลำดับ แต่ยังมีช่องอินพุต <code>ADC3</code> และ <code>ADC4</code> 
+สำหรับวัดแรงดันไฟฟ้าที่ขา <strong>VSYS</strong> (ได้ค่าที่ถูกหารด้วย 3) และจากวงจรเซ็นเซอร์วัดอุณหภูมิภายในชิป ตามลำดับ</p>
+<p>ลองมาดูตัวอย่างโค้ด <strong>Arduino Sketch</strong> ที่ใช้คำสั่ง <code>analogRead(...)</code> ของ <strong>Arduino API</strong>
+เพื่ออ่านค่าจาก <code>ADC3</code> หรือขา <code>GP29</code> (ไม่มีอยู่บนบอร์ด <strong>Pico</strong>) สำหรับวัดระดับแรงดันไฟฟ้าที่ขา <strong>VSYS</strong> 
+และในตัวอย่างนี้ได้กำหนดให้ค่าที่อ่านได้จาก <strong>ADC</strong> มีขนาด 12 บิต
+ในกรณีที่ใช้ <strong>VUSB</strong> (ประมาณ <strong>+5V</strong>) เป็นแหล่งจ่ายแรงดันไฟเลี้ยงให้บอร์ด <strong>Pico</strong> 
+ระดับแรงดันไฟฟ้าที่ขา <strong>VSYS</strong> จะต่ำกว่า <strong>VUSB</strong> ประมาณ <strong>0.2V</strong></p>
+<pre><code class="language-c++">// The GPIO29 pin on the Pico board is used
+// in ADC mode (ADC3) to measure VSYS/3.
+#define ADC_PIN  (A3)
+#define ADC_BITS (12)  // use 12-bit ADC value
+#define ADC_VREF (3.3) 
+
+void setup() {
+   SerialUSB.begin( 115200 ); 
+   while(!SerialUSB){}
+   analogReadResolution( ADC_BITS );
+}
+
+float read_adc_vsys() {
+   uint32_t value = analogRead(ADC_PIN);
+   float volt = ADC_VREF*value/(1 &lt;&lt; ADC_BITS);
+   return 3*volt; 
+}
+
+String strbuf;
+
+void loop() {
+   strbuf = &quot;Voltage at VSYS Pin: &quot;;
+   strbuf += read_adc_vsys();
+   strbuf += &quot; V&quot;;
+   SerialUSB.println( strbuf.c_str() );
+   delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หรือจะเขียนโดยใช้ <a href="https://os.mbed.com/docs/mbed-os/latest/apis/i-o-apis.html"><code>AnalogIn</code></a>
+ของ <strong>Mbed Drivers</strong> ก็ได้เช่นกัน</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+#define ADC_VREF (3.3) 
+// The GPIO29 pin on the Pico board is used 
+// in ADC mode (ADC3) to measure VSYS/3.
+AnalogIn  ain(p29); // GP29 = ADC3
+
+void setup() {
+   SerialUSB.begin( 115200 ); 
+   while(!SerialUSB){}
+}
+
+float read_adc_vsys() {
+   uint32_t value = ain.read_u16();
+   float volt = ADC_VREF*value/65536;
+   return 3*volt;  
+}
+
+std::string strbuf;
+
+void loop() {
+   strbuf = &quot;Voltage at VSYS Pin: &quot;;
+   strbuf += std::to_string( read_adc_vsys() );
+   strbuf += &quot; V&quot;;
+   SerialUSB.println( strbuf.c_str() );
+   delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าต้องการอ่านค่าอุณหภูมิภายใน <strong>RP2040</strong> ก็ให้อ่านค่าจาก <code>ADC4</code> แล้วนำมาแปลงค่าตามสูตรต่อไปนี้</p>
+<p><code>Temperature (deg.C) = 27 - (ADC4_Voltage - 0.706)/0.001721</code></p>
+<p>และเขียนโค้ดตามตัวอย่างดังนี้ </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+
+#define ADC_VREF (3.3)
+// ADC4 (internal ADC temperature sensor)
+AnalogIn ain( ADC_TEMP ); 
+
+void setup() {
+   SerialUSB.begin( 115200 ); 
+   while(!SerialUSB){}
+}
+
+float read_adc_temp() {
+   uint32_t value = ain.read_u16();
+   float volt = ADC_VREF*value/65536;
+   float temp = (27.0 - (volt - 0.706)/0.001721);
+   return temp; 
+}
+
+std::string strbuf;
+
+void loop() {
+   strbuf = &quot;Internal temperature: &quot;;
+   strbuf += std::to_string( read_adc_temp() );
+   strbuf += &quot; deg.C&quot;;
+   SerialUSB.println( strbuf.c_str() );
+   delay(500);
+}
+</code></pre>
+<p>ถ้าจะลองเขียนโค้ด โดยใช้คำสั่งของ 
+<a href="https://raspberrypi.github.io/pico-sdk-doxygen/index.html"><strong>Pico SDK</strong></a> /
+<a href="https://raspberrypi.github.io/pico-sdk-doxygen/group__hardware.html"><strong>Hardware API</strong></a>
+ที่เกี่ยวข้องกับการทำงานของ <strong>ADC</strong> (สังเกตได้จากชื่อของฟังก์ชันที่ขึ้นต้นด้วย <code>adc_</code>) ก็สามารถเขียนโค้ดได้ดังนี้</p>
+<pre><code class="language-c++">#include &quot;hardware/gpio.h&quot;
+#include &quot;hardware/adc.h&quot;
+
+#define ADC_VREF (3.3) 
+// The internal temperature sensor is on ADC4.
+#define ADC_PIN  (30) // 30-26 = 4 (ADC4)
+
+void setup() {
+   SerialUSB.begin( 115200 );  
+   adc_init();
+   adc_set_temp_sensor_enabled ( true ); 
+   adc_gpio_init( ADC_PIN );
+   adc_select_input( ADC_PIN - 26 ); 
+}
+
+char sbuf[32];
+
+void loop() {
+   uint16_t value = adc_read(); // 12-bit value
+   float volt = ADC_VREF*value/(1 &lt;&lt; 12);
+   float temp = (27.0 - (volt - 0.706)/0.001721);
+   std::sprintf( sbuf, &quot;Temperature: %.2f deg.C&quot;, temp );
+   SerialUSB.println( sbuf );
+   delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการอ่านค่าจาก <code>ADC0</code> .. <code>ADC2</code> ตามลำดับ 
+โดยใช้โมดูลเซ็นเซอร์แสง <strong>TEMT6000</strong> (ใช้แรงดันไฟเลี้ยง 3.3V) 
+ที่ได้สัญญาณเอาต์พุตแบบแอนะล็อก จำนวน 3 ชุด นำมาต่อที่ขาอินพุต
+<code>P26</code>..<code>P28</code> (สำหรับ <code>ADC0</code>..<code>ADC2</code>) ตามลำดับ</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+
+#define ADC_VREF       (3300) // Reference voltage in mV
+#define NUM_ADC_INPUTS (3)    // number of ADC inputs used
+
+// ADC4 (internal ADC temperature sensor)
+AnalogIn a0(p26), a1(p27), a2(p28); 
+AnalogIn *adc_list[] = { &amp;a0, &amp;a1, &amp;a2 };
+
+void setup() {
+   SerialUSB.begin( 115200 ); 
+   while(!SerialUSB){}
+}
+
+std::string strbuf;
+
+void loop() {
+  strbuf = &quot;&quot;;
+  for ( int i=0; i &lt; NUM_ADC_INPUTS; i++ ) {
+    uint32_t value = adc_list[i]-&gt;read_u16();
+    float volt = ADC_VREF*value/65536;
+    strbuf += std::to_string(volt);
+    if (i &lt; NUM_ADC_INPUTS-1) {
+      strbuf += &quot;,&quot;;
+    }
+  }
+  SerialUSB.println( strbuf.c_str() );
+  delay(100);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_analog_3x_temt6000.png" />
+<br>รูป:  แสดงข้อมูลที่ได้รับจากบอร์ด <strong>Pico</strong> โดยใช้ <strong>Arduino Serial Plotter</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_analog_light_sensors.jpg" />
+<br>รูป:  ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ดสำหรับโมดูลเซ็นเซอร์แสงแบบแอนะล็อก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-lm75a">&#9655; <strong>การใช้งานบัส I2C เพื่อสื่อสารข้อมูลกับโมดูล LM75A</strong><a class="headerlink" href="#i2c-lm75a" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการสื่อสารด้วยบัส <strong>I2C</strong> (<em>Inter-Chip Communication</em>) 
+ระหว่างไมโครคอนโทรลเลอร์กับอุปกรณ์อื่น เช่น โมดูลเซ็นเซอร์ประเภทต่าง ๆ 
+ก็สามารถทำได้โดยให้ไมโครคอนโทรลเลอร์ทำหน้าที่เป็น <strong>I2C Master</strong> และอุปกรณ์อื่นเป็น <strong>I2C Slave</strong>
+อุปกรณ์เหล่านี้เชื่อมต่อเข้าด้วยกันด้วยสัญญาณดิจิทัล 2 เส้น คือ 
+<strong>SDA</strong> (<em>Serial Data</em>) และ <strong>SCL</strong> (<em>Serial Clock</em>) </p>
+<p>ชิป <strong>RP2040</strong> มีวงจร <strong>I2C Transceiver</strong> จำนวน 2 ชุด (<code>I2C0</code> และ <code>I2C1</code>) 
+ในตัวอย่างนี้ เราจะมาลองใช้โมดูล <strong>LM75A Digital Temperature Sensor</strong> 
+ซึ่งทำหน้าที่เป็น <strong>I2C Slave</strong>
+และได้เลือกใช้ขา <code>GP6</code> / <code>GP7</code> สำหรับสัญญาณ <strong>SDA</strong> / <strong>SCL</strong>
+ของบัส <code>I2C1</code> ตามลำดับ กำหนดแอดเดรสให้เป็น <code>0x48</code>
+และเขียนโค้ดโดยใช้คลาส <code>Wire</code> ของ <strong>Arduino API</strong></p>
+<pre><code class="language-c++">// LM75a digital temperature sensor (I2C)
+// vcc: 2.8V to 5.5V (use 3.3V)
+// 11-bit t 2's complement data (resolution: 0.125 C)
+// Datasheet: https://www.nxp.com/docs/en/data-sheet/LM75A.pdf
+#include &quot;Wire.h&quot;
+
+// Arduino Mbed for RP2040 uses a fixed i2c-1 assignment for SDA/SCL.
+// GP6=SDA and GP7=SCL.
+#define I2C_ADDR  (0x48)
+
+boolean lm75a_init() {
+  uint8_t mode = 0x10;
+  Wire.beginTransmission( I2C_ADDR );
+  Wire.write( 0x01 ); // configuration register
+  Wire.write( 0x00 ); // configuration value (default: 0)
+  return ( Wire.endTransmission() == 0 );
+}
+
+boolean lm75a_read( float *value ) {
+  *value = 0.0;
+  Wire.beginTransmission( I2C_ADDR );
+  Wire.write( 0x00 ); // read temperature register
+  if ( Wire.endTransmission() != 0 )  {
+     return false;  // error
+  } 
+  // request to read two bytes 
+  Wire.requestFrom( I2C_ADDR, 2 );
+  if ( Wire.available() == 2 ) {
+     uint8_t h = Wire.read(); // high byte
+     uint8_t l = Wire.read(); // low byte
+     uint16_t temp = (h &lt;&lt; 8) | l ;
+     *value = ((int16_t)temp)/256.0;
+     return true; // ok
+  }
+  return false; // error
+}
+
+void setup() {
+  SerialUSB.begin( 115200 ); 
+  while(!SerialUSB){}
+  SerialUSB.println(&quot;LM75a I2C Temperature Sensor...&quot;);
+  Wire.begin( );
+  Wire.setClock(100000);
+  if ( !lm75a_init() ) {
+    SerialUSB.println(&quot;LM75a initialization error!&quot;);
+    while(1) {}
+  }
+}
+
+char sbuf[64];
+float temp;
+
+void loop() {
+  if ( lm75a_read(&amp;temp) ) {
+    sprintf( sbuf, &quot;Temperature: %.2f deg.C&quot;, temp );
+  } else {
+    sprintf( sbuf, &quot;Temperature: --.-- deg.C&quot; );
+  }
+  SerialUSB.println( sbuf );
+  delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>แต่ถ้าจะใช้คลาส <a href="https://os.mbed.com/docs/mbed-os/latest/apis/i2c.html"><code>I2C</code></a>
+ของ <strong>Mbed Drivers</strong> ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;I2C.h&quot;
+using namespace mbed;
+
+#define I2C_ADDR  (0x48)  // 7-bit addresss
+const int addr8bit = (I2C_ADDR &lt;&lt; 1);
+
+I2C i2c_bus( p6, p7 ); // sda and scl pins
+uint8_t buf[2]; // data buffer for I2C read/write operations
+
+boolean lm75a_init( I2C &amp;i2c ) {
+  buf[0] = 0x01; // write configuration register
+  buf[1] = 0x00; // value (default 0)
+  int result = i2c.write( addr8bit, (const char*)buf, 2 );
+  return (result==0);
+}
+
+boolean lm75a_read( I2C &amp;i2c, float *value ) {
+  *value = 0.0;
+  buf[0] = 0x00; // read temperature register
+  if ( i2c.write( addr8bit, (const char*) buf, 1 ) != 0 ) {
+    return false;
+  }
+  if ( i2c.read( addr8bit, (char*)buf, 2 ) != 0 ) {
+    return false;
+  }
+  uint8_t h = buf[0];   // high byte
+  uint8_t l = buf[1];   // low byte
+  uint16_t temp = (h &lt;&lt; 8) | l;
+  *value = ((int16_t)temp)/256.0;
+  return true;
+}
+
+void setup() {
+  SerialUSB.begin( 115200 ); 
+  while(!SerialUSB){}
+  SerialUSB.println(&quot;LM75a I2C Temperature Sensor...&quot;);
+  i2c_bus.frequency(100000);
+  if ( !lm75a_init(i2c_bus) ) {
+    SerialUSB.println(&quot;LM75a initialization error!&quot;);
+    while(1) {} // error trap
+  }
+}
+
+char sbuf[64];
+float temp;
+
+void loop() {
+  if ( lm75a_read( i2c_bus, &amp;temp) ) {
+     sprintf( sbuf, &quot;Temperature: %.2f deg.C&quot;, temp );
+  } else {
+     sprintf( sbuf, &quot;Temperature: --.-- deg.C&quot; );
+  }
+  SerialUSB.println( sbuf );
+  delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/rp2040_i2c_bh1750_lm75a.png" />
+<br>รูป: ตัวอย่างการต่อวงจรสำหรับโมดูล <strong>LM75A</strong> และมีโมดูล  <strong>BH1750</strong> ต่อวงจรอยู่ด้วย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-bh1750">&#9655; <strong>การใช้งานบัส I2C เพื่อสื่อสารข้อมูลกับโมดูล BH1750</strong><a class="headerlink" href="#i2c-bh1750" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>BH1750 Digital Ambient Light Sensor</strong> 
+ (ใช้ไอซี <a href="https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf"><strong>BH1750FVI</strong></a> ของบริษัท <strong>ROHM Semiconductor</strong>) สำหรับวัดค่าความเข้มแสง (หน่วยเป็นลักซ์: Lux) 
+ให้ข้อมูลแบบดิจิทัลขนาด 16 บิต และค่าที่วัดได้จะอยู่ในช่วง <strong>0..65535 Lux</strong></p>
+<p>โมดูลนี้ทำหน้าที่เป็นอุปกรณ์ <strong>I2C Slave</strong> 
+และใช้สำหรับวัดความเข้มแสงในสภาพแวดล้อมโดยรอบ อ่านค่าและได้ข้อมูลขนาด 16 บิต เลือกใช้ขา <code>GP6</code> / <code>GP7</code>
+สำหรับสัญญาณ <strong>SDA</strong> / <strong>SCL</strong> ของบัส <strong>I2C</strong> ตามลำดับ กำหนดแอดเดรสให้เป็น <code>0x23</code>
+ถ้าต้องการเขียนโค้ดโดยใช้คลาส <code>Wire</code> ของ <strong>Arduino API</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &quot;Wire.h&quot;
+
+// The Arduino-mbed-Pico board 
+// uses a fixed i2c-1 assignment for SDA and SCL.
+// GP6=SDA and GP7=SCL.
+#define I2C_ADDR  (0x23)  // 7-bit address
+
+boolean bh1750_init() {
+  uint8_t mode = 0x10;
+  Wire.beginTransmission( I2C_ADDR );
+  Wire.write( mode );
+  int result = Wire.endTransmission();
+  return (result == 0);
+}
+
+boolean bh1750_read( uint32_t *level ) {
+  *level = 0;
+  Wire.requestFrom( I2C_ADDR, 2 );
+  if ( Wire.available() == 2 ) {
+    uint8_t h = Wire.read();
+    uint8_t l = Wire.read();
+    uint32_t value = (h &lt;&lt; 8) | l;
+    *level = 5*value/6;
+    return true; 
+  }
+  return false;
+}
+
+void setup() {
+  SerialUSB.begin( 115200 ); 
+  while(!SerialUSB){}
+  SerialUSB.println(&quot;BH1750 I2C Light Sensor...&quot;);
+  Wire.begin(); // start I2C master
+  Wire.setClock( 100000 ); // set I2C bus speed
+  if ( !bh1750_init() ) {
+    SerialUSB.println(&quot;BH1750 initialization error!&quot;);
+    while(1) {}
+  }
+}
+
+char sbuf[64];
+
+void loop() {
+  uint32_t level;
+  if ( bh1750_read(&amp;level) ) { // read sensor
+    sprintf( sbuf, &quot;Light level: %5lu Lx&quot;, level );
+  } else {
+    sprintf( sbuf, &quot;Light level: ----- Lx&quot; );
+  }
+  SerialUSB.println( sbuf );
+  delay(200);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>แต่ถ้าจะใช้คลาส <code>I2C</code> ของ <strong>Mbed Drivers</strong> ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;I2C.h&quot;
+
+using namespace mbed;
+// The Arduino-mbed-Pico board uses a fixed i2c-1 assignment for SDA and SCL.
+// GP6=SDA and GP7=SCL.
+
+#define I2C_ADDR  (0x23)
+
+const int addr8bit = (I2C_ADDR &lt;&lt; 1);
+
+I2C i2c_bus( p6, p7 ); // sda and scl pins
+uint8_t buf[2]; // data buffer for I2C read/write operations
+
+boolean bh1750_read( I2C &amp;i2c, uint32_t *level ) {
+  *level = 0;
+  i2c_bus.lock();
+  if ( i2c.read( addr8bit, (char*)buf, 2 ) != 0 ) {
+    i2c_bus.unlock();
+    return false;
+  }
+  i2c_bus.unlock();
+  uint8_t h = buf[0];   // high byte
+  uint8_t l = buf[1];   // low byte
+  uint32_t value = (h &lt;&lt; 8) | l ;
+  *level = 5*value/6;
+  return true;
+}
+
+boolean bh1750_init( I2C &amp;i2c ) {
+  uint8_t mode = 0x10;
+  buf[0] = 0x10;
+  i2c_bus.lock();
+  int result = i2c.write( addr8bit, (const char*) buf, 1 );
+  i2c_bus.unlock();
+  return (result == 0);
+}
+
+void setup() {
+  SerialUSB.begin( 115200 ); 
+  while(!SerialUSB){}
+  SerialUSB.println(&quot;BH1750 I2C Light Sensor...&quot;);
+  i2c_bus.frequency(100000); // set I2C bus speed
+  if ( !bh1750_init(i2c_bus) ) {
+     SerialUSB.println(&quot;BH1750 initialization error!&quot;);
+     while(1) {} // error trap
+  }
+}
+
+char sbuf[64];
+uint32_t level;
+
+void loop() {
+  if ( bh1750_read(i2c_bus, &amp;level) ) {
+    sprintf( sbuf, &quot;Light level: %5lu Lx&quot;, level );
+  } else {
+    sprintf( sbuf, &quot;Light level: ----- lx&quot; );
+  }
+  SerialUSB.println( sbuf );
+  delay(500);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ข้อสังเกต: <code>I2C</code> ของ <strong>Mbed Drivers</strong>
+จะใช้แอดเดรสแบบ 8 บิต คือ นำค่าแอดเดรสแบบ 7 บิต มาเลื่อนไปทางซ้ายหนึ่งตำแหน่ง</p>
+<p>แต่ถ้าจะลองเขียนโค้ดใหม่ โดยสร้างเป็นคลาส (<strong>C++ Class</strong>)
+เพื่อความสะดวกในการใช้งานโมดูล <strong>BH1750</strong> ก็มีแนวทางตามโค้ดตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &quot;Wire.h&quot;
+#define SDA_PIN    (p6)
+#define SCL_PIN    (p7)
+#define I2C_ADDR   (0x23) 
+#define BH1750_RESET               (0x07)
+#define BH1750_CONT_HIGH_RES_MODE  (0x10)
+
+class BH1750 {
+  public:
+    BH1750( arduino::MbedI2C *_i2c, uint8_t _addr ) 
+      : addr(_addr), i2c(_i2c) { 
+      // empty
+    }
+    void begin() {
+       reset();
+       init();
+       delay(180); // wait up to 180 msec 
+    }
+    void reset() { // reset the BH1750 device
+      i2c_write_u8( addr, BH1750_RESET );
+    }
+    void init() {
+      // configure the BH1750 device to operate 
+      // in continuous high-resolution (1.0 lux) mode 
+      i2c_write_u8( addr, BH1750_CONT_HIGH_RES_MODE );
+    }
+    bool read( uint16_t&amp; lux ) {
+      uint16_t raw_data;
+      if ( i2c_read_u16( addr, raw_data) ) {
+         lux = 5*raw_data/6;
+         return true;
+      }
+      return false;
+    }
+
+  protected:
+    void i2c_write_u8( uint8_t addr, uint8_t data ) {
+      i2c-&gt;beginTransmission( addr ); 
+      i2c-&gt;write( data ); // write a data byte
+      i2c-&gt;endTransmission();  
+    }
+    bool i2c_read_u16( uint8_t addr, uint16_t &amp;data ) {
+      uint8_t buf[2];
+      i2c-&gt;requestFrom( addr, 2 ); // read two data bytes
+      if ( i2c-&gt;available()==2 ) {
+        data = i2c-&gt;read();
+        data = (data &lt;&lt; 8) | i2c-&gt;read();
+        return true;
+      }
+      return false;
+    }
+
+  private:
+    arduino::MbedI2C *i2c;
+    uint8_t addr;
+};
+
+arduino::MbedI2C i2c( SDA_PIN, SCL_PIN ); 
+BH1750 bh1750( &amp;i2c, I2C_ADDR );
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  Serial.println( &quot;BH1750 I2C Light Sensor Demo...&quot; );
+  i2c.begin(); // start the I2C master
+  i2c.setClock( 400000 ); // set the I2C clock frequency
+  bh1750.begin(); // start the BH1750 operation
+}
+
+char sbuf[32];
+
+void loop() {
+  uint16_t lux;
+  if ( bh1750.read( lux ) ) { // read sensor
+    sprintf( sbuf, &quot;Light: %5u Lux&quot;, lux );
+  } else {
+    sprintf( sbuf, &quot;Light: ------ Lux&quot; );    
+  }
+  SerialUSB.println( sbuf ); 
+  delay(500);
+}
+</code></pre>
+<p>สำหรับการต่อวจรทดลอง ก็มีรูปแบบการเชื่อมต่อดังนี้</p>
+<pre><code class="language-text">Pico      BH1750
+3.3V ---- VCC
+GND  ---- GND
+GP7  &lt;--&gt; SCL
+GP6  &lt;--&gt; SDA
+ADDR (Not Connected)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การตรวจสอบสถานะของวงจรปุ่มกดโดยใช้อินเทอร์รัพท์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การตรวจสอบสถานะลอจิกของอินพุต และการเปลี่ยนแปลงของวงจรปุ่มภายนอก ทำได้หลายวิธี 
+เช่น การอ่านค่าอินพุตแล้วเปรียบเทียบกับค่าที่ได้บันทึกเก็บไว้ในตัวแปร ซึ่งจะต้องทำซ้ำไปเรื่อย ๆ 
+(<strong>Input Polling</strong>)
+หรืออีกวิธีหนึ่งคือ การเปิดใช้อินเทอร์รัพท์ภายนอก (<strong>External Interrupt</strong>)
+ที่ขาอินพุตสำหรับวงจรปุ่มกด </p>
+<p>ถ้าเขียนโค้ดโดยใช้ <strong>Arduino API</strong> ก็มีคำสั่ง <code>attachInterrupt(...)</code> 
+เพื่อเปิดใช้งานอินเทอร์รัพท์ภายนอก โดยเลือกรูปแบบของเหตุการณ์ได้ เช่น 
+ขอบขาขึ้น (<code>RISING</code>) ขอบขาลง (<code>FALLING</code>) หรือทั้งสองกรณี (<code>CHANGE</code>)</p>
+<p>ในตัวอย่างโค้ดต่อไปนี้ ได้เลือกใช้ขา <code>GP16</code> สำหรับวงจรปุ่มกดภายนอก ทำงานแบบ <strong>Active-Low</strong>
+เมื่อมีการเปลี่ยนสถานะลอจิกของปุ่มกด จะทำให้เกิดอินเทอร์รัพท์ ทั้งขอบขาลงและขาขึ้น
+และเรียกใช้ฟังก์ชัน <code>isr_button()</code> โดยอัตโนมัติเมื่อเกิดเหตุการณ์ดังกล่าว </p>
+<p>เมื่อเกิดเหตุการณ์ขอบขาขึ้นหรือขาลง จะมีการอ่านค่าเวลาของระบบ (หน่วยเป็นมิลลิวินาที) 
+แล้วนำมาคำนวณระยะเวลา ถ้ามีช่วงกว้างกว่าค่าที่กำหนดไว้ เช่น มากกว่า 20 มิลลิวินาที 
+ในช่วงที่อินพุตเป็นลอจิก Low จะถือว่า มีการกดปุ่มเกิดขึ้นหนึ่งครั้ง และเปลี่ยนค่าตัวแปรภายนอก 
+<code>event_detected</code> จาก <code>false</code> เป็น <code>true</code></p>
+<pre><code class="language-c++">#define LED_PIN     (25) // GP25 pin (on-board LED)
+#define BUTTON_PIN  (16) // GP16 pin
+#define MIN_PULSEWIDTH_MS (20) // in msec
+
+volatile bool event_detected = false;
+volatile uint32_t rise_time = 0, fall_time = 0;
+
+void isr_button() { // ISR function
+  uint32_t now = millis();
+  if ( digitalRead(BUTTON_PIN) ) { // high
+    rise_time = now;
+    if ( rise_time - fall_time &gt; MIN_PULSEWIDTH_MS ) {
+      event_detected = true;
+    }
+  } else { // low
+    fall_time = now;
+  }
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  pinMode( LED_PIN, OUTPUT );
+  // enable external interrupt for push button
+  attachInterrupt( BUTTON_PIN, isr_button, CHANGE );
+  pinMode( BUTTON_PIN, INPUT_PULLUP ); // digital input with pullup
+  event_detected = false;
+}
+
+String sbuf;
+uint32_t event_cnt = 0;
+
+void loop() {
+  if ( event_detected ) {
+    // toggle the LED 
+    digitalWrite( LED_PIN, !digitalRead(LED_PIN) );
+    event_cnt += 1; // increment the event counter
+    sbuf = &quot;event count: &quot;;
+    sbuf += event_cnt;
+    SerialUSB.println( sbuf.c_str() );
+    event_detected = false;
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าจะใช้คำสั่งของ <strong>Mbed OS API</strong> ก็มีคลาส 
+<a href="https://os.mbed.com/docs/mbed-os/latest/apis/interruptin.html"><code>InterruptIn</code></a>
+ สำหรับการใช้งานขาดิจิทัลให้เป็นอินพุต และเปิดใช้งานอินเทอร์รัพท์ภายนอกที่ขาดังกล่าว
+ตัวอย่างการเขียนโค้ดโดยใช้ 
+<a href="https://os.mbed.com/docs/mbed-os/latest/apis/interruptin.html"><code>InterruptIn</code></a>
+มีดังนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+#define MIN_PULSEWIDTH_MS (20)
+
+#define LED_PIN     (p25) // GP25 pin (on-board LED)
+#define BUTTON_PIN  (p16) // GP16 pin
+
+DigitalOut led( LED_PIN );
+InterruptIn button( BUTTON_PIN, PullUp );
+
+volatile bool event_detected = false;
+volatile uint32_t rise_time = 0, fall_time = 0;
+
+void isr_button() { // ISR function
+  uint32_t now = Kernel::get_ms_count();
+  if ( button.read() ) { // high
+    rise_time = now;
+    if ( rise_time - fall_time &gt; MIN_PULSEWIDTH_MS ) {
+      event_detected = true;
+    }
+  } else { // low
+    fall_time = now;
+  }
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  button.rise( isr_button );
+  button.fall( isr_button );
+  event_detected = false;
+}
+
+std::string sbuf;
+uint32_t event_cnt = 0;
+
+void loop() {
+  if ( event_detected ) {
+    led = !led; // toggle the LED
+    event_cnt += 1; // increment the event counter
+    sbuf = &quot;event count: &quot;;
+    sbuf += std::to_string( event_cnt );
+    SerialUSB.println( sbuf.c_str() );
+    event_detected = false;
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-04-16 | Last Updated: 2021-12-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/rpi-rp2040/arduino_pico/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมด้วย Arduino Pico Core สำหรับไมโครคอนโทรลเลอร์ Raspberry Pi Pico - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-pico-core-raspberry-pi-pico" class="nav-link">การเขียนโปรแกรมด้วย Arduino Pico Core สำหรับไมโครคอนโทรลเลอร์ Raspberry Pi Pico</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#arduino-pico-core" class="nav-link">&#9655; การติดตั้งและใช้งาน Arduino Pico Core</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink" class="nav-link">&#9655; ตัวอย่างโค้ด: LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#using-push-button-as-led-toggle-switch" class="nav-link">&#9655; ตัวอย่างโค้ด: Using Push Button as LED Toggle Switch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pwm-based-led-dimming" class="nav-link">&#9655; ตัวอย่างโค้ด: PWM-based LED Dimming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator" class="nav-link">&#9655; การจำลองการทำงานด้วย WokWi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-pico-core-raspberry-pi-pico">การเขียนโปรแกรมด้วย Arduino Pico Core สำหรับไมโครคอนโทรลเลอร์ Raspberry Pi Pico<a class="headerlink" href="#arduino-pico-core-raspberry-pi-pico" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="arduino-pico-core">&#9655; <strong>การติดตั้งและใช้งาน Arduino Pico Core</strong><a class="headerlink" href="#arduino-pico-core" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico</strong> หรือบอร์ดอื่นที่ใช้ชิป <a href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf"><strong>Raspberry Pi RP2040</strong></a>
+(<em>Dual Core Cortex M0+, 133MHz, 264 KB SRAM</em>)
+สามารถนำมาใช้ในการฝึกเขียนโปรแกรมสำหรับงานด้านระบบสมองกลฝังตัว
+(<strong>Embedded Systems</strong>) ด้วยภาษา <strong>C/C++</strong> ร่วมกับซอฟต์แวร์ <strong>Arduino IDE</strong> 
+ผู้ใช้งานเขียนโค้ดโดยใช้คำสั่งต่าง ๆ ของ <strong>Arduino API</strong> ได้เช่นกัน</p>
+<p>บทความนี้นำเสนอขั้นตอนการใช้งาน <a href="https://github.com/earlephilhower/arduino-pico"><strong>Arduino Pico Core</strong></a> ที่ได้มีการพัฒนาโดย  <strong>Earle F. Philhower</strong>
+และไม่ใช่ <strong>Arduino Core for Mbed OS - RP2040</strong> แม้ว่าทั้งสองตัวเลือกสามารถนำมาใช้ในการเขียนโค้ด <strong>Arduino Sketch</strong> ได้เช่นกัน แต่มีพื้นฐานซอฟต์แวร์ที่ใช้งานแตกต่างกัน</p>
+<p><img alt="" src="images/arduino_pico_github.png" /></p>
+<p>รูป: <strong>Arduino Pico Core - Github repo</strong></p>
+<p>ลองมาดูตัวอย่างโค้ดบางส่วนของ <strong>Arduino Pico Core</strong> ที่สร้างฟังก์ชันที่เป็นคำสั่งพื้นฐานของ <strong>Arduino API</strong>
+อย่างเช่น <code>pinMode()</code> และ <code>digitalWrite()</code> เป็นต้น (อยู่ในไฟล์ <code>/cores/rp2040/wiring_digital.cpp</code>)
+จากโค้ดตัวอย่างจะเห็นได้ว่า มีการใช้คำสั่งในกลุ่ม <a href="https://raspberrypi.github.io/pico-sdk-doxygen/group__hardware__gpio.html"><strong>GPIO</strong></a> ของ <strong>Pico C/C++ SDK</strong> เช่น</p>
+<ul>
+<li><code>gpio_init()</code> เริ่มต้นใช้งานขา <strong>GPIO</strong> ตามหมายเลขขาที่ระบุ (<strong>GPIO number</strong>)</li>
+<li><code>gpio_pull_up()</code> เปิดใช้งานตัวต้านทานภายในแบบ <strong>Pullup</strong> ที่ขา <strong>GPIO</strong></li>
+<li><code>gpio_pull_down()</code> เปิดใช้งานตัวต้านทานภายในแบบ <strong>Pulldown</strong> ที่ขา <strong>GPIO</strong></li>
+<li><code>gpio_disable_pull()</code> ปิดการใช้งานตัวต้านทานภายในทั้งสองแบบ</li>
+<li><code>gpio_set_dir()</code> กำหนดทิศทางขา (<code>GPIO_OUT</code>=1, <code>GPIO_IN</code>=0)</li>
+<li><code>gpio_set_function()</code> กำหนดฟังก์ชันการทำงานของขา <strong>GPIO</strong> (จำแนกเป็น <strong>F1..F9</strong>) ยกตัวอย่างเช่น <ul>
+<li><code>GPIO_FUNC_SIO</code>  เมื่อต้องการเข้าถึงรีจิสเตอร์ของซีพียูโดยตรงในส่วนที่เกี่ยวข้องกับ <strong>Single-cycle I/O Ports</strong> </li>
+<li><code>GPIO_FUNC_UART</code>(<strong>F2</strong>) เมื่อใช้งานขาสำหรับ <strong>UART RX/TX</strong></li>
+<li><code>GPIO_FUNC_PWM</code> (<strong>F4</strong>) เมื่อใช้งานขาสำหรับสัญญาณเอาต์พุต <strong>PWM</strong></li>
+<li><code>GPIO_FUNC_I2C</code> (<strong>F3</strong>) เมื่อใช้งานขาสำหรับบัส <strong>I2C</strong></li>
+<li><code>GPIO_FUNC_SPI</code> (<strong>F1</strong>) เมื่อใช้งานขาสำหรับบัส <strong>SPI</strong></li>
+<li><code>GPIO_FUNC_USB</code> (<strong>F9</strong>) เมื่อใช้งานขาสำหรับ <strong>USB</strong></li>
+<li><code>GPIO_FUNC_CLK</code> (<strong>F8</strong>) เมื่อใช้งานขาสำหรับ <strong>Clock In/Out</strong></li>
+<li><code>GPIO_FUNC_GPCK</code> (<strong>F6</strong>) เมื่อใช้งานขาสำหรับ <strong>PIO0</strong></li>
+<li><code>GPIO_FUNC_PI1</code> (<strong>F7</strong>) เมื่อใช้งานขาสำหรับ <strong>PIO0</strong></li>
+</ul>
+</li>
+<li><code>gpio_put()</code> กำหนดค่าให้ขา <strong>GPIO</strong> เป็น 0 หรือ 1</li>
+<li><code>gpio_get()</code> อ่านค่าจากขา <strong>GPIO</strong> ได้ค่าเป็น 0 (LOW) หรือ ไม่เท่ากับ 0 (HIGH)</li>
+</ul>
+<p><img alt="" src="images/arduino_core_pinmode.png" /></p>
+<p>รูป: </p>
+<p><img alt="" src="images/arduino_core_digitalwrite.png" /></p>
+<p>รูป: การสร้างฟังก์ชันสำหรับ <code>digitalWrite()</code></p>
+<p>ขั้นตอนการติดตั้งก็เหมือนการติดตั้งใช้งาน <strong>Arduino Core</strong> โดยทั่วไป โดยไปที่เมนู <strong>"File &gt; Preferences &gt; Additional Boards Manager URLs"</strong> และเพิ่มรายการดังนี้</p>
+<pre><code class="language-json">https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+</code></pre>
+<p><img alt="" src="images/arduino_core_pico_install-1.png" /></p>
+<p>รูป: การเพิ่มรายการสำหรับ <strong>Arduino Boards Manager URLs</strong></p>
+<p>จากนั้นไปที่เมนู <strong>Tools &gt; Boards ... &gt; Board Manager</strong> แล้วไปยังรายการของ <strong>Arduino Pico</strong>
+เพื่อติดตั้งซอฟต์แวร์ที่เกี่ยวข้อง (ทดลองใช้เวอร์ชัน <strong>v1.12.0</strong>)</p>
+<p><img alt="" src="images/arduino_pico_core_install-2.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino Pico Core</strong> (เวอร์ชัน <strong>v1.12.0</strong>) สำหรับบอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink">&#9655; <strong>ตัวอย่างโค้ด: LED Blink</strong><a class="headerlink" href="#led-blink" title="Permanent link">#</a></h2>
+<p>เริ่มต้นด้วยการสร้าง <strong>Arduino Sketch (.ino)</strong> ใน <strong>Arduino IDE</strong> 
+แล้วเลือกบอร์ด <strong>Arduino</strong> ตามตัวอย่างดังนี้</p>
+<p><img alt="" src="images/arduino_pico_led_blink-1.png" /></p>
+<p>รูป: ตัวอย่างการเลือกบอร์ดไมโครคอนโทรลเลอร์ และการตั้งค่าใช้งานจากเมนู</p>
+<p>จากรูปตัวอย่างเป็นการเลือกบอร์ด <strong>Raspberry Pi Pico</strong> ซึ่งมีหน่วยความจำภายนอก <strong>Qaud-SPI Flash</strong>
+ขนาดความจุรวม <strong>2MB</strong> และเลือกความถี่ในการทำงานของซีพียูเท่ากับ <strong>125MHz</strong> (หรืออาจจะเลือกค่าความถี่สูงกว่า เช่น <strong>133MHz</strong>) </p>
+<p>ในการเขียนโปรแกรม อาจจะเลือกแบ่งหน่วยความจำแฟลชมาใช้เป็น <a href="https://arduino-pico.readthedocs.io/en/latest/fs.html"><strong>Flash File System (Pico-LittleFS)</strong></a> ซึ่งสามารถเขียนหรืออ่านไฟล์ได้ แต่ถ้าไม่ต้องการแบ่งใช้งาน ก็ให้เลือกเป็น "<strong>no FS</strong></p>
+<p>ในเบื้องต้น ยังไม่มีการใช้อุปกรณ์เสริมเพื่อช่วยในการดีบักการทำงานของโปรแกรมในฮาร์ดแวร์ (<strong>In-Circuit Debugging</strong>) 
+ดังนั้น <strong>Debug Port</strong> จึงเลือกให้เป็น <strong>Disabled</strong></p>
+<p>เนื่องจากบอร์ด <strong>Raspberry Pi Pico</strong> รองรับการเชื่อมต่อกับพอร์ต <strong>USB</strong> แบบ <strong>native</strong> ดังนั้นจึงสามารถเปิดใช้งาน
+<strong>USB CDC - Serial</strong> เพื่อรับส่งข้อมูลผ่าน <strong>Virtual COM port</strong> ได้ และในรูปตัวอย่างเป็นการเลือกใช้
+<strong>Pico SDK - USB Stack</strong></p>
+<p><img alt="" src="images/arduino_pico_led_blink-2.png" /></p>
+<p>รูป: การตั้งค่าความถี่สำหรับซีพียู</p>
+<p><img alt="" src="images/arduino_pico_led_blink-3.png" /></p>
+<p>รูป: การตั้งค่าเพื่อแบ่งพื้นที่ของหน่วยความจำแฟลชสำหรับ <strong>Program Memory</strong> และ <strong>File System</strong></p>
+<p>ทดลองเขียนโค้ดตามตัวอย่างดังนี้ ซึ่งจะทำให้วงจร <strong>LED</strong> ที่ขา <strong>p25</strong> กระพริบ หรือสลับสถานะลอจิกโดยเว้นระยะเวลา
+500 มิลลิวินาที และมีการส่งข้อความทาง <strong>Serial-USB</strong> เพื่อแสดงสถานะลอจิกของ <strong>LED</strong></p>
+<pre><code class="language-c++">// onboard LED pin is p25
+
+void setup() {
+  Serial.begin(115200);   // initialize SerialUSB
+  while (!Serial){} // wait until SerialUSB is open
+  pinMode( LED_BUILTIN, OUTPUT ); // set pin direction for output
+}
+
+void loop() {
+  int state = !digitalRead(LED_BUILTIN);
+  digitalWrite( LED_BUILTIN, state ); // update LED output
+  Serial.printf( &quot;LED state: %d\n&quot;, state );
+  delay(500);
+}
+</code></pre>
+<p><img alt="" src="images/arduino_pico_led_blink-4.png" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ดและทำขั้นตอน <strong>Verify / Upload</strong></p>
+<p>เมื่อคอมไพล์โค้ดของ <strong>Arduino Sketch</strong> จะได้ไฟล์เอาต์พุตเป็น <strong>.uf</strong> 
+และก่อนจะทำขั้นตอน <strong>Upload</strong> เพื่ออัปโหลดไฟล์นี้ไปยังบอร์ด <strong>Raspberry Pi Poco</strong>
+จะต้องทำให้บอร์ดนี้เข้าสู่โหมด <strong>USB Bootloader</strong> โดยการกดปุ่ม <strong>BOOTSEL</strong> บนบอร์ดค้างไว้
+แล้วเสียบสาย <strong>USB</strong> กับคอมพิวเตอร์ของผู้ใช้ทางพอร์ต <strong>USB</strong> จากนั้นจะมองเห็นไดรฟ์ที่มีชื่อว่า <code>RPI-RP2</code></p>
+<p>เมื่อกดปุ่ม <strong>Upload</strong> โปรแกรม <strong>Arduino IDE</strong> จะค้นหาไดรฟ์ดังกล่าว และเขียนไฟล์ดังกล่าวลงในบอร์ดไมโครคอนโทรลเลอร์
+จากนั้นจะมองเห็น <strong>Serial COM Port</strong> ของบอร์ดนี้ แล้วสามารถเปิด <strong>Serial Monitor</strong> รับข้อความที่ถูกส่งเข้ามาได้</p>
+<p><img alt="" src="images/arduino_pico_led_blink-5.png" /></p>
+<p>รูป: เลือกพอร์ต <strong>Serial</strong> ที่ตรงกับการทำงานของบอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>การแก้ไขโค้ดและอัปโหลด <strong>Arduino Sketch</strong> ในครั้งถัดไป 
+ก็ไม่จำเป็นต้องทำให้บอร์ดเข้าสู่โหมด <strong>USB Bootloader</strong>
+เหมือนครั้งแรก ขั้นตอนนี้จะเกิดขึ้นโดยอัตโนมัติ (แต่จะต้องเลือกพอร์ต <strong>Serial</strong> ของบอร์ดให้ถูกต้อง)</p>
+<p><img alt="" src="images/arduino_pico_led_blink-6.png" /></p>
+<p>รูป: ข้อความเอาต์พุตที่ได้รับใน <strong>Arduino Serial Monitor</strong></p>
+<p>การใช้คำสั่ง <code>Serial</code> ของ <strong>Arduino API</strong> เป็นการใช้งานคลาส <a href="https://github.com/earlephilhower/arduino-pico/blob/master/cores/rp2040/SerialUSB.cpp"><code>SerialUSB</code></a>
+ซึ่งใช้ <strong>USB</strong> ในการรับส่งข้อมูล แต่ถ้าจะใช้ <strong>Hardware Serial</strong> ซึ่งมีสองตัวเลือกคือ
+<strong>UART0</strong> และ <strong>UART1</strong> จะต้องใช้คลาส <a href="https://github.com/earlephilhower/arduino-pico/blob/master/cores/rp2040/SerialUART.cpp"><code>SerialUART</code></a> และใช้คำสั่ง <code>Serial1</code> 
+และ <code>Serial2</code> ของ <strong>Arduino API</strong></p>
+<pre><code class="language-c++">extern SerialUSB  Serial;
+extern SerialUART Serial1; // HW UART 0
+extern SerialUART Serial2; // HW UART 1
+</code></pre>
+<p>&nbsp;</p>
+<p>หากจะลองเปลี่ยนมาทดลองใช้คำสั่งของ <strong>Pico C/C++ SDK</strong> ที่เกี่ยวข้องกับ <strong>GPIO</strong>
+เช่น <code>gpio_init()</code>, <code>gpio_set_dir()</code> และ <code>gpio_put()</code> ภายใต้การทำงานของ <strong>Arduino Framework</strong>
+ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#define LED_PIN (25)
+
+void setup() {
+  // initialize Serial (USB-based) provided by Arduino Pico Core
+  Serial.begin(); // SerialUSB is the same as Serial.
+  // use the API provided by the Pico C/C++ SDK
+  gpio_init( LED_PIN ); // initialize GPIO
+  gpio_set_dir( LED_PIN, GPIO_OUT ); // set direction to output
+}
+
+void loop() {
+  gpio_put( LED_PIN, 1 ); // output high
+  sleep_ms( 500 );
+  gpio_put( LED_PIN, 0 ); // output low
+  sleep_ms( 500 );
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="using-push-button-as-led-toggle-switch">&#9655; <strong>ตัวอย่างโค้ด: Using Push Button as LED Toggle Switch</strong><a class="headerlink" href="#using-push-button-as-led-toggle-switch" title="Permanent link">#</a></h2>
+<p>ตัวอย่างที่สองนี้สาธิตการเขียนโค้ด เพื่อตรวจสอบสถานะของอินพุตที่ขา <strong>p17</strong> (<code>BTN_PIN</code>) ซึ่งจะต้องนำไปต่อกับวงจรปุ่มกด (<strong>Push Button</strong>) ที่ทำงานแบบ <strong>Active-Low</strong> (ถ้ากดปุ่มจะได้ค่าลอจิกเป็น 0 แต่ถ้าไม่ได้กดปุ่มจะได้ลอจิก 1) เมื่อมีการกดปุ่มแล้วปล่อยในแต่ละครั้งจะทำให้ <strong>LED</strong> ที่ขา <strong>p25</strong> (<code>LED_PIN</code>) สลับสถานะลอจิกหนึ่งครั้ง</p>
+<p>การตรวจสอบปุ่มกด จะใช้วิธีเปิดใช้งานอินเทอร์รัพท์ภายนอกที่ขา <code>BTN_PIN</code> โดยกำหนดเงื่อนไขการเกิดเหตุการณ์อินเทอร์รัพท์
+คือ เกิดขอบขาลงหรือขาขึ้นของสัญญาณอินพุต  และใช้คำสั่ง <code>attachInterrupt()</code> ของ
+<strong>Arduino API</strong> ในการเปิดใช้งาน </p>
+<p>เมื่อเกิดเหตุการณ์อินเทอร์รัพท์ดังกล่าว จะมีการเรียกฟังก์ชัน <code>btn_isr()</code> ตามที่กำหนดเอาไว้ให้ทำงาน
+มีการบันทึกค่าเวลาในขณะนั้น (หน่วยเป็นมิลลิวินาที) เมื่อเกิดเหตุการณ์ขอบขาขึ้นหรือขาลงของสัญญาณอินพุตที่ปุ่มกด
+จากนั้นให้นำไปคำนวณระยะเวลาระหว่างขอบขาลงและขาขึ้นตามลำดับและเก็บไว้ในตัวแปร <code>pulsewidth</code>
+หากเป็นเหตุการณ์ขอบขาขึ้นจะทำให้ค่าของตัวแปร <code>btn_event</code> เป็น <code>true</code> </p>
+<p>ในฟังก์ชัน <code>loop()</code> ซึ่งมีการทำคำสั่งซ้ำ จะมีการตรวจสอบค่าของตัวแปร <code>btn_event</code> หากได้ค่าเป็น <code>true</code>
+จะมีการตรวจสอบระยะเวลาเพื่อดูความกว้างของช่วงที่เป็นลอจิก LOW ของสัญญาณอินพุต โดยดูจากค่าในตัวแปร
+<code>pulsewidth</code> หากมีความกว้างมากกว่าค่าที่กำหนดไว้ เช่น 20 มิลลิวินาที
+ก็จะสลับสถานะของลอจิกที่ขาเอาต์พุตสำหรับ <strong>LED</strong> หนึ่งครั้ง ส่งข้อความไปยัง <strong>Serial</strong></p>
+<pre><code class="language-c++">#define LED_PIN (25)
+#define BTN_PIN (17)
+
+volatile boolean btn_event = false;
+volatile uint32_t saved_timestamp, pulsewidth=0;
+
+void btn_isr() {
+  uint32_t now = millis();
+  if ( digitalRead(BTN_PIN)==1 ) { // rising edge
+    pulsewidth = now - saved_timestamp;
+    btn_event  = true; // set button event flag to true
+  }
+  saved_timestamp = now;
+}
+
+void setup() {
+  Serial.begin();
+  while(!Serial){} // wait until SerialUSB is open
+  pinMode( LED_PIN, OUTPUT );
+  pinMode( BTN_PIN, INPUT_PULLUP );
+  Serial.println( &quot;Press the button to toggle the LED state!&quot; );
+  Serial.flush();
+  // enable interrupt for button pin 
+  attachInterrupt( BTN_PIN, btn_isr, CHANGE );
+}
+
+bool state = 0; // used to keep the LED state
+uint32_t click_count = 0;
+uint32_t saved_pulsewidth = 0;
+
+void loop() {
+  if ( btn_event ) {
+     bool condition;
+    // disable interrupts on the current CPU core
+    noInterrupts();
+    btn_event = false; // clear button event flag 
+    saved_pulsewidth = pulsewidth; // save pulsewidth value
+    // enable interrupts on the current CPU core
+    interrupts();
+    if ( saved_pulsewidth &gt;= 20 ) { 
+      Serial.printf( &quot;Clicks: #%lu\n&quot;, ++click_count );
+      // toggle the LED
+      digitalWrite( LED_PIN, state = !state );
+      Serial.printf( &quot;LED state: %s\n&quot;, 
+                      state ? &quot;ON&quot; : &quot;OFF&quot; );
+    }
+  }
+}
+</code></pre>
+<p><img alt="" src="images/pico_led_toggle_switch_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับใน <strong>Arduino Serial Monitor</strong> เมื่อทดสอบการทำงานของโค้ดโดยใช้อุปกรณ์จริง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pwm-based-led-dimming">&#9655; <strong>ตัวอย่างโค้ด: PWM-based LED Dimming</strong><a class="headerlink" href="#pwm-based-led-dimming" title="Permanent link">#</a></h2>
+<p>ตัวอย่างที่สองนี้สาธิตการเขียนโค้ดโดยใช้คำสั่งของ <strong>Arduino API</strong> เพื่อสร้างสัญญาณเอาต์พุตแบบ <strong>PWM</strong> (<em>Pulse Width Modulation</em>)</p>
+<ul>
+<li>มีการกำหนดให้มีความถี่ 1kHz (เลือกได้ในช่วง <strong>100Hz</strong> ถึง <strong>60KHz</strong>) โดยใช้คำสั่ง 
+<code>analogWriteFreq()</code> </li>
+<li>กำหนดจำนวนบิตที่ใช้ในการกำหนดค่าให้เท่ากับ 8 บิต (สูงสุด 16 บิต) หรือ อยู่ในช่วง 0..255 โดยใช้คำสั่ง <code>analogWriteResolution()</code> เป็นต้น สัญญาณเอาต์พุต <strong>PWM</strong> นี้จะถูกนำไปใช้ปรับความสว่างของวงจร <strong>LED</strong> บนบอร์ดทดลอง</li>
+<li>กำหนดค่าสำหรับ <strong>PWM</strong> โดยใช้คำสั่ง <code>analogWrite()</code> ให้มีค่าเริ่มต้นเท่ากับ  0  เพิ่มขึ้นครั้งละหนึ่ง ไปจนถึง 255 แล้วลดลงทีละหนึ่งไปจนถึง 0  อีกครั้ง ซึ่งจะทำให้ <strong>LED</strong> ค่อย ๆ สว่างขึ้นตามลำดับ จนถึงระดับสูงสุด แล้วค่อย ๆ ลดลง</li>
+</ul>
+<pre><code class="language-c++">#define LED_PIN (25)
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  // set the PWM frequency to 1kHz
+  analogWriteFreq( 1000 );
+  // set PWM output to 8-bit resolution
+  analogWriteResolution(8); 
+  // set PWM duty cycle to 0.
+  analogWrite( LED_PIN, 0 );
+}
+
+void loop() {
+  for ( uint32_t i=0; i &lt; 512; i++ ) {
+     if ( i &lt; 256 ) {
+       analogWrite( LED_PIN, i );
+     } else {
+       analogWrite( LED_PIN, 511-i );
+     }
+     delay(5);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator">&#9655; <strong>การจำลองการทำงานด้วย WokWi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
+<p>ผู้พัฒนา <strong>WokWi Simulator</strong> (<a href="https://wokwi.com/arduino/projects/">https://wokwi.com/arduino/projects/</a>) ได้เพิ่มรายการบอร์ดไมโครคอนโทรลเลอร์ <strong>Pico</strong> (<a href="https://docs.wokwi.com/parts/wokwi-pi-pico"><code>wokwi-pi-pico</code></a>) สำหรับเขียนโค้ด
+และจำลองการทำงานของโค้ดได้ในเบื้องต้น มีสองตัวเลือกสำหรับ <strong>Arduino Core</strong> ได้แก่ <strong>Arduino Core for Mbed (Official)</strong> และ <strong>Arduino Pico Core (Community)</strong> </p>
+<p>แม้ว่า <strong>WokWi Simulator</strong> จะยังไม่รองรับการใช้งานของวงจรต่าง ๆ ภายในชิป <strong>RP2040</strong> ได้ครบทุกส่วน
+แต่ก็มีหลายอย่างที่ใช้ได้ เช่น <strong>GPIO</strong>, <strong>PIO</strong>, <strong>Serial</strong>, <strong>ADC</strong>, <strong>I2C</strong>, <strong>SPI</strong> เป็นต้น  (<a href="https://docs.wokwi.com/parts/wokwi-pi-pico">ดูรายละเอียด</a>)
+ลองมาดูตัวอย่างการใช้งานดังนี้</p>
+<p><img alt="" src="images/wokwi_pico-1.png" /></p>
+<p>รูป: เลือกบอร์ด <strong>Raspberry Pi Pico</strong> เพื่อสร้างโปรเจกต์ใหม่</p>
+<p><img alt="" src="images/wokwi_pico-2.png" /></p>
+<p>รูป: ตั้งค่าในไฟล์ <code>diagram.json</code> ของโปรเจกต์ เพื่อเลือกใช้ <strong>Arduino Pico Core (Community)</strong></p>
+<p><img alt="" src="images/wokwi_pico-3.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของโค้ดตัวอย่าง (มีการต่อปุ่มกดเพิ่มที่ขา <strong>GP17</strong>)</p>
+<p>หากต้องการเปลี่ยนไปใช้ <code>Serial1</code> (<strong>Serial Monitor over UART</strong>) ที่ขา <strong>GPIO</strong> (<strong>GP0=RX</strong> และ <strong>GP1=TX</strong>)
+แทนที่การใช้งาน <code>Serial</code> หรือ <code>SerialUSB</code>
+(<strong>Serial Monitor over USB</strong>) ก็ให้แก้ไขในไฟล์  <code>diagram.json</code> ในส่วนที่เรียกว่า <code>connections</code> ดังนี้</p>
+<pre><code class="language-json">&quot;connections&quot;: [
+    [ &quot;$serialMonitor:RX&quot;, &quot;pico:GP0&quot;, &quot;&quot;, [] ],
+    [ &quot;$serialMonitor:TX&quot;, &quot;pico:GP1&quot;, &quot;&quot;, [] ]
+ ]
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการติดตั้งและใช้งาน <strong>Arduino Core</strong> สำหรับ <strong>Arduino IDE</strong>
+เพื่อเขียนโปรแกรมสำหรับบอร์ด <strong>Raspberry Pi Pico</strong> พร้อมตัวอย่างโค้ดเพื่อสาธิตการใช้งานคำสั่งในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-02-26 | Last Updated: 2021-03-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

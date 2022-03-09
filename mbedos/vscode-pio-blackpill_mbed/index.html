@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/vscode-pio-blackpill_mbed/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Mbed OS ด้วย Visual Studio Code + PIO สำหรับบอร์ด Black Pill (STM32F4) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mbed-os-visual-studio-code-pio-black-pill-stm32f4" class="nav-link">การเขียนโปรแกรม Mbed OS ด้วย Visual Studio Code + PIO สำหรับบอร์ด Black Pill (STM32F4)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#black-pill-mbed-custom-target" class="nav-link">&#9655; บอร์ด Black Pill และ Mbed Custom Target</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#unbufferedserial" class="nav-link">&#9655; การส่งข้อความด้วย UnbufferedSerial</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#bufferedserial" class="nav-link">&#9655; การส่งข้อความด้วย BufferedSerial</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mbed-os-visual-studio-code-pio-black-pill-stm32f4">การเขียนโปรแกรม Mbed OS ด้วย Visual Studio Code + PIO สำหรับบอร์ด Black Pill (STM32F4)<a class="headerlink" href="#mbed-os-visual-studio-code-pio-black-pill-stm32f4" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>STM32 Programming</em>, <em>STM32F4</em>, <em>Black Pill Boards</em>,
+<em>PlatformIO</em>, <em>VS Code</em></p>
+<hr />
+<h2 id="black-pill-mbed-custom-target">&#9655; <strong>บอร์ด Black Pill และ Mbed Custom Target</strong><a class="headerlink" href="#black-pill-mbed-custom-target" title="Permanent link">#</a></h2>
+<p>แม้ว่าเราสามารถเขียนโค้ดสำหรับบอร์ดไมโครคอนโทรลเลอร์ <a href="https://github.com/WeActTC/MiniSTM32F4x1"><strong>WeAct Studio MiniF4 / Black Pill STM32F4x1</strong></a>
+(เช่น <strong>F401CCU6</strong>, <strong>F401CEU6</strong> และ  <strong>F411CCE6</strong>) 
+ได้โดยใช้ <a href="https://docs.platformio.org/en/latest/platforms/ststm32.html"><strong>ST-STM32 Framework</strong></a> (<code>ststm32</code>) ของ <a href="https://github.com/platformio/platformio-core"><strong>PlatformIO Core</strong></a>
+ (เช่น <strong>v5.2.4</strong>) อย่างเช่น <strong>Arduino (STM32Duino)</strong>, <strong>CMSIS</strong>, <strong>STM32Cube HAL</strong> เป็นต้น 
+แต่ก็ยังไม่รองรับการใช้งาน <strong>Mbed OS</strong> สำหรับบอร์ดดังกล่าว</p>
+<p>ขั้นตอนการติดตั้งและใช้งาน <strong>VS Code</strong> (ทดลองใช้กับระบบปฏิบัติการ <strong>Windows 10</strong>) ร่วมกับ <strong>PlatformIO</strong>
+เช่น เพื่อเขียนโปรแกรมด้วย <strong>Arduino</strong> สามารถศึกษาได้จากบทความภาษาไทย 
+<a href="../../arduino/vscode_pio_arduino_stm32/">"<strong>Arduino Programming with STM32 and PlatformIO</strong>"</a></p>
+<p>บทความนี้สาธิตขั้นตอนสำหรับการติดตั้งไฟล์และตั้งค่าใช้งาน <strong>Mbed OS</strong> สำหรับบอร์ด <strong>STM32F411CEU6</strong> </p>
+<ol>
+<li>ดาวน์โหลดและแตกไฟล์ <a href="../files/stm32f411ceu6_blackpill_mbed_demo.zip"><strong>stm32f411ceu6_blackpill_mbed_demo.zip</strong></a> 
+ซึ่งเป็นโปรเจกต์สาธิตการเขียนโปรแกรมด้วย <strong>Mbed OS</strong><ul>
+<li>ในโปรเจกต์ตัวอย่างนี้ได้มีการสร้าง <strong>Custom Targets</strong> ที่มีชื่อว่า <code>BLACKPILL_F411CE</code> ไว้ให้แล้ว 
+   ซึ่งได้แก้ไขดัดแปลงจาก <a href="https://github.com/vznncv/TARGET_BLACKPILL_F411CE">https://github.com/vznncv/TARGET_BLACKPILL_F411CE</a></li>
+</ul>
+</li>
+<li>เปิดใช้งาน <strong>VS Code</strong> ที่ได้มีการติดตั้ง <strong>PIO Extension</strong> 
+พร้อมใช้งานแล้ว จากนั้นให้คลิกเลือก <strong>PlatformIO &gt; PIO Home &gt; Open</strong> </li>
+<li>เปิดโปรเจกต์ที่ได้ดาวน์โหลดมา โดยเลือกจาก <strong>PIO Home &gt; Open Project</strong> ใน <strong>Quick Access</strong>
+เลือกไดเรกทอรีของโปรเจกต์ตัวอย่างที่มีไฟล์ <code>platformio.ini</code> อยู่ภายใน</li>
+<li>ตรวจสอบการตั้งค่าในไฟล์ของโปรเจกต์ ได้แก่ <ul>
+<li><code>custom_targets.json</code> เกี่ยวข้องกับการตั้งค่าใช้งาน <strong>Custom Target</strong> ของ <strong>Mbed</strong></li>
+<li><code>mbed_app.json</code> เกี่ยวข้องกับการตั้งค่าใช้งานสำหรับ <strong>Mbed Application</strong></li>
+<li><code>platformio.json</code> เกี่ยวข้องกับการตั้งค่าใช้งานสำหรับ <strong>PlatformIO</strong></li>
+</ul>
+</li>
+<li>แก้ไขโค้ดในไฟล์ <code>main.cpp</code> ตามโค้ดตัวอย่าง แล้วทำขั้นตอน <strong>PIO Build</strong>
+ซึ่งจะได้ไฟล์เอาต์พุต <code>firmware.elf</code> ภายใต้ไดเรกทอรี <code>./.pio/build/blackpill_f411ce/</code></li>
+<li>ทำขั้นตอน <strong>PIO Upload</strong> เพื่อทดสอบการทำงานของโค้ดตัวอย่างโดยใช้อุปกรณ์ฮาร์ดแวร์จริง
+(บอร์ด <strong>Black Pill</strong> จะต้องใช้งานร่วมกับ <strong>ST-Link/V2 USB Dongle</strong> สำหรับการอัปโหลดไฟล์ไปยังบอร์ด)</li>
+</ol>
+<p>โค้ดตัวอย่าง: <code>main.cpp</code></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;USBSerial.h&quot;
+
+DigitalOut  led(LED1); // PC_13
+USBSerial   serialUSB; // usb USB-CDC (blocking mode)
+
+int main() {
+    // show Mbed OS version
+    serialUSB.printf( &quot;Mbed Version: %d.%d.%d\r\n&quot;, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_PATCH_VERSION );
+
+    serialUSB.printf( &quot;CPU frequency: %lu MHz\r\n&quot;, 
+                      SystemCoreClock/1000000L );
+
+    while (true) {
+        // show the current LED status
+        serialUSB.printf( &quot;LED: %d\r\n&quot;, led.read() );
+        // toggle onboard LED
+        led = !led;
+        // delay for 500 milliseconds
+        ThisThread::sleep_for( 500ms );
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/vscode_pio_mbed_stm32f4-1.png" /></p>
+<p>รูป: การเปิดโปรเจกต์ตัวอย่างใน <strong>PIO Home</strong></p>
+<p><img alt="" src="../images/vscode_pio_mbed_stm32f4-2.png" /></p>
+<p>รูป: การทำขั้นตอน <strong>PIO Build</strong> เพื่อคอมไพล์โค้ดในโปรเจกต์</p>
+<p>เมื่อได้ทำขั้นตอน <strong>Build</strong> โดยปราศจากข้อผิดพลาดแล้ว 
+ให้เชื่อมต่อสาย <strong>Type-C USB</strong> ระหว่างคอมพิวเตอร์ของผู้ใช้กับบอร์ด <strong>Black Pill</strong>
+และทำขั้นตอน <strong>Upload</strong> เพื่ออัปโหลดไฟล์  <code>.bin</code> ของโปรเจกต์ ไปยังบอร์ดไมโครคอนโทรลเลอร์</p>
+<p>จากนั้นให้ใช้โปรแกรม เช่น <strong>Serial Monitor</strong> ของ <strong>Arduino IDE</strong> เปิด <strong>COM Port</strong> 
+ที่ตรงกับการทำงานของบอร์ด <strong>Black Pill</strong> เพื่อรับข้อความจากบอร์ดผ่านทาง <strong>USB</strong> และจะเห็นว่า <strong>LED</strong> 
+บนบอร์ดเริ่มกระพริบ</p>
+<p>หากไม่เปิดพอร์ตใช้งาน การทำงานของโค้ดตัวอย่างในไมโครคอนโทรลเลอร์จะหยุดรอเมื่อเริ่มต้นทำงาน แต่หากไม่ต้องการให้หยุดรอ
+ให้เปลี่ยนมาใช้โค้ดตัวอย่างดังนี้ (ให้ <strong>USB Device</strong> ทำงานในโหมด <strong>non-blocking</strong>)</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;USBSerial.h&quot;
+
+DigitalOut  led(LED1); // PC_13
+USBSerial   serialUSB(false); // usb USB-CDC (non-blocking mode)
+
+int main() {
+    serialUSB.init();
+    serialUSB.connect();
+
+    while ( !serialUSB.connected() ) {
+        // flashing the onboard LED while waiting for USB connection
+        led = !led;
+        ThisThread::sleep_for( 100ms );
+    }
+
+    // show Mbed OS version
+    serialUSB.printf( &quot;MBed Version: %d.%d.%d\r\n&quot;, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_PATCH_VERSION );
+
+    serialUSB.printf( &quot;CPU frequency: %lu MHz\r\n&quot;, 
+                      SystemCoreClock/1000000L );
+
+    while (true) {
+        // show the current LED status
+        serialUSB.printf( &quot;LED: %d\r\n&quot;, led.read() );
+        // toggle onboard LED at a slow rate
+        led = !led;
+        ThisThread::sleep_for( 500ms );
+    }
+}
+</code></pre>
+<p><img alt="" src="../images/vscode_pio_mbed_stm32f4-3.png" /></p>
+<p>รูป: การทำขั้นตอน <strong>PIO Upload</strong> เพื่อแปลงไฟล์ 
+<code>firmware.elf</code> ให้เป็น <code>firmware.bin</code> แล้วอัปโหลดไปยังบอร์ดทดลอง</p>
+<p><img alt="" src="../images/vscode_pio_mbed_stm32f4-4.png" /></p>
+<p>รูป: ตัวอย่างข้อความที่ได้รับใน <strong>Arduino Serial Monitor</strong> ซึ่งแสดงให้เห็น
+เวอร์ชันของ <strong>Mbed OS</strong> ที่ได้ใช้งาน และความถี่ของซีพียูเมื่อใช้งาน <strong>USB-CDC</strong> (<strong>Virtual Serial Port</strong>)
+สำหรับบอร์ด <strong>BlackPill</strong></p>
+<p><img alt="" src="../images/blackpill_usbserial.jpg" /></p>
+<p>รูป: การเชื่อมต่อระหว่างบอร์ด <strong>Black Pill</strong> กับอุปกรณ์ <strong>ST-Link/v2 USB Dongle</strong> เพื่ออัปโหลดไฟล์  <strong>.bin</strong>
+และการเชื่อมต่อด้วยสาย <strong>USB Type-C</strong> สำหรับสื่อสารข้อมูลด้วย <strong>Built-in USB-CDC (Virtual COM port)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="unbufferedserial">&#9655; <strong>การส่งข้อความด้วย UnbufferedSerial</strong><a class="headerlink" href="#unbufferedserial" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเปิดใช้งานวงจร <strong>USART2</strong> (<strong>Hardware Serial</strong>) ของ <strong>STM32F411CEU6</strong> 
+สำหรับการรับส่งข้อมูลแบบบิตอนุกรม ซึ่งตรงกับขา <code>PA_2</code> และ <code>PA_3</code> สำหรับ <strong>TX</strong> และ <strong>RX</strong> ตามลำดับ
+โดยเลือกใช้คลาส
+<a href="https://os.mbed.com/docs/mbed-os/latest/apis/unbufferedserial.html"><code>UnbufferedSerial</code></a>
+ของ <strong>Mbed Driver</strong></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+DigitalOut  led(LED1); // PC_13
+
+#define  CONSOLE_TX  PA_2
+#define  CONSOLE_RX  PA_3
+
+UnbufferedSerial serial2_port( CONSOLE_TX, CONSOLE_RX, 115200 );
+
+void send_string( const char *str ) {
+    while ( !serial2_port.writable() ) { }
+    serial2_port.write( str, strlen(str) );
+    serial2_port.sync(); // flush serial output
+}
+
+int main() {
+    char sbuf[128];
+
+    serial2_port.format( 
+        8, // 8 data bits
+        mbed::SerialBase::None, // no parity bit
+        1  // 1 stop bit 
+    );
+
+    // send strings to the serial console
+    sprintf( sbuf, &quot;Mbed Version: %d.%d.%d\r\n&quot;, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_PATCH_VERSION );
+    send_string( sbuf );
+
+    sprintf( sbuf, &quot;CPU frequency: %lu MHz\r\n&quot;, 
+                    SystemCoreClock/1000000L );
+    send_string( sbuf );
+
+    while (true) {
+        // send a string to serial2 
+        sprintf( sbuf, &quot;LED: %d\r\n&quot;, led.read() );
+        send_string( sbuf );
+
+        led = !led; // toggle LED
+        ThisThread::sleep_for( 500ms );
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/stm32f411ceu6_st-link.jpg" /></p>
+<p>รูป: บอร์ด <strong>Black Pill</strong> เชื่อมต่อกับอุปกรณ์ <strong>ST-Link/v2 USB Dongle</strong>
+และโมดูล <strong>USB-to-Serial (CP2104)</strong></p>
+<p>โมดูล <strong>USB-to-Serial</strong> ได้ถูกนำมาใช้เพื่อสื่อสารข้อมูลกับวงจร <strong>USART2</strong> ภายในไมโครคอนโทรลเลอร์
+ที่ขา <code>PA_2</code> และ <code>PA_3</code> ทางด้านหนึ่ง และอีกด้านหนึ่งคือ พอร์ต <strong>USB</strong> ที่เครื่องคอมพิวเตอร์ของผู้ใช้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="bufferedserial">&#9655; <strong>การส่งข้อความด้วย BufferedSerial</strong><a class="headerlink" href="#bufferedserial" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้เป็นการใช้งานสำหรับการรับส่งข้อมูลแบบบิตอนุกรม
+โดยใช้วงจร <strong>USART2</strong>  โดยใช้คลาส
+<a href="https://os.mbed.com/docs/mbed-os/latest/apis/serial-uart-apis.html"><code>BufferedSerial</code></a>
+ของ <strong>Mbed Driver</strong> และยังสามารถนำไปใช้กับคำสั่ง <code>printf()</code> ได้ด้วย ตามตัวอย่างโค้ดต่อไปนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+DigitalOut  led(LED1); // PC_13
+
+#define  CONSOLE_TX  PA_2
+#define  CONSOLE_RX  PA_3
+
+BufferedSerial serial2_port( CONSOLE_TX, CONSOLE_RX, 115200 );
+
+// The mbed_override_console() is declared in the file
+// mbed-os/platform/mbed_retarget.h.
+
+FileHandle *mbed::mbed_override_console(int fd) {
+    return &amp;serial2_port;
+}
+
+int main() {
+    char sbuf[128];
+
+    serial2_port.set_format(
+       8,                     // 8 data bits 
+       BufferedSerial::None,  // no parity 
+       1                      // 1 stop bit
+    );
+
+    // send strings to the serial console
+    printf( &quot;Mbed Version: %d.%d.%d\r\n&quot;, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_MAJOR_VERSION, 
+                    MBED_PATCH_VERSION );
+
+    printf( &quot;CPU frequency: %lu MHz\r\n&quot;, 
+            SystemCoreClock/1000000L );
+
+    while (true) {
+        // send a string to serial2 
+        sprintf( sbuf, &quot;LED: %d\r\n&quot;, led.read() );
+        serial2_port.write( sbuf, strlen(sbuf) );
+
+        led = !led; // toggle LED
+        ThisThread::sleep_for( 500ms );
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ในบทความนี้ เราได้เรียนรู้ขั้นตอนการเขียนโค้ดด้วย <strong>Mbed OS</strong> สำหรับบอร์ด <strong>Black Pill (STM32F411CEU6)</strong>
+โดยใช้ไฟล์จากโปรเจกต์ตัวอย่างสำหรับ <strong>Visual Studio Code + PlatformIO</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-12-30 | Last Updated: 2021-12-31</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

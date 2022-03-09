@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-studio-blackpill/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานบอร์ด Black Pill ร่วมกับ Mbed OS และ Mbed Studio - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#black-pill-mbed-os-mbed-studio" class="nav-link">การใช้งานบอร์ด Black Pill ร่วมกับ Mbed OS และ Mbed Studio</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#black-pill-mbed-custom-target" class="nav-link">&#9655; บอร์ด Black Pill และ Mbed Custom Target</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mbed-studio-black-pill" class="nav-link">&#9655; การเขียนโปรแกรมด้วย Mbed Studio สำหรับบอร์ด Black Pill</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#usbserial-driver" class="nav-link">&#9655; ตัวอย่างการใช้ USBSerial Driver</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="black-pill-mbed-os-mbed-studio">การใช้งานบอร์ด Black Pill ร่วมกับ Mbed OS และ Mbed Studio<a class="headerlink" href="#black-pill-mbed-os-mbed-studio" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>STM32 Programming</em>, <em>STM32F4</em></p>
+<hr />
+<h2 id="black-pill-mbed-custom-target">&#9655; <strong>บอร์ด Black Pill และ Mbed Custom Target</strong><a class="headerlink" href="#black-pill-mbed-custom-target" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ <strong>STM32F411CEU6 "Black Pill"</strong> ของ <strong>WeACT Studio</strong> 
+ไม่จัดอยู่ในประเภทแพลตฟอร์มที่ใช้กับ <strong>Mbed</strong> ได้โดยตรง 
+(&rarr; ดูรายการ <a href="https://os.mbed.com/platforms/"><strong>Mbed-enabled Platforms</strong></a>) 
+แต่เราก็สามารถทำให้บอร์ดนี้สามารถใช้งานกับ <strong>Mbed OS</strong> ได้  โดยวิธีการสร้างสิ่งที่เรียกว่า
+<a href="https://os.mbed.com/docs/mbed-studio/current/targets/custom-targets.html">"<strong>Mbed Custom Target</strong>"</a> หรือ ดูตัวอย่าง <strong>Custom Targets</strong>
+สำหรับ <strong>Mbed</strong> ได้จาก &rarr;
+<a href="https://github.com/ARMmbed/stm32customtargets">https://github.com/ARMmbed/stm32customtargets</a></p>
+<p>ยกตัวอย่างบอร์ดที่ใช้ชิป <strong>STM32F4 Series</strong> เช่น 
+<a href="https://os.mbed.com/platforms/ST-Nucleo-F401RE/"><strong>ST NUCLEO-F401RE</strong></a>
+และ <a href="https://os.mbed.com/platforms/ST-Nucleo-F411RE/"><strong>ST NUCLEO-F411RE</strong></a> 
+ชิปทั้งสองรุ่นมีคุณสมบัติใกล้เคียงกัน ไฟล์ที่เกี่ยวข้องและใช้งานได้กับ  <strong>Mbed OS</strong>
+<a href="https://github.com/ARMmbed/mbed-os/tree/master/targets/"><strong>Targets</strong></a>
+จะอยู่ในไดเรกทอรีของ <strong>Mbed OS</strong> ดังนี้</p>
+<pre><code class="language-text">mbed-os/targets$ tree -L 1 -d
+.
+├── TARGET_ARM_FM
+├── TARGET_ARM_SSG
+├── TARGET_Ambiq_Micro
+├── TARGET_Analog_Devices
+├── TARGET_Cypress
+├── TARGET_Freescale
+├── TARGET_GigaDevice
+├── TARGET_Maxim
+├── TARGET_NORDIC
+├── TARGET_NUVOTON
+├── TARGET_NXP
+├── TARGET_RENESAS
+├── TARGET_STM
+├── TARGET_Samsung
+├── TARGET_Silicon_Labs
+└── TARGET_TOSHIBA
+</code></pre>
+<p>และแสดงเฉพาะในส่วนที่เกี่ยวข้องกับ <strong>STM32F41xE</strong></p>
+<pre><code class="language-text">targets/
++--- TARGET_STM/
+      +--- TARGET_STM32F4/
+           +--- TARGET_STM32F401xE/
+                +-- TARGET_NUCLEO_F401RE
+           +--- TARGET_STM32F411xE/
+                +--- TARGET_NUCLEO_F411RE/
+
+</code></pre>
+<p>&nbsp;</p>
+<p>ลองมาดูตัวอย่างไฟล์ที่เกี่ยวข้องกับ <strong>Custom Targets</strong> เช่น</p>
+<ul>
+<li><code>PinNames.h</code>: 
+การกำหนดชื่อขา <strong>I/Os</strong> และการใช้งาน 
+เช่น <code>PA_0</code>/ <code>PB_6</code> / <code>PC_2</code> / <code>LED1</code> / <code>BUTTON1</code> เป็นต้น</li>
+<li><code>PeripheralNames.h</code> | <code>PeripheralPins.c</code>:
+การกำหนดจำนวนของวงจรภายใน (<strong>On-chip Peripherals</strong>)
+ในแต่ละประเภท เช่น <strong>UART / I2C / SPI / TIM / PWM / DAC</strong>
+และการอ้างอิงหมายเลขตามจำนวนที่มี </li>
+<li><code>system_clock.c</code>:
+มีฟังก์ชันสำหรับเลือกใช้ <strong>Clock Source</strong> 
+จำแนกได้หลายแบบ เช่น <strong>Low-speed / High-speed External (LSE / HSE)</strong>, 
+<strong>Low-speed / High-speed Internal (LSI / HSI)</strong> เป็นต้น
+การเปิดใช้งานวงจร <strong>PLL</strong> ภายในชิป และการตั้งค่าความถี่ให้ถูกต้อง</li>
+<li><code>flash_data.h</code>:
+มีการกำหนดขนาดของ <strong>Program Flash Memory</strong> พร้อมทั้งแอดเดรสเริ่มต้น
+และขนาดของ <strong>Flash Sectors</strong> ที่เกี่ยวข้อง</li>
+</ul>
+<p>&nbsp;</p>
+<p><a href="https://os.mbed.com/users/hudakz/"><strong>Zoltan Hudak</strong></a>
+ซึ่งเป็นหนึ่งในกลุ่มผู้ใช้ <strong>Mbed OS</strong> ได้แชร์ไฟล์สำหรับ 
+<a href="https://os.mbed.com/users/hudakz/code/BLACKPILL_Custom_Target">"<strong>Custom Target for Blackpill STM32F411</strong>"</a>
+(ชื่อของ <strong>Target</strong>: <code>BLACKPILL</code> อัปเดทล่าสุด:  <strong>30-Oct-2021</strong>) 
+ให้ผู้ที่สนใจสามารถดาวน์โหลดไปใช้งานได้</p>
+<p>เมื่อได้ดาวน์โหลดเป็นไฟล์ .zip มายังเครื่องของผู้ใช้ แล้วนำไปแตกไฟล์  (<strong>Unzip</strong>)
+และนำสิ่งที่อยู่ภายในไปใส่ลงในไดเรกทอรีของโปรแกรม (<strong>Root directory of the project</strong>) 
+เมื่อเปิดใช้งาน <strong>Mbed Studio IDE</strong> 
+และให้ระบุชื่อ <code>BLACKPILL</code> สำหรับการเลือก <strong>Target</strong></p>
+<p>อีกตัวเลือกหนึ่งคือ ไฟล์สำหรับ <strong>Custom Targets</strong> ที่ได้มีการแชร์ไว้ใน <strong>Github</strong> โดยผู้ใช้ชื่อ 
+"<a href="https://github.com/vznncv/"><strong>vznncv</strong></a>" สำหรับบอร์ด
+<a href="https://github.com/WeActTC/MiniSTM32F4x1">"<strong>WeAct Studio - Black Pill STM32F4x1</strong>"</a>
+และบอร์ดอื่น เช่น </p>
+<ul>
+<li><a href="https://github.com/vznncv/TARGET_BLACKPILL_F411CE"><code>BLACKPILL_F411CE</code></a></li>
+<li><a href="https://github.com/vznncv/TARGET_BLACKPILL_F401CE"><code>BLACKPILL_F401CE</code></a></li>
+<li><a href="https://github.com/vznncv/TARGET_BLACKPILL_F401CE"><code>BLACKPILL_F401CC</code></a></li>
+<li><a href="https://github.com/vznncv/TARGET_BLUEPILL_F103C8"><code>BLUEPILL_F103C8</code></a></li>
+<li><a href="https://github.com/vznncv/TARGET_WEACT_H743VI"><code>WEACT_H743VI</code></a></li>
+</ul>
+<p>หากเปรียบเทียบบอร์ด <strong>Black Pill</strong> (<em>STM32F411CEU6, 512KB Flash, 128KB SRAM</em>) 
+กับบอร์ด <strong>ST NUCLEO F411RE</strong> (<em>STM32F411RET6, 512KB Flash, 128KB SRAM</em>) 
+จะพบว่า ทั้งสองกรณีใช้ชิปไมโครคอนโทรลเลอร์ใน <strong>STM32F4 Series</strong> เหมือนกัน มีขนาดหน่วยความจำเท่ากัน 
+แต่มีความแตกต่างและต้องปรับเปลี่ยนในการใช้งาน เช่น</p>
+<ul>
+<li>บอร์ด <strong>NUCLEO</strong> ใช้สัญญาณความถี่ <strong>8MHz Crystal</strong> จาก <strong>On-board ST-Link/v2</strong> 
+แต่บอร์ด <strong>Black Pill</strong> ใช้สัญญาณความถี่จาก <strong>25MHz Osc.</strong> (HSE)</li>
+<li>บอร์ด <strong>NUCLEO-F411RE</strong> (<em>LQFP64 package</em>) มีจำนวนขามากกว่า <strong>Black Pill</strong> (<em>UFQFPN48 package</em>)</li>
+</ul>
+<hr />
+<h2 id="mbed-studio-black-pill">&#9655; <strong>การเขียนโปรแกรมด้วย Mbed Studio สำหรับบอร์ด Black Pill</strong><a class="headerlink" href="#mbed-studio-black-pill" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการดำเนินการมีดังนี้</p>
+<ul>
+<li>เปิดใช้งาน <strong>Mbed Studio</strong> </li>
+<li>สร้างไดเรกทอรีใหม่ และใช้ไดเรกทอรีดังกล่าวสำหรับ <strong>Workspace</strong></li>
+<li>เปิด <strong>Workspace</strong> ใหม่ (<strong>File &gt; Open Workspace..</strong>) 
+  โดยเลือกไดเรกทอรีที่ได้สร้างขึ้นมาใหม่</li>
+<li>สร้างโปรแกรม (โปรเจกต์) ใหม่ (<strong>New Program</strong>) ภายใน <strong>Workspace</strong> </li>
+<li>เลือก "<strong>empty Mbed OS program</strong>" <ul>
+<li>ตั้งชื่อโปรแกรมใหม่</li>
+<li>ระบุที่อยู่หรือไดเรกทอรีสำหรับไลบรารี <strong>Mbed OS</strong></li>
+</ul>
+</li>
+<li>นำไฟล์และไดเรกทอรีย่อยสำหรับ <strong>Black Pill Target</strong> 
+   มาใส่ในไดเรกทอรีของโปรแกรม ได้แก่<ul>
+<li>ไฟล์ <code>custom_targets.json</code> </li>
+<li>ไดเรกทอรี <code>TARGET_BLACKPILL/*</code></li>
+</ul>
+</li>
+<li>เปิดไฟล์ <code>main.cpp</code> ที่ได้มีการสร้างขึ้นไว้แล้วในไดเรกทอรีของโปรเจกต์ และแก้ไขตามโค้ดตัวอย่าง</li>
+<li>สร้างและเพิ่มไฟล์ <code>mbed_app.json</code> ในไดเรกทอรีของโปรเจกต์ (ดูตัวอย่างข้างล่าง)</li>
+<li>แก้ไขไฟล์ <code>custom_targets.json</code> ในไดเรกทอรีของโปรเจกต์ (ดูตัวอย่างข้างล่าง)</li>
+<li>ทำขั้นตอน <strong>Build</strong> เพื่อสร้างไฟล์ไบนารี .bin ซึ่งเป็นเอาต์พุตที่ได้สำหรับโปรแกรม</li>
+<li>เชื่อมต่อบอร์ด <strong>Black Pill</strong> กับคอมพิวเตอร์ของผู้ใช้ ผ่านทาง <strong>ST-Link/V2 USB Dongle</strong></li>
+<li>ตั้งค่าสำหรับ <strong>Target &gt; Manage Custom Targets</strong> เลือกอุปกรณ์ <strong>USB</strong>
+ที่มองเห็นสำหรับ  <strong>ST-Link/V2</strong></li>
+<li>เลือก <code>BLACKPILL</code> เป็นชื่อสำหรับ <strong>Target Name</strong> และ <strong>Build Target</strong></li>
+<li>ในส่วนของ <strong>Deploy and debug target</strong> จะต้องเปลี่ยนจากเดิม  <strong>"None (Use mass storage copy for deploy)"</strong> ให้เป็น "<strong>STM32F411E (Keil.STM32F4xx_DFP.x.x.x)</strong>" ตามรูปตัวอย่าง</li>
+<li>ในส่วนของ <strong>Debug flags</strong> จะมีการใส่ข้อความให้โดยอัตโนมัติ
+(และในบางกรณี อาจจำเป็นต้องกำหนดค่าความถี่ของ <strong>SWD</strong> ให้น้อยลง ไม่เกิน 1 MHz) แล้วกดปุ่ม <strong>Save All</strong></li>
+<li>กดปุ่ม <strong>Run Program</strong> เพื่ออัปโหลดไฟล์ .bin ของโปรแกรมไปยังบอร์ดทดลอง 
+แล้วสังเกตการเปลี่ยนแปลงสถานะของ <strong>LED</strong></li>
+<li>กดปุ่ม <strong>Debug</strong> หากต้องการดีบักการทำงานของโปรแกรมโดยใช้บอร์ดทดลองที่เชื่อมต่ออยู่ในขณะนั้น</li>
+</ul>
+<p>ข้อสังเกต: ผู้ใช้สามารถนำออกโปรเจกต์ (<strong>Export Project</strong>) จาก <strong>Mbed Studio</strong> 
+ให้อยู่ในรูปของไฟล์สำหรับซอฟต์แวร์ <strong>Keil &mu;Vision</strong> หรือ เป็นไฟล์ <strong>.tgz</strong> ได้ 
+โดยทำคำสั่งจากเมนู <strong>File &gt; Export to</strong></p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-1_open_workspace.png" /></p>
+<p>รูป: เมื่อเปิด <strong>Workspace</strong> ใหม่ใน <strong>Mbed Studio</strong></p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-2_create_program.png" /></p>
+<p>รูป: ทำขั้นตอนสร้างโปรแกรมใหม่ (<strong>New Program</strong>)</p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-3_add_custom_target.png" /></p>
+<p>รูป: เพิ่มไฟล์  <code>custom_targets.json</code> และไดเรกทอรีของ<code>TARGET_BLACKPILL</code> ในโปรแกรม</p>
+<p>&nbsp;</p>
+<p><strong>ตัวอย่างไฟล์</strong>:  <code>custom_targets.json</code></p>
+<pre><code class="language-json">{
+    &quot;BLACKPILL&quot;: {
+        &quot;inherits&quot;: [
+            &quot;MCU_STM32F4&quot;
+        ],
+        &quot;extra_labels_add&quot;: [
+            &quot;STM32F411xE&quot;
+        ],
+        &quot;macros_add&quot;: [
+            &quot;STM32F411xE&quot;
+        ],
+        &quot;config&quot;: {
+           &quot;hse_value&quot;: {
+                &quot;help&quot;: &quot;Use 25MHz external crystal&quot;,
+                &quot;value&quot;: &quot;25000000&quot;,
+                &quot;macro_name&quot;: &quot;HSE_VALUE&quot;
+            },            
+            &quot;clock_source_usb&quot;: {
+                &quot;help&quot;: &quot;Use 48 MHz clock for USB and 96 MHz for CPU&quot;,
+                &quot;value&quot;: &quot;0&quot;,
+                &quot;macro_name&quot;: &quot;CLOCK_SOURCE_USB&quot;
+            }
+        },
+        &quot;overrides&quot;: {
+            &quot;clock_source&quot;: &quot;USE_PLL_HSE_XTAL&quot;,
+            &quot;lse_available&quot;: 1
+        },
+        &quot;device_has_add&quot;: [
+            &quot;USBDEVICE&quot;
+        ],
+        &quot;bootloader_supported&quot;: true,
+        &quot;detect_code&quot;: [
+            &quot;0740&quot;
+        ],
+        &quot;device_name&quot;: &quot;MCU_STM32F411CE&quot;
+    }
+}
+</code></pre>
+<p>ข้อสังเกต: บอร์ด <strong>BlackPill</strong> รับสัญญาณ <strong>Clock</strong> จากวงจรสร้างสัญญาณความถี่ <strong>25MHz</strong> จากภายนอก
+ดังนั้นจึงมีการกำหนดค่า <code>HSE_VALUE</code> (<strong>High-Speed External Clock Source</strong>) ให้เท่ากับความถี่ดังกล่าว 
+และมีการเปิดใช้งานวงจรภายในที่เรียกว่า <strong>PLL</strong> เพื่อสร้างสัญญาณ <strong>Clock</strong> ที่มีความถี่สูงใหักับซีพียู</p>
+<p>ถ้าไม่ใช้ <strong>USB</strong> จะได้ความถี่สำหรับการทำงานของซีพียูเท่ากับ <strong>100MHz</strong> แต่ถ้าใช้เปิดใช้งาน <strong>USB</strong> จะได้ความถี่ <strong>96MHz</strong>
+และความถี่สำหรับการทำงานของวงจร <strong>USB</strong> เท่ากับ <strong>48MHz</strong></p>
+<p>&nbsp;</p>
+<p><strong>ตัวอย่างไฟล์</strong>: <code>mbed_app.json</code></p>
+<pre><code class="language-json">{
+    &quot;target_overrides&quot;: {
+        &quot;*&quot;: {
+            &quot;target.c_lib&quot;: &quot;std&quot;,
+            &quot;target.printf_lib&quot;: &quot;minimal-printf&quot;,
+            &quot;platform.minimal-printf-enable-floating-point&quot;: true,
+            &quot;platform.minimal-printf-set-floating-point-max-decimals&quot;: 6        
+        },
+        &quot;BLACKPILL&quot;: {
+            &quot;target.device_has_add&quot;: [&quot;USBDEVICE&quot;],
+            &quot;target.clock_source&quot;: &quot;USE_PLL_HSE_XTAL&quot;,
+            &quot;target.clock_source_usb&quot;: &quot;1&quot;
+        }
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างสำหรับสาธิตการทำงานของบอร์ดต่อไปนี้ จะทำให้ <strong>LED</strong> บนบอร์ดกระพริบได้
+(เปลี่ยนสถานะทุก 200 มิลลิวินาที) แต่ถ้ามีการกดปุ่ม <strong>KEY</strong> ค้างไว้ จะไม่มีการเปลี่ยนสถานะ</p>
+<p><strong>ตัวอย่างไฟล์</strong>: <code>main.cpp</code></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+// use onboard LED (PC_13 pin)
+DigitalOut  led(LED1); 
+
+// use onboard button / KEY (PA_0 pin)
+DigitalIn   btn(USER_BUTTON, PullUp); // Internal PullUp must be enabled.
+
+int main() {
+    while (true) {
+        if ( btn.read() != 0 ) { // is button not pressed ?
+           led = !led; // toggle LED
+        }
+        ThisThread::sleep_for( 200ms );
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-5_mbed_app_json.png" /></p>
+<p>รูป: สร้างและเพิ่มไฟล์ <code>mbed_app.json</code> ตามตัวอย่าง</p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-4_main_cpp.png" /></p>
+<p>รูป: แก้ไขไฟล์ <code>main.cpp</code> ตามตัวอย่าง</p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-6_build_target.png" /></p>
+<p>รูป:  ทำขั้นตอน <strong>Build</strong></p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-7_debug_target.png" /></p>
+<p>รูป: ตั้งค่าสำหรับ <strong>Custom Target</strong> เมื่อได้เชื่อมต่อบอร์ด <strong>Black Pill</strong>
+ผ่านทาง <strong>ST-Link/V2 USB Dongle</strong></p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-8_run_program.png" />
+รูป:  กดปุ่ม <strong>Run Program</strong> เพื่ออัปโหลดโปรแกรมไปยังบอร์ดทดลอง</p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-9_debug_paused-1.png" />
+รูป: กดปุ่ม <strong>Debug</strong> และเข้าสู่ <strong>Debug Session</strong> 
+จะสังเกตเห็นได้ว่า มีการทำคำสั่งมาหยุดที่บรรทัดถัดไปในฟังก์ชัน <code>main()</code>
+และมีตัวชี้ด้านข้างที่มีสีเหลืองส้ม  (<strong>Marker</strong>) </p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/mbed_blackpill-9_debug_paused-2.png" />
+รูป: เมื่อรันโปรแกรมต่อ จะมาหยุดอยู่ตรงบรรทัดที่มีการกำหนดให้เป็น <strong>Breakpoint</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="usbserial-driver">&#9655; <strong>ตัวอย่างการใช้ USBSerial Driver</strong><a class="headerlink" href="#usbserial-driver" title="Permanent link">#</a></h2>
+<p>ชิป <strong>STM32F411CEU6</strong> รองรับการใช้งาน <strong>Native USB</strong> และบอร์ด <strong>Black Pill</strong>
+มีคอนเนกเตอร์แบบ <strong>USB Type-C</strong> ดังนั้นเมื่อเสียบสาย <strong>USB</strong> กับคอมพิวเตอร์ ก็สามารถเขียนโปรแกรม
+ให้บอร์ดนี้ส่งข้อความผ่านทาง <strong>USB CDC  / USBSerial</strong> ได้อย่างง่าย ซึ่งมีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;USBSerial.h&quot;
+
+DigitalOut  led(LED1); // onboard LED
+USBSerial   usbSerial;
+
+int main() {
+    for( int i=0; i &lt; 10; i++ ) { // fast LED toggle
+        led = !led;
+        ThisThread::sleep_for( 50ms );
+    }
+
+    usbSerial.printf( &quot;MCU Flash Size: %u Kbytes\r\n&quot;,  MBED_ROM_SIZE/1024 );
+    usbSerial.printf( &quot;HSE_VALUE: %u\r\n&quot;, HSE_VALUE );
+    usbSerial.printf( &quot;CLOCK_SOURCE_USB: %d\r\n&quot;, CLOCK_SOURCE_USB );
+    usbSerial.printf( &quot;CPU Clock: %lu MHz\r\n&quot;, SystemCoreClock/1000000UL );
+    usbSerial.printf( &quot;Mbed OS STM32F411CEU6 BlackPill Demo..\r\n&quot; );
+
+    while (true) {
+        led = !led; // toggle LED 
+        usbSerial.printf( &quot;Blink: %d\r\n&quot;, led.read() );
+        ThisThread::sleep_for( 500ms );
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากนำโค้ดตัวอย่างนี้ไปทดลอง เมื่ออัปโหลดไฟล์ .bin ไปยังบอร์ดไมโครคอนโทรลเลอร์แล้ว จะมองเห็น
+<strong>Serial COM port</strong> (หากทดลองกับระบบปฏิบัติการ <strong>Windows</strong>)
+และถ้าใช้โปรแกรม เช่น <strong>Tera Term</strong> เปิดพอร์ตดังกล่าว ก็จะเห็นมีข้อความถูกส่งออกมา </p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/blackpill_usbserial_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<p><img alt="Image Missing" src="../images/blackpill_usbserial.jpg" /></p>
+<p>รูป: บอร์ด <strong>Black Pill</strong> และการเชื่อมต่อกับพอร์ต <strong>USB</strong> ของคอมพิวเตอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>เนื้อหาในเอกสารนี้ ได้กล่าวถึงขั้นตอนการนำบอร์ดไมโครคอนโทรลเลอร์ <strong>Black Pill</strong>
+ซึ่งมีราคาไม่แพง และใช้ชิป <strong>STM32F411CEU6</strong> เป็นตัวประมวลผล
+มาใช้งานร่วมกับอุปกรณ์ <strong>ST-Link/V2 USB Dongle (clone)</strong>
+และใช้ซอฟต์แวร์ <strong>Mbed Studio IDE</strong> สำหรับฝึกเขียนโปรแกรม <strong>STM32</strong>
+โดยได้ลองใช้ <strong>Mbed OS (v6.15.1)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-12-05 | Last Updated: 2021-12-31</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

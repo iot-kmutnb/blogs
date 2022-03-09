@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/mplab-x_ide_arduino_avr/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การนำเข้า Arduino Sketch สำหรับ AVR โดยใช้ซอฟต์แวร์ MPLAB-X IDE - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-sketch-avr-mplab-x-ide" class="nav-link">การนำเข้า Arduino Sketch สำหรับ AVR โดยใช้ซอฟต์แวร์ MPLAB-X IDE</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#mplab-ide-arduino-import-plug-in" class="nav-link">&#9655; MPLAB-IDE &amp; Arduino Import Plug-In</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch" class="nav-link">&#9655; ตัวอย่าง Arduino Sketch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-import-plugin" class="nav-link">&#9655; การติดตั้ง Arduino Import Plugin</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch_1" class="nav-link">&#9655; การนำเข้า Arduino Sketch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch-freertos" class="nav-link">&#9655; การนำเข้า Arduino Sketch ที่ใช้ไลบรารี FreeRTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino" class="nav-link">&#9655; การเรียกใช้คำสั่งภายนอกเพื่ออัปโหลดไฟล์ไปยังบอร์ด Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-sketch-avr-mplab-x-ide">การนำเข้า Arduino Sketch สำหรับ AVR โดยใช้ซอฟต์แวร์ MPLAB-X IDE<a class="headerlink" href="#arduino-sketch-avr-mplab-x-ide" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel/Microchip AVR MCUs</em>, <em>ATmega328P</em>, <em>MPLAB-X IDE</em>, <em>Arduino Sketch</em></p>
+<hr />
+<h2 id="mplab-ide-arduino-import-plug-in">&#9655; <strong>MPLAB-IDE &amp; Arduino Import Plug-In</strong><a class="headerlink" href="#mplab-ide-arduino-import-plug-in" title="Permanent link">#</a></h2>
+<p>บทความนี้ นำเสนอขั้นตอนการติดตั้ง  <strong>Arduino Import Plugin</strong>
+สำหรับซอฟต์แวร์ <strong>Microchip MPLAB-X IDE (v6.00)</strong>
+และทดลองนำเข้าตัวอย่างไฟล์ <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Arduino Nano (ATmega328P)</strong>
+เพื่อนำมาเขียนโค้ดภาษา  <strong>C/C++</strong> และจำลองการทำงานหรือดีบักโค้ดด้วย <strong>Simulator</strong></p>
+<p>ขั้นตอนการนำเข้า <strong>Arduino Sketch</strong> เพื่อใช้งานร่วมกับ <strong>MPLAB-X IDE</strong> มีดังนี้</p>
+<ul>
+<li>ติดตั้ง <strong>Arduino Import Plug-in</strong> สำหรับ <strong>MPLAB-X IDE</strong></li>
+<li>นำเข้า  <strong>Arduino Sketch</strong> ที่ได้เคยสร้างไว้ เพื่อสร้างเป็นโปรเจกต์ใหม่</li>
+<li>เลือก <strong>Arduino Platform</strong> ให้เป็น <strong>Arduino AVR Boards</strong></li>
+<li>ระบุ  <strong>Location</strong> หรือ <strong>Path</strong> ของ <strong>Arduino IDE</strong> (ทดลองใช้เวอร์ชัน <strong>1.8.13</strong>)</li>
+<li>ระบุ  <strong>Location</strong> หรือ <strong>Path</strong> ของ <strong>Arduino Core for AVR</strong> (เป็นเวอร์ชัน <strong>1.8.4</strong>)
+ที่ได้ติดตั้งโดย <strong>Arduino IDE</strong> เอาไว้พร้อมใช้งานแล้ว</li>
+<li>ระบุไดเรกทอรีสำหรับสร้างโปรเจกต์ใหม่ (<strong>Projet Directory</strong>) และจบขั้นตอนการนำเข้าโปรเจกต์</li>
+</ul>
+<hr />
+<h2 id="arduino-sketch">&#9655; <strong>ตัวอย่าง Arduino Sketch</strong><a class="headerlink" href="#arduino-sketch" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างสาธิตการทำให้ขา <strong>D11</strong> และ <strong>D12</strong> เป็นขาสำหรับเอาต์พุต-ดิจิทัล และมีการสลับสถานะลอจิก
+ตามระยะเวลา (หน่วยเป็นมิลลิวินาที) ที่กำหนดไว้โดย <code>INTERVAL_MSEC</code> </p>
+<p>ให้นำไปโค้ดตัวอย่างนี้ไปสร้างเป็น <strong>Arduino Sketch</strong> และคอมไพล์โค้ดโดยใช้ซอฟต์แวร์ <strong>Arduino IDE</strong>
+(ผู้ใช้จะต้องติดตั้งซอฟต์แวร์นี้ในเครื่องคอมพิวเตอร์)</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#define NUM_LEDS        (2)
+#define INTERVAL_MSEC   (20)
+
+// global constants / variables
+const int LED_PINS[ NUM_LEDS ] = { 12, 13 }; // D12 and D13
+uint32_t ts, now;
+uint8_t cnt = 0;
+
+void setup() {
+  for ( int i=0; i &lt; NUM_LEDS; i++ ) { // configure output pins
+     pinMode( LED_PINS[i], OUTPUT );   // LED output
+     digitalWrite( LED_PINS[i], LOW ); // output LOW
+  }
+  ts = millis(); // save timestamp
+}
+
+void loop() {
+  now = millis(); // get the current timestamp (in msec)
+  // Do we need to update output now ?
+  if ( now - ts &gt;= INTERVAL_MSEC ) { 
+     // keep the timestamp 
+     ts = now;
+     // select the pin
+     int pin = LED_PINS[ cnt ]; 
+     // increment the counter variable by 1
+     cnt = (cnt + 1) % NUM_LEDS;
+     // toggle the selected pin either D12 or D13
+     digitalWrite( pin, !digitalRead( pin ) );
+  }
+}
+</code></pre>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-0.png" /></p>
+<p>รูป: ตัวอย่าง <strong>Arduino Sketch</strong></p>
+<p>โดยทั่วไปแล้ว เราจะใช้ซอฟต์แวร์ <strong>Arduino IDE</strong> สำหรับการเขียนโค้ด คอมไพล์ และอัปโหลดไปยังบอร์ด <strong>Arduino</strong>
+แต่ไม่สามารถดีบักการทำงานได้โดยใช้ตัวจำลองการทำงาน (<strong>Simulator</strong>) หรือ อุปกรณ์สำหรับการดีบักโค้ดในฮาร์ดแวร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-import-plugin">&#9655; <strong>การติดตั้ง Arduino Import Plugin</strong><a class="headerlink" href="#arduino-import-plugin" title="Permanent link">#</a></h2>
+<p>เปิดโปรแกรม <strong>MPLAB-X IDE</strong> แล้วไปทำคำสั่งจากเมนู <strong>Tools &gt; Plugins</strong> และจะปรากฎหน้าต่างใหม่ชื่อ
+<strong>Plugins</strong> ถัดไปให้กดปุ่ม <strong>Check for Updates</strong> แล้วจึงตรวจสอบดูรายการของ <strong>Plugins</strong>
+ที่สามารถดาวน์โหลดมาใช้งานได้ </p>
+<p>เลือก <strong>Arduino Import Plugin</strong> แล้วกดปุ่ม <strong>Install</strong> เพื่อทำขั้นตอนการติดตั้ง</p>
+<p><img alt="" src="../avr/images/mplabx_arduino_plug_in-1.png" /></p>
+<p>รูป: ทำขั้นตอนติดตั้ง <strong>Arduino Import Plugin</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_plug_in-2.png" /></p>
+<p>รูป: แสดงรายการ <strong>Plugins</strong> ที่ได้มีการติดตั้งพร้อมใช้งานแล้วใน <strong>MPLAB-X IDE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch_1">&#9655; <strong>การนำเข้า Arduino Sketch</strong><a class="headerlink" href="#arduino-sketch_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นขั้นตอนการนำเข้าไฟล์ <strong> Arduino Sketch (.ino)</strong> ที่มีอยู่แล้ว ให้ทำคำสั่งจากเมนู <strong>File &gt; Import &gt; Import Arduino Project</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-1.png" /></p>
+<p>รูป: เริ่มขั้นตอนการนำเข้า <strong>Arduino Sketch</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-2.png" /></p>
+<p>รูป: เลือก <strong>Arduino Sketch</strong> ที่ต้องการนำมาเข้าใน <strong>MPLAB-X IDE</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-3.png" /></p>
+<p>รูป: เลือกไมโครคอนโทรลเลอร์เป็น <strong>ATmega328P</strong> สำหรับบอร์ด <strong>Arduino Nano v3.0</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-4.png" /></p>
+<p>รูป:  เลือก <strong>Hardware Tools</strong> ให้เป็น <strong>Simulator</strong> เพื่อใช้ในการดีบักโค้ด</p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-5.png" /></p>
+<p>รูป: เปิดไฟล์ <strong>.cpp</strong> ที่อยู่ใน <strong>Source</strong> ของโปรเจกต์ ซึ่งถูกสร้างมาจากไฟล์ <strong>.ino</strong> โดยอัตโนมัติ</p>
+<p>&nbsp;</p>
+<p><strong>ปัญหา:</strong> จากการทดลองใช้งาน (อ้างอิงเวอร์ชัน <a href="https://github.com/arduino/ArduinoCore-avr"><strong>v1.8.3</strong></a>
+ที่ได้ทดลองใช้งาน)
+เมื่อคอมไพล์โค้ดในโปรเจกต์ จะพบปัญหาเกี่ยวกับคำสั่ง <code>#include "new"</code> 
+ในไฟล์ <a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/new.h"><code>new.h</code></a>
+แต่ก็มีวิธีการแก้ไขดังนี้</p>
+<ul>
+<li>ให้แก้ไขจากเดิม  <code>#include "new"</code> ให้เป็น   <code>#include "new.h"</code></li>
+<li>ให้แก้ไขไฟล์ <a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/new.h"><code>new.h</code></a> ที่มีอยู่ใน <strong>"Imported Core"</strong> ให้มีเนื้อหาภายในเหมือนกับไฟล์ 
+<a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/new"><code>new</code></a></li>
+</ul>
+<p>จากนั้นจึงทำขั้นตอน <strong>Build Project</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-6.png" /></p>
+<p>รูป: ทำขั้นตอนจากเมนู <strong>Production &gt; Build Project ...</strong>
+เพื่อคอมไพล์โค้ดที่ได้นำเข้าจาก <strong>Arduino Sketch</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-7.png" /></p>
+<p>รูป: กำหนดตำแหน่งของ <strong>Breakpoint</strong> (เช่น บรรทัดที่ 32 ในรูปตัวอย่าง) 
+ก่อนเข้าสู่ <strong>Debug Session</strong></p>
+<p>ในระหว่างการดีบักโค้ด ผู้ใช้สามารถเพิ่มรายการติดตาม (ในหน้าต่าง <strong>Watches</strong>) 
+เพื่อดูการเปลี่ยนแปลงค่าของตัวแปร (<strong>Global Symbols</strong> หรือ <strong>SFRs</strong>) ในโปรเจกต์ได้</p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-8.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่า <strong>Oscillator Options</strong> สำหรับ <strong>Simulator</strong></p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-9.png" /></p>
+<p>รูป: เมนูคำสั่งที่เกี่ยวข้องกับการดีบัก เช่น <strong>Continue</strong> เพื่อรันโค้ดต่อไป
+หลังจากถูกหยุดไว้ชั่วคราวเมื่อทำคำสั่งมาถึง <strong>Breakpoint</strong></p>
+<hr />
+<p>&nbsp;</p>
+<h2 id="arduino-sketch-freertos">&#9655; <strong>การนำเข้า Arduino Sketch ที่ใช้ไลบรารี FreeRTOS</strong><a class="headerlink" href="#arduino-sketch-freertos" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไป สาธิตการนำเข้า <strong>Arduino Sketch</strong> ที่มีการใช้งานไลบรารี 
+<a href="https://github.com/feilipu/avrfreertos"><strong>FreeRTOS</strong></a> ดังต่อไปนี้</p>
+<pre><code class="language-c++">// include the FreeRTOS library for AVR
+#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define NUM_LEDS  (4)
+const int LED_PINS[ NUM_LEDS ] = { 5, 6, 7, 8 };
+
+void task( void *pvParameters ); // task entry function
+
+void setup() {
+   for ( int i=0; i &lt; NUM_LEDS; i++ ) {
+     pinMode( LED_PINS[i], OUTPUT ); // configure output pins
+     digitalWrite( LED_PINS[i], LOW ); // LED output LOW
+   } 
+   // create a new task
+   xTaskCreate( task, &quot;Task&quot;, 128, NULL, tskIDLE_PRIORITY+1, NULL );
+   // Note the task scheduler is started automatically.  
+}
+
+void loop() {
+  /* empty */
+}
+
+void task( void *pvParameters ) { // task-entry function
+   uint8_t cnt = 0; // a counter variable, increment by 1
+   while(1) { 
+     int pin = LED_PINS[ cnt ];
+     digitalWrite( pin, LOW ); // turn the current LED off
+     cnt = (cnt+1) % NUM_LEDS;
+     pin = LED_PINS[ cnt ]; 
+     digitalWrite( pin, HIGH ); // turn the next LED on
+     vTaskDelay( pdMS_TO_TICKS(1000) ); 
+   }
+}
+</code></pre>
+<p>ทำขั้นตอนเหมือนเดิม แต่เปลี่ยน <strong>Arduino Sketch</strong> ที่จะนำเข้าในตัวอย่างนี้</p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_import-10.png" /></p>
+<p>รูป: การนำเข้าและจำลองการทำงาน (ดีบัก)  <strong>Arduino Sketch</strong> ที่มีการใช้คำสั่งจากไลบรารี <strong>FreeRTOS</strong></p>
+<hr />
+<h2 id="arduino">&#9655; <strong>การเรียกใช้คำสั่งภายนอกเพื่ออัปโหลดไฟล์ไปยังบอร์ด Arduino</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
+<p>หากต้องการจะอัปโหลดไฟล์ <strong>.hex</strong> ที่ได้จากการคอมไพล์โค้ด ไปยังบอร์ด <strong>Arduino</strong>
+(เช่น <strong>Arduino Nano</strong> ในตัวอย่างนี้) ก็มีวิธีการดังนี้</p>
+<p>1) ให้สร้างไฟล์ชื่อ <code>nano_programmer.bat</code> ให้มีคำสั่งต่อไปนี้ (เรียกใช้คำสั่ง <code>avrdude</code> ของ <strong>Arduino Tools</strong>) แล้วบันทึกไฟล์</p>
+<pre><code class="language-bat">@echo OFF
+set ARDUINO_TOOLS_PATH=&quot;C:\Users\%USERNAME%\AppData\Local\Arduino15\packages\arduino\tools&quot;
+%ARDUINO_TOOLS_PATH%\avrdude\6.3.0-arduino17\bin\avrdude.exe ^
+  -C%ARDUINO_TOOLS_PATH%\avrdude\6.3.0-arduino17\etc\avrdude.conf ^
+  -v -patmega328p -carduino -P%1 -b115200 -D -Uflash:w:%2:i
+</code></pre>
+<p>2) กลับไปยังโปรเจกต์ที่ได้สร้างไว้ใน <strong>MPLAB-X IDE</strong> แล้วให้ไปที่
+<strong>File &gt; Project Properties &gt; Conf: [default] &gt; Building</strong>
+และกดเลือก <strong>Check Box</strong>: 
+<strong>Execute the line after build</strong> เขียนคำสั่งที่ต้องการทำในช่องบรรทัดถัดไป
+(เรียกใช้ไฟล์ <code>nano_programmer.bat</code>) 
+ในรูปตัวอย่างได้เลือกใช้พอร์ตอนุกรมหมายเลข <code>COM9</code> (อาจเป็นหมายเลขอื่นและขึ้นอยู่กับคอมพิวเตอร์ที่กำลังใช้งาน)</p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_external_tool.png" /></p>
+<p>รูป: การตั้งค่าเพื่อให้ทำคำสั่งเพิ่มหลังจากทำขั้นตอน <strong>Build Project</strong> ได้สำเร็จ</p>
+<p><img alt="" src="../avr/images/mplabx_arduino_sketch_upload.png" /></p>
+<p>รูป: เมื่อทำขั้นตอน <strong>Build Project</strong> จะมีการอัปโหลดไฟล์ <strong>.hex</strong> ไปยังบอร์ดโดยอัตโนมัติ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ผู้ใช้สามารถนำเข้า <strong>Arduino Sketch</strong> (ไฟล์ <strong>.ino</strong>) เพื่อนำมาเขียนโค้ด คอมไพล์ และดีบักการทำงานของโค้ด
+โดยใช้ซอฟต์แวร์ <strong>Microchip MPLAB-X IDE</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-01-27 | Last Updated: 2022-01-28</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/arduino_avr_io_follower/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Arduino เพื่ออ่านค่าอินพุตจากปุ่มกดและปัญหา Switch Bouncing - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-switch-bouncing" class="nav-link">การเขียนโปรแกรม Arduino เพื่ออ่านค่าอินพุตจากปุ่มกดและปัญหา Switch Bouncing</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#io-follower" class="nav-link">&#9655; I/O Follower</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-io-polling-loop" class="nav-link">&#9655; โค้ดตัวอย่างที่ 1: I/O Polling Loop</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-interrupt-driven-callback" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2: Interrupt-Driven Callback</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-software-based-button-debouncing" class="nav-link">&#9655; ตัวอย่างที่ 3: Software-based Button Debouncing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-c-class-for-button-debouncing" class="nav-link">&#9655; ตัวอย่างที่ 4: C++ Class for Button Debouncing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5-wokwi-based-arduino-simulator" class="nav-link">&#9655; ตัวอย่างที่ 5: Wokwi-based Arduino Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-switch-bouncing">การเขียนโปรแกรม Arduino เพื่ออ่านค่าอินพุตจากปุ่มกดและปัญหา Switch Bouncing<a class="headerlink" href="#arduino-switch-bouncing" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, <em>Arduino Programming</em>,
+<em>Software-based Button Debouncing</em></p>
+<hr />
+<h2 id="io-follower">&#9655; <strong>I/O Follower</strong><a class="headerlink" href="#io-follower" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างโจทย์พื้นฐานสำหรับการฝึกเขียนโค้ดด้วยภาษา <strong>C/C++</strong>
+โดยใช้คำสั่งของ <strong>Arduino</strong> (หรือเรียกว่า <strong>Arduino API</strong>) 
+และเจาะจงเลือกใช้บอร์ดไมโครคอนโทรเลอร์ที่มีตัวประมวลผล 8 บิต ตระกูล <strong>AVR</strong> เช่น 
+<strong>ATmega328P</strong> (สำหรับบอร์ด <strong>Arduino Uno</strong> หรือ <strong>Nano</strong> เป็นต้น)</p>
+<p>โจทย์ตัวอย่างคือ การเขียนโปรแกรมเพื่อคอยอ่านค่าที่ขาอินพุตแบบดิจิทัล 
+แล้วตรวจสอบดูค่าลอจิกที่ได้และนำไปกำหนดสถานะที่ขาเอาต์พุต ดังนั้นถ้ามีการเปลี่ยนแปลงลอจิกที่ขาอินพุต
+เอาต์พุตจะต้องเปลี่ยนแปลงตาม (จึงเรียกว่า <strong>Digital I/O Follower</strong>) 
+โดยกำหนดให้มีความสัมพันธ์แบบ <strong>Inverse</strong> (การกลับค่า) ดังนั้นในกรณีนี้ 
+โปรแกรมจะทำให้งานในลักษณะที่เป็นลอจิกเกตแบบ <strong>NOT</strong> (<strong>Software-based Logic Inverter</strong>)</p>
+<p>เมื่อมีการเปลี่ยนแปลงที่ขาอินพุตจะส่งผลต่อการเปลี่ยนแปลงที่ขาเอาต์พุตตามมา และระยะเวลาในการตอบสนองต่อการเปลี่ยนแปลง
+(<strong>Response Latency</strong>) ก็ขึ้นอยู่กับความเร็วหรือความสามารถในการประมวลผลของซีพียู</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-io-polling-loop">&#9655; <strong>โค้ดตัวอย่างที่ 1: I/O Polling Loop</strong><a class="headerlink" href="#1-io-polling-loop" title="Permanent link">#</a></h2>
+<p>ในตัวอย่างแรก จะเห็นได้ว่า ในฟังก์ชัน <code>setup(){...}</code> มีการใช้คำสั่ง <code>pinMode()</code>
+เพื่อกำหนดทิศทางของขา <strong>D2</strong> ให้เป็นขาดิจิทัลอินพุต
+(และเปิดใช้งานตัวต้านทานภายในแบบ <strong>Pullup</strong>) และ <strong>D13</strong> เป็นขาเอาต์พุต ตามลำดับ</p>
+<p>ในฟังก์ชัน <code>loop(){...}</code> มีคำสั่งที่จะต้องทำซ้ำ และมีเพียงคำสั่งเดียวในตัวอย่างนี้ คือ 
+คำสั่ง <code>digitalRead(...)</code> อ่านอินพุตที่ขา <strong>D2</strong>
+แล้วนำมากลับค่าลอจิก (ด้วยโอเปอร์เรเตอร์ <code>!</code>  หรือ <strong>Logical NOT</strong>) 
+และนำไปใช้อัปเดตค่าที่ขาเอาต์พุต <strong>D13</strong> โดยใช้คำสั่ง <code>digitalWrite(...)</code></p>
+<pre><code class="language-c++">void setup() {
+  // configure D2 pin as input with internal pullup
+  pinMode( 2, INPUT_PULLUP );
+  // configure D13 pin as output
+  pinMode( 13, OUTPUT );
+}
+
+void loop() {
+  int new_value = !digitalRead( 2 );
+  digitalWrite( 13, new_value );
+}
+</code></pre>
+<p>หากนำโค้ดตัวอย่างนี้ไปทดลองกับอุปกรณ์ฮาร์ดแวร์จริง ก็ต้องหาวิธีการกำหนดค่าอินพุต 
+ซึ่งก็สามารถทำได้โดยการสร้างวงจรปุ่มกด  (<strong>Push Button / Tactile Switch</strong>) นำมาต่อเพิ่มบนเบรดบอร์ด 
+(เช่น ต่อปุ่มกดแบบ <strong>Active-Low</strong>)
+เพื่อสร้างสัญญาณอินพุตแล้วป้อนเข้าที่ขา <strong>D2</strong> ในขณะที่ขา <strong>D13</strong> มีวงจร <strong>LED</strong> ใส่ไว้บนบอร์ดแล้ว</p>
+<p>ตัวอย่างการต่อวงจรบนเบรดบอร์ดมีดังนี้</p>
+<p><img alt="" src="../avr/images/arduino_pushbutton_breadboard.png" /></p>
+<p>รูป: การต่อวงจรปุ่มกดบนเบรดบอร์ดร่วมกับบอร์ด <strong>Arduino Uno</strong> แบบ  <strong>Active-High</strong> (Source: Arduino.cc)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/arduino_pushbutton_schematic.png" /></p>
+<p>รูป: ตัวอย่างผังวงจรปุ่มกดที่ทำงานแบบ <strong>Active-High</strong> 
+และมีตัวต้านทานภายนอก <strong>10k&ohm;</strong> แบบ <strong>Pulldown</strong>  (Source: Arduino.cc)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/push_button_arduino_nano.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองจริงโดยใช้บอร์ด <strong>Arduino Nano 3.0</strong> 
+(วงจรปุ่มกดที่ทำงานแบบ <strong>Active-Low</strong> โดยใช้ตัวต้านทานแบบ <strong>Pull-up</strong> ของขา <strong>I/O</strong> ที่อยู่ภายในชิป)</p>
+<p>&nbsp;</p>
+<p>อย่างไรก็ตามเพื่อให้เห็นการเปลี่ยนแปลงที่เกิดขึ้นที่ขาอินพุตและขาเอาต์พุตตามลำดับ การใช้เครื่องมือวัดอย่างเช่น
+ออสซิลโลโสโคปแบบดิจิทัล (<strong>Digital Oscillscope</strong>) หรือ เครื่องมือวิเคราะห์สัญญาณดิจิทัล
+(<strong>Logic Analyzer</strong>) จึงเป็นสิ่งสำคัญในการทดลอง</p>
+<p>นอกจากนั้นแล้ว การใช้วงจรปุ่มกดและวัดสัญญาณการเปลี่ยนแปลงเชิงเวลาโดยใช้ออสซิลลโสโคป
+จะทำให้เห็นลักษณะของสัญญาณอินพุตจริงที่ถูกป้อนเข้าสู่วงจรภายในไมโครคอนโทรลเลอร์ผ่านทางขาดิจิทัล</p>
+<p>การกดปุ่มแล้วปล่อยโดยทั่วไปแล้ว อาจมีการกระเด้งของปุ่มกดเกิดขึ้น (<strong>Button Bouncing</strong>)
+ทำให้เกิดการเปลี่ยนแปลงของระดับแรงดันไฟฟ้าหรือค่าลอจิกของสัญญาณอินพุตหลายครั้งในช่วงเวลาสั้น ๆ </p>
+<p>&nbsp;</p>
+<p>ลองมาดูตัวอย่างสัญญาณที่วัดได้จริง (วัดสัญญาณโดยใช้เครื่องออสซิลโลสโคปแบบดิจิทัล <strong>Rigol DS1054Z</strong>)</p>
+<p><img alt="" src="../avr/images/button_click_2-1.png" /></p>
+<p>รูป: แสดงรูปคลื่นสัญญาณช่วงที่อินพุตเปลี่ยนจากลอจิก LOW เป็น HIGH
+ช่อง (1) เป็นสัญญาณอินพุตที่ขา <strong>D2</strong> รับมาจากวงจรปุ่มกด 
+และช่อง (2) เป็นสัญญาณเอาต์พุตที่ขา <strong>D13</strong></p>
+<p><img alt="" src="../avr/images/button_click_2-2.png" /></p>
+<p>รูป: เปลี่ยน <strong>Time Resolution</strong> จาก <strong>100us /div</strong> เป็น <strong>5us /div</strong> </p>
+<p>หากขยายแกนเวลาของรูปคลื่นสัญญาณ จะเห็นได้ชัดเจนมากขึ้น
+เมื่ออินพุตเปลี่ยนแปลงระดับจาก 10%  ไปยัง 90% ของ <strong>VCC=+5V</strong> จะมีช่วงเวลาขาขึ้น (<strong>Rise Time</strong>)
+และเมื่ออินพุตเปลี่ยนจากลอจิก 0 เป็น 1 แล้ว จะทำให้เอาต์พุตเปลี่ยนแปลงตาม (เปลี่ยนจากลอจิก 1 เป็น 0)
+ทั้งสองเหตุการณ์มีระยะเวลาห่างกันประมาณ <strong>5 us</strong> (ไมโครวินาที)</p>
+<p>สัญญาณจากวงจรอินพุต หากไม่มีการกดปุ่ม จะได้ค่าลอจิกเป็น HIGH (1) หรือมีแรงดันไฟฟ้าประมาณ <strong>5V</strong> 
+สำหรับกรณีตัวอย่างนี้ แต่ถ้ามีการกดปุ่มในช่วงเวลาดังกล่าว ค่าลอจิกที่ได้จะเปลี่ยนเป็น LOW (0) 
+และเมื่อปล่อยปุ่ม ก็จะกลับไปเป็นลอจิก HIGH เหมือนเดิม หากพิจารณาดูความสัมพันธ์เชิงลอจิกระหว่างสัญญาณอินพุตและเอาต์พุต
+ก็พบว่า เป็นแบบกลับค่าตามที่กำหนดไว้โดยฟังก์ชันการทำงานของโค้ดตัวอย่าง</p>
+<p><img alt="" src="../avr/images/io_follower_button_button_click_1-2.png" /></p>
+<p>รูป: แสดงรูปคลื่นสัญญาณอินพุตและเอาต์พุต เมื่อมีการกดแล้วปล่อยปุ่ม</p>
+<p>แต่หากสังเกตดูคลื่นสัญญาณอินพุตที่วัดได้จริงโดยใช้เครื่องออสซิลโสโคป จะพบว่า มีช่วงเวลาสั้น ๆ ที่มีการเปลี่ยนแปลงสัญญาณอย่างรวดเร็ว
+เหมือนมีสัญญาณรบกวน การเปลี่ยนแปลงในลักษณะนี้ เกิดจากการกระเด้งของปุ่มกดเมื่อถูกกดแล้วปล่อย</p>
+<p><img alt="" src="../avr/images/io_follower_button_button_click_3.png" /></p>
+<p>รูป: กดปุ่มครั้งที่ 1 เกิดการกระเด้งของปุ่มกดหลายครั้ง ช่วงที่มีการปล่อยปุ่ม (ช่วงเปลี่ยนจาก LOW เป็น HIGH หรือขอบขาขึ้น)</p>
+<p><img alt="" src="../avr/images/io_follower_button_button_click_4.png" /></p>
+<p>รูป: กดปุ่มครั้งที่ 2 เกิดการกระเด้งของปุ่มกดหลายครั้ง ช่วงที่มีการปล่อยปุ่ม </p>
+<p><img alt="" src="../avr/images/io_follower_button_button_click_5.png" /></p>
+<p>รูป: กดปุ่มครั้งที่ 3 เกิดการกระเด้งของปุ่มกดหลายครั้ง ช่วงที่มีการปล่อยปุ่ม </p>
+<p>จากรูปสัญญาณที่วัดได้จริงและนำมาเป็นตัวอย่าง จะเห็นได้ว่า การกดปุ่มแล้วปล่อยในแต่ละครั้ง อาจให้ผลแตกต่างกัน ดังนั้นจากตัวอย่างนี้
+การต่อวงจรปุ่มกดและอ่านค่าอินพุต ควรจะต้องพิจารณาปัญหาที่เกิดจากการกระเด้งของปุ่มกดหลายครั้งด้วย</p>
+<p>บนเว็บไซต์ของ <strong>Arduino</strong> มีตัวอย่างการเขียนโค้ดเป็นแนวทางเพื่อรับมือกับปัญหานี้ (<a href="https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce"><strong>Button Debounce</strong></a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-interrupt-driven-callback">&#9655; <strong>โค้ดตัวอย่างที่ 2: Interrupt-Driven Callback</strong><a class="headerlink" href="#2-interrupt-driven-callback" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างที่ 1 เราสามารถเขียนโปรแกรมให้แตกต่างจากเดิมได้ เช่น การเปิดใช้งานส่วนที่เรียกว่า อินเทอร์รัพท์
+(<strong>Interrupt</strong>) ซึ่งเกิดจากเหตุการณ์ภายนอก (<strong>External Interrupt</strong>) 
+ในกรณีนี้คือ การเปลี่ยนแปลงลอจิกที่ขาอินพุต</p>
+<p>ชิป <strong>ATmega328P</strong> มีขา <strong>I/O</strong> ที่ใช้งานร่วมกับอินเทอร์รัพท์จากเหตุการณ์ภายนอกได้ 2 ขา
+คือ <strong>Arduino D2 Pin</strong> (<strong>PD2 pin</strong>) และ <strong>Arduino D3 Pin</strong> (<strong>PD3 pin</strong>)
+ซึ่งตรงกับอินเทอร์รัพท์ภายนอกหมายเลข 0 และ 1 ตามลำดับ  </p>
+<p><strong>โค้ดตัวอย่างที่ 2</strong>:</p>
+<pre><code class="language-c++">#define BTN_PIN      (2)  // D2  pin
+#define LED_PIN      (13) // D13 pin
+
+void setup() {
+  pinMode( BTN_PIN, INPUT_PULLUP );
+  pinMode( LED_PIN, OUTPUT );
+  // use an anonymous function for callback
+  attachInterrupt( 
+     digitalPinToInterrupt(BTN_PIN), 
+     [](){
+        digitalWrite( LED_PIN, !digitalRead(BTN_PIN) );
+     }, CHANGE );
+}
+
+void loop() {
+}
+</code></pre>
+<p>การเปิดใช้งานอินเทอร์รัพท์ภายนอกสำหรับบอร์ด <strong>Arduino</strong> ก็ทำได้โดยการใช้คำสั่งของ <strong>Arduino API</strong>: 
+<a href="https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/"><code>attachinterrupt(...)</code></a> และให้เลือกขาดิจิทัล <strong>D2 (INT.0)</strong> หรือ <strong>D3 (INT.1)</strong> สำหรับ <strong>ATmega328P</strong> </p>
+<p>การใช้คำสั่ง <code>digitalPinToInterrupt(...)</code> จะช่วยระบุว่า ขาที่เลือกใช้นั้นตรงกับอินเทอร์รัพท์ภายนอกที่หมายเลขใด
+(เรียกว่า <strong>External Interrupt Number</strong>) </p>
+<p>อีกทั้งต้องระบุประเภทของเหตุการณ์ หรือ โหมดการทำงาน ได้แก่ ขอบขาขึ้น (<code>RISING</code>) ขอบขาลง (<code>FALLING</code>) หรือทั้งสองกรณีก็ได้ (<code>CHANGE</code>)</p>
+<p>ฟังก์ชัน <a href="https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/"><code>attachInterrupt(...)</code></a> สำหรับเปิดใช้งาน
+และ <a href="https://www.arduino.cc/reference/en/language/functions/external-interrupts/detachinterrupt/"><code>detachInterrupt(...)</code></a> สำหรับปิดอินเทอร์รัพท์ภายนอกที่ขาอินพุต ถูกสร้างไว้ในไฟล์ 
+<a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/WInterrupts.c"><code>WInterrupts.c</code></a> ของ 
+<a href="https://github.com/arduino/ArduinoCore-avr"><strong>Arduino Core for AVR</strong></a></p>
+<pre><code class="language-c++">void attachInterrupt( 
+       uint8_t interruptNum, 
+       void (*userFunc)(void), 
+       int mode );
+
+void detachInterrupt( uint8_t interruptNum );
+</code></pre>
+<p>เมื่อเกิดเหตุการณ์อินเทอร์รัพท์ภายนอกในแต่ละครั้ง จะมีการเรียกฟังก์ชันที่เกี่ยวข้อง หรือเรียกว่า 
+<strong>User-defined Callback Function</strong> ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>)</p>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> ชิปไมโครคอนโทรลเลอร์บนบอร์ด <strong>Arduino</strong> ที่แตกต่างกัน 
+มีจำนวนหมายเลขอินเทอร์รัพท์ภายนอกแตกต่างกันได้</p>
+<p><img alt="" src="../avr/images/arduino_external_interrupt_pins.png" /></p>
+<p>ตาราง: เปรียบเทียบความแตกต่างในการใช้งานขาอินพุต-ดิจิทัลของบอร์ด <strong>Arduino</strong> สำหรับคำสั่ง <code>attachInterrupt()</code>
+เช่น จำนวนขาและหมายเลขขาที่เลือกใช้ได้ (Source: Arduino.cc)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-software-based-button-debouncing">&#9655; <strong>ตัวอย่างที่ 3: Software-based Button Debouncing</strong><a class="headerlink" href="#3-software-based-button-debouncing" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการสาธิตวิธีการลดปัญหาปุ่มกระเด้งที่ทำให้เกิดสัญญาณแบบพัลส์ช่วงสั้น ๆ เทคนิคที่ใช้คือ
+การวนลูปคอยอ่านค่าลอจิกที่ขาอินพุต (<strong>Input Sampling</strong>)
+เว้นระยะห่างคงที่ เช่น ทุก ๆ 2 มิลลิวินาที แล้วเก็บบันทึกค่าลอจิกเอาไว้ในตัวแปร <code>sampled_bits</code>
+โดยมีลักษณะเลื่อนบิตเข้าไปเก็บในตำแหน่ง <strong>LSB</strong> (<em>Least Significant Bit</em>)
+และเลื่อนบิตก่อนหน้านั้นไปทางซ้ายทีละหนึ่งตำแหน่ง ขนาดข้อมูลที่ใช้เก็บค่าบิตเหล่านี้ เท่ากับ 8 บิต (ใช้ชนิดข้อมูลเป็นแบบ
+<code>uint8_t</code>)</p>
+<p>ถ้าค่าบิตในตัวแปร <code>sampled_bits</code> มีค่าเท่ากับ <code>0b0000000</code> (เลขฐานสอง) หรือ ทุกบิตเป็น 0 ก็หมายความว่า ช่วงเวลาที่ผ่านมาและมีการสุ่มอ่านค่าอินพุต 8 ครั้งล่าสุด สัญญาณอินพุตคงที่ (<strong>Stable</strong>) และเป็น LOW ดังนั้นเอาต์พุตจะต้องเป็น HIGH</p>
+<p>แต่ถ้าตัวแปรมีค่าเท่ากับ <code>0b11111111</code> (เลขฐานสอง) หรือ ทุกบิตเป็น 1 ก็หมายความว่า ช่วงเวลาที่ผ่านมานั้น สัญญาณอินพุตคงที่
+และเป็น HIGH ดังนั้นเอาต์พุตจะต้องเป็น LOW</p>
+<p>แต่ถ้าตัวแปร <code>sampled_bits</code> มีบิตทั้งเป็น 0 หรือ 1 แสดงว่า เกิดการเปลี่ยนแปลงชั่วขณะ ดังนั้นในช่วงเวลาดังกล่าว จึงไม่ต้องอัปเดตค่าลอจิกของเอาต์พุต เป็นวิธีกรองเหตุการณ์ (<strong>Event Filtering</strong>) ที่เกิดกระเด้งของปุ่มกดซึ่งไม่เป็นที่ต้องการ</p>
+<pre><code class="language-c++">#define BTN_PIN      (2)
+#define LED_PIN      (13)
+
+#define INTERVAL_MS  (2)
+
+// global variable 
+uint32_t ts; // used to save timestamp (in msec)
+
+void setup() {
+  pinMode( BTN_PIN, INPUT_PULLUP );
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+  ts = millis();
+}
+
+void loop() {
+  static uint8_t sampled_bits = 0xff;
+  if ( millis() - ts &gt;= INTERVAL_MS ) {
+      ts += INTERVAL_MS;
+      sampled_bits = (sampled_bits&lt;&lt;1) | (digitalRead(BTN_PIN) &amp; 1);
+      if (sampled_bits==0x00) {
+        digitalWrite( LED_PIN, HIGH );
+      } else if (sampled_bits==0xff) {
+        digitalWrite( LED_PIN, LOW );
+      }
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>มาลองดูตัวอย่างสัญญาณอินพุตและเอาต์พุตจากการทดลองโดยใช้ฮาร์ดแวร์จริง</p>
+<p><img alt="" src="../avr/images/debounce_waveform-1.png" /></p>
+<p>รูป: การกดปุ่มแล้วปล่อยหนึ่งครั้ง</p>
+<p><img alt="" src="../avr/images/debounce_waveform-2.png" /></p>
+<p>รูป: สัญญาณอินพุตที่มีขอบขาลงซึ่งเกิดจากการกดปุ่ม แต่มีการกระเด้งของปุ่มและทำให้เกิดสัญญาณพัลส์ตามมา
+แต่สัญญาณเอาต์พุตยังคงระดับเดิม ยังไม่เปลี่ยนแปลง (พัลส์ที่เกิดขึ้นถูกกรองด้วยวิธีการซอฟต์แวร์)</p>
+<p><img alt="" src="../avr/images/debounce_waveform-3.png" /></p>
+<p>รูป: สัญญาณอินพุตและเอาต์พุตในช่วงเวลาที่มีการกดปุ่มแล้วปล่อย สองครั้งถัดกัน (<strong>Double Click</strong>)</p>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> การแเก้ปัญหาที่เกิดจากปุ่มกระเด้งด้วยวิธีการซอฟต์แวร์ ก็ช่วยได้ระดับหนึ่ง นอกจากนั้นแล้วยังมีวิธีการแก้ปัญหาเชิงฮาร์ดแวร์
+เช่น การใช้ลอจิกเกตประเภท <a href="https://training.ti.com/debounce-switch"><strong>Schmitt-Trigger</strong></a> หรือการใช้วงจร <strong>RC Filter</strong> (<strong>Passive Low-Pass Filter</strong>) หรือใช้ไอซีที่มีหน้าที่นี้โดยเฉพาะ (เรียกว่า <strong>Switch Debouncer IC</strong>)
+เช่น <a href="https://www.maximintegrated.com/en/design/technical-documents/app-notes/2/287.html"><strong>Maxim MAX681x</strong></a> (<a href="https://datasheets.maximintegrated.com/en/ds/MAX6816-MAX6818.pdf">datasheet</a>)</p>
+<p><img alt="" src="../avr/images/ti_button_debouncer.png" /></p>
+<p>รูป: วงจร <strong>RC</strong> และลอจิกเกต <strong>Schmitt-Trigger Inverter</strong> (Source: Texas Instruments)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-c-class-for-button-debouncing">&#9655; <strong>ตัวอย่างที่ 4: C++ Class for Button Debouncing</strong><a class="headerlink" href="#4-c-class-for-button-debouncing" title="Permanent link">#</a></h2>
+<p>จากโค้ดตัวอย่างที่แล้ว เราลองมาสร้างคลาส <strong>C++</strong> (ใช้ชื่อคลาส <code>Button</code>) 
+สำหรับเอาไว้ใช้งานกับอินพุตที่มาจากวงจรปุ่มกด เป็นตัวอย่างดังนี้</p>
+<p>File: <code>Button.h</code></p>
+<pre><code class="language-c++">/////////////////////////////////////////////////////
+// File: Button.h (C++ Class: Button)
+/////////////////////////////////////////////////////
+
+class Button { // Input Button with Debouncing Logic
+  public: 
+    Button( int pin, bool pullup=false, int interval_ms=2 ) {
+       _pin = pin;
+       pinMode( _pin, pullup ? INPUT_PULLUP : INPUT );
+       _sampled_bits = 0xff;
+       clear();
+       _interval_ms  = interval_ms;
+       _ts = millis();
+    }
+
+    void update() {
+       uint32_t now = millis();
+       if ( millis() - _ts &gt;= _interval_ms ) {
+          _ts = now;
+          _sampled_bits = (_sampled_bits&lt;&lt;1) | (digitalRead(_pin) &amp; 1);
+          if (_sampled_bits==0xf0) {
+              _falling_edge = true;
+          } 
+          else if (_sampled_bits==0x0f) {
+              _rising_edge = true;
+          }
+      }
+    }
+    bool has_changed_rising() {
+      return _rising_edge;
+    }
+    bool has_changed_falling() {
+      return _falling_edge;
+    }
+    void clear() {
+      _rising_edge  = false;
+      _falling_edge = false;  
+    }
+
+  private: 
+    int _pin;
+    uint8_t  _sampled_bits = 0xff;
+    uint32_t _interval_ms, _ts;
+    bool _rising_edge;
+    bool _falling_edge;
+};
+</code></pre>
+<p>File: <code>button_debouncer_demo.ino</code></p>
+<pre><code class="language-c++">/////////////////////////////////////////////////////
+// Demo code for the Button C++ class
+/////////////////////////////////////////////////////
+
+#include &quot;Button.h&quot;
+
+#define BTN_PIN      (2)
+#define LED_PIN      (13)
+
+Button btn( BTN_PIN, true ); // create a Button instance
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+}
+
+void loop() {
+  btn.update(); // must be called regularly.
+  if (btn.has_changed_falling()) {
+    btn.clear();
+    digitalWrite( LED_PIN, HIGH );
+  }
+  if (btn.has_changed_rising()) {
+    btn.clear();
+    digitalWrite( LED_PIN, LOW );
+  }
+}
+</code></pre>
+<p>จากตัวอย่าง ตัวแปร <code>btn</code> อ้างอิงอ็อบเจกต์ที่ถูกสร้างขึ้นมาจากคลาส <code>Button</code> และจะต้องมีการทำคำสั่ง
+<code>update()</code> ของตัวแปร <code>btn</code> เพื่อตรวจสอบอินพุตสำหรับปุ่มกดเป็นระยะ ๆ </p>
+<p>ถ้าหากต้องการตรวจดูว่า มีการเปลี่ยนแปลงเกิดขึ้นกับสถานะของอินพุต เช่น ขอบขาขึ้น หรือ ขอบขาลง 
+ให้ใช้คำสั่ง <code>has_changed_rising()</code> หรือ <code>has_changed_falling()</code>
+และจากนั้นให้เคลียร์เหตุการณ์ที่ตรวจพบ โดยทำคำสั่ง <code>clear()</code> ของตัวแปร <code>btn</code></p>
+<p><img alt="" src="../avr/images/class_button_debouncer.png" /></p>
+<p>รูป: ทดสอบการทำงานของโค้ดตัวอย่างโดยใช้ฮาร์ดแวร์จริง และวัดสัญญาณที่ได้</p>
+<p>&nbsp;</p>
+<p>ถัดไปลองมาดัดแปลงโค้ดตัวอย่าง เพื่อสาธิตการนับจำนวนการกดปุ่มแล้วปล่อย และแสดงข้อความจำนวนครั้งที่นับได้
+และมีการสลับสถานะของ <strong>LED</strong> เมื่อมีการกดปุ่มแล้วปล่อยในแต่ละครั้ง</p>
+<p>File: <code>button_click_counter.ino</code></p>
+<pre><code class="language-c++">#include &quot;Button.h&quot;
+
+#define BTN_PIN      (2)
+#define LED_PIN      (13)
+
+Button btn( BTN_PIN, true ); // create a Button instance
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.println( &quot;Switch debouncer demo...\n&quot; );
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+}
+
+String str;
+uint8_t cnt = 0;
+
+void loop() {
+  btn.update(); // must be called regularly.
+  if (btn.has_changed_falling()) {
+    btn.clear();
+    cnt++; // increment click counter by 1
+    str = &quot;Clicks: &quot;;
+    str += cnt;
+    Serial.println( str.c_str() );
+  }
+  if (btn.has_changed_rising()) {
+    btn.clear();
+    // toggle LED
+    digitalWrite( LED_PIN, !digitalRead(LED_PIN) );
+  }
+}
+</code></pre>
+<p><img alt="" src="../avr/images/arduino_click_counter.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับมาจากบอร์ดและปรากฎใน <strong>Arduino Serial Monitor</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-wokwi-based-arduino-simulator">&#9655; <strong>ตัวอย่างที่ 5: Wokwi-based Arduino Simulator</strong><a class="headerlink" href="#5-wokwi-based-arduino-simulator" title="Permanent link">#</a></h2>
+<p>เราลองมาใช้โปรแกรมแบบออนไลน์ที่มีชื่อว่า <strong>Wokwi AVR Simulator</strong>
+จำลองการทำงานหรือทดสอบการทำงานของโค้ดตัวอย่าง
+จุดเด่นข้อหนึ่งของ <strong>Wokwi</strong> คือ เราสามารถเขียนโค้ด <strong>Arduino Sketch</strong> และจำลองการทำงานได้
+และในกรณีที่ใช้วงจรปุ่มกดเป็นอินพุต (<a href="https://docs.wokwi.com/parts/wokwi-pushbutton"><code>wokwi-pushbutton</code></a>) เราสามารถตั้งค่าได้ว่า จะให้จำลองสถานการณ์ที่มีการกระเด้งของปุ่มด้วย หรือไม่ (<code>bounce</code> เป็น 0 หรือ 1)</p>
+<p><img alt="" src="../avr/images/button_wokwi_1-1.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรเสมือนจริงโดยใช้บอร์ด <strong>Arduino Nano</strong> และปุ่มกดบนเบรดบอร์ด</p>
+<p>ในการจำลองการทำงานของ <strong>Arduino</strong> โดยใช้ <strong>Wokwi Simulator</strong> เราสามารถนำอุปกรณ์ที่เรียกว่า
+<strong>Virtual Logic Analyzer</strong> มาใช้สำหรับตรวจสอบและบันทึกการเปลี่ยนแปลงของสัญญาณในระบบได้
+บันทึกเป็นไฟล์ .vcd โดยอัตโนมัติ เมื่อจบขั้นตอนการจำลองการทำงาน แต่มีข้อจำกัดคือ ยังไม่สามารถแสดงรูปคลื่นสัญญาณได้
+และต้องใช้โปรแกรมภายนอกสำหรับไฟล์ .vcd ที่ได้</p>
+<p>จากการจำลองการทำงานและมีการกดปุ่มหลาย ๆ ครั้ง ลองมาดูตัวอย่างรูปคลื่นสัญญาณอินพุตและเอาต์พุตที่ได้</p>
+<p><img alt="" src="../avr/images/button_wokwi_1-2.png" /></p>
+<p>รูป: แสดงข้อมูลจากไฟล์ .vcd ที่ได้จากการจำลองการทำงาน โดยใช้โปรแกรม <strong>GTKwave</strong>  และสังเกตได้ว่า
+มีการกดปุ่มแล้วปล่อยหลายครั้ง</p>
+<p><img alt="" src="../avr/images/button_wokwi_1-3.png" /></p>
+<p>รูป: ขยายแกนเวลา (<strong>Zoom-In</strong>) จะเห็นได้ว่า มีการเกิดเหตุการณ์การกระเด้งของปุ่มกด มีสัญญาณพัลส์หลายครั้งเกิดขึ้น</p>
+<p><img alt="" src="../avr/images/button_wokwi_2-1.png" /></p>
+<p>รูป: ทดลองโค้ดตัวอย่างที่มีการแก้ปัญหาการกระเด้งของปุ่มกด</p>
+<p><img alt="" src="../avr/images/button_wokwi_2-3.png" /></p>
+<p>รูป: สังเกตเห็นได้ว่า เมื่อมีการกดปุ่มและสัญญาณเปลี่ยนจาก HIGH เป็น LOW มีเหตุการณ์การกระเด้งของปุ่มกด
+แต่สัญญาณเอาต์พุตจะไม่เปลี่ยนแปลงตามทันที มีการกรองเหตุการณ์ดังกล่าวเอาไว้ และเกิดการเปลี่ยนแปลงของเอาต์พุต
+ประมาณ 10 ms หลังจากนั้น</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดสำหรับใช้งานขา <strong>GPIO</strong> ของบอร์ด <strong>Arduino</strong> เป็นอินพุตและเอาต์พุตแบบดิจิทัล 
+และกำหนดให้โปรแกรมตัวอย่างมีหน้าที่คอยตรวจสอบการเปลี่ยนแปลงสถานะลอจิกที่ขาอินพุตเพื่อนำไปอัปเดตสถานะลอจิกที่ขาเอาต์พุต 
+โดยใช้สองวิธี คือ <strong>I/O Polling Loop</strong> และ <strong>External Interrupt Handling</strong>
+อีกทั้งได้ยกตัวอย่างปัญหาที่เกิดจากการกระเด้งของปุ่มกดที่ใช้เป็นอินพุต และตัวอย่างการแก้ปัญหา</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-01-20 | Last Updated: 2022-02-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

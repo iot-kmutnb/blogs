@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/pthreads/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Multi-Threaded C/C++ Programming with Pthreads - IoT Engineering Education</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../css/extra.css" rel="stylesheet">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#multi-threaded-cc-programming-with-pthreads" class="nav-link">Multi-Threaded C/C++ Programming with Pthreads</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การทำงานแบบมัลติเธรด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#posix-pthreads" class="nav-link">&#9655; POSIX Pthreads</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-thread-creation" class="nav-link">&#9655; ตัวอย่างโค้ด 1:  Thread Creation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-thread-attribute" class="nav-link">&#9655; ตัวอย่างโค้ด 2:  Thread Attribute</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-binary-semaphore" class="nav-link">&#9655; ตัวอย่างโค้ด 3:  Binary Semaphore</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-producer-consumer-problem" class="nav-link">&#9655; ตัวอย่างโค้ด 4: Producer-Consumer Problem</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5-condition-variable" class="nav-link">&#9655; ตัวอย่างโค้ด 5: Condition Variable</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#6-producer-consumer-problem-revisited" class="nav-link">&#9655; ตัวอย่างโค้ด 6: Producer-Consumer Problem (Revisited)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#7-condition-variable-with-broadcasting" class="nav-link">&#9655; ตัวอย่างโค้ด 7: Condition Variable with Broadcasting</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#8-barrier" class="nav-link">&#9655; ตัวอย่างโค้ด 8: Barrier</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#9-multi-threading-in-c-using-stdthread" class="nav-link">&#9655; ตัวอย่างโค้ด 9: Multi-threading in C++ using std::thread</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#10-condition-variable-in-c" class="nav-link">&#9655; ตัวอย่างโค้ด 10: Condition Variable in C++</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="multi-threaded-cc-programming-with-pthreads">Multi-Threaded C/C++ Programming with Pthreads<a class="headerlink" href="#multi-threaded-cc-programming-with-pthreads" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้นำเสนอตัวอย่างการเขียนโค้ดในภาษา <strong>C/C++</strong> 
+เพื่อสาธิตการทำงานแบบมัลติเธรด (<strong>Multi-threading</strong>) 
+โดยใช้ไลบรารี <a href="https://man7.org/linux/man-pages/man7/pthreads.7.html"><strong>POSIX Pthreads</strong></a></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การทำงานแบบมัลติเธรด</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ระบบปฏิบัติการ เช่น <strong>Linux</strong> มีหน้าที่จัดการโปรแกรมต่าง ๆ ในระบบ หรือที่เรียกว่า "โพรเซส" (<strong>Process</strong>)
+แอปพลิเคชัน (<strong>Application</strong>) หรือโปรแกรมในระดับผู้ใช้ (<strong>User-Level Program</strong>)
+ก็ทำงานอยู่ในรูปแบบของโพรเซสในระบบ </p>
+<p>หลายโพรเซสสามารถทำงานได้อิสระจากกันและทำงานในช่วงเวลาที่แตกต่างกันหรือทำงานไปได้พร้อม ๆ กัน 
+ดังนั้นจึงเป็นการทำงานแบบหลายโพรเซส (<strong>Multi-Processing</strong>) 
+หรืออาจจะเรียกว่า เป็นการทำงานแบบมัลติทาสก์โดยใช้โพรเซส (<strong>Process-based Multi-tasking</strong>)</p>
+<p>โพรเซสสามารถสร้างโพรเซสอื่นให้เริ่มต้นทำงานใหม่ได้เช่นกัน เป็นความสัมพันธ์ระหว่างโพรเซสที่เป็นผู้สร้าง (<strong>Parent Process</strong>) 
+กับโพรเซสที่ถูกสร้าง (<strong>Child Process</strong>) และเรียกขั้นตอนนี้ว่า <strong>Process Forking / Spawning</strong></p>
+<p>ในแต่ละโพรเซสก็ยังสามารถแบ่งออกเป็นการทำงานย่อย ๆ ได้อีก เรียกว่า "เธรด" (<strong>Thread</strong>) 
+เธรดเหล่านั้นทำงานได้พร้อม ๆ กัน (<strong>Multi-Threading</strong>) หรือเรียกว่า ภาวะการทำงานพร้อมกันในระดับเธรด 
+(<strong>Thread-level Concurrency</strong>)
+ซึ่งจะมีประโยชน์และช่วยเพิ่มประสิทธิภาพในการทำงานของระบบเนื่องจากคอมพิวเตอร์มีตัวประมวลผลมากกว่าหนึ่งตัวได้ 
+(ทั้งแบบกายภาพและแบบเสมือน) และเป็นการเพิ่มระดับการทำงานแบบขนานกันในระดับฮาร์ดแวร์ 
+(<strong>Parallel Processing</strong>)</p>
+<p>การทำงานแบบหลายเธรดนั้น สามารถใช้งานได้ทั้งแบบมีซีพียูเดียว (<strong>Single-CPU</strong>) โดยการแบ่งช่วงเวลากันทำงานระหว่างเธรด 
+ให้ดูเสมือนว่าทำงานไปได้พร้อม ๆ กัน หรือใช้กับการทำงานของซีพียูที่มีหลายแกน (<strong>Multi-Core CPU</strong>) ก็ได้
+แต่ถ้ามีการนำคอมพิวเตอร์มาใช้งานร่วมกันในระบบเครือข่ายที่เชื่อมต่อกันด้วยความเร็วสูง และเขียนโปรแกรมเพื่อให้ทำงานร่วมกัน 
+ให้เป็นส่วนหนึ่งของแอปพลิเคชันเดียวกัน ก็จะเรียกรูปแบบนี้ว่า การประมวลผลหรือคำนวณแบบกระจาย
+(<strong>Distributed Processing / Computing</strong>) </p>
+<p>เราสามารถเขียนโปรแกรมคอมพิวเตอร์ เพื่อให้มีมากกว่าหนึ่งเธรด และสามารถทำงานได้อิสระจากกัน
+แต่บางกรณีก็ต้องมีการสื่อสารกันระหว่างเธรด หรือรอจังหวะการทำงานซึ่งกันและกัน (การประสานเวลาระหว่างเธรด) ตามเงื่อนไขที่กำหนด
+หรือรอเหตุการณ์บางอย่างในระบบ 
+(<strong>Inter-Thread Communication &amp; Synchronization</strong>)</p>
+<p>ถ้าเปรียบเทียบการทำงานระหว่างโพรเซสกับเธรดภายใต้การจัดการของระบบปฏิบัติการ การสร้างเธรดขึ้นมาใหม่นั้น
+มีขั้นตอนและการใช้ทรัพยากรของระบบ (หรือเรียกว่า <strong>Overhead</strong>) น้อยกว่าการสร้างโพรเซส 
+เช่น เธรดที่ถูกสร้างขึ้นภายใต้โพรเซสเดียวกันจะแชร์การใช้หน่วยความจำเดียวกันในโพรเซส
+แต่ถ้าเป็นการสร้างโพรเซสใหม่ จะมีการแยกหน่วยความจำในการใช้งานระหว่างโพรเซสเหล่านั้น </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="posix-pthreads">&#9655; <strong>POSIX Pthreads</strong><a class="headerlink" href="#posix-pthreads" title="Permanent link">#</a></h2>
+<p>ในกรณีที่เขียนโปรแกรมด้วยภาษา <strong>C</strong> สำหรับ <strong>Linux</strong> 
+ก็สามารถใช้ไลบรารีที่มีชื่อว่า <strong>POSIX Pthreads</strong> (ตามมาตรฐาน (<strong>POSIX.1-2001 และ POSIX.1-2008</strong>) 
+สำหรับการสร้างและจัดการทำงานของเธรดได้ ตัวอย่างฟังก์ชันการทำงานที่เกี่ยวกับเธรด เช่น</p>
+<ul>
+<li>การสร้างเธรดใหม่ (<strong>Thread creation</strong>)</li>
+<li>การจบการทำงานของเธรด (<strong>Thread termination</strong>)</li>
+<li>การทำงานแบบรอจังหวะกันระหว่างเธรด (<strong>Thread synchronization</strong>)</li>
+<li>การจัดลำดับการทำงานของเธรด (<strong>Thread scheduling</strong>)</li>
+<li>การจัดการข้อมูลของเธรดและปฏิสัมพันธ์กับโพรเซส (<strong>Thread data management and process interaction</strong>)</li>
+</ul>
+<p>ถ้าเขียนโค้ดใช้ภาษา <strong>C++</strong> ก็มีความแตกต่างจากโค้ดภาษา <strong>C</strong> ออกไปบ้าง 
+แต่ก็สามารถใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>POSIX Pthreads</strong> ได้เช่นกัน หรือจะใช้คลาส <code>std::thread</code> 
+(สำหรับเวอร์ชันตั้งแต่ <strong>C++11</strong>, <strong>C++14</strong> และ <strong>C++17</strong>)</p>
+<p>ในกรณีที่เขียนโปรแกรมด้วยภาษาอื่น อย่างเช่น <strong>Java</strong> หรือ <strong>Python</strong> 
+ก็มีไลบรารีให้ใช้งานสำหรับการทำงานแบบมัลติเธรดเช่นกัน</p>
+<p>การทำงานของเธรดภายใต้โพรเซสเดียวกัน มีการแชร์หรือใช้ทรัพยากรร่วมกันระหว่างเธรด แต่ก็มีสิ่งที่แต่ละเธรดนั้นใช้งานแยกกัน เช่น</p>
+<ul>
+<li><strong>Thread ID</strong> เป็นหมายเลขที่แตกต่างกันและใช้ระบุเธรดแต่ละเธรด</li>
+<li><strong>Thread priority</strong> เป็นระดับความสำคัญของเธรดและใช้ในการจัดลำดับการทำงานของเธรด</li>
+<li><strong>Set of registers, stack pointer (SP)</strong> เป็นหน่วยความจำที่ใช้เก็บค่าของรีจิสเตอร์ต่าง ๆ ของซีพียู
+และเกี่ยวข้องกับการทำงานของเธรด  เนื่องจากมีการแชร์การใช้งานซีพียูร่วมกัน 
+ข้อมูลเหล่านี้จะถูกจัดเก็บลงในหน่วยความจำที่เรียกว่า <strong>Stack</strong> ของแต่ละเธรด
+ดังนั้นจึงต้องมีตัวระบุหรือชี้ตำแหน่งบนสุดของ<strong> Stack</strong> ดังกล่าว</li>
+<li><strong>Stack for local variables, return addresses</strong> เป็นหน่วยความจำแบบ <strong>Stack</strong> 
+ที่ใช้เก็บข้อมูลในขณะที่เธรดกำลังทำงาน เช่น เก็บค่าตัวแปรภายในเมื่อมีการเรียกใช้ฟังก์ชันและจบการทำงานของฟังก์ชัน เป็นต้น</li>
+</ul>
+<p>เนื่องจากในการทำงานแบบมัลติเธรด จะต้องมีการแบ่งเวลาหรือสลับเวลาในการทำงานกันระหว่างเธรด 
+ดังนั้นจึงต้องมีการบันทึกสถานะการทำงานของเธรด และเรียกคืนกลับมาทำงานต่อจากตำแหน่งที่ถูกหยุดเอาไว้ชั่วคราว 
+การสลับการทำงานของเธรดในลักษณะนี้เรียกว่า <strong>Thread Context Switching</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-thread-creation">&#9655; <strong>ตัวอย่างโค้ด 1:  Thread Creation</strong><a class="headerlink" href="#1-thread-creation" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างแรกนี้ สาธิตการเขียนโปรแกรม เพื่อสร้างเธรดจำนวน 2 เธรด (<strong>Thread 1</strong> และ <strong>Thread 2</strong>) 
+โดยใช้คำสั่ง <code>pthread_create(...)</code> ซึ่งจะให้ค่ากลับคืน (<strong>Return Value</strong>) เป็น 0 ถ้าสร้างเธรดใหม่ได้สำเร็จ</p>
+<pre><code class="language-c++">// $ gcc -Wall main.c -o main -lpthread
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;  // for srand(), rand()
+#include &lt;unistd.h&gt;  // for sleep(), usleep()
+#include &lt;pthread.h&gt; // the header file for the pthread library
+
+void *thread_entry_func( void *arg ) {
+  long id = (long)arg;
+  printf( &quot;Thread '%ld' started\n&quot;, id );
+  // sleep for some seconds (randomized between 1..10)
+  sleep( 1 + (rand() % 10) );
+  printf( &quot;Thread '%ld' finished\n&quot;, id );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval; // return value from a function call
+  pthread_t thread1, thread2; // thread handles
+
+  // initialize the pseudo-random generator with a seed
+  srand( time(NULL) );
+
+  // create Thread 1
+  retval = pthread_create(
+               &amp;thread1          /* used to identify thread 1 */,
+               NULL              /* default attributes */,
+               thread_entry_func /* start routine */,
+               (void*) 1         /* thread argument */ );
+  printf( &quot;Thread creation (1): %s\n&quot;, retval ? &quot;FAILED&quot; : &quot;OK&quot; );
+
+  // create Thread 2
+  retval = pthread_create(
+               &amp;thread2          /* used to identify thread 2 */,
+               NULL              /* default attributes */,
+               thread_entry_func /* start routine */,
+               (void*) 2         /* thread argument */ );
+  printf( &quot;Thread creation (2): %s\n&quot;, retval ? &quot;FAILED&quot; : &quot;OK&quot; );
+  // sleep for 10msec
+  usleep( 10000 /*usec*/ );
+  // wait until both threads (thread 1 and 2) are finished.
+  printf( &quot;\nWaiting for threads to be finished...\n&quot; );
+  if ( thread1 ) {
+    pthread_join( thread1, NULL ); // wait for thread 1
+  }
+  if ( thread2 ) {
+    pthread_join( thread2, NULL ); // wait for thread 2
+  }
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตมีดังนี้</p>
+<pre><code class="language-plain">Thread creation (1): OK
+Thread '1' started
+Thread creation (2): OK
+Thread '2' started
+
+Waiting for threads to be finished...
+Thread '1' finished
+Thread '2' finished
+Done...
+</code></pre>
+<p>&nbsp;</p>
+<p>ในขั้นตอนการสร้างเธรด จะต้องมีการเรียกใช้ฟังก์ชันตามรูปแบบที่กำหนดไว้โดย <strong>POSIX Pthreads</strong> ดังนี้</p>
+<pre><code class="language-c++">int pthread_create( 
+       pthread_t *thread, 
+       const pthread_attr_t *attr,
+       void *(*start_routine)(void*), 
+       void *arg );
+</code></pre>
+<p>&nbsp;</p>
+<p>ฟังก์ชัน <code>thread_entry_func(...)</code> ในโค้ดตัวอย่างนี้ เป็นฟังก์ชันสำหรับ <strong>Thread Start Routine</strong> 
+หรือเรียกว่า <strong>Thread Entry Function</strong> เป็นฟังก์ชันสำหรับการทำงานของเธรด 
+ทั้งสองเธรดในตัวอย่างนี้ มีการใช้ฟังก์ชันดังกล่าวร่วมกัน และเมื่อสร้างเธรดขึ้นมาแล้ว 
+จะใช้ตัวแปรที่มีชนิดข้อมูลเป็น <code>pthread_t</code> เป็นตัวอ้างอิงแต่ละเธรด </p>
+<p>ฟังก์ชันของเธรดจะรับค่าอาร์กิวเมนต์มาเป็นพอยน์เตอร์แบบ <code>void *</code>
+แต่ในตัวอย่างนี้ จะมีการแปลงให้เป็นเลขจำนวนเต็ม
+(ชนิดข้อมูลแบบ <code>long</code>) เพื่อใช้จำแนกว่าเป็นเธรดหมายเลขใด </p>
+<p>เมื่อทำคำสั่งต่าง ๆ ของฟังก์ชันนี้ จะมีการรอเวลาให้ผ่านไปโดยใช้คำสั่ง <code>sleep(...)</code> 
+ระยะเวลาในการรอหน่วยเป็นวินาที เช่น ได้จากการใช้คำสั่ง <code>rand(...)</code> เพื่อสุ่มค่าตัวเลขจำนวนเต็ม 
+โดยกำหนดให้มีค่าอยูในช่วง 1..10 วินาที เมื่อรอเวลาตามที่กำหนดไว้แล้ว การทำงานของเธรดจึงจบลง 
+(แต่ละเธรดจะใช้เวลารอไม่เหมือนกัน เพราะอาจสุ่มเลขได้ค่าต่างกัน ดังนั้นจึงจบการทำงานไม่พร้อมกัน)</p>
+<p>ในการทำงานของโปรแกรมนี้ เมื่อได้สร้างเธรดใหม่ทั้งสองแล้ว ได้กำหนดให้มีการรอให้เธรดทั้งสองจบการทำงานก่อน 
+จึงจะจบการทำงานของโปรแกรม การรอคอยให้เธรดของโพรเซสจบการทำงานนั้น จะต้องใช้คำสั่ง <code>pthread_join(...)</code> 
+ดังนั้นจึงเป็นการเรียกฟังก์ชันแบบ <strong>Blocking Call</strong> หรือ รอไปแบบไม่มีเวลาจำกัดจนกว่าเงื่อนไขจะเป็นจริง</p>
+<p>จากโค้ดตัวอย่างทั้งสองเธรดนั้นมีฟังก์ชันการทำงานเหมือนกัน แต่รับค่าสำหรับอาร์กิวเมนต์ที่แตกต่างกันเมื่อเธรดถูกสร้างขึ้น
+ถัดไปเป็นการปรับแก้โค้ดใหม่เพื่อสร้างเธรดตามจำนวนที่กำหนดไว้โดย <code>NUM_THREADS</code> 
+เช่น  กำหนดให้มีค่าเท่ากับ 10 จากเดิมที่มีเพียง 2 เธรด</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;  // for srand(), rand()
+#include &lt;unistd.h&gt;  // for sleep(), usleep()
+#include &lt;pthread.h&gt; // the header file for the pthread lib
+
+#define NUM_THREADS   (10)
+
+void *thread_entry_func( void *arg ) {
+  long id = (long)arg;
+  printf( &quot;Thread '%ld' started (0x%08lX)\n&quot;, id, pthread_self() );
+  // sleep for some seconds (randomized between 1..10)
+  sleep( 1 + (rand() % 10) );
+  printf( &quot;Thread '%ld' finished\n&quot;, id );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t threads[ NUM_THREADS ]; // array of thread handles
+
+  // initialize the pseudorandom generator with a seed
+  srand( time(NULL) );
+
+  // create a number of threads
+  for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+    long id = (i+1); // used as thread argument
+    retval = pthread_create(
+                &amp;threads[i], NULL,
+                thread_entry_func,
+                (void*) id );
+    printf( &quot;main&gt; thread creation (%ld): %s\n&quot;, id,
+         retval ? &quot;FAILED&quot; : &quot;OK&quot; );
+    if ( retval ) { // thread creation error
+      printf( &quot;Program terminated...\n&quot; );
+      exit(1);
+    }
+  }
+  // sleep for 1msec before proceeding
+  usleep( 1000 /*usec*/ );
+  // wait until all threads are finished.
+  printf( &quot;\nWaiting for all threads to be finished..\n&quot; );
+  for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+    pthread_join( threads[i], NULL ); // wait for thread
+  }
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>&nbsp; </p>
+<p>สำหรับการคอมไพล์โค้ดตัวอย่าง ถ้าตั้งชื่อไฟล์เป็น <code>main.c</code> และเขียนโค้ดตามตัวอย่าง ก็สามารถทำคำสั่งแบบ
+<strong>Command Line</strong> ใน <strong>Linux Terminal</strong> ดังนี้</p>
+<p>คำสั่งแรกนี้เป็นการติดตั้ง <strong>GCC Compiler</strong> และ <strong>Build Tools</strong> ที่เกี่ยวข้อง 
+สำหรับระบบปฏิบัติการ <strong>Linux (Ubuntu/Debian Distro</strong>) 
+และลองตรวจสอบเวอร์ชันของ <code>gcc</code> ดังนี้</p>
+<pre><code class="language-bash">$ sudo apt install gcc g++ build-essential
+
+$ gcc --version
+gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</code></pre>
+<p>คำสั่งที่สองเป็นการคอมไพล์โค้ดในไฟล์ <code>main.c</code> ให้กลายเป็นไฟล์ไบนารี (<strong>executable</strong>) ที่มีชื่อว่า <code>main</code></p>
+<pre><code class="language-bash">$ gcc -Wall ./main.c -o main -lpthread
+</code></pre>
+<p>โดยที่ <code>-Wall</code> หมายถึง การให้คอมไพลเลอร์แสดงข้อความแจ้งเตือนต่าง ๆ เมื่อคอมไพล์โค้ด <code>-o</code> เป็นการระบุชื่อไฟล์เอาต์พุต
+และ <code>-lpthread</code> เป็นการบอกว่า ให้โปรแกรม <strong>Linker</strong> ของ <strong>GCC</strong> ใช้ไลบรารี <strong>Pthread</strong> </p>
+<p><img alt="" src="images/linux_nano.png" /></p>
+<p>รูป: ตัวอย่างการใช้โปรแกรม <code>nano</code> แก้ไขโค้ดในไฟล์ <code>main.c</code></p>
+<p>ตัวอย่างเอาต์พุตเมื่อรันโปรแกรม <code>./main</code> มีดังนี้ และจะเห็นได้ว่า 
+ลำดับในการจบการทำงานของเธรดก็อาจแตกต่างจากลำดับในการสร้างเธรด
+และถ้ารันโปรแกรมนี้อีกครั้ง จะให้ผลที่แตกต่างไปจากเดิม</p>
+<pre><code class="language-plain">$ ./main
+main&gt; thread creation (1): OK
+Thread '1' started (0x7FE7F8F41700)
+main&gt; thread creation (2): OK
+Thread '2' started (0x7FE7F8740700)
+main&gt; thread creation (3): OK
+Thread '3' started (0x7FE7F7F3F700)
+main&gt; thread creation (4): OK
+Thread '4' started (0x7FE7F773E700)
+main&gt; thread creation (5): OK
+Thread '5' started (0x7FE7F6F3D700)
+main&gt; thread creation (6): OK
+Thread '6' started (0x7FE7F673C700)
+main&gt; thread creation (7): OK
+Thread '7' started (0x7FE7F5F3B700)
+main&gt; thread creation (8): OK
+Thread '8' started (0x7FE7F573A700)
+main&gt; thread creation (9): OK
+Thread '9' started (0x7FE7F4F39700)
+main&gt; thread creation (10): OK
+Thread '10' started (0x7FE7F4738700)
+
+Waiting for all threads to be finished..
+Thread '10' finished
+Thread '3' finished
+Thread '4' finished
+Thread '6' finished
+Thread '2' finished
+Thread '5' finished
+Thread '7' finished
+Thread '9' finished
+Thread '8' finished
+Thread '1' finished
+Done...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-thread-attribute">&#9655; <strong>ตัวอย่างโค้ด 2:  Thread Attribute</strong><a class="headerlink" href="#2-thread-attribute" title="Permanent link">#</a></h2>
+<p>ในขั้นตอนการสร้างเธรดใหม่ เราสามารถกำหนดคุณสมบัติของเธรด (<code>pthread_attr_t</code>)
+ที่จะถูกสร้างขึ้นใหม่ได้โดยใช้คำสั่ง <code>pthread_attr_init(...)</code> และมีตัวอย่างการเขียนโค้ดดังนี้
+เช่น การกำหนดให้เธรดมีสถานะเป็น <strong>joinable</strong> และการกำหนดขนาดของ <strong>Stack</strong> 
+สำหรับการทำงานของเธรด เป็นต้น</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;  // for sleep(), usleep()
+#include &lt;pthread.h&gt; // the header file for the pthread lib
+
+void *thread_entry_func( void *arg ) {
+  printf( &quot;Thread is active.\n&quot; );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int             retval;     // return value
+  size_t          stack_size; // thread stack size
+  pthread_attr_t  attr;       // thread attribute
+  pthread_t       thread;     // thread handle
+
+  // create a thread attribute object
+  retval = pthread_attr_init( &amp;attr );
+  if ( retval ) {
+    printf( &quot;Error while creating thread attribute!\n&quot; );
+    exit(1);
+  }
+
+  // use a joinable thread
+  pthread_attr_setdetachstate( &amp;attr, PTHREAD_CREATE_JOINABLE );
+
+  // get the default stack size
+  pthread_attr_getstacksize( &amp;attr, &amp;stack_size );
+  printf( &quot;Default thread stack size: %ld\n&quot;, stack_size );
+
+  // set the stack size (use a larger value, say 4 times larger)
+  pthread_attr_setstacksize( &amp;attr, 4*stack_size );
+
+  // now, create a new thread using the specified thread attribute
+  retval = pthread_create(
+               &amp;thread, &amp;attr, thread_entry_func, NULL );
+  printf( &quot;Thread creation %s\n&quot;, retval ? &quot;FAILED&quot; : &quot;OK&quot; );
+
+  sleep(1);
+  // get the thread stack size
+  pthread_attr_getstacksize( &amp;attr, &amp;stack_size );
+  printf( &quot;Thread stack size: %ld\n&quot;, stack_size );
+  pthread_attr_destroy( &amp;attr ); // destroy thread attribute
+  if ( thread ) {
+    pthread_join( thread, NULL ); // wait for thread
+  }
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-binary-semaphore">&#9655; <strong>ตัวอย่างโค้ด 3:  Binary Semaphore</strong><a class="headerlink" href="#3-binary-semaphore" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการใช้งานสิ่งที่เรียกว่า "เซมาฟอร์แบบไบนารี" (<strong>Binary Semaphore</strong>) 
+เพื่อใช้ส่งสัญญาณสื่อสารกันระหว่างเธรด เช่น ให้เธรดหนึ่งรอสัญญาณจากอีกเธรดหนึ่ง 
+หรือในกรณีที่มีการเข้าใช้ทรัพยากรของระบบร่วมกัน
+เช่น การเรียกใช้ฟังก์ชัน <code>printf()</code> ของ <strong>Standard C library</strong> โดยเธรด</p>
+<p>คำสั่งที่เกี่ยวข้องกับการใช้งานเซมาฟอร์แบบไบนารีของ <strong>POSIX Pthreads</strong> มีดังนี้</p>
+<ul>
+<li><code>sem_init(...)</code>
+    สร้างเซมาฟอร์ขึ้นมาใหม่และตั้งค่าเริ่มต้นของตัวนับ</li>
+<li><code>sem_wait(...)</code>
+    รอการใช้งานเซมาฟอร์ โดยให้ลดค่าลงจาก 1 เป็น 0 แต่ถ้ามีค่าเป็น 0 ในขณะนั้น ให้รอไปก่อน</li>
+<li><code>sem_trywait(...)</code>
+    เหมือน <code>sem_wait(...)</code>แต่ไม่มีการรอ ถ้าทำได้สำเร็จ จะได้ค่ากลับคืนเป็น 0 แต่ถ้าไม่สำเร็จได้ค่าเป็น -1</li>
+<li><code>sem_post(...)</code>
+    เพิ่มค่าเซมาฟอร์ให้เป็น 1 ทันทีโดยไม่ต้องรอ</li>
+<li><code>sem_destroy(...)</code>
+    เลิกใช้งานเซมาฟอร์ที่ถูกสร้างขึ้นมาใช้งาน</li>
+</ul>
+<p>เซมาฟอร์แบบไบนารีมีค่าเริ่มต้นเป็น 1 หลังจากนั้นเมื่อมีการเข้าใช้งานโดยเธรดและทำคำสั่ง <code>sem_wait(...)</code> ได้สำเร็จ 
+ก็จะลดค่าลงเป็น 0 แต่ถ้ามีค่าเป็น 0 ในขณะนั้นและมีเธรดใดต้องการใช้งาน จะต้องรอไปก่อน 
+เมื่อใช้งานเซมาฟอร์แล้วก็ต้องเพิ่มค่าให้เป็น 1 ด้วยคำสั่ง <code>sem_post(...)</code></p>
+<p>ข้อสังเกต: ถ้าให้ตัวนับของเซมาฟอร์มีค่าเริ่มต้นมากกว่า 1 เราจะเรียกว่า 
+"เซมาฟอร์แบบนับ" (<strong>Counting Semaphore</strong>)</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;    // for sleep(), usleep()
+#include &lt;pthread.h&gt;   // the header file for the pthread lib
+#include &lt;semaphore.h&gt;
+
+#define NUM_THREADS    (10) // number of threads
+
+// global variable
+sem_t semaphore; // binary semaphore
+
+void *thread_entry_func( void *arg ) {
+  long id = (long)arg;
+  sleep(1);
+  sem_wait( &amp;semaphore );  // acquire the binary semaphore
+  printf( &quot;Thread '%ld' is active.\n&quot;, id );
+  fflush( stdout ); // flush stdout
+  sem_post( &amp;semaphore );  // release the binary semaphore
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t threads[ NUM_THREADS ];
+
+  // create a binary semaphore
+  // note:the semaphore will be shared between threads of the process
+  sem_init( &amp;semaphore, 0 /*pshared*/, 1 /*initial value*/ ); 
+
+  // create Threads
+  for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+    long id = (i+1L);
+    retval = pthread_create(
+               &amp;threads[i], NULL,
+               thread_entry_func,
+               (void*)id );
+    printf( &quot;Thread creation ('%ld'): %s\n&quot;, id,
+            retval ? &quot;FAILED&quot; : &quot;OK&quot; );
+    if (retval) {
+       exit(1);
+    }
+  }
+  sleep(1);
+  for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+    if ( threads[i] ) {
+      pthread_join( threads[i], NULL ); // wait for thread
+    }
+  }
+  sem_destroy( &amp;semaphore ); // destroy semaphore
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตเมื่อรันโปรแกรม</p>
+<pre><code class="language-plain">$ ./main
+Thread creation ('1'): OK
+Thread creation ('2'): OK
+Thread creation ('3'): OK
+Thread creation ('4'): OK
+Thread creation ('5'): OK
+Thread creation ('6'): OK
+Thread creation ('7'): OK
+Thread creation ('8'): OK
+Thread creation ('9'): OK
+Thread creation ('10'): OK
+Thread '2' is active.
+Thread '9' is active.
+Thread '10' is active.
+Thread '4' is active.
+Thread '5' is active.
+Thread '7' is active.
+Thread '6' is active.
+Thread '8' is active.
+Thread '1' is active.
+Thread '3' is active.
+Done...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-producer-consumer-problem">&#9655; <strong>ตัวอย่างโค้ด 4: Producer-Consumer Problem</strong><a class="headerlink" href="#4-producer-consumer-problem" title="Permanent link">#</a></h2>
+<p>ในการทำงานร่วมกันระหว่างเธรดตามรูปแบบที่เรียกว่า  "ผู้ผลิต-ผู้บริโภค" (<strong>Producer-Consumer Pattern</strong>)
+มีเธรดหนึ่งทำหน้าที่สร้างข้อมูล (<strong>Producer</strong>) แล้วส่งต่อให้อีกเธรดหนึ่งที่รออยู่ (<strong>Consumer</strong>) 
+กล่าวคือ มีการรอจังหวะการทำงานระหว่างกันหรือประสานเวลากัน (<strong>Inter-Thread Synchronization</strong>) 
+เช่น เธรดที่สร้างข้อมูลจะต้องรอให้อีกเธรดหนึ่งรับข้อมูลไปใช้ก่อนที่จะสร้างข้อมูลลำดับถัดไป 
+มิเช่นนั้นก็อาจเกิดปัญหาได้ หรือที่เรียกว่า "สภาวะเงื่อนไขการแย่งชิง" (<strong>Race Condition</strong>)
+ในกรณีที่มีการใช้ตัวแปรร่วมกัน (<strong>Shared Variable</strong>)</p>
+<p>ดังนั้นในกรณีนี้ จึงจะใช้สิ่งที่เรียกว่า <strong>Mutex</strong> (ซึ่งเป็นคำย่อมาจาก <strong>Mutual Exclusive</strong>) 
+ทำหน้าที่เป็นเสมือนล็อคป้องกัน หรือ "ตัวปิดกั้น" (<strong>Lock</strong>) เพื่อเข้าใช้งานทรัพยากรร่วม 
+หรือเพื่อการจำกัดสิทธิ์การเข้าถึงทรัพยากรร่วมระหว่างเธรด ยกตัวอย่างเช่น </p>
+<p>ถ้ามีหลายเธรด และต้องการให้ในช่วงเวลาใดเวลาหนึ่ง มีเพียงเธรดเดียวเท่านั้นที่เข้าใช้ทรัพยากรร่วมได้
+ถ้าเธรดใดจะเข้าถึงตัวแปรที่แชร์ใช้งานร่วมกัน จะต้องพยายามใส่ล็อคเพื่อป้องกันมิให้เธรดอื่นเข้ามาใช้งานได้ 
+และเมื่อเสร็จแล้ว ก็ต้องปลดล็อคดังกล่าว </p>
+<p>การทำงานของ <strong>Mutex</strong> มีลักษณะคล้ายกับเซมาฟอร์แบบไบนารี แต่ก็มีความแตกต่างกัน 
+เช่น หลักการทำงานแบบมีเจ้าของ (<strong>Ownership</strong>) และ <strong>Recursive Mutex</strong> คือ สามารถเข้าใช้งานซ้ำได้</p>
+<p>คำสั่งที่เกี่ยวกับการใช้งาน <strong>Mutex Lock</strong> (<code>pthread_mutex_t</code>) ที่สำคัญได้แก่</p>
+<ul>
+<li><code>pthread_mutex_init(...)</code>
+    เพื่อสร้างและเริ่มต้นใช้งาน <strong>Mutex</strong></li>
+<li><code>pthread_mutex_lock(...)</code>
+    เพื่อปิดล็อคของ <strong>Mutex</strong> แต่ถ้าไม่ได้จะบล็อกการทำงานของเธรดไปจนกว่าจะปิดล็อคได้</li>
+<li><code>pthread_mutex_trylock(...)</code>
+    เพื่อลองดูว่าสามารถปิดล็อคของ <strong>Mutex</strong> ได้หรือไม่ ถ้าไม่ได้ ก็จะไม่มีการบล็อกการทำงานของเธรด</li>
+<li><code>pthread_mutex_unlock(...)</code> 
+     เพื่อปลดล็อคของ <strong>Mutex</strong></li>
+<li><code>pthread_destroy(...)</code> 
+    เลิกใช้งาน <strong>Mutex</strong></li>
+</ul>
+<p>ในตัวอย่างนี้ ตัวแปร <code>message</code> ซึ่งเป็นอาร์เรย์แบบ <code>char *</code> สำหรับเก็บข้อความ (<strong>String</strong>) 
+จะถูกใช้ในการส่งข้อมูลระหว่างเธรดที่เป็น <strong>Producer</strong> และ <strong>Consumer</strong> 
+ดังนั้นจึงถือว่าเป็นส่วนที่เรียกว่า "เขตวิกฤต" หรือ "ส่วนวิกฤต" (<strong>Critical Section</strong>) </p>
+<p>ถ้าจะเข้าใช้งานตัวแปรนี้จะต้องมีการใช้ <strong>Mutex Lock</strong> ก่อนทุกครั้ง และจะมีการสร้างข้อความทั้งหมด 10 ครั้ง
+เธรดที่ทำหน้าที่เป็น <strong>Producer</strong> จะต้องตรวจสอบก่อนว่า ตัวแปร <code>flag</code> เป็น <code>false</code> หรือไม่ 
+จึงจะเขียนข้อความใหม่ลงไป เธรดที่เป็น <strong>Consumer</strong> จะต้องตรวจสอบค่าของตัวแปรนี้เช่นกัน 
+แต่เมื่อนำข้อความไปใช้แสดงผลแล้วเปลี่ยนค่าของตัวแปร <code>flag</code> เป็น <code>true</code></p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;pthread.h&gt;
+
+// global variables
+static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER; 
+
+static char message[32];    // used as shared variable
+static bool running = true;
+static bool flag    = false;
+
+void *producer_func( void *arg ) {
+  int cnt = 1; // counter variable
+  while (cnt &lt;= 10) { // repeat 10 times
+    // acquire mutex lock (blocking call)
+    pthread_mutex_lock( &amp;lock );
+    if ( !flag ) {
+       snprintf( message, sizeof(message), 
+                 &quot;hello #%d&quot;, cnt++ );
+       printf( &quot;Producer&gt; %s\n&quot;, message );
+       flag = true; // set flag (message available)
+    }
+    // release the mutex lock
+    pthread_mutex_unlock( &amp;lock );
+    // sleep for a random number of microseconds
+    usleep( 1000 + (rand() % 1000) );
+  }
+  return NULL;
+}
+
+void *consumer_func( void *arg ) {
+  while (running) {
+    // acquire mutex lock (blocking call)
+    pthread_mutex_lock( &amp;lock );
+    if ( flag ) {
+      printf( &quot;Consumer&gt; %s\n\n&quot;, message );
+      message[0] = '\0'; // clear message string
+      flag = false;      // clear flag
+      usleep( (rand() % 1000)*1000 );
+    }
+    // release the mutex lock
+    pthread_mutex_unlock( &amp;lock );
+    usleep(1);
+  }
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t producer_thread, consumer_thread;
+
+  // initialize the pseudorandom generator with a seed
+  srand( time(NULL) ); 
+
+  // clear message buffer
+  memset( message, 0, sizeof(message) );
+
+  // create a mutex lock
+  if ( pthread_mutex_init( &amp;lock, NULL ) ) {
+    printf( &quot;Mutex initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create producer and consumer threads
+  retval = pthread_create( 
+              &amp;producer_thread, NULL, 
+              producer_func, (void*) NULL );
+  if (retval) {
+    printf( &quot;Producer thread creation failed!\n&quot; );
+    exit(1);
+  }
+
+  retval = pthread_create(
+              &amp;consumer_thread, NULL,
+              consumer_func, (void*) NULL );
+  if (retval) {
+    printf( &quot;Consumer thread creation failed!\n&quot; );
+    exit(1);
+  }
+  // sleep for 10msec before proceeding
+  usleep( 10000 /*usec*/ );
+  // wait for producer thread
+  pthread_join( producer_thread, NULL );
+  running = false; // change running flag to false
+  pthread_cancel( consumer_thread ); // cancel consumer thread
+  pthread_join( consumer_thread, NULL ); // wait for consumer thread
+  pthread_mutex_destroy( &amp;lock ); // destroy mutex lock
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ในตัวอย่างนี้ เธรด <strong>Producer</strong> จะจบการทำงานเมื่อได้สร้างข้อความตามจำนวนที่กำหนดไว้ครบแล้ว
+(เช่น 10 ครั้ง) แต่สำหรับการทำงานของเธรด <strong>Consumer</strong> จะมีการใช้คำสั่ง <code>pthread_cancel(...)</code>
+เพื่อขอให้จบการทำงานหลังจากนั้น </p>
+<p>ถ้าจะลองเปลี่ยนมาใช้คำสั่ง <code>pthread_mutex_trylock(...)</code>
+สำหรับฟังก์ชันการทำงานของเธรด ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">void *producer_func( void *arg ) {
+  int cnt = 1;
+  while (cnt &lt;= 10) {
+    // try to acquire mutex lock (non-blocking call)
+    while( pthread_mutex_trylock( &amp;lock ) ) {
+      usleep( 1000 );
+    }
+    if ( !flag ) {
+      snprintf( message, sizeof(message), 
+                &quot;hello #%d&quot;, cnt++ );
+      printf( &quot;Producer&gt; %s\n&quot;, message );
+      flag = true;  // set flag (message available)
+    }
+    pthread_mutex_unlock( &amp;lock );
+    // sleep for a random number of microseconds
+    usleep( 1000 + (rand() % 1000) );
+  }
+  return NULL;
+}
+
+void *consumer_func( void *arg ) {
+  while (running) {
+    // try to acquire mutex lock (non-blocking call)
+    while( pthread_mutex_trylock( &amp;lock ) ) {
+      usleep( 1000 );
+    }
+    if ( flag ) {
+      printf( &quot;Consumer&gt; %s\n\n&quot;, message );
+      message[0] = '\0'; // clear message string
+      flag = false;      // clear flag
+      // sleep for a random number of microseconds
+      usleep( (rand() % 1000)*1000 );
+    }
+    pthread_mutex_unlock( &amp;lock );
+    usleep(1);
+  }
+  return NULL;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-condition-variable">&#9655; <strong>ตัวอย่างโค้ด 5: Condition Variable</strong><a class="headerlink" href="#5-condition-variable" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการให้เธรดหยุดรอเหตุการณ์หรือเงื่อนไข (<strong>Waiting / Blocked</strong>) ตามที่กำหนดไว้ 
+จนกว่าเงื่อนไขจะเป็นจริง แล้วจึงให้ทำงานต่อไป ในสถานการณ์เช่นนี้ เราสามารถใช้ตัวแปรประเภทหนึ่งที่เรียกว่า 
+"ตัวแปรเงื่อนไข" (<strong>Condition Variable</strong>) และการทำให้เงื่อนไขเป็นจริงได้นั้น 
+จะต้องมีการส่งสัญญาณ (<strong>Signaling</strong>) จากเธรดอื่นมา </p>
+<p>ตัวแปรเงื่อนไขจึงเป็นอีกวิธีการหนึ่งในการสื่อสารกันระหว่างเธรด (<strong>Inter-Thread Communication</strong>)
+ในไลบรารีของ <strong>POSIX Pthread</strong> ก็มีคำสั่งสำหรับการใช้งาน <strong>Condition Variable</strong> 
+(ชนิดข้อมูล <code>pthread_cond_t</code>) โดยจะต้องใช้ร่วมกับ <strong>Mutex</strong> 
+(ชนิดข้อมูล <code>pthread_mutex_t</code>) และมีคำสั่งที่เกี่ยวข้องได้แก่</p>
+<ul>
+<li><code>pthread_cond_init(...)</code>
+     สร้างและเริ่มต้นใช้งานตัวแปรเงื่อนไข </li>
+<li><code>pthread_cond_wait(...)</code>
+     รอจนกว่าตัวแปรเงื่อนไขจะเป็นจริง</li>
+<li><code>pthread_cond_timedwait(...)</code>
+     รอจนกว่าตัวแปรเงื่อนไขจะเป็นจริง แต่มีระยะเวลาจำกัดในการรอ</li>
+<li><code>pthread_cond_signal(...)</code>
+     ส่งสัญญาณไปยังเธรดที่รออยู่ เพื่อระบุว่าตัวแปรเงื่อนไขเป็นจริง และเธรดที่รอเงื่อนไขอยู่จะทำงานต่อได้</li>
+<li><code>pthread_cond_broadcast(...)</code>
+     ส่งสัญญาณไปยังทุกเธรดที่รออยู่ เพื่อระบุว่าตัวแปรเงื่อนไขเป็นจริง</li>
+<li><code>pthread_cond_destroy(...)</code>
+     เลิกใช้งานตัวแปรแบบเงื่อนไข</li>
+</ul>
+<p>ตัวอย่างนี้สาธิตการสร้างเธรดขึ้นมาใหม่ และให้เธรดดังกล่าวรอให้มีการส่งสัญญาณมาจากเธรดหลักในฟังก์ชัน <code>main()</code> 
+และเพิ่มค่าตัวนับของตัวแปรภายในและแสดงข้อความตัวเลขดังกล่าว 
+การส่งสัญญาณสำหรับตัวแปรเงื่อนไขในตัวอย่างจะเกิดขึ้นทั้งหมด 10 ครั้ง </p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt; 
+#include &lt;unistd.h&gt;
+#include &lt;pthread.h&gt; 
+
+// global variables
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  cond  = PTHREAD_COND_INITIALIZER;
+
+void *thread_func( void *arg ) {
+  int ticks = 0;
+  while (1) {
+    pthread_mutex_lock( &amp;mutex );
+    // wait for signal
+    if ( !pthread_cond_wait( &amp;cond, &amp;mutex ) ) {
+      printf( &quot;ticks: %d\n&quot;, ++ticks );
+    }
+    pthread_mutex_unlock( &amp;mutex );
+  }
+  printf( &quot;Thread finished..\n&quot; );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t thread;
+
+  // create a mutex lock
+  if ( pthread_mutex_init( &amp;mutex, NULL ) ) {
+    printf( &quot;Mutex initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create a condition variable
+  if ( pthread_cond_init( &amp;cond, NULL ) ) {
+    printf( &quot;Condition variable initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create a thread
+  retval = pthread_create( 
+             &amp;thread, NULL, thread_func, (void*) NULL );
+  if (retval) {
+    printf( &quot;Thread creation failed!\n&quot; );
+    exit(1);
+  }
+  usleep(10);
+
+  for ( int i=0; i &lt; 10; i++ ) { // repeat 10 times
+    pthread_mutex_lock( &amp;mutex );
+    pthread_cond_signal( &amp;cond ); 
+    pthread_mutex_unlock( &amp;mutex );
+    sleep(1);
+  }
+  pthread_cancel( thread );
+  pthread_join( thread, NULL );
+  pthread_cond_destroy( &amp;cond );   // destroy condition variable
+  pthread_mutex_destroy( &amp;mutex ); // destroy mutex lock
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>แต่ถ้าจะลองเปลี่ยนมาใช้คำสั่ง <code>pthread_cond_timewait(...)</code> 
+เพื่อให้เธรดสามารถรอเงื่อนไข แต่มีระยะเวลาจำกัด (<strong>Timeout</strong>) เช่น 1 วินาที 
+แล้วจึงตรวจสอบซ้ำ ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;time.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;pthread.h&gt;
+
+// global variables
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  cond  = PTHREAD_COND_INITIALIZER;
+
+static struct timespec ts; // used to read timestamp
+
+void *thread_func( void *arg ) {
+  int ticks = 0;
+  int retval;
+  struct timeval now;
+  while (1) {
+    pthread_mutex_lock( &amp;mutex );
+    // wait for signal with timeout (1 second)
+    gettimeofday( &amp;now, NULL );
+    ts.tv_sec  = now.tv_sec + 1; // plus 1 second
+    ts.tv_nsec = now.tv_usec * 1000;
+    // wait for condition variable with timeout
+    retval = pthread_cond_timedwait( &amp;cond, &amp;mutex, &amp;ts );
+    if ( retval == 0 ) { // success
+      printf( &quot;ticks: %d\n&quot;, ++ticks );
+    } else { // timeout
+      time_t now;
+      time( &amp;now ); // get current time
+      printf( &quot;timeout at %s\n&quot;, ctime(&amp;now) );
+    }
+    fflush( stdout );
+    pthread_mutex_unlock( &amp;mutex );
+  }
+  printf( &quot;Thread finished..\n&quot; );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t thread;
+
+  srand( time(NULL) );
+
+  // create a mutex lock
+  if ( pthread_mutex_init( &amp;mutex, NULL ) ) {
+    printf( &quot;Mutex initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create a condition variable
+  if ( pthread_cond_init( &amp;cond, NULL ) ) {
+    printf( &quot;Conditional variable initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create a thread
+  retval = pthread_create(
+             &amp;thread, NULL, thread_func, (void*) NULL );
+  if (retval) {
+    printf( &quot;Thread creation failed!\n&quot; );
+    exit(1);
+  }
+  usleep(10);
+
+  for ( int i=0; i &lt; 10; i++ ) { // repeat 10 times
+    pthread_mutex_lock( &amp;mutex );
+    pthread_cond_signal( &amp;cond );
+    pthread_mutex_unlock( &amp;mutex );
+    // sleep for a random number of microseconds
+    usleep( (rand()%2000)*1000 );
+  }
+  pthread_cancel( thread );
+  pthread_join( thread, NULL );
+  pthread_cond_destroy( &amp;cond );   // destroy condition variable
+  pthread_mutex_destroy( &amp;mutex ); // destroy mutex lock
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6-producer-consumer-problem-revisited">&#9655; <strong>ตัวอย่างโค้ด 6: Producer-Consumer Problem (Revisited)</strong><a class="headerlink" href="#6-producer-consumer-problem-revisited" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างการสื่อสารกันระหว่างเธรดแบบ <strong>Producer-Consumer</strong> หากต้องการจะใช้งานตัวแปรเงื่อนไข
+เช่น สำหรับเธรด <strong>Producer</strong> และเธรด <strong>Consumer</strong> (แยกกันในสองทิศทาง)
+แต่จะต้องมีการใช้ <strong>Mutex</strong> ร่วมด้วย ก็มีแนวทางดังนี้</p>
+<ul>
+<li>เธรด <strong>Producer</strong> จะต้องรอตัวแปรเงื่อนไข <code>cond_p</code> และมีการส่งสัญญาณจากเธรด <strong>Consumer</strong></li>
+<li>เธรด <strong>Consumer</strong> จะต้องรอตัวแปรเงื่อนไข <code>cond_c</code> และมีการส่งสัญญาณจากเธรด <strong>Producer</strong></li>
+</ul>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt; 
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;time.h&gt;
+#include &lt;pthread.h&gt; 
+
+// global variables
+static pthread_mutex_t mutex  = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  cond_c = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t  cond_p = PTHREAD_COND_INITIALIZER;
+
+static char message[32] = {'\0'};
+static bool flag = false;
+
+void *producer_thread_func( void *arg ) {
+  int ticks = 0;
+  while (1) {
+    pthread_mutex_lock( &amp;mutex );
+    while ( flag ) { 
+       // wait for signal from consumer thread
+       pthread_cond_wait( &amp;cond_p, &amp;mutex );
+    }
+    flag = true; // set flag (message available)
+    snprintf( message, sizeof(message), &quot;test %d&quot;, ++ticks );
+    printf( &quot;Producer&gt; %s\n&quot;, message );
+    // send signal to consumer thread
+    pthread_cond_signal( &amp;cond_c ); 
+    pthread_mutex_unlock( &amp;mutex );
+    usleep( (1+rand()%1000)*1000 );
+    if (ticks &gt;= 10) break; // repeat 10 times
+  }
+  printf( &quot;Producer thread finished..\n&quot; );
+  return NULL;
+}
+
+void *consumer_thread_func( void *arg ) {
+  while (1) {
+    pthread_mutex_lock( &amp;mutex );
+    while ( !flag ) { 
+      // wait for signal from consumer thread
+      pthread_cond_wait( &amp;cond_c, &amp;mutex );
+    }
+    flag = false; // clear flag
+    printf( &quot;Consumer&gt; %s\n\n&quot;, message );
+    message[0] = '\0';
+    // send signal to producer thread 
+    pthread_cond_signal( &amp;cond_p ); 
+    pthread_mutex_unlock( &amp;mutex );
+    usleep( (1+rand()%1000)*1000 );
+  }
+  printf( &quot;Consumer thread finished..\n&quot; );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t thread_p, thread_c;
+
+  srand( time(NULL) );
+
+  // create a mutex lock
+  if ( pthread_mutex_init( &amp;mutex, NULL ) ) {
+    printf( &quot;Mutex initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create condition variables
+  if ( pthread_cond_init( &amp;cond_p, NULL ) ) {
+    printf( &quot;Condition variable initialization failed!\n&quot; );
+    exit(1);
+  }
+  if ( pthread_cond_init( &amp;cond_c, NULL ) ) {
+    printf( &quot;Condition variable initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create Producer thread
+  retval = pthread_create(
+             &amp;thread_p, NULL,
+             producer_thread_func,
+             (void*) NULL );
+  if (retval) {
+    printf( &quot;Producer thread creation failed!\n&quot; );
+    exit(1);
+  }
+  // create Consumer thread
+  retval = pthread_create(
+             &amp;thread_c, NULL,
+             consumer_thread_func,
+             (void*) NULL );
+  if (retval) {
+    printf( &quot;Consumer thread creation failed!\n&quot; );
+    exit(1);
+  }
+  pthread_join( thread_p, NULL );
+  pthread_cancel( thread_c );
+  pthread_join( thread_c, NULL );
+  pthread_cond_destroy( &amp;cond_p );
+  pthread_cond_destroy( &amp;cond_c );
+  pthread_mutex_destroy( &amp;mutex );
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="7-condition-variable-with-broadcasting">&#9655; <strong>ตัวอย่างโค้ด 7: Condition Variable with Broadcasting</strong><a class="headerlink" href="#7-condition-variable-with-broadcasting" title="Permanent link">#</a></h2>
+<p>ถ้าจะลองใช้คำสั่ง <code>pthread_cond_broadcast()</code> เพื่อส่งสัญญาณไปยังทุกเธรดในกรณีที่มีหลายเธรด 
+(ตามจำนวนที่กำหนดโดย <code>NUM_THREADS</code> เช่น 4 เธรดในตัวอย่างนี้่)
+และเธรดกำลังรอตัวแปรเงื่อนไขเดียวกัน ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt; 
+#include &lt;unistd.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;time.h&gt;
+#include &lt;pthread.h&gt; 
+
+#define NUM_THREADS   (4) // number of threads
+
+// global variables
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  cond  = PTHREAD_COND_INITIALIZER;
+
+static bool is_running = true;
+
+void *thread_func( void *arg ) {
+  long id   = (long)arg; // thread id
+  int ticks = 0;         // local variable
+  while (is_running) {
+    pthread_mutex_lock( &amp;mutex );
+    pthread_cond_wait( &amp;cond, &amp;mutex );
+    printf( &quot;Thread: #%ld, ticks=%d\n&quot;, id, ++ticks );
+    fflush( stdout ); // flush stdout
+    pthread_mutex_unlock( &amp;mutex );
+    usleep(10);
+  }
+  sleep(1);
+  printf( &quot;Thread #%ld finished..\n&quot;, id );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t threads[ NUM_THREADS ];
+
+  srand( time(NULL) );
+
+  // create a mutex lock
+  if ( pthread_mutex_init( &amp;mutex, NULL ) ) {
+    printf( &quot;Mutex initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create a condition variable
+  if ( pthread_cond_init( &amp;cond, NULL ) ) {
+    printf( &quot;Condition variable initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create threads
+  for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+     retval = pthread_create(
+                &amp;threads[i], NULL, thread_func,
+                (void*) (long)(i+1) );
+     if (retval) {
+       printf( &quot;Create a new thread: failed!.\n&quot; );
+       exit(1);
+     }
+  }
+  usleep( 1000 );
+  int N = 10; // repeat 10 times
+  for ( int i=0; i &lt; N; i++ ) {
+    pthread_mutex_lock( &amp;mutex );
+    is_running = (i==N-1) ? false : true;
+    pthread_cond_broadcast( &amp;cond ); 
+    pthread_mutex_unlock( &amp;mutex );
+    printf(&quot;-------------------------\n&quot;);
+    usleep( (rand()%1000)*1000 );
+  }
+  sleep(1);
+  for (int i=0; i &lt; NUM_THREADS; i++) {
+    pthread_join( threads[i], NULL );
+  }
+  pthread_cond_destroy( &amp;cond );   // destroy condition variable
+  pthread_mutex_destroy( &amp;mutex ); // destroy mutex lock
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>เธรดที่ถูกสร้างขึ้น (มีทั้งหมด 4 เธรด) จะต้องรอการส่งสัญญาณจากเธรดหลัก ผ่านทางตัวแปรเงื่อนไข (ชื่อตัวแปร <code>cond</code>) 
+และมีการส่งสัญญาณทั้งหมด 10 ครั้ง (เธรดเพิ่มค่าของตัวแปรภายใน <code>ticks</code> ทีละหนึ่งเมื่อได้รับสัญญาณในแต่ละครั้ง)
+ก่อนจบการทำงาน ตัวอย่างข้อความเอาต์พุตมีดังนี้</p>
+<pre><code class="language-plain">-------------------------
+Thread: #1, ticks=1
+Thread: #4, ticks=1
+Thread: #2, ticks=1
+Thread: #3, ticks=1
+-------------------------
+Thread: #4, ticks=2
+Thread: #3, ticks=2
+Thread: #1, ticks=2
+Thread: #2, ticks=2
+-------------------------
+Thread: #1, ticks=3
+Thread: #4, ticks=3
+Thread: #3, ticks=3
+Thread: #2, ticks=3
+-------------------------
+Thread: #1, ticks=4
+Thread: #3, ticks=4
+Thread: #4, ticks=4
+Thread: #2, ticks=4
+-------------------------
+Thread: #1, ticks=5
+Thread: #4, ticks=5
+Thread: #3, ticks=5
+Thread: #2, ticks=5
+-------------------------
+Thread: #3, ticks=6
+Thread: #1, ticks=6
+Thread: #2, ticks=6
+Thread: #4, ticks=6
+-------------------------
+Thread: #2, ticks=7
+Thread: #1, ticks=7
+Thread: #3, ticks=7
+Thread: #4, ticks=7
+-------------------------
+Thread: #1, ticks=8
+Thread: #4, ticks=8
+Thread: #2, ticks=8
+Thread: #3, ticks=8
+-------------------------
+Thread: #2, ticks=9
+Thread: #3, ticks=9
+Thread: #1, ticks=9
+Thread: #4, ticks=9
+-------------------------
+Thread: #3, ticks=10
+Thread: #2, ticks=10
+Thread: #4, ticks=10
+Thread: #1, ticks=10
+Thread #2 finished..
+Thread #1 finished..
+Thread #4 finished..
+Thread #3 finished..
+Done...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="8-barrier">&#9655; <strong>ตัวอย่างโค้ด 8: Barrier</strong><a class="headerlink" href="#8-barrier" title="Permanent link">#</a></h2>
+<p>ในกรณีที่มีการสร้างเธรดขึ้นมาทำงานไปพร้อม ๆ กัน
+แต่จะต้องมีการรอจังหวะให้ทุกเธรดได้ทำงานในแต่ละขั้นตอนย่อยเสร็จครบทุกเธรดก่อน
+แล้วจึงอนุญาตให้ทุกเธรดสามาารถทำงานในขั้นตอนต่อไปได้ เราจะใช้สิ่งที่เรียกว่า "แผงกั้น" (<strong>Barrier</strong>)
+เปรียบเสมือนจุดที่ให้ทุกเธรดมาถึงจนครบตามจำนวนที่กำหนดไว้ จึงเปิดแผงกั้นให้ทำงานต่อไปได้</p>
+<p>การใช้ <strong>POSIX Pthreads</strong> ก็มีชนิดของข้อมูล แต่คำสั่งที่เกี่ยวข้องดังนี้</p>
+<ul>
+<li><code>pthread_barrier_init()</code> สร้าง <strong>Barrier</strong> สำหรับใช้งาน</li>
+<li><code>pthread_barrier_wait()</code> รอจนกว่าจะได้รับการแจ้งให้ผ่านไปได้</li>
+<li><code>pthread_barrier_destroy()</code> เลิกใช้งาน <strong>Barrier</strong></li>
+</ul>
+<p>ตัวอย่างโค้ดสาธิตการใช้ <strong>Barrier</strong> มีดังนี้ โดยมีการสร้างเธรดขึ้นมาตามจำนวนที่กำหนด (<code>NUM_THREADS</code>) 
+และรวมถึงเธรดหลักด้วย ดังนั้นในกรณีนี้ <strong>Barrier</strong> จะใช้สำหรับจำนวนเธรดเท่ากับ <code>(NUM_THREADS+1)</code>
+และทุกเธรดที่สร้างขึ้นมานั้นรวมถึงเธรดหลักจะต้องรอจังหวะกันโดยใช้คำสั่ง <code>pthread_barrier_wait()</code></p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;time.h&gt;
+#include &lt;pthread.h&gt;
+
+#define NUM_THREADS   (4)   // number of threads
+
+// global variables
+static pthread_barrier_t barrier;
+static bool is_running = true;
+
+void *thread_func( void *arg ) {
+  long id = (long)arg;
+  int ticks = 0;
+  while (is_running) {
+    pthread_barrier_wait( &amp;barrier );
+    printf( &quot;Thread: #%ld, ticks=%d\n&quot;, id, ++ticks );
+    usleep( (1+rand()%2000)*1000 );
+  }
+  sleep(1);
+  printf( &quot;Thread #%ld finished..\n&quot;, id );
+  return NULL;
+}
+
+int main( int argc, char *argv[] ) {
+  int retval;
+  pthread_t threads[ NUM_THREADS ];
+
+  srand( time(NULL) );
+
+  // create a barrier
+  if (pthread_barrier_init( &amp;barrier, NULL, NUM_THREADS+1) ) {
+    printf( &quot;Barrier initialization failed!\n&quot; );
+    exit(1);
+  }
+  // create threads
+  for (int i=0; i &lt; NUM_THREADS; i++ ) {
+     retval = pthread_create(
+                &amp;threads[i], NULL, thread_func,
+                (void*) (long)(i+1) );
+     if (retval) {
+       printf( &quot;Create a new thread failed!\n&quot; );
+       exit(1);
+     }
+  }
+  for ( int i=0; i &lt; 10; i++ ) { // repeat 10 times
+    pthread_barrier_wait( &amp;barrier );
+    usleep(1000);
+    printf(&quot;---------------------------\n&quot;);
+    fflush(stdout);
+  }
+  is_running = false;
+  for (int i=0; i &lt; NUM_THREADS; i++) {
+    pthread_join( threads[i], NULL );
+  }
+  pthread_barrier_destroy( &amp;barrier ); // destroy barrier
+  printf( &quot;Done...\n\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="9-multi-threading-in-c-using-stdthread">&#9655; <strong>ตัวอย่างโค้ด 9: Multi-threading in C++ using std::thread</strong><a class="headerlink" href="#9-multi-threading-in-c-using-stdthread" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการสร้างเธรดโดยใช้ <code>std::thread</code> สำหรับภาษา <strong>C++</strong> จำนวน 2 เธรด<br />
+(<code>thread1</code> และ <code>thread2</code>) และเมื่อเธรดทำงาน จะต้องมีการล็อคการใช้งานของ <strong>Mutex</strong> (<code>std::mutex</code>) 
+ให้ได้ก่อนแล้วจึงจะแสดงหมายเลขของเธรดเป็นข้อความ จากนั้นจะมีการรอเวลาซึ่งมีระยะเวลาตามตัวเลขสุ่มในช่วง 1000 ถึง 2000 (มิลลิวินาที) 
+แล้วจึงปลดล็อค <strong>Mutex</strong></p>
+<pre><code class="language-c++">// g++ -std=c++14 main.cc -o main -lpthread
+
+#include &lt;iostream&gt; // for std::cout
+#include &lt;thread&gt;   // for std::thread
+#include &lt;mutex&gt;    // for std::mutex
+#include &lt;cstdlib&gt;  // for std::srand(), std::rand()
+#include &lt;vector&gt;   // for std::vector()
+
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+// global variable
+std::mutex output_lock; // mutex for standard output
+
+static void thread_func( long arg ) {
+  output_lock.lock();
+  std::cout &lt;&lt; &quot;Thread #&quot; &lt;&lt; arg &lt;&lt; &quot;\n&quot;;
+  // generate a random integer value between 1000..2000
+  long msec = 1000 + (std::rand() % 1000);
+  auto delay_ms = std::chrono::milliseconds(msec);
+  std::this_thread::sleep_for( delay_ms );
+  output_lock.unlock();
+}
+
+int main() {
+  std::srand( std::time(nullptr) ); // set seed value
+
+  // create two threads
+  std::thread thread1( thread_func, 1 );
+  std::thread thread2( thread_func, 2 );
+  // sleep for 1 second
+  std::this_thread::sleep_for( 1s );
+  // wait for threads 1 and 2
+  if( thread1.joinable() ) {
+     thread1.join();
+  }
+  if( thread2.joinable() ) {
+     thread2.join();
+  }
+  return 0;
+}
+</code></pre>
+<p>การเขียนโค้ดในภาษา <strong>C++</strong> นั้น มีความหลากหลายมากกว่าภาษา <strong>C</strong> เนื่องจากรองรับการเขียนโปรแกรมแบบเชิงวัตถุ 
+และมีการสร้างคลาส (<strong>Classes</strong>) ไว้สำหรับใช้งานได้เป็นมาตรฐาน ตัวอย่างโค้ดต่อไปนี้ ให้ผลการทำงานเหมือนโค้ดตัวอย่างแรก 
+แต่มีการเพิ่มจำนวนเธรดให้มีมากกว่า 2 ได้ และมีรูปแบบการเขียนที่แตกต่างกันออกไป เช่น มีการใช้เวกเตอร์ (<code>std::vector</code>) 
+สำหรับอ้างอิงออปเจกต์ของเธรด (<code>std::thread</code>) และมีการสร้างฟังก์ชันสำหรับเธรดแต่ละเธรด 
+ให้อยู่ในรูปแบบที่เรียกว่า <strong>Anonymous Function</strong></p>
+<pre><code class="language-c++">#include &lt;iostream&gt;  // for std::cout
+#include &lt;thread&gt;    // for std:thread
+#include &lt;mutex&gt;     // for std::mutex
+#include &lt;cstdlib&gt;   // for std::srand(), std::rand()
+#include &lt;vector&gt;    // for std::vector
+#include &lt;algorithm&gt; // for std::for_each()
+
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+// global variable
+std::mutex output_lock; // mutex for standard output
+
+const int NUM_THREADS = 10;
+
+int main() {
+  // initialize pseudorandom number generator
+  std::srand( std::time(nullptr) ); 
+  // use a vector container stores threads
+  std::vector&lt;std::thread&gt; workers; // worker threads
+
+  for ( int i=0; i &lt; NUM_THREADS; i++ ) {
+    // create a thread with an anonymous function
+    // and add it to the vector container
+    workers.push_back( std::thread( [](long arg){
+      output_lock.lock(); // lock the mutex
+      std::cout &lt;&lt; &quot;Thread #&quot; &lt;&lt; arg &lt;&lt; &quot;\n&quot;;
+      // generate a random integer value between 1000..2000
+      long msec = 1000 + (std::rand() % 1000);
+      auto delay_ms = std::chrono::milliseconds(msec);
+      std::this_thread::sleep_for( delay_ms);
+      output_lock.unlock(); // release the mutex
+    }, i+1) );
+  }
+  // sleep for 1 second
+  std::this_thread::sleep_for(1s);
+  // wait for worker threads
+  std::for_each( workers.begin(), workers.end(), [](std::thread&amp; t) {
+    if (t.joinable()) {
+        t.join();
+    }
+   } );
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="10-condition-variable-in-c">&#9655; <strong>ตัวอย่างโค้ด 10: Condition Variable in C++</strong><a class="headerlink" href="#10-condition-variable-in-c" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการใช้งาน <strong>Mutex</strong> (<code>std::mutex</code>) 
+ร่วมกับตัวแปรเงื่อนไข (<code>std::condition_variable</code>) 
+โดยให้เธรดหลักของฟังก์ชัน <code>main()</code> คอยส่งสัญญาณโดยใช้คำสั่ง <code>notify_once(...)</code>
+ไปยังอีกเธรดหนึ่งที่ถูกสร้างขึ้นใหม่ (เป็นการส่งสัญญาณรอจังหวะในทิศทางเดียว) 
+และให้เธรดนั้นรอสัญญาณแบบไม่จำกัดเวลาโดยใช้คำสั่ง <code>wait(...)</code> สำหรับตัวแปรเงื่อนไข 
+ในการทำงานแต่ละรอบของลูป <code>while</code></p>
+<pre><code class="language-c++">#include &lt;iostream&gt; // for std::cout
+#include &lt;thread&gt;   // for std:thread
+#include &lt;mutex&gt;    // for std::mutex
+#include &lt;condition_variable&gt; // for std::condition_variable
+
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+// global variables
+std::mutex mtx;
+std::condition_variable cv;
+
+bool running = true;
+bool ready   = false;
+
+void thread_func() {
+  int ticks = 0;
+  while (running) {
+    // create a mutex lock
+    std::unique_lock&lt;std::mutex&gt; lock(mtx);
+    while (!ready) { // check the ready flag
+      cv.wait( lock ); // wait for notification
+    }
+    ready = false; // clear ready flag
+    if (running) {
+      std::cout &lt;&lt; &quot;Thread: ticks=&quot; &lt;&lt; (++ticks) &lt;&lt; &quot;\n&quot;;  
+    }
+    // The mutex lock is automatically released after each while loop.
+  }
+}
+
+int main() {
+  // create a thread
+  std::thread t( thread_func );
+  for ( int i=0; i &lt; 10; i++ ) { // repeat 10 times
+    mtx.lock();      // acquire the mutex lock
+    ready = true;    // set ready flag
+    cv.notify_one(); // send notification
+    mtx.unlock();    // release the mutex lock
+    std::this_thread::sleep_for( 500ms );
+  }
+
+  mtx.lock();
+  ready   = true;
+  running = false; // thread should stop running
+  cv.notify_one(); // send notification
+  mtx.unlock();
+
+  if ( t.joinable() ) { 
+    t.join(); // wait for thread to be finished
+  }
+  std::cout &lt;&lt; &quot;Done...&quot; &lt;&lt; std::endl;
+  return 0;
+}
+</code></pre>
+<p>ถ้าจะเปลี่ยนมาใช้คำสั่ง <code>wait_for(...)</code> ซึ่งเป็นการรอที่มีระยะเวลาจำกัด (<strong>Timeout</strong>)
+สำหรับตัวแปรเงื่อนไข ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &lt;iostream&gt; // for std::cout
+#include &lt;thread&gt;   // for std:thread
+#include &lt;mutex&gt;    // for std::mutex
+#include &lt;condition_variable&gt; // for std::condition_variable
+
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+// global variables
+std::mutex mtx;
+std::condition_variable cv;
+
+bool running = true;
+bool ready   = false;
+
+void thread_func() {
+  int ticks = 0;
+  while (running) {
+    std::unique_lock&lt;std::mutex&gt; lock(mtx);
+    // timeout for 10 msec
+    if ( cv.wait_for(lock,milliseconds(10))!=std::cv_status::timeout ){
+      if (ready) {
+        std::cout &lt;&lt; &quot;Thread: ticks=&quot; &lt;&lt; (++ticks) &lt;&lt; &quot;\n&quot;;  
+        ready = false;
+      }  
+    }
+    // The mutex lock is automatically released after each while loop.
+  }
+}
+
+int main() {
+  // create a thread
+  std::thread t( thread_func );
+  for ( int i=0; i &lt; 10; i++ ) { // repeat 10 times
+    mtx.lock();
+    ready = true;
+    cv.notify_one(); // send notification
+    mtx.unlock();
+    std::this_thread::sleep_for( 500ms );
+  }
+
+  mtx.lock();
+  ready = true;
+  running = false; // thread should stop running
+  cv.notify_one(); // send notification
+  mtx.unlock();
+
+  if ( t.joinable() ) {
+    t.join();
+  }
+  std::cout &lt;&lt; &quot;Done...&quot; &lt;&lt; std::endl;
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างโค้ดในภาษา <strong>C/C++</strong> 
+ที่สาธิตการใช้คำสั่งต่าง ๆ ในเบื้องต้น ที่เกี่ยวข้องกับการใช้งาน <strong>POSIX PThreads</strong> เพื่อเขียนโค้ดแบบมัลติเธรด
+(ทดลองใช้งานกับระบบปฏิบัติการ <strong>Linux</strong>) ซึ่งจะช่วยให้ผู้เรียนได้ลองฝึกการเขียนโค้ด ทดลองปฏิบัติได้จริง 
+ซึ่งจะช่วยให้มีความเข้าใจในหลักการทำงานได้ดียิ่งขึ้น รวมถึงนำไปประยุกต์ใช้งานได้อีกด้วย</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2022-01-09 | Last Updated: 2022-01-11</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

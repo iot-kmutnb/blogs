@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/mplab-x_ide_avr/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานซอฟต์แวร์ MPLAB-X IDE สำหรับ AVR ในเบื้องต้น - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mplab-x-ide-avr" class="nav-link">การใช้งานซอฟต์แวร์ MPLAB-X IDE สำหรับ AVR ในเบื้องต้น</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#mplab-x-ide-vs-mplab-xpress-ide" class="nav-link">&#9655; MPLAB-X IDE vs. MPLAB Xpress IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ขั้นตอนการใช้งาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; การสร้างโปรเจกต์ใหม่</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#software-simulator" class="nav-link">&#9655; การดีบักด้วย Software Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#io" class="nav-link">&#9655; การแสดงสัญญาณ I/O เมื่อจำลองการทำงาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; การกำหนดสัญญาณอินพุตเพื่อทดสอบการทำงานของโปรแกรม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mplab-x-ide-avr">การใช้งานซอฟต์แวร์ MPLAB-X IDE สำหรับ AVR ในเบื้องต้น<a class="headerlink" href="#mplab-x-ide-avr" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel/Microchip AVR MCUs</em>, <em>ATmega328P</em>, <em>MPLAB-X IDE</em></p>
+<hr />
+<h2 id="mplab-x-ide-vs-mplab-xpress-ide">&#9655; <strong>MPLAB-X IDE vs. MPLAB Xpress IDE</strong><a class="headerlink" href="#mplab-x-ide-vs-mplab-xpress-ide" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการทดลองใช้งานซอฟต์แวร์ <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-x-ide"><strong>MPLAB-X IDE v6.0.0</strong></a> ร่วมกับ <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers"><strong>XC8 C Compiler v2.31</strong></a> ของบริษัท <strong>Microchip</strong> ในเบื้องต้น และสาธิตการเขียนโปรแกรมภาษา <strong>C</strong> สำหรับไมโครคอนโทรลเลอร์ <strong>AVR MCU</strong> เช่น <strong>ATMega328P</strong></p>
+<p>หลังจากที่บริษัท <strong>Microchip</strong> ได้เข้าควบรวมกิจกรรมของบริษัท <strong>Atmel</strong> ในปีค.ศ. 2016
+ก็ได้พัฒนาให้ซอฟต์แวร์ <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-x-ide"><strong>MPLAB-X IDE</strong></a> (ตั้งแต่เวอร์ชัน <strong>v5.05</strong> และเปิดให้ดาวน์โหลดไปใช้งานในเดือนตุลาคม ค.ศ. 2018) และ <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-xpress"><strong>MPLAB Xpress IDE</strong></a>
+รองรับการใช้งานไมโครคอนโทรลเลอร์ของบริษัท <strong>Atmel</strong> สำหรับ <strong>AVR</strong> (8 บิต)  และ <strong>SAM</strong> (32 บิต) </p>
+<p>ในช่วงต่อมาได้มีการปรับปรุงซอฟต์แวร์ <strong>Atmel Studio 7 IDE</strong> 
+ภายใต้ชื่อใหม่คือ <strong>Microchip Studio IDE</strong> แต่ผู้ใช้คงจะต้องพิจารณาเลือกเองว่า
+จะใช้ซอฟต์แวร์ใดเป็นหลักในการทำงานต่อไปอนาคต หากว่า ยังใช้ชิปไมโครคอนโทรลเลอร์ของ <strong>Atmel</strong></p>
+<p>จุดเด่นข้อหนึ่งของ <strong>MPLAB-X IDE</strong> คือ เป็นซอฟต์แวร์ประเภท <strong>Cross-platform</strong> 
+มีให้เลือกใช้ได้สำหรับระบบปฏิบัติการ <strong>Windows</strong>, <strong>Linux</strong> และ <strong>Mac OS X</strong> ในขณะที่
+<strong>Microchip Studio IDE</strong> จะใช้ได้เฉพาะกับระบบปฏิบัติการ <strong>Windows</strong> เท่านั้น</p>
+<p>ซอฟต์แวร์รองรับไมโครคอนโทรเลอร์ในตระกูลต่าง ๆ ของบริษัท <strong>Atmel / Microchip</strong>
+ที่มีให้เลือกทั้งตัวประมวลผลแบบ 8 บิต ไปจนถึง 32 บิต ผู้ใช้สามารถทำขั้นตอนดีบักโค้ดโดยใช้ตัวจำลองการทำงาน 
+(<strong>Simulator</strong>) เช่น สำหรับ <strong>AVR</strong>, <strong>SAMC/SAMD</strong> และ <strong>PIC32/PIC32C</strong> เป็นต้น</p>
+<p><img alt="" src="../avr/images/mplabx_avr-10.png" /></p>
+<p>รูป:  <strong>MPLAB-X Desktop IDE (v6.0.0)</strong> สาธิตการเขียนโค้ดภาษา <strong>C</strong> สำหรับ <strong>AVR MCU</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>ขั้นตอนการใช้งาน</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>หากยังไม่เคยใช้งานซอฟต์แวร์มาก่อน ให้ผู้ใช้ดาวน์โหลดและติดตั้งซอฟต์แวร์
+<a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-x-ide"><strong>MPLAB-X IDE</strong></a> และ <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers"><strong>XC8 C Compiler</strong></a> ในเครื่องคอมพิวเตอร์ของผู้ใช้ก่อน 
+(สำหรับบทความนี้ ได้ทดลองใช้ซอฟต์แวร์สำหรับระบบปฏิบัติการ <strong>Windows 10</strong>)</p>
+<p>ขั้นตอนการทดลองใช้งานเบื้องต้น มีดังนี้</p>
+<ol>
+<li>สร้างโปรเจกต์ใหม่ พร้อมระบุชื่อโปรเจกต์และเลือกชิปไมโครคอนโทรลเลอร์ <strong>AVR</strong></li>
+<li>สร้างไฟล์ <code>main.c</code> ในโปรเจกต์ใหม่ สำหรับเขียนโค้ด</li>
+<li>ลองเขียนโค้ดตามตัวอย่างและทำขั้นตอน <strong>Build Project</strong> เพื่อคอมไพล์โค้ด</li>
+<li>ทดลองการทำงานของโปรแกรมโดยวิธีดีบักโค้ด (<strong>Source-Level Debugging</strong>)
+โดยใช้ตัวจำลองการทำงาน (<strong>Simulator</strong>) เพื่อช่วยในการตรวจสอบหรือหาข้อผิดพลาดในการทำงานของโค้ด</li>
+<li>เลือกบรรทัดของโค้ดในไฟล์ <code>main.c</code> เพื่อใช้เป็นตำแหน่งของ <strong>Breakpoints</strong>
+เมื่อมีการทำคำสั่งมาถึงบรรทัดดังกล่าว จะมีการหยุดทำคำสั่งชั่วคราว หรือจะทำคำสั่งต่อไปก็ได้</li>
+<li>ดูการเปลี่ยนแปลงที่เกิดขึ้นกับฮาร์ดแวร์ เช่น รีจิสเตอร์ต่าง ๆ ของซีพียู ตัวแปรที่มีอยู่ภายในโปรแกรม เป็นต้น</li>
+</ol>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>การสร้างโปรเจกต์ใหม่</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>เริ่มต้นด้วยการเปิดใช้งานซอฟต์แวร์  <strong>MPLAB-X IDE</strong> แล้วสร้างโปรเจกต์ใหม่</p>
+<p><img alt="" src="../avr/images/mplabx_avr-2.png" /></p>
+<p>รูป: เริ่มต้นขั้นตอนการสร้างโปรเจกต์ใหม่</p>
+<p><img alt="" src="../avr/images/mplabx_avr-3.png" /></p>
+<p>รูป: เลือกรูปแบบของโปรเจกต์ใหม่ เป็นแบบ <strong>Standalone Project</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-4.png" /></p>
+<p>รูป: เลือกชิปไมโครคอนโทรลเลอร์ ในตัวอย่างนี้คือ <strong>ATmega - ATmega328P</strong>
+และเลือกเครื่องมือ <strong>Tool - Simulator</strong> สำหรับการตรวจสอบการทำงานด้วยตัวจำลองการทำงาน
+(ไม่ได้ใช้อุปกรณ์สำหรับการดีบักโปรแกรมด้วยฮาร์ดแวร์จริง)</p>
+<p><img alt="" src="../avr/images/mplabx_avr-5.png" /></p>
+<p>รูป: เลือกซอฟต์แวร์ <strong>Compiler Toolchains</strong>
+ที่จะใช้สำหรับการคอมไพล์โค้ดในโปรเจกต์  ในตัวอย่างนี้ได้เลือกใช้
+<strong>Microchip XC8 C Compiler</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-6.png" /></p>
+<p>รูป: ระบุชื่อของโปรเจกต์ใหม่และไดเรกทอรีสำหรับเก็บไฟล์ต่าง ๆ ของโปรเจกต์</p>
+<p>เมื่อได้สร้างโปรเจกต์ใหม่สำหรับ <strong>ATmega328P</strong> แล้ว ถัดไปให้สร้างไฟล์ <code>main.c</code> 
+ให้เป็นส่วนหนึ่งของโปรเจกต์ สำหรับทดลองเขียนโค้ด</p>
+<p><img alt="" src="../avr/images/mplabx_avr-7.png" /></p>
+<p>รูป: สร้างไฟล์เพิ่มในโปรเจกต์สำหรับเขียนโค้ด (<strong>File &gt; New &gt; main.c</strong>)</p>
+<p><img alt="" src="../avr/images/mplabx_avr-8.png" /></p>
+<p>รูป: ตั้งชื่อไฟล์เป็น <code>main.c</code></p>
+<p>โค้ดตัวอย่างต่อไปนี้ สาธิตการเขียนคำสั่งเพื่อทำให้ขา <strong>GPIO</strong> หมายเลข <strong>PB5</strong> ของไมโครคอนโทรลเลอร์
+<strong>ATmega328P</strong>  สลับสถานะลอจิกทุก ๆ 100 มิลลิวินาที โดยใช้การรอเวลาและเรียกใช้ฟังก์ชัน <code>_delay_ms(...)</code>
+และ หากใช้บอร์ด <strong>Arduino Uno</strong> หรือ <strong>Nano</strong> จะพบว่า มีวงจร <strong>LED</strong> อยู่บนบอร์ดแล้วที่ขา <strong>PB5</strong>
+หรือ <strong>Arduino D13 Pin</strong></p>
+<p>ให้ลองคอมไพล์โค้ดตัวอย่าง เพื่อตรวจสอบความถูกต้องในเบื้องต้น โดยทำคำสั่งจากเมนู <strong>Production &gt; Build Project</strong></p>
+<pre><code class="language-c++">#define F_CPU   16000000UL  // CPU clock speed
+
+// This header file is included when using the XC8 compiler.
+#include &lt;xc.h&gt;
+#include &lt;util/delay.h&gt; // for _delay_ms()
+
+int main(void) {
+   DDRB |= _BV(DDB5); // set PB5 pin as output
+   while(1) {
+      PORTB |= _BV(PB5);  // output high to PB5 pin
+      _delay_ms( 100 );   // busy-wait delay for 100ms
+      PORTB &amp;= ~_BV(PB5); // output low to PB5 pin
+      _delay_ms( 100 );   // busy-wait delay for 100ms
+   }
+   return 0;
+}
+</code></pre>
+<p>รีจิสเตอร์ <code>DDRB</code> เกี่ยวข้องกับการกำหนดทิศทางอินพุตหรือเอาต์พุตที่ขาของพอร์ต <strong>B</strong> 
+ดังนั้นจะต้องกำหนดให้บิตในตำแหน่งที่ 5 ของรีจิสเตอร์ มีค่าเป็น 1 เพื่อใช้งานขา <strong>PB5</strong> เป็นเอาต์พุต
+(1 หมายถึง เอาต์พุต และ 0 หมายถึง อินพุต)</p>
+<p>การกำหนดสถานะลอจิกสำหรับเอาต์พุตของพอร์ต <strong>B</strong> เกี่ยวข้องกับการทำงานของรีจิสเตอร์  <code>PORTB</code>
+ดังนั้นการเซตหรือเคลียร์บิตที่ 5 ของรีจิสเตอร์ดังกล่าว จะเป็นตัวกำหนดสถานะลอจิก HIGH หรือ LOW ตามลำดับ</p>
+<p>ในไลบรารี <strong>avr-libc</strong> มีฟังก์ชัน <a href="https://www.nongnu.org/avr-libc/user-manual/group__util__delay.html"><code>_delay_ms(...)</code></a> ซึ่งทำหน้าที่หน่วงเวลาแบบ <strong>busy-wait delay</strong> 
+และได้ถูกการประกาศเอาไว้ในไฟล์ <code>util/delay.h</code> เป็นแบบ <strong>inline function</strong>
+ดังนั้นเมื่อเรียกใช้ฟังก์ชันนี้ (<strong>Function Call</strong>) คอมไพล์เลอร์จะแทนที่คำสั่งเรียกฟังก์ชันด้วยโค้ดที่อยู่ภายในฟังก์ชันดังกล่าว </p>
+<pre><code class="language-c++">static inline void _delay_ms(double __ms) __attribute__((always_inline));
+</code></pre>
+<p>นอกจากนั้น จะต้องมีการกำหนดค่าของสัญลักษณ์ <code>F_CPU</code> เพื่อระบุความถี่ที่ใช้ในการทำงานของซีพียู <strong>AVR</strong> 
+ในฟังก์ชัน <code>_delay_ms(...)</code> จะมีการเรียกใช้ฟังก์ชันอีกฟังก์ชันหนึ่งชื่อ 
+<a href="https://www.nongnu.org/avr-libc/user-manual/group__util__delay__basic.html"><code>_delay_loop_2(...)</code></a> ที่ทำคำสั่งแบบวนลูป (<strong>Delay loop</strong>)
+เพื่อนับนับถอยหลังทีละหนึ่งจากค่าเริ่มต้น หนึ่งรอบของการนับใช้เวลา 4 ไซเคิล 
+เช่น ถ้าความถี่ <code>F_CPU</code> เท่ากับ 1MHz จะนับถอยหลังโดยใช้เวลาสูงสุดไม่เกิน 262.14 มิลลิวินาที
+(<script type="math/tex">= 65536 \times 4 \times 10^{-6}</script> วินาที) ต่อการเรียกฟังก์ชันนี้หนึ่งครั้ง</p>
+<pre><code class="language-c++">void _delay_loop_2(uint16_t __count);
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="software-simulator">&#9655; <strong>การดีบักด้วย Software Simulator</strong><a class="headerlink" href="#software-simulator" title="Permanent link">#</a></h2>
+<p>การดีบักโปรแกรมที่ได้จากการคอมไพล์โค้ด ทำได้สองวิธีคือ การจำลองการทำงาน (ใช้ซอฟต์แวร์ที่เรียกว่า
+<strong>Simulator</strong>) และวิธีที่สองคือ การใช้ฮาร์ดแวร์ซึ่งประกอบด้วยบอร์ดไมโครคอนโทรลเลอร์
+และอุปกรณ์สำหรับการดีบักในวงจร (<strong>In-Circuit Debugger</strong>)</p>
+<p>ในบทความนี้ เราจะใช้วิธีการทดสอบการทำงานของโค้ดตัวอย่างในขั้นตอนดีบัก
+(เมนูคำสั่ง <strong>Debug &gt; Debug Project</strong>) โดยใช้ตัวจำลองการทำงาน
+ซึ่งเป็นวิธีที่สะดวก และไม่จำเป็นต้องมีอุปกรณ์จริง  </p>
+<p>การเข้าสู่ <strong>Debug Session</strong> จะมีสองขั้นตอนคือ การคอมไพล์โค้ดสำหรับดีบัก
+(<strong>Build for Debugging</strong>) และเริ่มต้นการทำงานของดีบักเกอร์ (<strong>Launch Debugger</strong>)</p>
+<p><img alt="" src="../avr/images/mplabx_avr_debug.png" /></p>
+<p>รูป: เมนูคำสั่งที่เกี่ยวข้องกับการดีบัก</p>
+<p>ก่อนเริ่มขั้นตอนดีบัก ให้กำหนดตำแหน่งหยุดชั่วคราวของดีบักเกอร์ในโค้ด <code>main.c</code> เช่น อาจจะกำหนดให้บรรทัดแรกภายใน
+ฟังก์ชัน <code>main(){...}</code> เป็นตำแหน่งหยุดแรก ตำแหน่งหยุดในลักษณะนี้เรียกว่า <strong>Breakpoint</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr_simulator_options.png" /></p>
+<p>รูป: การตั้งค่าในส่วนที่เกี่ยวข้องกับการทำงานของ <strong>Simulator</strong> เช่น การกำหนดความถี่หรือความเร็วในการทำคำสั่ง
+(<strong>Instruction Frequency</strong> ซึ่งมีค่า  <strong>Default</strong> เท่ากับ <strong>1MHz</strong>) เป็นต้น</p>
+<p><img alt="" src="../avr/images/mplabx_avr-9.png" /></p>
+<p>รูป: เข้าสู่ <strong>Debug Session</strong> สำหรับโปรเจกต์ และมีการหยุดชั่วคราวในตำแหน่งแรกของ <strong>Breakpoint</strong></p>
+<p>จากรูปตัวอย่างข้างล่าง จะเห็นได้ว่า มีการกำหนดตำแหน่งหยุดไว้ที่บรรทัด 10 และ 12 ตามลำดับ ซึ่งอยู่ภายในคำสั่งวนซ้ำแบบ
+<code>while</code></p>
+<p><img alt="" src="../avr/images/mplabx_avr-10.png" /></p>
+<p>รูป: เมื่อดีบักเกอร์ทำงานต่อไป (<strong>Continue</strong>) จะไปหยุดที่ตำแหน่งของ <strong>Breakpoint</strong> ในลำดับการทำงานถัดไป
+และให้สังเกตข้อความในหน้าต่าง <strong>Stopwatch</strong></p>
+<p>ในระหว่างการดีบัก ผู้ใช้สามารถเปิดหน้าต่างย่อยเพื่อดูสถานะการทำงานของไมโครคอนโทรลเลอร์ได้ เช่น</p>
+<ul>
+<li><strong>Stopwatch</strong> แสดงค่าของ <strong>Cycle Count</strong> ที่มีการนับจำนวนไซเคิลของซีพียูและบันทึกเอาไว้ และแสดงค่าตัวเลขล่าสุด
+เมื่อมีการหยุดการทำงานของดีบักเกอร์ชั่วคราวในแต่ละครั้ง</li>
+<li><strong>Window &gt; Debugging &gt; Variables</strong> แสดงค่าของตัวแปรที่มีการประกาศใช้ในโค้ด</li>
+<li><strong>Window &gt; Debugging &gt; Breakpoints</strong> แสดงตำแหน่งหยุดการทำงานชั่วคราวที่ได้มีการกำหนดไว้โดยผู้ใช้</li>
+<li><strong>Window &gt; Debugging &gt; Watches</strong> แสดงค่าของตัวแปรหรือรีจิสเตอร์เฉพาะรายการที่ได้เลือกมาโดยผู้ใช้</li>
+<li><strong>Window &gt; Debugging &gt; Call Stack</strong> แสดงลำดับชั้นของการเรียกฟังก์ชันต่าง ๆ ในโค้ด
+เช่น เริ่มต้นจากการทำงานของ <strong>Startup Code</strong> เมื่อหลังจากรีเซต 
+เช่น <a href="https://github.com/vancegroup-mirrors/avr-libc/blob/master/avr-libc/crt1/gcrt1.S"><code>gcrt1.S</code></a> ของ <a href="https://www.nongnu.org/avr-libc/"><strong>avr-libc</strong></a> แล้วเรียกฟังก์ชัน <code>main()</code> ซึ่งอาจมีการเรียกฟังก์ชันอื่นต่อไปอีกในขณะทำงาน</li>
+<li><strong>Window &gt; Debugging &gt; IO View</strong> แสดงค่าในรีจิสเตอร์ที่เกี่ยวข้องกับวงจรภายในของชิป  (<strong>Peripheral Registers</strong>)</li>
+<li><strong>Window &gt; Debugging &gt; Disassembly</strong> แสดงคำสั่งในภาษาแอสเซมบลีในแต่ละฟังก์ชันที่ได้จากการแปลงโค้ดภาษา <strong>C</strong> </li>
+<li><strong>Simulator &gt; IO Pins</strong> แสดงสถานะลอจิกของขา <strong>I/O</strong> ที่ผู้ใช้เจาะจงเลือกมา</li>
+</ul>
+<p><img alt="" src="../avr/images/mplabx_avr-11.png" /></p>
+<p>รูป: หน้าต่าง <strong>IO View</strong> แสดงค่าในรีจิสเตอร์ที่เกี่ยวข้องกับวงจรภายในของชิป  เช่น การดูค่าของรีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของพอร์ต <strong>B</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-12.png" /></p>
+<p>รูป:  หน้าต่าง <strong>I/O Memory (SFRs)</strong> แสดงค่าในรีจิสเตอร์ทั้งหมดที่เกี่ยวข้องกับวงจรภายใน</p>
+<p><img alt="" src="../avr/images/mplabx_avr_disassembly.png" /></p>
+<p>รูป: แสดงโค้ดในภาษา <strong>AVR Assembly</strong> ที่ได้จากการแปลงโค้ดภาษา <strong>C</strong> ในไฟล์ <code>main.c</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="io">&#9655; <strong>การแสดงสัญญาณ I/O เมื่อจำลองการทำงาน</strong><a class="headerlink" href="#io" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการสาธิตการจำลองการทำงานและแสดงรูปคลื่นสัญญาณที่เกิดขึ้นกับขา <strong>PB5</strong>
+ของไมโครคอนโทรลเลอร์ ซึ่งมีการทำคำสั่งในลูป <code>while(1){...}</code>
+เขียนค่าลงในรีจิสเตอร์ <code>PINB</code> เพื่อทำให้เกิดการสลับสถานะลอจิก
+ที่ขา <strong>PB5</strong> โดยไม่มีการหน่วงเวลา </p>
+<pre><code class="language-c++">#define F_CPU   16000000UL  // CPU clock speed 16MHz
+// This header file is included when using the XC8 compiler.
+#include &lt;xc.h&gt;
+
+int main(void) {
+  DDRB |= _BV(DDB5); // output pin for LED
+  while (1) {
+     PINB |= _BV(PINB5); // toggle LED
+  }
+  return 0;
+}
+</code></pre>
+<p>เมื่อแก้ไขโค้ดในไฟล์ <code>main.c</code> และคอมไพล์โค้ดแล้ว ให้เริ่มต้นขั้นตอนดีบักอีกครั้ง แล้วเปิดหน้าต่าง
+<strong>Window &gt; Simulator &gt; Logic Analyzer</strong> </p>
+<p><img alt="" src="../avr/images/mplabx_avr-13.png" /></p>
+<p>รูป: เปิดหน้าต่าง <strong>Simulator &gt; Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-14.png" /></p>
+<p>รูป: คลิกเลือกขาหมายเลข <strong>PB5</strong> (<strong>Selected Pin</strong>) </p>
+<p><img alt="" src="../avr/images/mplabx_avr-15.png" /></p>
+<p>รูป:  ในหน้าต่าง <strong>Logic Analyzer Settings</strong> จะเห็นว่า บัปเฟอร์สำหรับบันทึกข้อมูลมีขนาดจำกัด
+(<strong>Buffer Size</strong> สูงสุด 10,000 records)</p>
+<p><img alt="" src="../avr/images/mplabx_avr-16.png" /></p>
+<p>รูป:  แสดงรูปคลื่นสัญญาณที่ขา <strong>PB5</strong> ที่เป็นผลจากการทำงานของโปรแกรม
+แกนนอนแสดงจำนวนไซเคิลของการทำคำสั่ง (<strong>Instruction Cycles</strong>)</p>
+<p><img alt="" src="../avr/images/mplabx_avr-17.png" /></p>
+<p>รูป:  แสดงรูปคลื่นสัญญาณที่ขา <strong>PB5</strong> และตัวเลขในแกนนอนเป็นเวลา (ในหน่วยนาโนวินาที: nano sec)
+หากเปลี่ยนไปแสดงค่าตัวเลขเชิงเวลาแทนจำนวนไซเคิล</p>
+<p><img alt="" src="../avr/images/mplabx_avr-18.png" /></p>
+<p>รูป:  แสดงข้อความในหน้าต่าง <strong>Stopwatch</strong> จะเห็นได้ว่า การทำซ้ำในหนึ่งรอบเพื่อทำคำสั่งสลับสถานะลอจิกที่ขา <strong>PB5</strong>
+จะใช้เวลา 10 ไซเคิล หรือ <script type="math/tex">10 \times 1/(16\mbox{ MHz}) = 0.625\,us</script>
+ซึ่งเป็นความกว้างของพัลส์ (ช่วงที่เป็น HIGH และ LOW) ของสัญญาณเอาต์พุต</p>
+<p><img alt="" src="../avr/images/mplabx_avr_disassembly-2.png" /></p>
+<p>รูป: ตัวอย่างโค้ดในภาษา <strong>AVR Assembly</strong> ของโค้ดตัวอย่างที่ได้จากขั้นตอน <strong>Disassembly</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>การกำหนดสัญญาณอินพุตเพื่อทดสอบการทำงานของโปรแกรม</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการเปิดใช้งานอินเทอร์รัพท์ภายนอก หมายเลข 0 (<strong>External Interrupt 0</strong>)
+ของ <strong>AVR</strong> ที่ขา <strong>PD2</strong> (พอร์ต <strong>D</strong> บิตที่ 2) ซึ่งตรงกับขา <strong>D2</strong> ของบอร์ด <strong>Arduino</strong></p>
+<p>เมื่อมีการเปลี่ยนแปลงลอจิกที่ขาอินพุต <strong>PD2</strong> และเป็นขอบขาลง
+จะเกิดอินเทอร์รัพท์ และฟังก์ชัน <strong>ISR</strong> (<em>Interrupt Service Routine</em>) ที่เกี่ยวข้องจะทำงาน 
+และทำให้เกิดการสลับสถานะลอจิกหนึ่งครั้งที่ขา <strong>PB5</strong> (ขา <strong>D13</strong> ของบอร์ด <strong>Arduino</strong>)</p>
+<pre><code class="language-c++">#define F_CPU   16000000UL  // CPU clock speed 16MHz
+// This header file is included when using the XC8 compiler.
+#include &lt;xc.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/delay.h&gt;
+
+ISR(INT0_vect) { // ISR for external interrupt 0 
+  PINB |= _BV(PINB5); // toggle LED &lt;-- set breakpoint #1
+}
+
+void init_button_pin() {
+  DDRD  &amp;= ~_BV(DDD2);   // clear the PD2/D2 pin
+  PORTD |= _BV(PORTD2);  // enable internal pull-up on PD2
+  // set INT0 to trigger on both edges
+  EICRA &amp;= ~_BV(ISC01); 
+  EICRA |= _BV(ISC00); 
+  EIMSK |= _BV(INT0);  // turn on INT0 interrupt
+}
+
+void init_led_pin() {
+  DDRB |= _BV(DDB5); // output pin for LED
+}
+
+int main(void) {
+  init_led_pin();
+  init_button_pin();
+  sei(); // enable global interrupts
+  while (1) {
+     // nop operation
+     __asm(&quot;nop&quot;); // &lt;-- set breakpoint #2
+     _delay_us(100); // delay for 100 usec
+  }
+  return 0;
+}
+</code></pre>
+<p>ให้ไปที่เมนูคำสั่ง <strong>Window &gt; Simulator &gt; Stimulus</strong> เพื่อกำหนดรูปแบบของสัญญาณอินพุต
+ซึ่งจะนำไปใช้ในการจำลองการทำงานของโปรแกรม</p>
+<p>รูปแบบการสัญญาณกระตุ้นเพื่อใช้เป็นอินพุตมีหลายแบบให้เลือก ในตัวอย่างนี้ให้เลือกแบบ <strong>Clock Stimulus</strong>
+คือ การสร้างสัญญาณแบบพัลส์ที่เกิดขึ้นหลายครั้งหรือมองว่าเป็นสัญญาณคลื่นสี่เหลี่ยม (<strong>Rectangular Wave</strong>) </p>
+<ul>
+<li>ตั้งชื่อ <strong>Label</strong> เป็น <code>PulseIn</code></li>
+<li>เลือกขาอินพุต <strong>Pin</strong>เป็น <code>PD2</code></li>
+<li>ให้ค่าเริ่มต้น <strong>Initial</strong> เป็น <code>Low</code></li>
+<li>จำนวนไซเคิลสำหรับ <strong>Low Cycles</strong> เท่ากับ <code>160</code>  ไซเคิล</li>
+<li>จำนวนไซเคิลสำหรับ <strong>High Cycles</strong> เท่ากับ <code>160</code>  ไซเคิล</li>
+<li>เริ่มต้นสร้างสัญญาณ <strong>Begin</strong> ให้เป็น <code>Start</code></li>
+<li>หยุดสร้างสัญญาณ <strong>End</strong> ให้เป็น <code>Never</code></li>
+</ul>
+<p>จากนั้นจะต้องมีการกำหนดตำแหน่งสำหรับ <strong>Breakpoint</strong> เพื่อให้ดีบักเกอร์หยุดทำงานชั่วคราว</p>
+<ol>
+<li>หยุดที่คำสั่งแรกภายในฟังก์ชัน <strong>ISR</strong> และจะเกิดขึ้นเมื่อเกิดเหตุการณ์ขอบขาขึ้นหรือขาลงที่ขาอินพุต <strong>PD2</strong></li>
+<li>หยุดที่คำสั่ง <code>__asm("nop");</code> ในฟังก์ชัน <code>main()</code> ซึ่งจะเกิดขึ้นซ้ำโดยเว้นระยะห่างประมาณ 100 usec</li>
+</ol>
+<p>เมื่อเกิดการหยุดโดย <strong>Breakpoint</strong> ผู้ใช้จะต้องกดปุ่ม <strong>F5</strong> (<strong>Continue</strong>) หลาย ๆ ครั้ง 
+และหากต้องการดูการเปลี่ยนแปลงที่ขา <strong>PD2</strong> (อินพุต) และ <strong>PB5</strong> (เอาต์พุต)
+ให้เป็นเพิ่มรายการและสังเกตการเปลี่ยนแปลงในหน้าต่าง
+<strong>Window &gt; Simulator &gt; Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-19.png" /></p>
+<p>รูป: การตั้งค่าเพื่อสร้างสัญญาณอินพุตที่ขา <strong>PD2</strong> ในหน้าต่าง <strong>Stimulus</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-20.png" /></p>
+<p>รูป: การหยุดโดย <strong>Breakpoint</strong> เมื่อฟังก์ชัน <strong>ISR</strong> ถูกเรียกให้ทำงานเนื่องจากเกิดอินเทอร์รัพท์
+(เกิดขึ้นทุก ๆ 160 ไซเคิล หรือ 10 usec)</p>
+<p><img alt="" src="../avr/images/mplabx_avr-21.png" /></p>
+<p>รูป: ตัวอย่างข้อความที่แสดงให้เห็นในหน้าต่างของ <strong>Stopwatch</strong> ซึ่งมีการบันทึกหรือจับเวลาเมื่อหยุดชั่วคราวโดย
+<strong>Breakpoint</strong></p>
+<p><img alt="" src="../avr/images/mplabx_avr-22.png" /></p>
+<p>รูป: แสดงคลื่นสัญญาณดิจิทัลที่ขา <strong>PD2</strong> (อินพุต) และ <strong>PB5</strong> (เอาต์พุต) ที่ได้จากการจำลองการทำงาน
+และเห็นได้ว่า เมื่อมีการเปลี่ยนแปลงเกิดขึ้นที่สัญญาณอินพุต จะมีการเปลี่ยนแปลงที่สัญญาณเอาต์พุตตามมา</p>
+<p><img alt="" src="../avr/images/mplabx_avr-23.png" /></p>
+<p>รูป: วัดระยะห่างจากขอบขาลงของสัญญาณอินพุต <strong>PD2</strong> และขอบขาขึ้นของสัญญาณเอาต์พุต <strong>PB5</strong> 
+ซึ่งเป็นผลจากการตอบสนองต่ออินเทอร์รัพท์ที่เกิดขึ้น (มีระยะห่างเชิงเวลาหรือ <strong>Latency</strong> ประมาณ 1.44 usec)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้สาธิตการใช้งานซอฟต์แวร์ <strong>MPLAB-X IDE v6.0.0</strong> สำหรับการเขียนโปรแกรมภาษา <strong>C</strong>
+เพื่อนำไปทดลองใช้งานกับไมโครคอนโทรลเลอร์ <strong>ATmega328P</strong> และทดสอบการทำงานของโค้ดตัวอย่างโดยใช้ตัวจำลองการทำงาน
+(<strong>Simulator</strong>) ของซอฟต์แวร์ <strong>MPLAB-X IDE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-01-21 | Last Updated: 2022-01-23</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

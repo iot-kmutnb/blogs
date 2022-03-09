@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/freertos/arduino_avr_part-4/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino-FreeRTOS for AVR (Part 4) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-freertos-for-avr-part-4" class="nav-link">Arduino-FreeRTOS for AVR (Part 4)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การใช้ฟังก์ชันเพื่อควบคุมการทำงานของทาสก์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-suspend-resume-task" class="nav-link">&#9655; ตัวอย่างที่ 1: Suspend &amp; Resume Task</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-resume-task-from-isr" class="nav-link">&#9655; ตัวอย่างที่ 2: Resume Task from ISR</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-change-task-priority-at-runtime" class="nav-link">&#9655; ตัวอย่างที่ 3: Change Task Priority at Runtime</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-resume-suspend-tasks-in-sequence" class="nav-link">&#9655; ตัวอย่างที่ 4: Resume / Suspend Tasks in Sequence</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5-task-delay" class="nav-link">&#9655; ตัวอย่างที่ 5: Task Delay</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#6-task-delay" class="nav-link">&#9655; ตัวอย่างที่ 6: Task Delay</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-freertos-for-avr-part-4">Arduino-FreeRTOS for AVR (Part 4)<a class="headerlink" href="#arduino-freertos-for-avr-part-4" title="Permanent link">#</a></h1>
+<p>บทความนี้ (ตอนที่ 4) นำเสนอตัวอย่างการเขียนโค้ดโดยใช้ <a href="https://www.freertos.org/"><strong>FreeRTOS Library</strong></a>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino</strong> ที่ใช้ชิป <strong>8-bit Atmel AVR</strong> 
+(เช่น บอร์ด <strong>Uno</strong> | <strong>Nano</strong> | <strong>MEGA2560</strong>) และใช้ซอฟต์แวร์ <strong>Arduino IDE</strong>
+ในการเขียนโค้ด รวมถึงสาธิตการจำลองการทำงานด้วย <strong>Web-based Wokwi AVR Simulator</strong></p>
+<p><strong>Keywords:</strong> <em>Arduino</em>, <em>8-bit AVR MCU</em>, <em>FreeRTOS</em>, <em>Wokwi AVR Simulator</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การใช้ฟังก์ชันเพื่อควบคุมการทำงานของทาสก์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>จากบทความในตอนที่แล้ว (ตอนที่ <a href="../../freertos/arduino_avr_part-1/">1</a> | <a href="../../freertos/arduino_avr_part-2/">2</a> | <a href="../../freertos/arduino_avr_part-3/">3</a>) เราได้เห็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับ <strong>Arduino Boards (AVR MCU)</strong> ใช้งานร่วมกับไลบรารี <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library"><strong>Arduino-FreeRTOS Library</strong></a> 
+และได้ลองใช้ <a href="https://wokwi.com/"><strong>Web-based Wokwi Simulator</strong></a> และ <strong>Web-based GDB-AVR debugger</strong> เพื่อจำลองการทำงานของโค้ดและตรวจสอบการทำงาน</p>
+<p>บทความนี้นำเสนอเนื้อหาเกี่ยวกับการควบคุมการทำงานของทาสก์  (<a href="https://www.freertos.org/a00112.html"><strong>Task Control</strong></a>) เช่น การหยุดชั่วคราวหรือให้ทำงานต่อ  (<strong>Task Suspend &amp; Resume</strong>) การเปลี่ยนระดับความสำคัญของทาสก์ เป็นต้น</p>
+<p>ลองมาดูตัวอย่างฟังก์ชันพื้นฐานของ <strong>FreeRTOS</strong> ที่เกี่ยวข้องกับการทำงานของทาสก์ 
+(<a href="https://www.freertos.org/a00112.html"><strong>Task Control Functions</strong></a>)</p>
+<ul>
+<li><a href="https://www.freertos.org/a00125.html"><code>xTaskCreate(...)</code></a> สร้างทาสก์ใหม่</li>
+<li><a href="https://www.freertos.org/a00126.html"><code>vTaskDelete(...)</code></a> ยกเลิกการใช้งานทาสก์ในระหว่างการทำงานของโปรแกรม</li>
+<li><a href="https://www.freertos.org/a00127.html"><code>vTaskDelay(...)</code></a> ให้ทาสก์หยุดรอเวลาตามระยะเวลาที่กำหนดไว้</li>
+<li><a href="https://www.freertos.org/vtaskdelayuntil.html"><code>vTaskDelayUntil(...)</code></a>
+หรือ <a href="https://www.freertos.org/xtaskdelayuntiltask-control.html"><code>xTaskDelayUntil(...)</code></a>
+ให้ทาสก์หยุดรอจนถึงเวลาที่กำหนดไว้</li>
+<li><a href="https://www.freertos.org/a00129.html"><code>vTaskPrioritySet(...)</code></a> กำหนดระดับความสำคัญของทาสก์</li>
+<li><a href="https://www.freertos.org/a00128.html"><code>vTaskPriorityGet(...)</code></a> อ่านค่าระดับความสำคัญของทาสก์ในระหว่างการทำงานของโปรแกรม</li>
+<li><a href="https://www.freertos.org/a00130.html"><code>vTaskSuspend(...)</code></a> หยุดการทำงานของทาสก์ชั่วคราว</li>
+<li><a href="https://www.freertos.org/a00131.html"><code>vTaskResume(...)</code></a> ให้ทาสก์ทำงานต่อ
+<a href="https://www.freertos.org/taskresumefromisr.html"><code>xTaskResumeFromISR()</code></a>
+หรือให้ทาสก์ทำงานต่อจากการทำงานของ <strong>ISR</strong> (<em>Interrupt Service Routine</em>) ที่กำลังทำงานอยู่ในขณะนั้น</li>
+</ul>
+<p>หากสังเกตการตั้งชื่อของฟังก์ชันเหล่านี้ ตัวอักษรแรกของชื่อฟังก์ชัน จะหมายถึง ชนิดของข้อมูลสำหรับค่าของฟังก์ชัน (<strong>Return Type</strong>) เช่น </p>
+<ul>
+<li>ถ้าขึ้นต้นด้วย <code>x</code> หมายถึง  ให้ค่าเป็น <strong>Non-standard Integer Types</strong> เช่น  ชนิดข้อมูล <code>BaseType_t</code> และ <code>TickType_t</code> ที่ได้มีการประกาศไว้ใช้สำหรับ <strong>FreeRTOS</strong></li>
+<li>ถ้าขึ้นต้นด้วย <code>v</code> หมายถึง <code>void</code> ไม่ให้ค่ากลับคืนมาเมื่อจบการทำงานของฟังก์ชัน  </li>
+</ul>
+<p>แนะนำให้ศึกษารายละเอียดเพิ่มเติมได้จาก: <a href="https://www.freertos.org/FreeRTOS-Coding-Standard-and-Style-Guide.html"><strong>"FreeRTOS Naming Convention"</strong></a></p>
+<p>ข้อสังเกต: ในการใช้งานคำสั่งหรือฟังก์ชันของ <strong>FreeRTOS API</strong> จะต้องมีการตรวจสอบดูก่อนว่า สามารถใช้งานได้หรือไม่สำหรับ <strong>FreeRTOS Port</strong> (ในกรณีนี้คือ <strong>FreeRTOS</strong> สำหรับ <strong>AVR</strong>) โดยดูได้จากไฟล์สำหรับการปรับและตั้งค่าใช้งาน (<a href="https://www.freertos.org/a00110.html"><strong>FreeRTOS Customization</strong></a>) ที่เรียกว่า <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/FreeRTOSConfig.h"><code>FreeRTOSConfig.h</code></a> </p>
+<p>ตัวอย่างการกำหนดค่าสำหรับ <strong>Arduino-FreeRTOS Library (FreeRTOS Kernel V10.4.6)</strong>
+มีตัวอย่างดังนี้ (ตัดมาบางส่วน) </p>
+<pre><code class="language-c++">#define INCLUDE_vTaskPrioritySet                1
+#define INCLUDE_uxTaskPriorityGet               1
+#define INCLUDE_vTaskDelete                     1
+#define INCLUDE_vTaskCleanUpResources           1
+#define INCLUDE_vTaskSuspend                    1
+#define INCLUDE_vResumeFromISR                  1
+#define INCLUDE_xTaskDelayUntil                 1
+#define INCLUDE_vTaskDelay                      1
+#define INCLUDE_xTaskGetSchedulerState          0
+#define INCLUDE_xTaskGetIdleTaskHandle          0
+#define INCLUDE_xTaskGetCurrentTaskHandle       0
+#define INCLUDE_uxTaskGetStackHighWaterMark     1
+</code></pre>
+<p>จากตัวอย่างสัญลักษณ์ (<strong>Macros</strong>) ที่มีชื่อขึ้นต้นด้วย <code>INCLUDE_</code> หากมีค่าเป็น 1 หมายความว่า
+มีฟังก์ชันตามชื่อที่เกี่ยวข้องให้เรียกใช้งานได้ใน <strong>FreeRTOS</strong>
+เช่น <code>INCLUDE_vTaskPrioritySet</code> มีค่าเป็น 1 
+ดังนั้นในการเขียนโค้ด ผู้ใช้สามารถทำคำสั่ง <code>vTaskPrioritySet(...)</code> ได้</p>
+<p>ลองมาพิจารณาตัวอย่างการกำหนดค่าใช้งานสำหรับ <strong>FreeRTOS-AVR</strong> ต่อไปนี้</p>
+<pre><code class="language-c++">#define configMAX_PRIORITIES            4
+#define configUSE_PREEMPTION            1
+#define configUSE_TIME_SLICING          1
+#define configUSE_IDLE_HOOK             1
+#define configMINIMAL_STACK_SIZE        ( 192 )
+</code></pre>
+<p>ซึ่งมีคำอธิบายดังนี้</p>
+<ul>
+<li>ระดับความสำคัญของทาสก์ (ต่ำสุด-สูงสุด):  <code>0</code>  ถึง  <code>3</code>  หรือ <code>(configMAX_PRIORITIES-1)</code></li>
+<li>ใช้วิธีจัดลำดับการทำงานของทาสก์แบบ <strong>Preemptive Scheduling</strong>
+  (ไม่ได้เลือกใช้วิธี <strong>Co-operative Scheduling</strong>)</li>
+<li>มีการแบ่งเวลาให้ทาสก์ที่มีระดับความสำคัญเท่ากันได้ทำงานสลับกันไป (<strong>Time Slicing</strong>)</li>
+<li>มีการเปิดใช้งานฟังก์ชันที่เรียกว่า <strong>Idle Hook Function</strong> &mdash;
+เมื่อไม่มีทาสก์ใดอยู่ในสถานะพร้อมจะทำงาน ทาสก์ของระบบที่เรียกว่า <a href="https://www.freertos.org/RTOS-idle-task.html"><strong>Idle Task</strong></a> ซึ่งเป็นทาสก์ที่ถูกสร้างขึ้นมาในระบบโดยอัตโนมัติ ก็จะได้ทำงาน แล้วไปเรียกฟังก์ชันดังกล่าวที่กำหนดโดยผู้ใช้</li>
+<li>มีขนาดของ <strong>Task Stack</strong> อย่างน้อยที่สุด เท่ากับ 192 </li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-suspend-resume-task">&#9655; <strong>ตัวอย่างที่ 1: Suspend &amp; Resume Task</strong><a class="headerlink" href="#1-suspend-resume-task" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างแรกสาธิตการเขียนเพื่อสร้างทาสก์ <code>Task1</code> ในฟังก์ชัน <code>setup()</code> 
+และมีการสร้างฟังก์ชัน <code>task1()</code> สำหรับการทำงานของทาสก์ดังกล่าว ฟังก์ชันนี้จะทำให้เกิดการสลับสถานะลอจิกที่ขาเอาต์พุต
+<strong>Arduino D12 pin</strong> ทุก ๆ 500 มิลลิวินาที แต่เมื่อสลับสถานะลอจิกครบ 10 ครั้ง แล้วจะหยุดการทำงานของทาสก์ดังกล่าว
+ด้วยการทำคำสั่ง <code>vTaskSuspend()</code> </p>
+<p>เมื่อทาสก์ <code>Task1</code> หยุดการทำงานชั่วคราว อยู่ในสถานะ <strong>Suspended</strong>
+และก็ไม่มีทาสก์อื่นใดในระบบที่พร้อมจะทำงานอีกก ดังนั้น <strong>FreeRTOS Scheduler</strong>
+หรือ ตัวจัดลำดับการทำงานของทาสก์ในระบบ จะเปลี่ยนให้ทาสก์ที่เรียกว่า <strong>Idle Task</strong> ได้ทำงาน 
+จนกว่าจะมีทาสก์อื่นที่มีระดับความสำคัญสูงกว่าพร้อมที่จะทำงาน</p>
+<p>สำหรับ <strong>Arduino-FreeRTOS port</strong> ได้มีการกำหนดให้เปิดใช้งาน <strong>Idle Hook Function</strong>
+และเมื่อ <strong>Idle Task</strong> ทำงาน ก็จะไปเรียกฟังก์ชัน <code>loop()</code> ของ <strong>Arduino Sketch</strong> ให้ทำงาน </p>
+<p>หากดูเนื้อหาในไฟล์  <a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/FreeRTOSConfig.h"><code>FreeRTOSConfig.h</code></a> มีเปิดใช้งาน <strong>FreeRTOS Idle Hook Function</strong> และจะฟังก์ชัน <code>loop(){...}</code> ของ <strong>Arduino Sketch</strong> จะถูกเรียกให้ทำงาน
+เมื่อไม่มีทาสก์ใดอยู่ในสถานะพร้อมที่จะทำงาน ยกเว้นทาสก์ที่เป็น <strong>Idle Task</strong> ของ <strong>FreeRTOS</strong></p>
+<pre><code class="language-c++">#define configUSE_IDLE_HOOK             1
+#define configIDLE_SHOULD_YIELD         1
+</code></pre>
+<p>ในตัวอย่างนี้ ฟังก์ชัน <code>loop()</code> จะทำงานซ้ำหลายรอบ และมีการนับจำนวนการเรียกฟังก์ชันนี้ หากได้จำนวนครั้งตามที่กำหนดไว้โดย
+<code>IDLE_CNT_MAX</code> จะมีการทำให้ทาสก์ <code>Task1</code> ได้กลับมาทำงานอีกครั้ง กล่าวคือ เปลี่ยนจากสถานะ <strong>Suspended</strong>
+มาเป็น <strong>Ready</strong> และจะได้ทำงานในลำดับถัดไป เพราะเป็นทาสก์ที่มีระดับความสำคัญสูงสุดในตัวอย่างนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; // include the FreeRTOS library
+#include &lt;task.h&gt;
+
+#define LED1_PIN   (13)  // Arduino D13 pin (for 'Idle Task')
+#define LED2_PIN   (12)  // Arduino D12 pin (for 'Task1`)
+
+TaskHandle_t task1_handle = NULL;
+
+void setup() {
+  pinMode( LED1_PIN, OUTPUT );
+  Serial.begin( 115200 );
+
+  xTaskCreate(
+    task1,                // task-entry function for &quot;Task1&quot; 
+    &quot;Task1&quot;,              // task name: &quot;Task1&quot;
+    128,                  // task stack (allocated on heap)
+    (void*)LED2_PIN,      // task param (LED pin)
+    tskIDLE_PRIORITY+1,   // task priority 1
+    &amp;task1_handle );      // task handle for Task1
+
+  Serial.println( &quot;FreeRTOS started...&quot; );
+}
+
+// Note that configUSE_IDLE_HOOK is set to 1.
+// In Arduino the loop() function is hooked to the FreeRTOS Idle Task
+// and will be called whenever the task scheduler runs its Idle Task.
+
+#define IDLE_CNT_MAX  (100000UL)
+static uint32_t idle_cnt = 0;
+String str; 
+
+void loop() { // called by the Idle Task
+  if ( ++idle_cnt &lt; IDLE_CNT_MAX ) {
+    digitalWrite( LED1_PIN, HIGH );
+  } else {
+    idle_cnt = 0; // reset the counter for idle-hook function calls
+    digitalWrite( LED1_PIN, LOW ); // toggle the LED1
+    Serial.println( F(&quot;Idle-hook function resumes Task1..&quot;) );
+    str = &quot;Ticks: &quot;;
+    str += xTaskGetTickCount();
+    Serial.println( str.c_str() ); // show current FreeRTOS ticks
+    vTaskResume( task1_handle );   // resume Task1
+  }
+}
+
+// task-entry function for Task1
+void task1( void* pvParameters ) { 
+  int blink_cnt = 0;           // the number of LED blinks
+  int pin = (int)pvParameters; // use the task parameter for LED pin
+  pinMode( pin, OUTPUT );      // set output direction for LED
+  while (1) {
+     digitalWrite( pin, !digitalRead(pin) ); // toggle LED
+     delay( 200 );  // delay for 200 msec
+     if ( ++blink_cnt &gt;= 10 ) { // blink the LED up to 10 times 
+       blink_cnt = 0;           // reset the LED-blink counter
+       vTaskSuspend( NULL );    // let Task1 suspend itself.
+     }
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>คำถาม:</strong> เราจะสังเกตพฤติกรรมการทำงานของโค้ดตัวอย่างนี้ได้อย่างไร ?</p>
+<p>เราสามารถใช้ <strong>Wokwi AVR Simulator</strong> จำลองการทำงานของโค้ดตัวอย่าง และดูสัญญาณการเปลี่ยนแปลงที่ขาเอาต์พุต
+<code>LED1_PIN</code> และ <code>LED2_PIN</code> (ตรงกับขา <strong>D13</strong> และ <strong>D12</strong> ตามลำดับ)
+ในแต่ละช่วงเวลาของการทำงาน และดูข้อความเอาต์พุตผ่านทาง <code>Serial</code> เป็นต้น</p>
+<p><img alt="" src="../avr/images/avr_wokwi_suspend_resume-1.png" /></p>
+<p>รูป: การจำลองการทำงานด้วย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/avr_wokwi_suspend_resume-2.png" /></p>
+<p>รูป:  การใช้โปรแกรม <strong>GTKWave</strong> แสดงรูปคลื่นสัญญาณที่ขาเอาต์พุต  <strong>D13</strong> และ <strong>D12</strong> จากข้อมูลในไฟล์ .vcd </p>
+<p>จากรูปจะเห็นได้ว่า มีสัญญาณพัลส์ที่ขา <strong>D13</strong> ซึ่งเกิดจากการทำงานของทาสก์ <code>Task1</code>
+มีความกว้างช่วง <strong>High</strong> 200 มิลลิวินาที โดยประมาณ และเกิดพัลส์ 5 ครั้งตามลำดับ
+(มีการเปลี่ยนสถานะลอจิก 10 ครั้ง)  ก่อนที่จะหยุดการทำงานชั่วคราว (<strong>Task Suspended</strong>) </p>
+<p>ถัดจากนั้น จะเกิดสัญญาณพัลส์ที่ขา <strong>D12</strong> ซึ่งเป็นผลมาจากการทำงานของ <strong>Idle Task</strong> 
+ที่ทำคำสั่งต่าง ๆ ในฟังก์ชัน <code>loop()</code> ไปจนกว่าจะมีการทำให้ <code>Task1</code> กลับมาอยู่ในสถานะพร้อมทำงานอีกครั้ง
+(<strong>Task Resumed</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-resume-task-from-isr">&#9655; <strong>ตัวอย่างที่ 2: Resume Task from ISR</strong><a class="headerlink" href="#2-resume-task-from-isr" title="Permanent link">#</a></h2>
+<p>ตัวอย่างที่สองนี้มีหลักการทำงานคล้ายกับตัวอย่างแรก แต่มีความแตกต่างตรงที่การทำให้ทาสก์ <code>Task1</code>
+ได้กลับมาทำงานต่อไปหลังจากที่หยุดการทำงานชั่วคราว จะเกิดขึ้นเมื่อมีการกดปุ่มสำหรับสัญญาณอินพุตที่ขา <strong>D2</strong>
+(ทำงานแบบ <strong>Active-Low</strong>) </p>
+<p>เมื่อฟังก์ชัน <strong>ISR</strong> สำหรับเหตุการณ์ดังกล่าวถูกเรียกให้ทำงาน (ทุกครั้งที่เกิดขอบขาลง หรือ <strong>Falling-Edge</strong>
+และมีระยะห่างจากเหตุการณ์ครั้งก่อนอย่างน้อย 500 มิลลิวินาที) ก็จะมีการทำคำสั่ง <code>xTaskResumeFromISR()</code>
+เพื่อให้ทาสก์ <code>Task1</code> เปลี่ยนสถานะจาก <strong>Suspended</strong> 
+ไปอยู่สถานะ <strong>Ready</strong> และทำคำสั่ง <code>portYIELD_FROM_ISR()</code>
+เพื่อให้เกิดการเปลี่ยนบริบทการทำงานให้ทาสก์อื่นที่พร้อมจะทำงาน ซึ่งก็คือ ทาสก์ <code>Task1</code> ในกรณีตัวอย่างนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; // include the FreeRTOS library
+#include &lt;task.h&gt;
+
+#define LED1_PIN   (13)  // Arduino D13 pin (for 'Idle Task')
+#define LED2_PIN   (12)  // Arduino D12 pin (for 'Task1`)
+#define BTN_PIN    (2)   // Arduino D2 pin  (for button input)
+
+TaskHandle_t task1_handle = NULL;
+
+volatile uint32_t ts;  // timestamp
+
+void btn_isr() { // ISR for push button input
+  BaseType_t status = pdFALSE;
+  uint32_t now = millis();
+  if ( now - ts &gt;= 500 ) {
+     // toggle LED1 pin
+     digitalWrite( LED1_PIN, !digitalRead( LED1_PIN ) );
+     status = xTaskResumeFromISR( task1_handle ); // resume Task1
+  }
+  ts = now; // update timestamp
+  if ( status == pdTRUE ) {
+     portYIELD_FROM_ISR( ); // yield CPU from ISR
+  }
+}
+
+void setup() {
+  pinMode( LED1_PIN, OUTPUT );
+  pinMode( BTN_PIN, INPUT_PULLUP );
+  Serial.begin( 115200 );
+  // enable external interrupt 0 (EINT0) for button input 
+  attachInterrupt( digitalPinToInterrupt(BTN_PIN), btn_isr, FALLING );
+  ts = millis(); // save current time (in msec)
+
+  xTaskCreate(
+    task1,              // task-entry function for &quot;Task1&quot; 
+    &quot;Task1&quot;,            // task name: &quot;Task1&quot;
+    128,                // task stack (allocated on heap)
+    (void*)LED2_PIN,    // task param (LED pin)
+    tskIDLE_PRIORITY+1, // task priority 1
+    &amp;task1_handle );    // task handle for Task1
+
+  Serial.println( &quot;FreeRTOS started...&quot; );
+}
+
+void loop() { }
+
+// task-entry function for Task1
+void task1( void* pvParameters ) { 
+  int blink_cnt = 0;           // the number of LED blinks
+  int pin = (int)pvParameters; // the task parameter for LED pin
+  pinMode( pin, OUTPUT );      // set output direction for LED
+  while (1) {
+     digitalWrite( pin, !digitalRead(pin) ); // toggle LED
+     delay( 200 );  // delay for 200 msec
+     if ( ++blink_cnt &gt;= 10 ) { // blink the LED up to 10 times 
+       blink_cnt = 0;           // reset the LED-blink counter
+       vTaskSuspend( NULL );    // let Task1 suspend itself
+     }
+  }
+}
+</code></pre>
+<p><img alt="" src="../avr/images/avr_wokwi_suspend_resume-3.png" /></p>
+<p>รูป:  การจำลองการทำงานสำหรับตัวอย่างที่ 2</p>
+<p><img alt="" src="../avr/images/avr_wokwi_suspend_resume-4.png" /></p>
+<p>รูป:  แสดงรูปคลื่นสัญญาณที่บันทึกได้จากขา <strong>D13, D12, D2</strong> ตามลำดับ</p>
+<p>ช่วงที่สัญญาณ <strong>D2</strong> เป็น <strong>Low</strong> เกิดจากการกดปุ่มในขณะนั้น และเมื่อ<strong>ISR</strong> ทำงาน จะทำให้ <strong>D12</strong>
+เปลี่ยนสถานะลอจิกหนึ่งครั้ง และจะทำให้ทาสก์ <code>Task1</code> เปลี่ยนจาก <strong>Suspended</strong>
+เป็น <strong>Ready</strong> และ <strong>Running</strong> ตามลำดับ และจะเห็นว่า มีสัญญาณพัลส์ที่ขา <strong>D13</strong> เกิดขึ้นตามมา</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-change-task-priority-at-runtime">&#9655; <strong>ตัวอย่างที่ 3: Change Task Priority at Runtime</strong><a class="headerlink" href="#3-change-task-priority-at-runtime" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการเปลี่ยนระดับความสำคัญของทาสก์ในระหว่างการทำงานของโปรแกรม 
+โดยการสร้างทาสก์ <code>Task1</code> และ <code>Task2</code> ที่มีระดับความสำคัญในตอนเริ่มต้นเท่ากัน
+และได้ฟังก์ชันชื่อ <code>task()</code> เพื่อแสดงพฤติกรรมการทำงานของทาสก์
+กล่าวคือ ให้สลับสถานะลอจิกที่ขาเอาต์พุตที่เกี่ยวข้อง แต่ละทาสก์จะใช้ขาเอาต์พุตที่ต่างกัน
+(<strong>D11</strong> และ <strong>D12</strong> ตามลำดับ)</p>
+<p>เมื่อทาสก์ได้ทำงาน จะเปลี่ยนระดับความสำคัญของทาสก์ขึ้นแล้วสลับสถานะลอจิกที่ขาเอาต์พุตทั้งหมด 10 ครั้ง 
+และเว้นระยะเวลาในแต่ละครั้ง ประมาณ 10 มิลลิวินาที โดยทำคำสั่ง <code>delay()</code> ซึ่งทำงานในลักษณะ <strong>wait-busy</strong>
+ก่อนเปลี่ยนระดับความสำคัญของทาสก์กลับไปเหมือนเดิม ในช่วงเวลาดังกล่าว จะเกิดสัญญาณพัลส์ จำนวน 5 ครั้ง
+(ช่วงที่เป็น <strong>High</strong> กว้างประมาณ 10 มิลลิวินาที ตามด้วยช่วงที่ Low กว้าง 10 มิลลิวินาที) </p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; // include the FreeRTOS library
+#include &lt;task.h&gt;
+
+#define LED1_PIN   (11)  // Arduino D11 pin 
+#define LED2_PIN   (12)  // Arduino D12 pin
+
+UBaseType_t task_priority = (tskIDLE_PRIORITY+1);
+
+void setup() {
+  pinMode( LED1_PIN, OUTPUT );
+  pinMode( LED2_PIN, OUTPUT );
+  Serial.begin( 115200 );
+
+  xTaskCreate(
+    task,              // task-entry function for &quot;Task1&quot; 
+    &quot;Task1&quot;,           // task name: &quot;Task1&quot;
+    128,               // task stack (allocated on heap)
+    (void*)LED1_PIN,   // task param (LED pin)
+    task_priority,     // task priority
+    NULL );            // task handle for Task1
+
+  xTaskCreate(
+    task,              // task-entry function for &quot;Task2&quot; 
+    &quot;Task2&quot;,           // task name: &quot;Task2&quot;
+    128,               // task stack (allocated on heap)
+    (void*)LED2_PIN,   // task param (LED pin)
+    task_priority,     // task priority 
+    NULL );            // task handle for Task2
+
+  Serial.println( &quot;FreeRTOS started...&quot; );
+}
+
+void loop() { }
+
+#define RAISE_PRIORITY   (1)
+
+// task-entry function
+void task( void* pvParameters ) { 
+  int pin = (int)pvParameters; // the task parameter for LED pin
+  pinMode( pin, OUTPUT );      // set output direction for LED
+  while (1) {
+    UBaseType_t priority = uxTaskPriorityGet( NULL );
+#ifdef RAISE_PRIORITY
+    vTaskPrioritySet( NULL, priority+1 ); // raise priority
+#endif 
+    for ( int i=0; i &lt; 10; i++ ) {
+       digitalWrite( pin, !digitalRead(pin) ); // toggle LED
+       delay( 10 ); // busy-wait for 10 msec
+    }
+    vTaskPrioritySet( NULL, priority ); // restore priority
+  }
+}
+</code></pre>
+<p>การทำงานของ <strong>FreeRTOS</strong> สำหรับ <strong>AVR</strong> จะมีระยะเวลาการเกิด <strong>OS Tick</strong>
+ประมาณ <strong>~16 msec</strong> โดยใช้วงจร <strong>WDT</strong> เมื่อเกิดเหตุการณ์ <strong>OS Tick</strong> ในแต่ละครั้ง
+จะต้องมีการตรวจสอบดูว่า มีทาสก์ใดที่มีระดับความสำคัญสูงกว่า
+และพร้อมจะทำงานหรือไม่ หากมี ก็จะเกิดการเปลี่ยนบริบทการทำงานของทาสก์ (<strong>Task Switching</strong>)</p>
+<p>ในตัวอย่างนี้ การทำงานของแต่ละทาสก์ เมื่อเปลี่ยนเข้าสู่สถานะ <strong>Running</strong> 
+จะมีการยกระดับความสำคัญของทาสก์ โดยใช้คำสั่ง <code>vTaskPrioritySet(...)</code> 
+ให้สูงกว่าทาสก์อื่นในระบบที่มีอยู่ในขณะนั้น แล้วจะสลับสถานะลอจิกที่ขาเอาต์พุต 10 ครั้ง 
+ใช้เวลาโดยรวมประมาณ  100 มิลลิวินาที (10 msec <script type="math/tex">\times</script> 10 iterations / loop) 
+ดังนั้นในช่วงเวลาดังกล่าว จะไม่มีการเปลี่ยนให้ทาสก์อื่นได้ทำงาน</p>
+<p><img alt="" src="../avr/images/avr_wokwi_priority_change-1.png" /></p>
+<p>รูป: การต่อวงจรและจำลองการทำงานด้วย <strong>Wokwi AVR Simulator</strong></p>
+<p><img alt="" src="../avr/images/avr_wokwi_priority_change-2.png" /></p>
+<p>รูป: แสดงสัญญาณที่ขาเอาต์พุต <strong>D11</strong> และ <strong>D12</strong> ซึ่งได้จากการจำลองการทำงาน (มีการยกระดับความสำคัญ)</p>
+<p>แต่ถ้าลองแก้ไขโค้ดตัวอย่าง โดยไม่ให้มีการยกระดับความสำคัญของทาสก์
+แล้วทำขั้นตอนจำลองการทำงานอีกครั้ง ก็จะให้ผลการทำงานที่แตกต่างไปจากผลก่อนหน้านี้ ตามรูปต่อไปนี้</p>
+<p><img alt="" src="../avr/images/avr_wokwi_priority_change-3.png" /></p>
+<p>รูป: แสดงสัญญาณที่ขาเอาต์พุต <strong>D11</strong> และ <strong>D12</strong> ซึ่งได้จากการจำลองการทำงาน (ไม่มีการยกระดับความสำคัญ)</p>
+<p>ทาสก์ <code>Task1</code> และ <code>Task2</code> เมื่อไม่มีการยกระดับความสำคัญให้สูงขึ้นเมื่อทำงาน 
+ทั้งสองจึงมีระดับความสำคัญเท่ากันเหมือนตอนเริ่มต้น และจะไม่สามารถทำงานต่อเนื่องได้นานกว่า <strong>~16 msec</strong>
+หรือ <strong>1 OS Tick</strong> เพราะ <strong>Task Scheduler</strong> จะบังคับให้เกิดการสลับให้อีกทาสก์ได้ทำงานบ้าง
+(สลับกันไปแบบ <strong>Round Robin</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-resume-suspend-tasks-in-sequence">&#9655; <strong>ตัวอย่างที่ 4: Resume / Suspend Tasks in Sequence</strong><a class="headerlink" href="#4-resume-suspend-tasks-in-sequence" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการสร้างทาสก์ตามจำนวนที่กำหนดไว้โดย <code>NUM_LEDS</code> (มีค่าเท่ากับ 4)
+แต่ละทาสก์จะสร้างสัญญาณพัลส์กว้างประมาณ 100 msec โดยทำให้ลอจิกเป็น <strong>High</strong> ก่อน
+จากนั้นหน่วงเวลาด้วยคำสั่ง <code>vTaskDelay()</code> แล้วทำให้ลอจิกกลับไปเป็น <strong>Low</strong> 
+ถือว่าจบการทำงานหนึ่งรอบ</p>
+<p>นอกจากนั้น ทาสก์ที่ถูกสร้างขึ้นใหม่ จะอยู่ในสถานะ <strong>Suspended</strong> ในตอนเริ่มต้น
+แต่จะถูกเปลี่ยนสถานะจาก <strong>Suspended</strong> เป็น <strong>Ready</strong> ไปตามลำดับ  ดังนั้นทาสก์เหล่านี้
+จะได้ทำงานตามลำดับที่กำหนดไว้ </p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; // tested on Uno
+#include &lt;task.h&gt;
+
+#define LED_ON     HIGH
+#define LED_OFF    LOW
+#define NUM_LEDS   (4)
+
+const byte LED_PINS[] = { 5,6,7,8 };
+
+TaskHandle_t taskHandles[ NUM_LEDS ];
+
+void setup() {
+  char sbuf[4];
+  int  priority = (tskIDLE_PRIORITY + 2);
+  // create tasks and suspend all tasks initially.
+  for ( int id=0; id &lt; NUM_LEDS; id++ ) {
+     sprintf( sbuf, &quot;T%d&quot;, id );
+     xTaskCreate( task, (const char *)sbuf, 64, 
+       (void *)id, priority, &amp;taskHandles[id] 
+     );
+     vTaskSuspend( taskHandles[id] );
+  }
+  vTaskResume( taskHandles[0] ); // resume the first task
+  // Note the task scheduler is started automatically.  
+}
+
+void loop() {} 
+
+void task( void *pvParameters ) {
+   byte id = (int)pvParameters;
+   byte ledPin = LED_PINS[id];
+   pinMode( ledPin, OUTPUT );
+   digitalWrite( ledPin, LED_OFF ); 
+   while(1) { 
+      // turn on LED
+      digitalWrite( ledPin, LED_ON );
+      // delay for approx. 100 msec
+      vTaskDelay( pdMS_TO_TICKS(100) );
+      // turn off LED
+      digitalWrite( ledPin, LED_OFF );
+      // resume the next task in the sequence
+      vTaskResume( taskHandles[ (id+1) % NUM_LEDS ] ); 
+      // suspend itself
+      vTaskSuspend( NULL ); 
+   }
+}
+</code></pre>
+<p><img alt="" src="../avr/images/avr_wokwi_task_suspend_resume-1.png" /></p>
+<p>รูป: การจำลองการทำงานด้วย <strong>Wokwi AVR Simulator</strong></p>
+<p><img alt="" src="../avr/images/avr_wokwi_task_suspend_resume-2.png" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ขา {<strong>D5</strong>,<strong>D6</strong>,<strong>D7</strong>,<strong>D8</strong>} ตามลำดับ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-task-delay">&#9655; <strong>ตัวอย่างที่ 5: Task Delay</strong><a class="headerlink" href="#5-task-delay" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการใช้คำสั่งเพื่อทำให้ทาสก์หยุดรอเวลา โดยเปลี่ยนจากสถานะ <strong>Running</strong> ไปอยู่ที่สถานะ
+<strong>Blocked</strong> และรอจนกว่าจะถึงเวลาตามที่กำหนดไว้ </p>
+<p>การรอเวลาสำหรับทาสก์ มีคำสั่งให้ใช้งานได้ 2 รูปแบบ และให้ผลแตกต่างกัน คือ</p>
+<ul>
+<li><a href="https://www.freertos.org/a00127.html"><code>vTaskDelay()</code></a>: รอตามจำนวน <strong>Ticks</strong>
+ นับจากจุดเวลาที่ทำคำสั่ง (<strong>Relative Delay Time</strong>)</li>
+<li><a href="https://www.freertos.org/vtaskdelayuntil.html"><code>vTaskDelayUntil()</code></a>: 
+ รอให้ถึงจุดเวลาที่ระบุโดยนับเป็นจำนวน <strong>Ticks</strong> (<strong>Absolute Delay Time</strong>)</li>
+</ul>
+<p>การทำงานของโค้ดตัวอย่างประกอบด้วยทาสก์ <code>Task1</code> และ <code>Task2</code>
+โดยให้ทำหน้าที่สลับสถานะลอจิกของขาเอาต์พุตที่เกี่ยวข้อง และให้มีการเว้นระยะเวลาในแต่ละครั้ง</p>
+<p>การทำงานของทาสก์ มีการใช้คำสั่ง <code>vTaskDelay()</code> เพื่อรอเวลา โดยนับจากจุดเวลาที่ทำคำสั่งในขณะนั้น
+และในเชิงเปรียบเทียบได้ให้ทาสก์ <code>Task2</code> มีการใช้คำสั่ง <code>vTaskDelayUntil()</code> 
+เพื่อรอเวลาให้ผ่านไปถึงจุดเวลาในอนาคตตามที่กำหนดไว้ ทั้งสองคำสั่งนี้ของ <strong>FreeRTOS API</strong> 
+จะทำให้ทาสก์เปลี่ยนสถานะจาก <strong>Running</strong> ไปเป็น <strong>Blocked</strong> ในขณะที่รอเวลา</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; // include the FreeRTOS library
+#include &lt;task.h&gt;
+
+#define LED1_PIN   (11)  // Arduino D11 pin 
+#define LED2_PIN   (12)  // Arduino D12 pin
+
+UBaseType_t task_priority = (tskIDLE_PRIORITY+1);
+
+void setup() {
+  pinMode( LED1_PIN, OUTPUT );
+  pinMode( LED2_PIN, OUTPUT );
+  Serial.begin( 115200 );
+
+  xTaskCreate(
+    task1,                // task-entry function for &quot;Task1&quot; 
+    &quot;Task1&quot;,              // task name: &quot;Task1&quot;
+    128,                // task stack (allocated on heap)
+    (void*)LED1_PIN,    // task param (LED pin)
+    task_priority,      // task priority
+    NULL );             // task handle for Task1
+
+  xTaskCreate(
+    task2,              // task-entry function for &quot;Task2&quot; 
+    &quot;Task2&quot;,            // task name: &quot;Task2&quot;
+    128,                // task stack (allocated on heap)
+    (void*)LED2_PIN,    // task param (LED pin)
+    task_priority,      // task priority 
+    NULL );             // task handle for Task2
+
+  Serial.println( &quot;FreeRTOS started...&quot; );
+}
+
+void loop() {} // idle
+
+// task-entry function for Task1
+void task1( void* pvParameters ) { 
+  int pin = (int)pvParameters; // use the task parameter for LED pin
+  pinMode( pin, OUTPUT );      // set output direction for LED
+  while (1) {
+    digitalWrite( pin, HIGH );
+    vTaskDelay( 10 ); // wait for 10 ticks (relative delay)
+    digitalWrite( pin, LOW ); 
+    vTaskDelay( 10 ); // wait for 10 ticks (relative delay)
+  }
+}
+
+// task-entry function for Task2
+void task2( void* pvParameters ) { 
+  int pin = (int)pvParameters; // use the task parameter for LED pin
+  pinMode( pin, OUTPUT );      // set output direction for LED
+  TickType_t ticks = xTaskGetTickCount(); // get current OS tick count
+  while (1) {
+    digitalWrite( pin, HIGH ); 
+    vTaskDelay( 10 ); // wait for 10 ticks (relative delay)
+    digitalWrite( pin, LOW );
+    // wait and update timestamp every 20 ticks (absolute delay)
+    vTaskDelayUntil( &amp;ticks, 20 ); 
+  }
+}
+</code></pre>
+<p><img alt="" src="../avr/images/avr_wokwi_task_delay-1.png" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ขา <strong>D11</strong> และ <strong>D12</strong> ที่ได้จากการจำลองการทำงานของโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6-task-delay">&#9655; <strong>ตัวอย่างที่ 6: Task Delay</strong><a class="headerlink" href="#6-task-delay" title="Permanent link">#</a></h2>
+<p>อีกหนึ่งตัวอย่างที่เปรียบเทียบผลการทำงานระหว่างการใช้คำสั่ง  <code>vTaskDelay()</code> และ <code>vTaskUntilDelay()</code>
+ซึ่งคล้ายกับตัวอย่างที่แล้ว มีการสร้างทาสก์ <strong>T1</strong> และ <strong>T2</strong> ที่มีระดับความสำคัญเท่ากัน </p>
+<p>ทาสก์ <strong>T1</strong> เมื่อได้สลับสถานะหนึ่งครั้งจะรอเวลาเท่ากับ <strong>2 OS Tick</strong> โดยใช้คำสั่ง <code>vTaskDelay()</code>
+แต่ทาสก์ <strong>T2</strong> จะมีการแทรกคำสั่ง <code>delay()</code> เพิ่มเข้ามา เพื่อทำให้เกิดการทำคำสั่งแบบ <strong>busy-wait</strong>
+ตามระยะเวลาที่มีการสุ่มในหน่วยเป็นมิลลิวินาที ซึ่งจะอยู่ระหว่างค่า <code>(portTICK_PERIOD_MS-5)</code> ถึง
+<code>(portTICK_PERIOD_MS+4)</code> ก่อนที่จะทำคำสั่ง <code>vTaskDelay()</code></p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define LED1_PIN   (11)  // Arduino D11 pin 
+#define LED2_PIN   (12)  // Arduino D12 pin
+
+void setup() {
+  xTaskCreate( task1, &quot;T1&quot;, 128 , NULL, 2, NULL );
+  xTaskCreate( task2, &quot;T2&quot;, 128 , NULL, 2, NULL );
+  srand( analogRead(A0) ); // read A0 pin for seed
+}
+
+void task1( void *pvParameters ) {
+  boolean st = false; // LED1 state
+  pinMode( LED1_PIN, OUTPUT );
+  while(1) { 
+    // toggle LED1 output
+    digitalWrite( LED1_PIN, st = !st );
+    vTaskDelay( 2 /*ticks*/ );
+  }
+}
+
+void task2( void *pvParameters ) {
+  boolean st = false; // LED2 state
+  pinMode( LED2_PIN, OUTPUT );
+  while(1) { // toggle LED2 output
+    digitalWrite( LED2_PIN, st = !st ); 
+    // busy-wait for a randomized interval in msec
+    delay( (-5 + rand()%10) + portTICK_PERIOD_MS );
+    vTaskDelay( 2 /*ticks*/ );
+  }
+}
+
+void loop() {} // idle
+</code></pre>
+<p>หากนำโค้ดตัวอย่างไปจำลองการทำงาน ก็จะได้รูปคลื่นสัญญาณเอาต์พุตดังนี้</p>
+<p><img alt="" src="../avr/images/avr_wokwi_task_delay-2a.png" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ขา <strong>D11</strong> และ <strong>D12</strong> ที่ได้จากการจำลองการทำงานของโค้ด
+ซึ่งจะได้สัญญาณที่แตกต่างกัน</p>
+<p>แต่ถ้าลองเปลี่ยนมาใช้คำสั่ง <code>vTaskDelayUntil()</code> ตามตัวอย่างต่อไปนี้ และนำไปจำลองการทำงานอีกครั้ง</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define LED1_PIN   (11)  // Arduino D11 pin 
+#define LED2_PIN   (12)  // Arduino D12 pin
+
+TickType_t tickCount; // for saving tick count
+
+void setup() {
+  xTaskCreate( task1, &quot;T1&quot;, 128 , NULL, 2, NULL );
+  xTaskCreate( task2, &quot;T2&quot;, 128 , NULL, 2, NULL );
+  srand( analogRead(A0) ); // read A0 pin for seed
+  tickCount = xTaskGetTickCount(); // get the current tick count
+}
+
+void task1( void *pvParameters ) {
+  boolean st = false;
+  TickType_t lastWakeTime = tickCount;
+  pinMode( LED1_PIN, OUTPUT );
+  while(1) { 
+    // toggle LED1 output
+    digitalWrite( LED1_PIN, st = !st );
+    // delay until the next time point specified by lastWakeTime
+    vTaskDelayUntil( &amp;lastWakeTime, 2 );
+  }
+}
+
+void task2( void *pvParameters ){
+  boolean st = false;
+  TickType_t lastWakeTime = tickCount;
+  pinMode( LED2_PIN, OUTPUT );
+  while(1) { 
+    // toggle LED2 output
+    digitalWrite( LED2_PIN, st = !st );
+    // busy-wait for a randomized interval in msec
+    delay( (-5 + rand()%10) + portTICK_PERIOD_MS );
+    // delay until the next time point specified by lastWakeTime
+    vTaskDelayUntil( &amp;lastWakeTime, 2 );
+  }
+}
+
+void loop() {} // idle
+</code></pre>
+<p>ในตัวอย่างนี้ ค่าของตัวแปร <code>lastWakeTime</code> ใช้สำหรับการบันทึกการนับจำนวน <strong>OS Ticks</strong> ในปัจจุบัน
+และจะมีการเพิ่มค่าครั้งละ 2 เพื่อใช้เป็นตัวกำหนดจุดเวลาในอนาคตสำหรับคำสั่ง <code>vTaskDelayUntil()</code>
+เพื่อให้ทาสก์รอถึงเวลาที่กำหนดไว้ ก่อนที่จะทำงานต่อไป</p>
+<p>ผลจากการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> จะได้รูปคลื่นสัญญาณลักษณะนี้</p>
+<p><img alt="" src="../avr/images/avr_wokwi_task_delay-2b.png" /></p>
+<p>รูป:  สัญญาณเอาต์พุตที่ขา <strong>D11</strong> และ <strong>D12</strong> ที่ได้จากการจำลองการทำงานของโค้ด
+ซึ่งจะได้สัญญาณที่เหมือนกัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ในบทความนี้ เราได้เห็นตัวอย่างการเขียนโค้ด <strong>FreeRTOS</strong> สำหรับ <strong>AVR</strong>
+ในรูปแบบของ <strong>Arduino Sketch</strong> และทดลองใช้คำสั่งหรือฟังก์ชันของ <strong>FreeRTOS Library</strong>
+ที่เกี่ยวข้องกับการควบคุมการทำงานของทาสก์ ซึ่งทำให้เกิดการเปลี่ยนสถานะของทาสก์หรือสลับบริบทในการทำงาน เช่น
+<code>vTaskSuspend()</code> และ <code>vTaskResume()</code> และมีตัวอย่างแสดงให้เห็นความแตกต่างระหว่างการใช้คำสั่ง
+<code>vTaskDelay()</code> กับ <code>vTaskDelayUntil()</code></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-01-25 | Last Updated: 2022-02-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

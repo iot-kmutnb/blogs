@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-rp2040-part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-3" class="nav-link">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#isr-semaphore" class="nav-link">&#9655; การสื่อสารระหว่าง ISR กับเธรดโดยใช้ Semaphore</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rotary-encoder" class="nav-link">&#9655; การตรวจสอบการเปลี่ยนตำแหน่งของโมดูล Rotary Encoder</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#htu21d" class="nav-link">&#9655; การอ่านค่าจากโมดูลเซ็นเซอร์ HTU21D</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dht22" class="nav-link">&#9655; การอ่านค่าจากโมดูลเซ็นเซอร์ DHT22</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-3">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 3)<a class="headerlink" href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-3" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Mbed OS</strong> และ <strong>Arduino IDE</strong> 
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>RP2040</strong> เช่น <strong>Raspberry Pi Pico</strong>
+โดยนำเสนอเป็น <strong>ตอนที่ 3</strong>
+ต่อจาก <a href="../mbed-rp2040-part-1/"><strong>ตอนที่ 1</strong></a> | <a href="../mbed-rp2040-part-2/"><strong>ตอนที่ 2</strong></a></p>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>Raspberry Pi Pico</em>, 
+ <em>RP2040</em>, <em>Mbed-enabled Platforms</em>, <em>RTOS Programming</em></p>
+<hr />
+<h2 id="isr-semaphore">&#9655; <strong>การสื่อสารระหว่าง ISR กับเธรดโดยใช้ Semaphore</strong><a class="headerlink" href="#isr-semaphore" title="Permanent link">#</a></h2>
+<p>โดยทั่วไป <strong>RTOS</strong> รองรับการสื่อสารระหว่างฟังก์ชันที่ทำหน้าที่เป็น <strong>ISR</strong>
+(<em>Interrupt Service Routine</em> หรือเรียกว่า <em>Interrupt Handler</em>)
+กับเธรดหลักในระบบ ซึ่งก็มีหลายวิธีให้เลือกได้</p>
+<p>ตัวอย่างนี้ สาธิตการใช้งานสิ่งที่เรียกว่า "เซมาฟอร์" (<strong>Semaphore</strong>) 
+โดยกำหนดให้มีค่า 0 หรือ 1 เท่านั้น (เป็นแบบไบนารี) 
+และใช้คลาส <a href="https://en.wikipedia.org/wiki/Semaphore_(programming)"><code>Semaphore</code></a>
+ของ <strong>Mbed OS</strong> </p>
+<p>เซมาฟอร์สามารถใช้ได้กับการทำงานของ <strong>ISR</strong> ในกรณีที่ต้องการเพิ่มค่าของเซมาฟอร์ (<strong>Semaphore Release</strong>)
+และจะไม่มีการหยุดการทำงานของ <strong>ISR</strong> (ไม่ถูกบล็อการทำงานและอยู่ในสถานะรอ)</p>
+<p>ในทางตรงข้าม ถ้าเธรดต้องการจะใช้หรือลดค่าของเซมาฟอร์ (<strong>Semaphore Acquire</strong>) แต่มีจำนวนเป็น 0 (ต่ำสุดแล้ว) 
+จะถูกเปลี่ยนสถานะให้เป็นการรอ (<strong>Waiting</strong>) จนกว่าจะใช้งานเซมาฟอร์ได้ (มีค่ามากกว่า 0)</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+#define LED_PIN     (p25) // GP25 pin (on-board LED)
+#define BUTTON_PIN  (p16) // GP16 pin
+#define MIN_PULSEWIDTH_MS (20)
+
+DigitalOut led( LED_PIN );
+InterruptIn button( BUTTON_PIN, PullUp );
+// create a binary semaphore
+Semaphore sem(0,1); // count=0, maxcount=1
+
+volatile uint32_t rise_time = 0, fall_time = 0;
+uint64_t next_timeout;
+
+void isr_button() { // ISR function
+  uint32_t now = Kernel::get_ms_count();
+  if ( button.read() ) { // high
+    rise_time = now;
+    if ( rise_time - fall_time &gt; MIN_PULSEWIDTH_MS ) {
+      sem.release(); // release the semaphore
+    }
+  } else { // low
+    fall_time = now;
+  }
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  button.rise( isr_button );
+  button.fall( isr_button );
+  next_timeout = Kernel::get_ms_count();
+}
+
+std::string sbuf;
+uint32_t event_cnt = 0;
+
+void loop() {
+  // wait until the semaphore becomes avaiable (with timeout)
+  if ( sem.try_acquire_until(next_timeout) ) {
+    led = !led; // toggle the LED
+    event_cnt += 1; // increment the event counter
+    sbuf = &quot;event count: &quot;;
+    sbuf += std::to_string( event_cnt );
+    SerialUSB.println( sbuf.c_str() );
+  }
+  next_timeout = Kernel::get_ms_count() + 100; // update timeout
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rotary-encoder">&#9655; <strong>การตรวจสอบการเปลี่ยนตำแหน่งของโมดูล Rotary Encoder</strong><a class="headerlink" href="#rotary-encoder" title="Permanent link">#</a></h2>
+<p>โมดูล <a href="https://en.wikipedia.org/wiki/Rotary_encoder"><strong>Rotary Encoder</strong></a>
+เป็นอุปกรณ์ที่สร้างสัญญาณดิจิทัลแบบพัลส์ (<strong>Pulses</strong>) และมี 2 ช่อง (A และ B)
+โดยปรกติสัญญาณทั้งสองจะมีสถานะลอจิกเป็น High
+แต่เมื่อใช้มือหมุนในทิศทางทวนหรือตามเข็มนาฬิกา จะเกิดการเปลี่ยนแปลงลอจิกที่ช่องสัญญาณ A และ B ในลักษณะพัลส์
+แต่การเปลี่ยนแปลงของแต่ละช่องจะเกิดขึ้นไม่พร้อมกัน จำนวนพัลส์ที่เกิดขึ้นจะขึ้นอยู่กับตำแหน่งเชิงมุมที่เปลี่ยนไป
+อุปกรณ์ประเภทนี้สามารถนำมาใช้สร้างสัญญาณอินพุตให้ไมโครคอนโทรลเลอร์</p>
+<p><img alt="" src="../images/rotary_encoder_switch-1.jpg" />
+<br>รูป: ตัวอย่างโมดูล Rotary Encoder</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/rotary_waveform-1.png" />
+<br>รูป: ตัวอย่างรูปคลื่นสัญญาณ A และ B จากโมดูล Rotary Encoder เมื่อมีการหมุนเกิดขึ้น</p>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างต่อไปนี้ สาธิตการตรวจสอบการเกิดสัญญาณพัลส์ที่ช่องสัญญาณ A และ B และระบุทิศทางการหมุน 
+ซึ่งจะทำให้ค่าของตัวนับ <code>encoder_count</code> เพิ่มขึ้นหรือลดลงตามทิศทางการหมุน</p>
+<p>หลักการทำงานคือ การตรวจสอบการเปลี่ยนแปลงโดยใช้อินเทอร์รัพท์ภายนอก ทั้งขอบขาขึ้นและขอบขาลง 
+และใช้คำสั่ง <code>attachInterrupt(...)</code> ของ <strong>Arduino API</strong> </p>
+<p>เมื่อเกิดอินเทอร์รัพท์ที่ช่องสัญญาณ A ในแต่ละครั้ง ฟังก์ชันที่ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>)
+สำหรับอินเทอร์รัพท์ดังกล่าว จะทำงานและตรวจสอบดูว่า มีสัญญาณพัลส์แบบ Low ที่ช่อง A เกิดขึ้น
+และมีความกว้างไม่ต่ำกว่าค่าที่กำหนดไว้หรือไม่ (เช่น 20 มิลลิวินาที) </p>
+<p>ถ้าเงื่อนไขดังกล่าวเป็นจริง ให้ถือว่ามีการเปลี่ยนตำแหน่งไปหนึ่งตำแหน่ง สถานะของสัญญาณช่อง B ในขณะนั้น 
+จะถูกใช้ในการระบุทิศทางการเปลี่ยนแปลงที่เกิดขึ้น (เพิ่มขึ้นหรือลดลงทีละ 1) </p>
+<pre><code class="language-c++">#define PIN_A  (16)
+#define PIN_B  (17)
+#define MIN_PULSE_MS (20)
+
+volatile int32_t encoder_count = 0;
+volatile uint32_t last_time = 0;
+
+void isr_pin_a() { // ISR function
+  uint32_t now = millis();
+  int a = digitalRead( PIN_A );
+  int b = digitalRead( PIN_B );
+  if ( now - last_time &gt;= MIN_PULSE_MS ) {
+    if (a==0) {
+      encoder_count += b ? -1 : 1;
+    }
+  }
+  last_time = now;
+}
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB){}
+  attachInterrupt( PIN_A, isr_pin_a, CHANGE );
+  pinMode( PIN_A, INPUT_PULLUP );
+  pinMode( PIN_B, INPUT_PULLUP );
+}
+
+int saved_count = 0;
+
+void loop() {
+  if ( saved_count != encoder_count ) {
+     saved_count = encoder_count;
+     SerialUSB.println( saved_count );
+  }
+  delay(5);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าจะเปลี่ยนมาใช้คลาสของ <strong>Mbed Drivers</strong> เช่น <code>InterruptIn</code> และ <code>DigitalIn</code>
+สำหรับขาสัญญาณอินพุต A และ B และใช้คำสั่งของ <strong>Mbed OS (RTOS)</strong> ก็มีตัวอย่างดังนี้ 
+เช่น การใช้คำสั่ง <code>Kernel::get_ms_count(...)</code> แทนที่คำสั่ง  <code>millis(...)</code>
+สำหรับการอ่านค่าตัวเลขเวลาของระบบในขณะนั้น (หน่วยเป็นมิลลิวินาที)</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+#define PIN_A          (p16)
+#define PIN_B          (p17)
+#define MIN_PULSE_MS   (20)
+
+InterruptIn pin_a( PIN_A );
+DigitalIn   pin_b( PIN_B, PullUp );
+
+// create a binary semmaphore
+Semaphore sem(0,1); // count=0, maxcount=1
+
+volatile int32_t encoder_count = 0;
+volatile uint32_t last_time = 0;
+
+void isr_pin_a() {
+  uint32_t now = Kernel::get_ms_count();
+  int a = pin_a.read();
+  int b = pin_b.read();
+  if ( now - last_time &gt;= MIN_PULSE_MS ) {
+     if (a==0) {
+        encoder_count += b ? -1 : 1;
+        sem.release(); // release the semaphore
+     }
+  }
+  last_time = now;
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){}
+  pin_a.rise( isr_pin_a );
+  pin_a.fall( isr_pin_a );
+}
+
+int saved_count = 0;
+
+void loop() {
+  // wait until the semaphore becomes available
+  sem.acquire(); 
+  saved_count = encoder_count;
+  SerialUSB.println( saved_count );
+}
+</code></pre>
+<p>จากโค้ดตัวอย่าง จะเห็นได้ว่า มีการใช้เซมาฟอร์แบบไบนารี (<strong>Binary Semaphore</strong>)
+สำหรับการสื่อสารกันระหว่างฟังก์ชันสำหรับ <strong>ISR</strong> และการทำงานของเธรดหลักที่ทำคำสั่งต่าง ๆ 
+ในฟังก์ชัน <code>main() {...}</code></p>
+<p>นอกจากการใช้เซมาฟอร์แล้ว เรายังสามารถใช้คลาส <code>Queue</code> ของ <strong>Mbed OS</strong> 
+แทนได้สำหรับการส่งข้อมูลจาก <strong>ISR</strong> ไปยังเธรดหลัก ตามตัวอย่างต่อไปนี้ ใ
+นตัวอย่างนี้ได้เลือกใช้ชนิดข้อมูลเป็นเลขจำนวนเต็ม (<code>int</code>) สำหรับนำไปใช้กับ <code>Queue</code> 
+และอ้างอิงข้อมูลโดยใช้พอยน์เตอร์  </p>
+<p>ในตัวอย่างนี้  <strong>ISR</strong> จะนำข้อมูลไปใส่ลงใน <code>Queue</code> ถ้ายังไม่เต็มความจุ 
+และเป็นตามเงื่อนไขที่กำหนด 
+(เมื่อมีการตรวจสอบพบว่า มีการเปลี่ยนตำแหน่งของโมดูล <strong>Rotary Encoder</strong>) 
+และเธรดหลักจะคอยอ่านข้อมูลจาก <code>Queue</code> </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+#define PIN_A          (p16)
+#define PIN_B          (p17)
+#define MIN_PULSE_MS   (20)
+#define QUEUE_CAPACITY (4)
+
+InterruptIn pin_a( PIN_A );
+DigitalIn   pin_b( PIN_B, PullUp );
+Queue&lt;int, QUEUE_CAPACITY&gt; queue;
+
+volatile int encoder_count = 0;
+volatile uint32_t last_time = 0;
+
+void isr_pin_a() {
+  uint32_t now = Kernel::get_ms_count();
+  int a = pin_a.read();
+  int b = pin_b.read();
+  if ( now - last_time &gt;= MIN_PULSE_MS ) {
+     if (a==0) {
+        encoder_count += b ? -1 : 1;
+        // send data to the queue
+        queue.try_put( (int *)&amp;encoder_count );
+     }
+  }
+  last_time = now;
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){}
+  // enable interrupt for pin A (both rising and falling edges)
+  pin_a.rise( isr_pin_a );
+  pin_a.fall( isr_pin_a );
+}
+
+void loop() {
+  int *data_ptr;
+  while ( queue.count() &gt; 0 ) { // if queue is not empty
+    // get data from the queue
+    if ( queue.try_get( &amp;data_ptr ) ) { 
+      SerialUSB.println( *data_ptr );
+    } 
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_rotary_encoder-1.jpg" />
+<br>รูป: ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ดสำหรับการใช้งานโมดูล Rotary Encoder</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="htu21d">&#9655; <strong>การอ่านค่าจากโมดูลเซ็นเซอร์ HTU21D</strong><a class="headerlink" href="#htu21d" title="Permanent link">#</a></h2>
+<p>โมดูล [<strong>HTU21D</strong>] (<a href="http://www.farnell.com/datasheets/2207166.pdf">Datasheet</a>) 
+มีไอซีเซ็นเซอร์ของบริษัท <strong>TE Connectivity</strong> สำหรับวัดอุณหภูมิและความชื้นสัมพัทธ์ในอากาศ 
+ให้ข้อมูลแบบดิจิทัลและสื่อสารข้อมูลด้วยบัส I2C (แอดเดรส <code>0x40</code>) </p>
+<p>ข้อมูลเชิงเทคนิคสำหรับ <strong>HTU21D</strong></p>
+<ul>
+<li>Relative humidity measurement: from 0% to 100%</li>
+<li>Humidity Accuracy: ± 2% RH (20%RH to 80%RH)</li>
+<li>Humidity Resolution: 12 bits (max.)</li>
+<li>Temperature measurement: from -40°C to 125°C </li>
+<li>Temperature Accuracy: ± 0.3°C @25 deg.C </li>
+<li>Temperature Resolution: 14 bits (max.)</li>
+</ul>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Arduino API</strong> สำหรับบอร์ด <strong>Pico</strong> 
+เพื่อให้อุปกรณ์ทำหน้าที่เป็น <strong>I2C Master</strong> เชื่อมต่อสื่อสารกับโมดูล <strong>HTU21D</strong>
+ที่ทำหน้าที่เป็น <strong>I2C Slave</strong> เลือกใช้ความเร็วของบัส (<strong>I2C Bus Speed</strong>) เท่ากับ <strong>400kHz</strong> </p>
+<pre><code class="language-c++">#include &quot;Wire.h&quot;
+
+#define SDA_PIN  (p6)
+#define SCL_PIN  (p7)
+#define I2C_ADDR (0x40) //  HTU21D device address
+
+#define TRIG_TEMP_MEASURE_NOHOLD  (0xF3)
+#define TRIG_HUMD_MEASURE_NOHOLD  (0xF5)
+
+// Note The MbedI2C class is derived from Arduino's HardwareI2C.
+arduino::MbedI2C i2c( SDA_PIN, SCL_PIN ); // the same as Wire
+
+void write_u8( uint8_t addr, uint8_t data ) {
+  i2c.beginTransmission(addr);
+  i2c.write(data);
+  i2c.endTransmission();
+}
+
+bool read_bytes( uint8_t addr, uint8_t *buf, uint8_t len ) {
+  i2c.requestFrom( addr, len ); 
+  if ( i2c.available() == len ) { 
+     for ( uint8_t i=0; i &lt; len; i++ ) {
+       buf[i] = i2c.read();
+     }
+     return true;
+  }
+  return false;
+}
+
+uint8_t check_crc( uint16_t value, uint8_t chsum ) {
+  const uint32_t SHIFTED_DIVISOR = 0x988000;
+  uint32_t remainder = (uint32_t)value &lt;&lt; 8; 
+  remainder |= chsum;
+  uint32_t divisor = (uint32_t)SHIFTED_DIVISOR;
+  for (int i=0 ; i &lt; 16 ; i++) {
+    if ( remainder &amp; (uint32_t)1&lt;&lt;(23-i) )  {
+      remainder ^= divisor;
+    }
+    divisor &gt;&gt;= 1;
+  }
+  return (uint8_t)remainder;
+}
+
+bool read_humidity( uint8_t addr, float&amp; humidity ) {
+  // start the measurement for humidity (with no bus holding)
+  write_u8( addr, TRIG_HUMD_MEASURE_NOHOLD );
+  delay( 30 );
+  uint8_t buf[3];
+  if ( read_bytes(addr, buf, 3) ) {
+     uint16_t value = ((uint16_t)buf[0] &lt;&lt; 8) | buf[1];
+     if (check_crc(value,buf[2]) != 0) { // crc error
+       return false;
+     }
+     value &amp;= 0xfffc;
+     humidity = (0.00190735*value) - 6;
+     return true;
+  } 
+  return false;
+}
+
+bool read_temperature( uint8_t addr, float&amp; temperature ) {
+  // start the measurement for temperature (with no bus holding)
+  write_u8( addr, TRIG_TEMP_MEASURE_NOHOLD );
+  delay( 85 );
+  uint8_t buf[3];
+  if ( read_bytes(addr, buf, 3) ) {
+     uint16_t value = ((uint16_t)buf[0] &lt;&lt; 8) | buf[1];
+     if (check_crc(value,buf[2]) != 0) { // crc error
+       return false;
+     }
+     value &amp;= 0xfffc;
+     temperature = (0.00268127*value) - 46.85; 
+     return true;
+  }
+  return false;  
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  Serial.println( &quot;HTU21D I2C T&amp;H Sensor Demo...&quot; );
+  // start the I2C master
+  i2c.begin();
+  // set the I2C clock frequency
+  i2c.setClock( 400000 );
+}
+
+char sbuf[32];
+String strbuf;
+
+void loop() {
+  float temp, humid;
+  strbuf = &quot;Temperature: &quot;;
+  if ( read_temperature(I2C_ADDR, temp) ) {
+    sprintf( sbuf, &quot;%.1f&quot;, temp );
+  } else {
+    sprintf( sbuf, &quot;--.-&quot; );
+  }
+  strbuf += sbuf;
+  strbuf += &quot; deg.C, Relative Humidity: &quot;;
+  if ( read_humidity(I2C_ADDR, humid) ) {
+    sprintf( sbuf, &quot;%.2f&quot;, humid );
+  } else {
+    sprintf( sbuf, &quot;--.--&quot; );
+  }
+  strbuf += sbuf;
+  strbuf += &quot; %RH&quot;;
+  SerialUSB.println( strbuf.c_str() );
+  delay(1000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าจะเปลี่ยนมาลองใช้คำสั่งของ <strong>Mbed Drivers</strong> สำหรับ <strong>I2C Master</strong> ก็มีตัวอย่างโค้ดดังนี้  </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;I2C.h&quot;
+using namespace mbed;
+using namespace rtos;
+using namespace std::chrono;
+
+#define SDA_PIN  (p6)
+#define SCL_PIN  (p7)
+#define I2C_ADDR (0x40) 
+#define TRIG_TEMP_MEASURE_NOHOLD  (0xF3)
+#define TRIG_HUMD_MEASURE_NOHOLD  (0xF5)
+
+I2C i2c_bus( SDA_PIN, SCL_PIN ); // sda and scl pins
+const uint8_t addr8bit = I2C_ADDR &lt;&lt; 1;
+
+void write_u8( uint8_t addr, uint8_t data ) {
+  i2c_bus.write( addr,  (const char*)&amp;data, 1 );
+}
+
+bool read_bytes( uint8_t addr, uint8_t *buf, uint8_t len ) {
+  if ( i2c_bus.read( addr, (char*)buf, 3 ) != 0 ) {
+     return false;
+  }
+  return true;
+}
+
+uint8_t check_crc( uint16_t value, uint8_t chsum ) {
+  const uint32_t SHIFTED_DIVISOR = 0x988000;
+  uint32_t remainder = (uint32_t)value &lt;&lt; 8; 
+  remainder |= chsum;
+  uint32_t divisor = (uint32_t)SHIFTED_DIVISOR;
+  for (int i=0 ; i &lt; 16 ; i++) {
+    if ( remainder &amp; (uint32_t)1&lt;&lt;(23-i) )  {
+      remainder ^= divisor;
+    }
+    divisor &gt;&gt;= 1;
+  }
+  return (uint8_t)remainder;
+}
+
+bool read_humidity( uint8_t addr, float&amp; humidity ) {
+  // start the measurement for humidity (with no bus holding)
+  write_u8( addr, TRIG_HUMD_MEASURE_NOHOLD );
+  ThisThread::sleep_for( 30ms );
+  uint8_t buf[3];
+  if ( read_bytes(addr, buf, 3) ) {
+     uint16_t value = ((uint16_t)buf[0] &lt;&lt; 8) | buf[1];
+     if (check_crc(value,buf[2]) != 0) { // crc error
+       return false;
+     }
+     value &amp;= 0xfffc;
+     humidity = (0.00190735*value) - 6;
+     return true;
+  } 
+  return false;
+}
+
+bool read_temperature( uint8_t addr, float&amp; temperature ) {
+  // start the measurement for temperature (with no bus holding)
+  write_u8( addr, TRIG_TEMP_MEASURE_NOHOLD );
+  ThisThread::sleep_for( 85ms );
+  uint8_t buf[3];
+  if ( read_bytes(addr, buf, 3) ) {
+     uint16_t value = ((uint16_t)buf[0] &lt;&lt; 8) | buf[1];
+     if (check_crc(value,buf[2]) != 0) { // crc error
+       return false;
+     }
+     value &amp;= 0xfffc;
+     temperature = (0.00268127*value) - 46.85; 
+     return true;
+  }
+  return false;  
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  Serial.println( &quot;HTU21D I2C T&amp;H Sensor Demo...&quot; );
+  // set the I2C clock frequency
+  i2c_bus.frequency(400000);
+}
+
+char sbuf[32];
+std::string strbuf;
+
+void loop() {
+  float temp, humid;
+  strbuf = &quot;Temperature: &quot;;
+  if ( read_temperature( addr8bit, temp ) ) {
+    sprintf( sbuf, &quot;%.1f&quot;, temp );
+  } else {
+    sprintf( sbuf, &quot;--.-&quot; );
+  }
+  strbuf += sbuf;
+  strbuf += &quot; deg.C, Relative Humidity: &quot;;
+  if ( read_humidity( addr8bit, humid ) ) {
+    sprintf( sbuf, &quot;%.2f&quot;, humid );
+  } else {
+    sprintf( sbuf, &quot;--.--&quot; );
+  }
+  strbuf += sbuf;
+  strbuf += &quot; %RH&quot;;
+  SerialUSB.println( strbuf.c_str() );
+  ThisThread::sleep_for( 1000ms );
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_bh1750_htu21d-1.jpg" />
+<br>รูป: ตัวอย่างการต่อวงจรทดลองสำหรับโมดูล HTU21D และมีโมดูล BH1750 ใช้งานร่วมกัน</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_htu21d_output-1.png" />
+<br>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับและแสดงค่าของโมดูลเซ็นเซอร์ HTU21D</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dht22">&#9655; <strong>การอ่านค่าจากโมดูลเซ็นเซอร์ DHT22</strong><a class="headerlink" href="#dht22" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>AM2302 / DHT22</strong> เป็นตัวอย่างของเซ็นเซอร์สำหรับนำมาใช้เพื่อวัดค่าอุณหภูมิ (<strong>Temperature</strong>)
+และความชื้นสัมพัทธ์ในอากาศ (<strong>Relative Humidity: RH</strong>)
+ใช้ขาสัญญาณดิจิทัลแบบสองทิศทางเพียงเส้นเดียวในการสื่อสารข้อมูลกับไมโครคอนโทรลเลอร์ 
+ขา <code>DATA</code> จะต้องมีตัวต้านทานแบบ <strong>Pull-up</strong> ต่ออยู่ด้วย (เช่น <strong>4.7k&ohm;</strong>) 
+และสามารถใช้แรงดันไฟเลี้ยง <strong>VCC = +3.3V</strong> ได้</p>
+<p><img alt="" src="../images/dht22_modules-1.png" />
+<br>รูป: ตัวอย่างโมดูล DHT22 Breakout Boards</p>
+<p>ข้อมูลบิตที่ได้จากโมดูลนี้ในการอ่านค่าแต่ละครั้งจะมีจำนวน 40 บิต หรือ 5 ไบต์ แบ่งเป็น </p>
+<ul>
+<li>16-bit Relative Humidity</li>
+<li>16-bit Temperature</li>
+<li>8-bit Checksum </li>
+</ul>
+<p>จากลำดับข้อมูลบิตที่ได้รับจากโมดูล <strong>DHT22</strong> ถ้าจะจำแนกว่า บิตใดเป็น 0 หรือ 1
+จะต้องตรวจสอบจากความกว้างของสัญญาณพัลส์ที่ถูกส่งออกมาตามลำดับ
+(ศึกษาเพิ่มเติมได้จากเอกสาร <a href="https://cdn-shop.adafruit.com/datasheets/Digital+humidity+and+temperature+sensor+AM2302.pdf">Datasheet</a>)</p>
+<p>ลองมาดูตัวอย่างเขียนโค้ด โดยสร้างคลาส (<strong>C++ Class</strong>) 
+และมีตัวอย่างการใช้งานดังนี้ โดยใช้กับโมดูล <strong>DHT22</strong> จำนวน 2 ชุด 
+นำขาสัญญาณ <code>DATA</code> มาต่อเข้าที่ขา <code>p16</code> และ <code>p17</code> ของบอร์ด <strong>Pico</strong> ตามลำดับ</p>
+<pre><code class="language-c++">// file: DHT22.h
+#ifndef __DHT22__
+#define __DHT22__
+
+#include &quot;Wire.h&quot;
+
+class DHT22 {
+  public:
+    DHT22( PinName pin ) : data_pin(pin), status(0) {}
+    ~DHT22() {}
+    bool readSensor( float &amp;temperature, float &amp;humidity );
+    uint8_t getStatus() { return status; }
+
+  protected:
+    bool read_byte( uint8_t &amp;value );
+    inline bool is_data_high() { 
+      return (digitalRead(data_pin)==1); 
+    }
+    inline bool is_data_low()  { 
+      return (digitalRead(data_pin)==0); 
+    }
+    inline void data_high()    { digitalWrite(data_pin, 1); }
+    inline void data_low()     { digitalWrite(data_pin, 0); }
+    inline void data_input()   { pinMode(data_pin, INPUT);  }
+    inline void data_output()  { pinMode(data_pin, OUTPUT); }
+
+  private:
+    PinName data_pin;
+    uint8_t status;
+};
+
+#endif
+</code></pre>
+<pre><code class="language-c++">// fille: DHT22.cpp
+
+#include &quot;DHT22.h&quot;
+
+bool DHT22::read_byte( uint8_t &amp;value ) {
+   uint8_t cnt, result = 0x00;
+   for( int i=0; i &lt; 8; i++ ) {
+     cnt = 0;
+     while( is_data_low() ) { // wait until DATA goes HIGH.
+       delayMicroseconds(2);
+       if ( ++cnt &gt; 100 ) { // timeout
+         status |= 0x01;  // error: DATA is stuck LOW.
+         return false; 
+       }
+     }
+     delayMicroseconds(30); // wait for 30 usec
+     result &lt;&lt;= 1;
+     if ( is_data_high() ) { // if DATA is HIGH, this bit is 1.
+       result |= 1;
+     }
+     cnt = 0;
+     while( is_data_high() ) {  // wait until DATA goes LOW.
+       delayMicroseconds(2);
+       if ( ++cnt &gt; 100 ) { // timeout 
+         status |= 0x02; // error: DATA is stuck HIGH.
+         return false; 
+       }
+     }
+   }
+   value  = result; // one data byte 
+   status = 0;      // status: ok
+   return true;
+}
+
+bool DHT22::readSensor( float &amp;temperature, float &amp;humidity ) {
+   uint8_t buf[5]; 
+   status = 0;
+   // DATA must be configured as output.
+   data_output();
+   // send a start signal
+   data_low();
+   delayMicroseconds(500); // at least 500 msec
+   data_high();
+   // release the DATA pin and wait for a response signal
+   data_input();
+   delayMicroseconds(30);
+   if ( is_data_high() ) { // LOW expected
+      status |= 0x02;  // error: DATA is stuck HIGH.
+   }
+   delayMicroseconds(80);
+   if ( is_data_low() ){ // HIGH expected
+      status |= 0x01;  // error: DATA is stuck lOW.
+   }
+   delayMicroseconds(80);
+   if ( status != 0 ) { // if an error has occurred
+     data_output();
+     data_high();
+     return false;
+   }
+   status = 0;
+   // Now the DATA line must be LOW.
+   uint8_t value, checksum = 0x00;
+   for ( int i=0; i &lt; 5; i++ ) { // read 5 bytes into the buffer
+     if ( !read_byte( value ) ) { // error
+        status |= 0x04;
+        break;
+     }
+     buf[i] = value;
+     if ( i &lt; 4 ) {
+        checksum += value;
+     }
+   }
+   data_output();
+   data_high();
+   data_input();
+   if ( buf[4] != checksum ) {
+     status |= 0x08; // checksum error
+     return false;
+   }
+   // temperature in Celsius (0.1 step)
+   uint16_t temp = (buf[2] &lt;&lt; 8) + buf[3];
+   if (temp &amp; 0x8000) { // The sign bit is 1.
+     temp &amp;= 0x7fff;
+     temp = -temp;
+   }
+   temperature = 0.1 * temp;
+   // rel. humidity in percent (0.1 step)
+   uint16_t humid = (buf[0] &lt;&lt; 8) + buf[1];
+   humidity = 0.1 * humid;
+   return (status==0);
+}
+</code></pre>
+<p>โค้ดสาธิตการใช้งานคลาส <code>DHT22</code></p>
+<pre><code class="language-c++">// TEST CODE: Single-Thread Version
+
+#include &quot;DHT22.h&quot;
+
+const int NUM_SENSORS = 2;
+// create two DHT22 instances
+DHT22 *sensors[] = { new DHT22( p16 ), new DHT22( p17 ) };
+
+char sbuf[64]; // used when calling sprintf()
+String strbuf;
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB) {}
+  SerialUSB.println( &quot;DHT22 demo...&quot; );
+}
+
+void loop() {
+  float _temp, _humid;
+  for ( int id=0; id &lt; NUM_SENSORS; id++ ) { // for each sensor device
+    sprintf( sbuf, &quot;DHT22 (id=%d): &quot;, id );
+    strbuf = sbuf;
+    uint32_t t_start = micros();
+    bool ok = sensors[id]-&gt;readSensor(_temp, _humid);
+    uint32_t t_end = micros();
+    if (ok) {
+      sprintf( sbuf, &quot;T: %.1f deg.C, H: %.2f %%RH&quot;, 
+              _temp, _humid );
+    } else {
+      sprintf( sbuf, &quot;T: --.- deg.C, H: --.-- %%RH (err=0x%02X)&quot;, 
+              sensors[id]-&gt;getStatus() );
+    }
+    strbuf += sbuf;
+    strbuf += &quot;, exec (usec): &quot;;
+    strbuf += (t_end - t_start);
+    SerialUSB.println( strbuf.c_str() );
+    delay(1000);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/dht22_arduino_class.png" />
+<br>รูป: ตัวอย่างการสร้างไฟล์ .ino / .h / .cpp สำหรับ Arduino Sketch</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/pico_dht22_demo-1.jpg" />
+<br>รูป: ตัวอย่างการต่อวงจรทดลองสำหรับโมดูล DHT22 จำนวน 2 อุปกรณ์</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/dht22_output-1.png" />
+<br>รูป: ตัวอย่างข้อความเอาต์พุตเมื่ออ่านค่าจากโมดูล DHT22 จำนวน 2 อุปกรณ์</p>
+<p>&nbsp;</p>
+<p>ถ้าจะลองเปลี่ยนมาสร้าง <strong>Mbed Thread</strong> สำหรับการอ่านค่าจากโมดูล <strong>DHT22</strong> แต่ละตัว 
+โดยเว้นระยะห่างอย่างน้อยประมาณ  2 วินาที สำหรับการอ่านค่าแต่ละครั้ง และใช้ <strong>DHT22</strong> ทั้งหมด 5 อุปกรณ์
+(เลือกใช้ขา <code>p14</code>, <code>p15</code>, <code>p16</code>, <code>p17</code> และ <code>p18</code> ตามลำดับ) ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">///////////////////////////////////////////////////////////
+// TEST CODE: Multi-threaded version
+///////////////////////////////////////////////////////////
+
+#include &quot;DHT22.h&quot;
+
+#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+const PinName DHT22_PINS[] = { p14, p15, p16, p17, p18 };
+const int NUM_SENSORS = sizeof(DHT22_PINS)/sizeof(PinName);
+
+DHT22  *sensors[ NUM_SENSORS ];
+Thread *threads[ NUM_SENSORS ];
+Mutex mutex; // used to protect SerialUSB
+
+void thread_func( void *arg ) {
+  int id = (int)arg;
+  DHT22 *sensor = sensors[ id ];
+  float temp, humid; 
+  while(1) {
+    // raise the priority level of this Thread
+    osThreadSetPriority( osThreadGetId(), osPriorityAboveNormal );
+    uint32_t t_start = micros();
+    bool ok = sensor-&gt;readSensor( temp, humid );
+    uint32_t t_end = micros();
+    // lower the priority level of this Thread
+    osThreadSetPriority( osThreadGetId(), osPriorityNormal );
+    if (ok) {
+      char sbuf[80];
+      mutex.lock();
+      sprintf( sbuf, &quot;DHT22 (id=%d) T: %.1f deg.C, H: %.2f %%RH, %lu usec&quot;, 
+               id, temp, humid, (t_end-t_start) );
+      SerialUSB.println( sbuf );
+      SerialUSB.flush();
+      mutex.unlock();
+    }
+    thread_sleep_for( 2000 ); // repeat sensor reading every 2sec
+  }
+}
+
+void setup() {
+  SerialUSB.begin(115200);
+  while(!SerialUSB) {}
+  SerialUSB.println( &quot;DHT22 / Multi-threading demo...&quot; );
+  SerialUSB.flush();
+  for ( int i=0; i &lt; NUM_SENSORS; i++ ) {
+     // create a new DHT22 instance
+     sensors[i] = new DHT22( DHT22_PINS[i] );
+     // create a new Thread instance
+     threads[i] = new Thread( osPriorityNormal, OS_STACK_SIZE ); 
+     // start the new Thread
+     threads[i]-&gt;start( callback(thread_func,(void *)i) );
+     thread_sleep_for( 10 );
+  }
+  osDelay( osWaitForever ); // force the main thread to wait forever 
+}
+
+void loop() {}
+</code></pre>
+<p><img alt="" src="../images/pico_dht22_demo-2.png" />
+<br>รูป: ตัวอย่างการต่อวงจรทดลองสำหรับโมดูล DHT22 จำนวน 5 อุปกรณ์</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-04-16 | Last Updated: 2021-12-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

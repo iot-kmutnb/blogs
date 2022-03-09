@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/freertos/arduino_avr_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino-FreeRTOS for AVR (Part 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-freertos-for-avr-part-2" class="nav-link">Arduino-FreeRTOS for AVR (Part 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การสร้างทาสก์และการกำหนดระดับความสำคัญของทาสก์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">&#9655; ตัวอย่างที่ 1: การสร้างทาสก์เพื่อเปลี่ยนสถานะที่ขาเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; ตัวอย่างที่ 2: การสร้างทาสก์ที่มีระดับความสำคัญแตกต่างกัน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">&#9655; ตัวอย่างที่ 3: การเปลี่ยนบริบทการทำงานของทาสก์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-taskyield" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 4: การใช้คำสั่ง taskYIELD()</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-freertos-for-avr-part-2">Arduino-FreeRTOS for AVR (Part 2)<a class="headerlink" href="#arduino-freertos-for-avr-part-2" title="Permanent link">#</a></h1>
+<p>บทความนี้ (ตอนที่ 2) นำเสนอตัวอย่างการเขียนโค้ดโดยใช้ <a href="https://www.freertos.org/"><strong>FreeRTOS Library</strong></a>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino</strong> ที่ใช้ชิป <strong>8-bit Atmel AVR</strong> 
+(เช่น บอร์ด <strong>Uno</strong> | <strong>Nano</strong> | <strong>MEGA2560</strong>) และใช้ซอฟต์แวร์ <strong>Arduino IDE</strong>
+ในการเขียนโค้ด รวมถึงสาธิตการจำลองการทำงานด้วย <strong>Web-based Wokwi AVR Simulator</strong></p>
+<p><strong>Keywords:</strong> <em>Arduino</em>, <em>8-bit AVR</em>, <em>RTOS</em>, <em>FreeRTOS</em>, <em>Wokwi Simulator</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การสร้างทาสก์และการกำหนดระดับความสำคัญของทาสก์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>จากเนื้อหาในบทความก่อนหน้านี้ (<a href="../arduino_avr_part-1/">ตอนที่ 1</a>) 
+เราได้เห็นตัวอย่างการเขียนโค้ด เพื่อสร้างทาสก์ด้วย <strong>FreeRTOS</strong>
+โดยใช้คำสั่ง <a href="https://www.freertos.org/a00125.html"><code>xCreateTask()</code></a> ไปบ้างแล้ว</p>
+<pre><code class="language-c++">BaseType_t xTaskCreate( TaskFunction_t pvTaskCode,
+                        const char * const pcName,
+                        configSTACK_DEPTH_TYPE usStackDepth,
+                        void *pvParameters,
+                        UBaseType_t uxPriority,
+                        TaskHandle_t *pxCreatedTask );
+</code></pre>
+<p>&nbsp;</p>
+<p>ระดับความสำคัญของทาสก์ (<strong>Task Priority Level</strong>) 
+เป็นหนึ่งอาร์กิวเมนต์สำหรับฟังก์ชันดังกล่าวเมื่อมีการสร้างทาสก์ขึ้นใหม่ </p>
+<p>โดยทั่วไปแล้วก็ ระดับความสำคัญของทาสก์ใน <strong>FreeRTOS</strong> จะมีค่ามากกว่า 0 
+และค่าต่ำสุดคือ 0 ซึ่งใช้กับ <strong>Idle Task</strong> (<code>tskIDLE_PRIORITY</code> = 0) 
+และมีค่าสูงสุดคือ <code>configMAX_PRIORITIES-1</code>
+(ค่าของ <code>configMAX_PRIORITIES</code> เท่ากับ 4  ในไฟล์ 
+<a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/FreeRTOSConfig.h"><code>FreeRTOSConfig.h</code></a>)</p>
+<p>การทำงานของ <strong>FreeRTOS</strong> โดยทั่วไป จะอยู่ในโหมด <strong>Preemptive Scheduling</strong> 
+(ดูได้จากการกำหนดค่า <code>configUSE_PREEMPTION</code> ให้เป็น  1 ในไฟล์ 
+<a href="https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/src/FreeRTOSConfig.h"><code>FreeRTOSConfig.h</code></a>)</p>
+<p>ทาสก์มีความสำคัญแตกต่างกันได้ และทาสก์ที่มีความสำคัญสูงกว่าและพร้อมที่จะทำงาน (<strong>READY</strong>) 
+จะได้รับการจัดลำดับให้ทำงานได้ก่อนทาสก์ที่มีความสำคัญต่ำกว่า </p>
+<p>ทาสก์ที่มีความสำคัญต่ำกว่าอาจจะถูกหยุดการทำงานชั่วคราว หรือถูกแทรกกลางคัน (<strong>Preemption</strong>) 
+โดยทาสก์ที่มีความสำคัญมากกว่าและมีความจำเป็นที่ต้องรีบทำงานหรือตอบสนองต่อเหตุการณ์ได้ทันตามระยะเวลาที่กำหนดไว้ </p>
+<p>โดยทั่วไป <strong>RTOS</strong> จึงใช้วิธีกำหนดความสำคัญให้แก่ทาสก์ เพื่อให้ตอบสนองต่อเหตุการณ์หรือได้ทำงานทันเวลา
+ทาสก์ที่มีความสำคัญมากกว่า จะไม่ทำงานตลอดเวลา เพราะจะทำให้ทาสก์ที่มีความสำคัญน้อยกว่าไม่มีโอกาสได้ทำงาน</p>
+<p>ในกรณีที่มีหลายทาสก์ที่มีระดับความสำคัญเท่ากัน ก็จะใช้วิธีการเลือกและจัดสรรเวลาการทำงานของซีพียูแบบ <strong>Round-Robin Scheduling</strong> (วนไปตามลำดับ)</p>
+<p>การทำงานของ <strong>FreeRTOS</strong> นอกจากโหมด <strong>Preemptive Scheduling</strong> แล้วยังมีโหมด <strong>Co-operative Scheduling</strong> ให้เลือกใช้ได้เช่นกัน ในโหมดนี้ ในกรณีนี้ ทาสก์ทั้งหมดมีความสำคัญเท่ากัน และจะไม่มีการหยุดตามจังหวะของ <strong>RTOS Timer</strong> เพื่อเปลี่ยนให้ทาสก์อื่นได้ทำงาน ทาสก์ทำงานไปจนกว่าจะยอมปล่อย (<strong>Task Yield</strong>) ให้ทาสก์อื่นได้ทำงานต่อไป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1">&#9655; <strong>ตัวอย่างที่ 1: การสร้างทาสก์เพื่อเปลี่ยนสถานะที่ขาเอาต์พุต</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>ลองมาดูตัวอย่างการสร้างทาสก์ <strong>T0</strong> และ <strong>T1</strong> ตามลำดับ 
+ทั้งสองทาสก์มีระดับความสำคัญเท่ากัน เพื่อทำให้วงจร <strong>LED</strong> แต่ละดวง ที่ต่อกับขาเอาต์พุต <code>D5</code> และ <code>D6</code> 
+กระพริบได้ด้วยอัตราคงที่ แต่ใช้อัตราการกระพริบที่แตกต่างกัน</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; 
+
+#define LED0_PIN  5 // D5 pin
+#define LED1_PIN  6 // D6 pin
+
+// task function prototypes
+void task0( void *pvParameters ); 
+void task1( void *pvParameters );
+
+void sys_info() {
+  String str;
+  str = &quot;CPU frequency: &quot;;
+  str += configCPU_CLOCK_HZ;
+  str += &quot; Hz&quot;;
+  Serial.println( str.c_str() ); // 16 MHz
+
+  str = &quot;FreeRTOS Tick Rate: &quot;;
+  str += configTICK_RATE_HZ;
+  str += &quot; Hz&quot;;
+  Serial.println( str.c_str() );  // 62 Hz
+
+  str = &quot;FreeRTOS Tick Period: &quot;;
+  str += portTICK_PERIOD_MS;
+  str += &quot; ms&quot;;
+  Serial.println( str.c_str() );  // 1000/62 = 16
+}
+
+void setup() {
+  Serial.begin( 115200 );
+  sys_info();
+  // Create two tasks of the same priority level
+  xTaskCreate( task0, &quot;T0&quot;, 128, NULL, 
+               tskIDLE_PRIORITY+1, NULL );
+  xTaskCreate( task1, &quot;T1&quot;, 128, NULL, 
+               tskIDLE_PRIORITY+1, NULL );
+  // Note the FreeRTOS task scheduler is started automatically.  
+}
+
+void loop() {} 
+
+// task enty function for T0
+void task0( void *pvParameters ) { 
+   boolean state = false;
+   pinMode( LED0_PIN, OUTPUT );
+   while (1) { 
+      // toggle LED0 output
+      digitalWrite( LED0_PIN, state = !state );
+      // delay for one tick
+      vTaskDelay( 1 /* ticks */ );
+   }
+}
+
+// task entry function for T1
+void task1( void *pvParameters ){ 
+   boolean state = false;
+   pinMode( LED1_PIN, OUTPUT );
+   // delay for 100 ticks
+   vTaskDelay( 100 /* ticks */ );
+   while (1) { 
+      // toggle LED1 output
+      digitalWrite( LED1_PIN, state = !state );
+      // delay for two ticks
+      vTaskDelay( 2 /* ticks */ );
+   }
+}
+</code></pre>
+<p>ทาสก์ <strong>T0</strong> จะทำให้เกิดการสลับสถานะลอจิกของเอาต์พุต <code>D5</code>
+ทุก ๆ <strong>1 tick &times; 16ms per OS tick = 16ms</strong>
+และทาสก์ <strong>T1</strong> จะอัปเดทเอาต์พุต <code>D6</code> ทุก ๆ  <strong>2 ticks &times; 16ms per OS tick = 32ms</strong> 
+ดังนั้นสัญญาณเอาต์พุตที่ขา <code>D5</code> จะมีความถี่สูงกว่าเป็นสองเท่าของสัญญาณเอาต์พุตที่ขา <code>D6</code></p>
+<p>สังเกตว่า ทาสก์ <strong>T1</strong> (เอาต์พุตที่ขา <code>D6</code>) เมื่อเริ่มต้นทำงานจะถูกหน่วงเวลาไว้ก่อน นับไป <strong>100 ticks</strong> ก่อนเข้าสู่ 
+<code>while(1){…}</code> ในช่วงเวลานี้ จะไม่มีการเปลี่ยนแปลงที่ขาเอาต์พุต <code>D6</code> 
+แต่ในขณะที่ทาสก์ <strong>T0</strong> เริ่มต้นทำงานแล้วเข้าสู่ <code>while(1){…}</code> โดยไม่มีการรอ 
+และเกิดการสลับลอจิกที่ขาเอาต์พุต <code>D5</code> ก่อนที่จะเห็นการเปลี่ยนเปลี่ยนแปลงที่ขา <code>D6</code> ในช่วงเวลาถัดไป</p>
+<p>&nbsp;</p>
+<p>มาดูตัวอย่างผลการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> และบันทึกการเปลี่ยนแปลงที่ขาเอาต์พุต
+ด้วย <strong>Wokwi Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_sim.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างด้วย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_vcd-1.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ได้บันทึกลงในไฟล์ <strong>.vcd</strong> แล้วแสดงผลด้วยโปรแกรม <strong>GTKWave</strong></p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า ที่ขาเอาต์พุต <code>D6</code> ในช่วงแรกยังไม่มีการเปลี่ยนแปลงใด ๆ แต่ในขณะที่เอาต์พุต
+<code>D5</code> มีการเปลี่ยนแปลงตั้งแต่เริ่มต้น</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_vcd-2.png" /></p>
+<p>รูป:  คลื่นสัญญาณและการวัดระยะเวลาด้วย <strong>Markers</strong></p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า ที่ขาเอาต์พุต <code>D6</code> จะเริ่มมีการเปลี่ยนแปลงที่เอาต์พุตเมื่อเวลาผ่านไปประมาณ
+<strong>1600ms</strong> (<strong>= 100 ticks &times; 16 ms per OS tick</strong>)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_vcd-3.png" /></p>
+<p>รูป: การวัดความกว้างของคาบสัญญาณที่ขาเอาต์พุต <code>D5</code> 
+ซึ่งได้เท่ากับ <strong>32ms</strong> (<strong>= 2 ticks &times; 16ms per OS tick</strong>)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_vcd-4.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ช่วงที่เป็น <strong>Low</strong> ที่ขาเอาต์พุต <code>D5</code> ซึ่งได้ประมาณ <strong>16ms</strong> (<strong>= 1 OS tick</strong>)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_vcd-5.png" /></p>
+<p>รูป:  การวัดความกว้างของคาบสัญญาณที่ขาเอาต์พุต <code>D6</code> 
+ซึ่งได้เท่ากับ <strong>64ms</strong> (<strong>= 4 OS ticks</strong>)</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_vcd-6.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ช่วงที่เป็น <strong>High</strong> ที่ขาเอาต์พุต <code>D6</code> ซึ่งได้ประมาณ <strong>32 ms</strong> (<strong>= 2 OS ticks</strong>)
+ช่อง 1 (สีเหลือง) คือ เอาต์พุตที่ขา <code>D5</code> และช่อง 2 (สีฟ้าอมเขียว) คือ เอาต์พุตที่ขา <code>D6</code></p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex1_osc.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ได้จากการทดลองโดยใช้ฮาร์ดแวร์จริงและวัดสัญญาณด้วยเครื่องออสซิลสโคป</p>
+<p>ข้อสังเกต:  ความกว้างของ <strong>1 OS tick</strong> ที่ได้จากการวัดคลื่นสัญญาณเอาต์พุตจริง มีค่าประมาณ <strong>17ms</strong> 
+ซึ่งมากกว่า <strong>16ms</strong> ตามที่ระบุไว้ใน <strong>Datasheet</strong> ของ <strong>AVR</strong> และจากผลการจำลองการทำงาน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2">&#9655; <strong>ตัวอย่างที่ 2: การสร้างทาสก์ที่มีระดับความสำคัญแตกต่างกัน</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไป เป็นการสร้างทาสก์ เช่น ตั้งชื่อว่า <strong>T0</strong> และ <strong>T1</strong>
+ทั้งสองทาสก์จะทำให้เกิดการเปลี่ยนสถานะที่เอาต์พุตสำหรับ <strong>LED</strong> สำหรับขา <code>D5</code> และ <code>D6</code> ตามลำดับ
+แต่มีความสำคัญแตกต่างกัน โดยกำหนดให้ค่าความสำคัญดังนี้  <strong>T0</strong> ต่ำกว่า <strong>T1</strong> </p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define LED0_PIN  5 // D5
+#define LED1_PIN  6 // D6
+
+#define DELAY_TICKS  (6)
+
+void task0( void *pvParameters );
+void task1( void *pvParameters );
+
+void setup() {
+  xTaskCreate( task0, &quot;T0&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL ); 
+  xTaskCreate( task1, &quot;T1&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+2, NULL );
+  // Note the FreeRTOS task scheduler is started automatically.  
+}
+
+void loop() {} 
+
+// task entry function for T0
+void task0( void *pvParameters ) { 
+  boolean state = false;
+  pinMode( LED0_PIN, OUTPUT );
+  while (1) { 
+    // toggle LED0 output as fast as possible
+    digitalWrite( LED0_PIN, state = !state );
+  }
+}
+
+// task entry function for T1
+void task1( void *pvParameters ){ 
+  boolean state = false;
+  pinMode( LED1_PIN, OUTPUT );
+  vTaskDelay( DELAY_TICKS );
+  while (1) {  
+    // toggle LED1 output as fast as possible
+    digitalWrite( LED1_PIN, state = !state );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าสังเกตการทำงานของโค้ดตัวอย่างนี้ ในส่วนของ <code>task1(){…}</code> สำหรับทาสก์ <strong>T1</strong>
+จะมีการทำคำสั่ง <code>vTaskDelay( DELAY_TICKS )</code> ก่อนเข้าสู่ <code>while(1){…}</code> 
+ดังนั้นทาสก์ <strong>T1</strong> จะถูกหยุดการทำงานชั่วคราวเป็นเวลา <code>DELAY_TICKS</code> (<strong>= 6 OS Ticks</strong>)
+และอยู่ในสถานะ <strong>BLOCKED</strong> </p>
+<p>ในขณะที่ทาสก์ <strong>T0</strong> จะได้ทำงานทันที ในช่วงเวลานี้ สังเกตได้ว่า
+สัญญาณเอาต์พุตจะเกิดการเปลี่ยนแปลงที่ขา <code>D5</code> 
+(แสดงว่า ทาสก์ <strong>T0</strong> กำลังทำงาน) </p>
+<p>หลังจากนั้นเมื่อเวลาผ่านไป <code>WAIT_TICKS</code> ทาสก์ <strong>T1</strong> ที่เคยอยู่ในสถานะ <strong>BLOCKED</strong>
+ก็เปลี่ยนมาอยู่ในสถานะ <strong>READY</strong> และเมื่อเกิด <strong>Tick Interrupt</strong> ในครั้งถัดไป
+จะมีการเลือกให้ทาสก์ <strong>T1</strong> ได้ทำงาน เนื่องจากมีความสำคัญสูงกว่า  <strong>T0</strong>
+ที่กำลังทำงานอยู่ในสถานะ <strong>RUNNING</strong> ในขณะนั้น
+และ <strong>T0</strong> ก็จะถูกหยุดไว้ชั่วคราว (แต่อยู่ในสถานะ <strong>READY</strong>)</p>
+<p>ทาสก์ <strong>T1</strong> เมื่อได้ทำงานแล้วจะทำต่อเนื่องไป จนกว่าจะเกิด <strong>Tick Interrupt</strong> 
+เพื่อให้ <strong>Task Scheduler</strong> ได้ทำงานช่วงสั้น ๆ (หรืออาจหยุดชั่วคราวเป็นช่วงเวลาสั้น ๆ 
+เนื่องจากมีเหตุการณ์ที่เป็นอินเทอร์รัพท์ของ <strong>Arduino</strong> เกิดขึ้นในระบบ)
+หลังจากนั้น ทาสก์ <strong>T1</strong> ก็จะได้รับเลือกให้ทำงานอีกเป็นลำดับแรก หรือทำงานต่อไป
+เพราะมีความสำคัญสูงกว่าทาสก์ <strong>T0</strong><br />
+ถ้าดูจากคลื่นสัญญาณเอาต์พุต ในช่วงเวลานี้จะเห็นได้ว่า มีการเปลี่ยนแปลงสถานะลอจิกที่ขา <code>D6</code> 
+(ทาสก์ <strong>T1</strong> กำลังทำงาน) แต่ไม่เกิดขึ้นกับขา <code>D5</code> (ทาสก์ <strong>T0</strong> ไม่ได้ทำงาน)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-1.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุตที่ได้จากการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong></p>
+<p>จากรูปจะเห็นได้ว่า ในช่วงแรกมีการทำงานของ <strong>T0</strong> และเกิดการเปลี่ยนแปลงที่ขา <code>D5</code>
+เป็นระยะเวลาประมาณ <strong>95.926ms</strong> หรือประมาณ <strong>96ms</strong> (<strong>= 6 OS ticks &times; 16 ms per OS tick</strong>)
+แล้วจึงเปลี่ยนให้ทาสก์ <strong>T1</strong> ได้ทำงาน </p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-2.png" /></p>
+<p>รูป: การสลับสถานะลอจิกที่ขาเอาต์พุต เกิดขึ้นทุก ๆ <strong>4.438us</strong> (ไมโครวินาที) โดยประมาณ</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-3.png" /></p>
+<p>รูป: แสดงช่วงเวลาที่มีการเปลี่ยนจากการทำงานของทาสก์ <strong>T0</strong> ไปสู่การทำงานของทาสก์ <strong>T1</strong>
+จับเวลาจากเหตุการณ์ที่ขาเอาต์พุต <code>D5</code> ครั้งสุดท้าย และเหตุการณ์ที่ขาเอาต์พุต <code>D6</code> ครั้งแรก
+ใช้เวลาประมาณ <strong>38.375 us</strong> ในกรณีตัวอย่างนี้</p>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong>  ความกว้างของพัลส์ที่เกิดขึ้นกับสัญญาณเอาต์พุต จะมากหรือน้อยขึ้นอยู่กับการทำคำสั่งภายใน
+<code>while(1){...}</code> เช่น สำหรับ <code>LED1_PIN</code> ที่ใช้กับทาสก์ <strong>T1</strong></p>
+<pre><code class="language-c++">  while (1) {  
+    // toggle LED1 output as fast as possible
+    digitalWrite( LED1_PIN, state = !state );
+  }
+</code></pre>
+<p>ในโค้ดตัวอย่างนี้ ขาเอาต์พุต <code>LED1_PIN</code> ตรงกับขา <code>D6</code> ของ <strong>Arduino Pin</strong>
+และตรงกับขา <code>PD6</code> (พอร์ต <code>PORTD</code> บิตที่ 6) ของชิป <strong>ATmega328P</strong> 
+หากลองเปลี่ยนรูปแบบการเขียนโค้ดใหม่ดังนี้
+จะทำส่งผลอย่างไรบ้างต่อสัญญาณเอาต์พุตเมื่อจำลองการทำงาน</p>
+<pre><code class="language-c++">  while (1) {  
+    // toggle LED1 / PD6 output as fast as possible
+    PIND |= _BV(PD6);
+  }
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-4.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ได้จากการจำลองการทำงานและเปรียบเทียบกันระหว่างเอาต์พุตที่ขา <code>D5</code> 
+และ <code>D6</code> จะเห็นได้ว่า เอาต์พุตที่ขา <code>D6</code> มีการเปลี่ยนแปลงในอัตราที่เร็วกว่าอย่างเห็นได้ชัด
+ซึ่งแสดงให้เห็นถึง <strong>Overhead</strong> จากการใช้คำสั่ง <code>digitalWrite()</code> ของ <strong>Arduino API</strong></p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-5.png" /></p>
+<p>รูป:  การวัดความกว้างของพัลส์ช่วงที่เป็น <strong>High</strong> ของเอาต์พุตที่ขา <code>D6</code> และได้เท่ากับ
+<strong>250ns</strong> หรือ <strong>0.25us</strong> (<strong>= 4 CPU cycles per loop @ 16MHz</strong>)</p>
+<p>&nbsp;</p>
+<p>ถ้าเพิ่มคำสั่งในลูปของฟังก์ชัน <code>task1(){…}</code> ของทาสก์ <strong>T1</strong> เช่น 
+<code>vTaskDelay(0)</code> หรือ <code>taskYIELD()</code> 
+เพื่อให้เปลี่ยนการควบคุมกลับไปยัง <strong>Task Scheduler</strong> แต่ <strong>T1</strong> จะถูกเลือกให้ทำงานอีกเช่นเดิม</p>
+<pre><code class="language-c++">void task1( void *pvParameters ){ // task function for T1
+  boolean state = false;
+  pinMode( LED1_PIN, OUTPUT );
+  vTaskDelay( DELAY_TICKS );
+  while (1) { 
+    // toggle LED1 output as fast as possible
+    digitalWrite( LED1_PIN, state = !state );
+    vTaskDelay(0); // &lt;== task delay for 0 tick
+    taskYIELD();   // &lt;== return control to the task scheduler
+  }
+}
+</code></pre>
+<p>แต่ถ้าเขียนคำสั่ง เช่น <code>vTaskDelay(1)</code> เพื่อให้เกิดการหน่วงเวลาอย่างน้อย <strong>1 Tick</strong> 
+สำหรับการทำงานของ <strong>T1</strong> จะได้ผลการทำงานที่แตกต่างจากเดิม</p>
+<pre><code class="language-c++">void task1( void *pvParameters ){ // task function for T1
+  boolean state = false;
+  pinMode( LED1_PIN, OUTPUT );
+  vTaskDelay( DELAY_TICKS );
+  while (1) { 
+     // toggle LED1 output with one-tick delay
+     digitalWrite( LED1_PIN, state = !state );
+     vTaskDelay(1); // &lt;== task delay for 1 tick
+  }
+}
+</code></pre>
+<p><strong>ข้อสังเกต:</strong> ทาสก์ <strong>T0</strong> จะพยายามทำงานตลอดเวลา ไม่มีการยอมคืนการควบคุม 
+แต่เนื่องจากมีความสำคัญต่ำกว่า <strong>T1</strong> และทุก ๆ ครั้งที่เกิด <strong>Tick Interrupt</strong> 
+การทำงานของทาสก์ <strong>T0</strong> จะถูกแทรกกลางคัน (<strong>preempted</strong>) โดยการทำงานของ <strong>T1</strong></p>
+<p>เมื่อทาสก์ <strong>T1</strong> ได้ทำงาน และทำไปจนถึงคำสั่ง <code>vTaskDelay(1)</code> จะต้องหยุดทำงานชั่วคราว 
+รออยู่ในสถานะ <strong>BLOCKED</strong> เป็นเวลา <strong>1 Tick</strong> จึงจะได้ทำงานอีกครั้ง 
+ในระหว่างนั้น ทาสก์ <strong>T0</strong> จึงมีโอกาสได้ทำงาน และสามารถสังเกตเห็นได้จากผลการจำลองการทำงานต่อไปนี้</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-6.png" /></p>
+<p>รูป: คลื่นสัญญาณสำหรับเอาต์พุต <code>D5</code> และ <code>D6</code> ตามลำดับ ซึ่งจะเห็นได้ว่า ในช่วงแรกมีเพียงทาสก์ <strong>T0</strong>
+เท่านั้นที่ทำงาน ในขณะที่ทาสก์ <strong>T1</strong> หยุดรอเวลาในช่วงแรก จากนั้นจึงเริ่มทำงาน </p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-7.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ขาเอาต์พุตที่แสดงให้เห็นว่า ทาสก์ <strong>T1</strong> ทำให้เกิดการเปลี่ยนสถานะลอจิกที่ขา <code>D6</code>
+ทุก ๆ <strong>1 OS tick = 16ms</strong> ในขณะที่ทาสก์ <strong>T0</strong> ซึ่งมีระดับความสำคัญน้อยกว่า แต่ก็ยังได้ทำงานเช่นกัน</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex2_vcd-8.png" /></p>
+<p>รูป: แสดงช่วงเวลาที่มีการเปลี่ยนบริบทการทำงานระหว่างทาสก์ 
+<strong>T0</strong> &rarr; <strong>T1</strong> &rarr; <strong>T0</strong> ตามลำดับ
+จะเห็นได้ว่า ทาสก์ <strong>T0</strong> ถูกขัดจังหวะโดยทาสก์ <strong>T1</strong> ที่เข้ามาแทรกกลางเนื่องจากถึงเวลาที่กลับมาทำงาน
+และเมื่อ <strong>T1</strong> ได้ทำงานแล้วในสถานะ <strong>RUNNING</strong> ก็เปลี่ยนเป็นสถานะ <strong>BLOCKED</strong> 
+ส่งผลให้ <strong>T0</strong> ได้กลับมาทำงานต่อ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3">&#9655; <strong>ตัวอย่างที่ 3: การเปลี่ยนบริบทการทำงานของทาสก์</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างที่ 2 ถ้าให้ทั้งสองทาสก์ <strong>T0</strong> และ <strong>T1</strong> มีความสำคัญเท่ากัน 
+(เช่น เท่ากับ <code>tskIDLE_PRIORITY+1</code>) และต่างก็พยายามทำให้เอาต์พุตที่เกี่ยวข้อง (ขา <code>D5</code> และ <code>D6</code>)
+เปลี่ยนสถานะลอจิกให้เร็วที่สุด ไม่มีการหน่วงเวลาหรือยอมคืนการควบคุมการทำงานโดยซีพียู จะส่งผลอย่างไรต่อเอาต์พุต ?</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define LED0_PIN  5 // D5
+#define LED1_PIN  6 // D6
+
+void task0( void *pvParameters );
+void task1( void *pvParameters );
+
+void setup() {
+  xTaskCreate( task0, &quot;T0&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL ); 
+  xTaskCreate( task1, &quot;T1&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL );
+  // Note the FreeRTOS task scheduler is started automatically.  
+}
+
+void loop() {} 
+
+// task entry function for T0
+void task0( void *pvParameters ) { 
+  DDRD |= _BV(DDD5); // output direction for PD5
+  while (1) { 
+    PIND |= _BV(PD5); // toggle PD5 output
+  }
+}
+
+// task entry function for T1
+void task1( void *pvParameters ){ // task function for T1
+  DDRD |= _BV(DDD6); // output direction for PD6
+  while (1) { 
+    PIND |= _BV(PD6); // toggle PD6 output
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากทาสก์ <strong>T0</strong> หรือ <strong>T1</strong> ที่มีความสำคัญเท่ากัน 
+เมื่อทาสก์ใดได้ทำงานจนครบหนึ่งช่วงเวลา (<strong>1 OS tick</strong>)
+จะต้องถูกสลับให้ทาสก์อื่นที่มีความสำคัญเท่ากันทำงานในลำดับถัดไป ในลักษณะ <strong>Round-Robin</strong></p>
+<p>เหตุการณ์ที่เกิดขึ้นเรียกว่า การเปลี่ยนบริบทการทำงานของทาสก์ (<strong>Task Context Switching</strong>)
+ซึ่งเกี่ยวข้องกับขั้นตอนหลักสองขั้นตอนที่สำคัญคือ การบันทึกบริบทของทาสก์ปัจจุบัน (<strong>Context Saving</strong>)
+และการนำบริบทของทาสก์ถัดไปกลับมา (<strong>Context Restoring</strong>)
+ทั้งสองขั้นตอนเกี่ยวข้องกับการทำคำสั่งของ <strong>FreeRTOS</strong> ดังนี้</p>
+<ul>
+<li><a href="https://www.freertos.org/implementation/a00016.html"><code>portSAVE_CONTEXT()</code></a></li>
+<li><a href="https://www.freertos.org/implementation/a00017.html"><code>portRESTORE_CONTEXT()</code></a></li>
+</ul>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex3_vcd-1.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุตที่ได้จากการจำลองการทำงาน ซึ่งจะเห็นได้ว่า ทาสก์ <strong>T0</strong> เริ่มทำงานก่อน
+แล้วจึงถูกสลับให้ทาสก์ <strong>T1</strong> ทำงานบ้าง ใช้เวลาเท่า ๆ กัน สลับกันไป</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex3_vcd-2.png" /></p>
+<p>รูป: แต่ละทาสก์จะได้เวลาทำงานประมาณ <strong>16ms</strong> (<strong>= 1 OS tick</strong>) ก่อนสลับให้อีกทาสก์หนึ่งทำงาน</p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex3_vcd-3.png" /></p>
+<p>รูป: ช่วงเวลาที่มีการเปลี่ยนบริบทการทำงานจาก <strong>T0</strong> ไปยัง <strong>T1</strong> 
+จับเวลาจากเหตุการณ์ที่ขาเอาต์พุต <code>D5</code> ครั้งสุดท้าย และเหตุการณ์ที่ขาเอาต์พุต <code>D6</code> ครั้งแรก
+ใช้เวลาประมาณ <strong>20.5us</strong></p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex3_vcd-4.png" /></p>
+<p>รูป: ความกว้างของพัลส์ช่วงที่เป็น <strong>High</strong> เท่ากับ <strong>0.25us</strong> (<strong>250ns</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-taskyield">&#9655; <strong>ตัวอย่างโค้ดที่ 4: การใช้คำสั่ง taskYIELD()</strong><a class="headerlink" href="#4-taskyield" title="Permanent link">#</a></h2>
+<p>จากโค้ดตัวอย่างที่ 3 ถ้ามีการเพิ่มคำสั่ง <code>taskYIELD()</code> หรือ <code>portYIELD()</code> 
+ในการทำงานของแต่ละทาสก์ หลังจากที่มีการเปลี่ยนสถานะของลอจิกที่ขาเอาต์พุตในแต่ละครั้ง จะส่งผลอย่างไรต่อการทำงานโดยรวม</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt;
+
+#define LED0_PIN  5 // D5
+#define LED1_PIN  6 // D6
+
+void task0( void *pvParameters );
+void task1( void *pvParameters );
+
+void setup() {
+  xTaskCreate( task0, &quot;T0&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL ); 
+  xTaskCreate( task1, &quot;T1&quot;, 192, NULL, 
+               tskIDLE_PRIORITY+1, NULL );
+  // Note the FreeRTOS task scheduler is started automatically.  
+}
+
+void loop() {}
+
+// task entry function for T0
+void task0( void *pvParameters ) { 
+  DDRD |= _BV(DDD5); // output direction for PD5
+  while (1) { 
+    PIND |= _BV(PD5); // toggle PD5 output
+    taskYIELD(); // &lt;-----------
+  }
+}
+
+// task entry function for T1
+void task1( void *pvParameters ){ // task function for T1
+  DDRD |= _BV(DDD6); // output direction for PD6
+  while (1) { 
+    PIND |= _BV(PD6); // toggle PD6 output
+    taskYIELD(); // &lt;-----------
+  }
+}
+</code></pre>
+<p>เนื่องจาก <strong>T0</strong> และ <strong>T1</strong> มีระดับความสำคัญเท่ากัน เมื่อทาสก์ใดได้ทำงาน สลับสถานะที่ขาเอาต์พุตหนึ่งครั้ง
+จะทำคำสั่ง <code>taskYIELD()</code> เป็นคำสั่งสุดท้าย ก่อนวนลูปในรอบใหม่ ดังนั้นทาสก์ จะเปลี่ยนจากสถานะ <strong>RUNNING</strong>
+ไปเป็น <strong>READY</strong> และให้อีกทาสก์หนึ่งทำงานต่อ สลับกันไประหว่างทั้งสองทาสก์ </p>
+<p>จากผลการจำลองการทำงานซึ่งเป็นไปตามรูปคลื่นสัญญาณต่อไปนี้ จะเห็นได้ว่า มีการเปลี่ยนสถานะที่ขาเอาต์พุต <code>D5</code> และ <code>D6</code> 
+สลับกันไป มีช่วงเวลาห่างกันประมาณ <strong>16.563us</strong> และความกว้างของพัลส์ช่วงที่เป็น <strong>High</strong> หรือ <strong>Low</strong> ประมาณ <strong>33.688us</strong></p>
+<p><img alt="" src="../avr/images/freertos_avr_part2_ex4_vcd-1.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุตที่ได้จากการจำลองการทำงานของโค้ด</p>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> ในตัวอย่างนี้ การทำงานของแต่ละทาสก์ ในหนึ่งรอบการวนซ้ำ มีเพียงคำสั่งเดียวที่ใช้สำหรับการสลับสถานะของลอจิกที่ขาเอาต์พุต
+แล้วตามด้วยคำสั่ง <code>taskYIELD()</code> หากทำได้เร็ว จะเกิดการสลับบริบทในการทำงานของทาสก์เร็วขึ้น
+ดังนั้นช่วงเวลานี้จะใช้เวลามากหรือน้อยก็ขึ้นอยู่กับความเร็วในการทำคำสั่งของซีพียูและผลจากการทำงานของ <strong>FreeRTOS Kernel</strong></p>
+<p><strong>คำถาม:</strong> หากแทนที่คำสั่ง
+<code>PIND |= _BV(PD6);</code> ด้วย <code>PIND = _BV(PD6);</code> โค้ดตัวอย่างจะให้ผลการทำงานที่แตกต่างเดิมหรือไม่
+เช่น ความกว้างของสัญญาณพัลส์ที่วัดได้ ?</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดสาธิตการใช้งาน <strong>FreeRTOS</strong> สำหรับบอร์ด <strong>Arduino-AVR</strong>
+เช่น การสร้างทาสก์ การกำหนดความสำคัญของทาสก์ และศึกษาพฤติกรรมการทำงานของทาสก์ โดยใช้วิธีการจำลองการทำงาน
+และดูการเปลี่ยนแปลงที่ขา <strong>I/O</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2021-12-27 | Last Updated: 2021-12-30</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

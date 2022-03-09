@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arm_cmsis/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>CMSIS สำหรับซีพียูตระกูล Arm Cortex - IoT Engineering Education</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../css/extra.css" rel="stylesheet">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#cmsis-arm-cortex" class="nav-link">CMSIS สำหรับซีพียูตระกูล Arm Cortex</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#arm-cmsis" class="nav-link">&#9655; แนะนำ Arm CMSIS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arm-cmsis_1" class="nav-link">&#9655; องค์ประกอบทางซอฟต์แวร์ของ Arm  CMSIS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ความร่วมมือจากบริษัทผู้ผลิตชิปและซอฟต์แวร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#stm32cube-stm32-mcus" class="nav-link">&#9655; ซอฟต์แวร์ STM32Cube สำหรับ STM32 MCUs</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arm-mbed-os-cmsis" class="nav-link">&#9655; Arm Mbed OS และความเกี่ยวข้องกับ CMSIS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#stm32duino-cmsis" class="nav-link">&#9655; STM32duino และความเกี่ยวข้องกับ CMSIS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#micropython-cmsis" class="nav-link">&#9655; MicroPython และความเกี่ยวข้องกับ CMSIS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="cmsis-arm-cortex">CMSIS สำหรับซีพียูตระกูล Arm Cortex<a class="headerlink" href="#cmsis-arm-cortex" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="arm-cmsis">&#9655; <strong>แนะนำ Arm CMSIS</strong><a class="headerlink" href="#arm-cmsis" title="Permanent link">#</a></h2>
+<p><a href="https://developer.arm.com/tools-and-software/embedded/cmsis"><strong>CMSIS</strong></a>
+(<strong><em>The Common Microcontroller Software Interface Standard</em></strong>)
+เป็นการกำหนดรูปแบบของซอฟต์แวร์สำหรับตัวประมวลผลที่มีสถาปัตยกรรมแบบ 
+<strong>Arm Cortex-M</strong> (ใช้สำหรับชิปประเภท "ไมโครคอนโทรลเลอร์" หรือ <strong>MCU</strong>) และ 
+<strong>Arm Cortex-A</strong> (เช่น <strong>Cortex-A5/A7/A9</strong> สำหรับชิปประเภท
+"ไมโครโพรเซสเซอร์" หรือ <strong>MPU</strong> ซึ่งรองรับการใช้งานระบบปฏิบัติการ <strong>Embedded Linux</strong> ได้) </p>
+<p><em>"The Common Microcontroller Software Interface Standard (CMSIS) is a vendor-independent abstraction layer for microcontrollers that are based on Arm Cortex processors. CMSIS defines generic tool interfaces and enables consistent device support. The CMSIS software interfaces simplify software reuse, reduce the learning curve for microcontroller developers, and improve time to market for new devices."</em></p>
+<p>&nbsp;</p>
+<p><strong>CMSIS</strong> เกิดจากความต้องการที่จะให้มีมาตรฐาน (<strong>Standardization</strong>) หรือ อินเทอร์เฟสสำหรับซอฟต์แวร์  (<strong>Software Interface</strong>) โดยบริษัท <strong>Arm Ltd.</strong> เพื่อให้ผู้ที่พัฒนาชิปหรือซอฟต์แวร์สำหรับซีพียูดังกล่าว
+ได้มีแนวทางเดียวกันในการพัฒนาและสามารถทำงานร่วมกันได้
+ในปัจจุบันได้มีการพัฒนาหลายเวอร์ชัน จนมาถึง <a href="https://www.keil.com/pack/doc/cmsis/General/html/index.html"><strong>CMSIS 5</strong></a> </p>
+<p><strong>CMSIS</strong> เปรียบเสมือนกับการกำหนด <strong>API</strong> (<em>Application Programming Interface</em>) 
+สำหรับการเขียนพัฒนาแอพพลิเคชันโดยทั่วไป และไฟล์ต่าง ๆ ที่เกี่ยวข้องกับ <strong>CMSIS</strong>
+ได้ถูกเปิดเผยให้เป็น <strong>Open Source (Apache 2.0 License)</strong>
+(<a href="https://github.com/Arm -software/CMSIS_5"><strong>CMSIS on Github</strong></a>)
+และหากเป็นโค้ดในภาษา <strong>C/C++</strong> ก็จะอ้างอิงกับมาตรฐาน <strong>ANSI C/C99</strong> และ <strong>C++ (ISO/IEC 14882:2003 / C++03)</strong> ตามลำดับ รวมถึงมีการตรวจสอบตามข้อกำหนดของ <strong>MISRA-C:2012</strong> ด้วยเช่นกัน (แต่ไม่จำเป็นต้องเป็นไปตามข้อกำหนดทั้งหมด อาจมีข้อยกเว้นบ้าง)</p>
+<p><strong>CMSIS</strong> ทำให้มีรูปแบบที่เป็นมาตรฐานสำหรับการทำงานของซอฟต์แวร์ ซึ่งนำไปใช้งานกับฮาร์ดแวร์จากต่างผู้ผลิตกันได้ ช่วยลดต้นทุนในการพัฒนาซอฟต์แวร์ ลดระยะเวลาในการพัฒนาจนไปสู่ตลาด กำหนดรูปแบบในการเชื่อมต่อกับฮาร์ดแวร์เพื่อการดีบักการทำงานของเฟิร์มแวร์ และการแสดงสถานะการทำงานของวงจรภายในชิป
+&nbsp;</p>
+<hr />
+<h2 id="arm-cmsis_1">&#9655; <strong>องค์ประกอบทางซอฟต์แวร์ของ Arm  CMSIS</strong><a class="headerlink" href="#arm-cmsis_1" title="Permanent link">#</a></h2>
+<p>องค์ประกอบทางซอฟต์แวร์ (<strong>Software Components</strong>) ของ <strong>CMSIS (version 5)</strong> มีดังนี้</p>
+<ul>
+<li><a href="https://arm-software.github.io/CMSIS_5/Core/html/index.html"><strong>CMSIS-Core(M)</strong></a> เป็น  <strong>API</strong> สำหรับสถาปัตยกรรม  <strong>Arm Cortex-M</strong> และวงจรรอบข้างภายในชิปเดียวกัน</li>
+<li><a href="https://arm-software.github.io/CMSIS_5/Core_A/html/index.html"><strong>CMSIS-Core(A)</strong></a> เป็น  <strong>API</strong> สำหรับสถาปัตยกรรม  <strong>Arm Cortex-A</strong> และวงจรรอบข้างภายในชิปเดียวกัน</li>
+<li><a href="https://arm-software.github.io/CMSIS_5/Driver/html/index.html"><strong>CMSIS-Driver</strong></a> เป็น <strong>API</strong> สำหรับการใช้งานวงจรต่าง ๆ ของฮาร์ดแวร์ในระดับล่าง (เช่น <strong>USART</strong>, <strong>SPI</strong>, <strong>I2C</strong>, <strong>USB</strong>, <strong>CAN</strong>, <strong>Ethernet MAC/PHY</strong>, <strong>SDIO for SD/MMC</strong>, <strong>WiFi</strong>) และนำไปใช้ในการพัฒนาซอฟต์แวร์ในระดับที่สูงขึ้นไป เช่น <strong>Middleware</strong> เช่น การสื่อสารข้อมูลและเครือข่ายในรูปแบบต่าง ๆ การเชื่อมต่อด้วยบัส <strong>USB</strong> การจัดการข้อมูลในระบบไฟล์ เป็นต้น</li>
+<li><a href="https://arm-software.github.io/CMSIS_5/DSP/html/index.html"><strong>CMSIS-DSP</strong></a> เป็นไลบรารีสำหรับเขียนโค้ดที่เน้นการคำนวณเชิงตัวเลขและประมวลผลสัญญาณข้อมูลดิจิทัล
+(<strong>Digital Signal Processing</strong>) เช่น การคำนวณโดยใช้รูปแบบข้อมูลที่เรียกว่า <strong>Fixed-point numbers</strong>
+ (<strong>fractional q7, q15, q31</strong>) และเลขทศนิยมขนาด 32 บิต (<strong> single precision floating-point </strong>) โดยใช้ความสามารถของซีพียูและชุดคำสั่ง เช่น <strong>SIMD</strong> ที่รองรับการทำงานโดย <strong>Arm Cortex-M4/M7/M33/M35P</strong></li>
+<li><a href="https://arm-software.github.io/CMSIS_5/NN/html/index.html"><strong>CMSIS-NN</strong></a> เป็นไลบรารีที่รวบรวมฟังก์ชันที่เกี่ยวข้องกับการคำนวณโครงข่ายประสาทเทียม (<strong>Neural Network Kernels</strong>) และใช้สำหรับ <strong>Arm Cortex-M</strong> และถูกออกแบบมาให้ทำงานได้อย่างมีประสิทธิภาพในแง่ของการประมวลผลระดับคำสั่งของซีพียูและการใช้หน่วยความจำ</li>
+<li><a href="https://arm-software.github.io/CMSIS_5/RTOS/html/index.html"><strong>CMSIS-RTOS v1</strong></a> เป็นการกำหนด <strong>API</strong> สำหรับ <strong>RTOS</strong> (<em>Real-Time Operating System</em>)
+เวอร์ชัน 1 สำหรับ <strong>ArmCortex-M0/M0+/M3/M4/M7</strong> และใช้ <strong>Keil RTX</strong> เป็นตัวอย่างในการสร้างฟังก์ชันการทำงาต่าง ๆ
+ตามข้อกำหนดของ <strong>API</strong></li>
+<li><a href="https://arm-software.github.io/CMSIS_5/RTOS2/html/index.html"><strong>CMSIS-RTOS v2</strong></a> เป็นการขยายหรือเพิ่มฟังก์ชันการทำงานของ <strong>RTOS v2</strong> ให้รองรับได้ทั้ง <strong>Arm Cortex-M</strong>
+และ <strong>Arm Cortex-A5/A7/A9</strong> รวมถึงการทำงานแบบหลายซีพียู (<strong>Multi-Core Processor</strong>)</li>
+<li><a href="https://arm-software.github.io/CMSIS_5/SVD/html/index.html"><strong>CMSIS-SVD</strong></a> 
+เป็นไฟล์ที่มีรายละเอียดเกี่ยวกับชิปไมโครคอนโทรลเลอร์ เช่น รายการของรีจิสเตอร์ภายใน (<strong>Memory-mapped Registers of Peripherals</strong>) และจะถูกนำไปใช้ในการสร้างไฟล์ <strong>CMSIS-Core C Header Files</strong></li>
+<li><a href="https://arm-software.github.io/CMSIS_5/Pack/html/index.html"><strong>CMSIS-Pack</strong></a>
+เป็นการกำหนดรูปแบบแพ็คเกจของซอฟต์แวร์สำหรับการติดตั้งใช้งาน (หรือที่เรียกว่า <strong>Software Packs</strong>) สำหรับผู้พัฒนา <strong>Software Tools</strong> ซึ่งประกอบด้วยหลายส่วน เช่น<ul>
+<li><strong>C/C++ Source Code &amp; Header Files</strong></li>
+<li><strong>Software Libraries</strong></li>
+<li><strong>Documentation</strong></li>
+<li><strong>Example / Demo Projects</strong></li>
+<li><strong>Project Templates</strong></li>
+</ul>
+</li>
+<li><a href="https://arm-software.github.io/CMSIS_5/DAP/html/index.html"><strong>CMSIS-DAP</strong></a> เป็นตัวอย่างการพัฒนาเฟิร์มแวร์ เช่น <a href="https://github.com/Arm mbed/DAPLink"><strong>CMSIS-DAP interface firmware</strong></a> ซึ่งเป็น <strong>Open Source</strong> สำหรับไมโครคอนโทรลเลอร์ เพื่อนำใช้ในการอัปโหลดและดีบักการทำงานของโค้ดในฮาร์ดแวร์จริง (<strong>In-Circuit Debugging</strong>) อุปกรณ์ที่ทำงานได้ในลักษณะนี้ จะเรียกว่า <a href="https://daplink.io/"><strong>" CMSIS-DAP based / DAPLink Debuggers"</strong></a> และทางบริษัท <strong>Arm</strong> ก็ได้ออกแบบตัวอย่างฮาร์ดแวร์ (<strong>Reference Design</strong>) และ เรียกว่า <a href="https://github.com/ARMmbed/mbed-HDK-Eagle-Projects/tree/master/DAPLink"><strong>"Arm Mbed HDK"</strong></a>
+ตัวอย่างอุปกรณ์ <strong>Debug Probes</strong> ที่ทำงานเข้ากับ <strong>CMSIS-DAP</strong> ได้ เช่น<ul>
+<li><a href="https://www.segger.com/products/debug-probes/j-link/models/j-link-ob/"><strong>SEGGER J-Link OB</strong></a> (based on Atmel SAM3U)</li>
+<li><a href="https://www.st.com/en/evaluation-tools/stm32-nucleo-boards.html"><strong>STMicroelectronics ST-LINK/V2</strong></a> (based on STM32F103CB)</li>
+</ul>
+</li>
+</ul>
+<p>การทำงานของซอฟต์แวร์ที่เป็นไปตามข้อกำหนดของ <strong>CMSIS</strong> นอกจากจำแนกตามองค์ประกอบแล้ว ยังจำแนกตามระดับชั้นในเชิงสถาปัตยกรรมของซอฟต์แวร์ตามรูปดังนี้</p>
+<p><img alt="" src="images/cmsis_v4_model.png" /></p>
+<p>รูป:  องค์ประกอบของซอฟต์แวร์สำหรับ <strong>CMSIS</strong> (Source: Arm)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/cmsis_sw_components.png" /></p>
+<p>รูป: ชั้นของซอฟต์แวร์ (<strong>Software Layer</strong>) ที่เชื่อมต่อกับการทำงานของชิปในระดับล่าง
+และการทำงานของซอฟต์แวร์หรือแอพพลิเคชันในระดับที่สูงขึ้นไป (Source: Arm)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/cmsis_component_tcpip_ethernet.png" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>Ethernet (MAC &amp; PHY)</strong> สำหรับการเชื่อมต่อในระบบเครือข่ายด้วย <strong>TCP/IP</strong>
+และการใช้ซอฟต์แวร์ที่เป็นตัวเลือกจากต่างผู้ผลิต (Source: Arm)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/cmsis_dfp_flow.png" /></p>
+<p>รูป: ตัวอย่างขั้นตอนในการสร้าง <strong>CMSIS Pack - Device Family Pack (DFP)</strong>
+สำหรับไมโครคอนโทรลเลอร์ (Source: Arm)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>ความร่วมมือจากบริษัทผู้ผลิตชิปและซอฟต์แวร์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บริษัทผู้พัฒนาชิป (<strong>MCU Chip Vendors</strong>) เช่น <strong>STMicroelectronics</strong>,
+<strong>NXP/FreeScale</strong>, <strong>Texas Instruments</strong>, <strong>Microchip/Atmel</strong> เป็นต้น 
+รวมถึงผู้พัฒนาซอฟต์แวร์ (<strong>Development Software Vendors</strong>) เช่น ซอฟต์แวร์  <strong>Arm Development Studio</strong>, <strong>Arm-Keil MDK</strong>, <strong>SEGGER Embedded Studio for Arm </strong>, 
+<strong>IAR Embedded Workbench for Arm</strong> เป็นต้น ก็ได้ทำตามข้อกำหนดของ <strong>CMSIS</strong> </p>
+<p>หากพิจารณาซอฟต์แวร์ <a href="https://www2.keil.com/mdk5"><strong>Arm -Keil MDK</strong></a> 
+และ <a href="https://developer.arm.com/tools-and-software/embedded/arm-development-studio"><strong>Arm Development Studio</strong></a> จะพบว่า มีการใช้งาน 
+<strong>CMSIS Components</strong> </p>
+<p><img alt="" src="images/arm_software.png" /></p>
+<p>รูป: องค์ประกอบของซอฟต์แวร์ <strong>Arm Development Studio</strong> (Source: Arm)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/keil_mdk_pack.png" /></p>
+<p>รูป: องค์ประกอบของซอฟต์แวร์ <strong>Arm-Keil MDK</strong> (Source: Arm)</p>
+<p>&nbsp;</p>
+<p>ข้อกำหนดของ <strong>CMSIS</strong> จะช่วยในการจัดการซอฟต์แวร์ที่เกี่ยวข้องกับการใช้งานชิปไมโครคอนโทรลเลอร์ตระกูล <strong>Arm Cortex</strong>
+ในระดับต่าง ๆ ดังนี้</p>
+<ul>
+<li><strong>Device Support</strong>: เป็นระดับล่างสุดเกี่ยวข้องกับตัวชิป เมื่อต้องการใช้ชิปรุ่นใดหรือตระกูลใด
+จะต้องมีการติดตั้งแพ็คเกจที่เรียกว่า "<strong>Device Family Pack (DFP)</strong>" ภายในประกอบด้วยไฟล์ต่าง ๆ เช่น<ul>
+<li><strong>CMSIS-compliant Startup Files / Device Files / System Files</strong></li>
+<li><strong>CMSIS Drivers</strong></li>
+</ul>
+</li>
+<li><strong>Board Support</strong>: เป็นการรองรับการใช้งานบอร์ดของผู้ผลิต เช่น บอร์ด <strong>STM32 Nucleo</strong> 
+หรือ <strong>Discovery</strong> ของบริษัท <strong>STMicroelectronics</strong> หรือ <strong>Development Kits</strong> ของบริษัทอื่น 
+ดังนั้นหากจะเลือกใช้บอร์ดใด ก็จะมีแพ็จเกจที่เรียกว่า <strong>Board Support Pack (BSP)</strong> ให้เลือกใช้งานได้</li>
+</ul>
+<p><img alt="" src="images/keil_mdk_pack_installer_samd.png" /></p>
+<p>รูป: ตัวอย่างการเลือก <strong>DFP &amp; BSP</strong> เพื่อนำมาติดตั้งใช้งานสำหรับ <strong>Atmel SAMD21</strong> ใน <strong>Arm-Keil MDK Pack Installer</strong> (ดูรายการตัวเลือกได้จาก <a href="https://www.keil.com/dd2/pack/">MDK5 Software Packs</a>)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/keil_mdk_pack_installer_stm.png" /></p>
+<p>รูป: ตัวอย่างการเลือก <strong>DFP &amp; BSP</strong> เพื่อนำมาติดตั้งใช้งานสำหรับ <strong>STM32F4xx</strong> 
+ใน <strong>Arm-Keil MDK Pack Installer</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="stm32cube-stm32-mcus">&#9655; <strong>ซอฟต์แวร์ STM32Cube สำหรับ STM32 MCUs</strong><a class="headerlink" href="#stm32cube-stm32-mcus" title="Permanent link">#</a></h2>
+<p>ถัดไปลองมาดูตัวอย่างซอฟต์แวร์ของบริษัท <strong>STMicroelectronics (STM)</strong>
+ที่จะแสดงให้เห็นความเกี่ยวข้องกับ <strong>CMSIS</strong> </p>
+<p>บริษัท <strong>STM</strong> พัฒนาและผลิตชิปสองประเภทคือ ไมโครคอนโทรลเลอร์ <strong>MCU (32-bit Arm Cortex-M)</strong>
+และ ไมโครโพรเซสเซอร์  <strong>MPU (32-bit Arm Cortex-A plus Cortex-M)</strong> หรือแบบผสมในชิปเดียวกัน
+(<strong>Hybrid - Heterogeneous Multi-Core Architecture</strong>)</p>
+<p><img alt="" src="images/stm32_mcus.jpg" /></p>
+<p>รูป: <strong>STM32 32-bit Arm Cortex-M MCUs</strong> (Source: STM)</p>
+<p><img alt="" src="images/stm32_mpus.jpg" /></p>
+<p>รูป:  <strong>STM32 32-bit Arm Cortex-M MPUs</strong> (Source: STM)</p>
+<p>&nbsp;</p>
+<p><a href="https://www.st.com/en/ecosystems/stm32cube.html"><strong>STM32Cube</strong></a> เป็นซอฟต์แวร์ประเภท <strong>Open Source</strong> สำหรับการพัฒนาเฟิร์มแวร์ เพื่อนำไปใช้กับไมโครคอนโทรลเลอร์ของบริษัท  <strong>STM</strong>
+แบ่งออกเป็นกลุ่มจำแนกตามตระกูล เช่น </p>
+<ul>
+<li><strong>STM32CubeF0</strong> (STM32F0xx: Arm Cortex-M0, ARMv6-M instruction set)</li>
+<li><strong>STM32CubeF1</strong> (STM32F1xx: Arm Cortex-M3, ARMv7 instruction set)</li>
+<li><strong>STM32CubeF3</strong> (STM32F3xx: Arm Cortex-M4, ARMv7-M instruction set)</li>
+<li><strong>STM32CubeF4</strong> (STM32F4xx: Arm Cortex-M4, ARMv7-M instruction set)</li>
+<li><strong>STM32CubeF7</strong> (STM32F4xx: Arm Cortex-M7, ARMv7-M instruction set)</li>
+<li><strong>STM32CubeL0</strong> (STM32L0xx: Arm Cortex-M0+, ARMv6-M instruction set)</li>
+<li><strong>STM32CubeL4</strong> (STM32L4xx: Arm Cortex-M4, ARMv7-M instruction set)</li>
+</ul>
+<p><a href="https://www.st.com/en/development-tools/stm32cubemx.html"><strong>STM32CubeMX</strong></a>
+เป็นซอฟต์แวร์ที่ทำหน้าที่ช่วยในการสร้างโค้ดเริ่มต้นในโปรเจกต์ ตามที่ผู้ใช้ได้ตั้งค่าตัวเลือกสำหรับวงจรภายในของชิปเป้าหมาย (<strong>Peripheral Configuration &amp; Initial Code Generation</strong>) ดังนั้นจึงช่วยลดภาระสำหรับผู้ใช้
+ในการสร้างไฟล์ต่าง ๆ และมีการใส่โครงสร้างโค้ดเป็นตัวอย่าง (<strong>Code Template</strong>) หรือหากมีการแก้ไขไฟล์สำหรับการตั้งค่าใช้งาน (.ioc) โดยผู้ใช้ ซอฟต์แวร์นี้ก็สามารถสร้างโค้ดในไฟล์ต่าง ๆ ที่เกี่ยวข้องได้โดยอัตโนมัติ</p>
+<p><a href="https://www.st.com/en/development-tools/stm32cubeide.html"><strong>STM32CubeIDE</strong></a> เป็นซอฟต์แวร์ฟรีของบริษัท <strong>STM</strong> ทำหน้าที่เป็น <strong>IDE</strong> หรือ <strong>C/C++ Development Platform</strong> สำหรับไมโครคอนโทรลเลอร์ <strong>STM32</strong>
+หากย้อนกลับไปในช่วงปลายปีค.ศ. 2017  บริษัท <strong>STM</strong> ได้เข้าซื้อบริษัท <strong>Atollic</strong> และซอฟต์แวร์ที่มีชื่อว่า <a href="https://www.st.com/en/development-tools/truestudio.html"><strong>Atollic TrueSTUDIO</strong></a> แล้วก็เปิดให้ใช้ได้ฟรี แต่ใช้ได้สำหรับไมโครคอนโทรลเลอร์ของ <strong>STM</strong> เท่านั้น ต่อมาจึงได้มีการพัฒนาต่อแล้วเปลี่ยนชื่อใหม่เป็น <strong>STM32CubeIDE</strong></p>
+<p>ซอฟต์แวร์ตัวนี้ใช้  <strong>Eclipse/CDT framework</strong> เป็นพื้นฐานในการทำงานสำหรับ <strong>IDE</strong>
+ใช้ <strong>GCC toolchain</strong> สำหรับการคอมไพล์โค้ดภาษา <strong>C/C++</strong> และ <strong>GDB</strong> สำหรับการดีบักโค้ดและทดสอบการทำงานในฮาร์ดแวร์จริงได้ (<strong>In-Circuit Debugging</strong>) นอกจากนั้นได้รวม <strong>STM32CubeMX</strong> มาให้แล้ว (ไม่จำเป็นต้องติดตั้งแยกกัน)</p>
+<p><img alt="" src="images/stm32cubemx_software.jpg" /></p>
+<p>รูป: <strong>STM32CubeMX</strong> (Source: ST)</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างขององค์ประกอบภายใน <a href="https://github.com/STMicroelectronics/STM32CubeF4"><strong>STM32CubeF4 Package</strong></a> มีดังนี้</p>
+<ul>
+<li><a href="https://github.com/STMicroelectronics/STM32CubeF4/tree/master/Drivers/CMSIS"><strong>CMSIS Software Components</strong></a>
+จำแนกออกเป็นกลุ่มดังนี้<ul>
+<li><strong>CMSIS Core</strong></li>
+<li><strong>CMSIS Device</strong></li>
+<li><strong>CMSIS RTOS2</strong></li>
+<li><strong>CMSIS DSP</strong></li>
+<li><strong>CMSIS NN</strong></li>
+</ul>
+</li>
+<li><a href="https://github.com/STMicroelectronics/STM32CubeF4/tree/master/Drivers/STM32F4xx_HAL_Driver"><strong>STM32 Drivers</strong></a> (<code>STM32F4xx_HAL_Driver</code>) เป็น <strong>API</strong> และไลบรารีของบริษัท <strong>STM</strong> สำหรับการเขียนโค้ดเพื่อใช้งานวงจรรอบข้างที่มีอยู่ในชิปไมโครคอนโทรลเลอร์ <strong>STM32F4</strong> แบ่งเป็นสองระดับคือ<ul>
+<li><strong>STM32 HAL (Hardware Abstraction Layer)</strong>: มีการตั้งชื่อไฟล์เป็น <code>stm32f4xx_hal_&lt;xxx&gt;.h</code> และ <code>stm32f4xx_hal_&lt;xxx&gt;.c</code> และฟังก์ชันมักจะขึ้นต้นด้วย <code>HAL_</code> เช่น <code>HAL_Init()</code>, <code>HAL_Delay()</code>, <code>HAL_GPIO_WritePin()</code> เป็นต้น</li>
+<li><strong>STM32 LL (Low-Level)</strong>: มีการตั้งชื่อไฟล์เป็น <code>stm32f4xx_ll_&lt;xxx&gt;.h</code> และ <code>stm32f4xx_ll_&lt;xxx&gt;.c</code> โดยที่ <code>&lt;xxx&gt;</code> ใช้แทนชื่อของวงจรต่าง ๆ ภายในชิป</li>
+</ul>
+</li>
+<li><a href="https://github.com/STMicroelectronics/STM32CubeF4/tree/master/Drivers/BSP"><strong>STM32 BSP Drivers</strong></a> สำหรับบอร์ดของบริษัท เช่น <a href="https://www.st.com/en/evaluation-tools/stm32-nucleo-boards.html"><strong>Nucleo Boards</strong></a> และ <a href="https://www.st.com/en/evaluation-tools/stm32-discovery-kits.html"><strong>Discovery Kits</strong></a> เป็นต้น</li>
+<li>
+<p><a href="https://github.com/STMicroelectronics/STM32CubeF4/tree/master/Middlewares"><strong>STM32 Middlewares</strong></a> เป็นไลบรารีของ <strong>STM</strong> หรือของบริษัทอื่น (<strong>3rd Party</strong>) สำหรับการใช้งานในระดับสูงขึ้นไป โดยมีการใช้งาน <strong>STM32 HAL</strong> เป็นพื้นฐาน เช่น</p>
+<ul>
+<li><strong>RTOS / FreeRTOS</strong> </li>
+<li><strong>USB</strong></li>
+<li><strong>Graphics / TouchGFX</strong></li>
+<li><strong>LwIP</strong> (<strong>light-weight TCP/IP Stack</strong>)</li>
+<li><strong>mbedTLS</strong> </li>
+<li><strong>FatFS</strong> (<strong>FAT-based File System</strong>) เป็นต้น</li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/STMicroelectronics/STM32CubeF4/tree/master/Projects"><strong>Software Projects</strong></a> เป็นโปรเจกต์ที่สาธิตการทำงานของฮาร์ดแวร์หรือบอร์ดตัวอย่าง และการเขียนโค้ด (<strong>Examples</strong> / <strong>Project Templates</strong>
+/ <strong>Demo Applications</strong>) โดยจำแนกตามบอร์ดตัวอย่างของ <strong>STM</strong> ซอฟต์แวร์ประเภท <strong>IDE</strong> และคอมไพล์เลอร์ที่เลือกใช้ได้ เป็นต้น</p>
+</li>
+<li><a href="https://github.com/STMicroelectronics/STM32CubeF4/tree/master/Documentation"><strong>Documentation</strong></a> เช่น
+เอกสารเป็นไฟล์ .pdf แนะนำการใช้งาน เป็นต้น</li>
+</ul>
+<p>ตาราง: ตัวอย่างไฟล์ที่เกี่ยวข้องกับ <strong>CMSIS Core</strong> (จำแนกตามสถาปัตยกรรมของซีพียู และคอมไพล์เลอร์ที่เลือกใช้งานได้)</p>
+<table>
+<thead>
+<tr>
+<th>Files</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>core_cm0.h</td>
+<td>CMSIS Cortex-M0 Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>core_cm0plus.h</td>
+<td>CMSIS Cortex-M0+ Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>core_cm3.h</td>
+<td>CMSIS Cortex-M3 Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>core_cm4.h</td>
+<td>CMSIS Cortex-M4 Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>core_cm7.h</td>
+<td>CMSIS Cortex-M7 Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>core_cm23.h</td>
+<td>CMSIS Cortex-M23 Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>core_cm33.h</td>
+<td>CMSIS Cortex-M33 Core Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>cmsis_compiler.h</td>
+<td>CMSIS compiler generic header file</td>
+</tr>
+<tr>
+<td>cmsis_gcc.h</td>
+<td>CMSIS compiler GCC header file</td>
+</tr>
+<tr>
+<td>cmsis_armcc.h</td>
+<td>CMSIS compiler ARMCC (Arm Compiler 5) header file</td>
+</tr>
+<tr>
+<td>cmsis_armclang.h</td>
+<td>CMSIS compiler armclang (Arm Compiler 6) header file</td>
+</tr>
+<tr>
+<td>cmsis_iccarm.h</td>
+<td>CMSIS compiler ICCARM (IAR Compiler for Arm) header file</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>ตาราง: ตัวอย่างไฟล์ของ <strong>STM</strong> ที่เกี่ยวข้องกับ <strong>CMSIS Device &amp; System</strong> (สำหรับ <strong>STM32F4 Device Family &rarr; STM32F446xx MCU Device</strong> เป็นตัวอย่างของชิปที่ได้เลือกใช้งาน)</p>
+<table>
+<thead>
+<tr>
+<th>Files</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>system_stm32f4xx.h</td>
+<td>CMSIS Cortex-M4 Device System Source File for STM32F4xx devices</td>
+</tr>
+<tr>
+<td>system_stm32f4xx.c</td>
+<td>CMSIS Cortex-M4 Device Peripheral Access Layer System Source File</td>
+</tr>
+<tr>
+<td>stm32f4xx.h</td>
+<td>CMSIS STM32F4xx Device Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>stm32f446xx.h</td>
+<td>CMSIS STM32F446xx Device Peripheral Access Layer Header File</td>
+</tr>
+<tr>
+<td>startup_stm32f446xx.s</td>
+<td>STM32F446xx Device Startup File + Vector Table for specific toolchains (GCC, ARM, IAR)</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>ไฟล์ <code>stm32f446xx.h</code> เป็น <strong>C Header File</strong> ที่ประกาศค่าคงที่หรือสัญลักษณ์ต่าง ๆ และชนิดข้อมูลที่เป็นโครงสร้างแบบ <code>struct</code> เพื่อความสะดวกในการเข้าถึงรีจิสเตอร์ของวงจรต่าง ๆ ภายในชิป (<strong>Memory-mapped Peripherals Registers</strong>) และมีตัวอย่างที่ได้ตัดมาแสดงบางส่วนดังนี้</p>
+<p><img alt="" src="images/stm32f446re_gpio_usart.png" /></p>
+<p>รูป: การประกาศชนิดข้อมูลสำหรับโครงสร้างแบบ <code>struct</code> สำหรับวงจร <strong>GPIO</strong> และ
+<strong>USART</strong> ตามลำดับ ซึ่งภายในโครงสร้างข้อมูล จะมีชื่อสำหรับอ้างอิงรีจิสเตอร์ที่เกี่ยวข้องกับวงจรดังกล่าว</p>
+<p><img alt="" src="images/stm32f446re_rcc.png" /></p>
+<p>รูป: การกำหนดชนิดข้อมูลสำหรับวงจร <strong>RCC</strong> (<em>Reset and Clock Controller</em>)
+ของ <strong>STM32F446RE</strong></p>
+<p><img alt="" src="images/stm32f446re_base_addresses.png" /></p>
+<p>รูป: (ขวามือ) การกำหนดสัญลักษณ์สำหรับแอดเดรสเริ่มต้น (<strong>Base Addresses</strong>) โดยแบ่งตามประเภทของวงจรต่าง ๆ 
+ที่เชื่อมต่อกับระบบบัส  <strong>APB1</strong> และ <strong>APB2</strong> ภายในชิป <strong>STM32F446RE</strong>
+(ซ้ายมือ) สัญลักษณ์หรือชื่อที่สามารถนำไปใช้งานในรูปแบบของพอยน์เตอร์ (<strong>Pointers</strong>) เช่น <code>GPIOA-&gt;MODER</code> และ <code>GPIOA-&gt;PUPDR</code> สำหรับเข้าถึงรีจิสเตอร์  <strong>MODER</strong> และ <strong>PUPDR</strong> ของ <strong>GPIO Port A</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<p>การทำงานของซอฟต์แวร์ <strong>STM32CubeMX</strong> จะสร้างไฟล์สำหรับโปรเจกต์ได้โดยอัตโนมัติ หลังจากที่ผู้ใช้ได้กำหนดตัวเลือกต่าง ๆ
+สำหรับวงจรภายใน ซึ่งมีการจำแนกตามส่วนต่าง ๆ ของชิป เช่น การกำหนดตัวเลือกสำหรับวงจรสร้างความถี่
+การเปิดใช้งานขา <strong>GPIO</strong> การเปิดใช้งานวงจร <strong>USART</strong> สำหรับรับส่งข้อมูลแบบ <strong>Serial</strong> 
+รวมถึงการเปิดใช้งานอินเทอร์รัพท์ที่เกี่ยวข้องกับวงจรเหล่านั้น เป็นต้น ตัวอย่างของไฟล์ที่เกี่ยวข้องมีดังนี้</p>
+<table>
+<thead>
+<tr>
+<th>Files</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>main.c</td>
+<td>Main Source Code</td>
+</tr>
+<tr>
+<td>main.h</td>
+<td>Main Header File</td>
+</tr>
+<tr>
+<td>system_stm32f4xx.c</td>
+<td>CMSIS-compliant STM32F4xx System Source File</td>
+</tr>
+<tr>
+<td>stm32f4xx_hal_conf.h</td>
+<td>STM32F4xx HAL Configuration File</td>
+</tr>
+<tr>
+<td>stm32f4xx_hal_msp.c</td>
+<td>STM32F4xx HAL MSP (MCU Support Package) File</td>
+</tr>
+<tr>
+<td>stm32f4xx_it.h</td>
+<td>STM32F4xx Header File for Interrupt Handlers</td>
+</tr>
+<tr>
+<td>stm32f4xx_it.c</td>
+<td>STM32F4xx Source File for ISRs</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>ไฟล์  <code>stm32f4xx_hal_conf.h</code> เกี่ยวข้องกับการใช้เลือกใช้งานวงจรรอบข้าง (<strong>On-chip Peripherals</strong>) และการทำงานของ <strong>STM32 HAL Drivers</strong> การกำหนดค่าความถี่ของวงจรจากภายนอกหรือภายใน
+(เช่น ค่าความถี่สำหรับ <code>HSE_VALUE</code> และ <code>HSI_VALUE</code> ของชิปไมโครคอนโทรลเลอร์ที่ใช้งานจริง) ตัวอย่างการกำหนดค่า (โดยใช้คำสั่ง <code>#define</code>) เพื่อเลือกใช้งานวงจรภายในที่พบได้บ่อยสำหรับ <strong>STM32F4</strong> เช่น</p>
+<ul>
+<li><code>HAL_MODULE_ENABLED</code></li>
+<li><code>HAL_CORTEX_MODULE_ENABLED</code></li>
+<li><code>HAL_PWR_MODULE_ENABLED</code></li>
+<li><code>HAL_RCC_MODULE_ENABLED</code></li>
+<li><code>HAL_FLASH_MODULE_ENABLED</code></li>
+<li><code>HAL_DMA_MODULE_ENABLED</code></li>
+<li><code>HAL_GPIO_MODULE_ENABLED</code></li>
+<li><code>HAL_EXTI_MODULE_ENABLED</code></li>
+<li><code>HAL_UART_MODULE_ENABLED</code></li>
+<li><code>HAL_ADC_MODULE_ENABLED</code></li>
+<li><code>HAL_I2C_MODULE_ENABLED</code></li>
+<li><code>HAL_RTC_MODULE_ENABLED</code></li>
+<li><code>HAL_SPI_MODULE_ENABLED</code></li>
+<li><code>HAL_TIM_MODULE_ENABLED</code></li>
+<li>...</li>
+</ul>
+<p>ไฟล์ <code>system_stm32f4xx.h</code> และ <code>system_stm32f4xx.c</code> มีสองฟังก์ชันและหนึ่งตัวแปรภายนอก</p>
+<ul>
+<li><code>SystemInit()</code> เป็นฟังก์ชันนี้จะถูกเรียกให้ทำงานเมื่อไมโครคอนโทรลเลอร์เริ่มทำงานหลังจากการรีเซต
+และรับช่วงต่อจากการทำงานของ <strong>Startup Code</strong> (เช่น ไฟล์ <code>startup_stm32f4xx.s</code>)</li>
+<li><code>SystemCoreClockUpdate()</code> เป็นฟังก์ชันสำหรับการอัปเดทค่าของตัวแปร <code>SystemCoreClock</code> ให้ถูกต้อง
+หากมีการตั้งค่าใหม่ในรีจิสเตอร์ <strong>RCC</strong> ที่ทำให้เปลี่ยนความถี่ของ <strong>Core Clock</strong></li>
+<li><code>SystemCoreClock</code> เป็นตัวแปรภายนอก (<strong>Global Variable</strong>)
+สำหรับระบุค่าความถี่ของซีพียู (<strong>Core Clock Frequency</strong>) มีหน่วยเป็น <strong>Hz</strong></li>
+</ul>
+<p>ไฟล์ <code>stm32fxx_hal_msp.c</code> มีฟังก์ชันต่าง ๆ ที่เกี่ยวข้องกับการตั้งค่าเริ่มต้นใช้งาน (<strong>Initialization Functions</strong>) เพื่อเปิด (หรือปิด) การใช้งานวงจรรอบข้าง ตามที่ผู้ใช้ได้เลือกเอาไว้ใน <strong>STM32CubeMX</strong> ตัวอย่างชื่อของฟังก์ชันสำหรับวงจร <strong>GPIO</strong>, <strong>UART</strong>, <strong>I2C</strong> และ <strong>SPI</strong> (หากมีการเลือกใช้งาน) ได้แก่</p>
+<ul>
+<li><code>void HAL_MspInit( void )</code></li>
+<li><code>void HAL_UART_MspInit( UART_HandleTypeDef *huart )</code></li>
+<li><code>void HAL_I2C_MspInit( I2C_HandleTypeDef *hi2c )</code></li>
+<li><code>void HAL_SPI_MspInit( SPI_HandleTypeDef *hspi )</code></li>
+</ul>
+<p>ไฟล์ <code>stm32f4xx_it.c</code> เป็นไฟล์ที่ฟังก์ชันที่เกี่ยวข้องกับอินเทอร์รัพท์ในระบบ
+(ในส่วนที่เกี่ยวข้องกับการทำงานของซีพียูและวงจรรอบข้าง) ตัวอย่างฟังก์ชันที่เกี่ยวข้อง เช่น</p>
+<ul>
+<li>
+<p><strong>CPU Exception Handlers</strong></p>
+<ul>
+<li><code>void NMI_Handler( void )</code></li>
+<li><code>void HardFault_Handler( void )</code></li>
+<li><code>void MemManage_Handler( void )</code></li>
+<li><code>void UsageFault_Handler( void )</code></li>
+<li><code>void SVC_Handler( void )</code></li>
+<li><code>void PendSV_Handler( void )</code></li>
+<li><code>void DebugMon_Handler( void )</code></li>
+<li><code>void SysTick_Handler( void )</code></li>
+</ul>
+</li>
+<li>
+<p><strong>STM32 Peripheral Interrupt Handlers</strong></p>
+<ul>
+<li><code>void HAL_GPIO_EXTI_IRQHandler( uint16_t GPIO_Pin )</code></li>
+<li><code>void HAL_UART_IRQHandler( UART_HandleTypeDef *huart )</code></li>
+<li><code>void HAL_SPI_IRQHandler( SPI_HandleTypeDef *hspi )</code></li>
+<li><code>void HAL_I2C_EV_IRQHandler( I2C_HandleTypeDef *hi2c )</code></li>
+<li><code>void HAL_I2C_ER_IRQHandler( I2C_HandleTypeDef *hi2c )</code></li>
+<li>...</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="images/stm32cubeide_new_project_board_selector.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ใน <strong>STM32CubeIDE</strong> โดยเลือกบอร์ด <strong>NUCLEO STM32F446RE
+(STM32F446RET6 MCU)</strong> เป็นตัวอย่างในการใช้งาน</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/stm32cubeide_new_project_board_selector.png" /></p>
+<p>รูป: เริ่มต้นสร้างโปรเจกต์ใหม่ใน <strong>STM32CubeIDE</strong> โดยเลือกบอร์ด <strong>NUCLEO STM32F446RE</strong></p>
+<p>&nbsp;</p>
+<p>ลองสังเกตดูรายชื่อไฟล์ต่าง ๆ ต่อไปนี้ ที่มีอยู่ในโปรเจกต์ ถูกสร้างและเปิดใช้งานโดย <strong>STM32CubeIDE</strong> เป็นตัวอย่าง</p>
+<p><img alt="" src="images/stm32cubemx_f446re_default.png" /></p>
+<p>รูป: ซอฟต์แวร์ <strong>STM32CubeIDE</strong> และการเปิดไฟล์ <strong>STM32CubeMX Configuration File (.ioc)</strong>
+สำหรับบอร์ด <strong>NUCLEO STM32F446RE</strong> ที่ถูกสร้างมาเป็นตัวอย่าง (<strong>Peripheral Initialization
+in Default Mode</strong>) </p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/stm32cubemx_f446re_pin_configuration.png" /></p>
+<p>รูป: มุมมอง <strong>Pinout View</strong> แสดงตัวอย่างการเลือกใช้งานขา <strong>GPIO</strong> ใน <strong>STM32CubeMX</strong> ซึ่งจะเห็นได้ว่า มีการใช้ขา <strong>TX=PA2</strong>, <strong>RX=PA3</strong> สำหรับ <strong>UART2</strong> และ <strong>GPIO</strong> สำหรับ <strong>Push Button</strong> ที่ขา <strong>PC13</strong> และ <strong>Onboard LED / User LED)</strong> ที่ขา <strong>PA5</strong> ตามลำดับ</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/mx_init_functions.png" /></p>
+<p>รูป: ตัวอย่างโค้ดในฟังก์ชัน <code>MX_GPIO_Init()</code> และ <code>MX_USART2_UART_Init()</code>
+สำหรับการกำหนดรูปแบบหรือฟังก์ชันการทำงานของขา <strong>GPIO</strong>
+(ในกรณีนี้คือ ขาสำหรับ <strong>LED</strong> และ <strong>User Button</strong> บนบอร์ด <strong>NUCLEO</strong>) และวงจร <strong>USART2</strong> ตามลำดับ
+ฟังก์ชั้นเหล่านี้เป็นตัวอย่างของฟังก์ชันที่ได้ถูกสร้างโดย <strong>STM32CubeMX</strong> แล้วนำมาใส่ลงในไฟล์ <code>main.c</code> โดยอัตโนมัติ
+ในฟังก์ชัน <code>main()</code> จะต้องมีการเรียกใช้ฟังก์ชันเหล่านี้ก่อนเริ่มต้นใช้งานวงจรที่เกี่ยวข้อง</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/stm32cubeide_nucleo_stm32f446_build.png" /></p>
+<p>รูป: ขั้นตอนการคอมไพล์โค้ดในโปรเจกต์ (<strong>Build Project</strong>) ซึ่งมีโค้ดตัวอย่างที่ทำให้ <strong>LED</strong> บนบอร์ดกระพริบได้
+และส่งข้อความออกทาง <strong>UART2</strong></p>
+<p>&nbsp;</p>
+<p>เมื่อทำขั้นตอนเพื่อคอมไพล์โค้ด เพื่อให้ได้ไฟล์เอาต์พุตที่เป็น .elf และ .bin หรือ .hex ได้แล้ว ก็สามารถนำไปอัปโหลดไปยังบอร์ด
+<strong>NUCLEO STM32F446RE</strong> เพื่อทดสอบดูการทำงานของโค้ดในเบื้องต้น นอกจากนั้นแล้วยังสามารถดีบักการทำงานของโค้ดที่เขียน
+โดยใช้บอร์ดดังกล่าวได้ เนื่องจากบอร์ดดังกล่าวมีวงจร <strong>ST-Link/V2</strong> และทำงานได้ตามข้อกำหนดของ <strong>Arm CMSIS-DAP</strong></p>
+<p><img alt="" src="images/stm32cubeide_nucleo_stm32f446_debug-1.png" /></p>
+<p>รูป: การตั้งค่าเพื่อดีบักการทำงานของโค้ดโดยใช้บอร์ด <strong>NUCLEO STM32F446RE</strong> และซอฟต์แวร์
+<strong>ST-Link GDB Server</strong> ผ่านทางอุปกรณ์ <strong>ST-Link/v2 (STM32F103CB-based)</strong> ที่มีอยู่บนบอร์ด</p>
+<p>&nbsp;</p>
+<p><img alt="" src="images/stm32cubeide_nucleo_stm32f446_debug-2.png" /></p>
+<p>รูป: ตัวอย่างการดีบักและตั้งค่า <strong>Breakpoint</strong> ในโค้ด เช่น ตำแหน่งที่มีคำสั่ง
+<code>HAL_GPIO_WritePin(...)</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arm-mbed-os-cmsis">&#9655; <strong>Arm Mbed OS และความเกี่ยวข้องกับ CMSIS</strong><a class="headerlink" href="#arm-mbed-os-cmsis" title="Permanent link">#</a></h2>
+<p><a href="https://os.mbed.com/mbed-os/"><strong>Mbed OS</strong></a> เป็นซอฟต์แวร์ประเภท <strong>RTOS</strong> ของบริษัท <strong>Arm Ltd.</strong> และเป็น <strong>Open Source</strong> และใช้สำหรับไมโครคอนโทรลเลอร์ที่มีตัวประมวลผล <strong>Arm Cortex-M</strong> ซึ่งมีให้เลือกใช้งานจากหลายบริษัท เช่น <strong>STM</strong>, <strong>NXP / Freescale</strong>, <strong>Nordic Semiconductor</strong>, <strong>Silicon Labs</strong> เป็นต้น  (<a href="https://github.com/ARMmbed/mbed-os/tree/master/targets/">ดูรายการชิปไมโครคอนโทรลเลอร์ที่ใช้ได้กับ <strong>Mbed OS</strong></a>)</p>
+<ul>
+<li><code>TARGET_Ambiq_Micro/*</code></li>
+<li><code>TARGET_Analog_Devices/*</code></li>
+<li><code>TARGET_Cypress/*</code></li>
+<li><code>TARGET_Freescale/*</code></li>
+<li><code>TARGET_GigaDevice/*</code></li>
+<li><code>TARGET_Maxim/*</code></li>
+<li><code>TARGET_NORDIC/*</code></li>
+<li><code>TARGET_NUVOTON/*</code></li>
+<li><code>TARGET_NXP/*</code></li>
+<li><code>TARGET_RENESAS/*</code></li>
+<li><code>TARGET_STM/*</code></li>
+<li><code>TARGET_Samsung/*</code></li>
+<li><code>TARGET_Silicon_Labs/*</code></li>
+<li><code>TARGET_TOSHIBA/*</code></li>
+</ul>
+<p>หากดูในไดเรกทอรี <a href="https://github.com/ARMmbed/mbed-os/tree/master/targets/TARGET_STM/TARGET_STM32F4"><code>TARGET_STM/TARGET_STM32F4/</code></a> จะเห็นว่า มีรายการของไมโครคอนโทรลเลอร์ที่ใช้งานได้
+ในตระกูล <strong>STM32F4</strong> และมีไดเรกทอรี <a href="https://github.com/ARMmbed/mbed-os/tree/master/targets/TARGET_STM/TARGET_STM32F4/STM32Cube_FW"><code>STM32Cube_FW</code></a> ซึ่งภายในประกอบด้วย</p>
+<ul>
+<li><code>CMSIS/*</code></li>
+<li><code>STM32F4xx_HAL_Driver/*</code></li>
+<li><code>stm32f4xx_hal_conf.h</code></li>
+<li><code>system_stm32f4xx.c</code></li>
+<li><code>CMakeLists.txt</code></li>
+</ul>
+<p>ดังนั้นก็สามารถสรุปได้ว่า <strong>Mbed OS</strong> สำหรับ <strong>STM32</strong> นั้นใช้ <strong>CMSIS-compatible STM32Cube Firmware</strong>
+เป็นพื้นฐานในการทำงาน </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="stm32duino-cmsis">&#9655; <strong>STM32duino และความเกี่ยวข้องกับ CMSIS</strong><a class="headerlink" href="#stm32duino-cmsis" title="Permanent link">#</a></h2>
+<p><a href="https://github.com/stm32duino/Arduino_Core_STM32"><strong>STM32duino</strong></a> เป็นซอฟต์แวร์ในประเภทที่เรียกว่า <strong>Arduino Core</strong> สำหรับไมโครคอนโทรลเลอร์ <strong>STM32</strong> สามารถนำมาติดตั้งและใช้งานร่วมกับซอฟต์แวร์อย่างเช่น
+<strong>Arduino IDE</strong> และ <strong>VS Code IDE + PlatformIO</strong> ทำให้ผู้ใช้สามารถเขียนโค้ดด้วย <strong>Arduino API</strong>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>STM32</strong> ได้ง่ายขึ้น แทนการเขียนโค้ดโดยใช้คำสั่งของ <strong>STM32Cube HAL</strong> 
+หากใช้ซอฟต์แวร์ เช่น <strong>STM32CudeIDE</strong> ของบริษัท <strong>STM</strong> </p>
+<p>หากลองดูในไดเรกทอรี <a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/main/libraries/SrcWrapper/src/stm32"><code>libraries/SrcWrapper/src/stm32</code></a>  จะพบว่า มีไฟล์ <strong>Source Code</strong> (.c) ที่เป็นพื้นฐานในการสร้างฟังก์ชันต่าง ๆ สำหรับ <strong>Arduino API</strong> โดยใช้คำสั่งของ <strong>STM32 HAL Drivers</strong> เช่น ดูได้จากไดเรกทอรี <a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/main/system/Drivers/"><code>system/Drivers/</code></a>
+เช่น <a href="https://github.com/stm32duino/Arduino_Core_STM32/tree/main/system/Drivers/STM32F4xx_HAL_Driver"><code>STM32F4xx_HAL_Driver</code></a> สำหรับ <strong>STM32F4 Series</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython-cmsis">&#9655; <strong>MicroPython และความเกี่ยวข้องกับ CMSIS</strong><a class="headerlink" href="#micropython-cmsis" title="Permanent link">#</a></h2>
+<p><a href="https://github.com/micropython/"><strong>MicroPython</strong></a> เป็นเฟิร์มแวร์สำหรับรองรับการเขียนโค้ดภาษา <strong>Python 3</strong> สำหรับไมโครคอนโทรลเลอร์ เช่น <a href="https://github.com/micropython/micropython/tree/master/ports/stm32"><strong>MicroPython Port for STM32</strong></a></p>
+<p>ไฟล์ต่าง ๆ ในไดเรกทอรี <a href="https://github.com/micropython/micropython/tree/master/ports/stm32"><code>ports/stm32</code></a> แสดงให้เห็นว่า
+มีการใช้คำสั่งของ <strong>STM32 HAL Drivers</strong> เพื่อสร้างฟังก์ชันสำหรับการทำงานของวงจรภายในไมโครคอนโทรลเลอร์ <strong>STM32</strong></p>
+<p>ตาราง: ตัวอย่างไฟล์ <strong>Source Code</strong> (.c) ของ <strong>MicroPython port for STM32</strong> ที่มีการใช้คำสั่งของ  <strong>STM32 HAL Drivers</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>Files</strong></th>
+<th><strong>STM32 On-chip Peripheral Modules</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/uart.c"><code>uart.c</code></a></td>
+<td><strong>USART/UART</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/timer.c"><code>timer.c</code></a></td>
+<td><strong>Timer (TIM)</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/spi.c"><code>spi.c</code></a></td>
+<td><strong>SPI</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/i2c.c"><code>i2c.c</code></a></td>
+<td><strong>I2C</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/usb.c"><code>usb.c</code></a></td>
+<td><strong>USB</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/wdt.c"><code>wdt.c</code></a></td>
+<td><strong>WDT</strong> (<em>Watchdog Timer</em>)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/rtc.c"><code>rtc.c</code></a></td>
+<td><strong>RTC</strong> (<em>Real-Time Clock</em>)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/micropython/micropython/blob/master/ports/stm32/rng.c"><code>rng.c</code></a></td>
+<td><strong>RNG</strong> (<em>True-Random Number Generator</em>)</td>
+</tr>
+</tbody>
+</table>
+<p>ดังนั้นจึงสรุปได้ว่า <strong>STM32 HAL Drivers</strong> จึงถูกนำมาใช้เป็นพื้นฐานในการทำงานของเฟิร์มแวร์ <strong>MicroPython</strong> ในกรณีที่ใช้ชิป <strong>STM32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอเกี่ยวกับ <strong>Arm CMSIS</strong> ซึ่งเป็นการกำหนดมาตรฐานในการพัฒนาซอฟต์แวร์
+และเกี่ยวข้องกับการใช้งานไมโครคอนโทรลเลอร์ที่มีตัวประมวลผลตระกูล <strong>Arm Cortex</strong>
+นอกจากนั้นแล้วยังแสดงให้เห็นความเชื่อมโยงระหว่าง <strong>Arm CMSIS Core / Device</strong> 
+กับซอฟต์แวร์ เช่น <strong>STM32CubeMX / STM32CubeIDE</strong> ของบริษัท <strong>STMicroelectronics</strong> 
+ซึ่งเป็นผู้ผลิตชิป <strong>STM32</strong> ที่มีตัวประมวผล <strong>Arm Cortex-M</strong> อยู่ภายใน รวมถึงซอฟต์แวร์อื่น อย่างเช่น
+<strong>Arduino Core for STM32</strong>, <strong>MicroPython port for STM32</strong> และ <strong>Mbed OS</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-03-04 | Last Updated: 2022-03-06</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

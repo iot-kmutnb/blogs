@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-stm32-part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ARM Mbed OS for STM32: Code Examples (Part 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-for-stm32-code-examples-part-1" class="nav-link">ARM Mbed OS for STM32: Code Examples (Part 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#led-blink" class="nav-link">&#9655;  เริ่มต้นด้วย LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led" class="nav-link">&#9655; การอ่านค่าอินพุตจากวงจรปุ่มกดและกำหนดสถานะของ LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#interruptin" class="nav-link">&#9655; อินเทอร์รัพท์ภายนอกและการใช้งานคลาส InterruptIn</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timer" class="nav-link">&#9655; การอ่านค่าเวลาของระบบโดยใช้คลาส Timer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#lowpowertimer" class="nav-link">&#9655; การอ่านค่าเวลาของระบบโดยใช้คลาส LowPowerTimer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#system-ticker" class="nav-link">&#9655; การอ่านเวลาจาก System Ticker</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ticker" class="nav-link">&#9655; การทำงานซ้ำแบบมีคาบโดยใช้งานคลาส Ticker</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sleep-for-sleep-until" class="nav-link">&#9655; ความแตกต่างระหว่าง Sleep For และ Sleep Until</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rgb-led" class="nav-link">&#9655; การกำหนดสถานะลอจิกของโมดูล RGB LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-for-stm32-code-examples-part-1">ARM Mbed OS for STM32: Code Examples (Part 1)<a class="headerlink" href="#arm-mbed-os-for-stm32-code-examples-part-1" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Mbed OS</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ 
+เช่น บอร์ด <strong>STM32-NUCLEO</strong> เป็นต้น โดยนำเสนอเป็น <strong>ตอนที่ 1</strong>
+ต่อจากเนื้อหาแนะนำเกี่ยวกับ <a href="../../mbedos/"><strong>Mbed OS</strong></a></p>
+<p><strong>คำแนะนำ:</strong> การสร้างโปรเจกต์และคอมไพล์โค้ดตัวอย่าง สามารถทำได้หลายวิธี ถ้าจะลองใช้ <strong>Mbed CLI 2</strong>
+ซึ่งเป็นวิธีทำคำสั่งแบบ <strong>Command Line</strong>
+ก็สามารถศึกษาได้จากบทความ: <a href="../mbed-cli-2"><strong>แนะนำการใช้งาน ARM Mbed CLI 2</strong></a></p>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>STM32 Nucleo</em>, <em>Mbed-enabled Platforms</em>, <em>RTOS Programming</em></p>
+<hr />
+<h2 id="led-blink">&#9655; <strong> เริ่มต้นด้วย LED Blink</strong><a class="headerlink" href="#led-blink" title="Permanent link">#</a></h2>
+<p>ตัวอย่างแรกเป็นการเขียนโค้ดเพื่อทำให้ <strong>Onboard LED</strong> ที่อยู่บนบอร์ด <strong>STM32 NUCLEO</strong> 
+กระพริบได้ โดยทำให้ขาเอาต์พุต <code>LED1</code> เปลี่ยนสถานะลอจิก ทุก ๆ 100 มิลลิวินาที </p>
+<p>คลาส <strong><code>DigitalOut</code></strong> ของ <strong>Mbed API</strong> จะถูกนำมาสร้างเป็นอ็อบเจกต์ เพื่อใช้สำหรับขาดิจิทัลทิศทางเอาต์พุต 
+ในกรณีนี้ได้กำหนดให้เป็นขา <code>LED1</code> และมีเมธอดสำหรับการอ่านหรือเขียนค่าลอจิกได้ </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+DigitalOut led( LED1 ); // use on-board LED (LED1)
+
+int main() { // the Main thread
+   while (1) {
+      led.write( !led.read() ); // toggle the LED output
+      ThisThread::sleep_for( 100ms ); // sleep for 100 msec
+   }
+   return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>เนื่องจาก <strong>Mbed OS</strong> ทำงานโดยใช้ <strong>RTOS</strong> จึงมีการทำงานแบบ <strong>Multi-Threading</strong>
+มีการใช้งานเธรด (<strong>Thread</strong>) สำหรับการทำคำสั่งต่าง ๆ ในฟังก์ชัน <code>main()</code> และเรียกเธรดนี้ว่า
+เธรดหลัก (<strong>Main Thread</strong>)</p>
+<p>ยกตัวอย่างเช่น ถ้าต้องการหยุดรอชั่วคราวก่อนทำคำสั่งถัดไป เช่น รอ 100 มิลลิวินาที 
+ให้ใช้คำสั่ง <code>ThisThread::sleep_for()</code> เพื่อหยุดการทำงานของเธรดหลักชั่วคราว</p>
+<pre><code class="language-c++">ThisThread::sleep_for( 100ms ); // wait for 100 msec
+</code></pre>
+<p>เมื่อทำคำสั่งของโค้ดในส่วนนี้ เธรดหลักจะเปลี่ยนจากสถานะ <code>RUNNING</code> เป็น <code>WAITING</code> 
+แล้วรอจนกว่าเวลาจะผ่านไปตามระยะเวลาที่ต้องการ และในช่วงดังกล่าว <strong>RTOS</strong>
+ก็จะทำให้ไมโครคอนโทรลเลอร์เข้าสู่ <strong>Sleep Mode</strong> ได้ เพื่อประหยัดพลังงาน</p>
+<p>แต่ถ้าใช้คำสั่ง เช่น <code>wait_us()</code> ก็ใช้หน่วงเวลาได้เช่นกัน แต่เธรดจะทำงานตลอดเวลาในสถานะ <code>RUNNING</code></p>
+<pre><code class="language-c++">wait_us( 100000UL ); // wait for 100 msec
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> จากรูปแบบการเขียนคำสั่งสำหรับอ่านและเขียนค่าให้อ็อบเจกต์ <code>led</code> เพื่อใช้งานขา 
+<strong>GPIO</strong> เป็นเอาต์พุต และได้ถูกสร้างมาจากคลาส <strong><code>DigitalOut</code></strong> จากเดิมที่เขียนแบบนี้</p>
+<pre><code class="language-c++">led.write( !led.read() ); // toggle LED
+</code></pre>
+<p>ก็สามารถเขียนในอีกรูปแบบที่แตกต่างไปได้ดังนี้ ซึ่งให้ผลการทำงานเหมือนกัน</p>
+<pre><code class="language-c++">led = !led; // toggle LED (read-modify-write)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led">&#9655; <strong>การอ่านค่าอินพุตจากวงจรปุ่มกดและกำหนดสถานะของ LED</strong><a class="headerlink" href="#led" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการอ่านค่าอินพุตดิจิทัลของวงจรปุ่มกดที่ขา <code>BUTTON1</code> (Active-Low) 
+ของบอร์ด <strong>STM32 NUCLEO</strong> โดยใช้วิธีสร้างอ็อบเจกต์จากคลาส <code>DigitalIn</code> 
+แล้วนำค่าอินพุตที่อ่านได้มากำหนดสถานะของเอาต์พุตดิจิทัลที่ขา <code>LED1</code> </p>
+<p>การตรวจสอบสถานะลอจิกของอินพุตนี้ จะทำซ้ำไปเรื่อย ๆ โดยเว้นระยะเวลา เช่น 10 มิลลิวินาที เป็นต้น
+ดังนั้น ถ้ากดปุ่มค้างไว้ จะได้สถานะอินพุตเป็น 0 (ถ้าไม่กด จะได้ 1) 
+และทำให้ <strong>LED</strong> บนบอร์ดสว่าง (สถานะเอาต์พุตเป็น 1) และเมื่อปล่อย <strong>LED</strong> ก็จะดับลง
+(สถานะเอาต์พุตเป็น 0)</p>
+<p><strong>ข้อสังเกต</strong>: ถ้าเลือกใช้บอร์ด เช่น <code>NUCLEO_L476RG</code> ขา <code>LED1</code> และ <code>BUTTON1</code> 
+หมายถึง  <code>PinName</code> หรือ ขาหมายเลข  <code>PA_5</code> และ <code>PC_13</code> ตามลำดับ</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+DigitalOut led( LED1 ); // use on-board LED
+DigitalIn  button( BUTTON1 ); // use on-board push button
+
+int main() {
+   while (1) {
+      led = !button; 
+      ThisThread::sleep_for( 10ms );
+   }
+   return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="interruptin">&#9655; <strong>อินเทอร์รัพท์ภายนอกและการใช้งานคลาส InterruptIn</strong><a class="headerlink" href="#interruptin" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการตรวจสอบสถานะอินพุตจากวงจรปุ่มกดที่ขา <code>BUTTON1</code> (Active-Low) 
+ซึ่งมีอยู่บนบอร์ดทดลอง และเมื่อเกิดการเปลี่ยนสถานะลอจิกจาก <strong>High</strong> เป็น <strong>Low</strong> ในแต่ละครั้ง 
+จะทำให้สถานะของ <strong>LED</strong> ที่อยู่บนบอร์ดเปลี่ยนสถานะลอจิกหนึ่งครั้ง</p>
+<p>การตรวจสอบเหตุการณ์ที่ขาอินพุตจากปุ่มกด เช่น ขอบขาลง (<strong>Falling Edge</strong>) 
+จะใช้หลักการของอินเทอร์รัพท์จากภายนอก (<strong>External Interrupt</strong>) 
+และสร้างอ็อบเจกต์ <code>button</code> จากคลาส <strong><code>InterruptIn</code></strong>
+เพื่อใช้กับวงจรปุ่มกดบนบอร์ดทดลอง </p>
+<p>นอกจากนั้นยังต้องสร้างฟังก์ชันเพื่อทำหน้าที่เป็น <strong>Interrupt Callback</strong> 
+หรือ (<strong>Interrupt Service Routine</strong>) 
+สำหรับเหตุการณ์ดังกล่าว และในตัวอย่างนี้ได้สร้างฟังก์ชันชื่อ <code>button_callback()</code>
+และจะต้องเปิดใช้งานอินเทอร์รัพท์สำหรับอ็อบเจกต์ <code>button</code> โดยทำคำสั่ง
+<code>button.fall( &amp;button_callback )</code> </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+InterruptIn button( BUTTON1 ); // use on-board push button
+DigitalOut  led( LED1 );       // use on-board LED
+
+volatile int flag = 0; // global variable
+
+void button_callback() {
+  button.fall( NULL ); // disable interrupt on button pin
+  flag = 1; // set flag
+}
+
+int main() {
+  printf( &quot;Please press the button..\r\n&quot; );
+  fflush( stdout );
+  // enable interrupt on button pin
+  button.fall( &amp;button_callback );
+  while (1) {
+    if (flag) { // check flag
+       // toggle the LED
+       led  = !led; // toggle the LED
+       flag = 0;    // clear flag
+       // print the LED status
+       printf( &quot;LED: %d @%lu (msec)\n&quot;,
+              (int)led.read(), us_ticker_read()/1000 );
+       // sleep for 100 msec
+       ThisThread::sleep_for( 100ms );
+       // re-enable interrupt on button pin
+       button.fall( &amp;button_callback );
+    }
+  }
+}
+</code></pre>
+<p>เมื่อเกิดเหตุการณ์ในแต่ละครั้ง (เกิดขอบขาลงของสัญญาณอินพุตเมื่อมีการกดปุ่ม)
+จะมีการเปลี่ยนค่าของตัวแปรภายนอก <code>flag</code> จาก 0 ให้เป็น 1 
+แล้วปิดการตรวจสอบอินเทอร์รัพท์สำหรับขาอินพุตสำหรับปุ่มกด โดยทำคำสั่ง
+<code>button.fall( NULL )</code></p>
+<p>ในฟังก์ชัน <code>main()</code> การทำงานของประโยคคำสั่ง <code>while(1) {...}</code> 
+จะคอยตรวจสอบค่าของตัวแปร <code>flag</code> ถ้ามีค่าเป็น 1 ก็จะสลับสถานะลอจิกสำหรับ <code>LED1</code> 
+หนึ่งครั้ง แล้วเคลียร์ค่าของ <code>flag</code> เป็น 0 จากนั้นก็เปิดใช้งานอินเทอร์รัพท์ที่ขาอินพุตสำหรับปุ่มกดใหม่อีกครั้ง 
+และหยุดการทำงานไว้ประมาณ 100 มิลลิวินาที แล้วจึงทำต่อไป </p>
+<p><img alt="" src="../images/mbed_stm32_button_serial_9600.png" /></p>
+<p>รูปภาพ: ตัวอย่างข้อความเอาต์พุตจากคำสั่ง <code>printf()</code> ในหน้าต่างของ <strong>Arduino Serial Monitor</strong>
+เมื่อมีการกดปุ่มหลาย ๆ ครั้ง</p>
+<p><strong>ข้อสังเกต:</strong> รูปแบบการเขียนโค้ดเพื่อปิดและเปิดการตรวจสอบอินเทอร์รัพท์สำหรับขาอินพุตในตัวอย่างนี้ 
+ก็เพื่อช่วยลดปัญหาที่เกิดจากการกระเด้งของปุ่มกด (<strong>Push Button Bouncing</strong>) 
+หรือ การกดปุ่มหนึ่งครั้งแต่ทำให้เกิดเหตุการณ์ขอบขาลงหลายครั้งในช่วงเวลาสั้น ๆ 
+หรือจะใช้คำสั่งต่อไปนี้ เพื่อปิดหรือเปิดอินเทอร์รัพท์ที่ขาปุ่มกดก็ได้เช่นกัน</p>
+<pre><code class="language-c++">// disable the interrupt on button pin
+button.disable_irq();
+// enable the interrupt on button pin 
+button.enable_irq(); 
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timer">&#9655; <strong>การอ่านค่าเวลาของระบบโดยใช้คลาส Timer</strong><a class="headerlink" href="#timer" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ด เพื่อวัดช่วงเวลาระหว่างสองเหตุการณ์ โดยใช้ตัวนับ หรือ คลาส <strong><code>Timer</code></strong> 
+ที่มีอัตราการนับคงที่</p>
+<p>ตัวแปรภายนอกเป็นอ็อบเจกต์ <code>timer</code> ที่ถูกสร้างจากคลาส <strong><code>Timer</code></strong> แล้วมีการเรียกใช้เมธอด เช่น</p>
+<ul>
+<li>คำสั่ง <code>timer.start()</code> เป็นการเริ่มต้นทำงาน (เริ่มนับ) และถ้าต้องการให้หยุดชั่วคราว ก็ใช้คำสั่ง <code>timer.stop()</code> </li>
+<li>คำสั่ง <code>timer.reset()</code> เป็นการรีเซตค่าของตัวนับให้เป็น 0</li>
+<li>คำสั่ง <code>timer.elapsed_time()</code> เป็นการอ่านค่าของ <code>timer</code> ในขณะนั้น</li>
+</ul>
+<p>ถ้าต้องการแปลงค่าที่อ่านได้จาก <code>timer</code> ให้เป็นตัวเลขในหน่วยเวลาเป็นมิลลิวินาที ก็ให้ใช้คำสั่ง 
+<code>duration_cast&lt;milliseconds&gt;(...)</code> ของ <strong>C++ namespace</strong> ที่มีชื่อว่า <code>std::chrono</code></p>
+<p>ในตัวอย่างโค้ดนี้ จะเห็นว่า มีการใช้อ็อบเจกต์จากคลาส  <strong><code>Timer</code></strong> ในการจับเวลาหรือวัดความกว้างของช่วงเวลา
+(<strong>Time Duration Measurement</strong>) 
+เช่น การหน่วงเวลาที่เกิดจากการทำคำสั่ง <code>wait_us(...)</code> และ <code>ThisThread::sleep_for(...)</code> </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+using namespace std::chrono; // for duration_cast&lt;milliseconds&gt;()
+
+Timer timer; // create a Timer instance
+
+int main() {
+  uint32_t ts;
+  timer.start(); // start the timer
+  printf( &quot;Timer started.\n&quot; );
+  while (1) {
+     timer.reset();     // reset the timer
+     wait_us( 100000 ); // wait for 100ms before proceeding
+     // read the elapsed time of the timer (in msec)
+     ts = duration_cast&lt;milliseconds&gt;(timer.elapsed_time()).count();
+     printf( &quot;Duration 1): %lu msec\n&quot;, ts );
+
+     timer.reset();    // reset the timer
+     // sleep for 100 msec (0.1 seconds)
+     ThisThread::sleep_for( 100ms );
+     // read the elapsed time of the timer (in msec)
+     ts = duration_cast&lt;milliseconds&gt;(timer.elapsed_time()).count();
+     printf( &quot;Duration 2): %lu msec\n&quot;, ts );
+  }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code>Duration 1): 100 msec
+Duration 2): 99 msec
+Duration 1): 100 msec
+Duration 2): 99 msec
+Duration 1): 100 msec
+Duration 2): 99 msec
+...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="lowpowertimer">&#9655; <strong>การอ่านค่าเวลาของระบบโดยใช้คลาส LowPowerTimer</strong><a class="headerlink" href="#lowpowertimer" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการใช้งานคลาส <strong><code>LowPowerTimer</code></strong> การสร้างอ็อบเจกต์จากคลาสดังกล่าว
+แล้วอ้างอิงด้วยตัวแปร <code>timer</code> และมีการใช้คำสั่ง <code>timer.elapsed_time().count()</code>
+เป็นการอ่านค่าตัวเลขสำหรับเวลาในขณะนั้น 
+โดยมีหน่วยเป็นไมโครวินาที (<strong>Microseconds</strong>)</p>
+<p>นอกจากนั้นยังมีการสาธิตการใช้คำสั่ง <code>ThisThread::sleep_for(...)</code> 
+เพื่อทำให้เธรดที่ทำคำสั่งนี้ หยุดการทำงานชั่วคราว และมีการระบุค่าอาร์กิวเมนต์ โดยเขียนระบุค่าเป็น 
+<code>std::chrono::milliseconds(100)</code> หรือจะเขียนเป็น <code>100ms</code> แทนก็ได้</p>
+<p><strong>ข้อสังเกต:</strong> การใช้งานคลาส <strong><code>LowPowerTimer</code></strong> เหมาะสำหรับการทำงานที่เน้นการประหยัดพลังงาน 
+โดยใช้วงจรตัวนับตามเวลาภายนอกที่ใช้พลังงานต่ำ ( <strong>External Low Power Timer</strong>) 
+หรือเป็นวงจร <strong>RTC</strong> (<em>Real-Time Clock</em>) ที่ใช้ความถี่ 32.768kHz 
+การทำงานของตัวนับมีความแม่นยำไม่สูงมาก (ในระดับมิลลิวินาที) ซึ่งจะแตกต่างจากกรณีที่ใช้คลาส 
+<strong><code>Timer</code></strong> ซึ่งเป็นการใช้วงจรตัวนับความถี่สูงภายในของไมโครคอนโทรลเลอร์</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+using namespace std::chrono; // for duration_cast&lt;milliseconds&gt;()
+
+LowPowerTimer timer; // create a low-power timer instance
+
+int main() {
+   uint32_t ts;
+   timer.start(); // start the timer
+   while (1) {
+      timer.reset(); // reset timer's tick count
+      wait_us( 100000 ); // wait for 100ms before proceeding
+      ts = timer.elapsed_time().count(); // read tick count (usec)
+      printf( &quot;Duration 1): %lu.%03lu msec\n&quot;, ts/1000, ts%1000 );
+
+      timer.reset(); // reset timer's tick count
+      ThisThread::sleep_for( 100ms ); // sleep for 100 msec
+      ts = timer.elapsed_time().count(); // read tick count (usec)
+      printf( &quot;Duration 2): %lu.%03lu msec\n&quot;, ts/1000, ts%1000 );
+   }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">Duration 1): 99.976 msec
+Duration 2): 99.854 msec
+Duration 1): 100.098 msec
+Duration 2): 99.731 msec
+Duration 1): 99.975 msec
+Duration 2): 99.731 msec
+Duration 1): 99.975 msec
+Duration 2): 99.853 msec
+...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="system-ticker">&#9655; <strong>การอ่านเวลาจาก System Ticker</strong><a class="headerlink" href="#system-ticker" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้คำสั่ง <code>us_ticker_read()</code> 
+เพื่ออ่านค่าเวลาของระบบ (<strong>System Tick Count</strong>) สองครั้งถัดกัน 
+แล้วนำมาผลต่างเพื่อคำนวณระยะเวลาที่ผ่านไป</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+int main(){
+  uint32_t dt, ts1, ts2;
+  while(1) {
+     ts1 = us_ticker_read();          // read the system ticker
+     ThisThread::sleep_for( 500ms );  // sleep for 500 msec
+     ts2 = us_ticker_read();          // read the sytsem ticker
+     dt = ts2 - ts1;                  // calculate ticker count difference
+     printf( &quot;Thread sleep time: %lu.%03lu msec\r\n&quot;,
+             dt/1000, dt%1000 );
+  }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">Thread sleep time: 499.996 msec
+Thread sleep time: 499.545 msec
+Thread sleep time: 499.622 msec
+Thread sleep time: 499.596 msec
+Thread sleep time: 499.569 msec
+...
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ticker">&#9655; <strong>การทำงานซ้ำแบบมีคาบโดยใช้งานคลาส Ticker</strong><a class="headerlink" href="#ticker" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้คลาส <strong><code>Ticker</code></strong> และสร้างอ็อบเจกต์ชื่อ <code>ticker</code>
+เพื่อการทำคำสั่งในฟังก์ชันที่ต้องเกิดซ้ำ และเว้นระยะเวลาคงที่ 
+โดยใช้คำสั่ง <code>ticker.attach(...)</code> หรือ <code>ticker.attach_us(...)</code>
+เช่น การทำให้ <strong>LED</strong> เปลี่ยนสถานะลอจิกด้วยอัตราคงที่ </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+
+Ticker      ticker;      // create a Ticker instance
+DigitalOut  led( LED1 ); // use onboard LED1
+
+void toggle( DigitalOut *led ) { // callback for ticker
+  *led = !*led; // toggle the LED
+}
+
+int main() {
+  ticker.attach( callback(toggle,&amp;led), 100ms );
+  // ticker.attach_us( callback(toggle,&amp;led), 100000 );
+  printf( &quot;Main thread waits forever...\r\n&quot; );
+  while(1) { // The main thread waits forever.
+    osDelay( osWaitForever );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sleep-for-sleep-until">&#9655; <strong>ความแตกต่างระหว่าง Sleep For และ Sleep Until</strong><a class="headerlink" href="#sleep-for-sleep-until" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ เริ่มต้นด้วยการสาธิตการใช้คำสั่งเพื่อสร้างเลขจำนวนเต็มบวกแบบสุ่ม 
+(<strong>Pseudo-Random Number Generation</strong>) 
+โดยใช้คำสั่ง <code>rand()</code> และมีการกำหนดค่าเริ่มต้นที่เรียกว่า <strong>Seed</strong> 
+โดยใช้คำสั่ง <code>srand()</code> ก่อนอ่านค่าเลขสุ่มถัดไป</p>
+<p>ตัวเลขที่ได้จากการสุ่มนั้น จะถูกนำมาใช้กับคำสั่ง <code>wait_us(...)</code> 
+เพื่อหน่วงเวลาการทำงานตามระยะเวลาที่ได้จากเลขสุ่มดังกล่าว 
+ในตัวอย่างได้กำหนดให้มีระยะเวลาอยู่ในช่วง 100 ถึง 500 มิลลิวินาที</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+int main() {
+   uint32_t cnt = 0;
+
+   // initialize the seed for pseudo-random number generator
+   srand( time(NULL) );
+
+   while (1) {
+      // wait for a random time duration before proceeding
+      wait_us( 1000*(rand()%400 + 100) ); // 100..500 msec
+      printf( &quot;Count: %lu\n&quot;, ++cnt );
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นการเปรียบเทียบการทำงานระหว่างการใช้คำสั่ง <code>ThisThread::sleep_for(...)</code> 
+และ  <code>ThisThread::sleep_until(...)</code> ตามลำดับ</p>
+<p>การใช้คำสั่ง <code>ThisThread::sleep_for(...)</code> จะทำให้เธรดหยุดรอเป็นระยะเวลาตามตัวเลขที่กำหนด
+แต่การใช้คำสั่ง  <code>ThisThread::sleep_until(...)</code> จะทำให้เธรดหยุดรอจนถึงจุดเวลาถัดไปที่กำหนดไว้</p>
+<p>ลองมาดูโค้ดตัวยอย่างแรกซึ่งใช้คำสั่ง <code>ThisThread::sleep_for(...)</code></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+Timer timer; // create a Timer instance
+
+int main() {
+   uint32_t ts;
+   // initialize the seed for pseudo-random number generator
+   srand( time(NULL) );
+
+   timer.start(); // start the timer
+   while (1) {
+      // wait for a random time duration before proceeding
+      wait_us( 1000*(rand()%400 + 100) ); // 100..500 msec
+
+      // sleep for 1000 msec
+      ThisThread::sleep_for( std::chrono::milliseconds(1000) );
+
+      // read the elapsed time from the timer
+      ts = timer.elapsed_time().count(); // read a 32-bit tick count
+      timer.reset(); // reset the timer
+      // show timestamp
+      printf( &quot;Ticks: %lu.%03lu msec\n&quot;, ts/1000, ts%1000 );
+   }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตที่ได้ในกรณีแรก เป็นดังนี้</p>
+<pre><code class="language-plain">Ticks: 1167.978 msec
+Ticks: 1468.998 msec
+Ticks: 1425.998 msec
+Ticks: 1407.998 msec
+Ticks: 1298.998 msec
+Ticks: 1204.998 msec
+</code></pre>
+<p>แล้วลองเปรียบเทียบกับโค้ดตัวอย่างในแบบที่สองนี้ ซึ่งใช้คำสั่ง  <code>ThisThread::sleep_until(...)</code></p>
+<pre><code>#include &quot;mbed.h&quot;
+
+Timer timer; // create a Timer instance
+
+int main() {
+   uint32_t ts;
+   // initialize the seed for pseudo-random number generator
+   srand( time(NULL) );
+
+   // read the current time and set the next timestep (in seconds)
+   Kernel::Clock::time_point t_next = Kernel::Clock::now() + 1s;
+
+   timer.start(); // start the timer
+
+   while (1) {
+      // wait for a random time duration before proceeding
+      wait_us( 1000*(rand()%400 + 100) ); // 100..500 msec
+
+      // sleep until the clock time changes to the next timestep
+      ThisThread::sleep_until( t_next );
+
+      ts = timer.elapsed_time().count(); // read a 32-bit tick count
+      timer.reset(); // reset the timer
+      // show timestamp
+      printf( &quot;Ticks: %lu.%03lu msec\n&quot;, ts/1000, ts%1000 );
+      t_next += 1000ms; // update the next timestep
+  }
+}
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตในกรณีนี้ ซึ่งจะเห็นได้ว่า มีระยะเวลาในแต่ละรอบค่อนข้างคงที่คือ ประมาณ 1000 msec</p>
+<pre><code class="language-plain">Ticks: 999.976 msec
+Ticks: 999.998 msec
+Ticks: 999.998 msec
+Ticks: 999.998 msec
+Ticks: 999.998 msec
+Ticks: 999.998 msec
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rgb-led">&#9655; <strong>การกำหนดสถานะลอจิกของโมดูล RGB LED</strong><a class="headerlink" href="#rgb-led" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>RGB LED</strong> มีไดโอดเปล่งแสงที่สามารถให้แสงสีแดง เขียว และน้ำเงิน เมื่อมีระดับความสว่างแตกต่างกัน
+จึงให้แสงผสมที่ต่างสีกัน ตัวอย่างนี้ สาธิตการสร้างสัญญาณควบคุมแบบดิจิทัล <strong>ON/OFF</strong>
+ป้อนให้กับโมดูล <strong>RGB LED</strong> ที่ทำงานแบบ <strong>Active-High</strong>
+ซึ่งหมายความว่า จะให้เอาต์พุตเป็น 1 หรือ <strong>High</strong> จะทำให้อยู่ในสถานะ <strong>ON</strong> </p>
+<p>ขาสัญญาณควบคุมของโมดูล <strong>RGB LED</strong> เชื่อมต่อกับขา {<code>D11</code>,<code>D12</code>,<code>D13</code>} 
+ของบอร์ด <strong>NUCLEO</strong> และต่อขา <strong>GND</strong> ร่วมกัน</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+DigitalOut green( D11 ), blue( D12), red( D13 );
+
+int main() {
+  uint8_t index = 0; // between 0..7
+  uint8_t r,b,g;
+
+  printf( &quot;Mbed RGB LED demo\n&quot; );
+  // show 8 different bit patterns for RGB color
+  while(1) {
+     red   = r = (index &gt;&gt; 2) &amp; 1; // bit 2
+     green = g = (index &gt;&gt; 1) &amp; 1; // bit 1
+     blue  = b = (index &gt;&gt; 0) &amp; 1; // bit 0
+     // show current RGB bits
+     printf( &quot;RGB: %d%d%d\n&quot;, r, g, b );
+     index = (index+1) % 8;
+     ThisThread::sleep_for( 500ms );
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../images/mbed_stm32_rgb_values.png" /></p>
+<p>รูปภาพ: ข้อความเอาต์พุตแสดงลำดับของค่าบิตสำหรับ <strong>RGB</strong></p>
+<p>หรือจะเขียนโค้ดใช้ <code>BusOut</code> แทน <code>DigitalOut</code> ก็ได้เช่นกัน 
+โดยมองว่า ขาเอาต์พุตทั้งสามอยู่ในกลุ่มเดียวกันตามลำดับบิต 0,1,2</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+
+BusOut rgb( D11, D12, D13 ); // green blue red
+
+int main() {
+  uint8_t index = 0;
+  uint8_t r,b,g;
+
+  printf( &quot;Mbed RGB LED demo\n&quot; );
+  while(1) {
+     rgb = index &amp; 0b111;
+     r = (index &gt;&gt; 2) &amp; 1;
+     g = (index &gt;&gt; 1) &amp; 1;
+     b = (index &gt;&gt; 0) &amp; 1;
+     printf( &quot;RGB: %d%d%d\n&quot;, r, g, b );
+     index = (index+1) % 8;
+     ThisThread::sleep_for( 500ms );
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../images/mbed_stm32_nucleo_rgb_led.jpg" /></p>
+<p>รูปภาพ: การต่อวงจรทดลองโดยใช้โมดูล <strong>RGB LED</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-11-23 | Last Updated: 2021-11-28</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/mbedos/mbed-rp2040-part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-1" class="nav-link">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#led-blink-digitalout-mbed-os" class="nav-link">&#9655; LED Blink โดยใช้ DigitalOut ของ Mbed OS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink-delay" class="nav-link">&#9655; LED Blink โดยไม่ใช้คำสั่ง delay()</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink-thread" class="nav-link">&#9655; LED Blink โดยการสร้าง Thread</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink-ticker-timeout" class="nav-link">&#9655; LED Blink โดยใช้คลาส Ticker และ Timeout</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-fading-pwm" class="nav-link">&#9655; LED Fading โดยการสร้างสัญญาณ PWM</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-1">ARM Mbed OS for Raspberry Pi Pico RP2040: Code Examples (Part 1)<a class="headerlink" href="#arm-mbed-os-for-raspberry-pi-pico-rp2040-code-examples-part-1" title="Permanent link">#</a></h1>
+<p>เนื้อหาในส่วนนี้สาธิตการเขียนโค้ดโดยใช้ <strong>Mbed OS</strong> และ <strong>Arduino IDE</strong> 
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>RP2040</strong> เช่น <strong>Raspberry Pi Pico</strong> โดยนำเสนอเป็น <strong>ตอนที่ 1</strong></p>
+<p>แนะนำให้ศึกษาจากบทความเริ่มต้นเกี่ยวกับ <a href="../../mbedos/"><strong>Mbed OS</strong></a> และบทความแนะนำไมโครคอนโทรลเลอร์ 
+<a href="../../rpi-rp2040/"><strong>RP2040</strong></a> สำหรับเรียนรู้ด้านระบบสมองกลฝังตัว</p>
+<p><strong>Keywords</strong>: <em>Mbed OS</em>, <em>Raspberry Pi Pico</em>, 
+ <em>RP2040</em>, <em>Mbed-enabled Platforms</em>, <em>RTOS Programming</em></p>
+<hr />
+<h2 id="led-blink-digitalout-mbed-os">&#9655; <strong>LED Blink โดยใช้ DigitalOut ของ Mbed OS</strong><a class="headerlink" href="#led-blink-digitalout-mbed-os" title="Permanent link">#</a></h2>
+<p>โค้ดนี้สาธิตการใช้คลาส <a href="https://os.mbed.com/docs/mbed-os/latest/apis/digitalout.html"><code>DigitalOut</code></a>
+ของ <strong>Mbed Drivers</strong> เพื่อใช้สำหรับขา <strong>GPIO</strong> 
+ที่เป็นขาดิจิทัลในทิศทางเอาต์พุต เช่น ใช้กับขา <code>GP25</code> ของ <strong>LED</strong></p>
+<p>ในตัวอย่างนี้มีการใช้คลาส <a href="https://os.mbed.com/docs/mbed-os/latest/apis/digitalout.html"><code>DigitalOut</code></a>
+ภายใต้ชื่อ <code>mbed</code> ซึ่งเป็น <strong>C++ namespace</strong>
+และสร้างอ็อบเจกต์ใหม่ชื่อ <code>led</code> สำหรับใช้งานขา <code>GP25</code> เป็นเอาต์พุต</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+
+mbed::DigitalOut led( LED_PIN ); // use onboard LED
+
+void setup() {
+   SerialUSB.begin( 115200 );
+}
+
+String sbuf; // string buffer object
+
+void loop() {
+   led = !led; // toggle and update the LED output
+   sbuf = &quot;LED state: &quot;;
+   sbuf += led.read(); // read LED status
+   SerialUSB.println( sbuf.c_str() ); // send a string to SerialUSB 
+   rtos::ThisThread::sleep_for( 
+      std::chrono::milliseconds(100) 
+   );
+}
+</code></pre>
+<p>หรือจะสร้างไฟล์และเขียนโค้ดใน <code>main.cpp</code> แทนการเขียนโค้ดในไฟล์ <code>.ino</code> (ให้เป็นไฟล์ว่างเปล่า) ตามรูปแบบต่อไปนี้ ก็ทำได้เช่นกัน
+และสังเกตว่า ไม่มีการสร้างฟังก์ชัน <code>setup(){...}</code> และ <code>loop(){...}</code> </p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;USB/PluggableUSBSerial.h&quot;
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+
+mbed::DigitalOut led( LED_PIN ); // use onboard LED
+String sbuf; // String buffer object
+
+int main() {
+   PluggableUSBD().begin();
+   SerialUSB.begin( 115200 );
+   while(1) {
+     led = !led; // toggle and update the LED output
+     sbuf = &quot;LED state: &quot;;
+     sbuf += led.read();
+     SerialUSB.println( sbuf.c_str() ); // send a string 
+     rtos::ThisThread::sleep_for( 
+        std::chrono::milliseconds(100) 
+     );
+   }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>การใช้คำสั่ง <code>sleep_for(...)</code> ของ 
+<a href="https://os.mbed.com/docs/mbed-os/latest/mbed-os-api-doxy/namespacertos_1_1_this_thread.html"><code>rtos::ThisThread</code></a>
+ภายใต้ <strong>C++ namespace</strong> ที่มีชื่อว่า 
+<a href="https://os.mbed.com/docs/mbed-os/latest/mbed-os-api-doxy/group__rtos-public-api.html"><code>rtos</code></a>
+ให้ผลเหมือนคำสั่ง <code>delay(...)</code> ของ <strong>Arduino Core API</strong> </p>
+<p>คำสั่งนี้จะทำให้ <strong>Main Thread</strong>
+หรือ 'เธรดหลัก' ที่เกี่ยวข้องกับการทำงานของฟังก์ชัน <code>main(){...}</code>
+หยุดทำงานชั่วคราวตามระยะที่กำหนดไว้ แล้วจึงทำงานต่อ</p>
+<p>อีกคำสั่งหนึ่งที่ให้ผลเหมือนกันคือ 
+<a href="https://os.mbed.com/docs/mbed-os/latest/mbed-os-api-doxy/group__mbed__thread.html"><code>thread_sleep_for(...)</code></a> ซึ่งเป็นคำสั่งที่ใช้กับเธรด โดยจะต้องระบุค่าตัวเลขเป็นจำนวนเต็มบวก (หน่วยเป็นมิลลิวินาที) </p>
+<p>ข้อสังเกต: ในตัวอย่างนี้ มีการใช้คำสั่งของ <a href="https://github.com/arduino/ArduinoCore-mbed"><strong>Arduino Core for Mbed</strong></a> เช่น <code>PluggableUSBD()</code>
+และ <code>SerialUSB</code> (ถูกสร้างมาจากคลาส <code>USBSerial</code>) 
+สำหรับส่งข้อความผ่านทาง <strong>USB</strong> ไปยังคอมพิวเตอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink-delay">&#9655; <strong>LED Blink โดยไม่ใช้คำสั่ง delay()</strong><a class="headerlink" href="#led-blink-delay" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ด <strong>LED Blink</strong> โดยไม่ใช้คำสั่ง <code>delay(...)</code> ของ <strong>Arduino API</strong> 
+แต่ใช้วิธีอ่านค่าเวลาของระบบในหน่วยเป็นมิลลิวินาที โดยใช้คำสั่ง <code>millis()</code> 
+เพื่อนำมาใช้กำหนดช่วงเวลาในการเปลี่ยนสถานะของ <strong>LED</strong> ในครั้งถัดไป</p>
+<pre><code class="language-c++">#define LED_PIN (p25) // use on-board LED (GP25 pin)
+
+uint32_t start_time_ms, saved_time_ms = 0;
+
+void setup() {
+   SerialUSB.begin( 115200 );
+   pinMode( LED_PIN, OUTPUT );
+   saved_time_ms = start_time_ms = millis();
+}
+
+String sbuf;
+
+void loop() {
+  uint32_t now = millis();
+  if ( now - saved_time_ms &gt;= 100 ) {
+    saved_time_ms = now;
+    digitalWrite( LED_PIN, !digitalRead( LED_PIN ) );
+    sbuf = &quot;LED state: &quot;;
+    sbuf += digitalRead( LED_PIN );
+    sbuf += &quot;, time: &quot;;
+    sbuf += (now - start_time_ms);
+    SerialUSB.println( sbuf.c_str() ); 
+  }
+}
+</code></pre>
+<p>หากลองเปลี่ยนมาใช้คำสั่งตามรูปบบของ <strong>Mbed OS API</strong> ดูบ้าง เช่น ในโค้ดต่อไปนี้ 
+มีการสร้างฟังก์ชัน <code>get_time_msec(...)</code> มาใช้แทนคำสั่ง <code>millis(...)</code> ของ <strong>Arduino</strong></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace std::chrono;
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+
+mbed::DigitalOut led( LED_PIN ); // onboard LED
+
+uint32_t get_time_msec() {
+  auto now = rtos::Kernel::Clock::now();
+  auto tp  = time_point_cast&lt;microseconds&gt;(now); 
+  return (uint32_t) tp.time_since_epoch().count()/1000;
+}
+
+uint32_t start_time_ms, saved_time_ms = 0;
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  saved_time_ms = start_time_ms = get_time_msec();
+}
+
+String sbuf;
+
+void loop() {
+  uint32_t now = _millis();
+  if ( now - saved_time_ms &gt;= 100 ) {
+    saved_time_ms = now;
+    led = !led; // toggle and update the LED output
+    sbuf = &quot;LED state: &quot;;
+    sbuf += led.read();
+    sbuf += &quot;, time: &quot;;
+    sbuf += (now - start_time_ms);
+    sbuf += &quot; ms&quot;;
+    SerialUSB.println( sbuf.c_str() ); 
+  }
+}
+</code></pre>
+<p>หรือจะใช้คำสั่ง <code>thread_sleep_until(...)</code> ของ <strong>Mbed OS</strong>
+เพื่อหยุดการทำงานชั่วคราวของเธรดที่กำลังทำงานในขณะนั้น จนถึงเวลาครั้งถัดไปในอนาคตตามที่กำหนดไว้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed; // for DigitalOut
+using namespace rtos; // for ThisThread
+using namespace std::chrono; // for milliseconds()
+
+const PinName LED_PIN = p25;
+DigitalOut led( LED_PIN ); // onboard LED
+
+uint64_t next_time_ms, start_time_ms; // timestamps
+
+void setup() {  
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the Serial port is open.
+  start_time_ms = next_time_ms = Kernel::get_ms_count();
+}
+
+String sbuf;
+
+void loop() {
+  uint32_t ts;
+  led = !led; // toggle the LED state
+  sbuf = &quot;LED state: &quot;;
+  sbuf += led.read();
+  sbuf += &quot;, time: &quot;;
+  ts = Kernel::get_ms_count() - start_time_ms;
+  sbuf += ts;
+  sbuf += &quot; ms&quot;;
+  SerialUSB.println( sbuf.c_str() ); 
+  next_time_ms += 100;
+  thread_sleep_until( next_time_ms );
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink-thread">&#9655; <strong>LED Blink โดยการสร้าง Thread</strong><a class="headerlink" href="#led-blink-thread" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ดเพื่อสร้าง 'เธรด' (<strong>Thread</strong>) จากเธรดหลัก
+และให้ทำหน้าที่สลับสถานะลอจิกของ <strong>LED</strong> เว้นช่วงเวลาตามที่กำหนดไว้ เช่น 100 msec
+เมื่อเธรดหลักทำให้เธรดใหม่ (<strong>LED Thread</strong>) เริ่มทำงาน 
+ก็จะถูกหยุดรอแบบไม่มีกำหนด โดยใช้คำสั่ง <code>osDelay( osWaitForever )</code> 
+ซึ่งเป็นคำสั่งตามรูปแบบของ <strong>CMSIS RTOS</strong></p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed; // for mbed::DigitalOut
+using namespace rtos; // for rtos::Thread
+
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+
+DigitalOut  led( LED_PIN ); // on-board led pin
+Thread      thread; // the led-blink thread
+
+void toggle( DigitalOut *pin ) { // thread entry function
+  auto sleep_ms = std::chrono::milliseconds( 100 );
+  SerialUSB.println(&quot;LED-blink thread started...&quot;);
+  while(1) {
+    *pin = !*pin; // toggle the pin
+    ThisThread::sleep_for( sleep_ms );
+  }
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait until the USB serial port is open.
+  thread.start( callback(toggle,&amp;led) ); // start the thread
+  osDelay( osWaitForever ); // the main thread will wait forever
+}
+
+void loop() {} // not executed
+</code></pre>
+<p>&nbsp;</p>
+<p>แต่ถ้าลองเปลี่ยนมาสร้างเธรด เช่น <code>threadA</code> และ <code>threadB</code> ที่มีระดับความสำคัญ หรือ 
+ค่า <strong>Priority Level</strong> เท่ากัน (<code>osPriorityNormal</code>) 
+และให้ทำหน้าที่กำหนดสถานะของ <strong>LED</strong> ที่แตกต่างกัน คือ ลอจิก 0 และ 1 ตามลำดับ แต่สลับช่วงเวลากัน 
+ในกรณีนี้เราสามารถใช้ <code>Mutex</code> (<strong>Mutual Exclusion</strong>) ของ <strong>Mbed OS</strong>
+เพื่อป้องกันและให้มีเพียงเธรดเดียวในแต่ละช่วงเวลาที่เข้าถึงและกำหนดสถานะของ <strong>LED</strong> ได้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+
+DigitalOut  led( LED_PIN );
+Thread threadA(osPriorityNormal), threadB(osPriorityNormal);
+Mutex  mutex;
+
+typedef struct _thread_arg {
+  DigitalOut *pin;
+  uint32_t   id;
+  uint32_t   sleep_ms;
+} thread_arg_t;
+
+// used to pass thread's arguments
+ thread_arg_t thread_args[] = {
+  { .pin = &amp;led, .id = 0, .sleep_ms = 100 },
+  { .pin = &amp;led, .id = 1, .sleep_ms = 100 },
+};
+
+void led_update( thread_arg_t *args ) {
+  String s;
+  auto sleep_ms = std::chrono::milliseconds( args-&gt;sleep_ms );
+  while(1) {
+    mutex.lock();
+    args-&gt;pin-&gt;write( args-&gt;id );
+    s = &quot;thread id &quot;;
+    s += args-&gt;id;
+    SerialUSB.println( s.c_str() );
+    ThisThread::sleep_for( sleep_ms );
+    mutex.unlock();
+  }
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  // start threads A and B
+  threadA.start( callback(led_update, &amp;thread_args[0]) );
+  threadB.start( callback(led_update, &amp;thread_args[1]) );
+  osDelay( osWaitForever ); // the main thread will wait forever
+}
+
+void loop() {} // not executed
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink-ticker-timeout">&#9655; <strong>LED Blink โดยใช้คลาส Ticker และ Timeout</strong><a class="headerlink" href="#led-blink-ticker-timeout" title="Permanent link">#</a></h2>
+<p>การทำให้ <strong>LED</strong> กระพริบด้วยอัตราคงที่นั้น เป็นการทำงานแบบที่มีคาบ (<strong>Periodic Task</strong>) 
+ในกรณีนี้เราสามารถใช้คลาส <a href="https://os.mbed.com/docs/mbed-os/latest/apis/ticker.html"><code>Ticker</code></a>
+ ของ <strong>Mbed Drivers</strong> ตามตัวอย่างต่อไปนี้</p>
+<p>ขา <code>GP25</code> จะถูกใช้เป็นเอาต์พุตสำหรับวงจร <strong>LED</strong> และสร้างอ็อบเจกต์จากคลาส <code>Ticker</code> 
+เพื่อคอยทำคำสั่งของฟังก์ชันที่เป็น <strong>Callback</strong> และเกิดขึ้นซ้ำตามระยะเวลาที่กำหนดไว้ เช่น 
+ให้เรียกฟังก์ชัน <code>callback(){...}</code> ทุก ๆ 100 มิลลิวินาที</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+using namespace rtos;
+
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+DigitalOut  led( LED_PIN );
+Ticker      ticker;
+
+const auto interval = std::chrono::microseconds(100*1000);
+
+void toggle( DigitalOut *pin ) { // ISR callback function
+  *pin = !*pin;  // toggle LED pin
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while(!SerialUSB){} // wait for serial to open
+  SerialUSB.println( &quot;Ticker demo...&quot; );
+  ticker.attach( callback(toggle, &amp;led), interval );
+  osDelay( osWaitForever ); // block the main thread
+}
+
+void loop() {} // not executed
+</code></pre>
+<p>&nbsp;</p>
+<p><a href="https://os.mbed.com/docs/mbed-os/latest/apis/timeout.html"><code>Timeout</code></a>
+ของ <strong>Mbed Drivers</strong> เป็นอีกตัวเลือกหนึ่งสำหรับสร้างเหตุการณ์ให้เกิดขึ้นในอนาคต
+ใช้สำหรับการกำหนดเวลาในอนาคตเพื่อให้เรียกใช้ฟังก์ชัน <strong>Callback</strong> ที่เกี่ยวข้อง
+เมื่อเวลาผ่านไปตามที่กำหนดไว้ แต่จะทำเพียงครั้งเดียว ลองมาดูตัวอย่างการใช้ <code>Timeout</code> กับการทำงานที่เกิดขึ้นซ้ำได้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+DigitalOut  led( LED_PIN );
+Timeout     timeout;
+
+const auto interval = std::chrono::microseconds(100*1000);
+
+void toggle( DigitalOut *pin ) {
+  *pin = !*pin;  // toggle LED pin
+  timeout.attach( callback(toggle,pin), interval );
+}
+
+void setup() {
+  SerialUSB.begin( 115200 );
+  while (!SerialUSB){} // wait for serial to open
+  SerialUSB.println( &quot;Timeout demo...&quot; );
+  timeout.attach( callback(toggle, &amp;led), interval );
+  osDelay( osWaitForever ); // block the main thread
+}
+
+void loop() {} // not executed
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-fading-pwm">&#9655; <strong>LED Fading โดยการสร้างสัญญาณ PWM</strong><a class="headerlink" href="#led-fading-pwm" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโค้ดโดยใช้ <a href="https://os.mbed.com/docs/mbed-os/latest/apis/pwmout.html"><code>PwmOut</code></a> 
+ของ <strong>Mbed Drivers</strong> เพื่อสร้างสัญญาณแบบ <strong>PWM (Pulse Width Modulation)</strong> 
+ตั้งค่าความถี่ไว้เท่ากับ 500 Hz หรือมีคาบเท่ากับ 2000 usec (2 msec) </p>
+<p><strong>LED</strong> ที่ขา <code>GP25</code> จะสว่างขึ้นและดับลง วนซ้ำสลับกันไปเรื่อย ๆ โดยการปรับค่า <strong>Duty Cycle</strong> ของ <strong>PWM</strong> 
+ในช่วง 0 ถึง 100% (อัตราส่วนของความกว้างของพัลส์ High เทียบกับความกว้างของหนึ่งคาบ) ในทิศทางเพิ่มและลดลง</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+using namespace mbed;
+#define LED_PIN (p25) // use on-board LED (GP25 pin)
+#define STEPS   (10)  // number of LED brightness steps
+
+const uint32_t PWM_PERIOD_US = 2000; // frequency 500Hz
+PwmOut led_pwm( LED_PIN ); // use onboard LED
+
+void setup() {
+   SerialUSB.begin( 115200 );
+   led_pwm.period_us( PWM_PERIOD_US ); 
+   led_pwm.pulsewidth_us( 0 );
+}
+
+char sbuf[32];
+
+void loop() {
+   uint32_t t, pw;
+   for (uint32_t i=0; i &lt; 2*STEPS; i++) {
+      t = (i*PWM_PERIOD_US/STEPS);
+      pw = (t &lt;= PWM_PERIOD_US) ? t : 2*PWM_PERIOD_US-t;   
+      led_pwm.pulsewidth_us( pw );
+      sprintf( sbuf, &quot;step %2lu) %lu&quot;, i, pw );
+      SerialUSB.println( sbuf );
+      delay(100);
+   } 
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หรือจะเปลี่ยนไปใช้คำสั่ง <code>analogWrite()</code> ของ <strong>Arduino API</strong> 
+สำหรับสร้างสัญญาณ <strong>PWM</strong> (ความถี่ 500 Hz เป็นค่า default) ก็เป็นไปตามตัวอย่างโค้ดต่อไปนี้</p>
+<pre><code class="language-c++">#define LED_PIN   (p25) // use on-board LED (GP25 pin)
+#define STEPS     (10)  // number of LED brightness steps
+#define MAX_VALUE (1023)
+
+void setup() {
+   SerialUSB.begin( 115200 );
+   pinMode( LED_PIN, OUTPUT );
+   analogWriteResolution( 10 ); // use 10-bit value
+   analogWrite( LED_PIN, 0 ); 
+}
+
+char sbuf[32];
+
+void loop() {
+  uint32_t t, pw;
+   for ( uint32_t i=0; i &lt; 2*STEPS; i++ ) {
+      t = (i*MAX_VALUE/STEPS);
+      pw = (t &lt;= MAX_VALUE) ? t : 2*MAX_VALUE-t;
+      analogWrite( LED_PIN, pw );
+      sprintf( sbuf, &quot;step %2lu) %lu&quot;, i, pw );
+      SerialUSB.println( sbuf );
+      delay( 100 );
+   } 
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2021-04-16 | Last Updated: 2021-12-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

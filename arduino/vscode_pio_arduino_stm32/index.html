@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/vscode_pio_arduino_stm32/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino Programming with STM32 and PlatformIO - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-programming-with-stm32-and-platformio" class="nav-link">Arduino Programming with STM32 and PlatformIO</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#pio-arduino-stm32" class="nav-link">&#9655; ขั้นตอนการใช้ PIO เพื่อเขียนโปรแกรม Arduino สำหรับ STM32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#in-circuit-debugging" class="nav-link">&#9655; การทำขั้นตอน In-Circuit Debugging</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-programming-with-stm32-and-platformio">Arduino Programming with STM32 and PlatformIO<a class="headerlink" href="#arduino-programming-with-stm32-and-platformio" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>VS Code</em>, 
+<em>PlatformIO</em>, <em>PIO</em>, <em>Arduino Sketch</em>, 
+<em>Arduino Programming</em>, <em>STM32</em></p>
+<hr />
+<h2 id="pio-arduino-stm32">&#9655; <strong>ขั้นตอนการใช้ PIO เพื่อเขียนโปรแกรม Arduino สำหรับ STM32</strong><a class="headerlink" href="#pio-arduino-stm32" title="Permanent link">#</a></h2>
+<p>โดยปรกติแล้ว หากต้องการเขียนโปรแกรมโดยใช้คำสั่งของ <strong>Arduino</strong> และเลือกใช้บอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป 
+<strong>STM32 (ARM Cortex-M Processors)</strong> ของบริษัท <strong>STMicroelectronics</strong> ผู้ใช้สามารถติดตั้ง <a href="https://github.com/stm32duino/Arduino_Core_STM32"><strong>STM32Duino (Arduino Core for STM32)</strong></a>
+เพื่อใช้งานร่วมกับซอฟต์แวร์ <a href="https://www.arduino.cc/en/software"><strong>Arduino IDE</strong></a> </p>
+<p>แต่หากว่าต้องการใช้ <strong>VS Code IDE</strong> ร่วมกับ <strong>PIO Extension</strong> ก็มีขั้นตอนดังนี้</p>
+<ol>
+<li>เปิดใช้งาน <strong>VS Code IDE</strong> แล้วไปยัง <strong>PIO Home</strong></li>
+<li>สร้างโปรเจกต์ใหม่ด้วยใช้ <strong>PIO Project Wizard</strong> เลือกใช้ <strong>Arduino</strong> สำหรับ <strong>Framework</strong>
+และใช้ร่วมกับ <strong>Development Platform</strong> ที่มีชื่อว่า
+<a href="https://registry.platformio.org/packages/platforms/platformio/ststm32"><code>ststm32</code></a>
+(<strong>"ST STM32"</strong>)</li>
+</ol>
+<p><img alt="" src="../images/stm32f4_blackpill_stlink-v2.jpg" /></p>
+<p>รูป: บอร์ด <strong>WeAct Studio BlackPill V2.0</strong> + อุปกรณ์ <strong>ST-Link/V2 (clone)</strong></p>
+<p>ในตัวอย่างนี้ต่อไปนี้ จะเลือกใช้บอร์ด <a href="https://github.com/WeActTC/MiniSTM32F4x1"><strong>WeAct Studio BlackPill v2.0 (STM32F411CEU6)</strong></a> และสาธิตการเขียนโค้ดเพื่อทำให้
+<strong>LED</strong> ที่อยู่บนบอร์ดกระพริบได้ และเปิดใช้งาน <strong>USB CDC</strong> เพื่อให้สามารถใช้คำสั่ง <code>printf()</code>
+ส่งข้อความมายังคอมพิวเตอร์ได้</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino-1.png" /></p>
+<p>รูป: เริ่มต้นทำขั้นตอนเพื่อสร้างโปรเจกต์ใหม่ใน <strong>PIO Project Wizard</strong>
+ในตัวอย่างนี้ ได้เลือกใช้บอร์ด <strong>WeAct Studio BlackPill v2.0 (STM32F411CEU6)</strong></p>
+<p>&nbsp;</p>
+<p>เมื่อสร้างโปรเจกต์ได้สำเร็จแล้ว ลองตรวจสอบดูว่า มีการติดตั้ง <strong>ST STM32</strong> เพิ่มแล้วหรือไม่ </p>
+<p><img alt="" src="../images/vscode_st_stm32_platform.png" /></p>
+<p>รูป: ค้นหาและตรวจสอบรายการ <strong>Development Platforms</strong> ใน <strong>PIO Home</strong>
+(ในรูปตัวอย่างแสดงให้เห็นว่า ได้มีการติดตั้ง <strong>ST STM32</strong> แล้ว)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino-2.png" /></p>
+<p>รูป: เขียนโค้ดในไฟล์ <code>main.cpp</code> </p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino-3.png" /></p>
+<p>รูป: แก้ไขไฟล์ <code>platformio.ini</code></p>
+<p>&nbsp;</p>
+<p>เมื่อเขียนโค้ดในไฟล์ <code>main.cpp</code> และการตั้งค่าสำหรับ <strong>PIO</strong> ในไฟล์  <code>platformio.ini</code>
+แล้ว ให้ทำขั้นตอน <strong>PIO Build</strong> เพื่อคอมไพล์โค้ดของโปรเจกต์ 
+จากนั้นทำขั้นตอน <strong>PIO Upload</strong> เพื่อทดลองใช้กับบอร์ดไมโครคอนโทรลเลอร์</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino-4.png" /></p>
+<p>รูป: เปิดรับข้อมูลจากบอร์ดไมโครคอนโทรลเลอร์ โดยทำขั้นตอน <strong>PIO Device Monitor</strong> </p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการตั้งค่าคอนฟิกและตัวเลือกสำหรับ <a href="https://docs.platformio.org/en/latest/platforms/ststm32.html#stm32duino-configuration-system"><strong>STM32Duino Configuration</strong></a> ในส่วนที่เกี่ยวข้องกับการเลือกใช้ไลบรารี <strong>C/C++ Standard Library Configuration</strong> มีดังนี้</p>
+<ul>
+<li><code>PIO_FRAMEWORK_ARDUINO_STANDARD_LIB</code>: ใช้ <strong> Standard GCC Embedded C Library / Newlib</strong></li>
+<li><code>PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_PRINTF</code>: เลือกใช้ <strong>Newlib Nano Library</strong>
+ที่มีขนาดเล็กลง และสามารถใช้ใช้คำสั่ง <code>printf()</code> สำหรับชนิดข้อมูล <code>float</code> ได้ด้วย</li>
+<li><code>PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_SCANF</code>: เลือกใช้ <strong>Newlib Nano Library</strong> และสามารถใช้คำสั่ง <code>scanf()</code> สำหรับ <code>float</code> ได้ด้วย</li>
+</ul>
+<p>ถ้าหากใช้ไมโครคอนโทรลเลอร์ที่รองรับการใช้งาน <strong>Native USB</strong> อย่างเช่น ชิป STM32F4 ก็มีการตั้งค่าใช้งาน
+<strong>USB</strong> ที่เกี่ยวข้องดังนี้</p>
+<ul>
+<li><code>PIO_FRAMEWORK_ARDUINO_ENABLE_CDC</code>: CDC (generic Serial supersede U(S)ART)</li>
+<li><code>PIO_FRAMEWORK_ARDUINO_ENABLE_CDC_WITHOUT_SERIAL</code>: CDC (no generic Serial)</li>
+<li><code>PIO_FRAMEWORK_ARDUINO_ENABLE_HID</code>: HID (keyboard and mouse)</li>
+</ul>
+<p>หากต้องการเปิดใช้งาน  <strong>USB CDC</strong> และสามารถใช้คำสั่งของ <strong>Arduino</strong> โดยใช้คลาส <code>SerialUSB</code> 
+ในการส่งข้อความได้ (ทำหน้าที่เป็น <strong>Generic Serial</strong>) เหมือนการใช้ <code>Serial</code>
+ในกรณีนี้ จะต้องตั้งค่าการใช้งานให้ได้ถูกต้อง  (ดูตัวอย่างไฟล์  <code>platformio.ini</code> ข้างล่าง)
+<br>&rarr; ให้เลือกใช้ <code>PIO_FRAMEWORK_ARDUINO_ENABLE_CDC</code></p>
+<p>&nbsp;</p>
+<p>ตัวอย่างไฟล์ <code>platformio.ini</code> สำหรับโปรเจกต์  (บอร์ด <strong>WeAct Studio BlackPill V2.0 - STM32F411CEU6</strong>)</p>
+<ul>
+<li>มีการเลือกใช้อุปกรณ์  <strong>ST-Link/V2</strong> (<code>stlink</code>) สำหรับการอัปโหลดโปรแกรมไปยังบอร์ดผ่านทาง
+<strong>SWD (Serial Wire Debug)</strong> และใช้สำหรับการดีบักการทำงานของโปรแกรมในฮาร์ดแวร์ได้ด้วย</li>
+<li>มีการเลือก <strong>Build Type</strong> เป็นแบบ <code>debug</code> เพื่อทำให้โปรแกรมที่ได้สามารถนำไปใช้กับขั้นตอน
+<strong>In-Circuit Debugger</strong> ได้</li>
+</ul>
+<pre><code class="language-json">; PlatformIO Project Configuration File
+
+[env:blackpill_f411ce]
+; https://docs.platformio.org/en/latest/boards/ststm32/blackpill_f411ce.html
+platform = ststm32
+board = blackpill_f411ce
+board_build.mcu = stm32f411ceu6
+board_build.f_cpu = 100000000L
+framework = arduino
+upload_protocol = stlink
+debug_tool = stlink
+monitor_speed = 115200
+build_type = debug
+build_flags = 
+  -D HSE_VALUE=25000000UL
+  -D PIO_FRAMEWORK_ARDUINO_ENABLE_CDC
+  -D PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_PRINTF
+  -D USBCON
+  -D USBD_VID=0x0483
+  -D USBD_PID=0x0100  
+  -D USB_MANUFACTURER=&quot;WeAct&quot;
+  -D USB_PRODUCT=&quot;\&quot;BLACKPILL_F411CE\&quot;&quot;
+</code></pre>
+<p>&nbsp;</p>
+<p>ตัวอย่างไฟล์ <code>platformio.ini</code> สำหรับโปรเจกต์<br />
+(บอร์ด <strong>WeAct Studio BlackPill V2.0 - STM32F401CCU6</strong>)</p>
+<pre><code class="language-json">[env:blackpill_f401cc]
+; https://docs.platformio.org/en/latest/boards/ststm32/blackpill_f401cc.html
+platform = ststm32
+board = blackpill_f401cc
+board_build.mcu = stm32f401ccu6
+board_build.f_cpu = 84000000L
+framework = arduino
+upload_protocol = stlink
+monitor_speed = 115200
+build_type = debug
+debug_tool = stlink
+build_flags = 
+  -D HSE_VALUE=25000000
+  -D PIO_FRAMEWORK_ARDUINO_ENABLE_CDC 
+  -D PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_PRINTF
+  -D USBCON
+  -D USBD_VID=0x0483
+  -D USBD_PID=0x0100  
+  -D USB_MANUFACTURER=&quot;WeAct&quot;
+  -D USB_PRODUCT=&quot;\&quot;BLACKPILL_F401CC\&quot;&quot;
+</code></pre>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ด <code>main.cpp</code></p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+#define LED_PIN  PC13 // use the on-board LED
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  SerialUSB.begin( 115200 );
+  while ( !SerialUSB ){} // wait until the SerialUSB is open
+}
+
+int led_state = 0;
+
+void loop() {
+  led_state ^= 1; // toggle LED state
+  digitalWrite( LED_PIN, led_state ); // update LED output
+  SerialUSB.printf( &quot;LED: %d\n&quot;, led_state );
+  delay( 500 );
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="in-circuit-debugging">&#9655; <strong>การทำขั้นตอน In-Circuit Debugging</strong><a class="headerlink" href="#in-circuit-debugging" title="Permanent link">#</a></h2>
+<p>จากตัวอย่าง เราได้เลือกใช้บอร์ด <strong>STM32F411CEU6</strong> และมีการใช้อุปกรณ์ <strong>ST-Link/V2</strong>
+เชื่อมต่อกันผ่านทางอินเทอร์เฟส <strong>SWD (Serial Wire Debug)</strong> 
+ถัดไปเราจะมาลองทำขั้นตอนเพื่อดีบักโค้ด โดยให้โปรแกรมทำงานร่วมกับฮาร์ดแวร์</p>
+<p>หากดูรูปต่อไปนี้ จากแถบทางซ้ายมือ เลือกจากเมนูคำสั่ง <strong>Debug &gt; Start Debugging</strong>
+เพื่อเข้าสู่โหมดการดีบัก (<strong>PIO Debug</strong>) แต่ก่อนจะเริ่ม ให้เลือกบรรทัดในโค้ด เลือกมากกว่าหนึ่งบรรทัดก็ได้ 
+เพื่อให้เป็นตำแหน่งหยุดชั่วคราวเมื่อรันในดีบักโหมด ตำแหน่งเหล่านี้เรียกว่า <strong>Breakpoints</strong> 
+เมื่อคลิกเลือกบรรทัดใด จะมีจุดสีแดงปรากฎขึ้นอยู่ข้างหน้า แต่ถ้าคลิกอีกครั้งจะหายไป (ยกเลิกตำแหน่งของ <strong>Breakpoint</strong>)</p>
+<p>ในส่วนของ <strong>Watch Windows</strong> เราสามารถเลือกตัวแปรในโค้ดของเรา เพื่อดูการเปลี่ยนแปลงค่าในระหว่างที่โปรแกรมทำงานได้
+ในรูปตัวอย่าง ให้สังเกตการเปลี่ยนแปลงของตัวแปร <code>led_state</code> ซึ่งเป็นตัวแปรภายนอก (<strong>Global Variable</strong>)</p>
+<p>ข้อสังเกต: ในโหมดดีบัก การทำงานของโปรแกรมอาจไม่ต่อเนื่อง ถูกหยุดด้วย <a href="https://docs.platformio.org/en/latest/projectconf/section_env_debug.html"><strong>PIO Debugger</strong></a>
+เช่น เมื่อเริ่มทำขั้นตอนดีบัก โปรแกรมจะมาหยุดอยู่ที่คำสั่งแรกในฟังก์ชัน <code>main()</code> ของโปรแกรม โดยอัตโนมัติ
+(ถือว่าเป็น <strong>Initial Breakpoint</strong>)
+เนื่องจากการตั้งค่าสำหรับ <code>debug_init_break</code> มีค่าเท่ากับ <code>tbreak main</code> (default)
+ดังนั้นการทำงานของ <strong>USB</strong> ของ <strong>STM32F4</strong> เพื่อใช้สำหรับ <code>SerialUSB</code> อาจไม่สามารถใช้งานได้ตามปรกติ</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino_debug-1.png" /></p>
+<p>รูป: เมนูคำสั่ง <strong>Debug &gt; Start Debugging (F5)</strong> </p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino_debug-2.png" /></p>
+<p>รูป: เมื่อเข้าสู่โหมดการดีบัก โปรแกรมจะทำงานมาหยุดที่คำสั่งแรกในฟังก์ชัน <code>main()</code> ของโปรแกรม
+หากต้องการรันโค้ดต่อไป ให้กดปุ่ม <strong>F5 (Continue Debug)</strong> หรือถ้าจะเริ่มการดีบักใหม่อีกครั้ง
+ก็ให้กดปุ่ม <strong>Ctrl+Shift+F5 (Restart Debug)</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino_debug-3.png" /></p>
+<p>รูป: รันโปรแกรมต่อแล้วมาหยุดที่บรรทัดซึ่งมีคำสั่ง <code>digitalWrite()</code> ตามที่ได้เลือกเป็นตำแหน่ง
+<strong>Breakpoint</strong> แต่ถ้าไม่มี Breakpoint ใด ๆ ในโค้ด การทำงานของโปรแกรมก็จะทำงานต่อเนื่องไปตามปรกติ</p>
+<p>หากเพิ่มบรรทัด <code>debug_init_break = tbreak setup</code> ในไฟล์ <code>platformio.ini</code>
+เมื่อเข้าสู๋โหมดดีบักใหม่อีกครั้ง โปรแกรมจะรันและมาหยุดครั้งแรกที่ถึงฟังก์ชัน <code>setup()</code> ของ <strong>Arduino Sketch</strong>
+โดยอัตโนมัติ</p>
+<p><img alt="" src="../images/vscode_stm32f4_blackpill_arduino_debug-4.png" /></p>
+<p>รูป: การทำงานของโปรแกรมในโหมดดีบัก เมื่อหยุดที่คำสั่งแรกของฟังก์ชัน <code>setup()</code> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอขั้นตอนการใช้งานซอฟต์แวร์ <strong>PIO</strong> ร่วมกับ <strong>VS Code IDE</strong>
+เพื่อการเขียนโค้ดตามรูปแบบของ <strong>Arduino</strong>
+และเลือกใช้งานกับบอร์ด <strong>Black Pill (STM32F411CEU6)</strong> และใช้อุปกรณ์
+<strong>ST-Link/V2 (clone)</strong> สำหรับการอัปโหลดโปรแกรมและดีบักการทำงาน
+และถือว่าเป็นอีกตัวเลือกหนึ่งทั้งซอฟต์แวร์ที่เป็น <strong>Open Source</strong> และฮาร์ดแวร์ที่มีราคาไม่แพง
+(<strong>Low-Cost</strong>) สำหรับการเรียนรู้ด้านระบบสมองกลฝังตัวและการเขียนโปรแกรมภาษา 
+<strong>C/C++</strong> สำหรับไมโครคอนโทรลเลอร์</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2021-12-23 | Last Updated: 2021-12-25</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
