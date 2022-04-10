@@ -242,11 +242,11 @@ I_1 + I_2 = I_3 \\
 -V_1 + I_1 R_1 + I_3 R_2 = 0 \\
 -I_3 R_2 - I_2 R_3 + V_2 = 0 \\
 </script>
-จัดรูปของสมการใหม่ และเขียนให้อยู่ในรูปแบบของเมทริกซ์ <script type="math/tex">\mathbf{A}</script> และเวกเตอร์ <script type="math/tex">\mathbf{b}</script>
+จัดรูปของสมการใหม่ และเขียนให้อยู่ในรูปแบบของเมทริกซ์ <script type="math/tex">\mathbf{A}</script> และเวกเตอร์ <script type="math/tex">\mathbf{b}</script> ได้ดังนี้
 <script type="math/tex; mode=display">
 \begin{align}
   I_1 (R_1+R_2) + I_2 R_2 &_= V_1 \\
-- I_1 R_2 - I_2 (R_2+R_3) &= -V_2 \\
+ I_1 R_2 + I_2 (R_2+R_3) &= V_2 \\
 \end{align}
 </script>
 </p>
@@ -254,7 +254,7 @@ I_1 + I_2 = I_3 \\
 <script type="math/tex; mode=display">
 \underbrace{\begin{pmatrix}
  (R_1+R_2) & R_2 \\
- -R_2      & -(R_2+R_3) \\
+ R_2      & (R_2+R_3) \\
 \end{pmatrix}}_{\mathbf{A}}
 \begin{pmatrix}
 I_1 \\
@@ -263,7 +263,7 @@ I_2 \\
 = 
 \underbrace{\begin{pmatrix}
 V_1 \\
--V_2 \\
+V_2 \\
 \end{pmatrix}}_{\mathbf{b}}
 </script>
 </p>
@@ -282,9 +282,11 @@ V_1 \\
 และจะได้แรงดันไฟฟ้า <script type="math/tex">V_A=12 V</script>, <script type="math/tex">V_B=4 V</script> และ <script type="math/tex">V_C=5 V</script> ซึ่งใช้โพรบวัดแรงดัน (<strong>Voltage Probe</strong>)
 หรือจุดวัดแรงดันไฟฟ้าในวงจรเทียบกับ <strong>GND</strong></p>
 <p><img alt="" src="dc_op_sim_voltages.png" /></p>
-<p>รูป: ผลการจำลองการทำงาน (<strong>Simualtion Results</strong>) แสดงค่า <strong>V_A</strong>, <strong>V_B</strong>, <strong>V_C</strong></p>
+<p>รูป: ผลการจำลองการทำงาน (<strong>Simualtion Results</strong>) แสดงค่า <script type="math/tex">V_A</script>, <script type="math/tex">V_B</script>, <script type="math/tex">V_C</script>
+</p>
 <p>&nbsp;</p>
-<p>ถ้าจะลองเขียนโค้ด <strong>MATLAB</strong> เพื่อแก้ระบบสมการที่ได้จากการวิเคราะห์แบบ <strong>Mesh Analysis</strong> (ใช้การประมวลผลเชิงสัญลักษณ์ หรือ <strong>Symbolic Processing</strong>) ก็มีแนวทางดังนี้ ซึ่งจะได้ <strong>I1=0.016 A</strong> 
+<p>ถ้าจะลองเขียนโค้ด <strong>MATLAB</strong> (ทดลองใช้กับเวอร์ชัน <strong>R2022a</strong>)
+เพื่อแก้ระบบสมการที่ได้จากการวิเคราะห์แบบ <strong>Mesh Analysis</strong> (ใช้การประมวลผลเชิงสัญลักษณ์ หรือ <strong>Symbolic Processing</strong>) ก็มีแนวทางดังนี้ ซึ่งจะได้ <strong>I1=0.016 A</strong> 
 และ <strong>I2=0.004 A</strong> ตามลำดับ</p>
 <p><strong>การเขียนโค้ดแบบทื่ 1</strong>: สร้างสมการแล้วแปลงให้เป็นเมทริกซ์และเวกเตอร์  (<strong>Mesh Analysis</strong>)</p>
 <pre><code class="language-matlab">% clear all symbols, variables, figures and command outputs
@@ -318,9 +320,9 @@ clearvars; clc; clf;
 syms R1 R2 R3 positive;
 syms V1 V2 I1 I2;
 % write the corresponding matrix and vector
-A = [[(R1+R2), R2]; [-R2, -(R2+R3)]];
+A = [[(R1+R2), R2]; [R2, (R2+R3)]];
 I = [I1; I2];
-b = [V1; -V2];
+b = [V1; V2];
 % solve the equation system using the linsolve() command
 sol = linsolve(A,b);
 I1 = sol(1); I2 = sol(2);
@@ -332,7 +334,7 @@ I2 = subs( I2, params, values );
 % show the numeric values of current flows I1 and I2
 fprintf( &quot;I1=%.3f A, I2=%.3f A&quot;, I1, I2 )
 </code></pre>
-<p><strong>การเขียนโค้ดแบบทื่ 2</strong>:   เขียนให้อยู่ในรูปเมทริกซ์และเวกเตอร์  (<strong>Nodal Analysis</strong>)</p>
+<p><strong>การเขียนโค้ดแบบทื่ 3</strong>:  สร้างสมการแล้วแปลงให้เป็นเมทริกซ์และเวกเตอร์  (<strong>Nodal Analysis</strong>)</p>
 <pre><code>% clear all symbols, variables, figures and command outputs
 clearvars; clc; clf;
 % create symbols
@@ -400,7 +402,7 @@ fprintf( &quot;V_A=%.3f V, V_B=%.3f V, V_C=%.3f&quot;, V(1), V(2), V(3) )
 </p>
 <p>การวัดแรงดันตกคร่อม (<strong>Voltage Drop</strong>) ระหว่างสองจุดในวงจรไฟฟ้า อาจใช้สิ่งที่เรียกว่า <strong>Differential Probe</strong> โดยค้นหาอุปกรณ์โดยใช้คำว่า <code>Diff_V_Probe</code> จากไลบรารี <strong>Spice</strong></p>
 <p><img alt="" src="diff_probe_measure.png" /></p>
-<p>รูป:  การค้นหา <code>Diff_V_Probe</code> ใน <strong>Spice Libraru</strong></p>
+<p>รูป:  การค้นหา <code>Diff_V_Probe</code> ใน <strong>Spice Library</strong></p>
 <p>ถัดไปให้ลองนำ  <code>Diff_V_Probe</code> มาใช้ในวงจร เช่น วัดแรงดันตกคร่อมที่ตัวเก็บประจุ <script type="math/tex">C_1</script> แล้วแสดงรูปคลื่นสัญญาณจากผลการจำลองการทำงาน</p>
 <p><img alt="" src="rc_circuit_diff_probe.png" /></p>
 <p>รูป: การใช้ <code>Diff_V_Probe</code> เพื่อวัดแรงดันตกคร่อมที่ตัวเก็บประจุ <script type="math/tex">C_1</script>
@@ -554,7 +556,7 @@ fprintf( &quot;V_A=%.3f V, V_B=%.3f V, V_C=%.3f&quot;, V(1), V(2), V(3) )
 </p>
 <hr />
 <h2 id="rc-matlab">&#9655; <strong>การวิเคราะห์วงจร RC ด้วย MATLAB</strong><a class="headerlink" href="#rc-matlab" title="Permanent link">#</a></h2>
-<p>ลองมาดูตัวอย่างโค้ด <strong>MATLAB</strong> (ทดลองใช้กับเวอร์ชัน <strong>R2022a</strong>) สำหรับการวิเคราะห์วงจร <strong>RC</strong> 
+<p>ลองมาดูตัวอย่างโค้ด <strong>MATLAB</strong> สำหรับการวิเคราะห์วงจร <strong>RC</strong> 
 หากสามารถกำหนดรูปแบบของสมการเชิงอนุพันธ์สำหรับวงจร <strong>RC</strong> ได้แล้ว
 ก็สามารถหาผลเฉลยโดยใช้เทคนิคการคำนวณเชิงสัญลักษณ์ทางคณิตศาสตร์ (<strong>Symbolic Math Processing</strong>) </p>
 <h4 id="_4"><strong>กรณีที่ใช้แหล่งจ่ายแรงดันไฟฟ้ารูปคลื่นไซน์</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h4>
