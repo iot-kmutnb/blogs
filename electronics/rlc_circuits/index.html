@@ -282,7 +282,7 @@ V_2 \\
 และจะได้แรงดันไฟฟ้า <script type="math/tex">V_A=12 V</script>, <script type="math/tex">V_B=4 V</script> และ <script type="math/tex">V_C=5 V</script> ซึ่งใช้โพรบวัดแรงดัน (<strong>Voltage Probe</strong>)
 หรือจุดวัดแรงดันไฟฟ้าในวงจรเทียบกับ <strong>GND</strong></p>
 <p><img alt="" src="dc_op_sim_voltages.png" /></p>
-<p>รูป: ผลการจำลองการทำงาน (<strong>Simualtion Results</strong>) แสดงค่า <script type="math/tex">V_A</script>, <script type="math/tex">V_B</script>, <script type="math/tex">V_C</script>
+<p>รูป: ผลการจำลองการทำงาน (<strong>Simulation Results</strong>) แสดงค่า <script type="math/tex">V_A</script>, <script type="math/tex">V_B</script>, <script type="math/tex">V_C</script>
 </p>
 <p>&nbsp;</p>
 <p>ถ้าจะลองเขียนโค้ด <strong>MATLAB</strong> (ทดลองใช้กับเวอร์ชัน <strong>R2022a</strong>)
@@ -450,7 +450,8 @@ fprintf( &quot;V_A=%.3f V, V_B=%.3f V, V_C=%.3f&quot;, V(1), V(2), V(3) )
 <p>ก็สามารถเขียนสมการเชิงอนุพันธ์สามัญอันดับหนึ่ง (<strong>First-Order ODE</strong>) ได้ดังนี้
 <script type="math/tex; mode=display">
   v_R(t) + v_C(t) = v_S(t) \\
-  R\, i_R(t) + v_C(t) = RC\, v'_C(t) + v_C(t) = v_S(t) \\
+  R\, i_R(t) + v_C(t) = v_S(t) \\
+  RC\,v'_C(t) + v_C(t) = v_S(t) \\
 </script>
 </p>
 <p>หากเลือกแหล่งจ่าย <script type="math/tex">v_S(t)</script> เป็นแรงดันไฟฟ้ากระแสสลับ หรือ <strong>AC</strong> 
@@ -468,12 +469,15 @@ fprintf( &quot;V_A=%.3f V, V_B=%.3f V, V_C=%.3f&quot;, V(1), V(2), V(3) )
 </script>
 ในตัวอย่างนี้การหาผลเฉลยของ <strong>ODE</strong> ก็คือ การหาฟังก์ชัน <script type="math/tex">v_C(t)</script> สำหรับช่วงเวลา <script type="math/tex">t \geq 0</script> เป็นต้นไป ที่ทำให้สมการเชิงอนุพันธ์นี้เป็นจริง ถ้าทราบรูปแบบของฟังก์ชันสำหรับ <script type="math/tex">v_C(t)</script> แล้ว ก็สามารถหา <script type="math/tex">v_R(t)</script> ในวงจร <strong>RC</strong> โดยคำนวณจาก
 <script type="math/tex; mode=display">
-  v_R(t) = i(t) \cdot R = RC \frac{d}{dt} v_C(t)
+  v_R(t) = R \cdot i(t) = RC \frac{d}{dt} v_C(t)
 </script>
 </p>
-<p>ผลเฉลยของสมการเชิงอนุพันธ์ในลักษณะนี้ หรืออาจเรียกว่า ผลตอบสนองโดยสมบรูณ์ (<strong>Complete Response</strong>) ก็ได้จากผลรวมของผลตอบสนองทางธรรมชาติและผลตอบสนองบังคับ: <script type="math/tex">y(t) = y_h(t) + y_p(t)</script>
+<p>ผลเฉลยของสมการเชิงอนุพันธ์ในลักษณะนี้ หรืออาจเรียกว่า "ผลตอบสนองโดยสมบรูณ์" (<strong>Complete Response</strong>)
+ก็ได้จากผลรวมของผลตอบสนองทางธรรมชาติและผลตอบสนองบังคับ: <script type="math/tex">y(t) = y_h(t) + y_p(t)</script>
 </p>
+<p>&nbsp;</p>
 <h4 id="_2"><strong>การหาผลตอบสนองทางธรรมชาติ</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h4>
+<p>&nbsp;</p>
 <p>หากกำหนดให้ <script type="math/tex">v_S(t) = 0</script> ก็จะได้สมการที่เป็นเอกพันธ์ (<strong>Homogeneous ODE</strong>) และหาสมการลักษณะเฉพาะ (<strong>Characteristic Equation</strong>) และรากของสมการที่เกี่ยวข้องได้ดังนี้
 <script type="math/tex; mode=display">
    v'_C(t) + \frac{1}{RC} v_C(t) = 0 \\
@@ -491,6 +495,7 @@ fprintf( &quot;V_A=%.3f V, V_B=%.3f V, V_C=%.3f&quot;, V(1), V(2), V(3) )
 </script>
 </p>
 <h4 id="_3"><strong>การหาผลตอบสนองบังคับ</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h4>
+<p>&nbsp;</p>
 <p>แต่ถ้าสมมุติว่า  <script type="math/tex">v_C(0) = 0</script>  (เรียกว่า <strong>Zero Initial Condition</strong>) และให้ <script type="math/tex">v_S(t) = V_S\, sin(\omega t)</script> ผลเฉลยของสมการเชิงอนุพันธ์ที่ไม่เป็นเอกพันธ์ (<strong>Non-homogeneous</strong>) จะเรียกว่า  "ผลเฉลยเจาะจง" (<strong>Particular Solution</strong>) หรือ "ผลตอบสนองบังคับ" (<strong>Forced Reponse</strong>) </p>
 <p>สำหรับฟังก์ชันรูปคลื่นไซน์ จะมีรูปแบบของฟังก์ชันที่เป็นผลเฉลยดังนี้
 <script type="math/tex; mode=display">
@@ -554,12 +559,14 @@ fprintf( &quot;V_A=%.3f V, V_B=%.3f V, V_C=%.3f&quot;, V(1), V(2), V(3) )
   v_C(0) = V_0
 </script>
 </p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="rc-matlab">&#9655; <strong>การวิเคราะห์วงจร RC ด้วย MATLAB</strong><a class="headerlink" href="#rc-matlab" title="Permanent link">#</a></h2>
 <p>ลองมาดูตัวอย่างโค้ด <strong>MATLAB</strong> สำหรับการวิเคราะห์วงจร <strong>RC</strong> 
 หากสามารถกำหนดรูปแบบของสมการเชิงอนุพันธ์สำหรับวงจร <strong>RC</strong> ได้แล้ว
 ก็สามารถหาผลเฉลยโดยใช้เทคนิคการคำนวณเชิงสัญลักษณ์ทางคณิตศาสตร์ (<strong>Symbolic Math Processing</strong>) </p>
 <h4 id="_4"><strong>กรณีที่ใช้แหล่งจ่ายแรงดันไฟฟ้ารูปคลื่นไซน์</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h4>
+<p>&nbsp;</p>
 <pre><code class="language-matlab">% clear all symbols, variables, figures and command outputs
 clearvars; clc; clf;
 % define symbols to be used for formulating the ODE
@@ -625,7 +632,9 @@ grid on, xlabel('t')
 \\
 \end{align}</script>
 </p>
+<p>&nbsp;</p>
 <h4 id="_5"><strong>กรณีที่ใช้แหล่งจ่ายแรงดันไฟฟ้าแบบขั้นบันได</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h4>
+<p>&nbsp;</p>
 <p>ถ้าให้ <script type="math/tex">v_S(t)</script> เป็นฟังก์ชันแบบขั้นบันได
 <script type="math/tex; mode=display">
   v_S(t) = \begin{cases}
