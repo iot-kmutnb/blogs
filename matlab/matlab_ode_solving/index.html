@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/matlab/matlab_ode_solving/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย MATLAB - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#matlab" class="nav-link">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย MATLAB</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; สมการเชิงอนุพันธ์สามัญ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">&#9655; ตัวอย่างที่ 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; ตัวอย่างที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">&#9655; ตัวอย่างที่ 3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4" class="nav-link">&#9655; ตัวอย่างที่ 4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="matlab">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย MATLAB<a class="headerlink" href="#matlab" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ</p>
+<p><strong>Keywords:</strong> <em>MATLAB</em>, <em>Ordinary Differential Equations</em>, <em>ODE Solving</em>, 
+<em>Symbolic Methods</em>, <em>Numerical Methods</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>สมการเชิงอนุพันธ์สามัญ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>สมการเชิงอนุพันธ์ (<strong>Differential Equations: DE</strong>) เป็นสมการที่ประกอบไปด้วยฟังก์ชัน เช่น <script type="math/tex">y(t)</script> ซึ่งเป็นตัวแปรตาม (<strong>Dependent Variable</strong>) ที่ขึ้นอยู่กับ <script type="math/tex">t</script> ซึ่งเป็นตัวแปรอิสระ หรือ ตัวแปรต้น (<strong>Independent Variable</strong>)
+รวมถึงอนุพันธ์อันดับต่าง ๆ ของฟังก์ชัน <script type="math/tex">y(t)</script> เช่น <script type="math/tex">y'(t)</script>, <script type="math/tex">y''(t)</script>, <script type="math/tex">... </script> และอันดับของสมการเชิงอนุพันธ์คือ
+อันดับสูงสุดของอนุพันธ์ของฟังก์ชันที่มีอยู่ในสมการ</p>
+<p>หากฟังก์ชันขึ้นอยู่กับตัวแปรอิสระเพียงตัวเดียว สมการเชิงอนุพันธ์นี้จะเรียกว่า สมการเชิงอนุพันธ์สามัญ (<strong>Ordinary Differential Equation: ODE</strong>) แต่ถ้ามีตัวแปรต้นหลายตัวและมีการใช้อนุพันธ์เทียบกับตัวแปรเหล่านั้นหลายตัวจะเรียกว่า สมการเชิงอนุพันธ์ย่อย (<strong>Partial Differential Equation: PDE</strong>)</p>
+<p>ในทางวิศวกรรมศาสตร์ เช่น การศึกษาและวิเคราะห์วงจรไฟฟ้าแบบเชิงเส้น (<strong>Linear Circuit Analysis</strong>)
+ก็เกี่ยวข้องกับสมการเชิงอนุพันธ์ซึ่งมีตัวแปรต้นเป็นเวลา และการหาผลเฉลยหรือรูปแบบของฟังก์ชันที่ทำให้สมการเชิงอนุพันธ์เป็นจริงนั้น ทำได้หลายวิธีในทางคณิตศาสตร์ เช่น การใช้วิธีการแปลงลาปลาส (<strong>Laplace Transforms</strong>) สำหรับสมการเชิงอนุพันธ์สามัญเชิงเส้นที่มีสัมประสิทธิ์คงตัว เป็นต้น </p>
+<p>แต่ในบทความนี้จะกล่าวถึง การใช้ซอฟต์แวร์และคำสั่งต่าง ๆ ของ <strong>MATLAB</strong> (ลองใช้เวอร์ชัน <em>R2022a</em>) ของบริษัท <strong>MathWorks</strong> เป็นตัวอย่าง โดยจำแนกเป็นสองแนวทาง คือ</p>
+<ul>
+<li>การประมวลผลเชิงสัญลักษณ์ (<strong>Symbolic Methods</strong>) โดยใช้ <a href="https://www.mathworks.com/products/symbolic.html"><strong>Symbolic Math Toolbox</strong></a></li>
+<li>การประมวลผลเชิงตัวเลข (<strong>Numerical Methods</strong>) เช่น การใช้คำสั่ง <a href="https://www.mathworks.com/help/matlab/ref/ode45.html"><code>ode45()</code></a> 
+ซึ่งเป็นการคำนวณด้วยวิธีการที่เรียกว่า <strong>Runge-Kutta (4-th order)</strong></li>
+</ul>
+<hr />
+<h2 id="1">&#9655; <strong>ตัวอย่างที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>ตัวอย่างแรกเป็นโจทย์สมการเชิงอนุพันธ์อันดับที่หนึ่ง
+<script type="math/tex; mode=display">
+  \frac{dy}{dt} = -2t\, y(t) \\
+  y'(t) = -2 t\, y(t) = f(t,y)  \\
+</script>
+</p>
+<p>หากคำนวณด้วยวิธีทางคณิตศาสตร์ ก็มีวิธีการดังนี้ โดยใช้เทคนิคที่เรียกว่า วิธีแยกตัวแปร (<strong>Separation of Variables</strong>)
+แล้วอินทิเกรตทั้งสองตัวแปรที่เกี่ยวข้อง</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \frac{1}{y}dy &= -2 t\, dt \\
+  \int \frac{1}{y}dy &= -2 \int t\, dt \\
+  ln(y) &= -t^2 + C_0 \\
+  y(t)  &= e^{-t^2 + C_0} \\
+        &= e^{C_0}\, e^{-t^2} \\
+        &= C_1\, e^{-t^2} \qquad (C_1 := e^{C_0}) \\
+\end{align}</script>
+</p>
+<p>โดยที่ <script type="math/tex">C_0</script> และ <script type="math/tex">C_1</script> เป็นค่าคงที่ใด ๆ และไม่เป็นศูนย์ และค่าของ <script type="math/tex">C_1</script> จะหาได้ ถ้ามีการกำหนดเงื่อนไขค่าเริ่มต้น
+(<strong>Initial Condition</strong>) เช่น ให้ <script type="math/tex">y(0) = y_0</script> ดังนั้น
+<script type="math/tex; mode=display">
+   y(0) = C_1\,e^{0} = y_0 \Rightarrow y(t) = y_0\, e^{-t^2} \\
+</script>
+</p>
+<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลย <script type="math/tex">y(t)</script> ของ  <strong>ODE</strong> 
+โดยวิธีการประมวลผลเชิงสัญลักษณ์ทางคณิตศาสตร์ และการใช้คำสั่ง เช่น 
+<a href="https://www.mathworks.com/help/symbolic/diff.html"><code>diff()</code></a> เพื่อหาอนุพันธ์ของฟังก์ชัน
+และคำสั่ง <a href="https://www.mathworks.com/help/symbolic/dsolve.html"><code>dsolve()</code></a> เพื่อหาผลเฉลย มีดังนี้</p>
+<pre><code class="language-matlab">clearvars; clc;
+% Solve the ODE: y'(t) = -2*t*y = f(t,y), y(0)=1
+% using symbolic method
+syms t y(t)
+% solve the ODE without initial condition
+sol = dsolve( diff(y,t,1) == -2*t*y );
+fprintf( 'y(t) = %s', string(sol) )
+% =&gt; y(t) = C1*exp(-t^2)
+% solve the ODE with initial condition y(0)=1
+sol = dsolve( diff(y,t,1) == -2*t*y, y(0)==1 );
+fprintf( 'y(t) = %s', string(sol) )
+% =&gt; y(t) = exp(-t^2)
+</code></pre>
+<p><img alt="" src="./matlab_output1-1.png" /></p>
+<p>รูป: ผลการรันโค้ด <strong>MATLAB</strong></p>
+<p>&nbsp;</p>
+<p>ในเชิงเปรียบเทียบ การเขียนโค้ด <strong>MATLAB</strong> โดยวิธีการประมวลผลเชิงตัวเลข
+จะต้องมีการกำหนดช่วงสำหรับตัวแปร <script type="math/tex">t</script> เช่น กำหนดให้ <script type="math/tex">t \in [t_0, t_f]</script> 
+(<script type="math/tex">t_0=0.0</script> และ <script type="math/tex">t_f=2.0</script>) เป็นต้น และจะต้องกำหนดค่าตัวเลขสำหรับเงื่อนไขเริ่มต้นด้วย</p>
+<pre><code class="language-matlab">clearvars; clc;
+% Solve the OD: y'(t) = -2*t*y = f(t,y), y(0)=1
+% using numeric method
+t0 = 0.0; % start time point
+tf = 2.0; % final time point
+y0 = 1.0; % initial condition for y(0)
+% define the function f(t,y) 
+f = @(t,y) -2*t*y;
+% solve the ODE using ode45()
+[ts, ys] = ode45( f, [t0 tf], y0 );
+% plot both solutions (numeric and analytic)
+plot( ts, ys, 'o', ts, exp( -ts.^2 ), '-' ), 
+grid on, xlabel('t'), ylabel('y(t)'),legend('numeric', 'symbolic')
+</code></pre>
+<p>การใช้คำสั่ง  <code>ode45()</code> จะต้องมีอาร์กิวเมนต์ เช่น 
+ฟังก์ชัน <code>f</code> สำหรับการคำนวณค่าของ <script type="math/tex">f(t,y)</script> การกำหนดช่วงเวลาในการคำนวณสำหรับตัวแปร <code>t</code>
+และจะต้องกำหนดค่าเริ่มต้น <code>y0</code> สำหรับ <script type="math/tex">y(t_0)</script> ตามลำดับ</p>
+<p>ผลจากการใช้คำสั่ง <code>ode45()</code> จะได้ชุดข้อมูลตัวเลขซึ่งเป็นอาร์เรย์สำหรับเวลา (<strong>time steps</strong>) และค่าของฟังก์ชันที่จุดเวลาต่าง ๆ 
+อ้างอิงโดยตัวแปร <code>ts</code> และ <code>ys</code> ตามลำดับ ดังนั้นหากต้องการตรวจสอบดูค่าของฟังก์ชันในเชิงเวลา ก็นำไปแสดงรูปกราฟ </p>
+<p><img alt="" src="./matlab_output1-2.png" /></p>
+<p>รูป: แสดงรูปกราฟเปรียบระหว่างผลเฉลยที่ได้จากสองวิธีการ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2">&#9655; <strong>ตัวอย่างที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>ตัวอย่างที่สองเป็นสมการเชิงอนุพันธ์อันดับที่สองที่มีการกำหนดค่าเริ่มต้นสองเงื่อนไข</p>
+<p>
+<script type="math/tex; mode=display">
+   y'' + 2y' + y = sin(2 t) = f(t,y,y') \\
+   y(0) = -1, y'(0) = 1 \\
+</script>
+</p>
+<p>หากใช้วิธีการในทางคณิตศาสตร์สำหรับสมการเชิงอนุพันธ์สามัญเชิงเส้นที่มีสัมประสิทธิ์คงตัว 
+ให้เริ่มต้นด้วยการกำหนดให้ทางซ้ายของสมการเป็นศูนย์ ซึ่งจะได้สมการที่เป็นเอกพันธ์ (<strong>Homogeneous</strong>) 
+และหาผลเฉลยของสมการ <script type="math/tex">y_h(t)</script> จากนั้นจึงพิจารณาสมการที่ไม่เป็นเอกพันธ์ (<strong>Homogeneous</strong>) 
+เพื่อหาผลเฉลยเฉพาะ  <script type="math/tex">y_p(t)</script> ตามลำดับ</p>
+<p>
+<script type="math/tex; mode=display">
+   y'' + 2y' + y = sin(2 t) = 0 \qquad \text{(homogeneous)}
+</script>
+</p>
+<p>จากสมการที่เป็นเอกพันธ์ สามารถเขียนสมการลักษณะเฉพาะ (<strong>Characteristic Equation</strong>)
+ที่เกี่ยวข้อง ซึ่งเป็นพหุนามโดยใช้ตัวแปร <script type="math/tex">s</script> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   (s^2 + 2s + 1) = (s+1)^2 = 0
+</script>
+</p>
+<p>โดยปรกติแล้ว ถ้าหาราก (<strong>roots</strong>) ของสมการลักษณะเฉพาะได้เป็น <script type="math/tex">s_{1,2}</script> และไม่เป็นค่าที่ซ้ำกัน 
+ก็สามารถเขียนรูปแบบของฟังก์ชันที่เป็นผลเฉลยได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">  
+   y_h(t) = C_1\, e^{s_1 t} + C_2\, e^{s_2 t} 
+</script>
+</p>
+<p>แต่เนื่องจากในตัวอย่างนี้ ได้รากของสมการที่ซ้ำกัน </p>
+<p>
+<script type="math/tex; mode=display">
+  s_{1,2} = -1
+</script>
+</p>
+<p>ดังนั้นจะต้องเขียนรูปแบบของฟังก์ชัน <script type="math/tex">y_h(t)</script> ที่เป็นผลเฉลยดังนี้
+<script type="math/tex; mode=display">  
+   y_h(t) = C_1\,e^{s_1 t} + C_2\, t\, e^{s_1 t} = C_1\, e^{-t} + C_2\,t\,e^{-t} 
+</script>
+</p>
+<p>ถัดไปเป็นการพิจารณาสมการที่ไม่เป็นเอกพันธ์ และทางซ้ายมือของสมการเป็นฟังก์ชัน <script type="math/tex">sin(2 t)</script> 
+ดังนั้นรูปแบบของฟังก์ชันสำหรับผลเฉลยเฉพาะ เป็นดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   y_p(t) = A\, cos(2 t) + B\, sin(2 t) \\
+</script>
+</p>
+<p>โดยที่ <script type="math/tex">A</script> และ <script type="math/tex">B</script> เป็นค่าคงที่ใด ๆ ดังนั้นจะต้องหาค่า <script type="math/tex">A</script> และ<script type="math/tex">B</script> ที่ทำให้สมการเชิงอนุพันธ์เป็นจริง หากใช้ <script type="math/tex">y_p(t)</script>
+เป็นผลเฉลยในสมการดังกล่าว</p>
+<p>
+<script type="math/tex; mode=display"> 
+\begin{align}
+   y_p(t)   &=   A\, cos(2 t) +  B\, sin(2 t) \\
+   y'_p(t)  &= -2A\, sin(2 t) + 2B\, cos(2 t) \\
+   y''_p(t) &= -4A\, cos(2 t) - 4B\, sin(2 t)
+\end{align}
+</script>
+</p>
+<p>จากนั้นให้นำฟังก์ชัน <script type="math/tex">y_p(t)</script> และอนุพันธ์ของฟังก์ชัน <script type="math/tex">y'_p(t)</script> และ <script type="math/tex">y''_p(t)</script> ไปแทนลงในสมการเชิงอนุพันธ์ 
+แล้วจัดกลุ่มแยกตามพจน์สำหรับ <script type="math/tex">sin(2t)</script> กับ <script type="math/tex">cos(2t)</script> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   (-4A -3B)\,sin(2 t) + (-3A + 4B)\,cos(2 t) = sin(2 t) \\  
+    -4A - 3B = 1 \\
+    -3A + 4B = 0
+</script>
+</p>
+<p>เมื่อแก้ระบบสมการสองตัวแปรจะได้ <script type="math/tex">A=-4/25</script> และ <script type="math/tex">B=-3/25</script>
+</p>
+<p>&nbsp;</p>
+<p>ผลเฉลยทั่วไปที่ได้ <script type="math/tex">y(t)</script> เป็นผลรวมของ <script type="math/tex">y_h(t)</script> และ <script type="math/tex">y_p(t)</script> ในรูปแบบของฟังก์ชันต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ y(t)  &= (C_1 + C_2\, t)\,e^{-t} -\frac{4}{25}cos(2t) - \frac{3}{25}sin(2t) \\
+ y'(t) &= (-C_1 + C_2 - C_2 t)\,e^{-t} + \frac{8}{25}sin(2t) - \frac{6}{25}cos(2t) 
+\end{align}</script>
+</p>
+<p>จากเงื่อนไขค่าเริ่มต้น <script type="math/tex">y(0) = -1</script> และ <script type="math/tex">y'(0) = 1</script> จะได้ระบบสมการที่สามารถนำไปหาค่า ของ <script type="math/tex">C_1</script> และ <script type="math/tex">C_2</script> ได้
+<script type="math/tex; mode=display">
+\begin{align}
+  y(0)  &=  C_1 - \frac{4}{25} = -1 \\
+  y'(0) &= -C_1 + C_2 - \frac{6}{25} = 1 \\
+ \Rightarrow\;  C_1 &= -\frac{21}{25}, \, C_2 = \frac{2}{5} 
+\end{align}
+</script>
+</p>
+<p>โดยสรุป จะได้ฟังก์ชัน <script type="math/tex">y(t)</script> ที่เป็นผลเฉลยของปัญหาค่าเริ่มต้นดังนี้
+<script type="math/tex; mode=display">
+   y'' + 2y' + y = sin(2 t), \; y(0) = -1, y'(0) = 1 \\
+\begin{align}
+ y(t) &= (-\frac{21}{25} + \frac{2}{5} \, t)\,e^{-t}
+        -\frac{3}{25}sin(2t) -\frac{4}{25}cos(2t) \\
+      &= \frac{1}{25}(10\, t - 21)\,e^{-t}
+        - \frac{1}{5}cos(2t - atan(\frac{3}{4})) 
+\end{align}
+</script>
+</p>
+<p>จะเห็นได้ว่า การหาผลเฉลยของสมการเชิงอนุพันธ์ในตัวอย่างนี้มีหลายขั้นตอน </p>
+<p>&nbsp;</p>
+<p>ถัดไปลองมาดูตัวอย่างเขียนโค้ด <strong>MATLAB</strong> ด้วยวิธีการคำนวณเชิงสัญลักษณ์เพื่อใช้ในการหาคำตอบ</p>
+<pre><code class="language-matlab">clearvars; clc; clf;
+% 2nd-order ODE: y'' + 2y' + y = sin(2t)
+% Initial conditions: y(0)=-1, y'(0)=1
+syms t y(t)
+% the first derivative of y(t)
+D1y = diff(y,t,1);
+% the first derivative of y(t)
+D2y = diff(y,t,2);
+% write the dififerential equation
+ode = D2y + 2*D1y + y == sin(2*t);
+% define the vector of initial values
+ics = [y(0)==-1, D1y(0)==1];
+% solve the ODE without initial values to find y(t)
+y(t) = simplify( expand( dsolve(ode) ) );
+% rewrite the solution y(t)
+y(t) = collect( y(t), [exp(-t)]) 
+D1y  = collect( diff( y,t ), exp(-t))
+% solve the linear equation system to find C1 and C2
+solve( [y(0)==-1, D1y(0)==1] )
+% solve the ODE with initial values and simplify the solution
+y(t) = simplify( dsolve(ode, ics), 'Steps', 100 )
+% convert symbolic expression to Latex string
+tex_str = latex(y(t));
+% plot the solution y(t) for t in [t0 tf]
+t0=0.0; tf=10.0;
+fplot( y(t), [t0 tf] ), grid on, 
+xlabel('t'), ylabel('y(t)'), ylim([-1 0.5]), 
+legend( ['$y(t)=' tex_str '$'],'Interpreter','latex' ), 
+legend( 'boxoff')
+</code></pre>
+<p><img alt="" src="./matlab_output2-1.png" /></p>
+<p>รูป: แสดงรูปกราฟสำหรับ <script type="math/tex">y(t)</script> ที่ได้จากการคำนวณเชิงสัญลักษณ์ด้วย <strong>MATLAB</strong></p>
+<p>&nbsp;</p>
+<p>การหาผลเฉลยสำหรับสมการเชิงอนุพันธ์ที่มีอันดับมากกว่าหนึ่ง มีอีกวิธีหนึ่งคือ
+การแปลงสมการดังกล่าวให้เป็นระบบสมการอนุพันธ์ที่มีอันดับเป็นหนึ่ง ซึ่งมีแนวทางดังนี้</p>
+<p>ขั้นตอนแรกคือ กำหนดฟังก์ชันเป็นตัวช่วย เช่น <script type="math/tex">z_1(t)</script> และ <script type="math/tex">z_2(t)</script> สำหรับสมการอนุพันธ์อันดับสอง</p>
+<p>
+<script type="math/tex; mode=display"> 
+   z_1(t) := y(t), \;   z_2(t) := y'(t) \\
+   z'_1(t) = z_2(t), \; z'_2(t) = y''(t) \\
+   z_1(0) = y(0), \; z_2(0) = y'(0) \\
+</script>
+</p>
+<p>จากนั้นเขียนสมการอนุพันธ์ให้อยู่ในรูปเมทริกซ์</p>
+<p>
+<script type="math/tex; mode=display">
+  \begin{align} 
+  y'' + 2y' + y &= sin(2t) \\
+  y'' &= -2y' - y + sin(2t) = f(t,y,y') \\
+      &= -2 z_2(t) - z_1(t) + sin(2t) 
+  \end{align}\\
+</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+  \frac{d}{dt} \begin{pmatrix}
+    z_1(t) \\
+    z_2(t) \\
+  \end{pmatrix}
+  = \begin{pmatrix}
+     0 &  1  \\
+    -1 & -2 \\
+  \end{pmatrix}
+  \begin{pmatrix}
+    z_1(t) \\
+    z_2(t) \\
+  \end{pmatrix}
+  + \begin{pmatrix}
+   0      \\
+   sin(2t) \\ 
+  \end{pmatrix}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> โดยใช้การคำนวณเชิงสัญลักษณ์มีดังนี้</p>
+<pre><code class="language-matlab">clearvars; clc; clf;
+% ODE: y'' + 2y' + y = sin(2*t), y(0)=-1.0, y'(0)=1.0
+syms t y(t) z1(t) z2(t);
+% Z is a vector of two functions z1(t) and z2(t)
+Z = [z1(t), z2(t)];
+% rewrite the 2nd-order ODE into a first-oder system
+eq1 = diff(Z(1),t) == Z(2);
+eq2 = diff(Z(2),t) == -2*Z(2) - Z(1) + sin(2*t);
+ode = [eq1, eq2];
+% define the vector of initial values
+ics = [subs(Z(1),t,0)==-1, subs(Z(2),t,0)==1];
+% solve the first-order DE system
+[Z(1),Z(2)] = dsolve( ode, ics );
+y(t) = simplify( Z(1) )
+% plot the solution y(t) 
+t0=0.0; tf=10.0;
+t_interval = [t0 tf];
+fplot( y(t), t_interval ), 
+grid on, xlabel('t'), ylabel('y(t)')
+</code></pre>
+<p><img alt="" src="./matlab_output2-2.png" /></p>
+<p>รูป: ผลลัพธ์จากการรันโค้ด <strong>MATLAB</strong> (บางส่วน)</p>
+<p>ลองมาดูตัวอย่างการคำนวณด้วยวิธีเชิงตัวเลข โดยใช้คำสั่ง <code>ode45()</code> เปรียบเทียบกับวิธีเชิงสัญลักษณ์</p>
+<pre><code class="language-matlab">clearvars; clc; clf;
+% ODE: y'' + 2y' + y = sin(2t), y(0)=-1, y'(0)=1
+% define the function of the 1st-order DE system
+f = @(t,Z) [Z(2); -2*Z(2) - Z(1) + sin(2*t)];
+% set the interval
+t0=0.0; tf=10.0; t_interval = [t0 tf];
+% set the vector of initial values
+Z_init = [-1.0 1.0];
+% solve the DE system numerically by calling ode45()
+sol = ode45( f, t_interval, Z_init );
+% create a vector of 100 time steps in [t0,tf]
+ts = linspace( t0, tf, 100 );
+% call deval() to evaluate the values of y(t) = Z(1) 
+y_numeric  = deval( sol, ts, 1 );
+% evaluate the values of y(t) provided by the symbolic method
+y_symbolic = (10*ts - 21).*exp(-ts)/25 - cos(2*ts-atan(3/4))/5;
+plot( ts, y_numeric, 'o', ts, y_numeric, '-' ), 
+grid on, xlabel('t'), ylabel('y(t)'), legend('numeric','symbolic')
+</code></pre>
+<p><img alt="" src="./matlab_output2-3.png" /></p>
+<p>รูป: แสดงรูปกราฟของฟังก์ชันที่เป็นผลเฉลยซึ่งได้จากสองวิธีและเปรียบเทียบกัน</p>
+<p><strong>MATLAB</strong> มีคำสั่ง เช่น <code>odeToVectorField()</code> สำหรับแปลงสมการเชิงอนุพันธ์ที่มีอันดับมากกว่าหนึ่ง
+ให้เป็นสมการเชิงอนุพันธ์อันดับหนึ่งในรูปเมทริกซ์หรือเวกเตอร์ และคำสั่ง <code>matlabFunction()</code> สำหรับ
+แปลงผลลัพธ์ที่ได้ให้เป็นฟังก์ชันสำหรับนำไปใช้ได้กับคำสั่ง <code>ode45()</code> ดังนี้</p>
+<pre><code class="language-matlab">clearvars; clc; clf;
+% ODE: y'' + 2y' + y = sin(2*t), y(0)=-1, y'(0)=1
+% Use symbolic method to determine the function for ode45()
+syms t y(t)
+eqn = diff(y,t,2) == -2*diff(y,t) - y + sin(2*t);
+% convert a higher-order ODE to a system of 1st-order DEs
+% Y is a two-element vector with Y(1)=y(t) and Y(2)=y'(t)
+% V = [ Y(2); -2Y(2) - Y(1) + sin(2t)]
+[V,Y] = odeToVectorField(eqn);
+% convert symbolic expression to a function handle
+f = matlabFunction( V, 'vars', {'t','Y'} );
+% set time interval
+t0=0.0; tf=10.0; t_interval = [t0 tf];
+% set the vector of initial values
+Y_init = [-1.0 1.0];
+% solve the ODE numerically with ode45()
+sol = ode45( f, t_interval, Y_init );
+% define an array of 100 time steps
+ts = linspace(t0,tf,100);
+% evaluate the solution of the DE problem
+y_numeric = deval( sol, ts, 1 );
+plot( ts, y_numeric ), 
+grid on, xlabel('t'), ylabel('y(t)')
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3">&#9655; <strong>ตัวอย่างที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นสมการเชิงอนุพันธ์อันดับ 4 พร้อมเงื่อนไขค่าเริ่มต้น</p>
+<p>
+<script type="math/tex; mode=display">
+   y^{(4)}(t) + 2 y^{(3)}(t) + 2 y''(t) + 2 y'(t) + y(t) = 10 e^{-2t} \\
+   y(0)=0, y'(0)=1, y''(0)=-1, y'''(0)=2
+</script>
+</p>
+<p>หากพิจารณาสมการที่เป็นเอกพันธ์ จะเขียนสมการลักษณะเฉพาะได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   s^4 + 2 s^3 + 2 s^2 + 2 s + 1 = 0 \\
+  \Rightarrow\; (s+1)^2(s^2 + 1 ) = 0 \\
+</script>
+</p>
+<p>อาจลองเขียนโค้ดและใช้คำสั่งของ <strong>MATLAB</strong> ในการแก้สมการเพื่อหารากของสมการได้ดังนี้ </p>
+<pre><code class="language-matlab">syms s
+roots = solve( s^4 + 2*s^3 + 2*s^2 + 2*s + 1 == 0, s )';
+disp(roots)
+</code></pre>
+<p>รากของสมการซึ่งมีดีกรีของพหุนามเท่ากับ 4 หาได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  s_{1,2} = -1, \; s_{3,4} = \pm j, \; j := \sqrt{-1} \\ 
+</script>
+ซึ่งจะเห็นได้ว่า <script type="math/tex">s_{1,2}</script> มีค่าเป็นจำนวนจริงแต่ซ้ำกัน  (<strong>repeated roots</strong>) 
+และ <script type="math/tex">s_{3,4}</script> เป็นจำนวนเชิงซ้อน (เป็นสังยุคของจำนวนเชิงซ้อนคู่กัน)</p>
+<p>ดังนั้นรูปแบบของฟังก์ชันที่เป็นผลเฉลยของสมการเชิงอนุพันธ์ที่เป็นเอกพันธ์ เขียนได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  y_h(t) = C_1 e^{-t} + C_2 t e^{-2t} + C_3 cos(t) + C_4 sin(t)
+</script>
+โดยที่ <script type="math/tex">C_1, ..., C_4</script> เป็นค่าคงที่ใด ๆ</p>
+<p>ผลเฉลยเจาะจงสำหรับสมการเชิงอนุพันธ์ที่ไม่เป็นเอกพันธ์ ก็มีรูปแบบดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+    y_p(t) = 2 e^{-2t} \\
+</script>
+</p>
+<p>ดังนั้นเมื่อได้ผลเฉลยทั้งสองกรณีแล้ว ก็นำมาหาผลรวม</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   y(t) &= y_h(t) + y_p(t) \\
+        &= C_1 e^{-t} + C_2 t e^{-2t} + C_3 cos(t) + C_4 sin(t) + 2 e^{-2t} \\
+\end{align}
+</script>
+</p>
+<p>หากพิจารณาเงื่อนไขสำหรับค่าเริ่มต้น จะได้ผลเฉลยตามรูปแบบของฟังก์ชันดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+ y(t)= \frac{1}{2} e^{-t} + 6 t e^{-2t}
+     - \frac{5}{2} cos(t) - \frac{1}{2} sin(t) + 2 e^{-2t} \\
+</script>
+</p>
+<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยมีดังนี้</p>
+<pre><code class="language-matlab">clearvars; clc;
+syms t y(t);
+% find the derivatives of y(t) up to order 4
+D1y = diff(y,t,1);
+D2y = diff(y,t,2);
+D3y = diff(y,t,3);
+D4y = diff(y,t,4);
+ode = D4y + 2*D3y + 2*D2y + 2*D1y + y == 10*exp(-2*t);
+% solve the ODE and display the solution
+sol = simplify( dsolve(ode), 'Steps', 100 );
+disp( sol );
+% solve the ODE with initial values and
+% convert symbolic function to numeric function
+ics = [y(0)==0; D1y(0)==1; D2y(0)==-1; D3y(0)==2];
+sol = simplify(dsolve(ode, ics))
+f = matlabFunction( sol );
+% solve the system of 1st-order DEs
+[V,Y] = odeToVectorField( ode );
+F = matlabFunction( V, 'vars', {'t','Y'} );
+t0 = 0.0; tf = 20.0;
+t_interval = [t0 tf];
+ts = linspace( t0, tf, 50 );
+Y_init = double( rhs(ics)' );
+sol = ode45( F, t_interval, Y_init );
+y_symbolic = f( ts );
+y_numeric = deval( sol, ts, 1 );
+% plot both data sets
+plot( ts, y_numeric, 'o', ts, y_symbolic, '-' ), 
+grid on, xlabel('t'), ylabel('y(t)')
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4">&#9655; <strong>ตัวอย่างที่ 4</strong><a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการหาผลเฉลยของสมการเชิงอนุพันธ์  แต่จะลองเขียนโค้ด <strong>MATLAB</strong>
+โดยใช้วิธีการที่เรียกว่า <strong>Runge-Kutta (4th-order)</strong>
+โดยไม่ใช้คำสั่ง <code>ode45()</code> </p>
+<p>สมการเชิงอนุพันธ์อันดับสองต่อไปนี้
+<script type="math/tex; mode=display">
+  y''(t) + 2y'(t) + y(t) = e^{-t}, \; y(0)=1, y'(0)=0 \\ 
+</script>
+มีฟังก์ชัน <script type="math/tex">y(t)</script> ที่เป็นผลเฉลยดังนี้
+<script type="math/tex; mode=display">
+   y(t) = \frac{1}{2} e^{-t}(t^2 + 2t + 2)
+</script>
+</p>
+<p>&nbsp;</p>
+<h4 id="runge-kutta-4th-order"><strong>การคำนวณด้วยวิธีการของ Runge-Kutta (4th-order) </strong><a class="headerlink" href="#runge-kutta-4th-order" title="Permanent link">#</a></h4>
+<p>&nbsp;</p>
+<p>วิธีการของ <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods"><strong>Runge-Kutta (4th-order)</strong></a> หรือ <strong>RK4</strong> จะใช้สำหรับการผลเฉลยเชิงตัวเลขของสมการเชิงอนุพันธ์อันดับหนึ่ง
+และมีการกำหนดค่าเริ่มต้นตามรูปแบบต่อไปนี้
+<script type="math/tex; mode=display"> 
+    y' = f(t,y),  \;\;y(0) = y_0 \\
+</script>
+</p>
+<p>และการคำนวณจะเริ่มจากค่าเริ่มต้น <script type="math/tex">(t_0,y_0)</script> เพื่อคำนวณค่าของ <script type="math/tex">y</script> ในตำแหน่งถัดไปคือ
+<script type="math/tex">y_i=y_1, y_2, ...</script> สำหรับ <script type="math/tex">t_i=t_1, t_2, ...</script> ตามลำดับ 
+และให้มีระยะห่างคงที่เท่ากับ <script type="math/tex">h > 0</script> (เรียกว่า <strong>step-size</strong>) หรือ <script type="math/tex">t_{i+1} = t_i + h</script>
+</p>
+<p>สูตรในการคำนวณสำหรับ <strong>RK4</strong> สำหรับ <script type="math/tex">i=0,1,2,...</script> มีดังนี้ </p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+    k_1 &= f( t_i, y_i ) \\
+    k_2 &= f( t_i + h/2, y_i + k_1 h/2 ) \\
+    k_3 &= f( t_i + h/2, y_i + k_2 h/2 ) \\
+    k_4 &= f( t_i + h, y_i + k_3 h ) \\
+    y_{i+1} &= y_i + (k_1 + 2k_2 + 2k_3 + k_4)h/6 \\ 
+\end{align}
+</script>
+ดังนั้นถ้าจะคำนวณค่า <script type="math/tex">y_{i+1}</script> ในแต่ละรอบ จะต้องทราบค่าของ <script type="math/tex">y_i, k_1,...,k_4</script> และ <script type="math/tex">h</script>
+</p>
+<p>ถ้าจะนำไปใช้กับสมการเชิงอนุพันธ์อันดับสูงกว่าหนึ่ง จะต้องมีการแปลงให้เป็นระบบของสมการเชิงอนุพันธ์อันดับหนึ่ง
+และเขียนสูตรการคำนวณ <strong>RK4</strong> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+    K_1 &= F( t_i, Y_i ) \\
+    K_2 &= F( t_i + h/2, Y_i + K_1 h/2 ) \\
+    K_3 &= F( t_i + h/2, Y_i + K_2 h/2 ) \\
+    K_4 &= F( t_i + h, Y_i + K_3 h ) \\
+    Y_{i+1} &= Y_i + (K_1 + 2K_2 + 2K_3 + K_4)h/6 \\ 
+\end{align}
+</script>
+โดยที่ <script type="math/tex">Y</script> และ <script type="math/tex">K_1,...,K_4</script> เป็นเวกเตอร์ เช่นเดียวกับ <script type="math/tex">F(t,Y)</script> ที่ให้ค่าเป็นเวกเตอร์</p>
+<p>ดังนั้นถ้าจะเขียนโค้ด <strong>MATLAB</strong> สำหรับตัวอย่างที่ 4 โดยใช้ <strong>RK4</strong> ก็ทำได้ดังนี้</p>
+<pre><code class="language-matlab">clearvars; clc; clf;
+% set step size
+h = 0.1;
+% define time interval
+t0 = 0; tf = 10.0;
+% define timesteps
+ts = t0:h:tf;
+% Y is a vector with two elements
+Y = zeros( 2, length(ts) ); 
+% set the initial values at time t0
+Y(:,1) = [1.0, 0.0];
+% define F(t,Y) which returns a vector of two arrays
+F = @(t,Y) [Y(2); -2*Y(2) - Y(1) + exp(-t)];
+for i=1:(length(ts)-1)  
+    K1 = F( ts(i)       , Y(:,i)          );
+    K2 = F( ts(i) + h/2 , Y(:,i) + h*K1/2 );
+    K3 = F( ts(i) + h/2 , Y(:,i) + h*K2/2 );
+    K4 = F( ts(i) + h   , Y(:,i) + h*K3   );
+    Y(:,i+1) = Y(:,i) + h*(K1 + 2*K2 + 2*K3 + K4)/6; 
+end 
+
+% define the exact solution
+f_exact = @(t) (1/2).*exp(-t).*(t.^2 + 2.*t + 2);
+% plot both solutions
+plot( ts, Y(1,:), 'o', ts , f_exact(ts), '-' ), 
+grid on, xlabel('t'), ylabel('y(t)')
+</code></pre>
+<p><img alt="" src="./matlab_output4.png" /></p>
+<p>รูป: แสดงรูปกราฟของฟังก์ชัน <script type="math/tex">y(t)</script> ที่เป็นผลเฉลยซึ่งได้จากสองวิธี</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดสำหรับ <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ
+ด้วยวิธีการคำนวณเชิงสัญลักษณ์ และเปรียบเทียบกับวิธีการคำนวณเชิงตัวเลข</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-04-12 | Last Updated: 2022-04-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
