@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="RSP">
-        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/matlab/matlab_ode_solving/">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/python/python_ode_solving/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย MATLAB - IoT Engineering Education</title>
+        <title>การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย Python - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -79,7 +79,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#matlab" class="nav-link">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย MATLAB</a>
+            <li class="nav-item" data-level="1"><a href="#python" class="nav-link">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย Python</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; สมการเชิงอนุพันธ์สามัญ</a>
               <ul class="nav flex-column">
@@ -112,9 +112,10 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="matlab">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย MATLAB<a class="headerlink" href="#matlab" title="Permanent link">#</a></h1>
-<p>บทความนี้กล่าวถึง การเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ</p>
-<p><strong>Keywords:</strong> <em>MATLAB</em>, <em>Ordinary Differential Equations</em>, <em>ODE Solving</em>, 
+<h1 id="python">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วย Python<a class="headerlink" href="#python" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การเขียนโค้ด <strong>Python</strong> โดยใช้โมดูล เช่น <strong>SymPy</strong> และ <strong>NumPy / SciPy</strong>
+เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ</p>
+<p><strong>Keywords:</strong> <em>Python</em>, <em>Ordinary Differential Equations</em>, <em>ODE Solving</em>, 
 <em>Symbolic Methods</em>, <em>Numerical Methods</em></p>
 <hr />
 <h2 id="_1">&#9655; <strong>สมการเชิงอนุพันธ์สามัญ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -124,12 +125,18 @@
 <p>หากฟังก์ชันขึ้นอยู่กับตัวแปรอิสระเพียงตัวเดียว สมการเชิงอนุพันธ์นี้จะเรียกว่า สมการเชิงอนุพันธ์สามัญ (<strong>Ordinary Differential Equation: ODE</strong>) แต่ถ้ามีตัวแปรต้นหลายตัวและมีการใช้อนุพันธ์เทียบกับตัวแปรเหล่านั้นหลายตัวจะเรียกว่า สมการเชิงอนุพันธ์ย่อย (<strong>Partial Differential Equation: PDE</strong>)</p>
 <p>ในทางวิศวกรรมศาสตร์ เช่น การศึกษาและวิเคราะห์วงจรไฟฟ้าแบบเชิงเส้น (<strong>Linear Circuit Analysis</strong>)
 ก็เกี่ยวข้องกับสมการเชิงอนุพันธ์ซึ่งมีตัวแปรต้นเป็นเวลา และการหาผลเฉลยหรือรูปแบบของฟังก์ชันที่ทำให้สมการเชิงอนุพันธ์เป็นจริงนั้น ทำได้หลายวิธีในทางคณิตศาสตร์ เช่น การใช้วิธีการแปลงลาปลาส (<strong>Laplace Transforms</strong>) สำหรับสมการเชิงอนุพันธ์สามัญเชิงเส้นที่มีสัมประสิทธิ์คงตัว เป็นต้น </p>
-<p>แต่ในบทความนี้จะกล่าวถึง การใช้ซอฟต์แวร์และคำสั่งต่าง ๆ ของ <strong>MATLAB</strong> (ลองใช้เวอร์ชัน <em>R2022a</em>) ของบริษัท <strong>MathWorks</strong> เป็นตัวอย่าง โดยจำแนกเป็นสองแนวทาง คือ</p>
+<p>แต่ในบทความนี้จะกล่าวถึง การใช้ซอฟต์แวร์และคำสั่งต่าง ๆ ของ <strong>Python</strong> (ใช้เวอร์ชัน <em>Python 3.8</em>)
+โดยแบ่งเป็นสองแนวทาง คือ</p>
 <ul>
-<li>การประมวลผลเชิงสัญลักษณ์ (<strong>Symbolic Methods</strong>) โดยใช้ <a href="https://www.mathworks.com/products/symbolic.html"><strong>Symbolic Math Toolbox</strong></a></li>
-<li>การประมวลผลเชิงตัวเลข (<strong>Numerical Methods</strong>) เช่น การใช้คำสั่ง <a href="https://www.mathworks.com/help/matlab/ref/ode45.html"><code>ode45()</code></a> 
-ซึ่งเป็นการคำนวณด้วยวิธีการที่เรียกว่า <strong>Runge-Kutta (4-th order)</strong></li>
+<li>การประมวลผลเชิงสัญลักษณ์ (<strong>Symbolic Methods</strong>) โดยใช้คำสั่งของโมดูล <a href="https://sympy.org/"><strong>SymPy</strong></a></li>
+<li>การประมวลผลเชิงตัวเลข (<strong>Numerical Methods</strong>) เช่น การใช้คำสั่งของโมดูล <a href="https://numpy.org/"><strong>NumPy</strong></a> และ <a href="https://scipy.org/"><strong>SciPy</strong></a></li>
 </ul>
+<p>ในส่วนของการแสดงผล มีการใช้โมดูล <a href="https://matplotlib.org/"><strong>Matplotlib</strong></a> เพื่อแสดงรูปกราฟของฟังก์ชัน และ
+สำหรับการเขียนและรันโค้ดเพื่อดูผลลัพธ์ ก็สามารถใช้ <strong>Python IDE</strong> อย่างเช่น  <strong>Spyder 3</strong> 
+หรือจะใช้ <strong>Jupyterlab</strong> ก็ได้เช่นกัน </p>
+<p>ดังนั้นถ้าจะทดลองรันโค้ด จะต้องมีการติดตั้ง <strong>Python 3 Interpreter</strong> ในคอมพิวเตอร์ของผู้ใช้ก่อน
+(<a href="https://www.python.org/downloads/"><strong>Python Download &amp; Install</strong></a>)
+และติดตั้งโมดูล เช่น <code>matplotlib</code>, <code>numpy</code>, <code>scipy</code>, <code>ipython</code>, <code>jupyterlab</code> โดยใช้คำสั่ง <code>pip</code> </p>
 <hr />
 <h2 id="1">&#9655; <strong>ตัวอย่างที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
 <p>ตัวอย่างแรกเป็นโจทย์สมการเชิงอนุพันธ์อันดับที่หนึ่ง
@@ -156,49 +163,101 @@
    y(0) = C_1\,e^{0} = y_0 \Rightarrow y(t) = y_0\, e^{-t^2} \\
 </script>
 </p>
-<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลย <script type="math/tex">y(t)</script> ของ  <strong>ODE</strong> 
-โดยวิธีการประมวลผลเชิงสัญลักษณ์ทางคณิตศาสตร์ และการใช้คำสั่ง เช่น 
-<a href="https://www.mathworks.com/help/symbolic/diff.html"><code>diff()</code></a> เพื่อหาอนุพันธ์ของฟังก์ชัน
-และคำสั่ง <a href="https://www.mathworks.com/help/symbolic/dsolve.html"><code>dsolve()</code></a> เพื่อหาผลเฉลย มีดังนี้</p>
-<pre><code class="language-matlab">clearvars; clc;
-% Solve the ODE: y'(t) = -2*t*y = f(t,y), y(0)=1
-% using symbolic method
-syms t y(t)
-% solve the ODE without initial condition
-sol = dsolve( diff(y,t,1) == -2*t*y );
-fprintf( 'y(t) = %s', string(sol) )
-% =&gt; y(t) = C1*exp(-t^2)
-% solve the ODE with initial condition y(0)=1
-sol = dsolve( diff(y,t,1) == -2*t*y, y(0)==1 );
-fprintf( 'y(t) = %s', string(sol) )
-% =&gt; y(t) = exp(-t^2)
+<p>ตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อหาผลเฉลย <script type="math/tex">y(t)</script> ของ  <strong>ODE</strong> 
+โดยวิธีการประมวลผลเชิงสัญลักษณ์ทางคณิตศาสตร์ 
+เริ่มต้นด้วยการสร้างตัวแปรที่เป็นสัญลักษณ์ทางคณิตศาสตร์โดยใช้คำสั่ง <code>symbols()</code> ของ <strong>SymPy</strong>  ได้แก่
+<code>t</code> ซึ่งเป็นตัวแปรอิสระ และฟังก์ชันทางคณิตศาสตร์ <code>Function()</code> สำหรับ <script type="math/tex">y(t)</script>
+</p>
+<p>การหาอนุพันธ์ของฟังก์ชัน ทำได้โดยใช้คำสั่ง <a href="https://docs.sympy.org/latest/tutorial/calculus.html"><code>diff()</code></a> 
+หรือ คำสั่ง <code>Derivative()</code> กับตัวแปรที่เป็นสัญลักษณ์ <code>y(t)</code>
+และนำไปใช้ในการสร้างสมการเชิงอนุพันธ์ด้วยคำสั่ง <code>Eq()</code> ซึ่งจะต้องระบุอาร์กิวเมนต์สองตัว คือ สิ่งที่อยู่ด้านซ้ายและขวามือ
+ของเครื่องหมายเท่ากับในสมการเชิงอนุพันธ์</p>
+<p>คำสั่ง <a href="https://docs.sympy.org/latest/modules/solvers/ode.html"><code>dsolve()</code></a>
+จะถูกเรียกใช้ เพื่อหาผลเฉลยซึ่งเป็นคำตอบสำหรับฟังก์ชัน <script type="math/tex">y(t)</script> และสามารถแสดงเป็นข้อความเอาต์พุต
+ได้โดยใช้คำสั่ง <code>print()</code> หรือจะใช้ <code>display()</code> ของ <strong>IPython</strong> เพื่อแสดงผลลัพธ์ในทางคณิตศาสตร์ให้ดูง่ายขึ้น</p>
+<p>ฟังก์ชันเชิงสัญลักษณ์ที่เป็นผลเฉลย จะถูกแปลงให้เป็นฟังก์ชันที่นำไปใช้กับอาร์เรย์ของ <code>numpy</code> เพื่อคำนวณค่าได้ โดยใช้คำสั่ง
+<code>lambdify()</code></p>
+<pre><code class="language-python">from sympy import *
+import numpy as np
+import matplotlib.pyplot as plt
+from IPython.display import display, Latex
+
+# define a symbol: use t as an independent variable
+t, k = symbols('t k')
+# define a function y(t)
+y = Function('y')(t)
+# compute the first derivative of y(t)
+dydt = y.diff(t)
+# define the ODE
+ode  = Eq( dydt, -k*t*y )
+# substitute k with 2
+ode  = ode.subs( k, 2 )
+# set the initial condtion: y(0) = 1.0
+ics  = { y.subs(t,0): 1.0 }
+# solve the ODE with an initial condition (the IVP)
+sol  = dsolve( ode, ics=ics )
+print( sol.lhs, '=', sol.rhs )
+display( Eq( sol.lhs, sol.rhs ) )
+
+# convert the the solution into a callable function
+f = lambdify( t, sol.rhs )
+# create an array of 100 time steps between [0,1]
+ts = np.linspace(0,1,100)
+
+plt.clf()
+plt.plot( ts, f(ts) )
+plt.grid()
+plt.xlabel('t')
+plt.ylabel('y(t)')
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_output1-1.png" /></p>
-<p>รูป: ผลการรันโค้ด <strong>MATLAB</strong></p>
+<p><img alt="" src="python_output1-1.png" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ด <strong>Python</strong> และรันโค้ดด้วย <strong>Spyder 3 IDE</strong></p>
+<p><img alt="" src="python_output1-2.png" /></p>
+<p>รูป: กราฟแสดงผลเฉลยสำหรับฟังก์ชัน <script type="math/tex">y(t)</script> ในช่วง <script type="math/tex">t \in [0,1]</script>
+</p>
 <p>&nbsp;</p>
-<p>ในเชิงเปรียบเทียบ การเขียนโค้ด <strong>MATLAB</strong> โดยวิธีการประมวลผลเชิงตัวเลข
+<p>ในเชิงเปรียบเทียบ การเขียนโค้ด <strong>Python</strong> โดยวิธีการประมวลผลเชิงตัวเลข
 จะต้องมีการกำหนดช่วงสำหรับตัวแปร <script type="math/tex">t</script> เช่น กำหนดให้ <script type="math/tex">t \in [t_0, t_f]</script> 
-(<script type="math/tex">t_0=0.0</script> และ <script type="math/tex">t_f=2.0</script>) เป็นต้น และจะต้องกำหนดค่าตัวเลขสำหรับเงื่อนไขเริ่มต้นด้วย</p>
-<pre><code class="language-matlab">clearvars; clc;
-% Solve the OD: y'(t) = -2*t*y = f(t,y), y(0)=1
-% using numeric method
-t0 = 0.0; % start time point
-tf = 2.0; % final time point
-y0 = 1.0; % initial condition for y(0)
-% define the function f(t,y) 
-f = @(t,y) -2*t*y;
-% solve the ODE using ode45()
-[ts, ys] = ode45( f, [t0 tf], y0 );
-% plot both solutions (numeric and analytic)
-plot( ts, ys, 'o', ts, exp( -ts.^2 ), '-' ), 
-grid on, xlabel('t'), ylabel('y(t)'),legend('numeric', 'symbolic')
+(<script type="math/tex">t_0=0.0</script> และ <script type="math/tex">t_f=1.0</script>) เป็นต้น และจะต้องกำหนดค่าตัวเลขสำหรับเงื่อนไขเริ่มต้นด้วย 
+<script type="math/tex">y(t_0) = y_0</script> ซึ่งจะถูกใช้เป็นจุดเริ่มต้นในการคำนวณของค่าของฟังก์ชันในตำแหน่งของ <script type="math/tex">t</script> ถัดไป</p>
+<p>การหาผลเฉลยของสมการเชิงอนุพันธ์ด้วย <strong>Python</strong> เราสามารถใช้คำสั่ง <code>solve_ivp()</code>
+ของ <code>scipy.integrate</code> ได้ดังนี้</p>
+<pre><code class="language-python">import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+
+t0 = 0.0  # start point for t
+tf = 1.0  # end point for t
+h  = 0.05 # step size
+y0 = 1.0  # initial value: y(t0) = y0
+k  = 2
+
+# the exact solution found by analytic method
+f_exact = lambda t,y0: y0*np.exp(-k/2*ts**2)
+
+# y' = f(t,y) = -k*t*y
+f = lambda t,y: -k*t*y
+
+ts = np.arange(t0,tf,h) # array of time steps
+sol = solve_ivp( f, [t0,tf], [y0], t_eval=ts, method='RK45' )
+
+plt.clf()
+plt.plot( ts, sol.y[0], 'o', ts, f_exact(ts,y0), '-' )
+plt.grid()
+plt.xlabel( 't' )
+plt.ylabel( 'y(t)' )
+plt.legend( ['numeric','analytic'] )
+plt.show()
 </code></pre>
-<p>การใช้คำสั่ง  <code>ode45()</code> จะต้องมีอาร์กิวเมนต์ เช่น 
-ฟังก์ชัน <code>f</code> สำหรับการคำนวณค่าของ <script type="math/tex">f(t,y)</script> การกำหนดช่วงเวลาในการคำนวณสำหรับตัวแปร <code>t</code>
-และจะต้องกำหนดค่าเริ่มต้น <code>y0</code> สำหรับ <script type="math/tex">y(t_0)</script> ตามลำดับ</p>
-<p>ผลจากการใช้คำสั่ง <code>ode45()</code> จะได้ชุดข้อมูลตัวเลขซึ่งเป็นอาร์เรย์สำหรับเวลา (<strong>time steps</strong>) และค่าของฟังก์ชันที่จุดเวลาต่าง ๆ 
-อ้างอิงโดยตัวแปร <code>ts</code> และ <code>ys</code> ตามลำดับ ดังนั้นหากต้องการตรวจสอบดูค่าของฟังก์ชันในเชิงเวลา ก็นำไปแสดงรูปกราฟ </p>
-<p><img alt="" src="matlab_output1-2.png" /></p>
+<p>การใช้คำสั่ง  <code>solve_ivp()</code> จะต้องมีอาร์กิวเมนต์ เช่น 
+ฟังก์ชัน <code>f</code> สำหรับการคำนวณค่าของ <script type="math/tex">f(t,y)</script> การกำหนดค่าสำหรับตัวแปร <code>ts</code>
+(เป็นอาร์เรย์ของ <strong>Time Steps</strong>) ในช่วง <code>[t0,tf]</code> ซึ่งมีระยะห่างคงที่  <code>h</code> เท่ากับ <code>0.05</code><br />
+และจะต้องกำหนดค่าเริ่มต้น เช่น <code>[y0]</code>สำหรับ <script type="math/tex">y(t_0)</script> ให้มีค่าเท่ากับ <code>1.0</code> ตามลำดับ 
+และมีการเลือกวิธีการในการหาผลเฉลย <code>method</code> ให้เป็น <code>RK45</code> ซึ่งหมายถึง 
+<a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods"><strong>Runge-Kutta (4-th order)</strong></a></p>
+<p>ผลจากการใช้คำสั่ง <code>solve_ivp()</code> สามารถนำไปใช้ในการแสดงรูปกราฟจากชุดข้อมูล</p>
+<p><img alt="" src="python_output1-3.png" /></p>
 <p>รูป: แสดงรูปกราฟเปรียบระหว่างผลเฉลยที่ได้จากสองวิธีการ</p>
 <p>&nbsp;</p>
 <hr />
@@ -303,39 +362,51 @@ grid on, xlabel('t'), ylabel('y(t)'),legend('numeric', 'symbolic')
 </p>
 <p>จะเห็นได้ว่า การหาผลเฉลยของสมการเชิงอนุพันธ์ในตัวอย่างนี้มีหลายขั้นตอน </p>
 <p>&nbsp;</p>
-<p>ถัดไปลองมาดูตัวอย่างเขียนโค้ด <strong>MATLAB</strong> ด้วยวิธีการคำนวณเชิงสัญลักษณ์เพื่อใช้ในการหาคำตอบ</p>
-<pre><code class="language-matlab">clearvars; clc; clf;
-% 2nd-order ODE: y'' + 2y' + y = sin(2t)
-% Initial conditions: y(0)=-1, y'(0)=1
-syms t y(t)
-% the first derivative of y(t)
-D1y = diff(y,t,1);
-% the first derivative of y(t)
-D2y = diff(y,t,2);
-% write the dififerential equation
-ode = D2y + 2*D1y + y == sin(2*t);
-% define the vector of initial values
-ics = [y(0)==-1, D1y(0)==1];
-% solve the ODE without initial values to find y(t)
-y(t) = simplify( expand( dsolve(ode) ) );
-% rewrite the solution y(t)
-y(t) = collect( y(t), [exp(-t)]) 
-D1y  = collect( diff( y,t ), exp(-t))
-% solve the linear equation system to find C1 and C2
-solve( [y(0)==-1, D1y(0)==1] )
-% solve the ODE with initial values and simplify the solution
-y(t) = simplify( dsolve(ode, ics), 'Steps', 100 )
-% convert symbolic expression to Latex string
-tex_str = latex(y(t));
-% plot the solution y(t) for t in [t0 tf]
-t0=0.0; tf=10.0;
-fplot( y(t), [t0 tf] ), grid on, 
-xlabel('t'), ylabel('y(t)'), ylim([-1 0.5]), 
-legend( ['$y(t)=' tex_str '$'],'Interpreter','latex' ), 
-legend( 'boxoff')
+<p>ถัดไปลองมาดูตัวอย่างเขียนโค้ด <strong>Python</strong> ด้วยวิธีการคำนวณเชิงสัญลักษณ์ เพื่อใช้ในการหาคำตอบ</p>
+<pre><code class="language-python">from sympy import *
+import numpy as np
+import matplotlib.pyplot as plt
+from IPython.display import display, Latex
+
+# define a symbol: use t as an independent variable
+t = symbols('t')
+# define a function y(t)
+y = Function('y')(t)
+# compute the first derivate of y(t)
+D1y = y.diff(t)
+D2y = y.diff(t,2)
+
+# 2nd-order ODE: y'' + 2y' + y = sin(2t)
+# Initial conditions: y(0)=-1, y'(0)=1
+
+# define the ODE
+ode  = Eq( D2y + 2*D1y + y, sin(2*t) )
+# set the initial condtion: y(0) = 1.0
+ics  = { y.subs(t,0): -1.0, D1y.subs(t,0): 1.0 }
+# solve the ODE with an initial condition (the IVP)
+sol  = dsolve( ode, ics=ics )
+print( sol.lhs, '=', sol.rhs )
+display( Eq( sol.lhs, sol.rhs ) )
+# =&gt; y(t) = (0.4*t - 0.84)*exp(-t) - 3*sin(2*t)/25 - 4*cos(2*t)/25
+
+# convert the the solution into a callable function
+f = lambdify( t, sol.rhs )
+# create an array of 100 time steps between [t0,tf]
+t0 = 0.0
+tf = 10.0
+ts = np.linspace(t0,tf,100)
+
+plt.clf()
+plt.plot( ts, f(ts) )
+plt.grid()
+plt.xlabel('t')
+plt.ylabel('y(t)')
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_output2-1.png" /></p>
-<p>รูป: แสดงรูปกราฟสำหรับ <script type="math/tex">y(t)</script> ที่ได้จากการคำนวณเชิงสัญลักษณ์ด้วย <strong>MATLAB</strong></p>
+<p><img alt="" src="python_output2-1.png" /></p>
+<p>รูป: ตัวอย่างการรันโค้ดใน <strong>Spyder IDE</strong> สำหรับตัวอย่างที่ 2</p>
+<p><img alt="" src="python_output2-2.png" /></p>
+<p>รูป: แสดงรูปกราฟสำหรับ <script type="math/tex">y(t)</script> ที่ได้จากการคำนวณเชิงสัญลักษณ์ด้วย <strong>SymPy</strong></p>
 <p>&nbsp;</p>
 <p>การหาผลเฉลยสำหรับสมการเชิงอนุพันธ์ที่มีอันดับมากกว่าหนึ่ง มีอีกวิธีหนึ่งคือ
 การแปลงสมการดังกล่าวให้เป็นระบบสมการอนุพันธ์ที่มีอันดับเป็นหนึ่ง ซึ่งมีแนวทางดังนี้</p>
@@ -378,78 +449,81 @@ legend( 'boxoff')
 </script>
 </p>
 <p>&nbsp;</p>
-<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> โดยใช้การคำนวณเชิงสัญลักษณ์มีดังนี้</p>
-<pre><code class="language-matlab">clearvars; clc; clf;
-% ODE: y'' + 2y' + y = sin(2*t), y(0)=-1.0, y'(0)=1.0
-syms t y(t) z1(t) z2(t);
-% Z is a vector of two functions z1(t) and z2(t)
-Z = [z1(t), z2(t)];
-% rewrite the 2nd-order ODE into a first-oder system
-eq1 = diff(Z(1),t) == Z(2);
-eq2 = diff(Z(2),t) == -2*Z(2) - Z(1) + sin(2*t);
-ode = [eq1, eq2];
-% define the vector of initial values
-ics = [subs(Z(1),t,0)==-1, subs(Z(2),t,0)==1];
-% solve the first-order DE system
-[Z(1),Z(2)] = dsolve( ode, ics );
-y(t) = simplify( Z(1) )
-% plot the solution y(t) 
-t0=0.0; tf=10.0;
-t_interval = [t0 tf];
-fplot( y(t), t_interval ), 
-grid on, xlabel('t'), ylabel('y(t)')
+<p>ตัวอย่างการเขียนโค้ด <strong>Python</strong> โดยใช้การคำนวณเชิงสัญลักษณ์ในรูปแบบเมทริกซ์และเวกเตอร์ มีดังนี้</p>
+<pre><code class="language-python">from sympy import *
+from sympy.solvers.ode.systems import dsolve_system
+import numpy as np
+import matplotlib.pyplot as plt
+from IPython.display import display, Latex
+
+# define a symbol: use t as an independent variable
+t = symbols('t')
+# define a function y(t)
+y, z1, z2 = symbols('y z1 z2', cls=Function)
+# compute the first and second derivatives of y(t)
+D1y = Derivative(y(t),t,1)
+D2y = Derivative(y(t),t,2)
+
+# 2nd-order ODE: y'' + 2y' + y = sin(2t)
+# Initial conditions: y(0)=-1, y'(0)=1
+
+# define the ODE (system of 1st-order differential equations)
+# [z1'(t), z2'(t)] = [ z2(t), f(t,z1,z2) ]
+ode  = [ Eq( z1(t).diff(t), z2(t) ), 
+         Eq( z2(t).diff(t), -2*z2(t) -z1(t) + sin(2*t) ) ]
+
+# set the initial condtion: y(0) = 1.0
+ics  = { z1(0): -1.0, z2(0): 1.0 }
+# solve the ODE with an initial condition (the IVP)
+sol = dsolve_system( ode, ics=ics )
+
+# =&gt; y(t) = (0.4*t - 0.84)*exp(-t) - 3*sin(2*t)/25 - 4*cos(2*t)/25
+sol_eq = sol[0][0] # get y(t) from z1(t)
+for i in range(5): # repeat simplification for 5 steps
+    sol_eq = simplify( expand( sol_eq) ) 
+display( expand(sol_eq) )
+
+# convert the the solution into a callable function
+f = lambdify( t, sol_eq.rhs )
+# create an array of 100 time steps between [t0,tf]
+t0 = 0.0
+tf = 10.0
+ts = np.linspace(t0,tf,100)
+
+plt.clf()
+plt.plot( ts, f(ts), 'o' )
+plt.grid()
+plt.xlabel('t')
+plt.ylabel('y(t)')
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_output2-2.png" /></p>
-<p>รูป: ผลลัพธ์จากการรันโค้ด <strong>MATLAB</strong> (บางส่วน)</p>
-<p>ลองมาดูตัวอย่างการคำนวณด้วยวิธีเชิงตัวเลข โดยใช้คำสั่ง <code>ode45()</code> เปรียบเทียบกับวิธีเชิงสัญลักษณ์</p>
-<pre><code class="language-matlab">clearvars; clc; clf;
-% ODE: y'' + 2y' + y = sin(2t), y(0)=-1, y'(0)=1
-% define the function of the 1st-order DE system
-f = @(t,Z) [Z(2); -2*Z(2) - Z(1) + sin(2*t)];
-% set the interval
-t0=0.0; tf=10.0; t_interval = [t0 tf];
-% set the vector of initial values
-Z_init = [-1.0 1.0];
-% solve the DE system numerically by calling ode45()
-sol = ode45( f, t_interval, Z_init );
-% create a vector of 100 time steps in [t0,tf]
-ts = linspace( t0, tf, 100 );
-% call deval() to evaluate the values of y(t) = Z(1) 
-y_numeric  = deval( sol, ts, 1 );
-% evaluate the values of y(t) provided by the symbolic method
-y_symbolic = (10*ts - 21).*exp(-ts)/25 - cos(2*ts-atan(3/4))/5;
-plot( ts, y_numeric, 'o', ts, y_numeric, '-' ), 
-grid on, xlabel('t'), ylabel('y(t)'), legend('numeric','symbolic')
+<p><img alt="" src="python_output2-3.png" /></p>
+<p>รูป: ผลลัพธ์จากการรันโค้ดเพื่อสาธิตการใช้คำสั่ง <code>dsolve_system()</code></p>
+<p>ลองมาดูตัวอย่างการคำนวณด้วยวิธีเชิงตัวเลข โดยใช้คำสั่ง <code>solve_ivp()</code> ของ <strong>SciPy</strong></p>
+<pre><code class="language-python">import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+
+# 2nd-order ODE: y'' + 2y' + y = sin(2t)
+# Initial conditions: y(0)=-1, y'(0)=1
+
+t0 = 0.0   # start point for t
+tf = 10.0  # end point for t
+h  = 0.05  # step size
+
+f = lambda t,z: [z[1], -2*z[1] - z[0] + np.sin(2*t) ]
+ts  = np.arange(t0,tf,h) # array of time steps
+sol = solve_ivp( f, [t0,tf], [-1,1], t_eval=ts, method='RK45' )
+
+plt.clf()
+plt.plot( ts, sol.y[0], 'o' )
+plt.grid()
+plt.xlabel( 't' )
+plt.ylabel( 'y(t)' )
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_output2-3.png" /></p>
-<p>รูป: แสดงรูปกราฟของฟังก์ชันที่เป็นผลเฉลยซึ่งได้จากสองวิธีและเปรียบเทียบกัน</p>
-<p><strong>MATLAB</strong> มีคำสั่ง เช่น <code>odeToVectorField()</code> สำหรับแปลงสมการเชิงอนุพันธ์ที่มีอันดับมากกว่าหนึ่ง
-ให้เป็นสมการเชิงอนุพันธ์อันดับหนึ่งในรูปเมทริกซ์หรือเวกเตอร์ และคำสั่ง <code>matlabFunction()</code> สำหรับ
-แปลงผลลัพธ์ที่ได้ให้เป็นฟังก์ชันสำหรับนำไปใช้ได้กับคำสั่ง <code>ode45()</code> ดังนี้</p>
-<pre><code class="language-matlab">clearvars; clc; clf;
-% ODE: y'' + 2y' + y = sin(2*t), y(0)=-1, y'(0)=1
-% Use symbolic method to determine the function for ode45()
-syms t y(t)
-eqn = diff(y,t,2) == -2*diff(y,t) - y + sin(2*t);
-% convert a higher-order ODE to a system of 1st-order DEs
-% Y is a two-element vector with Y(1)=y(t) and Y(2)=y'(t)
-% V = [ Y(2); -2Y(2) - Y(1) + sin(2t)]
-[V,Y] = odeToVectorField(eqn);
-% convert symbolic expression to a function handle
-f = matlabFunction( V, 'vars', {'t','Y'} );
-% set time interval
-t0=0.0; tf=10.0; t_interval = [t0 tf];
-% set the vector of initial values
-Y_init = [-1.0 1.0];
-% solve the ODE numerically with ode45()
-sol = ode45( f, t_interval, Y_init );
-% define an array of 100 time steps
-ts = linspace(t0,tf,100);
-% evaluate the solution of the DE problem
-y_numeric = deval( sol, ts, 1 );
-plot( ts, y_numeric ), 
-grid on, xlabel('t'), ylabel('y(t)')
-</code></pre>
+<p><img alt="" src="python_output2-4.png" /></p>
+<p>รูป: แสดงรูปกราฟของฟังก์ชันที่เป็นผลเฉลยเมื่อใช้คำสั่ง <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html"><code>solve_ivp()</code></a> </p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="3">&#9655; <strong>ตัวอย่างที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
@@ -467,10 +541,11 @@ grid on, xlabel('t'), ylabel('y(t)')
   \Rightarrow\; (s+1)^2(s^2 + 1 ) = 0 \\
 </script>
 </p>
-<p>อาจลองเขียนโค้ดและใช้คำสั่งของ <strong>MATLAB</strong> ในการแก้สมการเพื่อหารากของสมการได้ดังนี้ </p>
-<pre><code class="language-matlab">syms s
-roots = solve( s^4 + 2*s^3 + 2*s^2 + 2*s + 1 == 0, s )';
-disp(roots)
+<p>อาจลองเขียนโค้ดและใช้คำสั่งของ <strong>SymPy</strong> ในการแก้สมการเพื่อหารากของสมการได้ดังนี้ </p>
+<pre><code class="language-python">s = symbols('s')
+roots = solve( Eq(s**4 + 2*s**3 + 2*s**2 + 2*s + 1,0), s )
+print(roots)
+# =&gt; [-1, -I, I]
 </code></pre>
 <p>รากของสมการซึ่งมีดีกรีของพหุนามเท่ากับ 4 หาได้ดังนี้</p>
 <p>
@@ -482,7 +557,7 @@ disp(roots)
 <p>ดังนั้นรูปแบบของฟังก์ชันที่เป็นผลเฉลยของสมการเชิงอนุพันธ์ที่เป็นเอกพันธ์ เขียนได้ดังนี้</p>
 <p>
 <script type="math/tex; mode=display">
-  y_h(t) = C_1 e^{-t} + C_2 t e^{-t} + C_3 cos(t) + C_4 sin(t)
+  y_h(t) = C_1 e^{-t} + C_2 t\, e^{-t} + C_3 cos(t) + C_4 sin(t)
 </script>
 โดยที่ <script type="math/tex">C_1, ..., C_4</script> เป็นค่าคงที่ใด ๆ</p>
 <p>ผลเฉลยเจาะจงสำหรับสมการเชิงอนุพันธ์ที่ไม่เป็นเอกพันธ์ ก็มีรูปแบบดังนี้</p>
@@ -496,54 +571,63 @@ disp(roots)
 <script type="math/tex; mode=display">
 \begin{align}
    y(t) &= y_h(t) + y_p(t) \\
-        &= C_1 e^{-t} + C_2 t e^{-t} + C_3 cos(t) + C_4 sin(t) + 2 e^{-2t} \\
+        &= C_1 e^{-t} + C_2 t\, e^{-t} + C_3 cos(t) + C_4 sin(t) + 2 e^{-2t} \\
 \end{align}
 </script>
 </p>
 <p>หากพิจารณาเงื่อนไขสำหรับค่าเริ่มต้น จะได้ผลเฉลยตามรูปแบบของฟังก์ชันดังนี้</p>
 <p>
 <script type="math/tex; mode=display">
- y(t)= \frac{1}{2} e^{-t} + 6 t e^{-t}
+ y(t)= \frac{1}{2} e^{-t} + 6 t\, e^{-t}
      - \frac{5}{2} cos(t) - \frac{1}{2} sin(t) + 2 e^{-2t} \\
 </script>
 </p>
-<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยมีดังนี้</p>
-<pre><code class="language-matlab">clearvars; clc;
-syms t y(t);
-% find the derivatives of y(t) up to order 4
-D1y = diff(y,t,1);
-D2y = diff(y,t,2);
-D3y = diff(y,t,3);
-D4y = diff(y,t,4);
-ode = D4y + 2*D3y + 2*D2y + 2*D1y + y == 10*exp(-2*t);
-% solve the ODE and display the solution
-sol = simplify( dsolve(ode), 'Steps', 100 );
-disp( sol );
-% solve the ODE with initial values and
-% convert symbolic function to numeric function
-ics = [y(0)==0; D1y(0)==1; D2y(0)==-1; D3y(0)==2];
-sol = simplify(dsolve(ode, ics))
-f = matlabFunction( sol );
-% solve the system of 1st-order DEs
-[V,Y] = odeToVectorField( ode );
-F = matlabFunction( V, 'vars', {'t','Y'} );
-t0 = 0.0; tf = 20.0;
-t_interval = [t0 tf];
-ts = linspace( t0, tf, 50 );
-Y_init = double( rhs(ics)' );
-sol = ode45( F, t_interval, Y_init );
-y_symbolic = f( ts );
-y_numeric = deval( sol, ts, 1 );
-% plot both data sets
-plot( ts, y_numeric, 'o', ts, y_symbolic, '-' ), 
-grid on, xlabel('t'), ylabel('y(t)')
+<p>ตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อหาผลเฉลยเชิงตัวเลข มีดังนี้</p>
+<pre><code class="language-python">import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+
+# ODE: 
+#  D4y + 2*D3y + 2*D2y + 2*D1y + y = 10*exp(-2*t);
+# Initial conditions:
+#  y(0)==0; D1y(0)==1; D2y(0)==-1; D3y(0)==2
+
+t0 = 0.0   # start point for t
+tf = 20.0  # end point for t
+h  = 0.1   # step size
+
+def f(t,z):
+    dz1 = z[1]
+    dz2 = z[2]
+    dz3 = z[3]
+    dz4 = -2*z[3] - 2*z[2] - 2*z[1] - z[0] + 10*np.exp(-2*t)
+    return [dz1,dz2,dz3,dz4]
+
+def f_exact(t):
+    return (1/2)*np.exp(-t) + (6*t)*np.exp(-t) \
+            - (5/2)*np.cos(t) - (1/2)*np.sin(t) + 2*np.exp(-2*t)
+
+ics = [0,1,-1,2]        # vector of initial values
+ts = np.arange(t0,tf,h) # array of time steps
+# solve the ODE system numerically 
+sol = solve_ivp( f, [t0,tf], ics, t_eval=ts, method='RK45' )
+
+plt.clf()
+# plot the numerical solution compared with the analytic solution
+plt.plot( ts, sol.y[0], 'o', ts, f_exact(ts) )
+plt.grid()
+plt.xlabel( 't' )
+plt.ylabel( 'y(t)' )
+plt.legend( ['numeric','analytic'] )
+plt.show()
 </code></pre>
+<p><img alt="" src="python_output3-1.png" /></p>
+<p>รูป: กราฟของฟังก์ชันที่เป็นผลเฉลย</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="4">&#9655; <strong>ตัวอย่างที่ 4</strong><a class="headerlink" href="#4" title="Permanent link">#</a></h2>
-<p>ถัดไปเป็นการหาผลเฉลยของสมการเชิงอนุพันธ์  แต่จะลองเขียนโค้ด <strong>MATLAB</strong>
-โดยใช้วิธีการที่เรียกว่า <strong>Runge-Kutta (4th-order)</strong>
-โดยไม่ใช้คำสั่ง <code>ode45()</code> </p>
+<p>ถัดไปเป็นการหาผลเฉลยของสมการเชิงอนุพันธ์  แต่จะลองเขียนโค้ด <strong>Python</strong>
+โดยใช้วิธีการที่เรียกว่า <strong>Runge-Kutta (4th-order)</strong></p>
 <p>สมการเชิงอนุพันธ์อันดับสองต่อไปนี้
 <script type="math/tex; mode=display">
   y''(t) + 2y'(t) + y(t) = e^{-t}, \; y(0)=1, y'(0)=0 \\ 
@@ -592,45 +676,58 @@ grid on, xlabel('t'), ylabel('y(t)')
 \end{align}
 </script>
 โดยที่ <script type="math/tex">Y</script> และ <script type="math/tex">K_1,...,K_4</script> เป็นเวกเตอร์ เช่นเดียวกับ <script type="math/tex">F(t,Y)</script> ที่ให้ค่าเป็นเวกเตอร์</p>
-<p>ดังนั้นถ้าจะเขียนโค้ด <strong>MATLAB</strong> สำหรับตัวอย่างที่ 4 โดยใช้ <strong>RK4</strong> ก็ทำได้ดังนี้</p>
-<pre><code class="language-matlab">clearvars; clc; clf;
-% set step size
-h = 0.1;
-% define time interval
-t0 = 0; tf = 10.0;
-% define timesteps
-ts = t0:h:tf;
-% Y is a vector with two elements
-Y = zeros( 2, length(ts) ); 
-% set the initial values at time t0
-Y(:,1) = [1.0, 0.0];
-% define F(t,Y) which returns a vector of two arrays
-F = @(t,Y) [Y(2); -2*Y(2) - Y(1) + exp(-t)];
-for i=1:(length(ts)-1)  
-    K1 = F( ts(i)       , Y(:,i)          );
-    K2 = F( ts(i) + h/2 , Y(:,i) + h*K1/2 );
-    K3 = F( ts(i) + h/2 , Y(:,i) + h*K2/2 );
-    K4 = F( ts(i) + h   , Y(:,i) + h*K3   );
-    Y(:,i+1) = Y(:,i) + h*(K1 + 2*K2 + 2*K3 + K4)/6; 
-end 
+<p>ดังนั้นถ้าจะเขียนโค้ด <strong>Python</strong> สำหรับตัวอย่างที่ 4 โดยใช้ <strong>RK4</strong> ก็ทำได้ดังนี้</p>
+<pre><code class="language-python">import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+import math
 
-% define the exact solution
-f_exact = @(t) (1/2).*exp(-t).*(t.^2 + 2.*t + 2);
-% plot both solutions
-plot( ts, Y(1,:), 'o', ts , f_exact(ts), '-' ), 
-grid on, xlabel('t'), ylabel('y(t)')
+t0 = 0.0   # start point for t
+tf = 10.0  # end point for t
+h  = 0.2   # step size
+
+def F(t,Y):
+    dY1 = Y[1]
+    dY2 =-2*Y[1] - Y[0] + math.exp(-t)
+    return np.array([dY1,dY2])
+
+ics = [1.0,0.0]
+ts = np.arange(t0,tf,h) # array of time steps
+
+Y = np.zeros( (len(ts),2) ); 
+Y[0][:] = np.array(ics)
+
+for i in range(0,len(ts)-1):  
+    K1 = F( ts[i]       , Y[i][:]          );
+    K2 = F( ts[i] + h/2 , Y[i][:] + h*K1/2 );
+    K3 = F( ts[i] + h/2 , Y[i][:] + h*K2/2 );
+    K4 = F( ts[i] + h   , Y[i][:] + h*K3   );
+    Y[i+1][:] = Y[i][:] + h*(K1 + 2*K2 + 2*K3 + K4)/6; 
+
+Y = Y.T # transpose
+
+f_exact = lambda t: (1/2)*np.exp(-t)*(t**2 + 2*t + 2);
+
+plt.clf()
+# plot the numerical solution compared with the analytic solution
+plt.plot( ts, Y[0], 'o', ts, f_exact(ts), '-' )
+plt.grid()
+plt.xlabel( 't' )
+plt.ylabel( 'y(t)' )
+plt.legend(['numeric','analytic'])
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_output4.png" /></p>
-<p>รูป: แสดงรูปกราฟของฟังก์ชัน <script type="math/tex">y(t)</script> ที่เป็นผลเฉลยซึ่งได้จากสองวิธี</p>
+<p><img alt="" src="python_output4-1.png" /></p>
+<p>รูป: กราฟของฟังก์ชันที่เป็นผลเฉลย</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
-<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดสำหรับ <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดสำหรับ <strong>Python</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ
 ด้วยวิธีการคำนวณเชิงสัญลักษณ์ และเปรียบเทียบกับวิธีการคำนวณเชิงตัวเลข</p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-04-12 | Last Updated: 2022-04-15</p></div>
+<p>Created: 2022-04-14 | Last Updated: 2022-04-15</p></div>
             </div>
         </div>
 
