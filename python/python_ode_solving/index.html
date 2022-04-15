@@ -180,7 +180,7 @@
 <pre><code class="language-python">from sympy import *
 import numpy as np
 import matplotlib.pyplot as plt
-from IPython.display import display, Latex
+from IPython.display import display
 
 # define a symbol: use t as an independent variable
 t, k = symbols('t k')
@@ -260,6 +260,119 @@ plt.show()
 <p><img alt="" src="python_output1-3.png" /></p>
 <p>รูป: แสดงรูปกราฟเปรียบระหว่างผลเฉลยที่ได้จากสองวิธีการ</p>
 <p>&nbsp;</p>
+<p><strong> การคำนวณด้วยวิธีการของออยเลอร์ (Euler Method) </strong></p>
+<p>วิธีการคำนวณเชิงตัวเลข เพื่อหาค่าประมาณของผลเฉลยของสมการเชิงอนุพันธ์อันดับหนึ่ง มีหลายวิธี แต่วิธีการหนึ่งที่เป็นพื้นฐาน
+เรียกว่า <a href="https://en.wikipedia.org/wiki/Backward_Euler_method"><strong>Euler Method</strong></a> 
+แบ่งเป็นสองกรณีคือ </p>
+<ol>
+<li><strong>Forward (Explicit) Euler Method</strong></li>
+<li><strong>Backward (Implicit) Euler Method</strong></li>
+</ol>
+<p>อนุพันธ์อันดับหนึ่งของฟังก์ชัน <script type="math/tex">y(t)</script> ก็คือ <script type="math/tex">y'(t)</script> หรือ เขียนค่าประมาณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   y'(t) = \frac{d}{dt}y(t) \approx \frac{y(t+h) - y(t)}{h}, \; h \rightarrow 0 \\
+   y(t+h) \approx y(t) + h\, y'(t) \\
+</script>
+</p>
+<p>จากสมการเชิงอนุพันธ์อันดับหนึ่ง <script type="math/tex">y'(t) = f(t,y)</script> ก็สามารถเขียนสูตรการคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   y(t+h) \approx y(t) + h\, f(t,y) \\
+</script>
+</p>
+<p>ถ้าให้ <script type="math/tex">h</script> เป็นระยะห่างและมีค่าคงที่ (เรียกว่า <strong>step-size</strong>) 
+การคำนวณจะเริ่มจากจุดแรก คือ <script type="math/tex">(t_0, y(t_0))</script> ไปยังตำแหน่งถัดไป
+คือ <script type="math/tex">(t_0+h, y(t_0+h))</script> ซึ่งหมายถึง <script type="math/tex">(t_1, y(t_1))</script> ในทิศทางไปข้างหน้า 
+(ค่าของ <script type="math/tex">t</script> เพิ่มขึ้น และ <script type="math/tex">t_0 < t_1</script>)</p>
+<p>ดังนั้นการคำนวณด้วยวิธี  <strong>Forward Euler Method</strong> จะเป็นดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+    y_{i+1} &= y_{i} + h\,y'(t_{i}) \\
+            &= y_{i} + h\,f(t_{i},y_{i}), \;\; i=0,1,2,... \\
+\end{align}
+</script>
+</p>
+<p>โดยเริ่มต้นที่จุด <script type="math/tex">(t_0,y_0), y_0 = y(0)</script> และคำนวณค่าถัดไปของฟังก์ชันในตำแหน่งถัดไป
+<script type="math/tex">y_1, y_2, ..., y_i</script> สำหรับ <script type="math/tex">t_1, t_2, ..., t_i</script> ตามลำดับ</p>
+<p>จากโจทย์ในตัวอย่างที่ 1 ก็สามารถเขียนสูตรการคำนวณตามวิธีของออยเลอร์แบบมองไปข้างหน้าได้ดังนี้
+<script type="math/tex; mode=display">
+  \begin{align}
+     y'(t) &= -2 t\, y(t) = f(t,y) \\
+     y_{0} &= 1 \\
+   y_{i+1} &= y_{i} - 2 h\, t_{i}\, y_{i}, \;\; i=0,1,2,... \\
+  \end{align}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>แต่ถ้าเป็นวิธี  <strong>Backward Euler Method</strong> จะเป็นดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+    y_{i+1} &= y_{i} + h\,y'(t_{i+1}) \\
+            &= y_{i} + h\,f(t_{i+1},y_{i+1}), \;\; i=0,1,2,... \\
+\end{align}
+</script>
+</p>
+<p>ซึ่งจะต้องมีจัดรูปใหม่หรือการแก้สมการ เพื่อหาค่า <script type="math/tex">y_{i+1}</script> ในการคำนวณ
+และสำหรับโจทย์ตัวอย่างที่ 1 จะเขียนสูตรการคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+ \begin{align}
+   y'(t) &= -2 t\, y(t) = f(t,y) \\
+    y_0  &= 1 \\
+    y_{i+1} &= y_{i} - 2 h\, t_{i+1}, y_{i+1}, \;\; i=0,1,2,... \\
+  \end{align}
+</script>
+และถ้านำไปจัดรูปใหม่ของสมการ จะได้เป็น
+<script type="math/tex; mode=display">
+\begin{align}
+    y_{i+1} &= y_{i} - 2 h\, t_{i+1}, y_{i+1} \\
+    y_{i+1}(1 + 2 h\, t_{i+1}) &= y_{i} \\
+    y_{i+1} &= \frac{y_{i}}{(1 + 2 h\, t_{i+1})}, \;\; i=0,1,2,... \\
+\end{align}
+</script>
+</p>
+<p>ลองมาดูตัวอย่างการเขียนโค้ด <strong>Python</strong> สำหรับสองวิธี และเปรียบเทียบผลลัพธ์ที่ได้ </p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# y'(t) = -2*t*y(t) = f(t,y) 
+t0 = 0.0  # start point for t
+tf = 1.0  # end point for t
+h  = 0.05 # step size
+y0 = 1.0  # initial value: y(t0) = y0
+
+f = lambda t,y: -2*t*y
+f_exact = lambda t: np.exp(-t**2)
+ts = np.arange(t0,tf,h)
+
+# forward Euler
+y = np.zeros( len(ts) )
+y[0] = y0
+for i in range(len(ts)-1):
+    y[i+1] = y[i] + h*f(ts[i],y[i])
+y_f = y
+
+# backward Euler
+y = np.zeros( len(ts) )
+y[0] = y0
+for i in range(len(ts)-1):
+    y[i+1] = y[i] / (1+2*h*ts[i+1])
+y_b = y
+
+plt.clf()
+plt.plot( ts, y_f, 'o', ts, y_b, 'o', ts, f_exact(ts), '-')
+plt.grid()
+plt.xlabel( 't' )
+plt.ylabel( 'y(t)' )
+plt.legend(['forward','backward','analytic'])
+plt.show()
+</code></pre>
+<p><img alt="" src="python_output1-4.png" /></p>
+<p>รูป: แสดงรูปกราฟเปรียบระหว่างผลเฉลยที่ได้จากสองวิธีการของออยเลอร์</p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="2">&#9655; <strong>ตัวอย่างที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
 <p>ตัวอย่างที่สองเป็นสมการเชิงอนุพันธ์อันดับที่สองที่มีการกำหนดค่าเริ่มต้นสองเงื่อนไข</p>
@@ -270,7 +383,7 @@ plt.show()
 </script>
 </p>
 <p>หากใช้วิธีการในทางคณิตศาสตร์สำหรับสมการเชิงอนุพันธ์สามัญเชิงเส้นที่มีสัมประสิทธิ์คงตัว 
-ให้เริ่มต้นด้วยการกำหนดให้ทางซ้ายของสมการเป็นศูนย์ ซึ่งจะได้สมการที่เป็นเอกพันธ์ (<strong>Homogeneous</strong>) 
+ให้เริ่มต้นด้วยการกำหนดให้ทางขวาของสมการเป็นศูนย์ ซึ่งจะได้สมการที่เป็นเอกพันธ์ (<strong>Homogeneous</strong>) 
 และหาผลเฉลยของสมการ <script type="math/tex">y_h(t)</script> จากนั้นจึงพิจารณาสมการที่ไม่เป็นเอกพันธ์ (<strong>Homogeneous</strong>) 
 เพื่อหาผลเฉลยเฉพาะ  <script type="math/tex">y_p(t)</script> ตามลำดับ</p>
 <p>
@@ -303,7 +416,7 @@ plt.show()
    y_h(t) = C_1\,e^{s_1 t} + C_2\, t\, e^{s_1 t} = C_1\, e^{-t} + C_2\,t\,e^{-t} 
 </script>
 </p>
-<p>ถัดไปเป็นการพิจารณาสมการที่ไม่เป็นเอกพันธ์ และทางซ้ายมือของสมการเป็นฟังก์ชัน <script type="math/tex">sin(2 t)</script> 
+<p>ถัดไปเป็นการพิจารณาสมการที่ไม่เป็นเอกพันธ์ และทางขวามือของสมการเป็นฟังก์ชัน <script type="math/tex">sin(2 t)</script> 
 ดังนั้นรูปแบบของฟังก์ชันสำหรับผลเฉลยเฉพาะ เป็นดังนี้</p>
 <p>
 <script type="math/tex; mode=display">
@@ -718,7 +831,7 @@ plt.legend(['numeric','analytic'])
 plt.show()
 </code></pre>
 <p><img alt="" src="python_output4-1.png" /></p>
-<p>รูป: กราฟของฟังก์ชันที่เป็นผลเฉลย</p>
+<p>รูป: กราฟของฟังก์ชันที่เป็นผลเฉลยจากการใช้วิธี <strong>RK4</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
