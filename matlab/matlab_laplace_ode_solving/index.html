@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/matlab/matlab_laplace_ode_solving/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยการแปลงลาปลาซและเขียนโค้ด MATLAB - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#matlab" class="nav-link">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยการแปลงลาปลาซและเขียนโค้ด MATLAB</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; สมการเชิงอนุพันธ์สามัญและการหาผลเฉลย</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; การแปลงลาปลาซด้านเดียว</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#matlab_1" class="nav-link">&#9655; การเขียนโค้ดด้วย MATLAB เพื่อหาผลการแปลงลาปลาซด้านเดียว</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; การแยกฟังก์ชันเศษส่วนออกเป็นเศษส่วนย่อย</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; การหาผลเฉลยของสมการอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rc" class="nav-link">&#9655; การวิเคราะห์วงจร RC ด้วยการแปลงลาปลาซ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#bode-plot-rc" class="nav-link">&#9655; การแสดงรูปกราฟ Bode Plot สำหรับวงจร RC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rc_1" class="nav-link">&#9655; การวิเคราะห์ผลตอบสนองชั่วขณะสำหรับวงจร RC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="matlab">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยการแปลงลาปลาซและเขียนโค้ด MATLAB<a class="headerlink" href="#matlab" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซ</p>
+<p><strong>Keywords:</strong> <em>MATLAB</em>, <em>Ordinary Differential Equations</em>, <em>ODE Solving</em>, <em>Symbolic Methods</em>, <em>Laplace Transforms</em>, <em>RC Circuit</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>สมการเชิงอนุพันธ์สามัญและการหาผลเฉลย</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การวิเคราะห์วงจรไฟฟ้าพื้นฐานที่ประกอบด้วยตัวต้านทาน ตัวเก็บประจุ ตัวเหนี่ยวนำไฟฟ้า หรือเรียกว่า วงจรประเภท <strong>RLC</strong>
+ซึ่งถือว่าเป็นวงจรประเภทเชิงเส้น และสำหรับวงจรประเภทนี้ เราสามารถใช้สมการเชิงอนุพันธ์สามัญ (<strong>ODE</strong>) เพื่อสร้างแบบจำลอง หรือ สร้างโมเดลของวงจรไฟฟ้า ในการวิเคราะห์เพื่อดูการเปลี่ยนแปลงของปริมาณไฟฟ้าในเชิงเวลาได้ (<strong>Transient Analysis</strong>) เช่น แรงดันไฟฟ้าหรือกระแสไฟฟ้าในวงจร</p>
+<p>ถ้าต้องการหาผลเฉลยของสมการเชิงอนุพันธ์สามัญที่มีคุณสมบัติต่อไปนี้ เราสามารถใช้วิธีที่เรียกว่า "การแปลงลาปลาซ"
+(<strong>Laplace Transform</strong>) ในการหาผลเฉลยได้</p>
+<ol>
+<li>สมการเชิงอนุพันธ์สามัญนั้นเป็นแบบเชิงเส้นและมีสัมประสิทธิ์คงตัว (<strong>Linear ODE with Constant Coefficients</strong>) </li>
+<li>มีการกำหนดเงื่อนไขเริ่มต้น (<strong>Initial Conditions</strong>) สำหรับฟังก์ชันที่ใช้เป็นผลเฉลยของสมการ <strong>ODE</strong></li>
+<li>ฟังก์ชันเจาะจงในสมการเชิงอนุพันธ์สามัญนั้นเป็นฟังก์ชันที่สามารถหาผลการแปลงลาปลาซได้ เช่น
+ฟังก์ชันที่เป็นค่าคงที่ ฟังก์ชันขั้นบันได ฟังก์ชันเลขชี้กำลัง-เอกซ์โพเนนเชียล ฟังก์ชันไซน์หรือและโคไซน์  เป็นต้น</li>
+</ol>
+<p>ฟังก์ชันและอนุพันธ์ของฟังก์ชัน (<strong>Deriviatives</strong>) ในโดเมนของตัวแปร <script type="math/tex">t</script> จะถูกแปลงให้อยู่ในรูปของฟังก์ชันในโดเมน <script type="math/tex">s</script> โดยทั่วไปแล้วจะอยู่ในรูปของเศษส่วนพหุนาม (<strong>Rational Polynomials</strong>) ของตัวแปร <script type="math/tex">s</script> จากนั้นจึงสามารถใช้เทคนิคต่าง ๆ ทางพีชคณิต (<strong>Algebraic Manipulation</strong>) กับผลการแปลงลาปลาซดังกล่าว แล้วนำไปหาผลการแปลงลาปลาซผกผัน (<strong>Inverse Laplace Transform</strong>) เพื่อให้ได้ฟังก์ชันที่เป็นผลเฉลยในโดเมน <script type="math/tex">t</script>
+</p>
+<p>ลองมาดูตัวอย่าง สมการเชิงอนุพันธ์สามัญอันดับที่ <script type="math/tex">n</script> และเป็นไปตามข้อ 1</p>
+<p>
+<script type="math/tex; mode=display">
+   a_n y^{(n)}(t) +  a_{n-1} y^{(n-1)}(t) + ... + a_1 y'(t) + a_0 y(0) = x(t) \\
+</script>
+</p>
+<ul>
+<li>
+<script type="math/tex">a_n, ..., a_0</script> เป็นค่าคงที่ </li>
+<li>
+<script type="math/tex">t</script> เป็นตัวแปรอิสระ (<strong>Independent Variable</strong>) หมายถึง เวลา (<strong>Time</strong>) </li>
+<li>
+<script type="math/tex">y(t)</script> เป็นฟังก์ชันที่ขึ้นอยู่กับตัวแปร <script type="math/tex">t</script> และเป็นผลเฉลยของ <strong>ODE</strong> หมายถึง ปริมาณทางไฟฟ้าในวงจร</li>
+<li>
+<script type="math/tex">y'(t)</script>, ..., <script type="math/tex">y^{(n)}(t)</script> เป็นอนุพันธ์อันดับที่ 1 ถึง <script type="math/tex">n</script> ของฟังก์ชัน <script type="math/tex">y(t)</script> ตามลำดับ</li>
+<li>
+<script type="math/tex">x(t)</script> เป็นฟังก์ชันที่ขึ้นอยู่กับตัวแปร <script type="math/tex">t</script> ตามรูปแบบของแหล่งจ่ายในวงจร และสามารถหาผลการแปลงลาปลาซได้ </li>
+</ul>
+<p>และปัญหานี้มีเงื่อนไขเริ่มต้นสำหรับ <script type="math/tex">t=0</script> ตามข้อ 2 ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   y^{(n-1)}(0) = y_{n-1}, ..., y'(0) = y_1, y(0) = y_0 
+</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>การแปลงลาปลาซด้านเดียว</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>การแปลงลาปลาซของฟังก์ชันที่มีตัวแปรอิสระ <script type="math/tex">t</script> เป็นการดำเนินการทางคณิตศาสตร์ โดยอาศัยการอินทิเกรต และได้ผลลัพธ์จากการหาอินทิกรัลเป็นฟังก์ชันที่มีตัวแปรอิสระ <script type="math/tex">s</script> (เป็นตัวแปรเชิงซ้อน) สำหรับช่วงเวลาตั้งแต่ <script type="math/tex">t=0^-</script> ไปจนถึง <script type="math/tex">t=\infty</script> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  \mathcal{L}\{\, f(t) \,\} = F(s) \\[1em]
+   F(s) = \int_{0^-}^\infty f(t)\, e^{-s t} dt, \; t \geq 0 \\
+</script>
+</p>
+<p>หรือกล่าวได้ว่า ฟังก์ชัน <script type="math/tex">f(t)</script> และ <script type="math/tex">F(s)</script> เป็นคู่ของการแปลงลาปลาซ (<strong>Laplace Transform Pair</strong>)</p>
+<p>การหาผลการแปลงลาปลาซในรูปแบบนี้ เป็นแบบด้านเดียว (<strong>One-sided Laplace Transform</strong>) ซึ่งหมายถึง ช่วงเวลาตั้งแต่ <script type="math/tex">t \geq 0</script> เป็นต้นไป</p>
+<p>ถ้าให้ <script type="math/tex">f(t)=1</script> ซึ่งเป็นฟังก์ชันที่ให้ค่าคงที่เท่ากับ 1 สำหรับค่าใด ๆ ของตัวแปร <script type="math/tex">t</script> 
+ผลการแปลงลาปลาซด้านเดียวของฟังก์ชันนี้ สามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   F(s) &= \int_{0^-}^\infty f(t)\, e^{-s t} dt \\
+        &= \int_{0^-}^\infty 1\cdot e^{-s t} dt \\
+        &= \Big[ \frac{1}{-s} e^{-s t} \Big]_{t=0^-}^{t=\infty}\\
+        &= \lim_{t\rightarrow \infty} \frac{1}{-s} e^{-s t}
+           - \lim_{t\rightarrow 0^-} \frac{1}{-s} e^{-s t} \\
+        &= \frac{1}{s}, \;\; \text{ROC: $Re\{s\} > 0$ } \\
+\end{align}
+</script>
+</p>
+<p>จากตัวอย่างการคำนวณ ถ้ากำหนดขอบเขตของการลู่เข้า (<strong>Region of Convergence: ROC</strong>) สำหรับตัวแปร <strong>s</strong> เช่น ถ้าให้ส่วนที่เป็นจำนวนจริงของตัวแปร <script type="math/tex">s</script> หรือ <script type="math/tex">Re\{s\}</script> มีค่ามากกว่า 0 ก็จะทำให้หาสามารถหาค่าลิมิตได้ในกรณีที่ <script type="math/tex">t \rightarrow \infty</script>
+</p>
+<p>&nbsp;</p>
+<p>ฟังก์ชัน <script type="math/tex">u(t)</script> ที่มีลักษณะเป็นขั้นบันไดหนึ่งหน่วย (<strong>Unit-step Function</strong>) หรือเรียกว่า ฟังก์ชันเฮฟวีไซด์ (<strong>Heaviside Function</strong>) มีค่าแบ่งเป็นช่วงดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+    u(t) = \begin{cases} 
+      1,  & \; t \geq 0 \\
+      0,  & \; t < 0 \\
+   \end{cases}
+</script>
+</p>
+<p>ผลการแปลงลาปลาซด้านเดียวของฟังก์ชัน <script type="math/tex">f(t) = u(t)</script> ให้ผลเหมือนกับกรณี <script type="math/tex">f(t) = 1</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   F(s) &= \int_{0^-}^\infty f(t)\, e^{-s t} dt \\
+        &= \int_{0^-}^\infty u(t) \cdot e^{-s t} dt \\
+        &= \int_{0^-}^\infty 1 \cdot e^{-s t} dt \\
+        &= \frac{1}{s},  \;\; \text{ROC: $Re\{s\} > 0$} \\
+\end{align}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ถ้าให้ <script type="math/tex">f(t) = e^{-a t}</script> เป็นฟังก์ชันเอกซ์โพเนนเชียล (<strong>Exponential Function</strong>)
+และให้ <script type="math/tex">a</script> เป็นค่าคงที่ ผลการแปลงลาปลาซด้านเดียวสามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   F(s) &= \int_{0^-}^\infty f(t)\, e^{-s t} dt \\
+        &= \int_{0^-}^\infty e^{-a t} \cdot e^{-s t} dt \\
+        &= \int_{0^-}^\infty e^{-(s+a)t} dt \\
+        &= \frac{1}{(s+a)}, \;\; \text{ROC: $Re\{s\} > -a$} \\
+\end{align}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ลองมาดูตัวอย่างของคู่การแปลงลาปลาซสำหรับฟังก์ชันพื้นฐานทางคณิตศาสตร์ที่พบเห็นได้บ่อย 
+โดยกำหนดให้   <script type="math/tex">c</script> และ <script type="math/tex">a</script> เป็นค่าคงที่ใด ๆ  <script type="math/tex">\omega_0</script> และ <script type="math/tex">t_0</script> เป็นค่าคงที่และเป็นจำนวนจริงที่เป็นบวก</p>
+<table>
+<thead>
+<tr>
+<th align="left">f(t)</th>
+<th align="left">F(s)</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">
+<script type="math/tex">\delta(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">1</script>
+</td>
+<td align="left">Dirac (unit-impulse) function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">c</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{c}{s}</script>
+</td>
+<td align="left">constant function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">u(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{1}{s}</script>
+</td>
+<td align="left">Heaviside (unit-step) function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">u(t)-u(t-t_0)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{1-e^{-s t_0}}{s}</script>
+</td>
+<td align="left">Pulse function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">e^{-at}</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{1}{s+a}</script>
+</td>
+<td align="left">Exponential function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">sin(\omega_0 t)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{\omega_0}{s^2 + \omega_0^2}</script>
+</td>
+<td align="left">Sine function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">cos(\omega_0 t)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{s}{s^2 + \omega_0^2}</script>
+</td>
+<td align="left">Cosine function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">e^{-at} sin(\omega_0t)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{\omega_0}{(s+a)^2 + \omega_0^2}</script>
+</td>
+<td align="left">Exponentially damped sine</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">e^{-at} cos(\omega_0t)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{(s+a)}{(s+a)^2 + \omega_0^2}</script>
+</td>
+<td align="left">Exponentially damped cosine</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">t\cdot u(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">\frac{1}{s^2}</script>
+</td>
+<td align="left">Ramp function</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">a\cdot f(t) \pm b\cdot g(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">a\cdot F(s) \pm b\cdot G(s)</script>
+</td>
+<td align="left">Linearity property</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex"> e^{\mp a t} \cdot f(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">F(s\pm a)</script>
+</td>
+<td align="left">Shifting in s domain</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">f'(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">s F(s) - f(0)</script>
+</td>
+<td align="left">The first derivative of <script type="math/tex">f(t)</script>
+</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">f''(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">s^2 F(s) - s f(0) - f'(0)</script>
+</td>
+<td align="left">The second derivative of <script type="math/tex">f(t)</script>
+</td>
+</tr>
+<tr>
+<td align="left">
+<script type="math/tex">f^{(n)}(t)</script>
+</td>
+<td align="left">
+<script type="math/tex">s^n F(s) - \sum_{i=0}^{n-1} s^{n-i-1}\, f^{(i)}(0)</script>
+</td>
+<td align="left">The <script type="math/tex">n</script>-th derivative of <script type="math/tex">f(t)</script>
+</td>
+</tr>
+</tbody>
+</table>
+<p>โดยทั่วไปแล้ว ตารางของคู่การแปลงลาปลาซ และคุณสมบัติต่าง ๆ ของการแปลงลาปลาซ มีประโยชน์และช่วยให้ง่ายขึ้นเมื่อต้องการหาผลการแปลงลาปลาซ และการแปลงลาปลาซผกผัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="matlab_1">&#9655; <strong>การเขียนโค้ดด้วย MATLAB เพื่อหาผลการแปลงลาปลาซด้านเดียว</strong><a class="headerlink" href="#matlab_1" title="Permanent link">#</a></h2>
+<p>จากตัวอย่างฟังก์ชันพื้นฐาน ลองมาดูการใช้คำสั่ง <code>laplace()</code> ของ <strong>MATALB - Symbolic Math Toolbox</strong>
+เพื่อหาผลการแปลงลาปลาซด้านเดียว โดยมีการประกาศให้ <script type="math/tex">t</script> และ <script type="math/tex">s</script> เป็นสัญลักษณ์สำหรับตัวแปรอิสระของฟังก์ชัน</p>
+<pre><code class="language-matlab">clearvars
+syms t s a c
+syms omega_0 t_0 positive
+% Laplace transform of the Dirac-delta function
+laplace( dirac(t),t,s )
+% Laplace transform of a constant function
+laplace( c,t,s )
+% Laplace transform of the Heaviside function
+laplace( heaviside(t),t,s )
+% Laplace transform of exponential function
+laplace( exp(-a*t),t,s )
+% Laplace transform of a sine function
+laplace( sin(omega_0*t),t,s )
+% Laplace transform of a cosine function
+laplace( cos(omega_0*t),t,s )
+% Laplace transform of a pulse function
+laplace( heaviside(t) - heaviside(t-t_0),t,s )
+% Laplace transform of a ramp function
+laplace( t*heaviside(t),t,s )
+% Laplace transform of an exponentially damped sine
+laplace( exp(-a*t)*sin(omega_0*t),t,s)
+% Laplace transform of an exponentially damped cosine
+laplace( exp(-a*t)*cos(omega_0*t),t,s )
+</code></pre>
+<p><img alt="" src="matlab_laplace_output-1.png" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ดเพื่อหาผลการแปลงลาปลาซโดยใช้ <strong>MATLAB (R2022a)</strong></p>
+<p>หากต้องการหาผลการแปลงลาปลาซผกผัน ก็สามารถใช้คำสั่ง <code>ilaplace()</code> ของ <strong>MATLAB</strong> ในการคำนวณได้</p>
+<p><img alt="" src="matlab_laplace_output-2.png" /></p>
+<p>รูป: ตัวอย่างการใช้คำสั่ง <code>ilaplace()</code> เพื่อหาผลการแปลงลาปลาซผกผัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>การแยกฟังก์ชันเศษส่วนออกเป็นเศษส่วนย่อย</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>เราจะพบว่า ผลการแปลงลาปลาซมักอยู่ในรูปของเศษส่วนย่อย (<strong>Rational Polynomials</strong>) เช่น
+<script type="math/tex">F(s) = N(s)/D(s)</script> โดยที่ <script type="math/tex">N(s)</script> และ  <script type="math/tex">D(s)</script> เป็นฟังก์ชันพหุนามที่มีตัวแปร <script type="math/tex">s</script>
+</p>
+<p>ในกรณีนี้ เราสามารถเขียนรูปใหม่ของฟังก์ชัน <script type="math/tex">F(s)</script> ให้เป็นผลรวมของฟังก์ชันเศษส่วนย่อย
+หรือ การแยกฟังก์ชันเศษส่วนออกเป็นเศษส่วนย่อย  (<strong>Partial Fraction Expansion</strong>) </p>
+<p>ตัวอย่างเช่น</p>
+<p>
+<script type="math/tex; mode=display"> 
+\begin{align}
+ F(s) &= \frac{(5s - 5)}{ (s^2+4)(s+1) } \\
+      &= \frac{2s + 3}{s^2+4} - \frac{2}{s+1} \\
+      &= 2\Big(\frac{s}{s^2+2^2}\Big) + 
+         \frac{3}{2}\Big(\frac{2}{s^2+2^2}\Big) - 2\Big(\frac{1}{s+1}\Big) \\
+\end{align}
+</script>
+</p>
+<p>เมื่อพิจารณาผลลัพธ์ที่ได้จากการแยกฟังก์ชันเศษส่วนออกให้เป็นเศษส่วนย่อยและจัดรูปพจน์ต่าง ๆ แล้ว
+จะทำให้สามารถหาผลการแปลงลาปลาซได้ง่ายขึ้น</p>
+<p>
+<script type="math/tex; mode=display"> 
+  f(t) = 2 cos(2 t) + \frac{3}{2} sin(2 t)- 2 e^{-t} 
+</script>
+</p>
+<p>&nbsp;</p>
+<p><strong>MATLAB</strong> ก็มีคำสั่ง <code>partfrac()</code> และ <code>residue()</code> สำหรับการแยกเป็นเศษส่วนย่อย
+ลองมาดูตัวอย่างการใช้คำสั่ง <code>partfrac()</code>
+เพื่อแยกฟังก์ชันเศษส่วนออกเป็นเศษส่วนย่อยแล้วหาผลการแปลงลาปลาซผกผันของแต่ละพจน์ย่อย</p>
+<pre><code class="language-matlab">clearvars
+syms t s f(t) F(s)
+F(s) = 5*(s-1)/((s^2 + 4)*(s+1))
+% find the inverse Laplace transform of F(s)
+f(t) = ilaplace( F(s),s,t )
+%  perform partial fraction expansion of F(s)
+P = partfrac( F(s), s )
+% find inverse Laplace transform of each term of P
+f(t) = 0;
+for p = children(P)
+    f(t) = f(t) + ilaplace( p, s, t );
+end
+% show the result
+disp( f(t) )
+</code></pre>
+<p><img alt="" src="matlab_laplace_output-3.png" /></p>
+<p>รูป: ตัวอย่างการใช้คำสั่ง <code>partfrac()</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>การหาผลเฉลยของสมการอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซ</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างของสมการ <strong>ODE</strong> อันดับสอง มีสัมประสิทธิ์คงตัวและเป็นสมการเชิงเส้น</p>
+<p>
+<script type="math/tex; mode=display">
+   y'' + 2y' + y = sin(2t) \\
+  y(0)=−1, y'(0)=1 \\
+</script>
+</p>
+<p>การหาผลเฉลยด้วยการแปลงลาปลาซมีขั้นตอนดังนี้ เริ่มต้นให้หาผลการแปลงลาปลาซสำหรับฟังก์ชัน
+<script type="math/tex">y(t)</script> และอนุพันธ์ของฟังก์ชันที่มีอยู่ในสมการในเชิงสัญลักษณ์ รวมถึงฟังก์ชัน <script type="math/tex">sin(2t)</script> ที่อยู่ทางขวามือของสมการ</p>
+<p>
+<script type="math/tex; mode=display">
+   \begin{align} 
+     \mathcal{L}\{ y(t) \} &=  Y(s) \\
+     \mathcal{L}\{ y'(t) \} &= s Y(s) - y(0) \\
+     \mathcal{L}\{ y''(t) \} &= s^2 Y(s) - s y(0) - y'(0) \\
+     \mathcal{L}\{ sin(2 t) \} &= \frac{2}{s^2 + 4}\\
+   \end{align}
+</script>
+</p>
+<p>แล้วนำไปแทนลงในสมการ <strong>ODE</strong> จะได้เป็น</p>
+<p>
+<script type="math/tex; mode=display">
+  \begin{align}
+  [s^2 Y(s) - s y(0) - y'(0)] + 2[s Y(s) - y(0)] + Y(s) 
+    &= \frac{2}{s^2 + 4} \\
+ Y(s)(s^2 + 2s + 1) - s y(0) - 2 y(0) - y'(0) 
+    &= \frac{2}{s^2 + 4} \\
+  \end{align}
+</script>
+</p>
+<p>หากพิจารณาเฉพาะปัญหาที่เป็นเอกพันธ์ (<strong>Homogeneous Problem</strong>) ด้านขวามือของสมการ
+<strong>ODE</strong> จะเป็น 0 ดังนี้</p>
+<p>
+<script type="math/tex; mode=display"> 
+  Y_h(s)(s^2 + 2s + 1) - s y(0) - 2 y(0) - y'(0) = 0 \\
+  Y_h(s) = \frac{ s y(0) + 2 y(0) + y'(0) }{ (s+1)^2 } \\
+</script>
+โดยที่ <script type="math/tex">Y_h(s)</script> เป็นผลการแปลงลาปลาซของผลเฉลย <script type="math/tex">y_h(t)</script> สำหรับสมการที่เป็นเอกพันธ์ </p>
+<p>ถ้าลองจัดรูปใหม่สำหรับ <script type="math/tex">Y_h(s)</script> จะได้ผลรวมของพจน์ย่อยต่อไปนี้
+<script type="math/tex; mode=display">
+\begin{align}
+   Y_h(s) &= \frac{ s y(0) + 2 y(0) + y'(0) }{ (s+1)^2 } \\
+          &= \frac{ (s+1)y(0) + y(0) + y'(0) }{ (s+1)^2 } \\
+          &= \frac{ y(0)}{(s+1)} + \frac{y(0) + y'(0) }{ (s+1)^2 } \\
+\end{align}
+</script>
+</p>
+<p>และนำไปหาผลการแปลงลาปลาซผกผันได้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   y_h(t) &= \underbrace{y(0)}_{C_1}\, e^{-t} + 
+             \underbrace{(y(0) + y'(0))}_{C_2}\, t\, e^{-t} \\
+          &= C_1\, e^{-t} + {C_2}\, t\, e^{-t} \\
+\end{align}
+</script>
+โดยที่ <script type="math/tex">C_1</script> และ <script type="math/tex">C_2</script> เป็นค่าคงที่ใด ๆ ซึ่งขึ้นอยู่กับเงื่อนไขเริ่มต้นของ <strong>ODE</strong></p>
+<p>&nbsp;</p>
+<p>ในกรณีที่สมการไม่เป็นเอกพันธ์ (<strong>Nonhomogeneous Problems</strong>)
+แต่ให้เงื่อนไขเริ่มต้นเป็น 0 ซึ่งกำหนดให้ <script type="math/tex">y(0) = 0, y'(0) = 0</script>
+หลังจากจัดรูปใหม่ของสมการ จะได้ <script type="math/tex">Y_p(s)</script> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  Y_p(s) = \frac{2}{ (s+1)^2 (s^2 + 4) } \\
+</script>
+โดยที่ <script type="math/tex">Y_p(s)</script> เป็นผลการแปลงลาปลาซของผลเฉลยเจาะจง <script type="math/tex">y_p(t)</script>
+</p>
+<p>หลังจากได้แยกฟังก์ชันเศษส่วน <script type="math/tex">Y_p(s)</script> ออกเป็นเศษส่วนย่อย จะได้เป็น</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+  Y_p(s) &= \frac{ 2/5 }{(s+1)^2} + \frac{ 4/25 }{(s+1)}
+          - \frac{ (4s + 6)/25 }{(s^2 + 4)} \\
+\end{align}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ผลเฉลยทั่วไป (<strong>General Solution</strong>) ของปัญหานี้คือ
+<script type="math/tex">Y(s)</script> ซึ่งได้จากผลเฉลยจากทั้งสองกรณีนำมารวมกัน (เมื่อแปลงลาปลาซแล้ว)</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   Y(s) &= Y_h(s) + Y_p(s) \\
+        &= \frac{ y(0)}{(s+1)} + \frac{y(0) + y'(0) }{ (s+1)^2 } \\
+        & \;\; + \frac{ 2/5 }{(s+1)^2} + \frac{ 4/25 }{(s+1)}
+           - \frac{ (4s + 6)/25 }{(s^2 + 4)} \\
+\end{align}
+</script>
+</p>
+<p>จากเงื่อนไขเริ่มต้น <script type="math/tex">y(0)=−1, y'(0)=1</script> แล้วแทนค่าลงในสมการสำหรับ <script type="math/tex">Y(s)</script> จะได้</p>
+<p>
+<script type="math/tex; mode=display">
+ \begin{align}
+   Y(s) &= Y_h(s) + Y_p(s) \\
+        &= \frac{(-1)}{(s+1)} + \frac{(-1+1)}{ (s+1)^2 } \\
+        & \;\; + \frac{ 2/5 }{(s+1)^2} + \frac{ 4/25 }{(s+1)}
+           - \frac{ (4s + 6)/25 }{(s^2 + 4)} \\
+        &= \frac{ 2/5  }{ (s+1)^2 }
+           - \frac{ 21/25 }{ (s+1) }
+           - \frac{ (4s + 6)/25 }{(s^2 + 4)} \\
+ \end{align}
+</script>
+</p>
+<p>การหาผลการแปลงลาปลาซผกผันของ <script type="math/tex">Y(s)</script> จะได้ผลลัพธ์เป็นฟังก์ชัน <script type="math/tex">y(t)</script> ดังนี้ 
+<script type="math/tex; mode=display">
+  y(t)  = \frac{2}{5} t e^{-t} - \frac{21}{25} e^{-t}
+        - \frac{4}{25} cos(2t) - \frac{3}{25}sin(2t) 
+</script>
+</p>
+<p>ถ้าให้  <script type="math/tex">cos(B) = 4/5</script> และ <script type="math/tex">sin(B) = 3/5</script> จะได้
+<script type="math/tex; mode=display">
+  sin^2(B) + cos^2(B) = 1 \\
+  tan(B) = \frac{sin(B)}{cos(B)} = \frac{3}{4} \\
+  B = tan^{-1}( \frac{3}{4} ) \\
+</script>
+จากสูตร
+<script type="math/tex; mode=display">
+  cos(A-B) = cos(A)cos(B) + sin(A)sin(B) \\\
+</script>
+ดังนั้น <script type="math/tex">y(t)</script> สามารถเขียนให้อยู่ในรูปใหม่ได้ดังนี้
+<script type="math/tex; mode=display">
+\begin{align}
+  y(t) &=  \frac{2}{5} t e^{-t} - \frac{21}{25} e^{-t}
+        - \frac{1}{5}\Big[ cos(2t) (\frac{4}{5}) + sin(2t)(\frac{3}{5}) \Big] \\
+       &= \frac{2}{5} t e^{-t} - \frac{21}{25} e^{-t} 
+       - \frac{1}{5} cos( 2t - atan(\frac{3}{4}) )
+\end{align}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> มีดังนี้</p>
+<pre><code class="language-matlab">clearvars
+syms s t y(t) Y(s)
+% derivatives of y(t)
+D1y = diff(y(t),t,1);
+D2y = diff(y(t),t,2);
+%  formulate the ODE
+ode = D2y + 2*D1y + y(t) == sin(2*t);
+% Solution 1: solve the ODE using the dsolve() command
+sol = dsolve( ode, [y(0)==-1, subs(D1y,t,0)==1] )
+% Laplace transform of the ODE
+lt_ode = laplace( ode, t, s );
+lt_ode = subs( lt_ode, laplace(y,t,s), Y(s) );
+collect(lt_ode,Y(s))
+lt_ode = subs( lt_ode, [y(0), subs(D1y,t,0)], [-1,1]);
+collect(lt_ode,Y(s))
+Y(s) = isolate( lt_ode, Y(s) )
+Y(s) = partfrac( Y(s) )
+% Solution 2: perform the inverse Laplace transform of Y(s)
+y(t) = ilaplace( rhs(Y(s)),s, t )
+% compare the solutions 
+isAlways( y(t) == sol ) 
+</code></pre>
+<p>เอาต์พุตที่ได้จากการรันโค้ด <strong>MATLAB</strong> มีตัวอย่างดังนี้</p>
+<p><img alt="" src="matlab_laplace_output-4a.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <strong>MATLAB</strong> (ส่วนที่หนึ่ง)</p>
+<p><img alt="" src="matlab_laplace_output-4b.png" /></p>
+<p>รูป:  ตัวอย่างการทำคำสั่ง <strong>MATLAB</strong> (ส่วนที่สอง)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rc">&#9655; <strong>การวิเคราะห์วงจร RC ด้วยการแปลงลาปลาซ</strong><a class="headerlink" href="#rc" title="Permanent link">#</a></h2>
+<p>วงจรตัวอย่างต่อไปนี้ประกอบด้วยตัวต้านทาน <script type="math/tex">R_1</script> และตัวเก็บประจุ <script type="math/tex">C_1</script> ที่นำมาต่ออนุกรมกัน
+และมีแหล่งจ่าย <script type="math/tex">v_S(t)</script> เป็นสัญญาณอินพุตของระบบและให้ <script type="math/tex">v_C(t)</script> 
+ซึ่งเป็นแรงดันตกคร่อมที่ตัวเก็บประจุ เป็นสัญญาณเอาต์พุตของระบบ
+รูปแบบของวงจร <strong>RC</strong> ในลักษณะนี้ ทำหน้าที่เป็นตัวกรองแบบพาสซีฟที่ยอมให้ความถี่ต่ำผ่านได้ดี 
+(<strong>Low-Pass Passive RC Filter</strong>) </p>
+<p><img alt="" src="rc_filter-1.png" /></p>
+<p>รูป: วงจร <strong>RC</strong></p>
+<p>ถ้าวิเคราะห์วงจรด้วยทฤษฎีทางไฟฟ้า <strong>KVL (Mesh Analysis)</strong> จะได้สมการต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">
+    v_R(t) + v_C(t) = v_S(t) \\
+\begin{align}
+    i(t) &= i_C(t) = i_R(t) \\
+    v_R(t) &= R \, i_R(t) \\
+    i_C(t) &= C \frac{d}{dt} v_C(t) \\
+\end{align}
+</script>
+</p>
+<p>และนำไปสู่สมการ <strong>ODE</strong> (อันดับหนึ่ง)
+<script type="math/tex; mode=display">
+  RC \frac{d}{dt} v_C(t) + v_C(t) = v_S(t) \\
+</script>
+</p>
+<p>ถ้าหาผลการแปลงลาปลาซ จะเขียนรูปสมการได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+  \mathcal{L}\{ v_C(t) \}  &= V_C(s) \\
+  \mathcal{L}\{ v'_C(t) \} &= s V_C(s) - v_C(0) \\
+  \mathcal{L}\{ v_S(t) \}  &= V_S(s) \\
+\end{align} \\
+  RC\, [s\,V_C(s) - v_c(0)] + V_C(s) = V_S(s) \\
+  (1 + sRC) V_C(s) = RC v_c(0) + V_S(s) \\
+</script>
+</p>
+<p>ถ้าให้เงื่อนไขเริ่มต้นของวงจรเป็น <script type="math/tex">0</script> (<strong>Zero Initial Condition</strong>) ซึ่งหมายถึง  <script type="math/tex">v_C(0) = 0</script> ดังนั้นจะได้ <script type="math/tex">V_C(s)</script>
+<script type="math/tex; mode=display">
+\begin{align}
+   V_C(s) &= \frac{1}{(1+sRC)} V_S(s) \\
+     H(s) &= \frac{V_{out}}{V_{in}} = \frac{V_C(s)}{V_S(s)} \\
+          &= \frac{1}{1+sRC} = \frac{ \frac{1}{RC} }{s + \frac{1}{RC}} \\
+\end{align}
+</script>
+</p>
+<p>
+<script type="math/tex">H(s)</script> เรียกว่า ฟังก์ชันถ่ายโอน (<strong>Transfer Function</strong>) ของวงจร
+และเป็นอัตราส่วนระหว่างสัญญาณเอาต์พุตต่อสัญญาณอินพุต และ <script type="math/tex">h(t)</script> คือ ผลตอบสนองอิมพัลส์ของระบบ 
+(<strong>Impulse Response</strong>) ซึ่งได้จากการแปลงลาปลาซผกผันของฟังก์ชัน <script type="math/tex">H(s)</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+  h(t) &= \mathcal{L}^{-1}\{ H(s) \} \\
+       &= \frac{1}{RC} e^{-t/RC} \\
+       &= \frac{1}{\tau} e^{-t/\tau}, \;\;  t \geq 0, \; \tau = RC \\
+\end{align}
+</script>
+</p>
+<p>ถัดไปมาดูตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> สำหรับการวิเคราะห์วงจรด้วยการแปลงลาปลาซ
+หารูปแบบของฟังก์ชันถ่ายโอน และฟังก์ชันที่เป็นผลตอบสนองอิมพัลส์ตามลำดับ</p>
+<pre><code class="language-matlab">clearvars
+syms s t v_C(t) v_S(t) V_C(s) V_S(s) H(s) h(t)
+syms R C tau positive 
+% the first-order ODE for the RC filter circuit
+ode = R*C*diff( v_C(t), t) + v_C(t) == v_S(t);
+% take the Laplace transform to the ODE
+lt_ode = laplace( ode,t,s );
+% substitute Laplace transforms of v_C(t) and v_S(t) with V_C(s) and V_S(s)
+lt_ode = subs( lt_ode, laplace(v_C(t),t,s), V_C(s) );
+lt_ode = subs( lt_ode, laplace(v_S(t),t,s), V_S(s) );
+% rewrite the equation so that V_C(s) appears on the left side 
+V_C(s) = isolate( lt_ode, V_C(s) );
+% substitute RC with tau and V_C(0) with 0 (zero initial condition)
+V_C(s) = subs( V_C(s), [R*C, v_C(0)], [tau, 0] )
+% find the transfer function H(s)
+H(s) = rhs(V_C(s))/ V_S(s)
+% find the impulse response h(t)
+h(t) = ilaplace( H(s),s,t )
+</code></pre>
+<p><img alt="" src="matlab_laplace_output-5a.png" /></p>
+<p>รูป: ตัวอย่างเอาต์พุตเมื่อทำคำสั่ง <strong>MATLAB</strong></p>
+<p>ในกรณีที่สัญญาณอินพุตเป็นรูปคลื่นไซน์ (<strong>Sinusoidal Wave</strong>)
+ที่มีความถี่เชิงมุม <script type="math/tex">\omega = 2\pi f</script>
+สัญญาณเอาต์พุตจะได้เป็นรูปคลื่นไซน์เช่นกัน เมื่อเข้าสู่สภาวะคงตัว (<strong>Steady State</strong>)</p>
+<p>ถ้าแทนตัวแปร <script type="math/tex">s</script> ด้วยสัญลักษณ์ <script type="math/tex">j\omega</script> (ความถี่เชิงซ้อน)
+ฟังก์ชัน <script type="math/tex">H(s)</script> จะเป็นฟังก์ชันที่ให้ค่าเป็นเลขเชิงซ้อน ใช้สัญลักษณ์เป็น <script type="math/tex">H(j\omega)</script>
+ซึ่งขึ้นอยู่ตัวแปรอิสระ <script type="math/tex">\omega</script> และสามารถเขียนให้อยู่ของขนาด (<strong>Magnitude</strong>) 
+และมุม (<strong>Phase</strong>) ได้ตามรูปแบบของออยเลอร์ (<strong>Euler's Exponential Form</strong>) ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  H(j\omega) = |H(j\omega)|\, e^{ j\angle{ H(j\omega) } } \\
+</script>
+</p>
+<p>ดังนั้นสำหรับวงจร <strong>RC</strong> ในตัวอย่างนี้จะได้ฟังก์ชันถ่ายโอน </p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+     H(j\omega) &= \frac{1}{1 + j\omega RC} = \frac{1 - j\omega RC}{1 + (\omega RC)^2}  \\
+   |H(j\omega)| &= \frac{1}{|1 + j\omega RC|} = \frac{1}{\sqrt{1 + (\omega RC)^2}} \\
+  \angle(H(j\omega)| &= -tan^{-1}(\omega RC) \\
+\end{align}
+</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="bode-plot-rc">&#9655; <strong>การแสดงรูปกราฟ Bode Plot สำหรับวงจร RC</strong><a class="headerlink" href="#bode-plot-rc" title="Permanent link">#</a></h2>
+<p>เราสามารถใช้คำสั่งของ <strong>MATLAB</strong> เช่น <code>tf()</code> เพื่อสร้างฟังก์ชันถ่ายโอนที่อยู่ในรูปเศษส่วนพหุนาม
+ของตัวแปร <script type="math/tex">s</script> โดยจะต้องระบุค่าสัมประสิทธิ์ของเศษส่วนพหุนามสำหรับ <script type="math/tex">H(s) = N(s)/D(s)</script>
+แล้วจึงใช้คำสั่ง <code>bodeplot()</code> แสดงรูปกราฟของฟังก์ชันถ่ายโอน (เรียกว่า <strong>Bode Plot</strong>)
+โดยแบ่งเป็นขนาด (<strong>Magnitude Plot</strong>) และเฟส (<strong>Phase Plot</strong>) ที่ขึ้นอยู่กับค่าความถี่ </p>
+<pre><code class="language-matlab">clearvars;
+RC = (1e+3)*(10e-6); % use R=1kOhm and C=10uF
+% define the transfer function H(s)
+% H(s) = N(s)/D(s) = [1/RC] / [s + 1/RC]
+H = tf(1/RC,[1 1/RC])
+% set Bode plot options
+opts = bodeoptions;
+opts.FreqUnits = 'Hz';
+opts.FreqScale = 'log';
+opts.MagUnits  = 'dB';
+opts.MagScale  = 'linear';
+opts.PhaseUnits = 'deg';
+% set the frequency range for Bode plot
+freq_range = {0.1 10^6};
+% show Bode plot 
+bodeplot( H, freq_range, opts ); grid on;
+</code></pre>
+<p><img alt="" src="bode_plot_rc_filter-1.png" /></p>
+<p>รูป: ตัวอย่างคำสั่ง <strong>MATLAB</strong> สำหรับการแสดงรูปกราฟ <strong>Bode Plot</strong></p>
+<p><img alt="" src="bode_plot_rc_filter-2.png" /></p>
+<p>รูป: รูปกราฟ <strong>Bode Plot</strong> สำหรับฟังก์ชันถ่ายโอนของวงจร <strong>RC (R=1k&Omega;, C=10uF</strong>)</p>
+<p>จากรูปกราฟจะเห็นได้ว่า เมื่อความถี่ <script type="math/tex">f</script> เพิ่มขึ้น จะทำให้ฟังก์ชันถ่ายโอน <script type="math/tex">H(j\omega)</script> มีขนาดลดลง
+ซึ่งหมายความว่า อัตราส่วนระหว่างเอาต์พุตต่ออินพุต จะมีขนาดลดลงเมื่อความถี่เพิ่มขึ้น</p>
+<p>ถ้ามีความถี่ใกล้ <script type="math/tex">0</script> จะทำให้ <script type="math/tex"> |H(j\omega)| </script> มีค่าใกล้เคียง <script type="math/tex"> 1 </script> (หรือ <script type="math/tex"> 0 \,dB </script>)
+แต่จะลดลงเมื่อความถี่เพิ่มขึ้น ดังนั้นวงจร <strong>RC</strong> ในรูปแบบนี้จึงทำหน้าที่เป็นตัวกรองให้ความถี่ต่ำผ่านได้ดี</p>
+<p>เฟส <script type="math/tex"> \angle H(j\omega)</script> จะเริ่มลดลงจาก <script type="math/tex">0^{\circ}</script> เมื่อความถี่เพิ่มขึ้น ซึ่งหมายความว่า
+สัญญาณเอาต์พุตจะมีความต่างเฟสเพิ่มมาขึ้นเมื่อเปรียบเทียบกับสัญญาณอินพุตถ้าความถี่เพิ่มมากขึ้น</p>
+<p>ถ้าไม่ใช้คำสั่ง <code>tf()</code> และ  <code>bodeplot()</code> ก็มีตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> ดังนี้</p>
+<pre><code class="language-matlab">clearvars; clf;
+syms s f omega
+syms R C positive
+% define the transfer function H(s) of the RC circuit
+H = 1/(1+s*R*C)
+% substitute s with j*omega 
+H = subs( H, s, 1i*omega ) 
+% substitute omega with 2*pi*f
+% substitute R and C with numeric values
+H = subs( H, [omega,R,C], [2*pi*f, 1e+3, 10e-6] );
+% convert symbolic functions to numeric functions
+H_mag   = matlabFunction( 20*log10( abs(H) ) );
+H_phase = matlabFunction( (180/pi)*angle( H ) );
+% define the frequency range (log-scale): 10^0 .. 10^4
+f = logspace( 0, 4 );
+% plot the magnitude of H(j*omega)
+semilogx( f, H_mag(f) ), grid on, 
+xlabel('Hz'), ylabel('Magnitude (dB)');
+% plot the phase of H(j*omega)
+semilogx( f, H_phase(f) ), grid on,
+xlabel('Hz'), ylabel('Phase (deg)');
+</code></pre>
+<p><img alt="" src="bode_plot_rc_filter-3.png" /></p>
+<p>รูป: ตัวอย่างคำสั่ง <strong>MATLAB</strong> สำหรับการแสดงรูปกราฟ <strong>Bode Plot</strong></p>
+<p><img alt="" src="bode_plot_rc_filter-4a.png" /></p>
+<p>รูป: รูปกราฟสำหรับขนาดของ <script type="math/tex">H(j\omega)</script> สำหรับความถี่ในช่วง <script type="math/tex">1..10^4</script>  (<strong>log-scale</strong>)</p>
+<p><img alt="" src="bode_plot_rc_filter-4b.png" /></p>
+<p>รูป: รูปกราฟสำหรับเฟสของ <script type="math/tex">H(j\omega)</script> สำหรับความถี่ในช่วง <script type="math/tex">1..10^4</script> Hz (<strong>log-scale</strong>)</p>
+<p>&nbsp;</p>
+<p>สำหรับวงจร <strong>RC</strong> ที่เป็นวงจรตัวกรองให้ความถี่ต่ำผ่านได้ดี (<strong>Low-pass RC Filter</strong>) 
+ความถี่ <script type="math/tex">\omega=\omega_c</script> ที่ทำให้ <script type="math/tex">|H(j\omega_c)| = \frac{1}{\sqrt{2}}</script> หรือ
+<script type="math/tex">20\cdot log_{10}(|H(j\omega_c)|) = -3\,dB\; </script> 
+เรียกว่า <strong>Cutoff Frequency</strong> และสามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  |H(j\omega_c)|^2 = \frac{1}{2} = \frac{1}{1 + (\omega_c RC)^2} \\
+\Rightarrow \quad \omega_c = 2\pi f_c = \frac{1}{RC} \\
+            f_c = \frac{1}{2\pi RC} \\
+</script>
+</p>
+<p>ถ้าให้ <script type="math/tex">R=1k \Omega</script> และ <script type="math/tex">C=10uF</script> จะได้ <script type="math/tex">f_c = \frac{1}{2\pi (0.01)} = 15.915 \,Hz</script> สำหรับวงจรตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rc_1">&#9655; <strong>การวิเคราะห์ผลตอบสนองชั่วขณะสำหรับวงจร RC</strong><a class="headerlink" href="#rc_1" title="Permanent link">#</a></h2>
+<p>ถ้ากำหนดให้แหล่งจ่ายแรงดันไฟฟ้า <script type="math/tex">v_S(t)</script> เป็นอินพุตของวงจร <strong>RC</strong> และเป็นสัญญาณรูปคลื่นไซน์ </p>
+<p>
+<script type="math/tex; mode=display"> 
+  v_S(t) = V_S\, sin(\omega_0 t), \; V_S > 0 \\
+ \omega_0 = 2\pi f_0 
+</script>
+</p>
+<p>ให้ <script type="math/tex">v_C(t)</script> เป็นเอาต์พุตของวงจรดังกล่าว ลองมาดูตัวอย่างการเขียนโค้ด <strong>MATLAB</strong>
+เพื่อวิเคราะห์วงจร และหาผลตอบสนองชั่วขณะในเชิงเวลาของวงจร (<strong>Transient Response</strong>)</p>
+<pre><code class="language-matlab">clearvars
+syms s t v_C(t) v_S(t) V_C(s)
+syms R C V_S omega_0 tau positive 
+% The input is a sinusoidal voltage source.
+v_S(t) = V_S*sin(omega_0*t);
+% define the ODE for the RC filter
+ode = R*C*diff( v_C(t), t) + v_C(t) == v_S(t);
+% perform LT of the ODE
+lt_ode = laplace( ode,t,s );
+% substitute a symbol for V_C(s)
+lt_ode = subs( lt_ode, laplace(v_C(t),t,s), V_C(s) );
+% rewrite the equation so that V_C(s) appears on the left-hand side
+sol = isolate( lt_ode, V_C(s) );
+% substitute R*C with tau (the time constant symbol)
+sol = subs( sol, R*C, tau );
+% show V_C(s)
+disp( sol )
+% assume zero initial condition: v_C(0) = 0
+sol = subs( sol, v_C(0), 0 );
+% find the inverse Laplace  transform to get v_C(t)
+sol = ilaplace( sol, s, t);
+% get the output signal v_C(t)
+v_C(t) = rhs(sol)
+% substitute tau with a specific value (R=1k, C=10u)
+v_C(t) = subs( v_C(t), tau, 1e3 * 10e-6 );
+% substitute omega_0 with 2*pi*50Hz and V_S with 5V
+v_C(t) = subs( v_C(t), [omega_0, V_S], [2*pi*50, 5] );
+v_S(t) = subs( v_S(t), [omega_0, V_S], [2*pi*50, 5] );
+fplot( [v_S(t), v_C(t)], [0,0.1] ), 
+grid on, xlabel('t'), legend( ['v_S(t)';'v_C(t)'] )
+</code></pre>
+<p><img alt="" src="matlab_laplace_output-6.png" /></p>
+<p>รูป: ตัวอย่างเอาต์พุตจากโค้ด <strong>MATLAB</strong></p>
+<p><img alt="" src="matlab_laplace_output-7.png" /></p>
+<p>รูป: ตัวอย่างรูปกราฟสำหรับ <script type="math/tex">v_S(t)</script> และ <script type="math/tex">v_C(t)</script> ในช่วงเวลา <script type="math/tex">0 .. 100\, msec</script>
+</p>
+<p>&nbsp;</p>
+<p>ถ้าเปลี่ยน <script type="math/tex">v_S(t)</script> จากสัญญาณรูปคลื่นไซน์ ให้เป็นแบบขั้นบันได เช่น</p>
+<p>
+<script type="math/tex; mode=display">
+  v_S(t) = V_S \cdot u(t) = \begin{cases}
+    V_S & \; t \geq 0 \\
+    0   & \; t < 0\\
+  \end{cases}
+</script>
+โดยที่ <script type="math/tex">u(t)</script> หมายถึง ฟังก์ชันเฮฟวีไซด์ (<strong>Heaviside Function</strong>)</p>
+<p>หากจะศึกษาผลตอบสนองต่อสัญญาณอินพุตที่เป็นฟังก์ชันแบบขั้นบันได (<strong>Step Function</strong>)
+ก็สามารถเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลตอบสนองชั่วขณะสำหรับ <script type="math/tex">v_C(t)</script> ได้ดังนี้
+(ในตัวอย่างนี้ ได้กำหนดเงื่อนไขเริ่มต้น <script type="math/tex">v_C(0) = 0</script>)</p>
+<pre><code class="language-matlab">clearvars; clf;
+syms s t v_C(t) v_S(t) V_C(s)
+syms R C V_S tau positive
+% The input is a DC source.
+v_S(t) = V_S*heaviside(t);
+% define the ODE for the RC filter
+ode = R*C*diff( v_C(t), t) + v_C(t) == v_S(t);
+% perform LT of the ODE
+lt_ode = laplace( ode,t,s );
+% substitute a symbol for V_C(s)
+lt_ode = subs( lt_ode, laplace(v_C(t),t,s), V_C(s) );
+% rewrite the equation so that V_C(s) appears on the left-hand side
+sol = isolate( lt_ode, V_C(s) );
+% substitute R*C with tau (the time constant symbol)
+sol = subs( sol, R*C, tau );
+% show V_C(s)
+disp( sol )
+% assume zero initial condition: v_C(0) = 0
+sol = subs( sol, v_C(0), 0 );
+% find the inverse Laplace transform to get v_C(t)
+sol = ilaplace( sol, s, t);
+% get the output signal v_C(t), for t&gt;=0
+v_C(t) = rhs(sol)*heaviside(t)
+% substitute tau with a specific value (R=1k, C=10u)
+v_C(t) = subs( v_C(t), tau, 1e3 * 10e-6 );
+% substitute V_S with 5V
+v_C(t) = subs( v_C(t), V_S, 5 );
+v_S(t) = subs( v_S(t), V_S, 5 );
+fplot( [v_S(t), v_C(t)], 'linewidth', 1.25 ), 
+grid on, xlabel('t'), 
+xlim([-0.01 0.1]), ylim([-0.2 5.2]), 
+legend( ['v_S(t)';'v_C(t)'] )
+</code></pre>
+<p><img alt="" src="matlab_laplace_output-8.png" /></p>
+<p>รูป: ตัวอย่างเอาต์พุตจากโค้ด <strong>MATLAB</strong></p>
+<p><img alt="" src="matlab_laplace_output-9.png" /></p>
+<p>รูป: ตัวอย่างรูปกราฟสำหรับ <script type="math/tex">v_S(t)</script> และ <script type="math/tex">v_C(t)</script> ในช่วงเวลา <script type="math/tex">0 .. 100\, msec</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการแปลงลาปลาซสำหรับฟังก์ชันคณิตศาสตร์พื้นฐาน 
+การนำไปใช้เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญแบบเชิงเส้นที่มีสัมประสิทธิ์คงตัว 
+และตัวอย่างการเขียนโค้ดและใช้คำสั่งของ <strong>MATLAB</strong>
+เพื่อหาผลเฉลยด้วยวิธีการประมวลเชิงสัญลักษณ์ เปรียบเทียบผลลัพธ์ที่ได้ในแต่ละวิธี</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-04-22 | Last Updated: 2022-04-24</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
