@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/electronics/dc_circuit_analysis/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การวิเคราะห์วงจรไฟฟ้ากระแสตรงและจำลองการทำงานด้วย EasyEDA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#easyeda" class="nav-link">การวิเคราะห์วงจรไฟฟ้ากระแสตรงและจำลองการทำงานด้วย EasyEDA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#dc-steady-state-analysis" class="nav-link">&#9655; การวิเคราะห์วงจร: DC Steady-State Analysis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dc-steady-state-analysis_1" class="nav-link">&#9655; การจำลองการทำงานของวงจร: DC Steady-State Analysis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dc-transient-analysis" class="nav-link">&#9655; การจำลองการทำงานของวงจร: DC Transient Analysis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dc-switching-analysis" class="nav-link">&#9655; การวิเคราะห์วงจรไฟฟ้า: DC Switching Analysis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dc-transient-analysis_1" class="nav-link">&#9655; การวิเคราะห์วงจรไฟฟ้า: DC Transient Analysis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="easyeda">การวิเคราะห์วงจรไฟฟ้ากระแสตรงและจำลองการทำงานด้วย EasyEDA<a class="headerlink" href="#easyeda" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การวิเคราะห์วงจรพื้นฐานทางไฟฟ้าที่ประกอบด้วย <strong>R L C</strong>
+โดยใช้ทฤษฎีทางไฟฟ้าและเปรียบเทียบกับการจำลองการทำงานของวงจรด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p><strong>Keywords:</strong> <em>DC Circuits</em>, <em>DC Circuit Analysis</em>, <em>EasyEDA / LTspice</em>, <em>MATLAB</em></p>
+<hr />
+<h2 id="dc-steady-state-analysis">&#9655; <strong>การวิเคราะห์วงจร: DC Steady-State Analysis</strong><a class="headerlink" href="#dc-steady-state-analysis" title="Permanent link">#</a></h2>
+<p>ลองมาดูวงจรในตัวอย่างแรกซึ่งประกอบด้วยแหล่งจ่ายแรงดันไฟฟ้าคงที่ (<strong>Constant Voltage Source</strong>) ตัวต้านทาน (<strong>Resistor: R</strong>) ตัวเก็บประจุ (<strong>Capacitor: C</strong>) และตัวเหนี่ยวนำไฟฟ้า (<strong>Inductor: L</strong>) ตามผังวงจรไฟฟ้าต่อไปนี้</p>
+<p><img alt="" src="dc_circuit-1_schematic.png" /></p>
+<p>รูป: วงจรไฟฟ้าและตัวอย่างการวาดผังวงจร (<strong>Schematic</strong>) ด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p>ในผังวงจร จะเห็นได้ว่า เส้นสัญญาณเชื่อมต่อ หรือ "เน็ต" (<strong>Nets</strong>) มีการกำหนดหมายเลข <strong>0</strong>, <strong>1</strong>, ..., <strong>4</strong>
+ซึ่งโดยทั่วไปแล้ว <strong>0</strong> หมายถึง <strong>GND</strong> หรือ กราวด์ของวงจร นอกจากนั้นยังได้มีการกำหนดชื่อและชนิดของอุปกรณ์ รวมถึงการเชื่อมต่อกับสายสัญญาณตามที่ปรากฏในไฟล์ <strong>SPICE Netlist</strong> ของวงจรนี้ เช่น</p>
+<ul>
+<li><strong>R1</strong> เป็นชื่อของตัวต้านทานที่มีขนาด <strong>50 &Omega;</strong> และขาทั้งสองเชื่อมต่อกับเน็ตหมายเลข <strong>1</strong> และ <strong>2</strong> ตามลำดับ</li>
+<li><strong>R2</strong> เป็นชื่อของตัวต้านทานที่มีขนาด <strong>100 &Omega;</strong> และขาทั้งสองเชื่อมต่อกับเน็ตหมายเลข <strong>2</strong> และ <strong>3</strong> ตามลำดับ</li>
+<li><strong>R3</strong> เป็นชื่อของตัวต้านทานที่มีขนาด <strong>100 &Omega;</strong> และขาทั้งสองเชื่อมต่อกับเน็ตหมายเลข <strong>4</strong> และ <strong>2</strong> ตามลำดับ</li>
+<li><strong>R4</strong> เป็นชื่อของตัวต้านทานที่มีขนาด <strong>300 &Omega;</strong> และขาทั้งสองเชื่อมต่อกับเน็ตหมายเลข <strong>3</strong> และ <strong>0</strong> (<strong>GND</strong>) ตามลำดับ</li>
+<li><strong>C1</strong> เป็นชื่อของตัวเก็บประจุไฟฟ้าที่มีขนาด <strong>100 uF</strong> มีขาขั้วบวกและขั้วลบเชื่อมต่อกับเน็ตหมายเลข <strong>1</strong> และ <strong>0</strong> (<strong>GND</strong>) ตามลำดับ </li>
+<li><strong>L1</strong> เป็นชื่อของตัวเหนี่ยวนำไฟฟ้าที่มีขนาด <strong>100 mH</strong> มีขาเชื่อมต่อกับเน็ตหมายเลข <strong>3</strong> และ <strong>0</strong> (<strong>GND</strong>) ตามลำดับ </li>
+<li><strong>VS</strong> เป็นชื่อของแหล่งจ่ายแรงดันไฟฟ้าดีซีที่มีขนาด <strong>10V</strong> มีขาขั้วบวกและขั้วลบเชื่อมต่อกับเน็ตหมายเลข <strong>4</strong> และ <strong>0</strong> (<strong>GND</strong>) ตามลำดับ </li>
+</ul>
+<p><img alt="" src="dc_circuit-1_netlist.png" /></p>
+<p>รูป:  แสดงรายการอุปกรณ์และการเชื่อมต่อในวงจรตามรูปแบบของ <strong>SPICE Netlist</strong></p>
+<p>ถ้าต้องการทราบว่า มีแรงดันไฟฟ้าและกระแสไฟฟ้าไหลในวงจรอย่างไรบ้าง ภายใต้เงื่อนไขสภาวะคงตัวสำหรับกระแสตรง
+(<strong>DC Steady-State Conditions</strong>) จะมีแนวทางการวิเคราะห์อย่างไร ?</p>
+<p>เนื่องจากวงจรนี้มีแหล่งจ่ายอิสระที่ให้แรงดันไฟฟ้าคงที่ (<script type="math/tex">V_S=10V</script>) ดังนั้นในสภาวะคงตัวสำหรับกระแสตรง
+จะไม่มีกระแสไหลผ่านตัวเก็บประจุไฟฟ้าและแรงดันตกคร่อมไม่เปลี่ยนแปลง และให้มองว่าไม่มีการเชื่อมต่อทางไฟฟ้าระหว่างขั้วทั้งสองของตัวเก็บประจุ (<strong>Open Circuit</strong>)</p>
+<p>ในขณะที่ตัวเหนี่ยวนำไฟฟ้าจะถูกมองว่า มีความต้านทานเป็น <strong>0 &Omega;</strong> (<strong>Short Circuit</strong>) ระหว่างปลายทั้งสองด้าน มีกระแสไหลผ่านได้ แต่แรงดันตกคร่อมเป็น <strong>0 V</strong> ภายใต้เงื่อนไขดังกล่าว จึงให้ผลเหมือนวงจรต่อไปนี้ </p>
+<p><img alt="" src="dc_circuit-2_schematic.png" /></p>
+<p>รูป: วงจรในสภาวะคงตัวสำหรับกระแสตรง</p>
+<p>แหล่งจ่ายแรงดันไฟฟ้ากระแสตรง <script type="math/tex">V_S</script> จะทำให้มีกระแสไหลผ่านตัวต้านทาน <script type="math/tex">R_2</script> กับ <script type="math/tex">R_3</script> แต่ไม่มีกระแสไหลผ่าน <script type="math/tex">R_1</script> เนื่องจากไม่ครบวงจร (<strong>Open Circuit</strong>) เช่นเดียวกับ <script type="math/tex">R_4</script> เนื่องจากมีการลัดวงจร (<strong>Short Circuit</strong>)</p>
+<p>หากใช้ <strong>Kirchhoff's Current Law (KCL)</strong> ในการวิเคราะห์ จะได้สมการดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+ \text{KCL: } \quad \frac{V_4 - V_2}{R_3} = \frac{V_2-V_3}{R_2} = I
+</script>
+โดยที่ <script type="math/tex">V_i</script> หมายถึง แรงดันไฟฟ้าที่จุดอ้างอิงตามหมายเลข <script type="math/tex">i=1,2,3,4</script> เทียบกับ <strong>GND</strong> ของวงจร
+และ <script type="math/tex">I</script> หมายถึง กระแสที่ไหลในวงจรผ่าน <script type="math/tex">R_2</script> และ <script type="math/tex">R_3</script>
+</p>
+<p>ในวงจรนี้ <script type="math/tex">V_3 = 0V</script> และ <script type="math/tex">V_4 = V_S = 10V</script> ดังนั้นจึงจัดรูปแบบของสมการใหม่ได้เป็น
+<script type="math/tex; mode=display">
+  \begin{align}
+   \frac{V_S}{R_3} &= \Big(\frac{1}{R_2} + \frac{1}{R_3}\Big) V_2  \\
+    V_2 &= \frac{R_2}{R_2+R_3} V_S \\
+  \end{align}
+</script>
+จากนั้นก็สามารถคำนวณปริมาณกระแส <script type="math/tex">I</script> ได้ดังนี้
+<script type="math/tex; mode=display">
+   I = \frac{V_2}{R_2} = \frac{V_S}{R_2 + R_3} = \frac{10\,V}{(100\,\Omega + 100\,\Omega)} = 0.05\,A
+</script>
+</p>
+<p>แรงดันตกคร่อมที่ตัวเก็บประจุ <script type="math/tex">C_1</script> เท่ากับ
+<script type="math/tex; mode=display">
+\begin{align}
+  V(C_1) &= V_1 = V_2 \\
+         &= \frac{R_2}{(R_2+R_3)} V_S = \frac{100\,\Omega}{200\,\Omega} \times 10\,V = 5\,V \\
+\end{align}
+</script>
+</p>
+<p>และกระแสที่ไหลผ่านตัวเหนี่ยวนำ <script type="math/tex">L_1</script> จะได้เท่ากับ 
+<script type="math/tex; mode=display">
+    I(L_1) = I = 0.05 A
+</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dc-steady-state-analysis_1">&#9655; <strong>การจำลองการทำงานของวงจร: DC Steady-State Analysis</strong><a class="headerlink" href="#dc-steady-state-analysis_1" title="Permanent link">#</a></h2>
+<p>ลองมาเปรียบเทียบกับผลการวิเคราะห์วงจรไฟฟ้าด้วยซอฟต์แวร์ <strong>EasyEDA (v6.5.3)</strong> ในโหมด <strong>DC Operating Point (.dc)</strong> ดังนี้</p>
+<ul>
+<li><code>V(4)</code> หมายถึง แรงดันไฟฟ้าของ <script type="math/tex">V_S</script> ที่ขั้วบวก จะได้ <strong>10.0 V</strong></li>
+<li><code>V(1)</code> หมายถึง แรงดันไฟฟ้าที่ขั้วบวกของตัวเก็บประจุ <script type="math/tex">C_1</script> จะได้ประมาณ <strong>5.0 V</strong> 
+และได้เท่ากับ <code>V(2)</code> เนื่องจากไม่มีกระแสไหลผ่าน <script type="math/tex">R_1</script>ดังนั้นแรงดันตกคร่อมที่ตัวต้านทานจึงเป็น <strong>0.0 V</strong></li>
+<li><code>I(L1)</code> หมายถึง กระแสไฟฟ้าที่ไหลผ่านตัวเหนี่ยวนำไฟฟ้า <script type="math/tex">L_1</script> และได้ค่าประมาณ <strong>0.05 A</strong>
+เช่นเดียวกับกระแสไฟฟ้า <code>I(R2)</code> และ <code>I(R3)</code> ที่ไหลผ่าน <script type="math/tex">R_2</script> และ <script type="math/tex">R_3</script>
+</li>
+</ul>
+<p><img alt="" src="dc_circuit-1_op.png" /></p>
+<p>รูป: ผลการวิเคราะห์วงจรด้วย <strong>EasyEDA</strong> ในโหมด <code>.dc</code></p>
+<p><strong>ข้อสังเกต:</strong> ในการวิเคราะห์วงจรไฟฟ้าด้วย <strong>EasyEDA</strong> ซึ่งอาศัยโปรแกรม <strong>LTspice</strong>
+เป็นตัวจำลองการทำงานของวงจร เนื่องจากเป็นการประมวลผลเชิงตัวเลข (<strong>Numerical Computing</strong>) ค่าที่ได้ซึ่งเป็นเลขทศนิยม อาจมีความแตกต่างจากค่าที่คำนวณได้ในเชิงทฤษฎี แต่ความคลาดเคลื่อนของผลลัพธ์ที่ได้นั้นถือว่าน้อยมาก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dc-transient-analysis">&#9655; <strong>การจำลองการทำงานของวงจร: DC Transient Analysis</strong><a class="headerlink" href="#dc-transient-analysis" title="Permanent link">#</a></h2>
+<p>จากผังวงจรในตัวอย่างที่แล้ว หากแก้ไขวงจรเล็กน้อย โดยใส่สวิตช์ไฟฟ้า (<strong>Switch</strong>) เพิ่มในวงจร และให้สวิตช์ <strong>SW1</strong> ถูกเปิดขึ้น (เปลี่ยนสถานะจาก <strong>Close</strong> เป็น <strong>Open</strong>) เมื่อเวลา <script type="math/tex">t=0</script> วินาที เพื่อแยกแหล่งจ่าย <script type="math/tex">V_S</script> ออกจากวงจรไฟฟ้า </p>
+<p><img alt="" src="dc_circuit-3_schematic.png" /></p>
+<p>รูป: การเพิ่มสวิตช์ในวงจร และถูกเปิดออกเมื่อเวลา <script type="math/tex">t=0</script>
+</p>
+<p>ในตัวอย่างนี้ เมื่อเวลา <script type="math/tex">t < 0</script> ตัวเก็บประจุไฟฟ้า <script type="math/tex">C_1</script> และตัวเหนี่ยวนำไฟฟ้า <script type="math/tex">L_1</script> มีพลังงานเก็บอยู่ภายใน  ดังนั้นสถานะเริ่มต้นของวงจรจึงไม่เป็นศูนย์  (<strong>Non-Zero Initial Conditions</strong>) และสามารถหาได้โดยการวิเคราะห์ในโหมด <code>.dc</code>
+(<strong>DC operating point</strong>) ตามที่ได้นำเสนอไปแล้ว </p>
+<p>ผลตอบสนองของวงจรตั้งแต่เวลา <script type="math/tex">t=0</script> เป็นต้นไป จึงขึ้นอยู่กับสถานะเริ่มต้นของวงจร และเรียกผลตอบสนองในลักษณะนี้ว่า ผลตอบสนองธรรมชาติ (<strong>Natural Response</strong>)</p>
+<p>เมื่อไม่มีแหล่งจ่าย <script type="math/tex">V_S</script> อยู่ในวงจรแล้ว และเวลาผ่านไป วงจรจะเข้าสู่สถานะคงตัว (<strong>DC Steady State</strong>) ดังนั้นจึงไม่มีกระแสไหลผ่าน <script type="math/tex">L_1</script> และแรงดันตกคร่อมที่ตัวเก็บประจุ <script type="math/tex">C_1</script> เป็น <strong>0V</strong> </p>
+<p>คำสั่ง <strong>SPICE directive</strong> สำหรับการวิเคราะห์วงจรในโหมด <strong>DC Transient</strong> คือ
+<code>.tran</code> ซึ่งจะต้องมีการกำหนดเวลาเริ่มต้นและเวลาจบการจำลองการทำงาน เช่น <strong>0</strong> ถึง <strong>50 msec</strong> 
+ในช่วงเวลาดังกล่าวจะต้องมีการแบ่งออกเป็นช่วงย่อยที่เรียกว่า <strong>Step Size</strong> เช่น <strong>5 usec</strong>
+เพื่อการวิเคราะห์สถานะของวงจรในแต่ละช่วงย่อย</p>
+<p>คำสั่ง <code>.ic</code> เป็นการกำหนดเงื่อนไขเริ่มต้น (<strong>Initial Conditions</strong>)
+เช่น สำหรับแรงดันตกคร่อมของตัวเก็บประจุ <script type="math/tex">C_1</script> และกระแสที่ไหลในขณะนั้นสำหรับตัวเหนี่ยวนำไฟฟ้า <script type="math/tex">L_1</script>
+ตามรูปแบบต่อไปนี้</p>
+<pre><code class="language-text">.save I(L1) V(1)
+.ic V(1)=5V I(L1)=0.05A
+.tran 0 50m 0 5u
+</code></pre>
+<p>&nbsp;</p>
+<p>จากการจำลองการทำงาน จะเห็นได้ว่า <code>V(1)</code> ซึ่งเป็นแรงดันตกคร่อมที่ตัวเก็บประจุ <script type="math/tex">C_1</script>
+ที่เวลาเริ่มต้น <script type="math/tex">t=0</script> มีค่าเท่ากับ <script type="math/tex">5V</script> จากนั้นจะลดลงจนเป็นศูนย์ ในขณะที่ <code>I(L1)</code>
+ซึ่งเป็นกระแสไฟฟ้าที่ไหลผ่าน <script type="math/tex">L_1</script> มีค่าเริ่มต้นที่ <script type="math/tex">50mA</script> จากนั้นจะลดลงจนเป็นศูนย์</p>
+<p><img alt="" src="dc_circuit-3_sim.png" /></p>
+<p>รูป: แสดงรูปกราฟสำหรับแรงดันตกคร่อมที่ <script type="math/tex">C_1</script> และกระแสที่ไหลผ่าน <script type="math/tex">L_1</script>
+</p>
+<p>อีกรูปแบบหนึ่งในการกำหนดเงื่อนไขเริ่มต้นให้กับตัวเก็บประจุและตัวเหนี่ยวนำไฟฟ้าในวงจร คือ การเพิ่มคำสั่ง <code>ic</code>
+(<strong>Set Initial Condition</strong>) เจาะจงสำหรับอุปกรณ์แต่ละตัว โดยการเขียนต่อท้ายข้อความที่กำหนดค่าของอุปกรณ์ และท้ายคำสั่ง <code>.trans</code> จะต้องเขียนคำว่า <code>uic</code> เพิ่มตามรูปแบบต่อไปนี้</p>
+<p><img alt="" src="dc_circuit-4_schematic.png" /></p>
+<p>รูป: ตัวอย่างการวาดผังวงจรและกำหนดเงื่อนไขเริ่มต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dc-switching-analysis">&#9655; <strong>การวิเคราะห์วงจรไฟฟ้า: DC Switching Analysis</strong><a class="headerlink" href="#dc-switching-analysis" title="Permanent link">#</a></h2>
+<p>หากต้องการจำลองการเปิดและปิดสวิตช์ <strong>SW1</strong> ตามช่วงเวลาที่กำหนด ในกรณีนี้ เราก็สามารถเลือกใช้อุปกรณ์ที่เรียกว่า
+<strong>VCSW (Voltage-Controlled Switch)</strong> แล้วนำมาต่อในวงจร และกำหนดคุณสมบัติของอุปกรณ์ <strong>VCSW</strong> ได้โดยใช้คำสั่ง <code>.model</code> ของ <strong>SPICE directive</strong> เช่น การกำหนดระดับแรงดัน <code>vt</code> (<strong>Threshold Voltage</strong>) ที่ทำให้สวิตช์ทำงาน (<strong>Close</strong> หรือ <strong>ON</strong>) และค่าความต้านทานของสวิตช์ <code>ron</code> และ <code>roff</code> ในสถานะ <strong>ON</strong> และ <strong>OFF</strong> ตามลำดับ แต่จะต้องมีการสร้างสัญญาณไฟฟ้าควบคุมการเปิดและปิดสวิตช์ด้วย ในกรณีนี้เราจะใช้แหล่งจ่ายแบบสัญญาณพัลส์ (<strong>PULSE</strong>) </p>
+<p><img alt="" src="dc_circuit-5_vcsw.png" /></p>
+<p>รูป: ตัวอย่างการวาดผังวงจรที่มีการใช้งาน <strong>VCSW</strong></p>
+<p>จากรูปตัวอย่างจะเห็นได้ว่า สวิตช์จะเริ่มทำงานในช่วงเวลา <strong>t=0 msec</strong> เป็นต้นไป อยู่ในสถานะ <strong>ON</strong>
+จนถึงเวลา <strong>t=60 msec</strong> จะเปลี่ยนสถานะเป็น <strong>OFF</strong> การทำงานและสถานะของสวิตช์ <strong>SW1</strong> ถูกกำหนดโดยระดับแรงดันของแหล่งจ่าย <strong>VP</strong> ที่สร้างสัญญาณแบบ <strong>PULSE</strong> ตามการตั้งค่าในรูปตัวอย่าง
+(<strong>Voltage Source Settings</strong>)</p>
+<p><img alt="" src="dc_circuit-5_plot.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของวงจรและรูปกราฟของสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dc-transient-analysis_1">&#9655; <strong>การวิเคราะห์วงจรไฟฟ้า: DC Transient Analysis</strong><a class="headerlink" href="#dc-transient-analysis_1" title="Permanent link">#</a></h2>
+<p>ถ้ากำหนดให้ <script type="math/tex">v_1</script> และ <script type="math/tex">v_3</script> เป็นแรงดันไฟฟ้าที่จุดอ้างอิงหมายเลข <strong>1</strong>  และ <strong>3</strong>
+เทียบกับ <strong>GND</strong> ของวงจร และให้ <script type="math/tex">i_1</script> เป็นกระแสที่ไหลผ่านตัวเหนี่ยวนำ <script type="math/tex">L_1</script> และ <script type="math/tex">v_1</script>
+เป็นแรงดันไฟฟ้าตกคร่อมที่ตัวเก็บประจุ <script type="math/tex">C_1</script> เมื่อการวิเคราะห์วงจรด้วย <strong>KCL</strong> จะได้สมการดังต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+    -C_1 v'_1 &= \frac{v_1 - v_3}{R_1+R_2}  &\qquad \text{(Eq.1)}\\
+  i_1 + \frac{v_3}{R_4} &= \frac{v_1-v_3}{R_1+R_2} &\qquad \text{(Eq.2)} \\
+    i'_1 &= \frac{1}{L_1} v_3  &\qquad  \text{(Eq.3)} \\
+ \end{align}
+</script>
+</p>
+<p>จากนั้นให้หา <script type="math/tex">v_3</script> จากสมการ <strong>Eq.2</strong> แล้วไปแทนที่ลงในสมการ <strong>Eq.1</strong> และ <strong>Eq.3</strong> ตามลำดับ 
+<script type="math/tex; mode=display">
+  v_3 = -\frac{(R_1+R_2)R_4}{R_1+R_2+R_4} i_1
+       + \frac{R_4}{R_1+R_2+R4} v_1 \\
+</script>
+</p>
+<p>และเขียนสมการ <strong>Eq.1</strong> และ <strong>Eq.3</strong> ซึ่งเป็นสมการเชิงอนุพันธ์ (<strong>Differential Equations</strong>) ที่มีฟังก์ชัน <script type="math/tex">\{v_1(t), i_1(t)\}</script> และอนุพันธ์ <script type="math/tex">\{v'_1(t), i'_1(t)\}</script> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+  v'_1 &= -\frac{1}{C_1(R_1+R_2+R_4)} v_1 
+             -\frac{R_4}{C_1(R_1+R_2+R_4)} i_1  &\quad \text{(Eq.1)}\\
+  i'_1 &= +\frac{R_4}{L_1(R_1+R_2+R_4)} v_1 - \frac{(R_1+R_2)R_4}{L_1(R_1+R_2+R_4)} i_1 &\quad  \text{(Eq.3)} \\
+ \end{align}
+</script>
+</p>
+<p>เราจะได้ระบบสมการเชิงอนุพันธ์ที่มีเงื่อนไขเริ่มต้น <script type="math/tex">v_1(0)=5V</script> และ <script type="math/tex">i_1(0)=0.05A</script> และสามารถเขียนโปรแกรมคอมพิวเตอร์เพื่อหาผลเฉลยสำหรับฟังก์ชัน <script type="math/tex">v_1(t)</script> และ <script type="math/tex">i_1(t)</script> และแสดงรูปกราฟของฟังก์ชันที่เป็นผลเฉลยตามแนวทางต่อไปนี้</p>
+<p>&nbsp;</p>
+<p>ลองมาดูตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> โดยใช้วิธีประมวลผลเชิงสัญลักษณ์สำหรับการวิเคราะห์วงจร
+และหาผลเฉลยของสมการเชิงอนุพันธ์ </p>
+<pre><code class="language-matlab">clearvars; clf;
+syms t v1(t) v3(t) i1(t) 
+syms C1 L1 R1 R2 R4 positive
+% write equations 
+eq1 = -C1*diff(v1,t) == (v1-v3)/(R1+R2)
+eq2 = i1 + v3/R4 == (v1 - v3)/(R1+R2)
+eq3 = diff(i1,t) == v3/L1
+% rewrite eq2 the expression for v3
+v3_expr = collect( rhs( isolate(eq2, v3) ), [i1 v1])
+% substitute the expression of v3 in eq1 and eq3
+eq1 = isolate( subs( eq1, v3, v3_expr ), diff(v1,t) )
+eq3 = isolate( subs( eq3, v3, v3_expr ), diff(i1,t) )
+% apply specific values to circuit parameters 
+params = [L1 C1 R1 R2 R4];
+values = [100e-3 100e-6 50 100 300];
+% substitute circuit parameters in the equations with specific values
+% define the differential equation system 
+ode = [subs(eq1,params,values), subs(eq3,params,values)].'
+% set the initial conditions
+ics = [v1(0)==5, i1(0)==0.05];
+% show the ODE in matrix form: Y1=i1 and Y2=v1
+[V,S] = odeToVectorField(ode)
+% solve the ODE system with initial conditions
+[i1, v1] = dsolve( ode, ics );
+% plot v1 and i1
+% set time range 0 to 50 msec
+t_range = [0,0.05];
+% create a figure with two subplots
+figure
+subplot(2,1,1)
+% plot v1(t) on the first subplot
+fplot( v1, t_range ), ylabel('v_1(t) [V]'), 
+xlabel('s'), grid on
+% plot i1(t) on the second subplot
+subplot(2,1,2)
+fplot( 1000*i1, t_range ), ylabel('i_1(t) [mA]'), 
+xlabel('s'), grid on
+</code></pre>
+<p>จากโค้ด <strong>MATLAB</strong> ลองมาดูตัวอย่างเอาต์พุตที่ได้จากการรันโค้ดบางส่วนดังนี้</p>
+<p><img alt="" src="matlab_output-1.png" /></p>
+<p>รูป: ตัวอย่างการรันโค้ด <strong>MATLAB</strong> (ส่วนที่ 1)</p>
+<p><img alt="" src="matlab_output-2.png" /></p>
+<p>รูป: ตัวอย่างการรันโค้ด <strong>MATLAB</strong> (ส่วนที่ 2)</p>
+<p>กราฟสำหรับฟังก์ชัน <script type="math/tex">v_1(t)</script> และ <script type="math/tex">i_1(t)</script> ซึ่งเป็นผลเฉลยของระบบสมการเชิงอนุพันธ์
+ก็มีลักษณะเหมือนกับผลลัพธ์ที่ได้จากการจำลองการทำงานด้วย <strong>EasyEDA</strong></p>
+<p><img alt="" src="matlab_plot-1.png" /></p>
+<p>รูป: แสดงรูปกราฟสำหรับฟังก์ชัน <script type="math/tex">v_1(t)</script> และ <script type="math/tex">i_1(t)</script> ในช่วงเวลา <script type="math/tex">t \in [0,50]</script> msec</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการวิเคราะห์วงจรไฟฟ้ากระแสตรงที่ประกอบด้วย <strong>R L C</strong> และใช้ซอฟต์แวร์
+<strong>EasyEDA / LTspice</strong> จำลองการทำงานและเปรียบเทียบผลที่ได้ นอกจากนั้นแล้วยังมีตัวอย่างโค้ด
+<strong>MATLAB</strong> ที่ใช้วิธีการประมวลผลเชิงสัญลักษณ์เพื่อช่วยในการวิเคราะห์วงจร</p>
+<p>หากสนใจตัวอย่างเพิ่มเติมสำหรับการเขียนโค้ด <strong>MATLAB</strong> หรือ <strong>Python</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ ด้วยวิธีการคำนวณเชิงสัญลักษณ์และเชิงตัวเลข สามารถอ่านเนื้อหาเพิ่มเติมได้จากบทความภาษาทไทยต่อไปนี้</p>
+<ul>
+<li><a href="../../python/python_ode_solving/">"<strong>ODE Solving with Python</strong>"</a> ตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์</li>
+<li><a href="../../matlab/matlab_ode_solving/">"<strong>ODE Solving with MATLAB</strong>"</a> ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์</li>
+<li><a href="../../matlab/matlab_laplace_ode_solving/">"<strong>ODE Solving with MATLAB - Laplace Transforms</strong>"</a> ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์ด้วยวิธีการแปลงลาปลาซ
+&nbsp;</li>
+</ul>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-04-26 | Last Updated: 2022-04-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
