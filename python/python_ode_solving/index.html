@@ -493,16 +493,15 @@ D2y = y.diff(t,2)
 
 # 2nd-order ODE: y'' + 2y' + y = sin(2t)
 # Initial conditions: y(0)=-1, y'(0)=1
-
 # define the ODE
 ode  = Eq( D2y + 2*D1y + y, sin(2*t) )
-# set the initial condtion: y(0) = 1.0
-ics  = { y.subs(t,0): -1.0, D1y.subs(t,0): 1.0 }
+# set the initial condition: y(0) = 1.0
+ics  = { y.subs(t,0): -1, D1y.subs(t,0): 1 }
 # solve the ODE with an initial condition (the IVP)
 sol  = dsolve( ode, ics=ics )
 print( sol.lhs, '=', sol.rhs )
 display( Eq( sol.lhs, sol.rhs ) )
-# =&gt; y(t) = (0.4*t - 0.84)*exp(-t) - 3*sin(2*t)/25 - 4*cos(2*t)/25
+# =&gt; y(t) = (2*t/5 - 21/25)*exp(-t) - 3*sin(2*t)/25 - 4*cos(2*t)/25
 
 # convert the the solution into a callable function
 f = lambdify( t, sol.rhs )
@@ -569,7 +568,7 @@ plt.show()
 from sympy.solvers.ode.systems import dsolve_system
 import numpy as np
 import matplotlib.pyplot as plt
-from IPython.display import display, Latex
+from IPython.display import display
 
 # define a symbol: use t as an independent variable
 t = symbols('t')
@@ -581,25 +580,19 @@ D2y = Derivative(y(t),t,2)
 
 # 2nd-order ODE: y'' + 2y' + y = sin(2t)
 # Initial conditions: y(0)=-1, y'(0)=1
-
 # define the ODE (system of 1st-order differential equations)
 # [z1'(t), z2'(t)] = [ z2(t), f(t,z1,z2) ]
 ode  = [ Eq( z1(t).diff(t), z2(t) ), 
          Eq( z2(t).diff(t), -2*z2(t) -z1(t) + sin(2*t) ) ]
-
-# set the initial condtion: y(0) = 1.0
-ics  = { z1(0): -1.0, z2(0): 1.0 }
+# set the initial condition: y(0) = 1.0
+ics  = { z1(0): -1, z2(0): 1 }
 # solve the ODE with an initial condition (the IVP)
-sol = dsolve_system( ode, ics=ics )
-
-# =&gt; y(t) = (0.4*t - 0.84)*exp(-t) - 3*sin(2*t)/25 - 4*cos(2*t)/25
-sol_eq = sol[0][0] # get y(t) from z1(t)
-for i in range(5): # repeat simplification for 5 steps
-    sol_eq = simplify( expand( sol_eq) ) 
-display( expand(sol_eq) )
+sol = dsolve( ode, ics=ics )
+sol_eq = expand( sol[0].rhs ) 
+display( sol_eq )
 
 # convert the the solution into a callable function
-f = lambdify( t, sol_eq.rhs )
+f = lambdify( t, sol_eq )
 # create an array of 100 time steps between [t0,tf]
 t0 = 0.0
 tf = 10.0
@@ -613,7 +606,8 @@ plt.ylabel('y(t)')
 plt.show()
 </code></pre>
 <p><img alt="" src="python_output2-3.png" /></p>
-<p>รูป: ผลลัพธ์จากการรันโค้ดเพื่อสาธิตการใช้คำสั่ง <code>dsolve_system()</code></p>
+<p>รูป: ผลลัพธ์จากการรันโค้ดเพื่อสาธิตการใช้คำสั่ง <code>dsolve()</code></p>
+<p>&nbsp;</p>
 <p>ลองมาดูตัวอย่างการคำนวณด้วยวิธีเชิงตัวเลข โดยใช้คำสั่ง <code>solve_ivp()</code> ของ <strong>SciPy</strong></p>
 <pre><code class="language-python">import numpy as np
 from scipy.integrate import solve_ivp
@@ -621,7 +615,6 @@ import matplotlib.pyplot as plt
 
 # 2nd-order ODE: y'' + 2y' + y = sin(2t)
 # Initial conditions: y(0)=-1, y'(0)=1
-
 t0 = 0.0   # start point for t
 tf = 10.0  # end point for t
 h  = 0.05  # step size
@@ -840,7 +833,7 @@ plt.show()
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-04-14 | Last Updated: 2022-04-23</p></div>
+<p>Created: 2022-04-14 | Last Updated: 2022-04-29</p></div>
             </div>
         </div>
 
