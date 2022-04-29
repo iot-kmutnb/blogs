@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="RSP">
-        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/matlab/matlab_laplace_ode_solving/">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/python/python_laplace_ode_solving/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยการแปลงลาปลาซและเขียนโค้ด MATLAB - IoT Engineering Education</title>
+        <title>การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซและเขียนโค้ด Python - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -79,7 +79,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#matlab" class="nav-link">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยการแปลงลาปลาซและเขียนโค้ด MATLAB</a>
+            <li class="nav-item" data-level="1"><a href="#python" class="nav-link">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซและเขียนโค้ด Python</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; สมการเชิงอนุพันธ์สามัญและการหาผลเฉลย</a>
               <ul class="nav flex-column">
@@ -89,7 +89,11 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#matlab_1" class="nav-link">&#9655; การเขียนโค้ดด้วย MATLAB เพื่อหาผลการแปลงลาปลาซด้านเดียว</a>
+            <li class="nav-item" data-level="2"><a href="#python_1" class="nav-link">&#9655; การเขียนโค้ด Python: การอนุพันธ์และอินทิกรัลสำหรับฟังก์ชัน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python_2" class="nav-link">&#9655; การเขียนโค้ด Python: การหาผลการแปลงลาปลาซ</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -102,10 +106,6 @@
               </ul>
             </li>
             <li class="nav-item" data-level="2"><a href="#rc" class="nav-link">&#9655; การวิเคราะห์วงจร RC ด้วยการแปลงลาปลาซ</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-level="2"><a href="#bode-plot-rc" class="nav-link">&#9655; การแสดงรูปกราฟ Bode Plot สำหรับวงจร RC</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -124,13 +124,18 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="matlab">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยการแปลงลาปลาซและเขียนโค้ด MATLAB<a class="headerlink" href="#matlab" title="Permanent link">#</a></h1>
-<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซ</p>
-<p><strong>Keywords:</strong> <em>MATLAB</em>, <em>Ordinary Differential Equations</em>, <em>ODE Solving</em>, <em>Symbolic Methods</em>, <em>Laplace Transforms</em>, <em>RC Circuit</em></p>
+<h1 id="python">การหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซและเขียนโค้ด Python<a class="headerlink" href="#python" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซ</p>
+<p><strong>Keywords:</strong> <em>Python</em>, <em>SymPy</em>, <em>Ordinary Differential Equations</em>, <em>ODE Solving</em>, <em>Symbolic Methods</em>, <em>Laplace Transforms</em>, <em>RC Circuit</em></p>
 <hr />
 <h2 id="_1">&#9655; <strong>สมการเชิงอนุพันธ์สามัญและการหาผลเฉลย</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
-<p>การวิเคราะห์วงจรไฟฟ้าพื้นฐานที่ประกอบด้วยตัวต้านทาน ตัวเก็บประจุ ตัวเหนี่ยวนำไฟฟ้า หรือเรียกว่า วงจรประเภท <strong>RLC</strong>
-ซึ่งถือว่าเป็นวงจรประเภทเชิงเส้น และสำหรับวงจรประเภทนี้ เราสามารถใช้สมการเชิงอนุพันธ์สามัญ (<strong>ODE</strong>) เพื่อสร้างแบบจำลอง หรือ สร้างโมเดลของวงจรไฟฟ้า ในการวิเคราะห์เพื่อดูการเปลี่ยนแปลงของปริมาณไฟฟ้าในเชิงเวลาได้ (<strong>Transient Analysis</strong>) เช่น แรงดันไฟฟ้าหรือกระแสไฟฟ้าในวงจร</p>
+<p>การวิเคราะห์วงจรไฟฟ้าพื้นฐานที่ประกอบด้วยตัวต้านทาน (<strong>Resistor: R</strong>)
+ตัวเก็บประจุ (<strong>Capacitor: C</strong>) ตัวเหนี่ยวนำไฟฟ้า (<strong>Inductor: L</strong>)
+ซึ่งเรามักจะเรียกวงจรประเภทนี้ว่า วงจร <strong>RLC</strong></p>
+<p>สำหรับวงจรประเภทนี้ ซึ่งถือว่าเป็นวงจรประเภทเชิงเส้น เราสามารถใช้สมการเชิงอนุพันธ์สามัญ (<strong>ODE</strong>)
+เพื่อสร้างแบบจำลองทางคณิตศาสตร์ สามารถอธิบายพฤติกรรมของวงจรไฟฟ้า
+หรือวิเคราะห์ดูการเปลี่ยนแปลงของปริมาณไฟฟ้าในเชิงเวลาได้ (<strong>Transient Analysis</strong>)
+เช่น แรงดันไฟฟ้าหรือกระแสไฟฟ้าในวงจร</p>
 <p>ถ้าต้องการหาผลเฉลยของสมการเชิงอนุพันธ์สามัญที่มีคุณสมบัติต่อไปนี้ เราสามารถใช้วิธีที่เรียกว่า "การแปลงลาปลาซ"
 (<strong>Laplace Transform</strong>) ในการหาผลเฉลยได้</p>
 <ol>
@@ -191,14 +196,19 @@
 \end{align}
 </script>
 </p>
-<p>จากตัวอย่างการคำนวณ ถ้ากำหนดขอบเขตของการลู่เข้า (<strong>Region of Convergence: ROC</strong>) สำหรับตัวแปร <strong>s</strong> เช่น ถ้าให้ส่วนที่เป็นจำนวนจริงของตัวแปร <script type="math/tex">s</script> หรือ <script type="math/tex">Re\{s\}</script> มีค่ามากกว่า 0 ก็จะทำให้หาสามารถหาค่าลิมิตได้ในกรณีที่ <script type="math/tex">t \rightarrow \infty</script>
+<p>จากตัวอย่างการคำนวณ ถ้ากำหนดขอบเขตของการลู่เข้า (<strong>Region of Convergence: ROC</strong>) สำหรับตัวแปร <strong>s</strong> เช่น ถ้าให้ส่วนที่เป็นจำนวนจริงของตัวแปร <script type="math/tex">s</script> หรือ <script type="math/tex">Re\{s\}</script> มีค่ามากกว่า 0 ก็จะทำให้สามารถหาค่าลิมิตได้ในกรณีที่ <script type="math/tex">t \rightarrow \infty</script>
 </p>
 <p>&nbsp;</p>
-<p>ฟังก์ชัน <script type="math/tex">u(t)</script> ที่มีลักษณะเป็นขั้นบันไดหนึ่งหน่วย (<strong>Unit-step Function</strong>) หรือเรียกว่า ฟังก์ชันเฮฟวีไซด์ (<strong>Heaviside Function</strong>) มีค่าแบ่งเป็นช่วงดังนี้</p>
+<p>ฟังก์ชัน <script type="math/tex">u(t)</script> ที่มีลักษณะเป็นขั้นบันไดหนึ่งหน่วย <script type="math/tex">u(t)</script> (<strong>Unit-step Function</strong>) หรือเรียกว่า ฟังก์ชันเฮฟวีไซด์ <script type="math/tex">\theta(t)</script> (<strong>Heaviside Function</strong>) มีค่าแบ่งเป็นช่วงดังนี้</p>
 <p>
 <script type="math/tex; mode=display">
     u(t) = \begin{cases} 
       1,  & \; t \geq 0 \\
+      0,  & \; t < 0 \\
+   \end{cases}\\
+    \theta(t) = \begin{cases} 
+      1,  & \; t > 0 \\
+\frac{1}{2}, & \; t=0 \\
       0,  & \; t < 0 \\
    \end{cases}
 </script>
@@ -383,38 +393,215 @@
 <p>โดยทั่วไปแล้ว ตารางของคู่การแปลงลาปลาซ และคุณสมบัติต่าง ๆ ของการแปลงลาปลาซ มีประโยชน์และช่วยให้ง่ายขึ้นเมื่อต้องการหาผลการแปลงลาปลาซ และการแปลงลาปลาซผกผัน</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="matlab_1">&#9655; <strong>การเขียนโค้ดด้วย MATLAB เพื่อหาผลการแปลงลาปลาซด้านเดียว</strong><a class="headerlink" href="#matlab_1" title="Permanent link">#</a></h2>
-<p>จากตัวอย่างฟังก์ชันพื้นฐาน ลองมาดูการใช้คำสั่ง <code>laplace()</code> ของ <strong>MATALB - Symbolic Math Toolbox</strong>
-เพื่อหาผลการแปลงลาปลาซด้านเดียว โดยมีการประกาศให้ <script type="math/tex">t</script> และ <script type="math/tex">s</script> เป็นสัญลักษณ์สำหรับตัวแปรอิสระของฟังก์ชัน</p>
-<pre><code class="language-matlab">clearvars
-syms t s a c
-syms omega_0 t_0 positive
-% Laplace transform of the Dirac-delta function
-laplace( dirac(t),t,s )
-% Laplace transform of a constant function
-laplace( c,t,s )
-% Laplace transform of the Heaviside function
-laplace( heaviside(t),t,s )
-% Laplace transform of exponential function
-laplace( exp(-a*t),t,s )
-% Laplace transform of a sine function
-laplace( sin(omega_0*t),t,s )
-% Laplace transform of a cosine function
-laplace( cos(omega_0*t),t,s )
-% Laplace transform of a pulse function
-laplace( heaviside(t) - heaviside(t-t_0),t,s )
-% Laplace transform of a ramp function
-laplace( t*heaviside(t),t,s )
-% Laplace transform of an exponentially damped sine
-laplace( exp(-a*t)*sin(omega_0*t),t,s)
-% Laplace transform of an exponentially damped cosine
-laplace( exp(-a*t)*cos(omega_0*t),t,s )
+<h2 id="python_1">&#9655; <strong>การเขียนโค้ด Python: การอนุพันธ์และอินทิกรัลสำหรับฟังก์ชัน</strong><a class="headerlink" href="#python_1" title="Permanent link">#</a></h2>
+<p>ลองมาดูการเขียนโค้ด <strong>Python</strong> สำหรับ <strong>SymPy</strong> (<strong>v1.10.0+</strong>)  ตรวจสอบเวอร์ชันของ <strong>SymPy</strong>
+โดยทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-python">import sympy
+print(sympy.__version__)
 </code></pre>
-<p><img alt="" src="matlab_laplace_output-1.png" /></p>
-<p>รูป: ตัวอย่างการเขียนโค้ดเพื่อหาผลการแปลงลาปลาซโดยใช้ <strong>MATLAB (R2022a)</strong></p>
-<p>หากต้องการหาผลการแปลงลาปลาซผกผัน ก็สามารถใช้คำสั่ง <code>ilaplace()</code> ของ <strong>MATLAB</strong> ในการคำนวณได้</p>
-<p><img alt="" src="matlab_laplace_output-2.png" /></p>
-<p>รูป: ตัวอย่างการใช้คำสั่ง <code>ilaplace()</code> เพื่อหาผลการแปลงลาปลาซผกผัน</p>
+<p>&nbsp;</p>
+<p><strong>SymPy</strong> มีคำสั่ง <code>sympy.diff()</code> และ  <code>sympy.integrate()</code> เพื่อคำนวณหาอนุพันธ์ (<strong>Derivative</strong>) และการหาปริพันธ์หรืออินทิกรัลแบบไม่จำกัดเขต (<strong>Indefinite Integral</strong>) </p>
+<p>ลองพิจารณาฟังก์ชัน เช่น <script type="math/tex">f(t) = e^{-a t}</script> และ <script type="math/tex">f(t) = sin(\omega t)</script> แล้วหาอนุพันธ์
+และปริพันธ์ของฟังก์ชันเหล่านี้</p>
+<p>
+<script type="math/tex; mode=display">
+  \int e^{-a t} dt = -\frac{e^{-a t}}{a} + C \\
+  \frac{d}{dt} e^{-a t}= -a e^{-a t} \\
+  \int sin(\omega t) dt = -\frac{cos(\omega t)}{\omega} + C \\
+  \frac{d}{dt} sin(\omega t) = \omega cos(\omega t) \\
+  \frac{d^2}{dt^2} sin(\omega t) = -\omega^2 sin(\omega t) \\
+</script>
+</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display
+# define 't' as a symbol 
+t = Symbol('t')
+# define a symbol for function f(t) 
+f = symbols('f', cls = Function)
+# define 'a' (non-zero) as a symbol
+a = Symbol( 'a', nonzero=True )
+# f is an exponential function
+f = exp(-a*t)
+# compute the integral of f(t)
+display( integrate( f, t ) )
+# compute the first derivative of f(t)
+display( diff( f, t) )
+# define 'w' (positive) as a symbol 
+w = Symbol( 'omega', positive=True )
+# f is a sine function
+f = sin(w*t)
+# compute the integral of f(t)
+display( integrate( f, t ) )
+# compute the first and second derivatives of f(t)
+for i in range(1,3):
+    display( diff(f, t, i) )
+</code></pre>
+<p>&nbsp;</p>
+<p>หากต้องการทดสอบการทำงานของโค้ดตัวอย่าง และแสดงผลลัพธ์ที่ได้ที่เป็นข้อความทางคณิตศาสตร์
+ก็สามารถใช้ <a href="https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html"><strong>JupyterLab</strong></a> ผ่านหน้าเว็บเบราว์เซอร์ได้ (ติดตั้งใช้งานด้วยคำสั่ง เช่น <code>pip install jupyterlab</code>)</p>
+<p><img alt="" src="sympy_output-1a.png" /></p>
+<p>รูป: การใช้งาน <strong>JupyterLab</strong></p>
+<p><img alt="" src="sympy_output-1b.png" /></p>
+<p>รูป: เอาต์พุตสำหรับโค้ดตัวอย่างเมื่อรันโค้ดด้วย <strong>JupyterLab</strong></p>
+<p>&nbsp;</p>
+<p>ฟังก์ชันขั้นบันไดหนึ่งหน่วย (<strong>Unit-Step Function</strong>) หรือ "ฟังก์ชันเฮฟวิไซด์"
+(<strong>Heaviside Function</strong>) ซึ่งใช้สัญลักษณ์ <script type="math/tex">\theta(t)</script> 
+และ "ฟังก์ชันดิแรกเดลตา" (<strong>Dirac-Delta Function</strong>) ซึ่งใช้สัญลักษณ์ <script type="math/tex">\delta(t)</script>
+ถือว่ามีความสำคัญในการวิเคราะห์ระบบและวงจรไฟฟ้า ลองมาทบทวนคุณสมบัติของฟังก์ชันดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+    \theta(t) = \begin{cases}
+      1 & t > 0 \\
+      \frac{1}{2}  & t = 0 \\
+      0 & t < 0  \\
+    \end{cases}\\[1em]
+    \delta(t) = \begin{cases}
+       \infty &  t \neq 0 \\
+       0 &  t = 0 \\
+    \end{cases} \\[1em]
+    \int_{-\infty}^{\infty} \delta(t) dt = 1 \\
+    \int_{-\infty}^{\infty} f(t) \delta(t) dt = \int_{-\infty}^{\infty} f(0) \delta(t) dt = f(0) \\
+    \int_{-\infty}^{t} \delta(\tau)d\tau = \theta(t) \\
+    \delta(t) = \frac{d}{dt} \theta(t) \\
+</script>
+</p>
+<p>ในโค้ดตัวอย่างจะเห็นได้ว่า คำสั่งสำหรับการใช้ฟังก์ชัน <script type="math/tex">\delta(t)</script> คือ <a href="https://docs.sympy.org/latest/modules/functions/special.html#diracdelta"><code>DiracDelta()</code></a>
+และคำสั่ง <a href="https://docs.sympy.org/latest/modules/functions/special.html#heaviside"><code>Heaviside()</code></a> 
+สำหรับฟังก์ชันเฮฟวิไซด์ <script type="math/tex">\theta(t)</script> นอกจากนั้นยังมีตัวอย่างการใช้คำสั่ง <a href="https://docs.sympy.org/latest/modules/functions/elementary.html#piecewise"><code>Piecewise()</code></a>
+เพื่อสร้างฟังก์ชันที่ให้ค่าแบ่งเป็นช่วง </p>
+<p>การหาอนุพันธ์ของฟังก์ชัน <script type="math/tex">\theta(t)</script> จะได้ฟังก์ชัน <script type="math/tex">\delta(t)</script> เป็นผลลัพธ์
+แต่ถ้าอินทิเกรต <script type="math/tex">\delta(t)</script> สำหรับ <script type="math/tex">t\in (-\infty,\infty)</script> จะได้เท่ากับ <script type="math/tex">1</script>
+(ในการเขียนโค้ดด้วย <strong>SymPy</strong> ถ้าใช้สัญลักษณ์ <code>sym.oo</code> จะหมายถึง ค่าอนันต์ <script type="math/tex">\infty</script>)</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display
+# define a symbol for variable 't'
+t = Symbol('t')
+# display the Heaviside function
+display( Heaviside(t) )
+# compute the value of the Heaviside function at t=0
+print( Heaviside(0) )
+# integrate the Heaviside function
+display( integrate( Heaviside(t) ) )
+# find the derivative of the Heaviside function
+display( diff(Heaviside(t),t ) )
+# rewrite Heaviside function as a piecewise function
+display( Heaviside(t).rewrite(Piecewise) )
+a = Symbol( 'a', nonzero=True )
+display( limit( integrate( DiracDelta(t),(t,-a,a)), a,oo) )
+# define 'a' as a nonzero symbol 
+a = Symbol( 'a', nonzero=True )
+# integrate the dirac-delta function for t=(-inf,+inf)
+display( limit( integrate( DiracDelta(t),(t,-a,a)), a,oo) )
+# define f as a piecewise function 
+f = Piecewise( (1,t&gt;0), (0,t&lt;0), (1/2,True) )
+display( f )
+</code></pre>
+<p><img alt="" src="sympy_output-1c.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python_2">&#9655; <strong>การเขียนโค้ด Python: การหาผลการแปลงลาปลาซ</strong><a class="headerlink" href="#python_2" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการคำนวณหาผลการแปลงลาปลาซของฟังก์ชัน <script type="math/tex">\delta(t)</script>,
+<script type="math/tex">\theta(t)</script> และ <script type="math/tex">\theta(t-t_0), t_0 > 0</script> ตามลำดับ โดยการใช้คำสั่ง
+<code>integrate()</code> เพื่ออินทิเกรตฟังก์ชันในช่วง <script type="math/tex">t\in [0^-,\infty)</script>
+และใช้คำสั่ง <a href="https://docs.sympy.org/latest/modules/integrals/integrals.html#sympy.integrals.transforms.laplace_transform"><code>laplace_transform()</code></a> เพื่อการแปลงลาปลาซโดยเฉพาะ</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display
+# define symbols for variables: t and s
+t = Symbol('t', real=True)
+s = Symbol('s')
+a = Symbol( 'a', real=True, negative=True )
+# compute the Laplace transform using definite integral
+F = integrate( DiracDelta(t)*exp(-s*t), (t,a,oo) )
+display( simplify( limit( F, a, 0,'-') ) ) 
+# compute the Laplace transform of \delta(t) using built-in function
+# return the Laplace transform only
+result = laplace_transform( DiracDelta(t), t, s, noconds=True )
+display( result )
+# return the Laplace transform and the convergence condition
+lt,cond,_ = laplace_transform( DiracDelta(t), t, s )
+display( lt )
+print( f'ROC: Re(s) &gt; {cond}' ) 
+# find the Laplace transform of the Heaviside function
+lt = laplace_transform( Heaviside(t), t, s, noconds=True )
+display( lt )
+# find the Laplace transform of the time-shifted Heaviside function
+t0 = Symbol( 't_0', real=True, positive=True )
+F = integrate( Heaviside(t-t0)*exp(-s*t), (t,a,oo) )
+display( simplify( limit( F, a, 0,'-') ) ) 
+lt,cond,_ = laplace_transform( Heaviside(t-t0), t, s )
+display( lt )
+print( f'ROC: Re(s) &gt; {cond}' ) 
+</code></pre>
+<p>จากผลการรันโค้ดจะเห็นได้ว่า ผลการแปลงลาปลาซของฟังก์ชัน <script type="math/tex">\delta(t)</script> จะได้เท่ากับ <script type="math/tex">1</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+ \begin{align}
+  \mathcal{L}\{ \delta(t)\} &= \int_{0^-}^\infty \delta(t) e^{-s t} dt \\
+   &= \int_{0^-}^\infty \delta(t) \cdot e^{-s t}|_{t=0}\, dt \\
+   &= \int_{0^-}^\infty \delta(t) \cdot 1\, dt = 1 \\
+ \end{align}
+</script>
+และมีขอบเขตการลู่เข้า (<strong>ROC</strong>) สำหรับตัวแปรเชิงซ้อน <script type="math/tex">Re(s) > -\infty</script> 
+(ในกรณีนี้หมายถึง ทั้งหมดของระนาบเชิงซ้อน <strong>s-plane</strong>)</p>
+<p>ผลการแปลงลาปลาซของฟังก์ชัน <script type="math/tex">\theta(t)</script> จะได้เท่ากับ <script type="math/tex">1/s</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+ \begin{align}
+  \mathcal{L}\{ \theta(t)\} &= \int_{0^-}^\infty \theta(t) e^{-s t} dt \\
+    &= \int_{0^-}^\infty 1 \cdot e^{-s t} dt \\
+    &= \frac{1}{s} \qquad (\text{ROC: } Re\{s\} > 0 )\\
+ \end{align}
+</script>
+และมีขอบเขตการลู่เข้า (<strong>ROC</strong>) สำหรับตัวแปรเชิงซ้อน <script type="math/tex">Re(s) > 0</script> 
+(ในกรณีนี้หมายถึง ครึ่งหนึ่งทางด้านซ้ายของระนาบเชิงซ้อน <strong>Half s-plane</strong>)</p>
+<p>คำสั่ง <a href="https://docs.sympy.org/latest/modules/integrals/integrals.html#sympy.integrals.transforms.laplace_transform"><code>laplace_transform()</code></a> เมื่อเรียกใช้คำสั่งนี้ และกำหนดให้อาร์กิวเมนต์ <code>noconds</code>
+เป็น <code>False</code> (หรือไม่มีการระบุไว้) จะให้ผลลัพธ์เป็นฟังก์ชันที่ได้จากการแปลงลาปลาซ กและเงื่อนไขการลู่เข้าสำหรับการอินทิเกรต
+แต่ถ้าให้อาร์กิวเมนต์นี้มีค่าเป็น <code>True</code> จะได้เฉพาะผลการแปลงลาปลาซเท่านั้น</p>
+<p><img alt="" src="sympy_output-2a.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
+<p><img alt="" src="sympy_output-2b.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง (ต่อจากส่วนแรก)</p>
+<p><strong>ข้อสังเกต:</strong> <script type="math/tex">|arg(s)| < \frac{\pi}{2}</script> ซึ่งเป็นเงื่อนไขการลู่เข้าของการอินทิเกรต
+สำหรับผลการแปลงลาปลาซ หมายความว่าอย่างไร ?  </p>
+<p>คำสั่ง <script type="math/tex">arg(s)</script> สำหรับ <strong>SymPy</strong> หมายถึง การหามุมของตัวแปร <script type="math/tex">s</script> ที่เป็นเลขเชิงซ้อน</p>
+<p>
+<script type="math/tex; mode=display">
+  s = Re(s) + j\, Im(s) \\
+  arg(s) = tan^{-1}\Big(\frac{Im(s)}{Re(s)}\Big) = atan2(Im(s),Re(s)) 
+</script>
+</p>
+<p>ดังนั้น <script type="math/tex">|arg(s)| < \frac{\pi}{2}</script> ก็หมายความว่า
+<script type="math/tex">Re(s)</script> จะต้องเป็นบวก หรือ <script type="math/tex">Re(s) > 0</script>
+</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อแสดงคู่ของฟังก์ชันและผลการแปลงลาปลาซที่พบเห็นได้บ่อยมีดังนี้</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math, Latex
+# define symbols
+t = Symbol('t', real=True)
+s = Symbol('s')
+t0, omega, a = symbols('t_0 omega_0 a', real=True)
+# define a list of basic functions
+functions = [ Heaviside(t),
+    Heaviside(t) - Heaviside(t-t0),
+    exp(-a*t), t*exp(-a*t),  t**2*exp(-a*t),
+    sin(omega*t), cos(omega*t),
+    exp(-a*t)*sin(omega*t), exp(-a*t)*cos(omega*t) ]
+# find Laplace transforms of a function list
+LT = lambda f: laplace_transform(f,t,s,noconds=True)
+results = [ LT(f) for f in functions]
+# display Laplace transform pairs in Latex style
+for f,F in zip(functions,results):
+    ltx = f'$$\\mathcal{{L}} \\{{ {latex(f)} \\}}'
+    ltx += '\\quad\\rightarrow\quad'
+    ltx += latex(F) + '$$'
+    display( Math(ltx) )
+</code></pre>
+<p><img alt="" src="sympy_output-2c.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_3">&#9655; <strong>การแยกฟังก์ชันเศษส่วนออกเป็นเศษส่วนย่อย</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
@@ -430,7 +617,8 @@ laplace( exp(-a*t)*cos(omega_0*t),t,s )
  F(s) &= \frac{(5s - 5)}{ (s^2+4)(s+1) } \\
       &= \frac{2s + 3}{s^2+4} - \frac{2}{s+1} \\
       &= 2\Big(\frac{s}{s^2+2^2}\Big) + 
-         \frac{3}{2}\Big(\frac{2}{s^2+2^2}\Big) - 2\Big(\frac{1}{s+1}\Big) \\
+         \frac{3}{2}\Big(\frac{2}{s^2+2^2}\Big) - 2\Big(\frac{1}{s+1}\Big),
+\;\; (t \geq 0) \\
 \end{align}
 </script>
 </p>
@@ -442,26 +630,31 @@ laplace( exp(-a*t)*cos(omega_0*t),t,s )
 </script>
 </p>
 <p>&nbsp;</p>
-<p><strong>MATLAB</strong> ก็มีคำสั่ง <code>partfrac()</code> และ <code>residue()</code> สำหรับการแยกเป็นเศษส่วนย่อย
-ลองมาดูตัวอย่างการใช้คำสั่ง <code>partfrac()</code>
-เพื่อแยกฟังก์ชันเศษส่วนออกเป็นเศษส่วนย่อยแล้วหาผลการแปลงลาปลาซผกผันของแต่ละพจน์ย่อย</p>
-<pre><code class="language-matlab">clearvars
-syms t s f(t) F(s)
-F(s) = 5*(s-1)/((s^2 + 4)*(s+1))
-% find the inverse Laplace transform of F(s)
-f(t) = ilaplace( F(s),s,t )
-%  perform partial fraction expansion of F(s)
-P = partfrac( F(s), s )
-% find inverse Laplace transform of each term of P
-f(t) = 0;
-for p = children(P)
-    f(t) = f(t) + ilaplace( p, s, t );
-end
-% show the result
-disp( f(t) )
+<p><strong>Python</strong> ก็มีคำสั่ง <code>apart()</code> สำหรับการแยกเป็นเศษส่วนย่อย และนำมาใช้กับฟังก์ชัน
+เศษส่วนที่มีตัวแปร <script type="math/tex">s</script> แล้วนำไปหาผลการแปลงลาปลาซผกผันของแต่ละพจน์ย่อยได้ ตามตัวอย่างต่อไปนี้</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math
+# define symbols
+t = Symbol('t', real=True)
+s = Symbol('s')
+# define a rational polynomial function F(s) 
+F = 5*(s-1)/((s**2 + 4)*(s+1))
+# perform partial fraction expansion of F(s)
+Fs = apart(F)
+# show the result of partial fraction expansion
+display( Math( '$$F(s) = $$' + latex(Fs) ) )
+# split the expression into a list of terms
+terms = Fs.args
+# perform inverse Laplace transform for each term in the list
+ILT = lambda term: inverse_laplace_transform( term, s, t )
+f = 0
+for term in terms:
+    f += ILT(term)
+# show the inverse Laplace tranform of F(s) --&gt; f(t)
+display( Math('$$f(t) = $$' + latex(f)) )
 </code></pre>
-<p><img alt="" src="matlab_laplace_output-3.png" /></p>
-<p>รูป: ตัวอย่างการใช้คำสั่ง <code>partfrac()</code></p>
+<p><img alt="" src="sympy_output-3a.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_4">&#9655; <strong>การหาผลเฉลยของสมการอนุพันธ์สามัญด้วยวิธีการแปลงลาปลาซ</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
@@ -595,34 +788,84 @@ disp( f(t) )
 </script>
 </p>
 <p>&nbsp;</p>
-<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> มีดังนี้</p>
-<pre><code class="language-matlab">clearvars
-syms s t y(t) Y(s)
-% derivatives of y(t)
-D1y = diff(y(t),t,1);
-D2y = diff(y(t),t,2);
-%  formulate the ODE
-ode = D2y + 2*D1y + y(t) == sin(2*t);
-% Solution 1: solve the ODE using the dsolve() command
-sol = dsolve( ode, [y(0)==-1, subs(D1y,t,0)==1] )
-% Laplace transform of the ODE
-lt_ode = laplace( ode, t, s );
-lt_ode = subs( lt_ode, laplace(y,t,s), Y(s) );
-collect(lt_ode,Y(s))
-lt_ode = subs( lt_ode, [y(0), subs(D1y,t,0)], [-1,1]);
-collect(lt_ode,Y(s))
-Y(s) = isolate( lt_ode, Y(s) )
-Y(s) = partfrac( Y(s) )
-% Solution 2: perform the inverse Laplace transform of Y(s)
-y(t) = ilaplace( rhs(Y(s)),s, t )
-% compare the solutions 
-isAlways( y(t) == sol ) 
+<p>ตัวอย่างการเขียนโค้ด <strong>SymPy</strong> เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์ โดยใช้คำสั่ง <code>dsolve()</code> มีดังนี้</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math
+# define symbols
+t = Symbol('t', real=True)
+y = symbols('y', cls=Function)
+# define D1y and D2y as the first and second derivative of y(t)
+D1y = y(t).diff(t)
+D2y = y(t).diff(t,t)
+# write the ODE
+ode = Eq( D2y + 2*D1y + y(t), sin(2*t) )
+display( ode )
+# define the initial conditions for the ODE
+ics = {y(0): -1, D1y.subs(t, 0): 1} 
+# solve the ODE without initial conditions
+sol = dsolve( ode, y(t) )
+# solve the ODE with initial conditions (IVP)
+sol_ivp = dsolve( ode, y(t), ics=ics )
+# display solutions 
+display( sol )
+display( sol_ivp )
 </code></pre>
-<p>เอาต์พุตที่ได้จากการรันโค้ด <strong>MATLAB</strong> มีตัวอย่างดังนี้</p>
-<p><img alt="" src="matlab_laplace_output-4a.png" /></p>
-<p>รูป: ตัวอย่างการทำคำสั่ง <strong>MATLAB</strong> (ส่วนที่หนึ่ง)</p>
-<p><img alt="" src="matlab_laplace_output-4b.png" /></p>
-<p>รูป:  ตัวอย่างการทำคำสั่ง <strong>MATLAB</strong> (ส่วนที่สอง)</p>
+<p>เอาต์พุตที่ได้จากการรันโค้ดตัวอย่าง มีดังนี้</p>
+<p><img alt="" src="sympy_output-4a.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
+<p>&nbsp;</p>
+<p>หากต้องการเขียนโค้ดโดยใช้วิธีการแปลงลาปลาซ เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญ (<strong>ODE</strong>) ก็มีแนวทางดังนี้</p>
+<ul>
+<li>สร้างฟังก์ชันที่เป็นสัญลักษณ์ <code>y(t)</code> และหาอนุพันธ์ของฟังก์ชันดังกล่าว แล้วนำไปแปลงลาปลาซ โดยใช้คำสั่ง <code>laplace_transform()</code> และนำผลลัพธ์ที่ได้ไปใช้เป็นพจน์ที่อยู่ทางด้านซ้ายของ <strong>ODE</strong></li>
+<li>ฟังก์ชันที่อยู่ทางขวามือของสมการ และในตัวอย่างนี้คือ <script type="math/tex">sin(2t)</script> ให้นำไปแปลงลาปลาซ แล้วนำไปใช้เป็นพจน์ที่อยู่ทางขวามือของ <strong>ODE</strong></li>
+<li>ใช้สัญลักษณ์ <code>Y(s)</code> แทนที่ผลการแปลงลาปลาซของฟังก์ชัน <code>y(t)</code></li>
+<li>สร้างเงื่อนไขเริ่มต้น (<strong>Initial Condition</strong>) แล้วนำไปแทนที่ลงในสมการ <strong>ODE</strong>
+หลังจากที่ได้มีการแปลงลาปลาซแล้ว</li>
+<li>จัดรูปสมการที่ทำให้ <code>Y(s)</code> ย้ายมาอยู่ด้านซ้ายมือของสมการ</li>
+<li>หากต้องการทำขั้นตอน <strong>Partial Fraction Expansion</strong> ให้ใช้คำสั่ง <code>apart()</code> ดำเนินการกับ <code>Y(s)</code></li>
+<li>หาผลเฉลยโดยการแปลงลาปลาซผกผันของ <code>Y(s)</code> </li>
+</ul>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display
+# define symbols for independent variables
+t = Symbol('t', real=True)
+s = Symbol('s', complex=True)
+# define symbols for functions
+y = Function('y')(t)
+Y = Function('Y')(s)
+# define lambda function for Laplace transform
+LT = lambda y: laplace_transform(y,t,s)
+# find the Laplace Transform of y(t) and its derivatives
+lt_y   = LT( y )
+lt_D1y = LT( y.diff(t,1) )
+lt_D2y = LT( y.diff(t,2) )
+# write thhe Laplace tranform of the ODE
+lt_ode = Eq( lt_D2y + 2*lt_D1y + lt_y, LT( sin(2*t) )[0] )
+# substitute the Laplace transform of y(t) with Y(s)
+Ys = LaplaceTransform(y,t,s)
+lt_ode = lt_ode.subs( Ys, Y )
+display( lt_ode )
+# substitute the initital conditions into the ODE
+ics = {y.subs(t,0): -1, y.diff(t).subs(t,0): 1}
+lt_ode = lt_ode.subs( ics )
+display( lt_ode ) 
+# solve the ODE using Laplace transform
+Y = solve( lt_ode, Y )[0]
+# display Y(s)
+display( Y )
+# perform partial fraction expansion of Y(s)
+Y = Y.apart( s ) 
+display( Y )
+# perform inverse Laplace transform
+sol = inverse_laplace_transform( Y,s,t )
+# simplify the solution y(t)
+sol = simplify( expand( sol ) )
+display( collect(expand( sol ), Heaviside(t)) )
+</code></pre>
+<p><img alt="" src="sympy_output-4b.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
+<p><img alt="" src="sympy_output-4c.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง (ต่อจากส่วนแรก)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="rc">&#9655; <strong>การวิเคราะห์วงจร RC ด้วยการแปลงลาปลาซ</strong><a class="headerlink" href="#rc" title="Permanent link">#</a></h2>
@@ -684,29 +927,47 @@ isAlways( y(t) == sol )
 \end{align}
 </script>
 </p>
-<p>ถัดไปมาดูตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> สำหรับการวิเคราะห์วงจรด้วยการแปลงลาปลาซ
-หารูปแบบของฟังก์ชันถ่ายโอน และฟังก์ชันที่เป็นผลตอบสนองอิมพัลส์ตามลำดับ</p>
-<pre><code class="language-matlab">clearvars
-syms s t v_C(t) v_S(t) V_C(s) V_S(s) H(s) h(t)
-syms R C tau positive 
-% the first-order ODE for the RC filter circuit
-ode = R*C*diff( v_C(t), t) + v_C(t) == v_S(t);
-% take the Laplace transform to the ODE
-lt_ode = laplace( ode,t,s );
-% substitute Laplace transforms of v_C(t) and v_S(t) with V_C(s) and V_S(s)
-lt_ode = subs( lt_ode, laplace(v_C(t),t,s), V_C(s) );
-lt_ode = subs( lt_ode, laplace(v_S(t),t,s), V_S(s) );
-% rewrite the equation so that V_C(s) appears on the left side 
-V_C(s) = isolate( lt_ode, V_C(s) );
-% substitute RC with tau and V_C(0) with 0 (zero initial condition)
-V_C(s) = subs( V_C(s), [R*C, v_C(0)], [tau, 0] )
-% find the transfer function H(s)
-H(s) = rhs(V_C(s))/ V_S(s)
-% find the impulse response h(t)
-h(t) = ilaplace( H(s),s,t )
+<p>ถัดไปมาดูตัวอย่างการเขียนโค้ด <strong>Python</strong> สำหรับการวิเคราะห์วงจรด้วยการแปลงลาปลาซ
+หารูปแบบของฟังก์ชันถ่ายโอน <script type="math/tex">H(s)</script> และฟังก์ชันที่เป็นผลตอบสนองอิมพัลส์ <script type="math/tex">h(t)</script> ตามลำดับ</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math
+# define symbols for independent variables
+t = Symbol('t', real=True)
+s = Symbol('s') 
+# define symbols for RC constant
+R,C,tau = symbols('R C tau', positive=True)
+# define symbols for time-dependent functions
+v_C = Function('v_C')(t)
+v_S = Function('v_S')(t)
+# define symbols for s-dependent functions
+V_C = Function('V_C')(s)
+V_S = Function('V_S')(s)
+LT = lambda y: laplace_transform(y,t,s)
+lt_ode = Eq( R*C*LT(v_C.diff(t)) + LT(v_C), LT(v_S) )
+LT_V_C = LaplaceTransform(v_C,t,s)
+LT_V_S = LaplaceTransform(v_S,t,s)
+# substitute symbols
+lt_ode = lt_ode.subs( {LT_V_C: V_C, LT_V_S: V_S, R*C: tau} )
+# assume v_C(0) = 0 (zero initial condition)
+lt_ode = lt_ode.subs( {v_C.subs(t,0): 0} )
+# after applying Laplace transform to the ODE, display the final result
+display( lt_ode )
+# move V_C(s) to the left side of the equation
+V_C = solve( lt_ode, V_C )[0]
+h = Function('h')(t)
+# get the transfer function H(s) = V_C(s)/V_S(s)
+H = V_C/V_S
+# get the impulse response h(t)
+h = inverse_laplace_transform( H, s, t)
+# display the transfer function
+display( H )
+# display the impulse response
+display( h )
 </code></pre>
-<p><img alt="" src="matlab_laplace_output-5a.png" /></p>
-<p>รูป: ตัวอย่างเอาต์พุตเมื่อทำคำสั่ง <strong>MATLAB</strong></p>
+<p><img alt="" src="sympy_output-5a.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
+<p><img alt="" src="sympy_output-5b.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง (ต่อจากส่วนแรก)</p>
 <p>ในกรณีที่สัญญาณอินพุตเป็นรูปคลื่นไซน์ (<strong>Sinusoidal Wave</strong>)
 ที่มีความถี่เชิงมุม <script type="math/tex">\omega = 2\pi f</script>
 สัญญาณเอาต์พุตจะได้เป็นรูปคลื่นไซน์เช่นกัน เมื่อเข้าสู่สภาวะคงตัว (<strong>Steady State</strong>)</p>
@@ -731,82 +992,6 @@ h(t) = ilaplace( H(s),s,t )
 </p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="bode-plot-rc">&#9655; <strong>การแสดงรูปกราฟ Bode Plot สำหรับวงจร RC</strong><a class="headerlink" href="#bode-plot-rc" title="Permanent link">#</a></h2>
-<p>เราสามารถใช้คำสั่งของ <strong>MATLAB</strong> เช่น <code>tf()</code> เพื่อสร้างฟังก์ชันถ่ายโอนที่อยู่ในรูปเศษส่วนพหุนาม
-ของตัวแปร <script type="math/tex">s</script> โดยจะต้องระบุค่าสัมประสิทธิ์ของเศษส่วนพหุนามสำหรับ <script type="math/tex">H(s) = N(s)/D(s)</script>
-แล้วจึงใช้คำสั่ง <code>bodeplot()</code> แสดงรูปกราฟของฟังก์ชันถ่ายโอน (เรียกว่า <strong>Bode Plot</strong>)
-โดยแบ่งเป็นขนาด (<strong>Magnitude Plot</strong>) และเฟส (<strong>Phase Plot</strong>) ที่ขึ้นอยู่กับค่าความถี่ </p>
-<pre><code class="language-matlab">clearvars;
-RC = (1e+3)*(10e-6); % use R=1kOhm and C=10uF
-% define the transfer function H(s)
-% H(s) = N(s)/D(s) = [1/RC] / [s + 1/RC]
-H = tf(1/RC,[1 1/RC])
-% set Bode plot options
-opts = bodeoptions;
-opts.FreqUnits = 'Hz';
-opts.FreqScale = 'log';
-opts.MagUnits  = 'dB';
-opts.MagScale  = 'linear';
-opts.PhaseUnits = 'deg';
-% set the frequency range for Bode plot
-freq_range = {0.1 10^6};
-% show Bode plot 
-bodeplot( H, freq_range, opts ); grid on;
-</code></pre>
-<p><img alt="" src="bode_plot_rc_filter-1.png" /></p>
-<p>รูป: ตัวอย่างคำสั่ง <strong>MATLAB</strong> สำหรับการแสดงรูปกราฟ <strong>Bode Plot</strong></p>
-<p><img alt="" src="bode_plot_rc_filter-2.png" /></p>
-<p>รูป: รูปกราฟ <strong>Bode Plot</strong> สำหรับฟังก์ชันถ่ายโอนของวงจร <strong>RC (R=1k&Omega;, C=10uF</strong>)</p>
-<p>จากรูปกราฟจะเห็นได้ว่า เมื่อความถี่ <script type="math/tex">f</script> เพิ่มขึ้น จะทำให้ฟังก์ชันถ่ายโอน <script type="math/tex">H(j\omega)</script> มีขนาดลดลง
-ซึ่งหมายความว่า อัตราส่วนระหว่างเอาต์พุตต่ออินพุต จะมีขนาดลดลงเมื่อความถี่เพิ่มขึ้น</p>
-<p>ถ้ามีความถี่ใกล้ <script type="math/tex">0</script> จะทำให้ <script type="math/tex"> |H(j\omega)| </script> มีค่าใกล้เคียง <script type="math/tex"> 1 </script> (หรือ <script type="math/tex"> 0 \,dB </script>)
-แต่จะลดลงเมื่อความถี่เพิ่มขึ้น ดังนั้นวงจร <strong>RC</strong> ในรูปแบบนี้จึงทำหน้าที่เป็นตัวกรองให้ความถี่ต่ำผ่านได้ดี</p>
-<p>เฟส <script type="math/tex"> \angle H(j\omega)</script> จะเริ่มลดลงจาก <script type="math/tex">0^{\circ}</script> เมื่อความถี่เพิ่มขึ้น ซึ่งหมายความว่า
-สัญญาณเอาต์พุตจะมีความต่างเฟสเพิ่มมาขึ้นเมื่อเปรียบเทียบกับสัญญาณอินพุตถ้าความถี่เพิ่มมากขึ้น</p>
-<p>ถ้าไม่ใช้คำสั่ง <code>tf()</code> และ  <code>bodeplot()</code> ก็มีตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> ดังนี้</p>
-<pre><code class="language-matlab">clearvars; clf;
-syms s f omega
-syms R C positive
-% define the transfer function H(s) of the RC circuit
-H = 1/(1+s*R*C)
-% substitute s with j*omega 
-H = subs( H, s, 1i*omega ) 
-% substitute omega with 2*pi*f
-% substitute R and C with numeric values
-H = subs( H, [omega,R,C], [2*pi*f, 1e+3, 10e-6] );
-% convert symbolic functions to numeric functions
-H_mag   = matlabFunction( 20*log10( abs(H) ) );
-H_phase = matlabFunction( (180/pi)*angle( H ) );
-% define the frequency range (log-scale): 10^0 .. 10^4
-f = logspace( 0, 4 );
-% plot the magnitude of H(j*omega)
-semilogx( f, H_mag(f) ), grid on, 
-xlabel('Hz'), ylabel('Magnitude (dB)');
-% plot the phase of H(j*omega)
-semilogx( f, H_phase(f) ), grid on,
-xlabel('Hz'), ylabel('Phase (deg)');
-</code></pre>
-<p><img alt="" src="bode_plot_rc_filter-3.png" /></p>
-<p>รูป: ตัวอย่างคำสั่ง <strong>MATLAB</strong> สำหรับการแสดงรูปกราฟ <strong>Bode Plot</strong></p>
-<p><img alt="" src="bode_plot_rc_filter-4a.png" /></p>
-<p>รูป: รูปกราฟสำหรับขนาดของ <script type="math/tex">H(j\omega)</script> สำหรับความถี่ในช่วง <script type="math/tex">1..10^4</script>  (<strong>log-scale</strong>)</p>
-<p><img alt="" src="bode_plot_rc_filter-4b.png" /></p>
-<p>รูป: รูปกราฟสำหรับเฟสของ <script type="math/tex">H(j\omega)</script> สำหรับความถี่ในช่วง <script type="math/tex">1..10^4</script> Hz (<strong>log-scale</strong>)</p>
-<p>&nbsp;</p>
-<p>สำหรับวงจร <strong>RC</strong> ที่เป็นวงจรตัวกรองให้ความถี่ต่ำผ่านได้ดี (<strong>Low-pass RC Filter</strong>) 
-ความถี่ <script type="math/tex">\omega=\omega_c</script> ที่ทำให้ <script type="math/tex">|H(j\omega_c)| = \frac{1}{\sqrt{2}}</script> หรือ
-<script type="math/tex">20\cdot log_{10}(|H(j\omega_c)|) = -3\,dB\; </script> 
-เรียกว่า <strong>Cutoff Frequency</strong> หรือ <strong>Corner Frequency</strong> และสามารถคำนวณได้ดังนี้</p>
-<p>
-<script type="math/tex; mode=display">
-  |H(j\omega_c)|^2 = \frac{1}{2} = \frac{1}{1 + (\omega_c RC)^2} \\
-\Rightarrow \quad \omega_c = 2\pi f_c = \frac{1}{RC} \\
-            f_c = \frac{1}{2\pi RC} \\
-</script>
-</p>
-<p>ถ้าให้ <script type="math/tex">R=1k \Omega</script> และ <script type="math/tex">C=10uF</script> จะได้ <script type="math/tex">f_c = \frac{1}{2\pi (0.01)} = 15.915 \,Hz</script> สำหรับวงจรตัวอย่าง</p>
-<p>&nbsp;</p>
-<hr />
 <h2 id="rc_1">&#9655; <strong>การวิเคราะห์ผลตอบสนองชั่วขณะสำหรับวงจร RC</strong><a class="headerlink" href="#rc_1" title="Permanent link">#</a></h2>
 <p>ถ้ากำหนดให้แหล่งจ่ายแรงดันไฟฟ้า <script type="math/tex">v_S(t)</script> เป็นอินพุตของวงจร <strong>RC</strong> และเป็นสัญญาณรูปคลื่นไซน์ </p>
 <p>
@@ -815,46 +1000,66 @@ xlabel('Hz'), ylabel('Phase (deg)');
  \omega_0 = 2\pi f_0 
 </script>
 </p>
-<p>ให้ <script type="math/tex">v_C(t)</script> เป็นเอาต์พุตของวงจรดังกล่าว ลองมาดูตัวอย่างการเขียนโค้ด <strong>MATLAB</strong>
-เพื่อวิเคราะห์วงจร และหาผลตอบสนองชั่วขณะในเชิงเวลาของวงจร (<strong>Transient Response</strong>)
+<p>ให้ <script type="math/tex">v_C(t)</script> เป็นเอาต์พุตของวงจรดังกล่าว หรือผลเฉลยของสมการเชิงอนุพันธ์ที่เกี่ยวข้องกับวงจร
+ลองมาดูตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อวิเคราะห์วงจร และหาผลตอบสนองชั่วขณะในเชิงเวลาของวงจร (<strong>Transient Response</strong>)
 โดยกำหนดให้ใช้ค่าตัวเลข <script type="math/tex">f_0 = 50\,Hz</script>, <script type="math/tex">V_S = 5\,V</script>, <script type="math/tex">R = 1k\,\Omega</script>
 และ <script type="math/tex">C = 10\,uF</script> สำหรับการแสดงรูปกราฟ <script type="math/tex">v_C(t)</script> และ <script type="math/tex">v_S(t)</script>
 </p>
-<pre><code class="language-matlab">clearvars
-syms s t v_C(t) v_S(t) V_C(s)
-syms R C V_S omega_0 tau positive 
-% The input is a sinusoidal voltage source.
-v_S(t) = V_S*sin(omega_0*t);
-% define the ODE for the RC filter
-ode = R*C*diff( v_C(t), t) + v_C(t) == v_S(t);
-% perform LT of the ODE
-lt_ode = laplace( ode,t,s );
-% substitute a symbol for V_C(s)
-lt_ode = subs( lt_ode, laplace(v_C(t),t,s), V_C(s) );
-% rewrite the equation so that V_C(s) appears on the left-hand side
-sol = isolate( lt_ode, V_C(s) );
-% substitute R*C with tau (the time constant symbol)
-sol = subs( sol, R*C, tau );
-% show V_C(s)
-disp( sol )
-% assume zero initial condition: v_C(0) = 0
-sol = subs( sol, v_C(0), 0 );
-% find the inverse Laplace  transform to get v_C(t)
-sol = ilaplace( sol, s, t);
-% get the output signal v_C(t)
-v_C(t) = rhs(sol)
-% substitute tau with a specific value (R=1k, C=10u)
-v_C(t) = subs( v_C(t), tau, 1e3 * 10e-6 );
-% substitute omega_0 with 2*pi*50Hz and V_S with 5V
-v_C(t) = subs( v_C(t), [omega_0, V_S], [2*pi*50, 5] );
-v_S(t) = subs( v_S(t), [omega_0, V_S], [2*pi*50, 5] );
-fplot( [v_S(t), v_C(t)], [0,0.1] ), 
-grid on, xlabel('t'), legend( ['v_S(t)';'v_C(t)'] )
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math
+# define symbols for independent variables
+t = Symbol('t', real=True)
+s = Symbol('s') 
+# define symbols for RC constant
+R,C,tau = symbols('R C tau', positive=True )
+V_S,omega_0 = symbols( 'V_S omega_0', positive=True )
+# define symbols for time-dependent functions
+v_C = Function('v_C')(t)
+v_S = V_S*sin(omega_0*t)
+# define symbols for s-dependent function
+V_C = Function('V_C')(s)
+LT = lambda y: laplace_transform(y,t,s)
+# apply the Laplace transform to the ODE
+lt_ode = Eq( R*C*LT(v_C.diff(t)) + LT(v_C), LT(v_S)[0] )
+# display the Laplace tranform of the ODE
+display(lt_ode)
+# substitute symbols
+LT_V_C = LaplaceTransform(v_C,t,s)
+LT_V_S = LaplaceTransform(v_S,t,s)
+lt_ode = lt_ode.subs( {LT_V_C: V_C, LT_V_S: V_S, R*C: tau} )
+# move V_C(s) to the left side of the equation
+V_C = solve( lt_ode, V_C )[0]
+# display V_C(s) which is the Laplace transform of v_C(t)
+display( factor(V_C) )
+# assume v_C(0) = 0 (zero initial condition)
+V_C = V_C.subs( {v_C.subs(t,0): 0} )
+# perform the inverse Laplace transform
+v_C = inverse_laplace_transform( V_C, s, t )
+# display v_C(t) which is the solution of the ODE
+display( collect( expand(v_C), 
+    {sin(omega_0*t), exp(-t/tau), Heaviside(t)} ) )
+
+import numpy as np
+import matplotlib.pyplot as plt
+# substitute numeric values for the circuit parameters
+params = {tau: (1e3)*(10e-6), omega_0: 2*pi*50, V_S: 5 }
+f1 = lambdify( t, v_S.subs( params ), &quot;numpy&quot; )
+f2 = lambdify( t, v_C.subs( params ), &quot;numpy&quot; )
+t = np.linspace(0, 0.1, 200)
+plt.figure(figsize=(10,6))
+plt.plot( t, f1(t), t, f2(t) )
+plt.ylabel('$v_C(t)$')
+plt.xlabel('t')
+plt.grid()
+plt.legend(['$v_S(t)$', '$v_C(t)$'])
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_laplace_output-6.png" /></p>
-<p>รูป: ตัวอย่างเอาต์พุตจากโค้ด <strong>MATLAB</strong></p>
-<p><img alt="" src="matlab_laplace_output-7.png" /></p>
-<p>รูป: ตัวอย่างรูปกราฟสำหรับ <script type="math/tex">v_S(t)</script> และ <script type="math/tex">v_C(t)</script> ในช่วงเวลา <script type="math/tex">0 .. 100\, msec</script>
+<p><img alt="" src="sympy_output-6a.png" /></p>
+<p>รูป:  เอาต์พุตเมื่อรันโค้ดตัวอย่าง</p>
+<p><img alt="" src="sympy_output-6b.png" /></p>
+<p>รูป: เอาต์พุตเมื่อรันโค้ดตัวอย่าง (ต่อจากส่วนแรก)</p>
+<p><img alt="" src="sympy_output-6c.png" /></p>
+<p>รูป: ตัวอย่างรูปกราฟสำหรับ <script type="math/tex">v_S(t)</script> และ <script type="math/tex">v_C(t)</script> ในช่วงเวลา <script type="math/tex">0 .. 0.1\,sec</script>
 </p>
 <p>&nbsp;</p>
 <p>ถ้าเปลี่ยน <script type="math/tex">v_S(t)</script> จากสัญญาณรูปคลื่นไซน์ ให้เป็นแบบขั้นบันได เช่น</p>
@@ -867,44 +1072,60 @@ grid on, xlabel('t'), legend( ['v_S(t)';'v_C(t)'] )
 </script>
 โดยที่ <script type="math/tex">u(t)</script> หมายถึง ฟังก์ชันเฮฟวีไซด์ (<strong>Heaviside Function</strong>)</p>
 <p>หากจะศึกษาผลตอบสนองต่อสัญญาณอินพุตที่เป็นฟังก์ชันแบบขั้นบันได (<strong>Step Function</strong>)
-ก็สามารถเขียนโค้ด <strong>MATLAB</strong> เพื่อหาผลตอบสนองชั่วขณะสำหรับ <script type="math/tex">v_C(t)</script> ได้ดังนี้
+ก็สามารถเขียนโค้ดเพื่อหาผลตอบสนองชั่วขณะสำหรับ <script type="math/tex">v_C(t)</script> ได้ดังนี้
 (ในตัวอย่างนี้ ได้กำหนดเงื่อนไขเริ่มต้น <script type="math/tex">v_C(0) = 0</script>)</p>
-<pre><code class="language-matlab">clearvars; clf;
-syms s t v_C(t) v_S(t) V_C(s)
-syms R C V_S tau positive
-% The input is a DC source.
-v_S(t) = V_S*heaviside(t);
-% define the ODE for the RC filter
-ode = R*C*diff( v_C(t), t) + v_C(t) == v_S(t);
-% perform LT of the ODE
-lt_ode = laplace( ode,t,s );
-% substitute a symbol for V_C(s)
-lt_ode = subs( lt_ode, laplace(v_C(t),t,s), V_C(s) );
-% rewrite the equation so that V_C(s) appears on the left-hand side
-sol = isolate( lt_ode, V_C(s) );
-% substitute R*C with tau (the time constant symbol)
-sol = subs( sol, R*C, tau );
-% show V_C(s)
-disp( sol )
-% assume zero initial condition: v_C(0) = 0
-sol = subs( sol, v_C(0), 0 );
-% find the inverse Laplace transform to get v_C(t)
-sol = ilaplace( sol, s, t);
-% get the output signal v_C(t), for t&gt;=0
-v_C(t) = rhs(sol)*heaviside(t)
-% substitute tau with a specific value (R=1k, C=10u)
-v_C(t) = subs( v_C(t), tau, 1e3 * 10e-6 );
-% substitute V_S with 5V
-v_C(t) = subs( v_C(t), V_S, 5 );
-v_S(t) = subs( v_S(t), V_S, 5 );
-fplot( [v_S(t), v_C(t)], 'linewidth', 1.25 ), 
-grid on, xlabel('t'), 
-xlim([-0.01 0.1]), ylim([-0.2 5.2]), 
-legend( ['v_S(t)';'v_C(t)'] )
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math
+# define symbols for independent variables
+t = Symbol('t', real=True)
+s = Symbol('s') 
+# define symbols for RC constant
+R,C,tau = symbols('R C tau', positive=True )
+V_S = symbols( 'V_S', positive=True )
+# define symbols for time-dependent functions
+v_C = Function('v_C')(t)
+v_S = V_S*Heaviside(t) # &lt;---- step function
+# define symbols for s-dependent function
+V_C = Function('V_C')(s)
+LT = lambda y: laplace_transform(y,t,s)
+# apply the Laplace transform to the ODE
+lt_ode = Eq( R*C*LT(v_C.diff(t)) + LT(v_C), LT(v_S)[0] )
+# display the Laplace tranform of the ODE
+display(lt_ode)
+# substitute symbols
+LT_V_C = LaplaceTransform(v_C,t,s)
+LT_V_S = LaplaceTransform(v_S,t,s)
+lt_ode = lt_ode.subs( {LT_V_C: V_C, LT_V_S: V_S, R*C: tau} )
+# move V_C(s) to the left side of the equation
+V_C = solve( lt_ode, V_C )[0]
+# display V_C(s) which is the Laplace transform of v_C(t)
+display( factor(V_C) )
+# assume v_C(0) = 0 (zero initial condition)
+V_C = V_C.subs( {v_C.subs(t,0): 0} )
+# perform the inverse Laplace transform
+v_C = inverse_laplace_transform( V_C, s, t )
+# display v_C(t) which is the solution of the ODE
+display( collect( expand(v_C), 
+    {exp(-t/tau), Heaviside(t)} ) )
+
+import numpy as np
+import matplotlib.pyplot as plt
+# substitute numeric values for the circuit parameters
+params = {tau: (1e3)*(10e-6), V_S: 5 }
+f1 = lambdify( t, v_S.subs( params ), &quot;numpy&quot; )
+f2 = lambdify( t, v_C.subs( params ), &quot;numpy&quot; )
+t = np.linspace(-0.02, 0.1, 200)
+plt.figure(figsize=(10,6))
+plt.plot( t, f1(t), t, f2(t), linewidth=2.0 )
+plt.ylabel('$v_C(t)$')
+plt.xlabel('t')
+plt.grid()
+plt.legend(['$v_S(t)$', '$v_C(t)$'])
+plt.show()
 </code></pre>
-<p><img alt="" src="matlab_laplace_output-8.png" /></p>
-<p>รูป: ตัวอย่างเอาต์พุตจากโค้ด <strong>MATLAB</strong></p>
-<p><img alt="" src="matlab_laplace_output-9.png" /></p>
+<p><img alt="" src="sympy_output-6d.png" /></p>
+<p>รูป: เอาต์พุตที่ได้จากการรันโค้ดตัวอย่าง</p>
+<p><img alt="" src="sympy_output-6e.png" /></p>
 <p>รูป: ตัวอย่างรูปกราฟสำหรับ <script type="math/tex">v_S(t)</script> และ <script type="math/tex">v_C(t)</script>
 </p>
 <p>&nbsp;</p>
@@ -912,12 +1133,12 @@ legend( ['v_S(t)';'v_C(t)'] )
 <h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอตัวอย่างการแปลงลาปลาซสำหรับฟังก์ชันคณิตศาสตร์พื้นฐาน 
 การนำไปใช้เพื่อหาผลเฉลยของสมการเชิงอนุพันธ์สามัญเชิงเส้นที่มีสัมประสิทธิ์คงตัว 
-และตัวอย่างการเขียนโค้ดและใช้คำสั่งของ <strong>MATLAB</strong>
+และตัวอย่างการเขียนโค้ดและใช้คำสั่งของ <strong>Python / SymPy</strong>
 เพื่อหาผลเฉลยด้วยวิธีการประมวลเชิงสัญลักษณ์ เปรียบเทียบผลลัพธ์ที่ได้ในแต่ละวิธี</p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-04-22 | Last Updated: 2022-04-29</p></div>
+<p>Created: 2022-04-28 | Last Updated: 2022-04-29</p></div>
             </div>
         </div>
 
