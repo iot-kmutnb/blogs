@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/electronics/dc_sources_analysis/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้แหล่งจ่ายไฟฟ้ากระแสตรงและการวิเคราะห์วงจรด้วย EasyEDA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#easyeda" class="nav-link">การใช้แหล่งจ่ายไฟฟ้ากระแสตรงและการวิเคราะห์วงจรด้วย EasyEDA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; แหล่งจ่ายไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#easyeda_1" class="nav-link">&#9655; ประเภทของแหล่งจ่ายใน EasyEDA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">&#9655; ตัวอย่างที่ 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; ตัวอย่างที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">&#9655; ตัวอย่างที่ 3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="easyeda">การใช้แหล่งจ่ายไฟฟ้ากระแสตรงและการวิเคราะห์วงจรด้วย EasyEDA<a class="headerlink" href="#easyeda" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง วงจรที่ประกอบด้วยตัวต้านทานและแหล่งจ่ายกระแสตรง (<strong>DC Sources</strong>) 
+และการวิเคราะห์วงจรในรูปแบบที่เรียกว่า <strong>DC Operating Point Analysis</strong> โดยใช้ซอฟต์แวร์ <strong>EasyEDA</strong> ที่มี <strong>LTspice</strong> ทำหน้าที่เป็นตัวจำลองการทำงานของวงจร (<strong>SPICE-based Circuit Simulator</strong>)</p>
+<p><strong>Keywords:</strong> <em>EasyEDA</em>, <em>LTspice</em>, <em>DC Circuit Analysis</em>,
+<em>Voltage and Current Sources</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>แหล่งจ่ายไฟฟ้า</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ในทางไฟฟ้า เราสามารถจำแนกแหล่งจ่าย (<strong>Sources</strong>) ซึ่งเป็นสิ่งที่ให้พลังงานไฟฟ้าภายในวงจร ได้เป็นหลายกรณี เช่น</p>
+<ul>
+<li>แหล่งจ่ายแรงดันไฟฟ้า (<strong>Voltage Source</strong>) และแหล่งจ่ายกระแสไฟฟ้า (<strong>Current Source</strong>)</li>
+<li>แหล่งจ่ายอิสระ  (<strong>Independent Source</strong>) และแหล่งจ่ายไม่อิสระหรือแหล่งจ่ายที่ถูกควบคุม ด้วยแรงดันหรือกระแสไฟฟ้าในวงจร (<strong>Dependent Source</strong>)<ul>
+<li>อุปกรณ์ที่ให้แรงดันคงที่ (<strong>Constant Voltage Source</strong>) เป็นแหล่งจ่ายแรงดันอิสระ </li>
+<li>อุปกรณ์ที่ให้กระแสไฟฟ้าคงที่ (<strong>Constant Current Source</strong>) เป็นแหล่งจ่ายกระแสอิสระ</li>
+</ul>
+</li>
+<li>แหล่งจ่ายแรงดันกระแสตรง (<strong>DC Voltage Source</strong>) และแหล่งจ่ายแรงดันกระแสสลับ (<strong>AC Voltage Source</strong>)</li>
+</ul>
+<p>แหล่งจ่ายแรงดันและกระแสไม่อิสระในทางอุดมคติ แบ่งเป็น 4 กรณี ดังนี้</p>
+<ul>
+<li>แหล่งจ่ายแรงดันที่ขึ้นกับแรงดันควบคุม (<strong>Voltage-Controlled Voltage Source: VCVS</strong>)</li>
+<li>แหล่งจ่ายแรงดันที่ขึ้นกับกระแสควบคุม (<strong>Current-Controlled Voltage Source: CCVS</strong>)</li>
+<li>แหล่งจ่ายกระแสที่ขึ้นกับแรงดันควบคุม (<strong>Voltage-Controlled Current Source: VCCS</strong>)</li>
+<li>แหล่งจ่ายกระแสที่ขึ้นกับกระแสควบคุม (<strong>Current-Controlled Current Source: CCCS</strong>) </li>
+</ul>
+<p>โดยทั่วไปแล้ว ในการวิเคราะห์วงจรไฟฟ้าพื้นฐานกระแสตรง (<strong>DC</strong>) พบว่ามีการใช้ความสัมพันธ์ระหว่างกระแสไฟฟ้าหรือแรงดันไฟฟ้าควบคุมที่เป็นเชิงเส้น โดยที่ <script type="math/tex">k</script> เป็นค่าคงที่ใด ๆ (เป็นอัตราส่วนคงที่)  เช่น</p>
+<ul>
+<li>
+<script type="math/tex">I_x = k\, V_y</script> หมายถึง แหล่งจ่ายกระแส <script type="math/tex">I_x</script> ขึ้นอยู่กับแรงดัน <script type="math/tex">V_y</script> ในวงจร</li>
+<li>
+<script type="math/tex">I_x = k\, I_y</script> หมายถึง แหล่งจ่ายกระแส <script type="math/tex">I_x</script> ขึ้นอยู่กับกระแส <script type="math/tex">I_y</script> ในวงจร</li>
+<li>
+<script type="math/tex">V_x = k\, V_y</script> หมายถึง แหล่งจ่ายแรงดัน <script type="math/tex">V_x</script> ขึ้นอยู่กับแรงดัน <script type="math/tex">V_y</script> ในวงจร</li>
+<li>
+<script type="math/tex">V_x = k\, I_y</script> หมายถึง แหล่งจ่ายแรงดัน <script type="math/tex">V_x</script> ขึ้นอยู่กับกระแส <script type="math/tex">I_y</script> ในวงจร</li>
+</ul>
+<hr />
+<h2 id="easyeda_1">&#9655; <strong>ประเภทของแหล่งจ่ายใน EasyEDA</strong><a class="headerlink" href="#easyeda_1" title="Permanent link">#</a></h2>
+<p>ในส่วนที่เป็น <strong>Commonly Library</strong> ของซอฟต์แวร์ <strong>EasyEDA</strong> มีประเภทของแหล่งจ่ายให้เลือกดังนี้</p>
+<ul>
+<li><strong>Voltage Sources</strong> (ชื่อขึ้นต้นด้วย <code>V</code>) และ <strong>Current Sources</strong> 
+(ชื่อขึ้นต้นด้วย <code>I</code>) มีตัวเลือกย่อยในรูปแบบต่าง ๆ เช่น<ul>
+<li><code>DC</code> = <strong>DC Constant</strong></li>
+<li><code>Sin</code> = <strong>Single-Frequency Sinusoidal Signal</strong></li>
+<li><code>PULSE</code> = <strong>Pulse (Rectangular Waveform) Signal</strong></li>
+<li><code>EXP</code> = <strong>Single Pulse with Exponential Rise/Fall</strong></li>
+<li><code>SFFM</code> = <strong>Single-Frequency, Frequency-Modulated Sinusoidal Signal</strong></li>
+<li><code>PWL</code> = <strong>Piecewise Linear Waveform</strong></li>
+<li><code>Behavioral_Source</code> = <strong>Behavioral Source</strong></li>
+</ul>
+</li>
+<li><strong>Dependent Sources</strong> ซึ่งเป็นแหล่งจ่ายแบบไม่อิสระ และจำแนกเป็นประเภทย่อยได้ดังนี้<ul>
+<li><strong>CCCS</strong></li>
+<li><strong>CCVS</strong> </li>
+<li><strong>VCCS</strong></li>
+<li><strong>VCVS</strong></li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="easyeda_schematic_editor.png" /></p>
+<p>รูป: การเปิดใช้งาน <strong>EasyEDA - Schematic Editor</strong></p>
+<p><img alt="" src="easyeda_sources.png" /></p>
+<p>รูป: สัญลักษณ์ทางไฟฟ้าของแหล่งจ่ายประเภทต่าง ๆ ใน <strong>EasyEDA</strong></p>
+<p>&nbsp;</p>
+<p><strong>คำแนะนำ:</strong> เอกสารสำหรับการใช้งานแหล่งจ่ายใน <strong>EasyEDA</strong> สามารถศึกษาได้จาก <a href="https://docs.easyeda.com/en/Simulation/Chapter7-Configuring-Voltage-and-Current-Sources/index.html">"EasyEDA - Configuring Voltage and Current Sources"</a></p>
+<hr />
+<h2 id="1">&#9655; <strong>ตัวอย่างที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>วงจรตัวอย่างแรกประกอบด้วย</p>
+<ul>
+<li>แหล่งจ่ายแรงดันไฟฟ้าคงที่ <strong>VS</strong> และได้กำหนดค่าให้เป็น <strong>12 V</strong></li>
+<li>แหล่งจ่ายกระแสไฟฟ้าคงที่ <strong>IS</strong> และได้กำหนดค่าให้เป็น <strong>1 A</strong></li>
+<li>ตัวต้านทาน <strong>R1, R2, R3</strong> และได้กำหนดค่าให้เป็น <strong>6 &Omega;, 3 &Omega;, 6 &Omega;</strong> ตามลำดับ</li>
+</ul>
+<p><img alt="" src="circuit-1.png" /></p>
+<p>รูป: การวาดผังวงจรตัวอย่างด้วย <strong>EasyEDA</strong> </p>
+<p>จากผลการวิเคราะห์วงจรในโหมด <strong>DC operating point</strong> จะเห็นว่า </p>
+<ul>
+<li><strong>V(1)</strong> = แรงดันที่เน็ตหมายเลข 1 เทียบกับ <strong>GND</strong> ได้เท่ากับ <strong>12 V</strong></li>
+<li><strong>V(2)</strong> = แรงดันที่เน็ตหมายเลข 2 เทียบกับ <strong>GND</strong> ได้เท่ากับ <strong>9 V</strong></li>
+<li><strong>V(3)</strong> = แรงดันที่เน็ตหมายเลข 3 เทียบกับ <strong>GND</strong> ได้เท่ากับ <strong>12 V</strong></li>
+<li><strong>I(Is)</strong> = กระแสไฟฟ้าที่ไหลผ่านแหล่งจ่ายกระแส <strong>IS</strong> ได้เท่ากับ <strong>1A</strong></li>
+<li><strong>I(R1)</strong> = กระแสไฟฟ้าที่ไหลผ่าน <strong>R1</strong> ได้เท่ากับ <strong>0.5 A</strong></li>
+<li><strong>I(R2)</strong> = กระแสไฟฟ้าที่ไหลผ่าน <strong>R2</strong> ได้เท่ากับ <strong>-1.0 A</strong></li>
+<li><strong>I(R3)</strong> = กระแสไฟฟ้าที่ไหลผ่าน <strong>R3</strong> ได้เท่ากับ <strong>1.5 A</strong></li>
+</ul>
+<p><img alt="" src="circuit-1_sim.png" /></p>
+<p>รูป:  รายการ <strong>SPICE netlist</strong> ของวงจร และผลการวิเคราะห์วงจร</p>
+<p>หากวิเคราะห์วงจรโดยใช้ทฤษฎีทางไฟฟ้า <strong>KCL</strong> เพื่อเปรียบเทียบผลลัพธ์ที่ได้จากการใช้ซอฟต์แวร์
+ก็มีแนวทางดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+    \frac{V_1 - V_2}{R_1} 
+     &= \frac{V_2-V_3}{R_2} + \frac{V_2}{R_3} \\
+ I_S &= -\frac{V_2-V_3}{R_2} \\
+ V_1 &= V_S \\
+\end{align}
+</script>
+</p>
+<p>จากสมการข้างบน จะสามารถหา <script type="math/tex">V_1</script>, <script type="math/tex">V_2</script> และ <script type="math/tex">V_3</script> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+  V_1 &= V_S = 12 V \\[1em]
+  V_2 &= \frac{R_1 R_3}{R_1 + R_3} \big(\frac{V_S}{R_1} + I_S\big) \\
+      &= (3 \Omega)( \frac{12 V}{ 6 \Omega } + 1 A ) = 9 V \\[1em]
+  V_3 &= I_S\, R_2 + V_2 = (1 A)(3 \Omega) + 9 V = 12 V \\
+\end{align} 
+</script>
+</p>
+<p>กระแสไฟฟ้าที่ไหลผ่านตัวต้านทาน โดยให้มีทิศทางจากขา 1 ไปยังขา 2 ของตัวต้านทานแต่ละตัว สามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   I(R_1) &= \frac{V_1 - V_2}{R_1} 
+           = \frac{12 V - 9 V}{6 \Omega} = 0.5 A \\[1em]
+   I(R_2) &= \frac{V_2 - V_3}{R_2} 
+           = \frac{9 V - 12 V}{3 \Omega} = -1.0 A \\[1em]
+   I(R_3) &= \frac{V_2 }{R_3} = \frac{9 V}{6 \Omega} = 1.5 A
+\end{align}
+</script>
+</p>
+<hr />
+<h2 id="2">&#9655; <strong>ตัวอย่างที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>วงจรในตัวอย่างที่ 2 ประกอบด้วย</p>
+<ul>
+<li>ตัวต้านทาน <strong>R1</strong> และ <strong>R2</strong> ซึ่งได้กำหนดค่าได้เป็น <strong>6 &Omega;</strong> และ <strong>3 &Omega;</strong> ตามลำดับ</li>
+<li>แหล่งจ่ายแรงดันอิสระ <strong>VS</strong> กำหนดค่าให้เป็น <strong>9V</strong> </li>
+<li>แหล่งจ่ายแรงดัน <strong>H1</strong> ที่ขึ้นกับกระแสควบคุม  (ใช้คอมโพเนนต์ <strong>CCVS_2</strong> ในไลบรารีของ <strong>EasyEDA</strong>)</li>
+<li>แหล่งจ่ายกระแส <strong>F1</strong> ที่ขึ้นกับกระแสควบคุม  (ใช้คอมโพเนนต์  <strong>CCCS_2</strong> ในไลบรารีของ <strong>EasyEDA</strong>)</li>
+</ul>
+<p>ในตัวอย่างนี้ ได้กำหนดให้ <strong>I(VS)</strong> เป็นกระแสที่ไหลผ่านแหล่งจ่าย <strong>VS</strong> และกำหนดให้มีทิศทางการไหลจากขั้วบวกไปยังขั้วลบของแหล่งจ่าย และกำหนดให้</p>
+<ul>
+<li><strong>H1</strong> สร้างแรงดันไฟฟ้าเท่ากับ <strong>I(VS)</strong> คูณด้วย <strong>-3</strong> (หน่วยเป็น <strong>V/A</strong>)</li>
+<li><strong>F1</strong> สร้างกระแสไฟฟ้าเท่ากับ <strong>I(VS)</strong> คูณด้วย <strong>2</strong> (ไม่มีหน่วย)</li>
+</ul>
+<p><img alt="" src="circuit-2.png" /></p>
+<p>รูป: การวาดผังวงจรตัวอย่างด้วย <strong>EasyEDA</strong></p>
+<p>จากผลการวิเคราะห์วงจรด้วย <strong>EasyEDA</strong> จะเห็นได้ว่า</p>
+<ul>
+<li><strong>V(1)</strong> ได้เท่ากับ <strong>9 V</strong></li>
+<li><strong>V(2)</strong> ได้เท่ากับ <strong>6 V</strong> </li>
+<li><strong>V(3)</strong> ได้เท่ากับ <strong>1.5 V</strong></li>
+<li><strong>I(VS)</strong> ซึ่งเป็นกระแสไฟฟ้าไหลที่ผ่านแหล่งจ่าย <strong>VS</strong> ได้เท่ากับ  <strong>-0.5 A</strong> เป็นต้น</li>
+</ul>
+<p><strong>ข้อสังเกต:</strong>  </p>
+<ul>
+<li><strong>H1</strong> และ <strong>F1</strong> เป็นแหล่งจ่ายที่ขึ้นอยู่กับกระแสที่ไหลผ่านแหล่งจ่าย <strong>VS</strong> ในวงจร ดังนั้น <strong>SPICE directive</strong> สำหรับกำหนดคุณสมบัติของอุปกรณ์ดังกล่าว จึงต้องมีข้อความที่ระบุว่า
+แหล่งจ่ายนี้ขึ้นอยู่กับปริมาณทางไฟฟ้าของแหล่งจ่ายใด ในกรณีนี้คือ <strong>VS</strong>
+แล้วตามด้วยค่าคงที่หรือตัวคูณที่เป็นเลขจำนวนเต็มหรือเลขทศนิยม</li>
+<li><strong>V(1)</strong>, <strong>V(2)</strong> และ <strong>V(3)</strong> เป็นแรงดันไฟฟ้าเทียบกับ <strong>GND</strong>
+สำหรับจุดหรือเน็ตที่หมายเลขอ้างอิง <strong>1</strong>, <strong>2</strong> และ <strong>3</strong> ในวงจร</li>
+</ul>
+<p><img alt="" src="circuit-2_sim.png" /></p>
+<p>รูป:  รายการ <strong>SPICE netlist</strong> ของวงจร และผลการวิเคราะห์วงจร</p>
+<p>ในการวิเคราะห์วงจรด้วยทฤษฎีทางไฟฟ้าได้ใช้สัญลักษณ์ดังต่อไปนี้</p>
+<ul>
+<li>
+<script type="math/tex">I(V_S)</script> = กระแสที่ไหลผ่าน <strong>VS</strong> ซึ่งเป็นแหล่งจ่ายแรงดันคงที่</li>
+<li>
+<script type="math/tex">I(F1)</script> = กระแสที่ไหลผ่าน <strong>F1</strong> ซึ่งเป็นแหล่งจ่ายประเภท <strong>CCCS</strong></li>
+<li>
+<script type="math/tex">V(H1)</script> = แรงดันตกคร่อมของ <strong>H1</strong> ซึ่งเป็นแหล่งจ่ายประเภท <strong>CCVS</strong></li>
+</ul>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   \frac{V_1 - V_2}{R_1} &= \frac{V_2 - V_3}{R_2} + I(F1) \\
+   I(V_S) &= -\frac{V_1 - V_2}{R_1} = -\frac{V_S - V_2}{R_1} \\
+    V_1   &= V_S \\
+    I(F1) &= 2\cdot I(V_S) \\
+    V(H1) &= -3\cdot I(V_S) = V_3 \\
+\end{align} \\
+</script>
+</p>
+<p>เมื่อจัดรูปของสมการใหม่ จะได้ผลดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   \frac{V_S - V_2}{R_1} &= \frac{V_2 - 3(V_S - V_2)/R_1}{R_2} 
+    - \frac{2(V_S - V_2)}{R_1} \\[1em]
+   V_2 &= \frac{V_S (3 + 3 R_2)}{3 + R_1 + 3 R_2}  = 6V \\
+   V_3 &= 3 \frac{(V_S - V_2)}{R1} = 1.5V \\
+   I(V_S) &= \frac{V_2 - V_1}{R_1} = \frac{V_2 - V_S}{R_1} = -0.5A \\
+\end{align}
+</script>
+</p>
+<p>การใช้แหล่งจ่าย <strong>CCVS_2</strong> และ <strong>CCCS_2</strong> ของ <strong>EasyEDA / LTspice</strong> มีจำกัด
+คือ กระแสควบคุมจะต้องเป็นกระแสที่ไหลผ่านแหล่งจ่ายแรงดันไฟฟ้าเท่านั้น ลองมาเปรียบเทียบการใช้งาน
+แหล่งจ่าย <strong>CCVS</strong> และ <strong>CCCS</strong> สำหรับ <strong>H1</strong> และ <strong>F1</strong> ตามลำดับ ในรูปวงจรต่อไปนี้</p>
+<p><img alt="" src="circuit-2_alternative.png" /></p>
+<p>รูป: การวาดผังวงจรตัวอย่างด้วย <strong>EasyEDA</strong> เมื่อเปลี่ยนมาใช้ <strong>CCVS</strong> และ <strong>CCCS</strong></p>
+<p>ข้อดีของการใช้งาน <strong>CCVS</strong> และ <strong>CCCS</strong> คือ เราสามารถเลือกกระแสไฟฟ้าในส่วนใดของวงจรเป็นกระแสควบคุมได้ แต่ก็มีข้อเสียคือ ขาคู่ด้านซ้ายสำหรับวัดกระแสที่ไหลผ่านกับขาคู่ด้านขวาสำหรับใช้เป็นแหล่งจ่ายของอุปกรณ์เดียวกันจะแยกกันไม่ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3">&#9655; <strong>ตัวอย่างที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>อุปกรณ์ที่เป็นแหล่งจ่ายอีกประเภทหนึ่ง เรียกว่า <strong>Behavioral Source</strong>
+ซึ่งมีให้เลือกทั้งแบบที่เป็นแรงดันควบคุมหรือกระแสควบคุม และสามารถกำหนดความสัมพันธ์ระหว่างอินพุตและเอาต์พุตของอุปกรณ์โดยใช้สูตรคณิตศาสตร์ได้ ถัดไปมาดูตัวอย่างการใช้งานแหล่งจ่ายประเภทนี้</p>
+<p>วงจรตัวอย่างนี้ประกอบ</p>
+<ul>
+<li>ตัวต้านทาน <strong>R1,R2,R3</strong> ซึ่งได้กำหนดค่าได้เป็น <strong>5 &Omega; 3 &Omega; 9 &Omega;</strong> ตามลำดับ</li>
+<li>แหล่งจ่ายแรงดันอิสระ <strong>VS</strong> กำหนดค่าให้เป็น <strong>6V</strong> </li>
+<li>แหล่งจ่ายแรงดัน <strong>BV</strong> ที่ขึ้นกับแรงดันควบคุม  (ใช้คอมโพเนนต์ <strong>Behavioral Voltage Source</strong> ในไลบรารีของ <strong>EasyEDA</strong>) โดยให้ <strong>V = -2*I(R1)</strong>
+และ <strong>I(R1)</strong> เป็นกระแสที่ไหลผ่านตัวต้านทาน <strong>R1</strong></li>
+<li>แหล่งจ่ายกระแส <strong>BI</strong> ที่ขึ้นกับกระแสควบคุม  (ใช้คอมโพเนนต์  <strong>Behavioral Current Source</strong> ในไลบรารีของ <strong>EasyEDA</strong>)  โดยให้ <strong>I = -V(1,0)/3</strong>
+และ <strong>V(1,0)</strong> เป็นผลต่างของแรงดันไฟฟ้าที่จุด <strong>1</strong> และ <strong>0</strong> (<strong>GND</strong>) ซึ่งเท่ากับแรงดันตกคร่อมที่แหล่งจ่าย <strong>VS</strong></li>
+</ul>
+<p><img alt="" src="circuit-3.png" /></p>
+<p>รูป: การวาดผังวงจรตัวอย่างด้วย <strong>EasyEDA</strong> </p>
+<p><img alt="" src="circuit-3_sim.png" /></p>
+<p>รูป:  รายการ <strong>SPICE netlist</strong> ของวงจร และผลการวิเคราะห์วงจร</p>
+<p>การวิเคราะห์วงจรด้วยทฤษฎีทางไฟฟ้า มีแนวทางดังนี้ โดยให้ <script type="math/tex">V_1,...,V_4</script> เป็นตัวแปรที่ไม่ทราบค่า
+(<strong>Unknowns</strong>) และเป็นแรงดันไฟฟ้าเทียบกับ <strong>GND</strong> ตามจุดอ้างอิงในผังวงจร</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+  \frac{V_1-V_2}{R_1} &= \frac{V_2-V_3}{R_2} + \frac{V_2-V_4}{R_3}  & (Eq.1) \\
+  V_4 &= (-2)\frac{V_1-V_2}{R_1}  & (Eq.2)\\
+  \frac{V_2-V_3}{R_2} &= -\frac{1}{3}V_1 &(Eq.3) \\
+   V_1 &= V_S & (Eq.4)
+\end{align}
+</script>
+</p>
+<p>ในการหาผลเฉลยของระบบสมการเชิงเส้น เราลองมาดูตัวอย่างการเขียนโค้ดด้วย <strong>Python</strong>
+และใช้โมดูล <strong>SymPy</strong> ในการประมวลผลเชิงสัญลักษณ์ เพื่อหาคำตอบสำหรับ <script type="math/tex">V_1,...,V_4</script>
+</p>
+<pre><code class="language-python">from sympy import *
+from IPython.display import display, Math
+# declare symbols for circuit parameters
+R1,R2,R3 = symbols(&quot;R_1 R_2 R_3&quot;, positive=True)
+VS,V1,V2,V3,V4 = symbols(&quot;V_S V_1 V_2 V_3 V_4&quot;)
+eq1 = Eq( (V1-V2)/R1, (V2-V3)/R2 + (V2-V4)/R3 )
+eq2 = Eq( V4, (-2)*(V1-V2)/R1 )
+eq3 = Eq( (V2-V3)/R2, -Rational(1,3)*V1 )
+eq4 = Eq( V1, VS )
+eqn_sys  = [eq1, eq2, eq3, eq4]
+unknowns = [V1,V2,V3,V4]
+# show the equations
+for eq in eqn_sys:
+    display( eq )
+# solve the linear equation system
+sol = solve( eqn_sys, unknowns )
+# show the expressions for V1,...,V4
+for k,v in sol.items():
+    display( Math(latex(k) + '=' + latex(simplify(v))) )
+# substitute V1,...,V4 with numeric values
+params = {VS:6,R1:5,R2:3,R3:9}
+t = ''
+for k,v in sol.items():
+    t += latex(k) + '=' + latex(v.subs(params)) + '\,V,'
+display( Math(t[:-1]) )
+</code></pre>
+<p><img alt="" src="python_output.png" /></p>
+<p>รูป:  เอาต์พุตจากโค้ด <strong>Python</strong> ที่แสดงผลเฉลยของระบบสมการเชิงเส้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอ ตัวอย่างการใช้งานแหล่งจ่ายในวงจรดีซี การวิเคราะห์และจำลองการทำงานของวงจร
+โดยใช้ซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-05-01 | Last Updated: 2022-05-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
