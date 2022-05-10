@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/esp32/esp32-c3_intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเริ่มต้นใช้งานชิป ESP32-C3 (RISC-V) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c++.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#esp32-c3-risc-v" class="nav-link">การเริ่มต้นใช้งานชิป ESP32-C3 (RISC-V)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#esp32-c3" class="nav-link">&#9655; ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-c3_1" class="nav-link">&#9655; ตัวเลือกสำหรับการใช้งาน ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-c3_2" class="nav-link">&#9655; ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-c3_3" class="nav-link">&#9655; การเขียนโปรแกรมสำหรับ ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#firmware-micropython" class="nav-link">&#9655; การติดตั้งไฟล์ Firmware สำหรับ MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32" class="nav-link">&#9655; ซอฟต์แวร์ Arduino สำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator" class="nav-link">&#9655; การใช้งาน WokWi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-c3-risc-v">การเริ่มต้นใช้งานชิป ESP32-C3 (RISC-V)<a class="headerlink" href="#esp32-c3-risc-v" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="esp32-c3">&#9655; <strong>ESP32-C3</strong><a class="headerlink" href="#esp32-c3" title="Permanent link">#</a></h2>
+<p><a href="https://www.espressif.com/en/products/socs/esp32-c3"><strong>ESP32-C3 Series</strong></a>
+(<em>announced: Nov 27, 2020</em>) เป็นชิปไมโครคอนโทรลเลอร์ (<strong>MCU: Microcontroller Unit</strong>) หรือ <strong>MCU-based System-on-Chip</strong> ของบริษัท <a href="https://www.espressif.com/"><strong>Espressif Systems</strong></a> และแตกต่างจากชิปรุ่น <strong>ESP32 / ESP32-S2 / ESP32-S3</strong> ที่ใช้ซีพียูของ <strong>Tensilica Xtensa (LX6/LX7)</strong> กล่าวคือ ซีพียูของ <strong>ESP32-C3</strong> ทำงานได้ตามสถาปัตยกรรมของชุดคำสั่ง (<strong>ISA: Instruction Set Architecture</strong>) ที่เรียกว่า <a href="https://en.wikipedia.org/wiki/RISC-V"><strong>RISC-V</strong></a>  (<em>pronounced "Risk-Five"</em>) </p>
+<p>ชิปรุ่นอื่นของ <strong>Espressif</strong> ที่ใช้ <strong>RISC-V</strong> ได้แก่ </p>
+<ul>
+<li><a href="https://www.espressif.com/en/news/ESP32_c6"><strong>ESP32-C6</strong></a> (<em>announced: Apr 9, 2021</em>):
+มีสเปคต่ำกว่า <strong>ESP32-C3</strong> แต่รองรับการใช้งาน <strong>IEEE 802.15.4 (Thread + Zigbee)</strong> และ <strong>Bluetooth 5</strong> แต่ไม่รองรับ <strong>Wi-Fi</strong></li>
+<li><a href="https://www.espressif.com/en/news/ESP32_H2"><strong>ESP32-H2</strong></a> (<em>announced: Aug 2, 2021</em>): 
+มีสเปคใกล้เคียงกับ <strong>ESP32-C3</strong> แต่รองรับการใช้งาน <strong>Wi-Fi 6 / IEEE 802.11ax</strong></li>
+<li><a href="https://www.espressif.com/en/news/ESP32-C2"><strong>ESP32-C2 Series</strong></a> (<em>announced: Apr 29, 2022</em>):
+มีสเปคต่ำกว่า <strong>ESP32-C3</strong> เนื่องจากมีการลดขนาดความจุของหน่วยความจำภายใน เป็นต้น </li>
+</ul>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li><a href="https://github.com/riscv/riscv-isa-manual/"><strong>RISC-V ISA</strong></a> เป็นสถาปัตยกรรมของชุดคำสั่งที่เปิดเผยและไม่มีค่าลิขสิทธิ์ในการใช้งาน
+(<strong>Open &amp; Free ISA</strong>) แต่ก็มีการกำหนดให้เป็นมาตรฐานโดยมี <a href="https://riscv.org/"><strong>RISC-V International</strong></a> ซึ่งองค์กรที่ไม่แสวงหากำไรหรือมีคณะทำงานคอยกำกับดูแล  </li>
+<li>การออกแบบและสร้างซีพียูสำหรับ <strong>RISC-V</strong> ที่เป็น <strong>IP (Intellectual Property) Cores</strong> สำหรับการนำไปสร้างหรือผลิตชิป อาจไม่ได้เป็น <strong>Open Source / Open Hardware</strong> และอาจมีค่าใช้งานในการนำไปใช้งาน</li>
+<li>อย่างไรก็ตาม <strong>RISC-V IP Cores</strong> ที่เป็น <strong>Open Source / Open Hardware</strong> ก็มีเช่นกัน และสามารถนำไปทดลองใช้งานได้ โดยการสร้างเป็นวงจรในชิปประเภท <strong>FPGA</strong></li>
+</ul>
+<p>แม้ว่ามีการเลือกใช้ซีพียูที่แตกต่างออกไป แต่ชิป <strong>ESP32-C3</strong> ก็มีวงจรรอบข้างซีพียู (<strong>On-chip Peripherals</strong>) ที่คล้ายกับชิป <strong>ESP32</strong> เช่น รองรับการสื่อสารข้อมูลไร้สายด้วยวงจร <strong>Wi-Fi (2.4GHz) / Bluetooth 5 (LE)</strong> และมีวงจรที่ช่วยในการประมวลผลและสื่อสารข้อมูลที่เน้นความปลอดภัย (<strong>Security</strong>) ซึ่งเหมาะกับงานด้าน <strong>IoT</strong></p>
+<p><strong>ESP32-C3</strong> ถูกมองว่าเป็นตัวเลือกใหม่และแทนที่ชิป <strong>ESP8266 / ESP8285</strong>
+ของบริษัท <strong>Espressif</strong> หากนำไปใช้ในลักษณะที่เรียกว่า <strong>Wi-Fi Serial Module</strong> และใช้ชุดคำสั่งที่เรียกว่า <a href="https://docs.espressif.com/projects/esp-at/en/latest/esp32/AT_Command_Set/index.html"><strong>Espressif AT Command Set</strong></a> เนื่องจากมีราคาไม่แพงและประหยัดพลังงานได้ดีกว่าเมื่อเปรียบเทียบกับชิป <strong>ESP32</strong> และชิปรุ่นอื่นที่ไม่ได้ใช้ <strong>RISC-V CPU Core</strong></p>
+<p><img alt="" src="esp32-c3_block_diagram.png" /></p>
+<p>รูป: <strong>Block Diagram</strong> แสดงองค์ประกอบภายในของชิป <strong>ESP32-C3</strong></p>
+<p>ชิป <strong>ESP32-C3</strong> มีแกนซีพียู <strong>RISC-V (RV32IMC ISA)</strong> อยู่ภายในเพียงแกนเดียว
+(<strong>Single Core</strong>) ทำคำสั่งโดยใช้ <strong>4-stage Instruction Pipeline</strong>
+ความเร็วสูงสุด <strong>160MHz</strong> โดยใช้ตัวสร้างสัญญาณ <strong>Clock</strong> จากภายนอกชิป (<strong>40MHz crystal</strong>)</p>
+<p><strong>RV32IMC ISA</strong></p>
+<ul>
+<li>I = 32-bit Integer Instruction Set (no FPU extension) </li>
+<li>M = Integer Multiplication and Division</li>
+<li>C = Compressed Instructions</li>
+</ul>
+<p>ชิป <strong>ESP32-C3</strong> มีหน่วยความจำภายในดังนี้</p>
+<ul>
+<li><strong>384 KB of ROM (Read-Only)</strong>: เป็นส่วนที่เก็บโปรแกรมสำหรับการเริ่มต้นทำงานของระบบ
+และฟังก์ชันพื้นฐานต่าง ๆ สำหรับการทำงานของชิปในระดับล่าง (โดยรวมเรียกว่า  <strong>ROM Functions</strong>)
+หน่วยความจำชนิดนี้ถูกบันทึกข้อมูลมาจากโรงงาน ผู้ใช้ไม่สามารถเขียนข้อมูลลงในส่วนนี้ได้</li>
+<li><strong>400 KB of SRAM</strong>: สำหรับเก็บข้อมูล (<strong>Data</strong>) และคำสั่งของโปรแกรม
+(<strong>Program Instructions</strong>) แต่ส่วนหนึ่งของ <strong>SRAM</strong> ที่มีขนาด <strong>16 KB</strong>
+จะถูกใช้งานเป็น <strong>Cache</strong> สำหรับการอ่านข้อมูลและคำสั่งจากหน่วยความจำภายนอก </li>
+<li><strong>8 KB of RTC memory</strong>: ใช้สำหรับเก็บข้อมูลชั่วคราวและไม่สูญหาย
+เมื่อซีพียูเข้าสู่โหมดประหยัดพลังงาน (<strong>Deep-sleep mode</strong>)</li>
+<li><strong>4 Kbit of eFuse</strong>: เป็นหน่วยความจำแบบ <strong>Non-volatile / One-time programmable</strong>
+มีวิธีการป้องกันการเขียนหรืออ่านข้อมูลจากภายนอกได้ (<strong>Read/write Protection</strong>)
+บางส่วนของหน่วยความจำสามารถเก็บข้อมูลที่ต้องมีการรักษาความปลอดภัย เช่น ใช้ในการเข้ารหัสข้อมูล
+สำหรับหน่วยความจำแพลช เป็นต้น</li>
+<li><strong>Embedded Flash</strong>: ชิปบางรุ่นได้รวมหน่วยความจำแฟลชไว้ในชิปเดียวกัน มีขนาดความจุ <strong>2MB</strong> หรือ <strong>4MB</strong></li>
+</ul>
+<p>หน่วยความจำภายในชิปของ <strong>ESP32-C3</strong> สามารถเข้าถึงได้ผ่านทางบัสของซีพียูทั้งสองประเภทคือ
+บัสสำหรับข้อมูล (<strong>Data Bus</strong>) และบัสสำหรับคำสั่ง  (<strong>Instruction Bus</strong>)
+แบ่งตามช่วงของแอดเดรสในแผนผังของหน่วยความจำ (<strong>Address Map</strong>) สำหรับหน่วยความจำภายในและภายนอก  เช่น</p>
+<ul>
+<li><code>0x0000_0000</code> ~ <code>0x4000_0000</code> เข้าถึงได้จากบัสสำหรับข้อมูลเท่านั้น</li>
+<li><code>0x4000_0000</code> ~ <code>0x4FFF_FFFF</code> เข้าถึงได้จากบัสสำหรับคำสั่งเท่านั้น</li>
+<li><code>0x5000_0000</code> ~ <code>0xFFFF_FFFF</code> เข้าถึงได้จากบัสทั้งสองประเภท</li>
+</ul>
+<p>การเข้าถึงรีจิสเตอร์ต่าง ๆ ของวงจรรอบข้างภายใน (<strong>On-chip Peripherals</strong>)
+จะอยู่ในช่วงแอดเดรส <code>0x6000_0000</code> ~ <code>0x600D_0FFF</code> และเข้าถึงได้ด้วยบัสสำหรับข้อมูล</p>
+<p>รายละเอียดในเชิงลึกเกี่ยวกับ <strong>ESP32-C3 SoC</strong> สามารถศึกษาได้จากไฟล์:
+<a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf"><strong>ESP32C3 Technical Reference Manual</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-c3_1">&#9655; <strong>ตัวเลือกสำหรับการใช้งาน ESP32-C3</strong><a class="headerlink" href="#esp32-c3_1" title="Permanent link">#</a></h2>
+<p>ตัวเลือกที่เป็นฮาร์ดแวร์สำหรับ <strong>ESP32-C3</strong> จำแนกได้เป็น 3 ระดับ</p>
+<ul>
+<li><strong>SoCs</strong>: เป็นชิปที่บริษัท <strong>Espressif</strong> ได้ผลิตและจำหน่าย แบ่งออกเป็นกลุ่มย่อย ได้แก่ <strong>ESP32-C3</strong> และ <strong>ESP8685</strong> อาจมีความแตกต่างกันไปบ้าง เช่น ขนาดของตัวชิป
+จำนวนขา <strong>GPIO</strong> การรวมหน่วยความจำ <strong>Embedded Flash</strong> ไว้ภายในชิปหรือใช้ชิปหน่วยความจำ <strong>SPI Flash</strong> ภายนอกได้ และขนาดของหน่วยความจำ <strong>Flash</strong> ช่วงอุณหภูมิในการทำงานของชิป เป็นต้น</li>
+<li><strong>Modules</strong>: เป็นโมดูลที่มีลักษณะเป็นแผงวงจร ซึ่งมีชิป <strong>ESP32-C3</strong> และวงจรส่วนอื่น เช่น <strong>40MHz crystal</strong> และวงจรเชื่อมต่อกับสายอากาศ (<strong>Antenna</strong>) อยู่บนแผ่น <strong>PCB</strong> อาจมาจากบริษัท <strong>Espressif</strong> หรือ บริษัทอื่น</li>
+<li><strong>Boards</strong>: เป็นบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิปหรือโมดูลสำหรับ <strong>ESP32-C3</strong>
+โดยอาจมาจากบริษัท <strong>Espressif</strong> ที่ได้ทำบอร์ดตัวอย่างที่เรียกว่า <strong>DevKit</strong>
+ออกมาสู่ตลาดเพื่อนำไปทดลองใช้งาน หรือบอร์ดที่เป็นสินค้าของบริษัทอื่น</li>
+</ul>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>แม้ว่าชิป <strong>ESP32-C3</strong> มีช่วงของแอดเดรสที่เข้าถึงหน่วยความจำภายนอก
+สำหรับโปรแกรมคำสั่งและข้อมูล ได้ไม่เกิน <strong>8MB (program) + 8MB (data)</strong> แต่โดยทั่วไปจะเห็นได้ว่า ขนาดของชิปหน่วยความจำ <strong>Flash</strong> มักจะเป็น <strong>2MB</strong> หรือ <strong>4MB</strong> ซึ่งน่าจะเพียงพอสำหรับงานโดยทั่วไป </li>
+</ul>
+<p><strong>ESP32-C3 SoCs</strong>: <a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3_datasheet_en.pdf"><strong>ESP32-C3 Datasheet</strong></a></p>
+<ul>
+<li><strong>Family members</strong>: <ul>
+<li><strong>ESP32-C3</strong>: external Flash, 22 GPIO pins</li>
+<li><strong>ESP32-C3FN4</strong>: embedded Flash (4MB), 22 GPIO pins</li>
+<li><strong>ESP32-C3FH4</strong>: embedded Flash (4MB), 22 GPIO pins</li>
+<li><strong>ESP32-C3FH4AZ</strong>: embedded Flash (4MB), 16 GPIO pins</li>
+</ul>
+</li>
+<li><strong>Chip package</strong>: QFN32 (5*5 mm^2)</li>
+<li><strong>Temperature range</strong>:<ul>
+<li><strong>N</strong> = Normal (-40 °C .. +85 °C)</li>
+<li><strong>H</strong> = High (-40 °C .. +105 °C)</li>
+</ul>
+</li>
+</ul>
+<p><strong>ESP8685 SoCs</strong>: <a href="https://www.espressif.com/sites/default/files/documentation/esp8685_datasheet_en.pdf"><strong>ESP8685 Datasheet</strong></a></p>
+<ul>
+<li><strong>Family members</strong>: <ul>
+<li><strong>ESP8685H2</strong>: 2MB embedded Flash</li>
+<li><strong>ESP8685H4</strong>: 4MB embedded Flash</li>
+</ul>
+</li>
+<li><strong>Chip package</strong>: QFN28 (4*4 mm^2)<ul>
+<li>Note: SPI Flash signals are not bonded out.</li>
+</ul>
+</li>
+<li><strong>Temperature range:</strong> -40 °C .. +105 °C (High)</li>
+</ul>
+<p><strong>ESP32-C3 Modules</strong></p>
+<ul>
+<li><strong>Espressif</strong><ul>
+<li><strong>ESP32-C3-MINI-1/1U (external Flash)</strong></li>
+<li><strong>ESP32-C3-WROOM-02/02U (embedded Flash)</strong></li>
+<li><strong>ESP8685-WROOM-03/-05/-06 (embedded Flash)</strong></li>
+</ul>
+</li>
+<li><strong>Ai Thinker</strong><ul>
+<li><strong>ESP-C3-12F</strong></li>
+<li><strong>ESP-C3-32S</strong></li>
+<li><strong>ESP-C3-01M</strong></li>
+<li><strong>ESP-C3-13</strong> / <strong>ESP-C3-13U</strong></li>
+<li><strong>ESP-C3-M1</strong> / <strong>ESP-C3-M1-I</strong></li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="esp32-c3_wroom-02_modules.png" /></p>
+<p>รูป: โมดูล <strong>Espressif ESP32-C3 WROOM-02 / 02U</strong> 
+(<a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3-wroom-02_datasheet_en.pdf"><strong>Datasheet</strong></a>)</p>
+<p><img alt="" src="esp32-c3-wroom-02_block_diagram.png" /></p>
+<p>รูป: <strong>Block Diagram</strong> ของโมดูล <strong>Espressif ESP32-C3 WROOM-02 (PCB Antenna)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-c3_2">&#9655; <strong>ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ ESP32-C3</strong><a class="headerlink" href="#esp32-c3_2" title="Permanent link">#</a></h2>
+<p>ในปัจจุบันเริ่มมีบอร์ด <strong>ESP32-C3</strong> ออกมาสู่ตลาดเพื่อให้ผู้ใช้ได้ลองใช้งาน 
+นอกเหนือจากบอร์ดของบริษัท <strong>Espressif</strong> แล้วยังมีของบริษัทอื่น เช่น
+<strong>Ai Thinker</strong> และ <strong>Adafruit</strong> เป็นต้น</p>
+<p><strong>ESP32-C3 Boards / DevKits</strong></p>
+<ul>
+<li><a href="https://www.espressif.com/en/products/devkits"><strong>Espressif</strong></a><ul>
+<li><strong>ESP32-C3-DevKitM-1</strong>
+[<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html">&#8594;</a>]</li>
+<li><strong>ESP32-C3-DevKitC-02</strong>
+[<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitc-02.html">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="http://www.ai-thinker.com/"><strong>Ai Thinker</strong></a><ul>
+<li><strong>ESP-C3-12F Kit</strong></li>
+<li><strong>ESP32-C3-32S Kit</strong></li>
+<li><strong>ESP-C3-01M Kit</strong></li>
+<li><strong>ESP-C3-13 Kit</strong>
+[<a href="https://docs.ai-thinker.com/_media/esp32/docs/esp-c3-13-kit-v1.0_specification.pdf">&#8594;</a>] </li>
+<li><strong>ESP-C3-13U Kit</strong>
+[<a href="https://docs.ai-thinker.com/_media/esp32/docs/esp-c3-13u-kit-v1.0_specification.pdf">&#8594;</a>]</li>
+<li><strong>ESP-C3-M1 Kit</strong> </li>
+<li><strong>ESP-C3-M1-I Kit</strong></li>
+</ul>
+</li>
+<li><a href="https://www.adafruit.com/"><strong>Adafruit</strong></a><ul>
+<li><strong>Adafruit QT Py ESP32-C3 WiFi Dev Board</strong>
+[<a href="https://learn.adafruit.com/adafruit-qt-py-esp32-c3-wifi-dev-board">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="https://www.wemos.cc/en/latest/"><strong>Wemos.cc</strong></a><ul>
+<li><strong>LOLIN-C3 Mini v1.0.0</strong>
+[<a href="https://www.wemos.cc/en/latest/c3/c3_mini.html">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="http://www.lilygo.cn/"><strong>LilyGo</strong></a><ul>
+<li><strong>TTGO T-01C3 ESP32-C3 Module</strong>
+[<a href="https://github.com/Xinyuan-LilyGO/T-01C3">&#8594;</a>]</li>
+<li><strong>LilyGo TTGO T-OI PLUS ESP32-C3 V1.0</strong>
+[<a href="https://github.com/Xinyuan-LilyGO/LilyGo-T-OI-PLUS">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="https://shop.m5stack.com/products"><strong>M5Stack</strong></a><ul>
+<li><strong>M5Stamp C3 / C3U</strong>
+[<a href="https://docs.m5stack.com/en/core/stamp_c3u">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="https://www.dfrobot.com/"><strong>DFRobot</strong></a><ul>
+<li><strong>Beetle-ESP32-C3 RISC-V Core Dev. Board</strong>
+[<a href="https://wiki.dfrobot.com/SKU_DFR0868_Beetle_ESP32_C3">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="https://www.muselab-tech.com/"><strong>MuseLab Tech</strong></a><ul>
+<li><strong>nanoESP32-C3</strong>
+[<a href="https://github.com/wuxx/nanoESP32-C3">&#8594;</a>]</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="espressif_esp32_c3_devkits.png" /></p>
+<p>รูป: บอร์ด <strong>Espressif ESP32-C3 DevKitM-1</strong> และ <strong>DevKitC-02</strong></p>
+<p><img alt="" src="esp32-c3_lolin_mini.png" /></p>
+<p>รูป: บอร์ด <strong>Wemos ESP32-C3 LOLIN Mini (v1.0.0)</strong> [<a href="sch_c3_mini_v1.0.0.pdf"><strong>Schematic</strong></a>]</p>
+<p>บอร์ด <strong>ESP32-C3 LOLIN Mini</strong> มี <strong>Onboard (Blue) LED</strong> 
+ต่ออยู่ที่ขา <strong>GPIO-7</strong> และสำหรับการเชื่อมต่อกับคอมพิวเตอร์ ก็มีคอนเนกเตอร์ <strong>USB Type-C</strong> 
+โดยไม่ได้ใช้ชิป <strong>USB-to-Serial Bridge</strong> ดังนั้นจึงต้องเปิดใช้งาน <strong>Built-in USB-CDC</strong></p>
+<p>เมื่อกดปุ่ม <strong>BOOT</strong> ค้างไว้ แล้วกดปุ่ม <strong>RST</strong> เพื่อรีเซตการทำงานของบอร์ด 
+และเข้าสู่โหมด <strong>Device Firmware Upgrade (DFU)</strong> 
+คอมพิวเตอร์ของผู้ใช้จะมองเห็น <strong>Virtual Serial COM Port</strong> และถ้าต้องการรับส่งข้อมูลผ่านพอร์ตนี้
+ในขั้นตอนการคอมไพล์โค้ดสำหรับ <strong>Arduino Sketch</strong> จะต้องเลือก <strong>"USB CDC on Boot: Enabled"</strong></p>
+<p><img alt="" src="ai_thinker_esp-c3-13-kits.png" /></p>
+<p>รูป: บอร์ด <strong>Ai Thinker ESP-C3-13 Kits</strong></p>
+<p>จากรูปภาพของบอร์ด <strong>Ai Thinker ESP-C3-13 Kits</strong> มีการจำแนกออกเป็น 4 รูปแบบ ดังนี้</p>
+<ul>
+<li>(a) <strong>C3FN4</strong>: normal temperature version (N), embedded 4MB Flash</li>
+<li>(b) <strong>C3FN4</strong>: normal temperature version (N), embedded 4MB Flash, with IPEX connector for external antenna</li>
+<li>(c) <strong>C3FH4</strong>: high temperature version (H), embedded 4MB Flash</li>
+<li>(d) <strong>C3-2M</strong>: normal temperature version (N), external 2MB Flash</li>
+</ul>
+<p>เนื่องจากบอร์ดใช้ชิปป <strong>CH340</strong> ทำหน้าที่เป็น <strong>USB-to-Serial Bridge</strong>
+ดังนั้นคอมพิวเตอร์ของผู้ใช้ จะต้องมีการติดตั้ง <a href="http://www.wch-ic.com/downloads/CH341SER_EXE.html"><strong>CH340/CH341 USB Driver</strong></a> สำหรับอุปกรณ์ตัวนี้ก่อน</p>
+<p><img alt="" src="esp32_c3_boards.png" /></p>
+<p>รูป: เปรียบบอร์ด <strong>WeMos LOLIN C3 Mini</strong> (ด้านซ้ายมือ)
+และบอร์ด <strong>Ai Thinker ESP-C3-13 Kit / C3FN4</strong> (ด้านขวามือ) </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-c3_3">&#9655; <strong>การเขียนโปรแกรมสำหรับ ESP32-C3</strong><a class="headerlink" href="#esp32-c3_3" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรมสำหรับ <strong>ESP32-C3</strong> ก็เหมือนกับกรณีของชิป <strong>ESP32</strong> รุ่นอื่น ซึ่งมีตัวเลือกดังนี้</p>
+<ul>
+<li>การเขียนโปรแกรมภาษา <strong>C/C++</strong> โดยใช้ <a href="https://www.espressif.com/en/products/sdks/esp-idf"><strong>ESP-IDF: IoT Development Framework for the ESP32</strong></a>
+ซึ่งประกอบด้วย <strong>SDK</strong> และ <strong>Toolchain</strong> ต่าง ๆ ที่ได้มีการพัฒนาโดยบริษัท <strong>Espressif</strong> และใช้ <strong>FreeRTOS</strong> เป็นพื้นฐานในการทำงานของโค้ด</li>
+<li>การเขียนโปรแกรมภาษา  <strong>C/C++</strong> ด้วย <strong>Arduino API</strong> ผู้ใช้จะต้องติดตั้ง <a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core</strong></a>
+สำหรับการใช้งานร่วมกับซอฟต์แวร์ <a href="https://www.arduino.cc/en/software/"><strong>Arduino IDE</strong></a></li>
+<li>การเขียนโปแกรมภาษา <strong>Python</strong> สำหรับไมโครคอนโทรลเลอร์ ในปัจจุบันมีสองตัวเลือกที่ได้รับความนิยมคือ <a href="https://micropython.org/"><strong>MicroPython</strong></a> และ <a href="https://circuitpython.org/"><strong>CircuitPython</strong></a> ผู้ใช้สามารถดาวน์โหลดไฟล์ <strong>.bin</strong> สำหรับนำไปใช้ในการติดตั้ง <strong>Firmware</strong> (โดยใช้โปรแกรม <code>esptool.py</code>) จำแนกตามบอร์ดไมโครคอนโทรลเลอร์ที่รองรับการใช้งาน<ul>
+<li><a href="https://micropython.org/download/?mcu=esp32c3"><strong>MicroPython esp32-c3 port</strong></a><ul>
+<li><strong>Generic ESP32-C3</strong>
+[<a href="https://micropython.org/download/esp32c3/">&#8594;</a>]</li>
+<li><strong>Generic ESP32-C3 with USB/Serial/JTAG</strong>
+[<a href="https://micropython.org/download/esp32c3-usb/">&#8594;</a>]</li>
+<li><strong>WeMos Lolin C3 Mini</strong> 
+[<a href="https://micropython.org/download/LOLIN_C3_MINI/">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="https://circuitpython.org/downloads?q=esp32-c3"><strong>CircuitPython esp32-c3 port</strong></a><ul>
+<li><strong>Adafruit QT Py ESP32-C3</strong> 
+[<a href="https://circuitpython.org/board/adafruit_qtpy_esp32c3/">&#8594;</a>]</li>
+<li><strong>Espressif ESP32-C3-DevKitC-1-N4</strong> 
+[<a href="https://circuitpython.org/board/espressif_esp32c3_devkitm_1_n4/">&#8594;</a>]</li>
+<li><strong>Ai-Thinker ESP-C3-32S</strong> 
+[<a href="https://circuitpython.org/board/ai_thinker_esp32-c3s/">&#8594;</a>]</li>
+<li><strong>TTGO T-01C3 ESP32-C3</strong>
+[<a href="https://circuitpython.org/board/lilygo_ttgo_t-01c3/">&#8594;</a>]</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="firmware-micropython">&#9655; <strong>การติดตั้งไฟล์ Firmware สำหรับ MicroPython</strong><a class="headerlink" href="#firmware-micropython" title="Permanent link">#</a></h2>
+<p>การติดตั้งไฟล์ที่เป็น <strong>Firmware (.bin)</strong> สำหรับ <strong>MicroPython / CircuitPython</strong> เพื่อใช้งานกับ <strong>ESP32-C3</strong> สามารถทำได้โดยใช้คำสั่ง <code>esptool.py</code> ซึ่งเป็นโปรแกรมภาษา <strong>Python</strong> ตัวอย่างการทำคำสั่งเพื่อติดตั้งและเขียนไฟล์ไปยังหน่วยความจำมีดังนี้</p>
+<pre><code class="language-python"># install esptool
+$ pip install esptool
+
+# show the version of esptool (current version: 3.2)
+$ esptool.py version
+esptool.py v3.2
+3.2
+
+# erase the internal Flash of ESP32 device
+$ esptool.py --port PORT_NAME erase_flash
+
+# upload the firmware file (.bin) to the device
+$ esptool.py --port PORT_NAME --baud 1000000 write_flash -z 0 FIRMWARE.bin
+</code></pre>
+<p>โดยที่ <code>PORT_NAME</code> จะต้องเป็นชื่อพอร์ตของอุปกรณ์ซึ่งตรงกับบอร์ด <strong>ESP32-C3</strong> ในขณะที่กำลังเชื่อมต่อกับคอมพิวเตอร์ และ <code>FIRMWARE.bin</code> เป็นชื่อไฟล์ (ระบุชื่อไฟล์แบบ <strong>Full Path Name</strong>) สำหรับเฟิร์มแวร์ </p>
+<p>เมื่อติดตั้งเฟิร์มแวร์ได้สำเร็จแล้ว ก็สามารถใช้ซอฟต์แวร์อย่างเช่น <a href="https://thonny.org/"><strong>Thonny IDE</strong></a> เป็น <strong>Python Editor</strong> สำหรับการเขียนโค้ดและเชื่อมต่อกับบอร์ด <strong>ESP32-C3</strong> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32">&#9655; <strong>ซอฟต์แวร์ Arduino สำหรับ ESP32</strong><a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h2>
+<p>หากยังไม่เคยติดตั้งใช้งาน ให้ดาวน์โหลดไฟล์สำหรับการติดตั้งซอฟต์แวร์ <strong>Arduino IDE</strong>
+ได้จากเว็บไซต์  <a href="https://www.arduino.cc/en/software/">https://www.arduino.cc/en/software/</a>
+จากนั้นจะต้องติดตั้ง <strong>Arduino-ESP32 Core</strong> ซึ่งมีขั้นตอนในการติดตั้ง อ้างอิงจากเอกสาร
+<a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html"><strong>Arduino-ESP32 Project</strong></a> และมีขั้นตอนที่สำคัญดังนี้</p>
+<ol>
+<li>ไปที่เมนู <strong>File &gt; Preferences</strong> จะมีการเปิดหน้าต่างใหม่
+และตรงช่องข้อความ <strong>Additional Board Manager URLs:</strong> 
+ให้เพิ่มรายการไฟล์ <a href="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"><strong>.json</strong></a> ซึ่งเป็น <strong>URL</strong> ที่ชี้ไปยังไฟล์ <strong>.json</strong> ใน <strong>Github</strong></li>
+<li>ไปที่เมนู <strong>Tools &gt; Boards Manager...</strong>  จะมีการเปิดหน้าต่างใหม่
+ให้ค้นหารายการสำหรับ  <strong>esp32</strong> เลือกเวอร์ชันและกดปุ่ม <strong>Install</strong></li>
+<li>สร้าง <strong>Arduino Sketch</strong> ใหม่ เขียนโค้ด และเลือกบอร์ด <strong>ESP32</strong> ให้ถูกต้องและตรงกับอุปกรณ์ที่จะใช้งานจริง ก่อนทำขั้นตอน <strong>Build &amp; Upload</strong> ตามลำดับ</li>
+</ol>
+<p>&nbsp;</p>
+<p><img alt="" src="arduino_esp32_board_manager.png" /></p>
+<p>รูป: การติดตั้งหรืออัปเดทสำหรับ <strong>Arduino-ESP32 Core</strong> 
+(เวอร์ชันที่ได้ทดลองใช้คือ <strong>v2.0.3</strong>)</p>
+<p><img alt="" src="arduino_lolin_c3_mini_demo.png" /></p>
+<p>รูป: สาธิตการใช้งาน <strong>Arduino IDE</strong> และเขียนโค้ดทดสอบการทำงานของบอร์ด
+<strong>WeMos LOLIN C3 Mini</strong> </p>
+<p>มาดูโค้ดตัวอย่างที่ได้นำมาทดลอง โค้ดนี้สาธิตการใช้คำสั่ง <code>analogWrite()</code>
+เพื่อสร้างสัญญาณ <strong>PWM (Pulse Width Modulation)</strong>
+ที่มีการปรับค่า <strong>Duty Cycle</strong> ของสัญญาณจาก 0 ไปจนถึง 255 แล้วลดลง
+ซึ่งจะทำให้ความสว่างของ <strong>LED</strong> ที่อยู่บนบอร์ดไมโครคอนโทรลเลอร์เปลี่ยนแปลงตามค่า 
+<strong>Duty Cycle</strong></p>
+<pre><code class="language-c">//////////////////////////////////////////////////////////////
+// Date: 2022-05-10
+// Board: WeMos LOLIN C3 Mini (4MB Flash)
+// Arduino-ESP32 Core: v2.0.3 
+// Espressif ESP-IDF: v4.4.1-1
+//////////////////////////////////////////////////////////////
+
+#define PWM_LED_PIN  (7) // GPIO-7 onboard LED LOLIN C3 Mini
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.printf( &quot;ESP32 demo: %s\n&quot;, ESP.getChipModel() );
+  Serial.printf( &quot;ESP-IDF version: %s\n&quot;, ESP.getSdkVersion() );
+  pinMode( PWM_LED_PIN, OUTPUT );
+  digitalWrite( PWM_LED_PIN, LOW );
+}
+
+const int N=256; // number of steps for PWM duty cycles
+int i=0; // counter variable: 0..(N-1)
+
+void loop() {
+  // compute a non-negative value based on the sine function
+  // and scale it up to the range from 0 to 255.
+  int value = int(256*sin(i*PI/N));
+  i = (i+1) % N;
+  analogWrite( PWM_LED_PIN, value );
+  Serial.printf( &quot;value:%d\n&quot;, value );
+  delay(8);
+}
+//////////////////////////////////////////////////////////////
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator">&#9655; <strong>การใช้งาน WokWi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
+<p>หากต้องการจะลองเขียนโค้ดและจำลองการทำงานของฮาร์ดแวร์ในเบื้องต้น ก็สามารถใช้
+<a href="https://wokwi.com/arduino/projects"><strong>Wokwi Online Simulator for ESP32</strong></a> ได้ ซึ่งรองรับ <strong>ESP32 / ESP32-S2 / ESP32-C3</strong> และเขียนโค้ดด้วย <strong>ESP-IDF</strong>, <strong>Arduino</strong>, <strong>MicroPython / CircuitPython</strong> และ <strong>Embedded Rust (experimental)</strong> &mdash; ดูรายละเอียดเพิ่มเติมได้จาก <a href="https://docs.wokwi.com/guides/esp32">"<strong>Wokwi - ESP32 Simulation</strong>"</a></p>
+<p><img alt="" src="wokwi-esp32-c3_arduino-1.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใน <strong>WokWi Simulator</strong> เพื่อทดลองเขียนโค้ด <strong>Arduino</strong>
+และใช้งานร่วมกับบอร์ด <strong>ESP32-C3 DevKitM-1</strong></p>
+<p><img alt="" src="wokwi-esp32-c3_arduino-2.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ด <strong>Arduino</strong> สำหรับ <strong>ESP32-C3</strong>
+สาธิตการควบคุมและเปลี่ยนสีของ <strong>RGB LED (NeoPixel)</strong> จำนวนหนึ่งดวง
+และมีขาสัญญาณข้อมูลต่อกับขา <strong>GPIO-8</strong> </p>
+<p><img alt="" src="wokwi-esp32-c3_arduino-3.png" /></p>
+<p>รูป: ตัวอย่างการใช้คำสั่ง <code>analogWrite()</code> เพื่อสร้างสัญญาณ <strong>PWM</strong>
+และแสดงรูปกราฟสัญญาณจากค่าตัวเลขสำหรับ <strong>PWM Duty Cycle</strong> (ค่าตัวเลขอยู่ในช่วง 0..255)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p><strong>ESP32-C3</strong> เป็นอีกหนึ่งตัวเลือกที่น่าสนใจสำหรับการประยุกต์ใช้งานไมโครคอนโทรลเลอร์
+เนื่องจากมีราคาไม่แพง ใช้พลังงานต่ำ สามารถเชื่อมต่อระบบเครือข่าย <strong>Wi-Fi</strong> และ <strong>Bluetooth</strong> ได้ แต่ไม่เน้นความเร็วในการประมวลผล ไม่มี <strong>Floating-Point Unit (FPU)</strong> มีจำนวนขา <strong>GPIO</strong> ให้ใช้ได้น้อยกว่า ซึ่งถือว่ามีจำนวนค่อนข้างจำกัด แต่ชิปสามารถทำงานในโหมดประหยัดพลังงานได้ต่ำกว่า เมื่อเปรียบเทียบกับชิป <strong>ESP32 / ESP32-S3 (Dual-Core)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-05-09 | Last Updated: 2022-05-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
