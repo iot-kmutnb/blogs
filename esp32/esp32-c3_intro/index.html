@@ -91,7 +91,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#esp32-c3_2" class="nav-link">&#9655; ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ ESP32-C3</a>
+            <li class="nav-item" data-level="2"><a href="#esp32-c3_2" class="nav-link">&#9655; ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป ESP32-C3</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -268,7 +268,7 @@
 ที่มีการแยกกันระหว่างชิป <strong>ESP32-C3</strong> กับชิป <strong>External SPI Flash</strong> ภายนอก</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="esp32-c3_2">&#9655; <strong>ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ ESP32-C3</strong><a class="headerlink" href="#esp32-c3_2" title="Permanent link">#</a></h2>
+<h2 id="esp32-c3_2">&#9655; <strong>ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป ESP32-C3</strong><a class="headerlink" href="#esp32-c3_2" title="Permanent link">#</a></h2>
 <p>หลังจากได้มีการเปิดตัวชิป <strong>ESP32-C3</strong> ในเดือนพฤศจิกายน ค.ศ. 2020 เป็นต้นมา
 มีบอร์ด <strong>ESP32-C3</strong> ออกมาสู่ตลาดเพื่อให้ผู้ใช้ได้เลือกและทดลองใช้งาน
 นอกเหนือจากบอร์ดของบริษัท <strong>Espressif</strong> แล้วยังมีของบริษัทอื่น เช่น
@@ -334,7 +334,7 @@
 <p>บอร์ด <strong>ESP32-C3 LOLIN Mini</strong> มี <strong>Onboard (Blue) LED</strong> 
 ต่ออยู่ที่ขา <strong>GPIO-7</strong> และสำหรับการเชื่อมต่อกับคอมพิวเตอร์ ก็มีคอนเนกเตอร์ <strong>USB Type-C</strong> 
 โดยไม่ได้ใช้ชิป <strong>USB-to-Serial Bridge</strong> ดังนั้นจึงต้องเปิดใช้งาน <strong>Built-in USB-CDC</strong>
-หากต้องการสื่อสารผ่าน <strong>Serial</strong> กับเครื่องคอมพิวเตอร์ของผู้ใช้</p>
+หากต้องการสื่อสารข้อมูลกับเครื่องคอมพิวเตอร์ของผู้ใช้โดยใช้คำสั่ง  เช่น <code>Serial.println()</code></p>
 <p>เมื่อกดปุ่ม <strong>BOOT</strong> ค้างไว้ แล้วกดปุ่ม <strong>RST</strong> เพื่อรีเซตการทำงานของบอร์ด 
 และเข้าสู่โหมด <strong>Device Firmware Upgrade (DFU)</strong> 
 คอมพิวเตอร์ของผู้ใช้จะมองเห็น <strong>Virtual Serial COM Port</strong> และถ้าต้องการรับส่งข้อมูลผ่านพอร์ตนี้
@@ -464,6 +464,46 @@ void loop() {
 //////////////////////////////////////////////////////////////
 </code></pre>
 <p>&nbsp;</p>
+<p>โค้ดตัวอย่างถัดไปสาธิตการเชื่อมต่อบอร์ด <strong>ESP32-C3</strong> เข้ากับระบบ <strong>Wi-Fi AP</strong> (<strong>Access Point</strong>)
+และจะต้องกำหนดค่าสำหรับ <code>WIFI_SSID</code> และ <code>WIFI_PASSWD</code> ให้ตรงกับการใช้งานจริง</p>
+<pre><code class="language-c">#include &lt;WiFi.h&gt;
+
+#define WIFI_SSID     &quot;xxxxxxx&quot;
+#define WIFI_PASSWD   &quot;xxxxxxx&quot;
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial){ delay(10); }
+  Serial.println(&quot;ESP32-C3 Mini v1.0.0&quot;);
+  // use WiFi STA (station mode)
+  WiFi.mode(WIFI_STA); 
+  WiFi.disconnect();
+  // WiFi Tx power to 11dBm
+  WiFi.setTxPower( WIFI_POWER_11dBm );
+  delay(100);
+  // connect to Wi-Fi AP
+  WiFi.begin( WIFI_SSID, WIFI_PASSWD );
+  // wait until Wi-Fi is connected.
+  while ( WiFi.status() != WL_CONNECTED ){
+    Serial.print( &quot;.&quot; );
+    delay(500);
+  }
+  // show the IP address assigned by DHCP
+  Serial.printf(&quot;\nIP address: %s\n&quot;, 
+                WiFi.localIP().toString().c_str() );
+}
+
+void loop() {
+  delay(100);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> หากดูจากไฟล์ <a href="https://www.wemos.cc/en/latest/_static/files/sch_c3_mini_v1.0.0.pdf"><strong>Schematic</strong></a> 
+ของบอร์ด <strong>ESP32-C3 LOLIN Mini v1.0.0</strong> จะเห็นได้ว่า มีการใช้ไอซีควบคุมแรงดันไฟฟ้า
+<a href="https://datasheet.lcsc.com/szlcsc/Nanjing-Micro-One-Elec-ME6211C33M5G-N_C82942.pdf"><strong>ME6211C33 LDO (Low-Drop Out)</strong></a> ที่ให้เอาต์พุต <strong>+3.3V</strong> แต่จ่ายกระแสสูงสุดได้ไม่เกิน <strong>500mA</strong>
+ดังนั้นการใช้กำลังส่ง <strong>Tx Power</strong> ในระดับสูงเพื่อเชื่อมต่อผ่าน <strong>Wi-Fi</strong> (ซึ่งอาจใช้กระแสสูงมากกว่า 
+<strong>300mA</strong> ที่กำลังส่งสูงสุด <strong>@21 dBm</strong>) พร้อมกับการใช้ขา <strong>+3.3V</strong> ของบอร์ดเพื่อจ่ายแรงดันไฟฟ้าให้อุปกรณ์อื่น อาจมีข้อจำกัดในการใช้งานได้ เช่น ทำให้การทำงานของระบบไม่เสถียร</p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="wokwi-simulator">&#9655; <strong>การใช้งาน WokWi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
 <p>หากต้องการจะลองเขียนโค้ดและจำลองการทำงานของฮาร์ดแวร์ในเบื้องต้น ก็สามารถใช้
@@ -489,7 +529,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-05-09 | Last Updated: 2022-05-16</p></div>
+<p>Created: 2022-05-09 | Last Updated: 2022-05-17</p></div>
             </div>
         </div>
 
