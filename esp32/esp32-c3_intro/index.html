@@ -498,6 +498,47 @@ void loop() {
 }
 </code></pre>
 <p>&nbsp;</p>
+<p>โค้ดสาธิตการตรวจสอบและแสดงรายการเครือข่ายไร้สายที่ปรากฏในบริเวณโดยรอบ (<strong>Wi-Fi Scanning</strong>)</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &quot;WiFi.h&quot;
+
+#define LED_PIN   (22) // use GPIO-22 onboard LED
+#define LED_ON    (LOW)
+#define LED_OFF   (!LED_ON)
+
+void wifi_scan() {
+  Serial.println( &quot;\nWiFi scanning...&quot; );
+  digitalWrite( LED_PIN, LED_ON );
+  int n = WiFi.scanNetworks();
+  digitalWrite( LED_PIN, LED_OFF );
+  if (n == 0) {
+    Serial.println( &quot;No APs found&quot; );
+  } else {
+    Serial.printf( &quot;Number of APs found: %d\n&quot;, n );
+    for ( int i=0; i&lt;n; i++ ) {
+      Serial.printf( &quot;%d) \&quot;%s\&quot; (%d)\n&quot;,
+        (i+1), WiFi.SSID(i).c_str(), WiFi.RSSI(i) );
+    }
+  }
+  Serial.println( &quot;=================\n&quot; );
+}
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LED_OFF );
+  Serial.begin( 115200 );
+  Serial.flush();
+  WiFi.mode( WIFI_STA );
+  WiFi.disconnect();
+  delay(100);
+}
+
+void loop() {
+  wifi_scan();
+  delay(5000);
+}
+</code></pre>
+<p>&nbsp;</p>
 <p><strong>ข้อสังเกต:</strong> หากดูจากไฟล์ <a href="https://www.wemos.cc/en/latest/_static/files/sch_c3_mini_v1.0.0.pdf"><strong>Schematic</strong></a> 
 ของบอร์ด <strong>ESP32-C3 LOLIN Mini v1.0.0</strong> จะเห็นได้ว่า มีการใช้ไอซีควบคุมแรงดันไฟฟ้า
 <a href="https://datasheet.lcsc.com/szlcsc/Nanjing-Micro-One-Elec-ME6211C33M5G-N_C82942.pdf"><strong>ME6211C33 LDO (Low-Drop Out)</strong></a> ที่ให้เอาต์พุต <strong>+3.3V</strong> แต่จ่ายกระแสสูงสุดได้ไม่เกิน <strong>500mA</strong>
