@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/electronics/inductance_measurement/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>วงจรสำหรับการทดลองเพื่อหาค่าของตัวเหนี่ยวนำ - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c++.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">วงจรสำหรับการทดลองเพื่อหาค่าของตัวเหนี่ยวนำ</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#easyeda" class="nav-link">&#9655; วงจรสำหรับการจำลองการทำงานด้วยซอฟต์แวร์ EasyEDA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rlc" class="nav-link">&#9655; การวิเคราะห์วงจร RLC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dc-operating-point" class="nav-link">&#9655; การจำลองการทำงานในโหมด DC Operating Point</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dc-transient" class="nav-link">&#9655; การจำลองการทำงานในโหมด DC Transient</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; อุปกรณ์ที่ใช้ในการทดลอง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; ผลการทดลองโดยใช้อุปกรณ์จริง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; การคำนวณค่าเหนี่ยวนำจากความถี่ของสัญญาณเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="_1">วงจรสำหรับการทดลองเพื่อหาค่าของตัวเหนี่ยวนำ<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอวิธีการหนึ่งสำหรับการทดลองต่อวงจรไฟฟ้า-อิเล็กทรอนิกส์ เพื่อวัดค่าเหนี่ยวนำ (<strong>Inductance Measurement</strong>) และสามารถนำไปประยุกต์ใช้งานร่วมกับไมโครคอนโทรลเลอร์ได้</p>
+<p><strong>Keywords:</strong> <em>Inductor</em>, <em>Inductance Measurement</em>, 
+<em>RLC Circuit Analysis</em>, <em>EasyEDA Simulation</em>, <em>Oscilloscope</em></p>
+<hr />
+<h2 id="easyeda">&#9655; <strong>วงจรสำหรับการจำลองการทำงานด้วยซอฟต์แวร์ EasyEDA</strong><a class="headerlink" href="#easyeda" title="Permanent link">#</a></h2>
+<p>การวิเคราะห์การทำงานของวงจรแบ่งเป็นสองช่วง และให้ตัดส่วนที่เกี่ยวข้องกับการทำงานของไอซี <strong>LM393</strong> ออกไปก่อน (ซึ่งใช้สำหรับการเปรียบเทียบแรงดันไฟฟ้าแล้วแปลงให้เป็นสัญญาณดิจิทัล)  </p>
+<p>จากรูปผังวงจรจะเห็นได้ว่า มีการใช้แหล่งจ่ายกระแสตรง <strong>VS</strong> ซึ่งเป็น <strong>DC Voltage Source</strong> และได้ตั้งค่าการใช้งานให้แหล่งจ่ายนี้สร้างสัญญาณแบบพัลส์ (<strong>Pulse</strong>) ที่มีระดับแรงดันไฟฟ้าเท่ากับ <strong>5V</strong> เป็นระยะเวลา <strong>5msec</strong> แล้วจึงลดลงมาที่ระดับ <strong>0V</strong></p>
+<p>ผังวงจรสำหรับการวิเคราะห์การทำงานด้วยซอฟต์แวร์ มีดังนี้</p>
+<p><img alt="" src="circuit_schematic_for_sim.png" /></p>
+<p>รูป: ผังวงจรสำหรับการจำลองการทำงานด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p>ในการวิเคราะห์การทำงานของวงจร ให้แบ่งเป็น 2 ช่วง</p>
+<p>1)  ช่วงที่หนึ่ง: <strong>VS</strong> เปลี่ยนจาก <strong>0V &rarr; 5V</strong></p>
+<ul>
+<li>เริ่มต้นตัวเก็บประจุมีแรงดันไฟฟ้าเป็น <strong>0V</strong> และตัวเหนี่ยวนำมีกระแสไหลผ่านเป็น <strong>0A</strong> ดังนั้นวงจรจึงมีเงื่อนไขเริ่มต้นเป็นศูนย์ (<strong>Zero Initial Condition</strong>)</li>
+<li>เนื่องจากมีแรงดันไฟฟ้ามากพอที่จะทำให้มีกระแสไหลผ่านตัวต้านทาน <strong>R1</strong> และไดโอด  <strong>D1</strong> ทำให้เกิดการบัสอัสตรง (<strong>Forward Bias</strong>) </li>
+<li>ค่า <strong>VF (Forward Voltage)</strong> ของ  <strong>1N5819</strong> เริ่มต้นอยู่ที่ประมาณ <strong>0.34V (max.) @0.1A</strong> โดยประมาณ (อ้างอิงจากไฟล์ <a href="onsemi_1N5819.pdf"><strong>1N5819 Datasheet</strong></a>)</li>
+<li>เมื่อมีกระแสไหลผ่านไดโอด <strong>D1</strong> กระแสส่วนหนึ่งจะทำให้เกิดการชาร์จประจุที่ตัวเก็บประจุ <strong>C1</strong>
+และขณะเดียวกันกระแสอีกส่วนหนึ่ง จะไหลผ่านตัวต้านทาน <strong>R3</strong> และตัวเหนี่ยวนำ <strong>L1</strong> ไปยัง <strong>GND</strong> ของวงจร (ในตัวอย่างนี้ <strong>R3</strong> ใช้แทนค่าความต้านทานแฝงของตัวเหนี่ยวนำไฟฟ้า <strong>L1</strong>)</li>
+<li>เมื่อเวลาผ่านไป แต่ <strong>VS</strong> ยังคงที่เท่ากับ <strong>5V</strong> แรงดันไฟฟ้าตกคร่อม <strong>V(C1)</strong> ที่ตัวเก็บประจุ เพิ่มขึ้นจนถึงระดับคงที่  (แต่ไม่ถึงระดับ <strong>5V</strong>) เข้าสู่สภาวะคงตัว (<strong>Steady State</strong>) และไม่มีการชาร์จประจุอีกต่อไป แต่ยังมีกระแสไหลผ่าน <strong>R3</strong> และ <strong>L1</strong> และสามารถคำนวณได้ดังนี้ (สมมุติว่า <strong>VF=0.34V</strong>)
+<script type="math/tex; mode=display">
+  I_L \approx \frac{(V_S - V_F)}{(R_1+R_3)} = \frac{(5V - 0.34V)}{(200.5\,\Omega)} = 23.24\, mA
+</script>
+</li>
+<li>ถ้าเลือกใช้ความต้านทานสำหรับ <strong>R1</strong> ที่มีค่าน้อยลง จะทำให้กระแส <strong>I(L1)</strong> ที่ไหลผ่านตัวเหนี่ยวนำ มีปริมาณสูงขึ้น</li>
+<li>แรงดันตกคร่อม <strong>V(C1)</strong> ที่ตัวเก็บประจุ จะเท่ากับแรงดันตกคร่อมที่ตัวต้านทาน <strong>R3</strong> (ตัวเหนี่ยวนำ <strong>L1</strong> มีความต้านทานเท่ากับศูนย์ในอุดมคติ)
+<script type="math/tex; mode=display"> 
+   V(C_1) = I_L \times R_3 = 23.24\,mA \times 0.5\,\Omega = 11.62\,mV
+</script>
+</li>
+</ul>
+<p>2)  ช่วงที่สอง: <strong>VS</strong> ลดลงจาก <strong>5V &rarr; 0V</strong></p>
+<ul>
+<li>แรงดันตกคร่อมที่ไดโอดจะเป็นลบเมื่อเปรียบเทียบกับแรงดันตกคร่อมที่ตัวเก็บประจุในขณะนั้น 
+ทำให้เกิดการไบอัสกลับ (<strong>Reverse Bias</strong>) ดังนั้นจะถือว่าไม่มีกระแสไหลย้อนกลับ (หรือมีในปริมาณต่ำมาก ๆ)  </li>
+<li>อุปกรณ์ทั้งสามตัวนี้ ทำงานอยู่ในวงจรแบบอนุกรม แต่ไม่มีแหล่งจ่าย <strong>VS</strong> เข้ามาเกี่ยวข้อง
+หรือ เรียกวงจรในลักษณะนี้ว่า <strong>Source-free RLC Circuit</strong></li>
+<li>แม้ว่าไม่มีแหล่งจ่ายใด ๆ ในวงจร แต่ตัวเก็บประจุมีแรงดันไฟฟ้ามากกว่า <strong>0mV</strong> 
+และมีกระแสไหลผ่านตัวเหนี่ยวนำมากกว่า <strong>0mA</strong> หรือกล่าวได้ว่า มีพลังงานอยู่ในวงจรไฟฟ้าในขณะนั้น </li>
+</ul>
+<hr />
+<h2 id="rlc">&#9655; <strong>การวิเคราะห์วงจร RLC</strong><a class="headerlink" href="#rlc" title="Permanent link">#</a></h2>
+<p>การวิเคราะห์กระแสไฟฟ้าที่ไหลในวงจร <strong>RLC (Source-free)</strong> ในช่วงที่สอง
+ตามรูปวงจรต่อไปนี้ จะนำไปสู่สมการเชิงอนุพันธ์อันดับสอง</p>
+<p><img alt="" src="rlc_circuit.png" /></p>
+<p>รูป: วงจร <strong>RLC</strong> แบบอนุกรมที่ใช้ในการวิเคราะห์และจำลองการทำงานของวงจร</p>
+<p>
+<script type="math/tex; mode=display">
+  -v_C(t) + v_R(t) + v_L(t) = 0 \\
+  i(t) = -i_C(t) = i_R(t) = i_L(t) \\
+\begin{align}
+  v_R(t) &= R\, i_R(t) \\
+  i_C(t) &= C \frac{d}{dt} v_C(t) \\
+  v_L(t) &= L \frac{d}{dt} i_L(t) \\
+\end{align}
+</script>
+</p>
+<p>และเขียนสมการใหม่ได้เป็น
+<script type="math/tex; mode=display">
+  -v_C(t) + v_R(t) + v_L(t) = 0 \\
+  -v_C(t) + R\,i_R(t) + L \frac{d}{dt} i_L(t) = 0 \\
+  i'(t) := \frac{d}{dt} i(t) = \frac{1}{L}(v_C(t) - R\,i(t))
+</script>
+และนำไปหาอนุพันธ์ของสมการนี้ จะได้สมการเชิงอนุพันธ์อันดับสอง
+<script type="math/tex; mode=display">
+\begin{align}
+  -\frac{d}{dt} v_C(t) + R\frac{d}{dt} i(t) + L\frac{d^2}{dt^2} i(t) &= 0 \\
+  \frac{d^2}{dt^2} i(t) + \frac{R}{L} \frac{d}{dt} i(t) + \frac{1}{LC} i(t) &= 0 
+\end{align}
+</script>
+และมีเงื่อนไขเริ่มต้นสำหรับสมการเชิงอนุพันธ์อันดับสอง
+<script type="math/tex; mode=display">
+\begin{align}
+  i(0) &= i_L(0) \\
+ i'(0) &= \frac{1}{L}(v_C(0) - R\, i(0)) = 0
+\end{align}
+</script>
+ค่าคงที่ <script type="math/tex">i(0)</script> และ <script type="math/tex">v_C(0)</script> เป็นค่าสำหรับเงื่อนไขเริ่มต้นซึ่งไม่เท่ากับศูนย์ (<strong>Non-Zero Initial Conditions</strong>) และคำนวณได้จากช่วงที่หนึ่งในสภาวะคงที่</p>
+<p>จากสมการเชิงอนุพันธ์อันดับสอง สามารถเขียนเป็นระบบสมการอนุพันธ์อันดับหนึ่งได้ดังนี้
+<script type="math/tex; mode=display">
+\frac{d}{dt} \begin{pmatrix}
+   v_C(t) \\[0.5em]
+   i(t) \\
+\end{pmatrix} =
+\begin{pmatrix}
+ 0 & -\frac{1}{C} \\
+  \frac{1}{L} & -\frac{R}{L} \\
+\end{pmatrix}
+\begin{pmatrix}
+  v_C(t) \\[0.5em]
+  i(t) \\
+\end{pmatrix}
+</script>
+</p>
+<p>&nbsp;</p>
+<p>เมื่อได้สมการเชิงอนุพันธ์ของวงจรแล้ว ก็สามารถหาผลเฉลยได้ เช่น โดยใช้วิธีเขียนโค้ดสำหรับ <strong>MATLAB</strong>
+และประมวลผลทางคณิตศาสตร์เชิงสัญลักษณ์ (<strong>Symbolic Math Processing</strong>) ตามตัวอย่างดังนี้</p>
+<p><img alt="" src="matlab_ode_solving.png" /></p>
+<p>รูป: ตัวอย่างโค้ด <strong>MATLAB</strong> เพื่อหาผลเฉลยของระบบสมการเชิงอนุพันธ์</p>
+<p><img alt="" src="matlab_plot.png" /></p>
+<p>รูป: กราฟแสดงฟังก์ชัน <script type="math/tex">v_C(t)</script> และ <script type="math/tex">i(t)</script> ที่เป็นผลเฉลยของระบบสมการเชิงอนุพันธ์</p>
+<p><img alt="" src="sim_voltage_drop_capacitor.png" /></p>
+<p>รูป: กราฟแสดงรูปคลื่นสัญญาณ <strong>V(1)</strong> สำหรับ <script type="math/tex">v_C(t)</script> เมื่อจำลองการทำงานด้วย <strong>EasyEDA</strong></p>
+<p><img alt="" src="sim_current_flow_inductor.png" /></p>
+<p>รูป: กราฟแสดงรูปคลื่นสัญญาณ <strong>i(L1)</strong> สำหรับ <script type="math/tex">i(t)</script> เมื่อจำลองการทำงานด้วย <strong>EasyEDA</strong></p>
+<p>&nbsp;</p>
+<p>สมการลักษณะเฉพาะ (<strong>Characteristic Equation</strong>) ที่เกี่ยวข้องกับสมการเชิงอนุพันธ์
+ตามที่ได้นำเสนอไป มีลักษณะดังนี้
+<script type="math/tex; mode=display">
+  s^2 + \frac{R}{L} s + \frac{1}{LC} = 0
+</script>
+และนำไปหารากของสมการดังกล่าว ซึ่งเป็นสมการกำลังสอง (<strong>Quadratic Equation</strong>)<br />
+<script type="math/tex; mode=display">
+\begin{align}
+  s_{1,2} & = -\alpha \pm \sqrt{\alpha^2 - \omega_0^2} \\
+  \alpha   & := \frac{R}{2L} \\
+  \omega_0 & := \frac{1}{ \sqrt{L C} } 
+\end{align}
+</script>
+โดยที่ <script type="math/tex">\omega_0</script> (มีหน่วยเป็น <strong>rad/sec</strong>) คือ ความถี่เรโซแนนซ์  (<strong>Resonance Frequency</strong>) และ <script type="math/tex">\alpha</script> คือ ตัวประกอบการหน่วง (<strong>Damping Factor</strong>)</p>
+<p>ค่าของพารามิเตอร์สำหรับ <strong>R,L,C</strong> ที่เลือกมาใช้งาน เช่น <strong>R=0.5 &Omega;,
+C=1 uF, L=330 uH</strong> ทำให้เงื่อนไขต่อไปนี้เป็นจริง 
+<script type="math/tex; mode=display">
+  \alpha < \omega_0 \quad \Longleftrightarrow \quad 
+  \frac{R}{2} \sqrt{ \frac{C}{L} } < 1
+</script>
+</p>
+<p>ในกรณีนี้ รากของสมการลักษณะเฉพาะ <script type="math/tex">s_{1,2}</script> จะได้เป็นเลขจำนวนเชิงซ้อน 
+และได้ผลตอบสนองแบบ "หน่วงต่ำกว่าวิกฤต" (<strong>Under-damped</strong>) และมีรูปแบบของฟังก์ชันสำหรับกระแส 
+<script type="math/tex; mode=display">
+  i(t) = e^{-\alpha t}
+  \Big(C_1 cos(\omega_d t) + C_2 sin(\omega_d t)\Big)
+</script>
+โดยที่ <script type="math/tex">C_1</script> และ <script type="math/tex">C_2</script> เป็นค่าคงที่ใด ๆ (ซึ่งอยู่กับค่าของเงื่อนไขเริ่มต้น) และมีความถี่ <script type="math/tex">\omega_d</script> เท่ากับ
+<script type="math/tex; mode=display">
+  \omega_d := \sqrt{ \omega_0^2 - \alpha^2 }
+   = \sqrt{\textstyle \frac{1}{L C} - \Big(\frac{R}{2L}\Big)^2}
+</script>
+</p>
+<p>หากทราบ <script type="math/tex">i(t)</script> ก็สามารถคำนวณหาแรงดันตกคร่อมที่ตัวเก็บประจุ ได้จากดังนี้
+<script type="math/tex; mode=display">
+   v_C(t) = \frac{1}{C} \int_0^{t} -i(\tau)\,d\tau + v_C(0)
+</script>
+</p>
+<p>ในการวิเคราะห์วงจรไฟฟ้าสำหรับวงจรตัวอย่างนี้ เราสามารถทราบได้ว่า
+ค่าของพารามิเตอร์ในวงจร เช่น <strong>R1</strong>, <strong>C1</strong>, <strong>L1</strong> มีผลอย่างไรบ้างต่อปริมาณทางไฟฟ้าในวงจร
+หรือคุณสมบัติของสัญญาณไฟฟ้า เช่น </p>
+<ul>
+<li><strong>I(L1)</strong>: กระแสที่ไหลผ่าน <strong>L1</strong> </li>
+<li><strong>V(C1)</strong>: แรงดันตกคร่อมที่ <strong>C1</strong></li>
+<li>คาบหรือความถี่ของการแกว่งของสัญญาณไฟฟ้าที่เป็นผลตอบสนองของวงจร</li>
+</ul>
+<p>จากสูตรสำหรับการคำนวณความถี่ ถ้าแทนค่า <strong>C=1 uF, L=330 uH, R=0.5 &Omega;</strong> จะได้ความถี่<br />
+<script type="math/tex; mode=display">
+ \omega_d = 2\pi f_d = \sqrt{ \textstyle\frac{1}{L C} 
+           -\Big(\frac{R}{2 L}\Big)^2 } \\
+ f_d = \frac{1}{2\pi} \sqrt{\frac{1}{(330\,uH)(1\,uF)} 
+       -\Big(\frac{0.5\,\Omega}{2\cdot 330\,uH}\Big)^2 } \;
+       \approx 8.760\, kHz
+</script>
+</p>
+<hr />
+<h2 id="dc-operating-point">&#9655; <strong>การจำลองการทำงานในโหมด DC Operating Point</strong><a class="headerlink" href="#dc-operating-point" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นผลการวิเคราะห์วงจรและจำลองการทำงานด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p><img alt="" src="sim_dc_r200_l330u_r500m_c1u.png" /></p>
+<p>รูป: ผลการจำลองการทำงานในโหมด <strong>DC operating-point (.op)</strong> ด้วยซอฟต์แวร์ <strong>EasyEDA</strong>
+สำหรับช่วงที่ <strong>VS=5V</strong> และวัดแรงดันตกคร่อมที่ไดโอด <strong>D1</strong> ได้เท่ากับ <strong>0.236V</strong>
+กระแสไหลเท่ากับ <strong>24mA</strong> และแรงดันตกคร่อมที่ตัวเก็บประจุเท่ากับ 
+<strong>12mV</strong> (<strong>= 24mA * 0.5&Omega;</strong>)</p>
+<p><img alt="" src="sim_dc_r25_l330u_r500m_c1u.png" /></p>
+<p>รูป: เมื่อเปลี่ยนค่าความต้านทาน <strong>R1</strong> ลดลงจาก <strong>200&Omega;</strong> เป็น <strong>25&Omega;</strong>
+และวัดแรงดันตกคร่อมที่ไดโอด <strong>D1</strong> จะได้เท่ากับ <strong>0.317V</strong> กระแสไหลเท่ากับ <strong>184mA</strong> 
+และแรงดันตกคร่อมที่ตัวเก็บประจุเท่ากับ <strong>92mV</strong> (<strong>= 184mA * 0.5&Omega;</strong>)</p>
+<hr />
+<h2 id="dc-transient">&#9655; <strong>การจำลองการทำงานในโหมด DC Transient</strong><a class="headerlink" href="#dc-transient" title="Permanent link">#</a></h2>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า เกิดการแกว่งของสัญญาณ <strong>V2</strong> ซึ่งวัดได้จากแรงดันตกคร่อมที่ตัวเก็บประจุ <strong>C1</strong> แบ่งได้เป็นสองช่วง ซึ่งเกิดจากการเปลี่ยนแปลงระดับของ <strong>VS</strong> และเกิดผลตอบสนองของวงจรชั่วขณะ
+(<strong>Transient Circuit Response</strong>) โดยที่ช่วงแรกนั้นเกิดจากกรณีที่ <strong>VS</strong>
+เปลี่ยนจาก <strong>0V &rarr; 5V</strong> และช่วงที่สองเกิดจาก <strong>VS</strong> เปลี่ยนจาก <strong>5V &rarr; 0V</strong> ตามลำดับ</p>
+<p><img alt="" src="sim_r200_l330u_r500m_c1u.png" /></p>
+<p>รูป: คลื่นสัญญาณที่วัดด้วย <strong>Voltage Probe: V2</strong> ซึ่งเป็นแรงดันตกคร่อมที่ตัวเก็บประจุ
+เมื่อจำลองการทำงาน (แบ่งเป็นสองช่วงเวลาคือ ช่วงที่หนึ่ง <strong>t=0..5msec</strong> ช่วงที่สอง <strong>t &geq; 5msec</strong>)</p>
+<p>คลื่นของสัญญาณมีลักษณะเป็นไปตามฟังก์ชัน <strong>Exponentially-damped Sinusoid</strong>
+แอมพลิจูดมีค่าลดลงแล้วลู่เข้าศูนย์</p>
+<p>เมื่อจำลองการทำงาน จะได้คลื่นสัญญาณเอาต์พุตจากไอซี <strong>LM393</strong> ดังนี้</p>
+<p><img alt="" src="sim_r200_l330u_r500m_c1u_lm393_pulses.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต</p>
+<p><img alt="" src="sim_r200_330u_lm393_pulses_released.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต (ซูมขยายในแกนเวลา) และการวัดคาบและความถี่ของสัญญาณดิจิทัล</p>
+<p>จากรูปคลื่นสัญญาณเมื่อใช้พารามิเตอร์ของวงจร <strong>C1=1 uF, R3=0.5 &Omega;, L1=330 uH</strong>
+จะวัดระยะเวลาหนึ่งคาบของสัญญาณเอาต์พุต ได้ประมาณ <strong>114 usec</strong> หรือคำนวณเป็นความถี่ได้ประมาณ <strong>8.772 kHz</strong>
+(ได้ค่าใกล้เคียงกับความถี่ <script type="math/tex">f_d</script> เมื่อคำนวณตามสูตร)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>อุปกรณ์ที่ใช้ในการทดลอง</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>เตรียมและตรวจสอบรายการของอุปกรณ์เพื่อนำมาใช้ในการต่อวงจรทดลองบนเบรดบอร์ด ดังนี้</p>
+<ul>
+<li>ตัวเหนี่ยวนำไฟฟ้า ทนกระแสสูงสุดได้อย่างน้อย 1A <ul>
+<li><strong>330μH</strong> (Code: 331) จำนวน 1 ตัว</li>
+<li><strong>470μH</strong> (Code: 471) จำนวน 1 ตัว</li>
+</ul>
+</li>
+<li>ตัวเก็บประจุไฟฟ้า <strong>1uF</strong> จำนวน 1 ตัว</li>
+<li>ตัวต้านทาน <strong>1k&Omega;</strong> จำนวน 1 ตัว</li>
+<li>ตัวต้านทาน <strong>100&Omega;</strong> และ <strong>200&Omega;</strong> อย่างละ 1 ตัว</li>
+<li>ไดโอด <strong>Schottky Rectifier</strong> เบอร์ <a href="onsemi_1N5819.pdf"><strong>1N5819 (40V/1A)</strong></a> จำนวน 1 ตัว</li>
+<li>ปุ่มกด <strong>Push Button</strong> จำนวน 1 ตัว</li>
+<li>ไอซี <a href="st_lm393.pdf"><strong>LM393 (Dual Voltage Comparator)</strong></a>  ตัวถัง <strong>PDIP-8</strong> จำนวน 1 ตัว</li>
+<li>แผงต่อวงจร (<strong>Breadboard</strong>) จำนวน 1 อัน</li>
+<li>แหล่งจ่ายแรงดันไฟฟ้าคงที่ <strong>5Vdc</strong> จำนวน 1 ชุด</li>
+<li>ลวดสายไฟ  (<strong>Jumper Wires</strong>) สำหรับการต่อวงจร</li>
+<li>ออสซิลโลสโคปแบบดิจิทัล จำนวน 1 เครื่อง</li>
+</ul>
+<p><img alt="" src="circuit_schematic_for_experiment.png" /></p>
+<p>รูป: ผังวงจรสำหรับการต่อวงจรบนเบรดบอร์ด</p>
+<p><img alt="" src="breadboard_circuit-1.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ด (<strong>L=330 uH, Tolerance &pm;10%</strong>)</p>
+<p><img alt="" src="breadboard_circuit-2.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ด  (<strong>L=470 uH, Tolerance &pm;10%</strong>)</p>
+<p><img alt="" src="oscilloscope_measurement.jpg" /></p>
+<p>รูป: การวัดสัญญาณด้วยเครื่องออสซิลโลสโคป</p>
+<hr />
+<h2 id="_3">&#9655; <strong>ผลการทดลองโดยใช้อุปกรณ์จริง</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นผลจากการวัดสัญญาณด้วยออสซิลโลสโคป (<strong>Oscilloscope</strong>)
+เมื่อต่อวงจรทดลองบนเบรดบอร์ด แล้ววัดสัญญาณ 2 ช่อง โดยที่ช่องแรก (สัญญาณเส้นสีเหลือง) 
+เป็นสัญญาณแบบแอนะล็อก ซึ่งเป็นแรงดันตกคร่อมที่ตัวเก็บประจุ <strong>V(C1)</strong> 
+และช่องที่สอง (สัญญาณเส้นสีฟ้า) ) เป็นสัญญาณเอาต์พุตที่ได้จากไอซีวงจรเปรียบเทียบแรงดัน <strong>LM393</strong>
+(มีตัวเปรียบเทียบสองชุด แต่ใช้เพียงชุดเดียว)</p>
+<p>ถ้าแรงดันเอาต์พุต  <strong>V(C1)</strong> มากกว่า <strong>0V</strong> ไอซี <strong>LM393</strong>
+จะให้เอาต์พุตลอจิก <strong>High</strong> (ได้ระดับแรงดันไฟฟ้าประมาณ <strong>5V</strong>) 
+และถ้าน้อยกว่า <strong>0V</strong> จะได้ลอจิกเป็น <strong>Low</strong></p>
+<p><img alt="" src="waveform_output_pressed.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่วัดได้ ช่วงที่มีการกดปุ่ม (<strong>Button Pressed</strong>)</p>
+<p><img alt="" src="waveform_output_released.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่วัดได้ ช่วงที่มีการปล่อยปุ่ม (<strong>Button Pressed</strong>)</p>
+<p><img alt="" src="waveform_1uF_330uH-1.png" /></p>
+<p>รูป: คลื่นสัญญาณที่วัดได้เมื่อปล่อยปุ่ม (<strong>L=330 uH</strong>) ความถี่ <strong>9.34 kHz</strong></p>
+<p><img alt="" src="waveform_1uF_470uH-1.png" /></p>
+<p>รูป: คลื่นสัญญาณที่วัดได้เมื่อปล่อยปุ่ม (<strong>L=470 uH</strong>) ความถี่ <strong>7.63 kHz</strong></p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า ถ้าเปลี่ยนตัวเหนี่ยวนำ <strong>L1</strong> ให้มีค่าเพิ่มขึ้น (เพิ่มจาก <strong>330 uH</strong> เป็น <strong>470 uH</strong>) จะทำให้สัญญาณเอาต์พุตจาก <strong>LM393</strong> มีความถี่ลดลง (ลดลงจาก <strong>9.34 kHz</strong> เป็น <strong>7.63 kHz</strong>)</p>
+<p>เอาต์พุตที่ได้จากไอซี <strong>LM393</strong> เป็นคลื่นรูปทรงสี่เหลี่ยม (<strong>Rectangular Waveform</strong>) 
+แต่จะไม่เกิดขึ้นต่อเนื่องไป และจะหายไป เมื่อแอมพลิจูดของสัญญาณ <strong>V(C1)</strong> ลดลงจนเป็นศูนย์ และเข้าสู่สภาวะคงตัวแล้ว</p>
+<p><img alt="" src="waveform_1uF_330uH_lm393_pulses.png" /></p>
+<p>รูป: เอาต์พุตที่ได้จากไอซี <strong>LM393</strong> รูปทรงสี่เหลี่ยม (<strong>Rectangular Waveform</strong>) </p>
+<p>ถ้าพิจารณาตัวเลขสำหรับตัวเหนี่ยวนำ <strong>L=330 uH</strong> จะได้ความถี่ของสัญญาณเอาต์พุต
+ประมาณ <strong>8.77 kHz</strong> จากการจำลองการทำงานด้วย <strong>EasyEDA</strong> และได้ <strong>9.34 kHz</strong> 
+จากการทดลองวัดสัญญาณด้วยอุปกรณ์จริง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>การคำนวณค่าเหนี่ยวนำจากความถี่ของสัญญาณเอาต์พุต</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>ถ้าทดลองตามวงจรที่ได้ออกแบบไว้ แล้ววัดความถี่ของสัญญาณเอาต์พุต ก็สามารถนำมาคำนวณค่าของตัวเหนี่ยวนำได้
+โดยใช้สูตรต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">
+ f_d = \frac{1}{2\pi} \sqrt{ \textstyle\frac{1}{LC} 
+         -\Big(\frac{R}{2L}\Big)^2 } 
+</script>
+ถ้าการเลือกใช้ค่าพารามิเตอร์ของวงจร ทำให้เงื่อนไขต่อไปนี้เป็นจริง 
+<script type="math/tex; mode=display">
+  \frac{1}{LC} \gg (\frac{R}{2L})^2
+</script>
+ก็ใช้การประมาณค่าได้เพื่อคำนวณค่าเหนี่ยวนำ
+<script type="math/tex; mode=display">
+ f_d \approx \frac{1}{2\pi\sqrt{LC}} \\
+  L \approx \frac{1}{(2\pi f_d)^2 \cdot C}
+</script>
+</p>
+<p>ข้อสังเกต:</p>
+<ul>
+<li>ถ้าลดค่าของตัวเก็บประจุ <strong>C</strong> จะทำให้ความถี่สูงขึ้น</li>
+<li>การเลือกใช้ค่าของตัวเก็บประจุ (คาปาซิเตอร์) สำหรับการทดลอง ควรเลือกอุปกรณ์ที่มีค่าความคลาดเคลื่อนน้อย (<strong>Tight Capacitance Tolerance</strong>) เช่น  &pm;10% หรือ &pm;5% </li>
+</ul>
+<p>จากผลการทดลอง ความถี่ของสัญญาณเอาต์พุตที่วัดได้คือ 
+<strong>9.34 kHz</strong> และ <strong>7.63 kHz</strong> สำหรับ <strong>L=330uH</strong> และ <strong>L=470uH</strong> ตามลำดับ ดังนั้นคำนวณค่าเหนี่ยวนำได้ประมาณ <strong>290.4 uH</strong> และ <strong>435.1 uH</strong> ตามลำดับ 
+และมีเปอร์เซ็นต์ความผิดพลาดจากค่าอ้างอิง
+<script type="math/tex; mode=display">
+  100 \times \frac{|290.4 - 330|}{330} = 12.0\% \\
+  100 \times \frac{|435.1 - 470|}{470} =\; 7.4\% \\
+</script>
+</p>
+<hr />
+<h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอวงจรพื้นฐานที่สามารถนำมาประยุกต์ใช้ในการวัดค่าค่าการเหนี่ยวนำไฟฟ้าได้ 
+โดยใช้อุปกรณ์พื้นฐานทางไฟฟ้าและอิเล็กทรอนิกส์สำหรับการต่อวงจรทดลอง
+และใช้ออสซิลโลสโคปเป็นเครื่องวัดความถี่ของสัญญาณเอาต์พุตจากวงจร แล้วนำไปคำนวณหาค่าของตัวเหนี่ยวนำ
+วิธีการตามที่ได้นำเสนอไปนั้นก็เหมาะสำหรับนำไปประยุกต์ใช้ร่วมกับไมโครคอนโทรลเลอร์เพื่อวัดความถี่ของสัญญาณดิจิทัล
+แทนการใช้เครื่องออสซิลโลสโคป</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-05-29 | Last Updated: 2022-05-30</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
