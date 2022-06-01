@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/electronics/arduino_inductance_measurement/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การต่อวงจรและเขียนโค้ด Arduino เพื่อหาค่าของตัวเหนี่ยวนำ - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c++.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino" class="nav-link">การต่อวงจรและเขียนโค้ด Arduino เพื่อหาค่าของตัวเหนี่ยวนำ</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การหาค่าเหนี่ยวนำในเชิงทฤษฎี</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; วงจรสำหรับการหาค่าเหนี่ยวนำ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; การต่อวงจรเสมือนจริงและจำลองการทำงาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino_1" class="nav-link">&#9655; การใช้งานร่วมกับบอร์ด Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino_2" class="nav-link">&#9655; การวัดความถี่ด้วย Arduino: จำลองการทำงานเสมือนจริง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino_3" class="nav-link">&#9655; การวัดความถี่ด้วย Arduino: การต่อวงจรทดลองด้วยอุปกรณ์จริง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; คำถามท้ายการทดลอง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino">การต่อวงจรและเขียนโค้ด Arduino เพื่อหาค่าของตัวเหนี่ยวนำ<a class="headerlink" href="#arduino" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอวงจรไฟฟ้า-อิเล็กทรอนิกส์ และตัวอย่างการเขียนโค้ด <strong>Arduino</strong>
+สำหรับบอร์ด <strong>Arduino Uno</strong> เพื่อวัดค่าเหนี่ยวนำ (<strong>Inductance Measurement</strong>)</p>
+<p><strong>Keywords:</strong> <em>Inductor</em>, <em>Inductance Measurement</em>, 
+<em>Arduino Programming</em>, <em>AUTODESK Tinkercad Circuits</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การหาค่าเหนี่ยวนำในเชิงทฤษฎี</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การวัดหรือหาคำนวณหาค่าความเหนี่ยวนำ (<strong>Inductance</strong>) ของตัวขดลวดเหนี่ยวนำ มีอยู่หลายวิธี ยกตัวอย่างเช่น 
+การนำตัวต้านทานและตัวเหนี่ยวนำมาต่อกันเป็นวงจรอนุกรมกัน (<strong>Series RL Circuit</strong>) 
+หรือ วงจรแบ่งแรงดัน (<strong>Voltage Divider</strong>) แล้วใช้เครื่องสร้างสัญญาณรูปคลื่นไซน์ (<strong>Sinusoidal Waveform</strong>) เป็นอินพุตให้วงจร และใช้เครื่องออสซิลโลสโคปวัดสัญญาณเอาต์พุตซึ่งเป็นแรงดันตกคร่อมที่ตัวต้านทาน
+โดยเปรียบเทียบกับสัญญาณอินพุต จากนั้นให้ปรับหาความถี่ที่ทำให้สัญญาณเอาต์พุต มีแอมพลิจูดเป็นครึ่งหนึ่งของสัญญาณอินพุต</p>
+<p>รีแอคแตนซ์ (<strong>Inductive Reactance: <script type="math/tex">X_L</script></strong>) ของตัวเหนี่ยวนำขึ้นอยู่กับค่าความเหนี่ยวนำและความถี่
+<script type="math/tex; mode=display">
+  X_L = \omega L = 2\pi f L
+</script>
+ดังนั้นเมื่อพิจารณาแอมพลิจูดของแรงดันตกคร่อมที่ตัวต้านทานในวงจร <strong>RL</strong> 
+เปรียบเทียบกับแอมพลิจูดของสัญญาณอินพุตที่เป็นรูปคลื่นไซน์ ก็สามารถเขียนความสัมพันธ์ได้ดังนี้
+<script type="math/tex; mode=display">
+   \frac{|\mathbf{V_{R}}|}{|\mathbf{V_{S}}|}  
+  = \frac{R}{\sqrt{R^2 + (\omega L)^2}} 
+</script>
+ถ้ากำหนดให้ <script type="math/tex">\omega_0</script> คือ ความถี่เชิงมุมที่ทำให้อัตราส่วนดังกล่าวมีค่าเท่ากับ <script type="math/tex">0.5</script>
+<script type="math/tex; mode=display">
+   \frac{R}{\sqrt{R^2 + (\omega_0 L)^2}} = \frac{1}{2}
+</script>
+ดังนั้นความสัมพันธ์ระหว่าง <script type="math/tex">L</script>, <script type="math/tex">R</script> และ <script type="math/tex">\omega_0</script> เป็นดังนี้
+<script type="math/tex; mode=display">
+ \frac{R^2}{R^2 + (\omega_0 L)^2} = 
+ \frac{1}{1 + (\frac{\omega_0 L}{R})^2} = \frac{1}{4} \\[1em]
+ \Big(\frac{\omega_0 L}{R}\Big)^2 = 3 \\
+ f_0 = \frac{\sqrt{3}\, R}{2\pi L} \\
+ L = \frac{R \cdot \sqrt{3}}{2\pi f_0}, \; \omega_0 = 2\pi f_0
+</script>
+</p>
+<p>หากคำนวณค่าให้เป็นหน่วยเดซิเบล เมื่อใช้ความถี่ <script type="math/tex">f_0</script> จะได้ค่าดังนี้
+<script type="math/tex; mode=display">
+   20\, log_{10}(0.5) \approx -6.0206 \, \mbox{dB}
+</script>
+</p>
+<p>มาลองดูตัวอย่างผลการจำลองและวิเคราะห์การทำงานของวงจร <strong>RL</strong> ด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p><img alt="" src="easyeda_rl_circuit_schematic.png" /></p>
+<p>รูป: วงจร <strong>RL</strong> แบบอนุกรม (เลือกใช้ค่าเป็นตัวอย่าง: <strong>R=100 &Omega;</strong> และ <strong>L=330uH</strong>)
+และสัญญาณอินพุตเป็นรูปคลื่นไซน์ที่มีแอมพลิจูดเท่ากับ <strong>1.0V</strong> หรือ <strong>Vpp = 2.0V</strong></p>
+<p>เนื่องจากในวงจรมี <strong>R=100 &Omega;</strong> และ <strong>L=330uH</strong> ดังนั้นความถี่ <script type="math/tex">f_0</script> ที่ทำให้แอมพลิจูดของ <script type="math/tex">V_R</script> เท่ากับครึ่งหนึ่งของแอมพลิจูดของสัญญาณอินพุต <script type="math/tex">V_S</script> สามารถคำนวณได้ดังนี้
+<script type="math/tex; mode=display">
+ f_0 = \frac{\sqrt{3}\cdot 100\,\Omega}{2\pi \cdot 330\,\mbox{uH}}
+   = 83,534.68\,\mbox{Hz} \\
+</script>
+</p>
+<p><img alt="" src="easyeda_rl_circuit_100R_330uH_sim.png" /></p>
+<p>รูป: ผลการจำลองการทำงานในโหมด <strong>Transient</strong>
+เมื่อกำหนดให้สัญญาณอินพุตมีความถี่เท่ากับ <strong>83,534.68 Hz</strong> ซึ่งจะได้แอมพลิจูดของสัญญาณเอาต์พุตเท่ากับ <strong>0.5V</strong></p>
+<p><img alt="" src="easyeda_rl_circuit_ac_sweep.png" /></p>
+<p>รูป: ผลการจำลองการทำงานในโหมด <strong>AC Sweep</strong> และแสดงค่าแอมพลิจูดที่มีหน่วยเป็นเดซิเบล
+จะเห็นได้ว่าเมื่อเพิ่มความถี่ให้กับสัญญาณอินพุต แอมพลิจูดของสัญญาณเอาต์พุตจะมีแนวโน้มลดลง</p>
+<p>อย่างไรก็ตามวิธีนี้ต้องอาศัยการสร้างสัญญาณแอนะล็อกที่เป็นรูปคลื่นไซน์ปรับความถี่ได้ 
+และการวัดค่าแอมพลิจูดของสัญญาณเอาต์พุต ซึ่งโดยทั่วไปก็จะใช้อุปกรณ์เครื่องมือวัดในห้องปฏิบัติการ ได้แก่
+เครื่องกำเนิดสัญญาณและออสซิลโลสโคป ดังนั้นวิธีนี้อาจไม่เหมาะสำหรับการนำไปใช้กับไมโครคอนโทรลเลอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>วงจรสำหรับการหาค่าเหนี่ยวนำ</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความ <a href="../inductance_measurement/">"วงจรสำหรับการทดลองเพื่อหาค่าของตัวเหนี่ยวนำ"</a> ได้นำเสนอตัวอย่างของวงจรอิเล็กทรอนิกส์ที่สร้างสัญญาณเอาต์พุต-ดิจิทัล และเป็นสัญญาณแบบพัลส์ที่มีความถี่ขึ้นอยู่ค่าของตัวเก็บประจุและตัวเหนี่ยวนำ ดังนั้นถ้าสามารถวัดความถี่ของสัญญาณพัลส์ที่เกิดขึ้นได้ (เช่น ใช้เครื่องออสซิลโลสโคป) และทราบค่าของตัวเก็บประจุ ก็สามารถคำนวณค่าของตัวเหนี่ยวนำได้จากความถี่ที่วัดได้</p>
+<p>ในบทความนี้ เราจะนำวงจรดังกล่าวมาทดลองเพิ่มเติม และจำลองการทำงานโดยใช้ซอฟต์แวร์ <a href="https://www.tinkercad.com/"><strong>AUTODESK Tinkercad - Circuits</strong></a> ทดลองใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ เช่น <strong>Arduino Uno</strong> และเขียนโค้ดเพื่อวัดความถี่ของสัญญาณแล้วแสดงค่าของตัวเหนี่ยวนำในวงจร</p>
+<p>การใช้ซอฟต์แวร์เพื่อวางแผนการต่อวงจรบนเบรดบอร์ดและจำลองการทำงาน
+จะทำให้ผู้ใช้สามารถตรวจสอบความถูกต้องของวงจร และทำความเข้าใจพฤติกรรมการทำงานของวงจรได้ในเบื้องต้น 
+โดยดูจากสัญญาณในวงจรและแสดงผลด้วยออสซิลโลสโคปเสมือนจริง</p>
+<p>รูปผังวงจรต่อไปนี้ แสดงให้เห็นว่า ด้านซ้ายของวงจรมีช่องรับสัญญาณอินพุต-ดิจิทัล (<strong>PULSE_IN</strong>)
+ซึ่งเป็นสัญญาณดิจิทัลแบบพัลส์ แล้วต่อกับตัวต้านทานอนุกรมและไดโอด ตามลำดับ 
+แรงดันตกคร่อมที่ตัวเก็บประจุ (<strong>CH1</strong>) จะถูกนำไปใช้กับไอซีเปรียบเทียบระดับแรงดัน <strong>LM393</strong> 
+และได้เอาต์พุต (<strong>CH2</strong>) เป็นสัญญาณดิจิทัล (<strong>PULSE_OUT</strong>)</p>
+<p><img alt="" src="circuit_schematic.png" /></p>
+<p>รูป: ผังวงจรสำหรับการต่อวงจรบนเบรดบอร์ด</p>
+<p>ในช่วงแรกของหนึ่งคาบสัญญาณอินพุต เมื่อแรงดันไฟฟ้าที่ขาอินพุต <strong>PULSE_IN</strong>
+เปลี่ยนจาก <strong>0V</strong> ไปเป็น <strong>5V</strong> จะเกิดการชาร์จประจุที่ตัวเก็บประจุ <strong>C1</strong>
+และในขณะเดียวกันก็มีกระแสไฟฟ้าไหลผ่านตัวเหนี่ยวนำ <strong>L1</strong></p>
+<p>เมื่อ <strong>PULSE_IN</strong> เปลี่ยนจาก <strong>5V</strong> ไปเป็น <strong>0V</strong>
+จะไม่มีกระแสไฟฟ้าไหลย้อนกลับผ่านตัวไดโอด ในกรณีนี้ ตัวเก็บประจุกับตัวเหนี่ยวนำซึ่งมีพลังงานไฟฟ้าอยู่ภายใน 
+จะกลายเป็นวงจร <strong>L</strong> กับ <strong>C</strong> ที่ต่อขนานกัน<br />
+และจะทำให้เกิดสัญญาณรูปคลื่นไซน์ที่มีความถี่เรโซแนนซ์ (<strong>Resonant Frequency</strong>) ของวงจร </p>
+<p>แต่เนื่องจากตัวเหนี่ยวนำมีค่าความต้านทานแฝงอยู่ แต่มีค่าไม่มากนัก (เช่น ไม่เกิน <strong>1&Omega;</strong>) 
+เมื่อวัดแรงดันตกคร่อมที่ตัวเก็บประจุหรือตัวเหนี่ยวนำ (สัญญาณที่ <strong>CH1</strong>) 
+แอมพลิจูดของสัญญาณรูปคลื่นไซน์จะลดลงไปเรื่อย ๆ จนเข้าสู่สภาวะคงตัว และมีแรงดันไฟฟ้าเป็น <strong>0V</strong></p>
+<p>หากนำสัญญาณ <strong>CH1</strong> ไปใช้เป็นอินพุตป้อนให้ไอซี <strong>LM393</strong> 
+แล้วเปรียบเทียบกับแรงดันอ้างอิง <strong>0V</strong> ก็จะได้สัญญาณเอาต์พุตเป็นสัญญาณดิจิทัล (สัญญาณที่ <strong>CH2</strong>)
+ที่มีลักษณะเป็นสัญญาณพัลส์ ในช่วงที่เกิดการแกว่งของสัญญาณ <strong>CH1</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>การต่อวงจรเสมือนจริงและจำลองการทำงาน</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างผลการจำลองการทำงานโดยใช้เครื่องกำเนิดสัญญาณ (<strong>Function Generator</strong>)
+สร้างสัญญาณแบบมีคาบและเป็นรูปสัญญาณทรงสี่เหลี่ยม (<strong>Rectangular Waveform</strong>)</p>
+<p>เริ่มต้นด้วยการต่อวงจรเสมือนจริงบนเบรดบอร์ด แตยังไม่ต่อวงจรสำหรับไอซี <strong>LM393</strong>
+โดยใช้ <strong>Tinkercad Circuits</strong> และการวัดสัญญาณ <strong>CH1</strong> (แรงดันตกคร่อมที่ตัวเก็บประจุ) </p>
+<p>การแกว่งของสัญญาณ <strong>CH1</strong> ในวงจร  (<strong>Ringing Signal</strong>) เกิดขึ้นเมื่อสัญญาณอินพุตเปลี่ยนจาก <strong>0V</strong> เป็น <strong>5V</strong> ช่วงที่เปลี่ยนเป็นลอจิก <strong>HIGH</strong> หรือเรียกว่า ขอบขาขึ้น (<strong>Rising-Edge</strong>)</p>
+<p><img alt="" src="tinkercad_sim_no_lm393-1.png" /></p>
+<p>รูป: แสดงรูปคลื่นสัญญาณ <strong>CH1</strong> (แรงดันตกคร่อมที่ตัวเก็บประจุ) เมื่อสัญญาณอินพุตเป็นขอบขาขึ้น </p>
+<p>การแกว่งของสัญญาณ <strong>CH1</strong> ในวงจร เกิดขึ้นอีกครั้งเมื่อสัญญาณอินพุตเปลี่ยนจาก <strong>5V</strong>
+เป็น <strong>0V</strong> ช่วงที่เปลี่ยนเป็นลอจิก <strong>LOW</strong> หรือเรียกว่า ขอบขาลง (<strong>Falling-Edge</strong>)</p>
+<p><img alt="" src="tinkercad_sim_no_lm393-2.png" /></p>
+<p>รูป: แสดงรูปคลื่นสัญญาณ <strong>CH1</strong> (แรงดันตกคร่อมที่ตัวเก็บประจุ) เมื่อสัญญาณอินพุตเป็นขอบขาลง</p>
+<p>ถัดไปเป็นตัวอย่างการต่อวงจรเสมือนจริงบนเบรดบอร์ด และมีการต่อวงจรสำหรับไอซี <strong>LM393</strong> 
+และวัดสัญญาณ  <strong>CH1</strong> (สัญญาณแอนะล็อก)  และ <strong>CH2</strong> (สัญญาณดิจิทัล) พร้อมกัน</p>
+<p><img alt="" src="tinkercad_sim-1.png" /></p>
+<p>รูป: สัญญาณ <strong>CH1</strong> และ <strong>CH2</strong> เมื่อเกิดขอบขาขึ้นที่สัญญาณอินพุต</p>
+<p><img alt="" src="tinkercad_sim-2.png" /></p>
+<p>รูป: สัญญาณ <strong>CH1</strong> และ <strong>CH2</strong> เมื่อเกิดขอบขาลงที่สัญญาณอินพุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino_1">&#9655; <strong>การใช้งานร่วมกับบอร์ด Arduino</strong><a class="headerlink" href="#arduino_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการเขียนโค้ดเพื่อให้บอร์ด <strong>Arduino</strong> สร้างสัญญาณพัลส์ (<code>PULSE_OUT</code>)
+ให้กับวงจรบนเบรดบอร์ด และรับสัญญาณเอาต์พุต (<code>PULSE_IN</code>) ที่เป็นสัญญาณแบบดิจิทัล
+เพื่อนำมาวัดคาบของสัญญาณพัลส์ คำนวณค่าความถี่ และค่าของตัวเหนี่ยวนำ ตามลำดับ</p>
+<p>คำสั่งพื้นฐานของ <strong>Arduino</strong> ที่ใช้สำหรับวัดความกว้างของพัลส์ (<strong>Pulse Width</strong>)
+ในช่วงที่เป็น <strong>High</strong> หรือ <strong>Low</strong> ก็ได้ คือ คำสั่ง <code>pulseIn()</code> และได้ค่าตัวเลขที่มีหน่วยเป็น
+ไมโครวินาที</p>
+<p>แต่โค้ดตัวอย่างต่อไปนี้ จะใช้วิธีการเปิดใช้งานอินเทอร์รัพท์ภายนอก (<strong>External Interrupt</strong>)
+สำหรับขาอินพุต-ดิจิทัล (เช่น ขา <strong>D2</strong> หรือ <strong>D3</strong> ของบอร์ด <strong>Arduino Uno</strong>) </p>
+<p>เมื่อเกิดเหตุการณ์ขอบขาขึ้นที่สัญญาณอินพุต
+ฟังก์ชันที่ถูกกำหนดให้ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>)
+จะทำการอ่านและบันทึกเวลาของระบบในหน่วยเป็นไมโครวินาที (<strong>usec</strong>)
+ผลต่างของเวลาเมื่อเกิดเหตุการณ์อย่างน้อยสองครั้งตามลำดับก็คือ คาบของสัญญาณพัลส์ (<code>period</code>)</p>
+<p><strong>ข้อสังเกต:</strong> ความละเอียดในการอ่านค่าเลข เช่น ค่าที่ได้จากการทำคำสั่ง <code>micros()</code> 
+สำหรับการจับเวลาของ <strong>Arduino Uno</strong> จะเท่ากับ <strong>4usec</strong> </p>
+<p>โค้ดตัวอย่างสำหรับ <strong>Arduino Sketch</strong> มีดังนี้</p>
+<pre><code class="language-c++">#define C_uF           (1)
+#define PULSE_OUT      (5)
+#define PULSE_IN       (2) // use either D2 or D3 pin
+#define INTERRUPT_PIN  digitalPinToInterrupt(PULSE_IN)
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println( &quot;Arduino - Inductance Measurement...&quot; );
+  delay( 1000 );
+  pinMode( PULSE_OUT, OUTPUT );
+  pinMode( PULSE_IN, INPUT   );
+}
+
+char sbuf[64];     // used for sprintf()
+volatile uint8_t   pulse_cnt = 0;
+volatile uint32_t  saved_ts;
+volatile uint32_t  saved_period = 0;
+uint32_t period;
+
+void pulse_isr() { // ISR function for external interrupt
+  uint32_t ts = micros();
+  if ( pulse_cnt == 0 ) {
+    saved_period = -1;
+  } else if ( pulse_cnt &lt; 4 ) {
+    saved_period = ts - saved_ts;
+  }
+  pulse_cnt++;
+  saved_ts = ts; 
+}
+
+void loop() {
+  // create a short pulse
+  digitalWrite( PULSE_OUT, HIGH );
+  delay(20);
+  digitalWrite( PULSE_OUT, LOW );
+  // enable the external interrupt on PULSE_PIN pin
+  pulse_cnt = 0;
+  attachInterrupt( INTERRUPT_PIN, pulse_isr, RISING );
+  delay(1); 
+  cli();
+  period = saved_period;
+  // disable the external interrupt on PULSE_PIN pin
+  detachInterrupt( INTERRUPT_PIN );
+  sei();
+  // compute the frequency from the measured period value
+  double f = 1.0e6/period;
+  // determine the inductance from the calculated frequency
+  uint32_t inductance = 1e12/(pow(2*PI*f,2)*C_uF);
+  // show the results
+  sprintf( sbuf,&quot;period: %lu usec, %lu Hz, %lu uH&quot;,
+           period, (uint32_t)f, inductance );
+  Serial.println( sbuf );
+  Serial.flush();
+  delay(1000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino_2">&#9655; <strong>การวัดความถี่ด้วย Arduino: จำลองการทำงานเสมือนจริง</strong><a class="headerlink" href="#arduino_2" title="Permanent link">#</a></h2>
+<p>ก่อนที่จะทดลองกับอุปกรณ์จริง เราสามารถใช้ <strong>Tinkercad Circuits</strong> 
+จำลองการทำงานของวงจรร่วมกับการทำงานของโค้ด <strong>Arduino Uno</strong> ได้ 
+ตามตัวอย่างต่อไปนี้</p>
+<p>การทดลองใช้ใช้ค่า <strong>L=330uH, C=1uF</strong> เมื่อจำลองการทำงานแล้ววัดค่าด้วย 
+<strong>Arduino</strong> ได้เท่ากับ <strong>340uH</strong></p>
+<p><img alt="" src="arduino_sim-1.png" /></p>
+<p>รูป: การจำลองการทำงาน โดยใช้ขา <strong>D2</strong> รับสัญญาณพัลส์มาจากวงจรบนเบรดบอร์ด</p>
+<p><img alt="" src="arduino_sim-2.png" /></p>
+<p>รูป: การจำลองการทำงาน โดยใช้ขา <strong>D3</strong> รับสัญญาณพัลส์ 
+มาจากเครื่องกำเนิดสัญญาณ (เช่น ตั้งค่าความถี่เท่ากับ <strong>12.5kHz</strong>) 
+และใช้เป็นสัญญาณทดสอบการทำงาของ <strong>Arduino</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino_3">&#9655; <strong>การวัดความถี่ด้วย Arduino: การต่อวงจรทดลองด้วยอุปกรณ์จริง</strong><a class="headerlink" href="#arduino_3" title="Permanent link">#</a></h2>
+<p>เมื่อได้ต่อวงจรโดยใช้อุปกรณ์จริงตามที่ได้ออกแบบไว้ถูกต้องและครบถ้วนแล้ว และอัปโหลด <strong>Arduino Sketch</strong>
+ลงในบอร์ด <strong>Arduino Uno</strong> ก็สามารถวัดความถี่หรือคาบของสัญญาณ
+โดยใช้เครื่องออสซิลโลสโคป เปรียบเทียบกับผลการทำงานด้วย <strong>Arduino</strong></p>
+<p><img alt="" src="breadboard_prototyping.jpg" /></p>
+<p>รูป: การต่อวงจรบนเบรดบอร์ดเพื่อทำการทดลอง</p>
+<p>&nbsp;</p>
+<p><strong>ผลการทดลอง:</strong> เมื่อใช้ขดลวดเหนี่ยวนำ <strong>L=330uH (Tolerance: &pm; 10%)</strong></p>
+<p>จากการทดลองโดยใช้ <strong>L=330uH</strong> จะเห็นได้ว่า คาบที่วัดได้จากสองวิธี มีความแตกต่างกันเล็กน้อย (ไม่เกิน <strong>4usec</strong>) 
+และมีความคลาดเคลื่อนในการวัด (<strong>Error</strong>) เมื่อใช้ <strong>Arduino</strong>
+เมื่อเปรียบเทียบกับค่าอ้างอิง คิดเป็นเปอร์เซ็นต์ได้ดังนี้
+<script type="math/tex; mode=display">
+  E_{rel} = 100\,\% \times \frac{|317 - 330|}{330} = 3.94\,\%
+</script>
+</p>
+<p><img alt="" src="arduino_output_L330uH.png" /></p>
+<p>รูป: ข้อความที่ได้จากการทำงานของบอร์ด <strong>Arduino</strong> (ได้ความถี่ <strong>8.928 kHz</strong> และคาบ <strong>112 usec</strong>)</p>
+<p><img alt="" src="oscilloscope_109usec.jpg" /></p>
+<p>รูป: การวัดสัญญาณด้วยเครื่องออสซิลโลสโคป (ได้ความถี่ <strong>9.28 kHz</strong> และคาบ <strong>109 usec</strong>)</p>
+<p>&nbsp;</p>
+<p><strong>ผลการทดลอง:</strong> เมื่อใช้ขดลวดเหนี่ยวนำ <strong>L=470uH (Tolerance: &pm; 10%)</strong></p>
+<p>จากการทดลองโดยใช้ <strong>L=470uH</strong> จะเห็นได้ว่า มีความคลาดเคลื่อนในการวัดด้วย <strong>Arduino</strong>
+เมื่อเปรียบเทียบกับค่าอ้างอิงดังนี้
+<script type="math/tex; mode=display">
+  E_{rel} = 100\,\% \times \frac{|441 - 470|}{470} = 6.17\,\%
+</script>
+</p>
+<p><img alt="" src="oscilloscope_132usec.jpg" /></p>
+<p>รูป: การวัดสัญญาณด้วยเครื่องออสซิลโลสโคป (ได้ความถี่ <strong>7.57 kHz</strong> และคาบ <strong>132 usec</strong>)</p>
+<p><img alt="" src="arduino_output_L470uH.png" /></p>
+<p>รูป: ข้อความที่ได้จากการทำงานของบอร์ด <strong>Arduino</strong> (ได้ความถี่ <strong>7.575 kHz</strong> และคาบ <strong>132 usec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>คำถามท้ายการทดลอง</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>เมื่อได้ทำความเข้าใจหลักการทำงานของวงจรและโค้ดตัวอย่าง รวมถึงการลงมือปฏิบัติทดลองจริงแล้ว ให้ลองตอบคำถามต่อไปนี้</p>
+<ul>
+<li>ในกรณีที่ใช้วงจร <strong>RL</strong> มาต่อแบบอนุกรมกัน แล้วใช้เครื่องออสซิลโลสโคปวัดสัญญาณเอาต์พุตซึ่งเป็นแรงดันตกคร่อมที่ตัวเหนี่ยวนำ 
+(แทนที่การวัดแรงดันตกคร่อมของตัวต้านทาน) และป้อนสัญญาณอินพุตเป็นรูปไซน์ จะมีสูตรคำนวณอย่างไร เพื่อหาความถี่ที่ทำให้แอมพลิจูดของสัญญาณเอาต์พุต เป็นครึ่งหนึ่งของแอมพลิจูดของสัญญาณอินพุต ? และเมื่อใช้ความถี่ดังกล่าว จะคำนวณความต่างเฟสระหว่างสัญญาณเอาต์พุตและอินพุตได้ค่าเท่าไหร่ ?</li>
+<li>ในการเลือกค่าสำหรับตัวต้านทานที่ต่ออนุกรมกับไดโอดในวงจร มีประเด็นใดบ้างที่จะต้องพิจารณา หรือ มีข้อควรระวังอย่างไรบ้าง ?
+และจะส่งผลอย่างไรต่อกระแสที่ไหลผ่านตัวเหนี่ยวนำในปริมาณสูงสุด ?</li>
+<li>การเพิ่มหรือลดค่าความเหนี่ยวนำของขดลวดเหนี่ยวนำ (เปรียบเทียบค่าตัวอย่างเช่น <strong>220uH, 330uH, 470uH</strong> เป็นต้น) จะส่งผลต่อจำนวนพัลส์ของสัญญาณเอาต์พุตที่เกิดขึ้นหรือไม่ จงอธิบาย ?</li>
+<li>ถ้าต้องการเขียนโค้ด <strong>Arduino</strong> ให้นับจำนวนพัลส์ที่เกิดขึ้นกับสัญญาณเอาต์พุตในช่วงที่มีการแกว่งของสัญญาณ จะมีแนวทางอย่างไร ?</li>
+<li>ถ้าจะเปลี่ยนไปใช้บอร์ดไมโครคอนโทรลเลอร์  เช่น <strong>Espressif ESP32</strong> หรือ <strong>Raspberry Pi Pico (RP2040)</strong> ซึ่งสามารถเขียนโค้ดได้ โดยใช้ <strong>Arduino API</strong> แต่ทำงานโดยใช้แรงดันไฟเลี้ยงสำหรับลอจิก (<strong>Logic Voltage Level</strong>) ที่ระดับ <strong>+3.3V</strong> (ไม่สามารถใช้กับ <strong>+5V</strong> ได้) ในกรณีจะต้องแก้ไขวงจรอย่างไร ?</li>
+</ul>
+<hr />
+<h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอวิธีการพื้นฐานสำหรับการหาค่าเหนี่ยวนำของขดลวดเหนี่ยวนำโดยใช้วงจรอิเล็กทรอนิกส์พื้นฐาน
+ร่วมกับการทำงานของบอร์ด <strong>Arduino</strong> และเปรียบเทียบผลการจำลองการทำงานกับการต่ออุปกรณ์และทดลองจริง</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-05-31 | Last Updated: 2022-06-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
