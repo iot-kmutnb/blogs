@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/arduino_attiny85/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Arduino สำหรับ ATtiny85 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c++.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-attiny85" class="nav-link">การเขียนโปรแกรม Arduino สำหรับ ATtiny85</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#attiny85" class="nav-link">&#9655; แนะนำไมโครคอนโทรลเลอร์ ATtiny85</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-ide-attiny85" class="nav-link">&#9655; การเขียนโปรแกรมด้วย Arduino IDE สำหรับ ATtiny85</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#attiny85_1" class="nav-link">&#9655; การอัปโหลดโปรแกรมไปยัง ATtiny85</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ตัวอย่างโค้ด: การอ่านค่าอินพุตแบบแอนะล็อก</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-attiny85">การเขียนโปรแกรม Arduino สำหรับ ATtiny85<a class="headerlink" href="#arduino-attiny85" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอการใช้งานชิปไมโครคอนโทรลเลอร์ <strong>ATtiny85 (8-bit MCU)</strong>
+การเขียนโปรแกรมด้วยคำสั่งของ <strong>Arduino</strong> การจำลองการทำงานและการนำทดลองใช้งานกับอุปกรณ์จริง</p>
+<p><strong>Keywords:</strong> <em>ATtiny85</em>, <em>Arduino Programming</em>,
+<em>AUTODESK Tinkercad Circuits</em>, <em>Wokwi AVR Simulator</em>,
+<em>Breadboard Prototyping</em></p>
+<hr />
+<h2 id="attiny85">&#9655; <strong>แนะนำไมโครคอนโทรลเลอร์ ATtiny85</strong><a class="headerlink" href="#attiny85" title="Permanent link">#</a></h2>
+<p><strong>คุณสมบัติเกี่ยวกับ  ATtiny85</strong> (<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"><strong>Datasheet</strong></a>)</p>
+<ul>
+<li>เป็นชิปไมโครคอนโทรลเลอร์ในตระกูล <strong>ATtiny (TinyAVR)</strong> ของบริษัท <strong>Atmel / Microchip</strong></li>
+<li>ภายในมีซีพียูขนาด 8 บิต และมีสถาปัตยกรรมแบบ <strong>RISC</strong></li>
+<li>มีหน่วยความจำภายใน 3 ประเภท<ul>
+<li><strong>SRAM (Data Memory)</strong> ขนาด 512 ไบต์ </li>
+<li><strong>Flash (Program Memory)</strong> ขนาด 8 กิโลไบต์ (KB) </li>
+<li><strong>EEPROM (Non-volatile Data Storage)</strong> ขนาด 512 ไบต์</li>
+</ul>
+</li>
+<li>ใช้ตัวถังของไอซีที่มีเพียง 8 ขา เช่น ตัวถังแบบ <strong>DIP-8</strong> (สามารถเสียบขาลงบนเบรดบอร์ดได้)</li>
+<li>มีตัวสร้างสัญญาณ <strong>Clock</strong> ภายใน (<strong>Internal Oscillator</strong>) ที่มีความถี่ <strong>8 MHz</strong></li>
+<li>รองรับช่วงแรงดันไฟเลี้ยง <strong>1.8V ~ 5.5V</strong> ได้</li>
+<li>มีขา <strong>GPIO</strong> ทั้งหมด 6 ขา ซึ่งเป็นส่วนหนึ่งของพอร์ต <strong>PORTB</strong></li>
+<li>สามารถสร้างสัญญาณ <strong>PWM (Pulse Width Modulation)</strong> ได้สูงสุด 4 ช่อง</li>
+<li>มีวงจร <strong>UCI (Universal Serial Interface)</strong> จำนวน 1 ชุด ที่สามารถใช้งานสำหรับ <strong>SPI</strong>, <strong>I2C/TWI</strong> และ <strong>UART</strong> ได้</li>
+<li>มีวงจรตัวนับ <strong>Timers/ Counters</strong> ขนาด 8 บิต จำนวน 2 ชุด</li>
+<li>มีวงจร <strong>10-bit ADC (Analog-to-Digital Converter)</strong> ที่รับอินพุตแบบ <strong>Single-Ended</strong> จำนวน 4 ช่อง (<strong>ADC0..ADC3</strong>) หรือแบบ <strong>Differential Pair</strong> ได้ 2 คู่</li>
+<li>มีวงจร  <strong>On-chip Analog Comparator</strong> และขาอินพุต <strong>AIN0(+)</strong> กับ <strong>AIN1(-)</strong> จำนวน 1 ช่อง</li>
+</ul>
+<p><img alt="" src="attiny85_pinout-1.png" /></p>
+<p><img alt="" src="attiny85_pinout-2.png" /></p>
+<p>รูป: ผังแสดงตำแหน่งขาของ <strong>ATtiny85</strong> ที่มีตัวถังแบบ <strong>Plastic DIP-8 / SOIC-8</strong></p>
+<p><img alt="" src="attiny85_dip8_breadboard.png" /></p>
+<p>รูป: ชิป <strong>ATtiny85-20PU</strong> ที่มีตัวถังแบบ <strong>PDIP-8</strong> และเสียบขาลงใน <strong>Round-pin IC Socket</strong> 
+สำหรับการต่อวงจรบนเบรดบอร์ด</p>
+<p>&nbsp;</p>
+<p><strong>ทำไมจึงแนะนำให้ลองใช้ ATtiny85 ?</strong></p>
+<ul>
+<li><strong>ATtiny85</strong> มีราคาไม่แพง (~50 บาท) </li>
+<li>มีตัวถังแบบ <strong>DIP-8</strong> (เหมือนไอซี <strong>OpAmp</strong> ทั่วไป) ให้เลือกใช้
+และสามารถนำไปเสียบลงบนเบรดบอร์ดเพื่อต่อวงจรทดลองได้ง่าย </li>
+<li>สามารถใช้ตัวสร้างสัญญาณ <strong>Clock</strong> ภายใน โดยไม่ต้องต่อวงจร <strong>Crystal Oscillator</strong> ภายนอก 
+(ไม่ต้องใช้ขา <strong>XTAL1 / XTAL2</strong>)</li>
+<li>มีตัวเลือกสำหรับความถี่ เช่น <strong>1 MHz</strong> / <strong>8 MHz</strong> / <strong>16 MHz</strong><ul>
+<li>ถ้าใช้ความถี่ <strong>16 MHz</strong> จะต้องใช้แรงดันไฟเลี้ยง <strong>+5V</strong></li>
+<li>ถ้าใช้ความถี่ <strong>1 MHz</strong> หรือ <strong>8 MHz</strong> สามารถเลือกใช้แรงดันไฟเลี้ยง <strong>3.3V</strong> หรือ <strong>5V</strong> ได้</li>
+</ul>
+</li>
+<li>สามารถใช้งานได้กับซอฟต์แวร์ <a href="https://www.tinkercad.com/"><strong>AUTODESK Tinkercad Circuits (Web-based)</strong></a> &mdash; ผู้ใช้สามารถเขียนโค้ดและจำลองการทำงานร่วมกับวงจรอิเล็กทรอนิกส์ได้ รองรับการเขียนโค้ด โดยใช้ชุดคำสั่งของ <strong>Arduino API</strong> หรือจะเขียนโค้ดโดยใช้ฟังก์ชันจากไลบรารี <strong>AVR libc</strong> ได้</li>
+<li>สามารถเขียนโค้ดและจำลองการทำงานโดยใช้ <a href="https://wokwi.com/"><strong>Wokwi Arduino Simulator</strong></a> ได้</li>
+<li>สามารถเขียนโค้ดโดยใช้ <strong>Arduino IDE</strong> สำหรับการคอมไพล์โค้ดและนำไปใช้กับฮาร์ดแวร์จริง</li>
+</ul>
+<p>อย่างไรก็ตาม ก็ต้องคำนึงถึงข้อจำกัดของ <strong>ATtiny MCU</strong> เมื่อต้องการนำไปใช้งาน เช่น ขนาดของหน่วยความจำที่มีค่อนข้างน้อย จำนวนของขา <strong>I/O</strong> ที่มีอย่างจำกัด เป็นต้น</p>
+<p>&nbsp;</p>
+<p>การใช้ซอฟต์แวร์ <strong>Tinkercad Circuits</strong> มีข้อดีคือ ผู้ใช้สามารถเลือกใช้ชิป <strong>ATtiny85</strong> 
+มาต่อวงจรเสมือนจริงบนเบรดบอร์ด ร่วมกับไอซีหรือวงจรอิเล็กทรอนิกส์ที่มีอยู่ในรายการของตัวเลือก 
+และจำลองการทำงานได้จริง ช่วยในการฝึกทักษะการวางแผนต่อวงจรบนเบรดบอร์ด</p>
+<p><img alt="" src="tinkercad_attiny85_led_blink-1.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริง โดยใช้ <strong>LED + 470R</strong> สำหรับแสดงสถานะลอจิก แสดงสถานะลอจิกที่ขา <strong>PB0</strong> เขียนโค้ดด้วย <strong>Arduino Sketch</strong> เพื่อกำหนดสถานะลอจิกที่ขาเอาต์พุต และจำลองการทำงานด้วย <strong>Tinkercad Circuits</strong></p>
+<p>ข้อสังเกต:  </p>
+<ul>
+<li>ในการต่อวงจรโดยใช้ <strong>Tinkercad Circuits</strong> เพื่อจำลองการทำงานของ <strong>ATtiny85</strong> จะต้องมีการต่อขาไฟเลี้ยง <strong>+5V</strong> และ <strong>0V</strong> สำหรับไอซี (จากแหล่งจ่ายคงที่ภายนอกหรือ <strong>Power Supply</strong>) ที่ขา <strong>8</strong> และขา <strong>4</strong> ตามลำดับ</li>
+<li>ภายในชิป <strong>ATtiny85</strong> ที่ขารีเซต มีตัวต้านทานแบบ <strong>Internal Pullup 
+(30k&Omega; ~ 60k&Omega;)</strong> ดังนั้นสำหรับการต่อวงจรทดลองโดยทั่วไป ก็ไม่จำเป็นต้องต่อตัวต้านทาน <strong>Pullup</strong>
+ภายนอกเพิ่ม</li>
+<li>โดยทั่วไป ฟังก์ชันการทำงานของขารีเซต จะไม่ถูกปิดการใช้งาน ดังนั้นจึงไม่สามารถใช้ขารีเซตเป็นขา <strong>GPIO</strong> ทั่วไปได้
+ยกเว้นกรณีที่มีการโปรแกรมค่าของ <strong>Fuse Bit</strong> (บิต <code>RSTDISBL</code> ใน <strong>Fuse High Byte</strong>) เพื่อปิดการใช้งานฟังก์ชันรีเซต (<strong>Disabling Reset Pin</strong>) แต่จะทำให้ไม่สามารถอัปโหลดโปรแกรมด้วยวิธี <strong>ICSP</strong> ได้อีกต่อไป ดังนั้นจะต้องใช้อุปกรณ์ที่เรียกว่า <strong>High-Voltage AVR Programmer</strong> เพื่อเปิดใช้งานฟังก์ชันของขารีเซตอีกครั้ง</li>
+<li>ในการต่อวงจรโดยใช้ไอซี <strong>ATtiny85</strong> บนเบรดบอร์ด แนะนำให้ใช้ <strong>IC Socket</strong> ร่วมด้วย เพื่อช่วยป้องกันขาของไอซี เมื่อต้องถอดไอซีออกจากเบรดบอร์ดบ่อยครั้ง</li>
+</ul>
+<p>ในเชิงเปรียบเทียบหรืออีกตัวเลือกหนึ่งคือ การใช้ซอฟต์แวร์ <strong>WokWi</strong> (ออกเสียงว่า "ว็อก-วี") เพื่อนำมาต่อวงจร <strong>ATtiny85</strong> ร่วมกับโมดูลหรืออุปกรณ์อิเล็กทรอนิกส์ต่าง ๆ ที่มีอยู่ในรายการตัวเลือกได้ แต่ก็มีความแตกต่างจาก <strong>Tinkercad Circuits</strong> เช่น ประเภทของอุปกรณ์ที่เลือกใช้ได้ และยังไม่สามารถต่อวงจรเสมือนจริงบนเบรดบอร์ดได้</p>
+<p><img alt="" src="wokwi_attiny85_led_blink-1.png" /></p>
+<p>รูป:  การต่อวงจรเสมือนจริง โดยใช้ <strong>LEDs (Red &amp; Blue Color) + 470R</strong> แสดงสถานะลอจิกที่ขา <strong>PB0 (IC Pin 5)</strong> เขียนโค้ดด้วย <strong>Arduino Sketch</strong> เพื่อกำหนดสถานะลอจิกที่ขาเอาต์พุต (<strong>LED</strong> สีแดงกับสีน้ำเงินจะติด-ดับสลับกัน) และจำลองการทำงานด้วย <strong>WokWi Simulator</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="wokwi_attiny85_led_blink-2.png" /></p>
+<p>รูป: ไฟล์ <strong>diagram.json</strong> ของวงจรตัวอย่าง และการกำหนดค่าของคุณสมบัติที่เกี่ยวข้องกับอุปกรณ์ที่ได้นำมาต่อวงจร
+(เช่น ค่าของตัวต้านทาน <code>wokwi-resistor</code> สีของหลอดแอลอีดี <code>wokwi-led</code> เป็นต้น)</p>
+<p><img alt="" src="attiny85_lcd_i2c_wokwi.png" /></p>
+<p>รูป: ตัวอย่างการใช้โมดูล <strong>LCD16X2 I2C</strong> ร่วมกับ <strong>ATtiny85</strong> และจำลองการทำงานด้วย <strong>WokWi Simulator</strong></p>
+<p>ข้อสังเกต:</p>
+<ul>
+<li>การต่อวงจรโดยใช้ <strong> WokWi Simulator</strong> เพื่อจำลองการทำงานของ <strong>ATtiny85</strong> ไม่จำเป็นต้องต่อขาไฟเลี้ยง <strong>+5V</strong> และ <strong>0V</strong> ที่ขา <strong>8</strong> และขา <strong>4</strong> ตามลำดับ</li>
+</ul>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Arduino Sketch</strong> สาธิตการใช้คำสั่งพื้นฐาน เช่น <code>pinMode()</code>,
+<code>delay()</code>, <code>digitalWrite()</code>, <code>digitalRead()</code>, <code>analogWrite()</code></p>
+<p>ตัวอย่างโค้ด: <strong>LED Blink</strong> โดยเลือกใช้ขา <strong>PB0</strong> เป็นขาเอาต์พุต</p>
+<pre><code class="language-c++">const int LED_PIN = PB0; // PB0 pin = Arduino D0 pin
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+}
+
+void loop() {
+  // toggle LED output
+  digitalWrite( LED_PIN, !digitalRead(LED_PIN) ); 
+  delay(500);
+}
+</code></pre>
+<p>ตัวอย่างโค้ด: <strong>PWM-based LED Fading</strong> โดยเลือกใช้ขา <strong>PB0</strong> เป็นขาเอาต์พุต</p>
+<pre><code class="language-c++">const int LED_PIN = PB0; // LED output pin
+
+void setup() {
+  analogWrite( LED_PIN, 0 );
+}
+
+void loop() {
+  for ( int i=0; i &lt; 512; i++ ) {
+    if ( i &lt;= 255 ) {
+      analogWrite( LED_PIN, i );
+    } else {
+      analogWrite( LED_PIN, 511-i );      
+    }
+    delay(8);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ide-attiny85">&#9655; <strong>การเขียนโปรแกรมด้วย Arduino IDE สำหรับ ATtiny85</strong><a class="headerlink" href="#arduino-ide-attiny85" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการนำโค้ด <strong>Arduino Sketch</strong> ไปใช้งานกับอุปกรณ์จริง จะต้องมีการคอมไพล์โค้ดให้เป็นไฟล์เฟิร์มแวร์ (<strong>.bin</strong>) 
+และผู้ใช้สามารถคอมไพล์โค้ดโดยใช้ซอฟต์แวร์ <strong>Arduino IDE</strong> แต่จะต้องมีการติดตั้ง 
+<a href="https://github.com/SpenceKonde/ATTinyCore"><strong>Arduino TinyCore</strong></a></p>
+<p>ในส่วน <strong>Preferences</strong> ของ <strong>Arduino IDE</strong> ให้ใส่ <strong>URL</strong> ต่อไปนี้ เพิ่มอีกหนึ่งบรรทัดสำหรับ <strong>Additional Boards Manager</strong> (ถ้ามีรายการ <strong>URL</strong> อื่นอีก ให้ใช้สัญลักษณ์ <code>,</code> เป็นตัวแบ่ง) </p>
+<pre><code class="language-text">http://drazzy.com/package_drazzy.com_index.json
+</code></pre>
+<p>จากนั้นให้ทำคำสั่งจากเมนู <strong>Tools &gt; Boards Manager</strong> เพื่อดาวน์โหลดและติดตั้ง <a href="https://github.com/SpenceKonde/ATTinyCore"><strong>ATTinyCore</strong></a> ซึ่งได้รับการดูแลโดย <strong>Spence Konde</strong>
+ตามรูปตัวอย่าง (ใช้เวอร์ชัน <strong>1.5.2</strong>)</p>
+<p><img alt="" src="arduino_attinycore-1.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino ATTinyCore</strong> สำหรับซอฟต์แวร์ <strong>Arduino IDE</strong></p>
+<p><img alt="" src="arduino_attinycore_settings.png" /></p>
+<p>รูป: การตั้งค่าเพื่อคอมไพล์โค้ดตัวอย่างใน <strong>Arduino IDE</strong> เลือกชิป <strong>ATtiny85</strong>
+ใช้ <strong>Clock Source: 8MHz Internal)</strong> และไม่ใช้งาน <strong>Bootloader</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="attiny85_1">&#9655; <strong>การอัปโหลดโปรแกรมไปยัง ATtiny85</strong><a class="headerlink" href="#attiny85_1" title="Permanent link">#</a></h2>
+<p>เมื่อสามารถคอมไพล์ <strong>Arduino Sketch</strong> ได้แล้ว 
+และต้องการนำไปทดลองกับ <strong>ATtiny85</strong> จะต้องมีอุปกรณ์อีกหนึ่งอย่างคือ
+<strong>AVR ISP Programmer</strong> ซึ่งมีให้เลือกใช้งานหลายแบบ เช่น</p>
+<ul>
+<li><a href="https://www.fischl.de/usbasp/"><strong>USBasp (Clone)</strong></a>: อุปกรณ์นี้ใช้ชิป <strong>ATMEGA-8</strong> พัฒนาโดย <strong>Thomas Fischl</strong> แต่ก็มีอุปกรณ์ประเภท <strong>Clone</strong> ที่ผลิตในจีน ดังนั้นจึงมีราคาถูกและหาซื้อได้ง่าย</li>
+<li><a href="https://docs.arduino.cc/built-in-examples/arduino-isp/ArduinoISP/"><strong>Arduino as ISP Programmer</strong></a>: ผู้ใช้สามารถนำบอร์ด เช่น <strong>Arduino Uno</strong> หรือ <strong>Nano</strong>
+(ถ้ามีอยู่แล้ว) มาติดตั้งโปรแกรมตัวอย่าง <a href="https://docs.arduino.cc/built-in-examples/arduino-isp/ArduinoISP"><strong>Examples &gt; ArduinoISP</strong></a> ให้กลายเป็นอุปกรณ์ <strong>ISP Programmer</strong> ได้ และไม่จำเป็นต้องซื้อหาอุปกรณ์มาเพิ่ม</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="usb_icsp_programmer.png" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ <strong>USBasp (Clone)</strong></p>
+<p>&nbsp;</p>
+<p>การเขียนไฟล์เฟิร์มแวร์ลงในหน่วยความจำภายในชิป <strong>AVR</strong> โดยใช้อุปกรณ์ <strong>AVR ISP</strong>
+จะต้องมีการเชื่อมต่อสายไฟ 6 เส้น ดังนี้</p>
+<ul>
+<li><strong>Pin 1: MISO</strong></li>
+<li><strong>Pin 2: VCC</strong></li>
+<li><strong>Pin 3: SCK</strong></li>
+<li><strong>Pin 4: MOSI</strong></li>
+<li><strong>Pin 5: RST</strong></li>
+<li><strong>Pin 6: GND</strong></li>
+</ul>
+<p>บอร์ด <strong>Arduino</strong> ที่ใช้ชิป <strong>AVR</strong> เช่น <strong>Uno</strong>, <strong>Nano</strong>, <strong>Mega</strong> มีคอนเนกเตอร์
+แบบ <strong>2x3 pins</strong> อยู่บนบนบอร์ด</p>
+<p><img alt="" src="arduino_icsp_programmer.png" /></p>
+<p>รูป: คอนเนกเตอร์ <strong>AVR ISP (2x3 pins)</strong> บนบอร์ด <strong>Arduino Uno</strong></p>
+<p><img alt="" src="arduino_isp_wires.png" /></p>
+<p>รูป: ตัวอย่างการเชื่อมต่อระหว่างบอร์ด <strong>Arduino Uno Rev.3</strong> ที่ได้นำมาใช้เป็นอุปกรณ์ <strong>ISP Programmer</strong>
+เพื่ออัปโหลดเฟิร์มแวร์ไปยังบอร์ด <strong>Arduino Nano v3 (Target)</strong></p>
+<p>ถ้าใช้บอร์ด <strong>Arduino Uno</strong> เป็น <strong>ArduinoISP</strong> ขาที่ใช้งานมีดังนี้</p>
+<ul>
+<li><strong>5V = VCC</strong></li>
+<li><strong>GND = GND</strong></li>
+<li><strong>D13 = SCK</strong></li>
+<li><strong>D12 = MISO</strong></li>
+<li><strong>D11 = MOSI</strong></li>
+<li><strong>D10 = RESET</strong></li>
+</ul>
+<p><img alt="" src="attiny85_icsp_connector.png" /></p>
+<p>รูป: คอนเนกเตอร์ <strong>AVR ISP</strong> เปรียบเทียบระหว่าง <strong>2x3 pins</strong> กับ <strong>2x5 pins</strong></p>
+<p>&nbsp;</p>
+<p>การต่อวงจรโดยใช้ <strong>ATtiny85</strong> บนเบรดบอร์ด จะต้องมีการเชื่อมต่อสายสัญญาณกับอุปกรณ์
+<strong>ISP/ICSP Programmer</strong> เพื่อใช้ในการอัปโหลดโปรแกรม และสามารถใช้แรงดันไฟเลี้ยงจากขา
+<strong>VCC (+5V)</strong> กับ <strong>GND</strong> ของอุปกรณ์ดังกล่าวได้</p>
+<p><img alt="" src="attiny85_icsp_breadboard.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรโดยใช้ชิป <strong>ATtiny85</strong> บนเบรดบอร์ด
+และเชื่อมต่อกับอุปกรณ์ <strong>USBasp</strong> หรือ <strong>Arduino ISP</strong></p>
+<p><img alt="" src="arduino_isp_example.png" /></p>
+<p>รูป:  การคอมไพล์โค้ดตัวอย่างและอัปโหลดไปยังบอร์ด <strong>Arduino Uno</strong> 
+เปลี่ยนเป็นอุปกรณ์ <strong>Arduino ISP</strong></p>
+<p><img alt="" src="uno_attiny85_arduino_isp.jpg" /></p>
+<p>รูป: บอร์ด <strong>Arduino Uno</strong> ที่ถูกโปรแกรมและใช้งานเป็น <strong>Arduino ISP</strong> (ซ้ายมือ) 
+และ <strong>ATtiny85</strong> บนเบรดบอร์ด (ขวามือ)</p>
+<p>ข้อสังเกต:</p>
+<ul>
+<li><strong>ATtiny85</strong> จะถูกโปรแกรมให้ทำงานด้วยความถี่  <strong>1MHz (Internal)</strong> แต่ถ้าจะใช้ความถี่เป็น
+<strong>8MHz (Internal)</strong> ให้ทำขั้นตอน <strong>Burn Bootloader</strong> โดยใช้ <strong>Arduino IDE / avrdude</strong> เพื่อเขียนค่า <strong>Fuse Low Byte</strong> ให้ถูกต้อง และเป็นการปรับค่าตัวหารความถี่ของ <strong>Clock Source</strong> 
+(<code>CKDIV8=0</code>)</li>
+</ul>
+<p><img alt="" src="arduino_attiny85_arduino_isp.png" /></p>
+<p>รูป: การอัปโหลด <strong>Arduino Sketch</strong> ไปยัง <strong>ATtiny85 (Target MCU)</strong> 
+โดยใช้บอร์ด <strong>Arduino Uno</strong> เป็นอุปกรณ์ <strong>Arduino ISP</strong></p>
+<p><strong>คำแนะนำ</strong></p>
+<ul>
+<li>ให้ใช้ซอฟต์แวร์ <strong>Tinkercad</strong> หรือ <strong>Wokwi Simulator</strong>
+เพื่อเขียนโค้ดและจำลองการทำงาน ตรวจสอบความถูกต้อง จนมั่นใจแล้วว่าถูกต้อง จึงนำไปทดสอบกับอุปกรณ์จริง</li>
+<li>เมื่อต้องการอัปโหลดโปรแกรมไปยัง <strong>ATtiny85</strong>
+ด้วยวิธี <strong>ICSP</strong> (โดยใช้อุปกรณ์ <strong>USBasp</strong> หรือ <strong>Arduino ISP</strong>) ซึ่งต้องใช้ขา <strong>I/O</strong> 
+ที่เกี่ยวข้องหลายขา ไม่ควรต่อใช้งานขา <strong>I/O</strong> กับวงจรอื่นในขณะอัปโหลดโปรแกรม
+ดังนั้นควรแยกวงจรสำหรับอัปโหลดโปรแกรมจากวงจรที่ใช้งานในการทดลอง</li>
+<li>เมื่ออัปโหลดโปรแกรมไปยัง <strong>ATtiny85</strong> ได้สำเร็จแล้ว จึงนำไปใส่ลงในวงจรสำหรับการทดลองที่ได้เตรียมไว้</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>ตัวอย่างโค้ด: การอ่านค่าอินพุตแบบแอนะล็อก</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการอ่านค่าจากช่องสัญญาณอินพุตแบบแอนะล็อก เช่น ขา <strong>PB2 / ADC1</strong> 
+โดยใช้คำสั่ง <code>analogRead()</code> ของ <strong>Arduino API</strong> ซึ่งจะได้ค่าที่เป็นเลขจำนวนเต็มขนาด 10 บิต
+ในช่วง 0..1023 แล้วเก็บไว้ในตัวแปร <code>value</code> และนำค่าไปเปรียบเทียบกับค่าคงที่
+เช่น ถ้าค่าที่อ่านได้มากกว่า  <code>THRESHOLD_VALUE</code> จะได้ลอจิกเป็น 1 แต่ถ้าไม่ใช่ จะได้ค่าลอจิกเป็น 0
+ผลลัพธ์นี้นำไปใช้กับเอาต์พุตที่ขา <strong>PB0</strong> สำหรับวงจร <strong>LED</strong> </p>
+<pre><code class="language-c++">#define LED_PIN   (0)  // D0 or PB0 pin
+#define ADC_PIN   (A1) // A1 or PB2 / ADC1 pin
+#define THRESHOLD_VALUE (511)
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+}
+
+void loop() {
+  // read an analog value from the ADC pin
+  int value = analogRead( ADC_PIN );
+  // compare the analog input value with the threshold value 
+  // and use the result to update output
+  digitalWrite( LED_PIN, value &gt; THRESHOLD_VALUE );
+  delay(10);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากต่อวงจรและจำลองการทำงานด้วย <strong>WokWi Simulator</strong> 
+ก็สามารถเลือกใช้โมดูลที่ให้สัญญาณเอาต์พุตแบบแอนะล็อก เช่น </p>
+<ul>
+<li>โมดูลที่มีตัวต้านทานปรับค่าได้และต่อใช้งานเป็นวงจรแบ่งแรงดันไฟฟ้า  (<strong>Voltage Divider</strong>)</li>
+<li>โมดูลเซนเซอร์แสงที่ใช้ตัวต้านทานไวแสง หรือ <strong>LDR (Light Dependent Resistor)</strong> 
+ต่ออนุกรมกับตัวต้านทานให้เป็นวงจรแบ่งแรงดันไฟฟ้า</li>
+</ul>
+<p><img alt="" src="wokwi_demo_potentiometer.png" /></p>
+<p>รูป:  การอ่านค่าจากโมดูลที่มีตัวต้านทานปรับค่าได้</p>
+<p><img alt="" src="wokwi_demo_ldr.png" /></p>
+<p>รูป: การอ่านค่าจากโมดูลเซ็นเซอร์แสงที่ใช้ <strong>LDR</strong></p>
+<p>ลองมาดูตัวอย่างโมดูลตรวจจับการเปลี่ยนแปลงความเข้มแสง โดยใช้ <strong>LDR</strong> ต่ออนุกรมกับตัวต้านทานคงที่ 
+(เช่น <strong>10k&Omega;</strong>) และให้เอาต์พุตแบบแอนะล็อก (ขา <strong>A0</strong>)</p>
+<p><strong>LDR</strong> จะให้มีค่าความต้านทานมากขึ้นเมื่อความเข้มแสงลดลง ในวงจรตัวอย่าง 
+ถ้าแสงน้อยลง จะทำให้ได้เอาต์พุต-แอนะล็อกมีค่ามากขึ้น (ระดับแรงดันไฟฟ้าสูงขึ้น)</p>
+<p>โมดูลนี้มีไอซี <strong>LM393 Voltage Comparator</strong> สำหรับเปรียบเทียบแรงดันที่ได้จากวงจร <strong>LDR</strong>
+กับแรงดันอ้างอิง (ปรับระดับได้โดยใช้ตัวต้านทานปรับค่าได้หรือ <strong>Trimpot</strong>) และให้เอาต์พุตแบบดิจิทัล  (ขา <strong>D0</strong>)</p>
+<p>โมดูลมีขาเชื่อมต่อดังนี้</p>
+<ul>
+<li><strong>VCC (+5V)</strong></li>
+<li><strong>GND</strong></li>
+<li><strong>D0 (Digital output signal)</strong></li>
+<li><strong>A0 (Analog Output Signal)</strong></li>
+</ul>
+<p><img alt="" src="ldr_lm393_sensor_module.png" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ <strong>Light Sensor Module</strong> ที่ให้เอาต์พุตทั้งแบบแอนะล็อกและดิจิทัล</p>
+<p>จากโค้ดตัวอย่าง เราอาจจะปรับเปลี่ยนพฤติกรรมการทำงานใหม่ เช่น ให้สร้างสัญญาณ <strong>PWM
+(Pulse Width Modulation)</strong> ที่มีความถี่คงที่ แต่ปรับเปลี่ยนค่า <strong>Duty Cycle</strong> ได้</p>
+<p>คำสั่งของ <strong>Arduino API</strong> สำหรับสร้างสัญญาณ <strong>PWM</strong> คือ <code>analogWrite()</code> 
+ใช้กับค่าที่เป็นเลขจำนวนเต็มในช่วง 0..255</p>
+<pre><code class="language-c++">#define LED_PIN   (0)  // PB0 pin
+#define ADC_PIN   (A1) // PB2/ADC1 pin
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+}
+
+void loop() {
+  // read an analog value from the ADC pin
+  int value = analogRead( ADC_PIN );
+  // map the value from 0..1023 to 0..255
+  value = map( value,0,1023,0,255 );
+  // update PWM output
+  analogWrite( LED_PIN, value );
+  delay(10);
+}
+</code></pre>
+<p><img alt="" src="attiny85_adc_pwm.jpg" /></p>
+<p>รูป: การทดลองต่อวงจรโดยใช้ตัวต้านทานปรับค่าได้ (<strong>Potentiometer</strong>) 
+สร้างสัญญาณแอนะล็อกป้อนให้ <strong>ATtiny85</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานไมโครคอนโทรลเลอร์ <strong>ATtiny85</strong> ที่มีขนาดเล็ก ใช้ตัวถังแบบ <strong>DIP-8</strong>
+สามารถนำไปต่อใช้งานบนเบรดบอร์ดได้ง่าย และสามารถเขียนโปรแกรมโดยใช้คำสั่งของ <strong>Arduino</strong> ได้
+มีซอฟต์แวร์อย่างเช่น <strong>Tinkercad Circuits</strong> และ <strong>Wokwi Simulator</strong>
+ที่สามารถจำลองการทำงานของโปรแกรมได้เสมือนจริง ดังนั้นผู้ใช้สามารถทดสอบการทำงานของโค้ดก่อนที่จะนำไปใช้กับอุปกรณ์จริง</p>
+<p>เอกสารสำหรับศึกษาเพิ่มเติม: <a href="Arduino_ATTiny85_Coding_2022-06-10.pdf"><strong>Arduino_ATTiny85_Coding.pdf</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-06-11 | Last Updated: 2022-06-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
