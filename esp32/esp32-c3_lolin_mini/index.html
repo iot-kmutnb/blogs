@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/esp32/esp32-c3_lolin_mini/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเริ่มต้นใช้งานบอร์ด WeMos ESP32-C3 Mini - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c++.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#wemos-esp32-c3-mini" class="nav-link">การเริ่มต้นใช้งานบอร์ด WeMos ESP32-C3 Mini</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#esp32-c3" class="nav-link">&#9655; ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wemos-esp32-c3-mini_1" class="nav-link">&#9655; WeMos ESP32-C3 Mini</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino" class="nav-link">&#9655; การเขียนโปรแกรมด้วย Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketches" class="nav-link">&#9655; ตัวอย่าง Arduino Sketches</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#micropython" class="nav-link">&#9655; การเขียนโปรแกรมด้วย MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#thonny-ide" class="nav-link">&#9655; การติดตั้งและใช้งาน Thonny IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="wemos-esp32-c3-mini">การเริ่มต้นใช้งานบอร์ด WeMos ESP32-C3 Mini<a class="headerlink" href="#wemos-esp32-c3-mini" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="esp32-c3">&#9655; <strong>ESP32-C3</strong><a class="headerlink" href="#esp32-c3" title="Permanent link">#</a></h2>
+<p><a href="https://www.espressif.com/en/products/socs/esp32-c3"><strong>ESP32-C3 Series</strong></a>
+(<a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3_datasheet_en.pdf"><strong>Datasheet</strong></a> | <a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf"><strong>Technical Manual</strong></a>)
+เป็นชิปประเภทไมโครคอนโทรลเลอร์ (<strong>MCU: Microcontroller Unit</strong>) หรือ <strong>MCU-based System-on-Chip</strong> ของบริษัท <a href="https://www.espressif.com/"><strong>Espressif Systems</strong></a> และได้มีการเปิดตัวครั้งแรกในช่วงปลายปีพ.ศ. 2563
+ชิปรุ่นนี้มีซีพียู 32 บิต แบบแกนเดียว (<strong>Single-Core</strong>) ที่ทำงานได้ตามสถาปัตยกรรมของชุดคำสั่งที่เรียกว่า <a href="https://en.wikipedia.org/wiki/RISC-V"><strong>RISC-V</strong></a> (อ่านออกเสียงว่า <em>Risk-Five</em>) </p>
+<p>บทความนี้จะกล่าวถึง การทดลองใช้งานบอร์ด <a href="https://www.wemos.cc/en/latest/c3/index.html"><strong>ESP32 C3 Mini (v1.0.0)</strong></a> ของ <a href="https://www.wemos.cc/en/latest"><strong>WeMos.cc</strong></a> ซึ่งเป็นบริษัทในประเทศจีน
+แต่ก็ยังมีบอร์ดไมโครคอนโทรลเลอร์อื่นอีกที่ใช้ชิป <strong>ESP32-C3</strong> ให้เลือกใช้งานได้หลายรูปแบบ จากหลายบริษัทผู้ผลิต ตามที่ได้เคยนำเสนอไว้ในบทความ: <a href="../esp32-c3_intro/">"การเริ่มต้นใช้งานชิป <strong>ESP32-C3 (RISC-V)</strong>"</a> </p>
+<p>หลายคนอาจเคยใช้บอร์ดของ <strong>WeMos</strong> มาก่อน เช่น บอร์ดที่ใช้ชิป <strong>ESP8266EX</strong> (เช่น บอร์ด
+<strong>WeMos D1 Mini / Lite</strong> และบอร์ด <strong>D1 Mini Shields</strong> ประเภทต่าง ๆ ) และ <strong>ESP32</strong> (เช่น บอร์ด <strong>LOLIN D32</strong>) เป็นต้น หากพิจารณาขนาดของบอร์ดและตำแหน่งของขา จะเห็นได้ว่า บอร์ด <strong>WeMos C3 Mini</strong> ยังคงเหมือนบอร์ด <strong>WeMos D1 Mini</strong> ดังนั้นจึงมีข้อดีอย่างหนึ่งคือ เราสามารถใช้ <strong>WeMos Shields</strong> เหมือนเดิมได้</p>
+<p><img alt="" src="wemos_esp8266_shields.png" /></p>
+<p>รูป: บอร์ด <strong>WeMos D1 Mini (ESP8266EX-based)</strong> และตัวอย่างโมดูล <strong>WeMos Shields</strong></p>
+<p><img alt="" src="esp32-c3_mini_front_back.jpg" /></p>
+<p>รูป: บอร์ด <strong>WeMos C3 Mini (V1.0.0)</strong> (มุมมองด้านหน้าและด้านหลัง)</p>
+<p><img alt="" src="esp32_c3_mini_pinout.png" /></p>
+<p>รูป: ตำแหน่งขาบนบอร์ด <strong>WeMos C3 Mini (V1.0.0) - Pinout</strong> </p>
+<p>&nbsp;</p>
+<p>บอร์ด <strong>WeMos ESP32-C3 Mini</strong> ถือว่ามีขนาดเล็ก แต่หากต้องการใช้บอร์ด <strong>ESP32-C3</strong>
+ที่มีขนาดเล็ก ก็ลองพิจารณาตัวเลือกอื่นได้อีก เช่น</p>
+<ul>
+<li><a href="https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/"><strong>Seeed Studio XIAO ESP32-C3</strong></a></li>
+<li><a href="https://shop.m5stack.com/products/m5stamp-c3u-mate-with-pin-headers"><strong>M5Stack M5Stamp C3U</strong></a></li>
+<li><a href="https://wiki.dfrobot.com/SKU_DFR0868_Beetle_ESP32_C3"><strong>DFRobot Beetle ESP32-C3</strong></a></li>
+<li><a href="https://www.adafruit.com/product/5405"><strong>Adafruit QT Py ESP32-C3 WiFi Dev Board</strong></a></li>
+</ul>
+<p><img alt="" src="esp32_c3_small_boards.png" /></p>
+<p>รูป: ตัวอย่างบอร์ด <strong>ESP32-C3</strong> ที่มีขนาดเล็ก และใช้งานได้กับเบรดบอร์ด</p>
+<hr />
+<h2 id="wemos-esp32-c3-mini_1">&#9655; <strong>WeMos ESP32-C3 Mini</strong><a class="headerlink" href="#wemos-esp32-c3-mini_1" title="Permanent link">#</a></h2>
+<p>คุณสมบัติของบอร์ดโดยสรุปคร่าว ๆ มีดังนี้</p>
+<ul>
+<li>ใช้ชิป <strong>ESP32-C3FH4</strong> ซึ่งได้รวม <strong>4MB SPI Flash</strong> ไว้ภายในแล้ว</li>
+<li>มีตัวประมวลผลแบบแกนเดียว <strong>32-bit RISC-V @160MHz</strong></li>
+<li>รองรับ <strong>Wi-Fi (2.4GHz)</strong> และ <strong> Bluetooth 5 (LE)</strong></li>
+<li>มีระดับแรงดันไฟฟ้าในการทำงาน: <strong>3.3V Operating Voltage</strong></li>
+<li>มี 12 ขา สำหรับ <strong>Digital I/O Pins</strong></li>
+<li>มีวงจร <strong>LED (Blue)</strong> อยู่บนบอร์ด ต่อกับขา <strong>GPIO-7</strong></li>
+<li>มีขาอินพุต-แอนะล็อก 6 ขา  (<strong>12-bit ADC, A0..A5 pins</strong>)</li>
+<li>มีปุ่มรีเซต (<strong>RST</strong>) ซึ่งต่อกับขา <strong>EN</strong> ของชิป <strong>ESP32-C3</strong></li>
+<li>มีปุ่ม <strong>SW2 (BOOT)</strong> ซึ่งต่อกับขา <strong>GPIO-9</strong> <ul>
+<li>ทำงานแบบ <strong>Active-Low</strong> แต่ไม่ได้ต่อตัวต้านทานแบบ <strong>Pull-up</strong></li>
+<li>ใช้สำหรับเข้าสู่โหมด <strong>Bootloader</strong> เมื่อมีการรีเซตการทำงาน และอัปโหลดโปรแกรมผ่านทางพอร์ต <strong>USB</strong></li>
+</ul>
+</li>
+<li>มีไอซี  <strong><a href="https://datasheet.lcsc.com/szlcsc/Nanjing-Micro-One-Elec-ME6211C33M5G-N_C82942.pdf">ME6211C33</a> (SOT23-5)</strong> ซึ่งเป็น <strong>LDO Voltage Regulator</strong> <ul>
+<li>ทำหน้าที่แปลงแรงดันจาก <strong>VBUS</strong> ให้ได้เอาต์พุต <strong>3.3V / 500mA (max.)</strong> สำหรับการทำงานของวงจรบนบอร์ด</li>
+</ul>
+</li>
+<li>สามารถใช้ไฟเลี้ยง <strong>VBUS (+5V)</strong> จากพอร์ต <strong>USB Type-C</strong> หรือขาจาก <strong>VBUS</strong> <ul>
+<li>แต่เนื่องจากไม่มีการต่อไดโอดป้องกันและกำหนดทิศทางการไหลของกระแส ดังนั้นจึงต้องระมัดระวังในการต่อวงจร
+หากเสียบสาย <strong>USB</strong> เชื่อมต่อกับคอมพิวเตอร์ และป้อนแรงดันไฟเลี้ยง <strong>5V</strong> จากภายนอกพร้อมกัน</li>
+</ul>
+</li>
+<li>ไม่ได้ใช้ชิป <strong>USB-to-Serial Bridge</strong> <ul>
+<li>สามารถรับส่งข้อมูลแบบอนุกรมโดยใช้ <strong>USB-CDC</strong> เนื่องจากชิป <strong>ESP32-C3</strong> รองรับการใช้งาน 
+<strong>Native USB</strong> และ</li>
+<li>รองรับการใช้งานรูปแบบที่เรียกว่า <strong> USB-to-JTAG interface</strong> 
+(ใช้สำหรับการดีบักการทำงานของโปรแกรมในฮาร์ดแวร์ ร่วมกับโปรแกรม <strong>OpenOCD / GDB</strong>)</li>
+</ul>
+</li>
+<li>ขา <strong>GPIO-20 / GPIO-21</strong> ใช้สำหรับสัญญาณ <strong>RXD / TXD</strong> ใช้สำหรับ <strong>Hardware Serial (UART)</strong> ตามลำดับ</li>
+<li>ขา <strong>GPIO-18 / GPIO-19</strong> จะใช้สำหรับ <strong>USB D- / D+</strong> (คู่สัญญาณข้อมูลของบัส <strong>USB</strong>) ตามลำดับ</li>
+<li>ในการเชื่อมต่อกับบัส <strong>I2C</strong> แนะนำให้ใช้ขา <strong>GPIO-8 / GPIO-10</strong> สำหรับสัญญาณ <strong>SDA / SCL</strong> ตามลำดับ</li>
+<li>ในการเชื่อมต่อกับบัส <strong>SPI</strong> แนะนำให้ใช้ขา <strong>GPIO-2 / GPIO-3 / GPIO-4</strong> สำหรับสัญญาณ <strong>SCK / MISO / MOSI</strong> ตามลำดับ</li>
+<li><strong>ข้อสังเกต</strong>:  บริษัท <strong>WeMos</strong> ได้แนะนำให้ตั้งค่ากำลังส่ง <strong>Tx Power</strong> ไว้ไม่เกิน <strong>8.5 dBm</strong> เมื่อเปิดใช้งาน <strong>Wi-Fi</strong> เนื่องจากข้อจำกัดของไอซี <strong>ME6211C33</strong> ในการจ่ายกระแสให้ <strong>ESP32-C3</strong> </li>
+</ul>
+<p><img alt="" src="esp32_c3_mini_schematic.png" /></p>
+<p>รูป: ผังวงจร <strong>WeMos C3 Mini (V1.0.0) - Schematic</strong> 
+(<a href="wemos_esp32_c3_mini_v1.0.0_schematic.pdf">.pdf</a>)</p>
+<hr />
+<h2 id="arduino">&#9655; <strong>การเขียนโปรแกรมด้วย Arduino</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
+<p><a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core</strong></a> ตั้งแต่เวอร์ชัน <strong>v2.0.0+</strong> ได้ใช้ <a href="https://github.com/espressif/esp-idf"><strong>ESP-IDF v4.4+</strong></a> เป็นพื้นฐานในการพัฒนาซอฟต์แวร์ และรองรับการเขียนโปรแกรมสำหรับบอร์ดที่ใช้ชิป <strong>ESP32</strong>, <strong>ESP32-S2</strong>, <strong>ESP32-S3</strong> และ <strong>ESP32-C3</strong> เป็นต้น และใช้ได้กับทั้ง <strong>Arduino IDE</strong> และ <strong>VS Code IDE + PlatformIO extension</strong> (สามารถศึกษาการใช้งานได้จากเอกสารออนไลน์ <a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/"><strong>Arduino-ESP32 Online Documentation</strong></a>)</p>
+<p>ในบทความนี้จะมาลองใช้ <strong>Arduino-ESP32 Core</strong> สำหรับบอร์ด <strong>ESP32-C3</strong>
+โดยจะต้องติดตั้งไฟล์ <code>package_esp32_index.json</code> (เป็น <strong>Stable Version</strong>) สำหรับ <strong>Arduino IDE</strong> ก่อน</p>
+<p><strong>URL:</strong> <a href="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"><code>https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code></a></p>
+<p><img alt="" src="arduino_esp32_install_update.png" /></p>
+<p>รูป: การติดตั้งหรืออัปเดต <strong>Arduino ESP32 Core</strong> (เช่น เลือกใช้เวอร์ชัน <strong>v2.0.4</strong>) สำหรับ <strong>Arduino IDE</strong></p>
+<p><img alt="" src="arduino_esp32_c3_build.png" /></p>
+<p>รูป: การตั้งค่าสำหรับตัวเลือกต่าง ๆ ที่เกี่ยวข้องกับการใช้งาน <strong>ESP32-C3</strong></p>
+<hr />
+<h2 id="arduino-sketches">&#9655; <strong>ตัวอย่าง Arduino Sketches</strong><a class="headerlink" href="#arduino-sketches" title="Permanent link">#</a></h2>
+<p>มาลองดูตัวอย่าง <strong>Arduino Sketches</strong> สำหรับทดลองใช้กับบอร์ด <strong>WeMos LOLIN C3 Mini</strong></p>
+<p><strong>ตัวอย่างโค้ดที่ 1:</strong></p>
+<pre><code class="language-c++">// WeMos ESP32-C3 Mini board
+#include &quot;esp_arduino_version.h&quot;
+#include &quot;esp_idf_version.h&quot;
+#include &quot;esp_chip_info.h&quot;
+
+#define LED_PIN   (7) // onboard LED (GPIO-7)
+#define SW2_PIN   (9) // SW2/BOOT button, active-low (GPIO-9)
+
+String str;
+
+void show_esp_info() {
+  esp_chip_info_t chip_info;
+  // get ESP32 chip info
+  esp_chip_info( &amp;chip_info );
+
+  char sbuf[32];
+  switch (chip_info.model) {
+    case CHIP_ESP32:
+      sprintf( sbuf, &quot;ESP32&quot; ); break;
+    case CHIP_ESP32S2:
+      sprintf( sbuf, &quot;ESP32-S2&quot; ); break;
+    case CHIP_ESP32S3:
+      sprintf( sbuf, &quot;ESP32-S3&quot; ); break;
+    case CHIP_ESP32C3:
+      sprintf( sbuf, &quot;ESP32-C3&quot; ); break;
+    case CHIP_ESP32H2:
+      sprintf( sbuf, &quot;ESP32-H2&quot; ); break;
+    default:
+      sprintf( sbuf, &quot;ESP Unknown&quot; ); break;
+  }
+  Serial.printf( &quot;ESP Chip: %s\n&quot;, sbuf );
+
+  // show the ESP32 unique chip ID and Flash size (MBytes)
+  if (esp_flash_init(esp_flash_default_chip)==ESP_OK) {
+    uint64_t id = 0; // 64-bit value
+    uint32_t flash_size = 0; // flash size in bytes
+    if (esp_flash_read_unique_chip_id(NULL, &amp;id)==ESP_OK) {
+      Serial.printf( &quot;Chip ID: 0x%08x\n&quot;, id );
+    }
+    if (esp_flash_get_size(NULL, &amp;flash_size)==ESP_OK) {
+      Serial.printf( &quot;Flash size: %lu MB\n&quot;, flash_size/(1024*1024) );    
+    }
+  }
+
+  Serial.printf( &quot;Number of CPU cores: %u\n&quot;, chip_info.cores );
+  Serial.printf( &quot;Active CPU core ID: %lu\n&quot;, cpu_hal_get_core_id() );
+  Serial.printf( &quot;Chip revision: rev.%u\n&quot;, chip_info.revision );
+  Serial.printf( &quot;Xtal Freq.: %4lu MHz\n&quot;, getXtalFrequencyMhz() );
+  Serial.printf( &quot; CPU Freq.: %4lu MHz\n&quot;, getCpuFrequencyMhz() );
+  Serial.printf( &quot; APB Freq.: %4lu MHz\n&quot;, getApbFrequency()/1000000UL );
+  Serial.printf( &quot;FreeRTOS tick rate:   %lu ticks/sec\n&quot;, pdMS_TO_TICKS(1000) );
+  Serial.printf( &quot;FreeRTOS tick period: %lu msec\n&quot;, portTICK_PERIOD_MS );
+  Serial.printf( &quot;Free Heap: %lu bytes\n&quot;, esp_get_free_heap_size() );  
+
+  // show MAC address
+  uint8_t mac[8];
+  if ( esp_read_mac(mac,ESP_MAC_WIFI_STA)==ESP_OK ) {
+    Serial.printf( &quot;MAC: %02x:%02x:%02x:%02x:%02x:%02x\n&quot;, 
+      mac[0],mac[1],mac[2],mac[3],mac[4],mac[5] );    
+  }
+  Serial.flush();
+  delay(10);
+}
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) { delay(1); } // wait for serial port to connect.
+  pinMode( LED_PIN, OUTPUT );
+  pinMode( SW2_PIN, INPUT_PULLUP );
+
+  // wait until the SW2 button is pressed or after 5-second timeout
+  uint32_t timeout_ms = millis() + 5000; // 5 seconds
+  while ( millis() &lt; timeout_ms ) {
+    if ( !digitalRead(SW2_PIN) ) { 
+      Serial.println( F(&quot;SW2 button is pressed\n&quot;) );
+      break;
+    } 
+    delay(10);
+  }
+
+  Serial.println( F(&quot;WeMos LOLIN C3 Mini...&quot;) );
+  Serial.println( F(&quot;Compiled: &quot; __DATE__ &quot;, &quot; __TIME__) );
+  Serial.printf( &quot;ESP32 chip model: %s\n&quot;, ESP.getChipModel() );
+  // show ESP-IDF version
+  Serial.printf( &quot;ESP-IDF version: %s\n&quot;, ESP.getSdkVersion() );
+  // show the Arduino-ESP32 version
+  Serial.printf( &quot;Arduino-ESP32 version: %d.%d.%d\n&quot;,
+                 ESP_ARDUINO_VERSION_MAJOR,
+                 ESP_ARDUINO_VERSION_MINOR,
+                 ESP_ARDUINO_VERSION_PATCH );
+  Serial.flush();
+
+  // show esp32 chip &amp; system info
+  show_esp_info();
+}
+
+void loop() {
+  int next_state = !digitalRead( LED_PIN );
+  digitalWrite( LED_PIN, next_state );
+  str = &quot;onboard LED: &quot;;
+  str += next_state;
+  str += &quot;, SW2 button: &quot;;
+  str += digitalRead( SW2_PIN );
+  Serial.println( str.c_str() );
+  Serial.flush();
+  delay( 500 );
+}
+</code></pre>
+<p><img alt="" src="arduino_esp32_c3_demo-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ปรากฎใน <strong>Arduino Serial Monitor</strong>
+เมื่อได้ทดสอบการทำงานของโค้ดตัวอย่างที่ 1</p>
+<hr />
+<p><strong>ตัวอย่างโค้ดที่ 2:</strong> สาธิตการเชื่อมต่อกับเครือข่าย <strong>WiFi</strong> ตามที่ระบุไว้โดย <strong>SSID</strong> และรหัสผ่านในการเชื่อมต่อ</p>
+<p>เมื่อเชื่อมต่อกับเครือข่าย <strong>WiFi</strong> ได้แล้ว จะมีการตั้งค่าวันเวลาของระบบโดยใช้ <strong>NTP (Network Time Protocol)</strong> และสื่อสารกับเครื่องแม่ข่ายในอินเทอร์เนต็ เช่น <strong>pool.ntp.org</strong> และถัดไปจะเป็นการตรวจสอบหาระบบเครือข่าย <strong>WiFi</strong> บริเวณโดยรอบ </p>
+<pre><code class="language-c++">#include &lt;WiFi.h&gt;
+#include &lt;time.h&gt;
+
+#define WIFI_SSID     &quot;xxxxxxxxxxxx&quot;
+#define WIFI_PASSWD   &quot;xxxxxxxxxxxx&quot;
+
+const char* ntp_server = &quot;pool.ntp.org&quot;;
+const long  gmt_offset_sec = (7 * 3600); // GMT+7
+const int   daylight_offset_sec = 0;
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial){ delay(10); }
+  Serial.println( &quot;ESP32-C3 Mini v1.0.0&quot; );
+  // use WiFi STA (station mode)
+  WiFi.mode( WIFI_STA ); 
+  WiFi.disconnect();
+  // set WiFi Tx power to 11dBm (see: WiFi/WiFiGeneric.h)
+  wifi_power_t tx_power = WIFI_POWER_11dBm;
+  WiFi.setTxPower( tx_power );
+  delay(100);
+  // connect to Wi-Fi AP
+  WiFi.begin( WIFI_SSID, WIFI_PASSWD );
+  // wait until Wi-Fi is connected.
+  while ( WiFi.status() != WL_CONNECTED ) {
+    Serial.print( &quot;.&quot; );
+    delay(500);
+  }
+  Serial.println( &quot;&quot; );
+  // show the IP address assigned by DHCP
+  Serial.printf( &quot;IP address: %s\n&quot;, 
+                 WiFi.localIP().toString().c_str() );
+
+  // see: &lt;arduino-esp32&gt;/cores/esp32/esp32-hal-time.c
+  // set local date and time using NTP
+  configTime( gmt_offset_sec, daylight_offset_sec, ntp_server );
+  // show current date and time
+  show_localtime();
+  delay(2000);
+
+  // disconnect WiFi network, but keep the WiFi active
+  WiFi.disconnect(false);
+}
+
+void show_localtime(){
+  struct tm timeinfo;
+  uint32_t timeout_ms = 5000;
+  if( !getLocalTime(&amp;timeinfo, timeout_ms) ) {
+    Serial.println( &quot;Failed to get local time!&quot; );
+  } else {
+    char sbuf[32];
+    strftime( sbuf, 31, &quot;%A, %B %d %Y %H:%M:%S&quot;, &amp;timeinfo );
+    Serial.println( sbuf );
+  }
+  Serial.flush();
+}
+
+void wifi_scan() {
+  Serial.print( &quot;WiFi scan (synchronous mode) started...&quot; );
+  int n = WiFi.scanNetworks();
+  Serial.println( &quot; done&quot; );
+  if ( n==0 ) {
+     Serial.println( &quot;No WiFi networks found...&quot; );
+  } else {
+     Serial.printf( &quot;WiFi networks found: %d\n&quot;, n );
+     for ( int i=0; i &lt; n; ++i ) {
+        // show SSID and RSSI for each network found
+         Serial.printf( &quot;%2d) SSID='%s', RSSI=%d, CHANNEL=%d\n&quot;, (i+1), 
+              WiFi.SSID(i).c_str(), WiFi.RSSI(i), WiFi.channel(i) );
+     }
+  }
+  Serial.println( &quot;&quot; );
+  Serial.flush();
+}
+
+void loop() {
+  wifi_scan();
+  show_localtime();
+  delay( 2000 );
+}
+</code></pre>
+<hr />
+<p><strong>ตัวอย่างโค้ดที่ 3:</strong> สาธิตการตรวจสอบอุปกรณ์ที่เชื่อมต่อกับบอร์ด <strong>ESP32-C3</strong> ด้วยบัส <strong>I2C</strong><br />
+(เลือกใช้ขา <strong>GPIO-8 &amp; GPIO-10</strong> สำหรับสัญญาณ <strong>SDA &amp; SCL</strong> ตามลำดับ)</p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+
+#define I2C_SDA_PIN (8)  // GPIO-8
+#define I2C_SCL_PIN (10) // GPIO-10
+
+void setup() {
+  Serial.begin( 115200 );
+  while (!Serial) { delay(10); }
+  // set I2C pins for ESP32-C3 Mini board
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+  Wire.setClock( 100000 ); // 100kHz
+}
+
+void i2c_scan() {
+  int n_devices = 0;
+  Serial.println( &quot;Scanning I2C bus...&quot; );
+  Serial.print( &quot;   &quot; );
+  for ( uint8_t col=0; col &lt; 16; col++ ) {
+    Serial.printf( &quot;%3x&quot;, col );
+  }
+  Serial.println( &quot;&quot; );
+
+  uint8_t addr=0;
+  for( uint8_t row=0; row &lt; 8; row++ ) {
+    Serial.printf( &quot;%02x:&quot;, row &lt;&lt; 4 );
+    for ( uint8_t col=0; col &lt; 16; col++ ) {
+      if ( row == 0 &amp;&amp; addr&lt;=1 ) {
+        Serial.print(&quot;   &quot;);
+      } else {
+        Wire.beginTransmission( addr );
+        if ( Wire.endTransmission()&gt;0 ) {
+          Serial.printf( &quot; --&quot; );
+        } else {
+          Serial.printf( &quot; %2x&quot;, addr );
+          n_devices++;
+        }
+      }
+      addr++;
+    }
+    Serial.println( &quot;&quot; );
+  }
+  Serial.println( &quot;---------------------\n\n&quot; );
+  Serial.flush();
+}
+
+void loop() {
+  i2c_scan();
+  delay(5000);
+}
+</code></pre>
+<p><img alt="" src="arduino_i2c_scan.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่แสดงการตรวจสอบอุปกรณ์ที่เชื่อมต่อกับ <strong>ESP32-C3</strong>
+ด้วยบัส <strong>I2C</strong> (มี 3 อุปกรณ์เชื่อมต่ออยู่)</p>
+<p>ในรูปตัวอย่าง  (เรียงจากซ้ายไปขวา)  จะเห็นได้ว่า มีอุปกรณ์ 3 ชนิด เชื่อมต่อกับบัส <strong>I2C</strong> เดียวกัน ได้แก่</p>
+<ul>
+<li><strong>GY-302 BH1750 Light Sensor</strong></li>
+<li><strong>GY-213V SI7021 Tempeature &amp; Humidity Sensor</strong> และ</li>
+<li><strong>CJMCU-8574 8-bit I/O Expander</strong></li>
+</ul>
+<p><img alt="" src="i2c_devices.jpg" /></p>
+<p>รูป: การต่อวงจรเพื่อเชื่อมต่ออุปกรณ์ 3 ชนิด ในระบบบัส <strong>I2C</strong> เดียวกัน (<strong>3.3V logic level</strong>) </p>
+<hr />
+<p><strong>ตัวอย่างโค้ดที่ 4:</strong> สาธิตการอ่านค่าจากโมดูล <strong>BH1750 Ambient Ligiht Sensor</strong>
+โดยใช้บัส <strong>I2C</strong> และใช้คำสั่งของไลบรารี <a href="https://github.com/claws/BH1750"><strong>BH1750</strong></a>
+สำหรับ <strong>Arduino</strong></p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+#include &lt;BH1750.h&gt; // https://github.com/claws/BH1750 
+
+#define I2C_SDA_PIN  (8)  // GPIO-8
+#define I2C_SCL_PIN  (10) // GPIO-10
+#define BH1750_ADDR  (0x23)
+
+BH1750 bh1750( BH1750_ADDR );
+
+void setup() {
+  Serial.begin( 115200 );
+  while (!Serial) { delay(10); }
+  // set I2C pins for ESP32-C3 Mini board
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+  Wire.setClock( 100000 ); // 100kHz
+  // set operating mode for BH1750: 
+  //  - lx lux precision
+  //  - 120ms measurement time
+  //  - continuous measurement mode
+  bh1750.begin( BH1750::CONTINUOUS_HIGH_RES_MODE );
+}
+
+void loop() {
+  if ( bh1750.measurementReady() ) {
+    float lux = bh1750.readLightLevel();
+    Serial.printf( &quot;Light: %.1f lx\n&quot;, lux );
+  }
+  delay( 1000 );
+}
+</code></pre>
+<p><img alt="" src="arduino_lib_bh1750.png" /></p>
+<p>รูป: ตัวอย่างขั้นตอนการติดตั้งไลบรารีใน <strong>Arduino IDE</strong> เพื่อใช้งานโมดูล <strong>BH1750</strong>:
+เลือกใช้ไลบรารีที่ได้มีการพัฒนาและดูแลโดย <strong>Christopher Laws</strong></p>
+<hr />
+<h2 id="micropython">&#9655; <strong>การเขียนโปรแกรมด้วย MicroPython</strong><a class="headerlink" href="#micropython" title="Permanent link">#</a></h2>
+<p>หากต้องการเขียนโค้ดด้วยภาษา <strong>Python</strong> ก็มีตัวเลือกแรกคือ <strong>MicroPython</strong> 
+ซึ่งได้มีการพัฒนามาให้ใช้ได้กับ <strong>ESP8266</strong> และ <strong>ESP32, ESP32-S2</strong> และ <strong>ESP32-C3</strong> ตามลำดับ (ดูรายการบอร์ดสำหรับ <a href="https://github.com/micropython/micropython/tree/master/ports/esp32/boards"><strong>MicroPython-ESP32 Support</strong></a>)</p>
+<p>ไฟล์เฟิร์มแวร์สำหรับ <strong>MicroPython</strong> ที่จะต้องนำมาเขียนลงในหน่วยความจำแฟลชของบอร์ด <strong>ESP32-C3</strong> แบ่งเป็น 2 ตัวเลือก ขึ้นอยู่กับรูปแบบการใช้งาน <strong>USB</strong></p>
+<ul>
+<li><a href="https://micropython.org/download/esp32c3/"><strong>MicroPython GENERIC_C3</strong></a>: 
+บอร์ด<strong>ESP32-C3</strong> ที่มีชิป <strong>USB-to-Serial Bridge</strong> เช่น <strong>CP2102/2104</strong> หรือ <strong>CH340/341</strong> เป็นต้น และมีตัวอย่างบอร์ดได้แก่ <ul>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html"><strong>Espressif ESP32-C3-DevKitM-1</strong></a> และ
+<a href="https://docs.ai-thinker.com/_media/esp32/docs/esp-c3-32s-kit-v1.0_specification.pdf"><strong>Ai-Thinker ESP-C3-32S-Kit Dev</strong></a></li>
+</ul>
+</li>
+<li><a href="https://micropython.org/download/esp32c3-usb/"><strong>MicroPython GENERIC_C3_USB</strong></a>: 
+เป็นบอร์ด <strong>ESP32-C3</strong> ที่ไม่มีชิป <strong>USB-to-Serial</strong> และใช้รูปแบบการสื่อสารโดยตรงผ่านทาง
+<strong>USB</strong><ul>
+<li>มีการเปิดใช้งาน <strong>USB-CDC</strong> และ <strong>USB-to-JTAG</strong></li>
+<li><a href="https://micropython.org/download/LOLIN_C3_MINI/"><strong>MicroPython LOLIN_C3_MINI</strong></a>: ไฟล์สำหรับบอร์ด <strong>WeMos ESP32 C3 Mini</strong> โดยเฉพาะ</li>
+</ul>
+</li>
+</ul>
+<p>การเขียนไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>ESP32-C3</strong> จะใช้โปรแกรมที่มีชื่อว่า <a href="https://github.com/espressif/esptool"><strong>esptool.py</strong></a> ซึ่งทำงานด้วย <strong>Python 3</strong></p>
+<p>1) ทำคำสั่งแบบบรรทัดเดียว เพื่อติดตั้งหรืออัปเดต <strong>esptool.py</strong> สำหรับ <a href="https://www.python.org/downloads/"><strong>Python 3</strong></a> โดยใช้คำสั่ง <strong>pip3</strong></p>
+<p><code>pip3 install --user esptool -U</code></p>
+<p>2) ตรวจสอบเวอร์ชันของโปรแกรมคำสั่ง <strong>esptool.py</strong> ก่อนใช้งาน โดยทำคำสั่งต่อไปนี้</p>
+<p><code>esptool.py version</code></p>
+<p>ในขั้นตอนถัดไป ให้เริ่มต้นด้วยการทำให้อุปกรณ์อยู่ในโหมด <strong>Bootloader</strong> โดยกดปุ่มรีเซต และ <strong>BOOT</strong> บนบอร์ด 
+พร้อมกันแล้วปล่อยปุ่มรีเซตและ *<em>BOOT</em> ตามลำดับ</p>
+<p>3) ทำคำสั่งแบบบรรทัดเดียว เพื่อลบหน่วยความจำ <strong>Flash</strong> ทั้งหมด และจากตัวอย่าง จะเห็นได้ว่า มีการเจาะจงชื่อชิปเป้าหมายเป็น
+<code>esp32c3</code> และระบุชื่อของพอร์ตอนุกรมที่เชื่อมต่อกับบอร์ดในขณะนั้น เช่น <code>/dev/ttyUSB0</code> (สำหรับระบบปฏิบัติการ <strong>Linux</strong>) แต่ถ้าไม่ระบุชื่อพอร์ต ก็จะมีการค้นหาอุปกรณ์ที่เชื่อมต่อโดยอัตโนมัติ (ในกรณีที่มีเพียงอุปกรณ์เดียวเชื่อมต่ออยู่)</p>
+<p><code>esptool.py --chip esp32c3 --port /dev/ttyUSB0 erase_flash</code></p>
+<p>ตัวอย่างการทำคำสั่งต่อไปนี้ ใช้ชื่อไฟล์ของ <strong>MicroPython firmware</strong> คือ 
+<code>LOLIN_C3_MINI-20220618-v1.19.1.bin</code></p>
+<p>4) ทำคำสั่งแบบบรรทัดเดียว เพื่อการเขียนไฟล์เฟิร์มแวร์ (ไฟล์ประเภท <strong>.bin</strong>) ไปยังหน่วยความจำ <strong>Flash</strong> เริ่มต้นที่แอดเดรส <code>0x0</code> และตั้งค่า <strong>Baudrate</strong> เป็น <code>460800</code> สำหรับพอร์ตอนุกรม</p>
+<p><code>esptool.py --chip esp32c3 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x0 LOLIN_C3_MINI-20220618-v1.19.1.bin</code></p>
+<p><img alt="" src="flashing_micropython.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <strong>esptool.py</strong> (ใช้ <strong>Python 3</strong> สำหรับระบบปฏิบัติการ <strong>Windows 10</strong>)
+เพื่อติดตั้งไฟล์ <strong>MicroPython Firmware</strong> ไปยังหน่วยความจำของบอร์ด <strong>ESP32-C3</strong></p>
+<hr />
+<h2 id="thonny-ide">&#9655; <strong>การติดตั้งและใช้งาน Thonny IDE</strong><a class="headerlink" href="#thonny-ide" title="Permanent link">#</a></h2>
+<p>เมื่อได้ติดตั้งเฟิร์มแวร์สำหรับ <strong>MicroPython</strong> ไปยังบอร์ด <strong>ESP32-C3</strong> ถัดไปเป็นการใช้งานซอฟต์แวร์ที่มีชื่อว่า <a href="https://thonny.org/"><strong>Thonny IDE (Python 3 based)</strong></a> เพื่อใช้ในการเขียนโค้ดไพธอนและอัปโหลดโค้ดไปยังหน่วยความจำภายในของฮาร์ดแวร์  </p>
+<p>หากยังไม่เคยได้ติดตั้งและใช้งาน สำหรับผู้ใช้ <strong>Windows</strong> และ <strong>Mac OS X</strong> ให้ดาวน์โหลดและเลือกใช้ไฟล์ <strong>.exe</strong> และ <strong>.pkg</strong> ตามลำดับ จากเว็บ <a href="https://thonny.org/">https://thonny.org/</a> แต่ถ้าเป็น <strong>Linux / Ubuntu</strong> ให้ใช้คำสั่งต่อไปนี้เพื่อติดตั้งโปรแกรมดังกล่าว</p>
+<p><code>sudo apt install python3-tk thonny</code></p>
+<p>ถัดไปเป็นตัวอย่างการติดตั้ง <strong>MicroPython Firmware</strong> และการทดลองใช้งาน <strong>Thonny IDE</strong> สำหรับ ระบบปฏิบัติการ <strong>Windows</strong></p>
+<p><img alt="" src="thonny_select_micropython.png" /></p>
+<p>รูป: การเลือก <strong>MicroPython (ESP32)</strong> จากเมนูคำสั่ง <strong>Run &gt; Select Interpreter</strong> ใน <strong>Thonny IDE</strong></p>
+<p><img alt="" src="thonny_run_script.png" /></p>
+<p>รูป: การเขียนโค้ดและบันทึกไฟล์ <code>led_blink.py</code> ไว้ในอุปกรณ์ <strong>MicroPython device</strong> 
+แล้วทดลองรันโค้ดดังกล่าว</p>
+<hr />
+<p><strong>ตัวอย่างโค้ดที่ 1:</strong> สาธิตการกำหนดสถานะลอจิกของ <strong>LED (GPIO-7)</strong> และหน่วงเวลาเพื่อทำให้เกิดการกระพริบของ <strong>LED</strong></p>
+<pre><code class="language-python">from micropython import const
+from machine import Pin
+import utime as time
+
+LED_GPIO = const(7) # use GPIO-7 for LED output
+# create objects from machine.Pin
+led = Pin( LED_GPIO, mode=Pin.OUT )
+stop=False
+state=0
+try:
+    while not stop:
+        state = not state    # toggle state
+        led.value( state )   # write value to output pin
+        time.sleep_ms( 100 ) # sleep for 100 msec
+except KeyboardInterrupt:    # press Ctrl+C to stop
+    pass
+finally:
+    led.value(0) # turn off the LED
+print('Done') 
+</code></pre>
+<hr />
+<p><strong>ตัวอย่างโค้ดที่ 2:</strong> สาธิตการอ่านค่าจากโมดูล <strong>BH1750 Ambient Ligiht Sensor (I2C)</strong>   </p>
+<pre><code class="language-python">import machine, utime
+
+def bh1750_init(addr):
+    try:
+        i2c.writeto(addr, bytes([0x01]) ) # power on BH1750
+        i2c.writeto(addr, bytes([0x07]) ) # reset the device
+        utime.sleep_ms(200)
+        # set mode to 1.0x high-resolution, continuous measurement
+        i2c.writeto(addr, bytes([0x10]) )
+        utime.sleep_ms(200)
+        return True
+    except OSError as ex:
+        return False
+
+def bh1750_read(addr):
+    try:
+        data  = i2c.readfrom(addr, 2) # read two bytes
+        value = (data[0]&lt;&lt;8 | data[1])/(1.2)
+        return value
+    except OSError as ex:
+        return None # BH1750 reading error
+
+i2c_bus = 0 # use bus 0 or 1
+i2c = machine.I2C( i2c_bus, freq=100000,
+    scl=machine.Pin(10), sda=machine.Pin(8) )
+
+addr_found = i2c.scan()
+bh1750_addr_list = []
+for addr in [0x23,0x5c]:
+    if addr in addr_found:
+        if bh1750_init( addr ):
+            bh1750_addr_list.append( addr )
+
+print( 'BH1750 demo...' )
+text = 'Light ({0:02X}h) {1:&gt;6.1f} lx'
+try:
+    while True:
+        for addr in bh1750_addr_list:
+            value = bh1750_read( addr )
+            if value:
+                print( text.format(addr,value) )
+        utime.sleep_ms(2000)
+except KeyboardInterrupt:
+    pass
+print('Done')
+</code></pre>
+<p><img alt="" src="micropython_bh1750.png" /></p>
+<p>รูป: ตัวอย่างการเขียนและรันโค้ด <strong>MicroPython</strong> เพื่ออ่านค่าจากโมดูล <strong>BH1750</strong></p>
+<hr />
+<p><strong>ตัวอย่างโค้ดที่ 3:</strong> สาธิตการเชื่อมต่อกับระบบเครือข่าย <strong>WiFi</strong></p>
+<pre><code class="language-python">import network
+import time
+
+SSID   = 'YOUR_SSID'
+PASSWD = 'YOUR_PASSWORD'
+
+sta_if = network.WLAN(network.STA_IF)
+
+if not sta_if.isconnected():
+    print('connecting to network...')
+    sta_if.active( True )
+    sta_if.config( txpower=8.5 )
+    sta_if.connect( SSID, PASSWD )
+    while not sta_if.isconnected():
+        time.sleep(0.1)
+
+print('network config:', sta_if.ifconfig())
+</code></pre>
+<p><img alt="" src="micropython_wifi_connect.png" /></p>
+<p>รูป: ตัวอย่างการเขียนและรันโค้ด <strong>MicroPython</strong> เพื่อเชื่อมต่อกับเครือข่าย <strong>WiFi</strong> 
+ตามที่กำหนดโดยชื่อ <strong>SSID</strong> และรหัสผ่าน</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานบอร์ด <strong>WeMos LOLIN C3 Mini</strong> ในเบื้องต้น และมีตัวอย่างโค้ดสำหรับการเขียนโปรแกรมด้วย
+<strong>Arduino IDE</strong> และโค้ดภาษา <strong>MicroPython</strong> และใช้งานร่วมกับ <strong>Thonny IDE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-07-09 | Last Updated: 2022-07-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

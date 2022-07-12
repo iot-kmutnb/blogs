@@ -189,6 +189,9 @@
 </ul>
 <p>การเข้าถึงรีจิสเตอร์ต่าง ๆ ของวงจรรอบข้างที่อยู่ภายในชิป (<strong>On-chip Peripherals</strong>)
 จะอยู่ในช่วงแอดเดรส <code>0x6000_0000</code> ~ <code>0x600D_0FFF</code> และเข้าถึงได้ด้วยบัสสำหรับข้อมูล</p>
+<p>โดยทั่วไปแล้ว ชิป <strong>ESP32-C3</strong> มีขาทางกายภาพ (<strong>Physical GPIO pins</strong>) จำนวน 22 ขา
+อ้างอิงโดยใช้ชื่อ <strong>GPIO-0 ~ GPIO-21</strong> และภายในมีวงจร <strong>GPIO Matrix / IO MUXes</strong>
+ดังนั้นจึงสามารถเลือกหรือโปรแกรมการเชื่อมต่อสัญญาณระหว่างวงจร <strong>Peripheral units</strong> กับขาทางกายภาพของชิปได้ทุกขา</p>
 <p>รายละเอียดในเชิงลึกเกี่ยวกับ <strong>ESP32-C3 SoC</strong> สามารถศึกษาได้จากไฟล์:
 <a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf"><strong>ESP32C3 Technical Reference Manual</strong></a></p>
 <p>&nbsp;</p>
@@ -324,6 +327,11 @@
 <li><a href="https://www.muselab-tech.com/"><strong>MuseLab Tech</strong></a><ul>
 <li><strong>nanoESP32-C3</strong>
 [<a href="https://github.com/wuxx/nanoESP32-C3">&#8594;</a>]</li>
+</ul>
+</li>
+<li><a href="https://wiki.seeedstudio.com/"><strong>Seeed Studio</strong></a><ul>
+<li><strong>XIAO ESP32C3</strong>
+[<a href="https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/">&#8594;</a>]</li>
 </ul>
 </li>
 </ul>
@@ -466,35 +474,37 @@ void loop() {
 <p>&nbsp;</p>
 <p>โค้ดตัวอย่างถัดไปสาธิตการเชื่อมต่อบอร์ด <strong>ESP32-C3</strong> เข้ากับระบบ <strong>Wi-Fi AP</strong> (<strong>Access Point</strong>)
 และจะต้องกำหนดค่าสำหรับ <code>WIFI_SSID</code> และ <code>WIFI_PASSWD</code> ให้ตรงกับการใช้งานจริง</p>
-<pre><code class="language-c">#include &lt;WiFi.h&gt;
+<pre><code class="language-c++">#include &lt;WiFi.h&gt;
 
 #define WIFI_SSID     &quot;xxxxxxx&quot;
 #define WIFI_PASSWD   &quot;xxxxxxx&quot;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin( 115200 );
   while (!Serial){ delay(10); }
-  Serial.println(&quot;ESP32-C3 Mini v1.0.0&quot;);
+  Serial.println( &quot;ESP32-C3 Mini v1.0.0&quot; );
   // use WiFi STA (station mode)
-  WiFi.mode(WIFI_STA); 
+  WiFi.mode( WIFI_STA ); 
   WiFi.disconnect();
-  // WiFi Tx power to 11dBm
-  WiFi.setTxPower( WIFI_POWER_11dBm );
-  delay(100);
+  // WiFi Tx power to 11dBm (see: WiFi/WiFiGeneric.h)
+  wifi_power_t tx_power = WIFI_POWER_11dBm;
+  WiFi.setTxPower( tx_power );
+  delay( 100 );
   // connect to Wi-Fi AP
   WiFi.begin( WIFI_SSID, WIFI_PASSWD );
   // wait until Wi-Fi is connected.
-  while ( WiFi.status() != WL_CONNECTED ){
+  while ( WiFi.status() != WL_CONNECTED ) {
     Serial.print( &quot;.&quot; );
-    delay(500);
+    delay( 500 );
   }
+  Serial.println( &quot;&quot; );
   // show the IP address assigned by DHCP
-  Serial.printf(&quot;\nIP address: %s\n&quot;, 
-                WiFi.localIP().toString().c_str() );
+  Serial.printf( &quot;IP address: %s\n&quot;, 
+                 WiFi.localIP().toString().c_str() );
 }
 
 void loop() {
-  delay(100);
+  delay( 100 );
 }
 </code></pre>
 <p>&nbsp;</p>
@@ -530,12 +540,12 @@ void setup() {
   Serial.flush();
   WiFi.mode( WIFI_STA );
   WiFi.disconnect();
-  delay(100);
+  delay( 100 );
 }
 
 void loop() {
   wifi_scan();
-  delay(5000);
+  delay( 5000 );
 }
 </code></pre>
 <p>&nbsp;</p>
@@ -570,7 +580,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-05-09 | Last Updated: 2022-05-17</p></div>
+<p>Created: 2022-05-09 | Last Updated: 2022-07-09</p></div>
             </div>
         </div>
 
