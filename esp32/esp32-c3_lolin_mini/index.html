@@ -329,16 +329,20 @@ const int   daylight_offset_sec = 0;
 void setup() {
   Serial.begin(115200);
   while (!Serial){ delay(10); }
-  Serial.println( &quot;ESP32-C3 Mini v1.0.0&quot; );
+  Serial.println( &quot;ESP32-C3&quot; );
+  Serial.flush();
+
   // use WiFi STA (station mode)
   WiFi.mode( WIFI_STA ); 
   WiFi.disconnect();
-  // set WiFi Tx power to 11dBm (see: WiFi/WiFiGeneric.h)
+  // set WiFi Tx power (see: WiFi/WiFiGeneric.h)
+  //wifi_power_t tx_power = WIFI_POWER_8_5dBm;
   wifi_power_t tx_power = WIFI_POWER_11dBm;
   WiFi.setTxPower( tx_power );
-  delay(100);
+  delay(100);  
   // connect to Wi-Fi AP
   WiFi.begin( WIFI_SSID, WIFI_PASSWD );
+
   // wait until Wi-Fi is connected.
   while ( WiFi.status() != WL_CONNECTED ) {
     Serial.print( &quot;.&quot; );
@@ -356,7 +360,7 @@ void setup() {
   show_localtime();
   delay(2000);
 
-  // disconnect WiFi network, but keep the WiFi active
+  //disconnect WiFi network, but keep the WiFi active
   WiFi.disconnect(false);
 }
 
@@ -383,8 +387,8 @@ void wifi_scan() {
      Serial.printf( &quot;WiFi networks found: %d\n&quot;, n );
      for ( int i=0; i &lt; n; ++i ) {
         // show SSID and RSSI for each network found
-         Serial.printf( &quot;%2d) SSID='%s', RSSI=%d, CHANNEL=%d\n&quot;, (i+1), 
-              WiFi.SSID(i).c_str(), WiFi.RSSI(i), WiFi.channel(i) );
+        Serial.printf( &quot;%2d) SSID='%s', MAC='%s', RSSI=%d, CHANNEL=%d\n&quot;, (i+1), 
+              WiFi.SSID(i).c_str(), WiFi.BSSIDstr(i).c_str(), WiFi.RSSI(i), WiFi.channel(i) );
      }
   }
   Serial.println( &quot;&quot; );
@@ -397,6 +401,11 @@ void loop() {
   delay( 2000 );
 }
 </code></pre>
+<p>&nbsp;</p>
+<p><strong>ข้อควรระวัง</strong>: บอร์ด <strong>WeMos ESP32-C3 Mini v1.0.0</strong> มีข้อจำกัดในการใช้ระดับกำลังส่ง
+<strong>Tx Power</strong> และทางผู้ผลิตแนะนำให้ใช้ได้ไม่เกิน <strong>8.5dBm</strong> และจากการทดลองก็สามารถใช้ได้ที่ระดับ
+<strong>11dBm</strong> แต่ถ้าใช้สูงกว่านั้น จะทำให้ไม่สามารถเชื่อมต่อ <strong>WiFi</strong> ได้ ดังนั้นระยะทางในการรับส่งข้อมูลด้วย 
+<strong>WiFi</strong> จึงมีข้อจำกัด</p>
 <hr />
 <p><strong>ตัวอย่างโค้ดที่ 3:</strong> สาธิตการตรวจสอบอุปกรณ์ที่เชื่อมต่อกับบอร์ด <strong>ESP32-C3</strong> ด้วยบัส <strong>I2C</strong><br />
 (เลือกใช้ขา <strong>GPIO-8 &amp; GPIO-10</strong> สำหรับสัญญาณ <strong>SDA &amp; SCL</strong> ตามลำดับ)</p>
@@ -648,7 +657,7 @@ print('network config:', sta_if.ifconfig())
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-07-09 | Last Updated: 2022-07-12</p></div>
+<p>Created: 2022-07-09 | Last Updated: 2022-07-15</p></div>
             </div>
         </div>
 

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/esp32/esp32-luatos_core_c3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเริ่มต้นใช้งานบอร์ด LUATOS CORE-ESP32C3 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c++.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#luatos-core-esp32c3" class="nav-link">การเริ่มต้นใช้งานบอร์ด LUATOS CORE-ESP32C3</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#airm2m-luatos-core-esp32c3" class="nav-link">&#9655; AirM2M / LUATOS CORE-ESP32C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ตัวเลือกสำหรับการเขียนโปรแกรม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino" class="nav-link">&#9655; ตัวอย่างโค้ดสำหรับ Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#luatos-esp32" class="nav-link">&#9655; ตัวอย่างการใช้งาน LuatOS-ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="luatos-core-esp32c3">การเริ่มต้นใช้งานบอร์ด LUATOS CORE-ESP32C3<a class="headerlink" href="#luatos-core-esp32c3" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="airm2m-luatos-core-esp32c3">&#9655; <strong>AirM2M / LUATOS CORE-ESP32C3</strong><a class="headerlink" href="#airm2m-luatos-core-esp32c3" title="Permanent link">#</a></h2>
+<p>บอร์ด <a href="https://wiki.luatos.com/chips/esp32c3/board.html"><strong>LUATOS CORE-ESP32C3</strong></a> เป็นอีกหนึ่งบอร์ดไมโครคอนโทรลเลอร์ของบริษัท <strong>Hezhou Communication Technology Co., Ltd. (Shanghai, China)</strong>
+บอร์ดนี้มีราคาถูกและใช้ชิป <a href="https://www.espressif.com/en/products/socs/esp32-c3"><strong>Espressif ESP32-C3</strong></a> รองรับการสื่อสารข้อมูลแบบไร้สายตามมาตรฐาน  <strong>IEEE 802.11b/g/n (2.4 GHz WiFi) &amp; Bluetooth 5 (LE)</strong></p>
+<p>ภายในชิปมีตัวประมวลผลที่ทำงานตามสถาปัตยกรรมชุดคำสั่งแบบ <strong>RISC-V (32-bit Single-Core RV32IMC, I=integer, M=multiplication/division C=standard compressed instruction set extension)</strong></p>
+<p>บอร์ดที่ได้นำมาทดลองใช้งาน มี 2 รุ่น และมีความแตกต่างกันดังนี้ </p>
+<ul>
+<li><strong>Classic version</strong> (<a href="core-esp32-c3_v1.2_ch340_schematic.pdf"><strong>Schematic</strong></a>): มีชิป <strong>USB-to-Serial Bridge IC (<a href="http://www.wch-ic.com/products/CH340.html">WCH CH340</a>)</strong>
+อยู่บนบอร์ด</li>
+<li><strong>Contracted version</strong> (<a href="core-esp32-c3_v1.2_schematic.pdf"><strong>Schematic</strong></a>): ไม่มีชิป <strong>WCH CH340</strong> ดังนั้นจึงมีราคาถูกกว่าเล็กน้อย</li>
+</ul>
+<p><img alt="" src="luatos_esp32c3_core_top.jpg" /></p>
+<p>รูป: บอร์ด <strong>LUATOS ESP32C3-CORE - Top View</strong></p>
+<p><img alt="" src="luatos_esp32c3_core_bottom.jpg" /></p>
+<p>รูป: บอร์ด <strong>LUATOS ESP32C3-CORE - Bottom View</strong></p>
+<p>&nbsp;</p>
+<p><strong>ข้อมูลเกี่ยวกับบอร์ด LUATOS ESP32C3-CORE</strong></p>
+<ul>
+<li>ใช้ชิป <strong>ESP32-C3</strong> และใช้ชิป <strong>SPI Flash (4MB)</strong> แยกกัน </li>
+<li>มี <strong>40MHz Crystal Oscillator</strong> </li>
+<li>มีปุ่มกด <strong>CHIP_EN / RST (Reset)</strong> และ <strong>BOOT/GPIO-9</strong></li>
+<li>มีวงจร <strong>LED (active-high)</strong> อยู่บนบอร์ด 2 ชุด (<strong>D4</strong> และ <strong>D5</strong>)
+ต่อกับขา <strong>GPIO-12</strong> และ <strong>GPIO-13</strong> ตามลำดับ</li>
+<li>ใช้ไอซี <a href="https://datasheet.lcsc.com/szlcsc/2010291602_MICRONE-Nanjing-Micro-One-Elec-ME6212C12M5G_C910808.pdf"><strong>ME6212C33M5G</strong></a> (<strong>LDO Voltage Regulator, 3.3V / 350mA max.</strong>) แปลงแรงดันไฟฟ้า <strong>VUSB (5V)</strong> ให้เป็น <strong>3.3V</strong> และมีขา <strong>PWB</strong> สำหรับ <strong>Shutdown / Enable</strong> </li>
+<li>มีคอนเนกเตอร์ <strong>USB Type-C</strong> สำหรับเชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="luatos_core_esp32c3_board_layout.png" /></p>
+<p>รูป: บอร์ด <strong>LUATOS ESP32C3-CORE (with CH340) - Board Layout</strong></p>
+<p><img alt="" src="luatos_core_esp32c3_pinout-1.png" /></p>
+<p>รูป: ผังแสดงตำแหน่งขาของบอร์ด (<strong>Board Pinout</strong>)</p>
+<p><img alt="" src="luatos_esp32c3_core_bom.png" /></p>
+<p>รูป: รายการอุปกรณ์ของบอร์ด (<a href="https://wiki.luatos.com/_static/bom/esp32c3.html"><strong>Interactive BOM</strong></a>)</p>
+<p><img alt="" src="esp32c3_core_classic_schematic_smaller.png" /></p>
+<p>รูป: ผังวงจรของบอร์ด (<a href="esp32c3_core_classic_schematic.png"><strong>View Schematic</strong></a>)</p>
+<hr />
+<h2 id="_1">&#9655; <strong>ตัวเลือกสำหรับการเขียนโปรแกรม</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บอร์ดนี้ เช่นเดียวกับบอร์ดอื่นที่ใช้ชิป <a href="https://www.espressif.com/en/products/socs/esp32-c3"><strong>ESP32-C3</strong></a>
+สามารถเขียนโปรแกรมได้ โดยใช้ภาษาคอมพิวเตอร์ที่แตกต่างกัน เช่น</p>
+<ul>
+<li><strong>C/C++</strong>:<ul>
+<li><a href="https://github.com/espressif/esp-idf"><strong>Espressif IDF 4.4+</strong></a></li>
+<li><a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32</strong></a></li>
+</ul>
+</li>
+<li><strong>Python</strong>:<ul>
+<li><a href="https://micropython.org/download/"><strong>MicroPython</strong></a></li>
+<li><a href="https://circuitpython.org/downloads"><strong>CircuitPython</strong></a></li>
+</ul>
+</li>
+<li><strong>Rust</strong><ul>
+<li><a href="https://github.com/esp-rs"><strong>Rust for ESP32</strong></a></li>
+<li><a href="https://github.com/ferrous-systems/espressif-trainings"><strong>ESP32-C3 Rust Training</strong></a> &amp; <a href="https://github.com/esp-rs/esp-rust-board"><strong>Rust Board</strong></a></li>
+</ul>
+</li>
+<li><strong>Lua</strong><ul>
+<li><a href="https://github.com/dreamcmi/LuatOS-ESP32"><strong>LuatOS: embedded Lua runtime engine for ESP32</strong></a></li>
+</ul>
+</li>
+</ul>
+<p><a href="https://gitee.com/openLuat/LuatOS"><strong>LuatOS</strong></a> เป็นชื่อของซอฟต์แวร์ที่ทางบริษัท <strong>Hezhou</strong> ได้สร้างขึ้น เพื่อนำมาใช้ในการพัฒนาเฟิร์มแวร์ด้วยภาษา <strong>Lua v5.3</strong> และใช้ <strong>ESP-IDFV4.4+ &amp; FreeRTOS</strong> เป็นพื้นฐานในการทำงาน สามารถนำมาใช้ได้กับชิป <a href="https://www.espressif.com/en/products/socs/esp32-c3"><strong>ESP32-C3</strong></a>
+และ <a href="https://www.espressif.com/en/products/socs/esp32-s2"><strong>ESP32-S2</strong></a> ของบริษัท <strong>Espressif</strong> </p>
+<hr />
+<h2 id="arduino">&#9655; <strong>ตัวอย่างโค้ดสำหรับ Arduino</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
+<p>ในการเขียนโปรแกรมด้วย <strong>Arduino IDE</strong> ให้ติดตั้ง <strong>Arduino-ESP32 Core</strong>
+โดยจะต้องติดตั้งไฟล์ <code>package_esp32_index.json</code> (เป็น <strong>Stable Version</strong> ตาม <strong>URL</strong> ต่อไปนี้)
+ใน <strong>Arduino Board Managers</strong></p>
+<p><strong>URL:</strong> <a href="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"><code>https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code></a></p>
+<p><img alt="" src="arduino_esp32_install_update.png" /></p>
+<p>รูป: ตัวอย่างการติดตั้งหรืออัปเดต <strong>Arduino-ESP32 Core</strong> สำหรับ <strong>Arduino IDE</strong></p>
+<p><img alt="" src="esp32_c3_dev_settings-1.png" /></p>
+<p>รูป: ตัวอย่างการเลือกบอร์ด <strong>"AirM2M_CORE_ESP32C3"</strong> และตั้งค่าใข้งานสำหรับ <strong>Arduino IDE</strong></p>
+<p><img alt="" src="esp32_c3_dev_settings-2.png" /></p>
+<p>รูป: ตัวอย่างการเลือกบอร์ดเป็น <strong>"ESP32C3 Dev Module"</strong></p>
+<p><strong>ข้อสังเกต:</strong> ถ้าใช้บอร์ด <strong>ESP32-C3</strong> ที่ไม่มีชิป <strong>USB-to-Serial IC</strong> จะต้องเลือกใช้
+<strong>USB CDC on Boot</strong> เพื่อใช้ในการอัปโหลดโปรแกรมและสื่อสารข้อมูลกับคอมพิวเตอร์ของผู้ใช้</p>
+<hr />
+<p><strong>โค้ดตัวอย่างที่ 1</strong> สาธิตการเขียนโค้ดโดยใช้คำสั่งของ <strong>Arduino API</strong> และ <strong>FreeRTOS for ESP32</strong>
+เพื่อเขียนโค้ดแบบมัลติทาสก์ (<strong>Multi-Tasking</strong>) และทำให้ <strong>LED</strong> ทั้งสองดวงบนบอร์ดกระพริบ (มีสถานะติด-ดับ)
+สลับกัน</p>
+<pre><code class="language-c++">#define TASK_STACK_SIZE  (2048)  // bytes
+#define TASK_PRIORITY    (2)
+
+const uint32_t LED_PINS[] = {12, 13}; // use onboard LEDs
+
+SemaphoreHandle_t mutex;
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial){ delay(10); }
+
+  UBaseType_t priority = uxTaskPriorityGet(NULL); 
+  Serial.printf( &quot;The priority of main task: %lu\n&quot;, priority );
+  Serial.printf( &quot;FreeRTOS-ESP32 max priority: %lu\n&quot;, (configMAX_PRIORITIES-1) );
+
+  mutex = xSemaphoreCreateMutex(); // create a mutex
+  // create two tasks with the same task priority 
+  xTaskCreate( led_task, &quot;LED-1 Task&quot;,
+               TASK_STACK_SIZE, (void*)0, TASK_PRIORITY, NULL );
+  xTaskCreate( led_task, &quot;LED-2 Task&quot;, 
+               TASK_STACK_SIZE, (void*)1, TASK_PRIORITY, NULL );
+}
+
+void loop() {
+  yield();
+}
+
+void led_task( void * pvParameters ) {
+  uint32_t id = (uint32_t)pvParameters;
+  uint32_t pin = LED_PINS[id];
+  pinMode( pin, OUTPUT );
+  if (id == 0) {
+    vTaskDelay( 500/portTICK_PERIOD_MS ); 
+  }
+  while(1) {
+    xSemaphoreTake( mutex, portMAX_DELAY ); // acquire the mutex lock
+    digitalWrite( pin, HIGH ); // turn the LED on
+    Serial.printf( &quot;LED-%lu task @ %lu msec\n&quot;, id, millis() );
+    vTaskDelay( 500/portTICK_PERIOD_MS );
+    digitalWrite( pin, LOW ); // turn the LED off
+    xSemaphoreGive( mutex ); // release the mutex lock
+    taskYIELD();
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_output_led_blinks.png" /></p>
+<p>รูป: ตัวอย่างข้อความที่เป็นเอาต์พุตและได้รับใน <strong>Arduino Serial Monitor</strong></p>
+<hr />
+<p><strong>โค้ดตัวอย่างที่ 2</strong> สาธิตการเขียนโค้ดสาธิตการตรวจสอบเครือข่ายไร้สายในบริเวณโดยรอบ (<strong>WiFi Scan</strong>) </p>
+<pre><code class="language-c++">#include &lt;WiFi.h&gt;
+
+#define WIFI_SSID     &quot;xxxxxxxxxx&quot;
+#define WIFI_PASSWD   &quot;xxxxxxxxxx&quot;
+
+#include &lt;map&gt; 
+#include &lt;iterator&gt; 
+using namespace std; 
+std::map&lt;String, int&gt; scan_results;
+std::map&lt;String, int&gt;::iterator iter; 
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial){ delay(10); }
+  Serial.println( &quot;ESP32-C3&quot; );
+  Serial.flush();
+
+  // use WiFi STA (station mode)
+  WiFi.mode( WIFI_STA ); 
+  WiFi.disconnect();
+  // set WiFi Tx power (see: WiFi/WiFiGeneric.h)
+  wifi_power_t tx_power = WIFI_POWER_19_5dBm;
+  WiFi.setTxPower( tx_power );
+  delay(10);  
+  // connect to Wi-Fi AP
+  WiFi.begin( WIFI_SSID, WIFI_PASSWD );
+  // wait until Wi-Fi is connected.
+  while ( WiFi.status() != WL_CONNECTED ) {
+    Serial.print( &quot;.&quot; );
+    delay(100);
+  }
+  Serial.println( &quot;&quot; );
+  // show the IP address assigned by DHCP
+  Serial.printf( &quot;IP address: %s\n&quot;, 
+                 WiFi.localIP().toString().c_str() );
+
+  //disconnect WiFi network, but keep the WiFi active
+  WiFi.disconnect(false);
+}
+
+void wifi_scan() {
+  Serial.print( &quot;WiFi scan (synchronous mode) started...&quot; );
+  int n = WiFi.scanNetworks(); // number of networks found
+  Serial.println( &quot; done&quot; );
+  if ( n==0 ) {
+     Serial.println( &quot;No WiFi networks found...&quot; );
+  } else {
+     Serial.printf( &quot;WiFi networks found: %d\n&quot;, n );
+     for ( int i=0; i &lt; n; ++i ) {
+        // keep only BSSID and RSSI for each network found
+        String bssid_str = WiFi.BSSIDstr(i);
+        int rssi_value = WiFi.RSSI(i);
+        iter = scan_results.find( bssid_str );
+        if (iter == scan_results.end()) {
+          scan_results.insert( { bssid_str, rssi_value } ); // insert 
+        } else {
+          iter-&gt;second = rssi_value; // update
+        }
+     }
+  }
+  Serial.println( &quot;&quot; );
+
+  for ( iter = scan_results.begin(); iter != scan_results.end(); ++iter ) { 
+     String mac_str = iter-&gt;first;
+     int rssi_value = iter-&gt;second;
+     // replace the last six hex digits with &quot;xx&quot;
+     mac_str = mac_str.substring( 0, mac_str.length()-8 );
+     mac_str += &quot;xx:xx:xx&quot;;
+     Serial.printf( &quot;%s %d\n&quot;, mac_str.c_str(), rssi_value ); 
+  }
+  Serial.printf( &quot;Free heap: %lu bytes\n\n&quot;, ESP.getFreeHeap() );
+  Serial.flush();
+}
+
+void loop() {
+  wifi_scan();
+  delay( 2000 );
+}
+</code></pre>
+<p><img alt="" src="arduino_wifi_scan.png" /></p>
+<p>รูป: ตัวอย่างข้อความที่เป็นเอาต์พุตสำหรับ <strong>WiFi Scan</strong></p>
+<hr />
+<h2 id="luatos-esp32">&#9655; <strong>ตัวอย่างการใช้งาน LuatOS-ESP32</strong><a class="headerlink" href="#luatos-esp32" title="Permanent link">#</a></h2>
+<p><strong>LuatOS</strong> รองรับการเขียนโค้ดด้วยภาษา <a href="https://wiki.luatos.com/_static/lua53doc/contents.html"><strong>Lua v5.3</strong></a>
+และสามารถนำมาใช้ได้กับบอร์ดไมโครคอนโทรลเลอร์หลายแบบ 
+(เช่น <strong>Air101 / Air103 / W806</strong>) ซึ่งรวมถึงบอร์ด <strong>CORE-ESP32C3</strong>
+ผู้ใช้สามารถเขียนโปรแกรมโดยใช้ <strong>VS Code IDE</strong> พร้อมกับติดตั้ง <strong>VS Code Extension</strong> 
+ที่มีชื่อว่า <strong>LuatIDE</strong> แต่มีเมนูคำสั่งและข้อความเป็นภาษาจีน
+ดังนั้นจึงยังไม่แนะนำให้ใช้งาน หากสนใจตัวอย่างการเขียนโค้ด ก็สามารถดูได้จาก
+<a href="https://github.com/openLuat/LuatOS/tree/master/demo"><code>https://github.com/openLuat/LuatOS/tree/master/demo</code></a></p>
+<p><img alt="" src="luatos_ide_vscode_demo.png" /></p>
+<p>รูป: การทดลองใช้งาน <strong>VS Code IDE + LuatOS</strong> สำหรับบอร์ด <strong>CORE-ESP32C3</strong>
+ที่มีชิป <strong>CH340C USB-to-Serial</strong> และใช้เฟิร์มแวร์ที่มีชื่อว่า <strong>LuatOS-SoC_V0003_ESP32C3_SSL.soc</strong></p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>AirM2M / LUATOS CORE-ESP32C3</strong> ก็เป็นอีกหนึ่งตัวเลือกสำหรับผู้ที่สนใจและต้องการลองใช้งานชิป
+<strong>Espressif ESP32-C3</strong> และมีราคาค่อนข้างต่ำกว่าบอร์ดที่เป็นตัวเลือกอื่น</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-07-15 | Last Updated: 2022-07-16</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
