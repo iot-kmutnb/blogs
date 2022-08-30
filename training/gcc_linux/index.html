@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/training/gcc_linux/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งาน GNU C/C++ Toolchain สำหรับระบบปฏิบัติการ Linux ในเบื้องต้น - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#gnu-cc-toolchain-linux" class="nav-link">การใช้งาน GNU C/C++ Toolchain สำหรับระบบปฏิบัติการ Linux ในเบื้องต้น</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#cc-linux" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C/C++ สำหรับ Linux</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#gnu-toolchain" class="nav-link">&#9655; GNU Toolchain</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#gcc-compilation-steps" class="nav-link">&#9655; GCC Compilation Steps</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#the-gnu-debugger" class="nav-link">&#9655; The GNU Debugger</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="gnu-cc-toolchain-linux">การใช้งาน GNU C/C++ Toolchain สำหรับระบบปฏิบัติการ Linux ในเบื้องต้น<a class="headerlink" href="#gnu-cc-toolchain-linux" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="cc-linux">&#9655; <strong>การเขียนโปรแกรมภาษา C/C++ สำหรับ Linux</strong><a class="headerlink" href="#cc-linux" title="Permanent link">#</a></h2>
+<p>ภาษา <strong>C</strong> และภาษา <strong>C++</strong> เป็นสองภาษาคอมพิวเตอร์ที่มีความใกล้เคียงกัน 
+ภาษา <strong>C</strong> มีบทบาทที่สำคัญตั้งแต่อดีต หากย้อนไปถึงประมาณ ปีค.ศ. 1972 
+เมื่อ <a href="https://en.wikipedia.org/wiki/Dennis_Ritchie"><strong>Dennis Ritchie</strong></a>
+ได้เริ่มต้นพัฒนาภาษา <strong>C</strong> และมีการนำมาใช้เพื่อพัฒนาเคอร์เนลของระบบปฏิบัติการ <strong>Unix</strong> 
+และระบบปฏิบัติการอื่น เช่น <strong>Linux</strong> และ <strong>BSD</strong> เป็นต้น ในช่วงเวลาต่อมา</p>
+<p>ภาษา <strong>C++</strong> ได้ถูกพัฒนาขึ้นโดย <a href="https://www.stroustrup.com/index.html"><strong>Bjarne Stroustrup</strong></a> โดยมีเป้าหมายคือ ให้เป็นภาษาที่ดีกว่า <strong>C</strong> (<strong>"A Better C"</strong>) และมีความแตกต่างจากภาษา <strong>C</strong> โดยเฉพาะอย่างยิ่ง คือ การรองรับการเขียนโปรแกรมเชิงวัตถุ (<strong>Object-Oriented Programming: OOP</strong>) เช่น การสร้างคลาสและอ็อปเจกต์จากคลาส (<strong>Classes and Objects</strong>) เป็นต้น</p>
+<p>ภาษา <strong>C/C++</strong> จะเหมาะสำหรับการเขียนโปรแกรมที่เกี่ยวข้องกับฮาร์ดแวร์และเน้นความเร็วในการประมวลผล เช่น การเขียนโปรแกรมไมโครคอนโทรลเลอร์หรือระบบสมองกลฝังตัว เป็นต้น และทั้งสองภาษาก็มีมาตรฐานอุตสาหกรรม และได้รับการดูแลและพัฒนามาจนถึงปัจจุบัน
+และก็มีมาตรฐานหลายเวอร์ชันให้เลือกใช้งาน </p>
+<ul>
+<li>นับตั้งแต่อดีตก็มีการกำหนดมาตรฐาน  <a href="https://www.iso.org/standard/82075.html"><strong>ISO / IEC 9899 C Standards</strong></a> สำหรับภาษา <strong>C</strong> หลายเวอร์ชัน ได้แก่ <strong>ANSI-C</strong> หรือ <strong>C89</strong> (1989), <strong>C99</strong> (1999), <strong>C11</strong> (2011) และ <strong>C18</strong> (2018) ตามลำดับ แต่ <strong>C99</strong> ยังเป็นเวอร์ชันที่มีการใช้งานแพร่หลายอยู่</li>
+<li>ถ้าเป็นภาษา <strong>C++</strong> ก็มีมาตรฐาน <a href="https://isocpp.org/std/the-standard"><strong> ISO C++ Standards</strong></a> เริ่มตั้งแต่
+<strong>C++98</strong> (1998), <strong>C++11</strong> (2011), <strong>C++14</strong> (2014), <strong>C++17</strong> (2017),
+และ <strong>C++20</strong> (2020) ตามลำดับ</li>
+</ul>
+<p>บทความนี้กล่าวถึง การลองเขียนโปรแกรมภาษา <strong>C</strong> และ <strong>C++</strong> ในเบื้องต้น และทดลองคอมไพล์โค้ดตัวอย่าง โดยใช้โปรแกรมแบบ <strong>Command Line Tools</strong> เช่น <strong>GNU Toolchain</strong> และ <strong>Clang / LLVM</strong> สำหรับระบบปฏิบัติการ <strong>Linux / Debian-based Linux Distribution</strong>  เช่น
+<strong>Ubuntu</strong> และ <strong>Raspbian OS</strong> (ได้ทดลองใช้ <strong>Ubuntu 22.04 LTS</strong>)</p>
+<pre><code class="language-bash">$ cat /etc/os-release | head -n 5
+PRETTY_NAME=&quot;Ubuntu 22.04.1 LTS&quot;
+NAME=&quot;Ubuntu&quot;
+VERSION_ID=&quot;22.04&quot;
+VERSION=&quot;22.04.1 LTS (Jammy Jellyfish)&quot;
+VERSION_CODENAME=jammy
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="gnu-toolchain">&#9655; <strong>GNU Toolchain</strong><a class="headerlink" href="#gnu-toolchain" title="Permanent link">#</a></h2>
+<p>ในการคอมไพล์โค้ดภาษา <strong>C/C++</strong> ให้เป็นไฟล์โปรแกรมที่เรียกใช้งานได้ (<strong>Executable</strong>) จะต้องมีการติดตั้งซอฟต์แวร์ที่เรียกว่า <strong>GNU Toolchain</strong> ซึ่งประกอบด้วยโปรแกรมย่อยแบ่งเป็นกลุ่มได้ดังนี้</p>
+<ul>
+<li><strong>The GCC (GNU Compiler Collection) for C/C++</strong> เป็นโปรแกรมที่ทำหน้าที่เป็นคอมไพเลอร์</li>
+<li><strong>The GNU Binary Utilities (binutils)</strong> เป็นโปรแกรมต่าง ๆ ที่ไม่ใช่คอมไพเลอร์ (เช่น <code>cpp</code>, <code>ar</code>, <code>ld</code>, <code>size</code>, <code>file</code>, <code>readelf</code>, ...)</li>
+<li><strong>The GNU C/C++ Library</strong> เป็นไลบรารี (มีทั้งแบบที่เป็น <strong>Static</strong> และ <strong>Shared / Dynamically Linked Library</strong>) สำหรับการสร้างและใช้งานฟังก์ชันที่ถูกกำหนดโดยมาตรฐานภาษา <strong>C/C++</strong> (เช่น <code>libc6</code> และ <code>libstdc++6</code>)</li>
+<li><strong>The GNU Debugger (gdb)</strong> เป็นโปรแกรมสำหรับการดีบักการทำงานของโปรแกรมที่ได้จากการคอมไพล์โค้ดแล้ว</li>
+</ul>
+<p>สำหรับผู้ที่ใช้ <strong>Linux/Ubuntu</strong> ให้ทำคำสั่งต่อไปนี้ใน <strong>Bash Shell</strong> เพื่อติดตั้งโปรแกรม</p>
+<pre><code class="language-bash">$ sudo apt update
+$ sudo apt install -y build-essential nano
+</code></pre>
+<p><strong>ข้อสังเกต:</strong> บรรทัดที่มีเครื่องหมาย  <code>$</code> ซึ่งเป็นสัญลักษณ์สำหรับ  <strong>Shell Prompt</strong> ตามด้วยคำสั่งที่จะต้องทำ</p>
+<p>สำหรับ <strong>Ubuntu / Debian-based Linux Distro</strong> แพ็กเกจ <a href="https://packages.ubuntu.com/jammy/build-essential"><code>build-essential</code></a> ประกอบด้วยโปรแแกรมต่าง ๆ ที่เกี่ยวข้องกัน (เรียกว่า <strong>meta-package</strong>) เช่น</p>
+<ul>
+<li><code>gcc</code> (the GNU compiler for the C Programming language)</li>
+<li><code>g++</code> (the GNU compiler for the C++ programming language)</li>
+<li><code>libc6-dev</code> (the GNU standard C/C++ library + header files)</li>
+<li><code>make</code> (used for directing the compilation of programs using Makefile) </li>
+</ul>
+<p>ลองใช้คำสั่งต่อไปนี้ ตรวจสอบดูว่า <code>build-essential</code> เกี่ยวข้องกับแพ็กเกจอื่นอย่างไรบ้าง</p>
+<pre><code class="language-bash">$ apt-cache depends build-essential
+</code></pre>
+<p>ในการติดตั้งแพ็กเกจ <a href="https://packages.ubuntu.com/eo/jammy/gcc"><code>gcc</code></a> ก็จะมีการติดตั้งแพ็กเกจอื่นอีก</p>
+<p>เมื่อได้ติดตั้ง <code>build-essential</code> ถัดไปให้ทำคำสั่งใน <strong>Bash Shell</strong> ดังต่อไปนี้
+เพื่อแสดงเวอร์ชันของโปรแกรมที่ได้ติดตั้งไว้ใช้งานได้แล้ว เช่น <code>gcc</code>, <code>g++</code> และ <code>make</code> เป็นต้น</p>
+<pre><code class="language-bash">$ gcc --version | head -n 1
+gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0
+
+$ g++ --version | head -n 1
+g++ (Ubuntu 11.2.0-19ubuntu1) 11.2.0
+
+$ make --version | head -n 1
+GNU Make 4.3
+</code></pre>
+<p>คำสั่ง <code>nano</code> (<strong>GNU nano</strong>) เป็นโปรแกรมประเภท <strong>Command-line text editor</strong> 
+เหมาะสำหรับการเรียกใช้งานในหน้าต่าง <strong>Terminal</strong> หรือ <strong>Shell Console</strong></p>
+<p>นอกจากนั้นยังมีตัวเลือกอื่นอีกที่เป็น <strong>Editor</strong> สำหรับระบบปฏิบัติการ <strong>Ubuntu Desktop</strong>
+เช่น <strong>Geany</strong> เป็นต้น</p>
+<p>ลองเขียนโค้ดภาษา <strong>C</strong> ตามตัวอย่างต่อไปนี้ โดยใช้ <strong>nano editor</strong> และทำคำสั่งใน <strong>Bash Shell</strong> ดังนี้</p>
+<pre><code class="language-bash">$ nano hello.c
+</code></pre>
+<p>โค้ดตัวอย่างนี้ เมื่อทำงานจะแสดงข้อความ <code>Hello World!</code>
+เป็นช่องทางเอาต์พุต (เรียกว่า <strong>Standard Output</strong>) ของโปรแกรม</p>
+<pre><code class="language-c">// file: hello.c
+#include &lt;stdio.h&gt;
+
+int main(void) {
+  printf( &quot;Hello World!\n&quot; );
+  return 0;
+}
+</code></pre>
+<p>เมื่อเขียนโค้ดแล้ว ให้บันทึกลงไฟล์ โดยกดปุ่ม <strong>Ctrl+O</strong> แล้วกดปุ่ม <strong>Enter</strong> เพื่อยืนยันการบันทึกไฟล์
+<code>hello.c</code> หากต้องการจบการทำงานของ <code>nano</code> ให้กดปุ่ม <strong>Ctrl+X</strong></p>
+<p><strong>คำอธิบายโค้ด</strong></p>
+<ul>
+<li>ในบรรทัดแรก มีสัญลักษณ์ <code>//</code> (<strong>Double Slash</strong>) ดังนั้นจึงถือว่า สิ่งที่ตามมาจนจบหนึ่งบรรทัด จะเป็นคำอธิบายโค้ด (<strong>Line Comment</strong>) และไม่มีผลต่อการทำงานของโปรแกรม</li>
+<li>บรรทัดถัดมาเป็นคำสั่ง <code>#include</code> ซึ่งเป็นสิ่งที่เรียกว่า <code>C Preprocessor Directive</code>
+เพื่อนำเข้าไฟล์ประเภท <strong>Header File</strong> ที่มีชื่อว่า <code>stdio.h</code> ภายในไฟล์นี้
+มีการประกาศและกำหนดรูปแบบของฟังก์ชัน เช่น <code>printf()</code> ที่จะมีการใช้งานถัดไปในโค้ด เป็นต้น</li>
+<li>ถัดไปเป็นการสร้างฟังก์ชัน <code>main</code> ทุกโปรแกรมภาษา <strong>C</strong> จะต้องมีฟังก์ชันอย่างน้อยหนึ่งฟังก์ชัน ซึ่งก็คือ ฟังก์ชัน <code>main</code><ul>
+<li>การสร้างฟังก์ชันเริ่มต้นด้วยการกำหนดรูปแบบของฟังก์ชัน หรือเรียกว่า <strong>Function Header</strong> </li>
+<li>มีการระบุชนิดของข้อมูลที่ฟังก์ชันจะให้ค่า (<strong>Return Type</strong>) เมื่อจบการทำงานของฟังก์ชัน เช่น <code>int</code> ซึ่งหมายถึง ค่าที่เป็นเลขจำนวนเต็ม</li>
+<li>มีชื่อฟังก์ชัน (<strong>Function Name</strong>) ในกรณีนี้คือ <code>main</code></li>
+<li>ถัดจากชื่อฟังก์ชันจะต้องมีรายการอาร์กิวเมนต์  (<strong>Argument List</strong>) อยู่ภายใน <code>(</code> ... <code>)</code>  ซึ่งจะเป็นสิ่งที่ฟังก์ชันรับมาใช้เป็นอินพุตสำหรับการทำงานของฟังก์ชัน แต่ถ้าไม่มี ให้ระบุว่าเป็น <code>void</code></li>
+<li>จากนั้นตามด้วยบล็อกของคำสั่งที่อยู่ระหว่าง <code>{</code> ... <code>}</code>  หรือเรียกว่า <strong>Function Body</strong> ภายในประกอบด้วยประโยคคำสั่งต่าง ๆ (<strong>Statement</strong>) แต่ละคำสั่งจะถูกแบ่งโดยสัญลักษณ์<code>;</code> (<strong>Semicolon</strong>) </li>
+<li>ฟังก์ชันจะจบการทำงาน เมื่อรันโค้ดมาถึงประโยคคำสั่ง  <code>return</code> ที่ให้ค่าเป็น <code>0</code> ในตัวอย่างนี้ (โดยทั่วไป <code>0</code> หมายถึง การจบการทำงานแบบปรกติของฟังก์ชัน <code>main</code>)</li>
+</ul>
+</li>
+</ul>
+<p>ลองคอมไพล์โค้ด <code>hello.c</code> โดยใช้คำสั่ง <code>gcc</code> เลือกใช้มาตรฐาน <strong>C99</strong> 
+(<code>-std=c99</code>) ให้แสดงข้อความเตือนจากการทำงานของคอมไพเลอร์ (<code>-Wall</code>) ด้วย
+และให้ได้ไฟล์เอาต์พุต (<strong>Binary Output File</strong>) ที่มีชื่อว่า <code>./hello</code> 
+และอยู่ในรูปแบบของไฟล์ที่เรียกว่า  <strong>Executable and Linkable Format (ELF)</strong>
+และทดลองรันไฟล์โปรแกรมที่ได้เป็นเอาต์พุต โดยการทำคำสั่งดังนี้</p>
+<pre><code class="language-bash">$ gcc -std=c99 -Wall hello.c -o ./hello
+
+$ ./hello
+Hello World!
+</code></pre>
+<p>&nbsp;</p>
+<p>ลำดับของคำสั่งต่อไปนี้ ซึ่งเป็นการทำคำสั่ง <code>ls</code> และ <code>awk</code>ตามลำดับในบรรทัดเดียวกัน จะแสดงชื่อไฟล์ <code>./hello</code> ที่ได้จากการคอมไพล์โค้ด และแสดงขนาดของไฟล์ดังกล่าว (หน่วยเป็นไบต์)</p>
+<pre><code class="language-bash">$ ls -l ./hello | awk -F' ' '{print $NF,&quot; &quot;,$(NF-4)}'
+./hello   15952
+</code></pre>
+<p>หรือจะใช้คำสั่ง <code>size</code> ซึ่งเป็นส่วนหนึ่งของ <a href="https://www.gnu.org/software/binutils/"><strong>GNU binutils</strong></a> แสดงขนาดของส่วนต่าง ๆ  (เรียกว่า <strong>Sections</strong>) ในไฟล์โปรแกรมดังกล่าว โดยแบ่งเป็น </p>
+<ul>
+<li><code>text</code>: <strong>Text Section</strong> (for program instructions)</li>
+<li><code>data</code>: <strong>Data Section</strong> (for initialized data / variables)</li>
+<li><code>bss</code>: <strong>BSS Section</strong> (for uninitialized data / global or static variables)</li>
+</ul>
+<pre><code class="language-bash">$ size ./hello
+   text    data     bss     dec     hex filename
+   1375     600       8    1983     7bf hello
+</code></pre>
+<p>หรือจะลองใช้คำสั่ง <code>file</code> แสดงข้อมูลเกี่ยวกับไฟล์ <code>./hello</code> ตามตัวอย่างดังนี้</p>
+<pre><code class="language-bash">$ file ./hello
+./hello: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), 
+dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, ...
+</code></pre>
+<p>&nbsp;</p>
+<p>นอกจากตัวอย่างโค้ดภาษา <strong>C</strong> แล้ว ลองมาดูโค้ดตัวอย่างที่เป็นภาษา <strong>C++</strong> ที่ให้ผลการทำงานเหมือนกัน
+และก็สามารถสังเกตเห็นความแตกต่างของรูปแบบคำสั่งได้ไม่ยาก</p>
+<pre><code class="language-bash">$ nano hello.cpp
+</code></pre>
+<pre><code class="language-cpp">// file: hello.cpp
+#include &lt;iostream&gt; // the header file for std (C++ standard library)
+
+int main(void) {
+  std::cout &lt;&lt; &quot;Hello World!&quot; &lt;&lt; std::endl;
+  return 0;
+}
+</code></pre>
+<p>ในการคอมไพล์โค้ด จะใช้คำสั่ง <code>g++</code> แทน <code>gcc</code> และสามารถกำหนดมาตรฐานของภาษาที่จะใช้ในการคอมไพล์โค้ดได้
+เช่น <code>-std=c+11</code> หมายถึง ใช้ <strong>C++11</strong> (2011)</p>
+<pre><code class="language-bash">$ g++ -std=c++11 -Wall hello.cpp -o ./hello
+
+$ ./hello
+Hello World!
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> นอกจาก <strong>GNU C/C++ Toolchain</strong> แล้ว ยังมีอีกตัวเลือกหนึ่งที่ได้รับความนิยมมากขึ้น คือ
+<a href="https://clang.llvm.org/"><strong>Clang C/C++ Compiler</strong></a> และ 
+<a href="https://lldb.llvm.org/"><strong>LLDB Debugger</strong></a>
+ซึ่งเป็นส่วนหนึ่งของ  <a href="https://llvm.org/"><strong>The LLVM Project</strong></a></p>
+<p>การติดตั้งโปรแกรม <code>clang</code> ก็ทำได้ง่าย ดังนี้</p>
+<pre><code class="language-bash">$ sudo apt install -y clang 
+$ clang --version | head -n1
+Ubuntu clang version 14.0.0-
+$ clang -std=c99 -Wall hello.c -o hello
+$ clang++ -Wall hello.cpp -o hello
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="gcc-compilation-steps">&#9655; <strong>GCC Compilation Steps</strong><a class="headerlink" href="#gcc-compilation-steps" title="Permanent link">#</a></h2>
+<p>การใช้คำสั่ง <code>gcc</code> หรือ <code>g++</code> สามารถคอมไพล์โค้ด <strong>C/C++</strong> ในซอร์สไฟล์ (<strong>Source File</strong>)
+ให้เป็นไฟล์เอาต์พุตแบบ <strong>Executable File</strong> ได้ในคำสั่งเดียว แต่การคอมไพล์โค้ด สามารถแบ่งออกเป็นขั้นตอนย่อยได้ ดังนั้น</p>
+<ol>
+<li>การทำงานของโปรแกรม <strong>C Preprocessor</strong> ด้วยคำสั่ง <code>cpp</code> ที่เกี่ยวข้องกับการใช้คำสั่ง <strong>Preprocessor Directives</strong> หรือ <strong>C Macros</strong> ในโค้ด เช่น คำสั่ง <code>#include</code> หรือ <code>#define</code> เป็นต้น</li>
+<li>การคอมไพล์โค้ด <code>.c</code> หรือ <code>.cpp</code> ด้วยคำสั่ง <code>gcc</code> หรือ <code>g++</code> ให้เป็นไฟล์ที่มีโค้ดภาษาแอสเซมบลี
+<code>.s</code> (<strong>Assembly Code File</strong>) </li>
+<li>การคอมไพล์ที่มีโค้ดแอสเซมบลี โดยใช้คำสั่ง <code>as</code> ให้เป็นไฟล์อ็อปเจกต์ <code>.o</code> (<strong>Object File</strong>)</li>
+<li>การทำงานของโปรแกรมที่เรียกว่า <strong>Linker</strong> เพื่อนำไฟล์อ็อปเจกต์
+รวมถึงฟังก์ชันของไลบรารีที่เกี่ยวข้อง มารวมกันเพื่อให้ได้ไฟล์เอาต์พุต (<strong>ELF</strong>) ในขั้นตอนสุดท้าย</li>
+</ol>
+<p>ลองทำคำสั่งต่อไปนี้ </p>
+<pre><code class="language-bash">$ cpp hello.c &gt; hello.i
+$ gcc -Wall -S hello.i
+$ as hello.s -o hello.o
+$ gcc hello.o -o hello
+</code></pre>
+<p>จากนั้นให้ลองดูสิ่งที่อยู่ภายใน <code>hello.i</code> และ <code>hello.s</code> ซึ่งเป็นไฟล์ที่ถูกสร้างขึ้นในขั้นตอนย่อยของการคอมไพล์โค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="the-gnu-debugger">&#9655; <strong>The GNU Debugger</strong><a class="headerlink" href="#the-gnu-debugger" title="Permanent link">#</a></h2>
+<p>คำสั่ง <code>gdb</code> (<strong>The GNU Debugger: GDB</strong>)
+ใช้สำหรับการดีบักการทำงานของโปรแกรมที่ได้จากการคอมไพล์โค้ดภาษา <strong>C/C++</strong>
+ถัดไปเป็นตัวอย่างการใช้ <code>gdb</code> ในเบื้องต้น</p>
+<p>เริ่มต้นด้วยการสร้างไฟล์ใหม่ เช่น <code>main.c</code> แล้วเขียนโค้ดตัวอย่างต่อไปนี้</p>
+<pre><code class="language-c">// file: main.c
+#include &lt;stdio.h&gt;
+
+int main(void) {
+  printf( &quot;The for loop begins...\n&quot; );
+  for ( int i=0; i &lt; 3; i++ ) {
+     printf( &quot;Value of the variable i = %d\n&quot;, i );
+  }
+  return 0;
+}
+</code></pre>
+<p>ภายในฟังก์ชัน <code>main</code> มีประโยคำสั่ง <code>prinf(...)</code> สำหรับแสดงข้อความเอาต์พุต 
+และมีประโยคคำสั่ง <code>for</code> เพื่อทำขั้นตอนซ้ำ </p>
+<p>การคอมไพล์โค้ดด้วยคำสั่ง <code>gcc</code> จะต้องมีการระบุ <code>-g</code> ซึ่งหมายถึง 
+ให้ใส่ข้อมูลต่าง ๆ ที่จำเป็นสำหรับการดีบักรวมไว้ในไฟล์เอาต์พุตด้วย</p>
+<pre><code class="language-bash">$ gcc -std=c99 -Wall -g main.c -o ./main
+</code></pre>
+<p>เมื่อคอมไพล์โค้ดและได้ไฟล์ <code>./main</code> แล้ว ก็เรียกใช้คำสั่ง <code>gdb</code> ดังนี้</p>
+<pre><code class="language-bash">$ gdb ./main
+</code></pre>
+<p><img alt="" src="gdb_session_started.png" /></p>
+<p>รูป: เริ่มต้นเข้าสู่ <strong>GDB Session</strong> และตำแหน่งที่มีข้อความ <code>(gdb)</code> เป็นสัญลักษณ์
+<strong>GDB Prompt</strong> เพื่อรอรับคำสั่งถัดไป</p>
+<p>ตัวอย่างคำสั่งพื้นฐานของ <strong>GDB</strong> สำหรับขั้นตอนการดีบักโค้ด เช่น</p>
+<ul>
+<li><code>run</code> หมายถึง ให้รันโค้ดไปจนจบการทำงานของโปรแกรม หรือเริ่มรันโค้ดใหม่อีกครั้ง</li>
+<li><code>l</code> หรือ <code>list</code> หมายถึง แสดงโค้ดภาษา <strong>C</strong> ที่เกี่ยวข้อง และสามารถระบุช่วงหมายเลขบรรทัดได้
+เช่น <code>list 1,5</code> แสดงโค้ดตั้งแต่บรรทัด 1 ถึง 5 </li>
+<li><code>b</code> หรือ  <code>breakpoint</code> หมายถึง กำหนดตำแหน่งหยุดชั่วคราวโดยระบุหมายเลขบรรทัดในโค้ด</li>
+<li><code>n</code> หรือ  <code>next</code> หมายถึง รันคำสั่งที่อยู่ถัดไป</li>
+<li><code>c</code> หรือ <code>continue</code> หมายถึง รันคำสั่งในโปรแกรมต่อไป</li>
+<li><code>i b</code> หรือ <code>info breakpoints</code> หมายถึง แสดงตำแหน่งของ <strong>Breakpoints</strong> ทั้งหมด</li>
+<li><code>d</code> หรือ <code>delete</code> หมายถึง ยกเลิกตำแหน่งของ <strong>Breakpoints</strong> ทั้งหมด</li>
+<li><code>finish</code> หมายถึง รันโค้ดจนกว่าจะออกจากการทำงานของฟังก์ชันที่ไม่ใช่ <code>main</code></li>
+<li><code>display</code> หมายถึง แสดงค่าของตัวแปรตามที่ได้ระบุชื่อเอาไว้โดยอัตโนมัติเมื่อหยุดการดีบักชั่วคราว</li>
+<li><code>q</code> หรือ <code>quit</code> หมายถึง จบการทำงานของ <strong>GDB</strong></li>
+</ul>
+<p>ให้ลองทำคำสั่งต่อไปนี้</p>
+<ul>
+<li><code>break main.c:5</code> เพิ่มตำแหน่ง
+<strong>Breakpoint</strong> เพื่อให้หยุดเมื่อถึงบรรทัดที่ 5 ของไฟล์ <code>main.c</code></li>
+<li><code>break main.c:7</code> เพิ่มตำแหน่ง
+<strong>Breakpoint</strong> เพื่อให้หยุดเมื่อถึงบรรทัดที่ 7 ของไฟล์ <code>main.c</code></li>
+<li><code>run</code> รันโปรแกรม ซึ่งจะไปหยุดชั่วคราวที่ตำแหน่งของ <strong>Breakpoint</strong> ถัดไป</li>
+<li><code>display i</code> เพื่อดูค่าของตัวแปร <code>i</code> โดยอัตโนมัติ</li>
+<li><code>n</code> หรือ <code>c</code> เพื่อรันโค้ดต่อไป (ทำซ้ำไปจนกว่าจะจบการทำงานของโปรแกรม)</li>
+</ul>
+<p><img alt="" src="gdb_run.png" /></p>
+<p>รูป: การทำคำสั่ง <code>l</code> หรือ <code>list</code> ซึ่งจะแสดงโค้ดของไฟล์ <code>main.c</code></p>
+<p>เมื่อได้กำหนดตำแหน่งหยุดชั่วคราวในโค้ด (<strong>Breakpoints</strong>) แล้วให้ลองรันโค้ด
+ด้วยคำสั่ง <code>next</code> หรือ <code>continue</code> และสังเกตการทำงานของโปรแกรม</p>
+<p><img alt="" src="gdb_run_breakpoints.png" /></p>
+<p>รูป: การกำหนดตำแหน่งหยุดชั่วคราวในโค้ด (<strong>Breakpoints</strong>) และรันโค้ดสำหรับการดีบัก</p>
+<p><strong> ข้อสังเกต: </strong> การดีบักโค้ดโดยใช้ <strong>GNU Debugger (GDB)</strong> แบบ <strong>Command Line</strong> อาจจะทำได้ไม่สะดวก
+และในปัจจุบันก็มีซอฟต์แวร์ประเภท <strong>IDE</strong> ที่สามารถดีบักการทำงานของโปรแกรมภาษา <strong>C/C++</strong> 
+ได้ในระดับซอร์สโค้ด (<strong>Source-Level Debugger</strong>) หรือทำงานร่วมกับโปรแกรม <strong>GDB</strong> ได้ง่ายขึ้น</p>
+<p>แนะนำให้ลองศึกษาจากบทความถัดไป <a href="../geany_editor">"การใช้โปรแกรม Geany เพื่อการเขียนโปรแกรมภาษา C/C++ สำหรับระบบปฏิบัติการ Linux
+"</a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้คำสั่งแบบ <strong>Command Line</strong>
+สำหรับ <strong>Linux / Ubuntu</strong> เพื่อลองเขียนโค้ดภาษา <strong>C/C++</strong> ในเบื้องต้น
+และคอมไพล์โค้ดโดยใช้ <strong>GNU C/C++ Toolchain</strong> และการใช้ <strong>GNU Debugger (GDB)</strong>
+เพื่อช่วยในการรันและดีบักโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-08-28 | Last Updated: 2022-08-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
