@@ -235,9 +235,11 @@ Hello World!
 </code></pre>
 <p>หรือจะใช้คำสั่ง <code>size</code> ซึ่งเป็นส่วนหนึ่งของ <a href="https://www.gnu.org/software/binutils/"><strong>GNU binutils</strong></a> แสดงขนาดของส่วนต่าง ๆ  (เรียกว่า <strong>Sections</strong>) ในไฟล์โปรแกรมดังกล่าว โดยแบ่งเป็น </p>
 <ul>
-<li><code>text</code>: <strong>Text Section</strong> (for program instructions)</li>
-<li><code>data</code>: <strong>Data Section</strong> (for initialized data / variables)</li>
-<li><code>bss</code>: <strong>BSS Section</strong> (for uninitialized data / global or static variables)</li>
+<li><code>text</code>: <strong>Text Section</strong> (for program instructions) แสดงขนาดของโปรแกรมที่เป็นคำสั่งสำหรับการทำงานของซีพียู</li>
+<li><code>data</code>: <strong>Data Section</strong> (for initialized data) สำหรับตัวแปรประเภท global
+และ static ที่มีการกำหนดค่าเริ่มต้นและไม่ใช่ 0</li>
+<li><code>bss</code>: <strong>BSS Section</strong> (for uninitialized data) สำหรับตัวแปรประเภท global
+และ static ที่ไม่มีการกำหนดค่าเริ่มต้น (แต่จะถูกกำหนดค่าเริ่มต้นให้เป็น 0 เมื่อโปรแกรมเริ่มทำงาน)</li>
 </ul>
 <pre><code class="language-bash">$ size ./hello
    text    data     bss     dec     hex filename
@@ -337,18 +339,22 @@ int main(void) {
 <li><code>l</code> หรือ <code>list</code> หมายถึง แสดงโค้ดภาษา <strong>C</strong> ที่เกี่ยวข้อง และสามารถระบุช่วงหมายเลขบรรทัดได้
 เช่น <code>list 1,5</code> แสดงโค้ดตั้งแต่บรรทัด 1 ถึง 5 </li>
 <li><code>b</code> หรือ  <code>breakpoint</code> หมายถึง กำหนดตำแหน่งหยุดชั่วคราวโดยระบุหมายเลขบรรทัดในโค้ด</li>
-<li><code>c</code> หรือ <code>continue</code> หมายถึง รันคำสั่งในโปรแกรมต่อไป</li>
-<li><code>n</code> หรือ  <code>next</code> หมายถึง ทำคำสั่งที่อยู่ถัดไป ถ้าเป็นการเรียกฟังก์ชัน จะไม่เข้าไปข้างใน</li>
-<li><code>s</code> หรือ <code>step</code> หมายถึง ทำคำสั่งที่อยู่ถัดไป ถ้าเป็นการเรียกฟังก์ชัน ให้เข้าไปทำคำสั่งข้างในฟังก์ชัน</li>
-<li><code>finish</code> หมายถึง ทำคำสั่งไปจนจบการทำงานของฟังก์ชัน หากเข้าไปทำคำสั่งข้างในฟังก์ชัน</li>
+<li><code>c</code> หรือ <code>continue</code> หมายถึง รันประโยคคำสั่งในโค้ดต่อไป จนกว่าจะถึงตำแหน่งของ <strong>Breakpoint</strong> ถัดไป</li>
+<li><code>n</code> หรือ  <code>next</code> หมายถึง ทำประโยคคำสั่งที่อยู่ถัดไปในโค้ดแล้วหยุดชั่วคราว แต่ถ้ามีการเรียกใช้ฟังก์ชัน
+ก็จะทำจนจบการทำงานของฟังก์ชันดังกล่าว</li>
+<li><code>s</code> หรือ <code>step</code> หมายถึง ทำประโยคคำสั่งที่อยู่ถัดไปในโค้ดแล้วหยุดชั่วคราว ถ้ามีการเรียกฟังก์ชันในซอร์สโค้ด 
+ให้เข้าไปทำประโยคคำสั่งข้างในฟังก์ชันแล้วหยุดที่ประโยคคำสั่งแรกของฟังก์ชัน</li>
+<li><code>finish</code> หมายถึง ทำคำสั่งไปจนจบการทำงานของฟังก์ชัน หากเข้าไปทำคำสั่งข้างในฟังก์ชันที่เกิดจากการทำคำสั่ง <code>step</code>
+ก่อนหน้านั้น</li>
 <li><code>info breakpoints</code> หมายถึง แสดงตำแหน่งของ <strong>Breakpoints</strong> ทั้งหมด</li>
 <li><code>info local variables</code> หมายถึง แสดงค่าของตัวแปรภายในของฟังก์ชัน</li>
 <li><code>delete</code> หมายถึง ยกเลิกตำแหน่งของ <strong>Breakpoints</strong> ทั้งหมด</li>
 <li><code>display</code> หมายถึง แสดงค่าของตัวแปรตามที่ได้ระบุชื่อเอาไว้โดยอัตโนมัติเมื่อหยุดชั่วคราวในแต่ละครั้ง</li>
-<li><code>info locals</code> หมายถึง แสดงค่าของตัวแปรภายใน (<strong>Local Variables</strong>)</li>
+<li><code>info locals</code> หมายถึง แสดงค่าของตัวแปรภายในฟังก์ชันหรือโค้ดบล็อก (<strong>Local Variables</strong>) ถ้ามีอยู่ในขณะนั้น</li>
+<li><code>info variables</code> หมายถึง แสดงค่าของตัวแปรภายนอก (<strong>Global/Static Variables</strong>) ถ้ามีในโค้ด</li>
 <li><code>q</code> หรือ <code>quit</code> หมายถึง จบการทำงานของ <strong>GDB</strong></li>
 </ul>
-<p>ให้ลองทำคำสั่งต่อไปนี้</p>
+<p>ให้ลองทำคำสั่งต่อไปนี้ใน <strong>GDB</strong> ตามลำดับ</p>
 <ul>
 <li><code>break main.c:5</code> เพิ่มตำแหน่ง
 <strong>Breakpoint</strong> เพื่อให้หยุดเมื่อถึงบรรทัดที่ 5 ของไฟล์ <code>main.c</code></li>
@@ -372,14 +378,11 @@ int main(void) {
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
-<p>บทความนี้นำเสนอการใช้คำสั่งแบบ <strong>Command Line</strong>
-สำหรับ <strong>Linux / Ubuntu</strong> เพื่อลองเขียนโค้ดภาษา <strong>C/C++</strong> ในเบื้องต้น
-และคอมไพล์โค้ดโดยใช้ <strong>GNU C/C++ Toolchain</strong> และการใช้ <strong>GNU Debugger (GDB)</strong>
-เพื่อช่วยในการรันและดีบักโค้ด</p>
+<p>บทความนี้นำเสนอการใช้คำสั่งแบบ <strong>Command Line</strong> สำหรับ <strong>Linux / Ubuntu</strong> เพื่อลองเขียนโค้ดภาษา <strong>C/C++</strong> ในเบื้องต้น และคอมไพล์โค้ดโดยใช้ <strong>GNU C/C++ Toolchain</strong> และการใช้ <strong>GNU Debugger (GDB)</strong> เพื่อช่วยในการรันและดีบักโค้ด</p>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-08-28 | Last Updated: 2022-08-31</p></div>
+<p>Created: 2022-08-28 | Last Updated: 2022-09-01</p></div>
             </div>
         </div>
 
