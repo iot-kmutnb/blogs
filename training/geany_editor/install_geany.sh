@@ -16,7 +16,7 @@ fi
 # install necessary packages to build Geany from sourcecode
 sudo apt install -y build-essential automake autoconf \
   pkg-config intltool libgtk-3-dev libvte-2.91-dev \
-  gdb cppcheck 
+  gdb cppcheck
 
 #-------------------------------------------------------
 # set the URL
@@ -73,4 +73,3 @@ sudo ldconfig -v
 rm -fr ./geany-plugins-${GEANY_VERSION}
 #-------------------------------------------------------
 echo "Done..."
-```
