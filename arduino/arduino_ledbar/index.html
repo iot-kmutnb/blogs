@@ -102,6 +102,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#pwm-esp32" class="nav-link">&#9655; การสร้างสัญญาณ PWM สำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -146,10 +150,20 @@
 (<a href="https://wokwi.com/projects/">https://wokwi.com/projects/</a>)
 และยังไม่จำเป็นต้องมีอุปกรณ์ฮาร์ดแวร์จริง </p>
 <pre><code class="language-cpp">#if defined(ESP32)
+// For ESP32 DevKit V1 board + 10-bit LED Bar (Wokwi Simulator):
+// =&gt; use pins: {23,22,32,33,25,26,27,14,12,13}
+// For WeMos Lolin32 Lite + 8-bit LED bar
+// =&gt; use pins: {22,19,23,18,5,17,16,4}
 const int LED_PINS[] = {23,22,32,33,25,26,27,14,12,13};
 #else
+// For Arduino Nano + 10-bit LED Bar (Wokwi Simulator)
+// =&gt; use pins: {2,3,4,5,6,7,8,9,10,11}
+// For Arduino Nano + 8-bit LED Bar 
+// =&gt; use pins: {5,6,7,8,9,10,11,12}
 const int LED_PINS[] = {2,3,4,5,6,7,8,9,10,11};
 #endif
+
+#define BIT_INV (1)  // 0 or 1
 
 const int NUM_LEDS = sizeof(LED_PINS)/sizeof(int);
 uint16_t MASK = (1U &lt;&lt; NUM_LEDS)-1;
@@ -170,13 +184,13 @@ void loop() {
   static uint16_t value=1;
   // update the output of each LED in the array
   for ( int i=0; i &lt; NUM_LEDS; i++ ) {
-     digitalWrite( LED_PINS[i], (value &gt;&gt; i) &amp; 1 );     
+     digitalWrite( LED_PINS[i], (value &gt;&gt; i) &amp; 1 ^ BIT_INV );     
   }
   // show the current value of the variable in a hex format
   str = &quot;LEDs: value=0x&quot;;
-  str += String(value, HEX);
+  str += String( value, HEX );
   Serial.println( str.c_str() );
-  // performs an rotate shift left operation on the value (10 bits)
+  // performs a rotate-shift-left operation on the value (10 bits)
   value = ((value &lt;&lt; 1) | (value &gt;&gt; (NUM_LEDS-1))) &amp; MASK;
   delay(500);
 }
@@ -226,8 +240,7 @@ void loop() {
 <p>รูป: การคอมไพล์และอัปโหลดโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Arduino Nano</strong></p>
 <p><img alt="" src="nano_ledbar.jpg" /></p>
 <p>รูป: ตัวอย่างการต่อวงจรโดยใช้บอร์ด <strong>Arduino Nano</strong> และโมดูล
-<strong>8-bit LED Bar</strong> แบบ <strong>COM=GND</strong>
-และเลือกใช้ขา
+<strong>8-bit LED Bar</strong> แบบ <strong>COM=GND</strong> และเลือกใช้ขา
 <strong>Arduino Pins = {D5, D6, D7, D8, D9, D10, D11, D12}</strong></p>
 <p><img alt="" src="esp32_lolin32_lite_ledbar.jpg" /></p>
 <p>รูป: ตัวอย่างการต่อวงจรโดยใช้บอร์ด <strong>WeMos Lolin32 Lite</strong> (ใช้แทนบอร์ด
@@ -235,13 +248,72 @@ void loop() {
 <strong>8-bit LED Bar</strong> แบบ <strong>COM=VCC</strong> และเลือกใช้ขา
 <strong>ESP32 GPIO Pins = {22, 19, 23, 18, 5, 17, 16, 4}</strong></p>
 <hr />
+<h2 id="pwm-esp32">&#9655; <strong>การสร้างสัญญาณ PWM สำหรับ ESP32</strong><a class="headerlink" href="#pwm-esp32" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ESP32</strong> มีวงจรภายในที่เรียกว่า <strong>LED Control (LEDC) Peripheral</strong>
+สามารถสร้างสัญญาณดิจิทัล-เอาต์พุตตามรูปแบบที่เรียกว่า <strong>PWM (Pulse-Width Modulation)</strong>
+ซึ่งเป็นสัญญาณที่มีความถี่คงที่ แต่ปรับความกว้างของพัลส์ที่เป็น <strong>HIGH</strong> ได้ (เรียกว่า ค่า <strong>Duty Cycle</strong>)
+และสามารถสร้างสัญญาณได้สูงสุด 16 ช่อง (<strong>PWM Channels</strong>)</p>
+<p>การเขียนโปรแกรมด้วย <strong>Arduino-ESP32</strong> ก็มีคำสั่งที่เกี่ยวข้องกับการใช้งาน 
+<a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/ledc.html"><strong>LEDC</strong></a> ดังนี้</p>
+<ul>
+<li><code>double ledcSetup(uint8_t channel, double freq, uint8_t resolution_bits)</code>
+เป็นการเริ่มต้นใช้งานวงจร <strong>LEDC</strong> สำหรับช่องสัญญาณ <code>channel</code> ตามที่เลือก (<strong>0..15</strong>)
+และตั้งค่าความถี่ให้ใกล้เคียงกับค่าที่ต้องการ (<code>freq</code>) และเลือกความละเอียดของค่า <strong>PWM Duty Cycle</strong>
+โดยระบุเป็นจำนวนบิต (<code>resolution_bits</code>) ฟังก์ชันนี้จะให้ค่าความถี่ (หน่วยเป็น <strong>Hz</strong>)
+ของสัญญาณ <strong>PWM</strong> ที่สามารถใช้ได้ แต่ถ้าได้ค่าเป็น 0 แสดงว่าเกิดความผิดพลาดในการตั้งค่าใช้งาน</li>
+<li><code>void ledcWrite(uint8_t channel, uint32_t duty)</code>
+เป็นการเขียนค่า <code>duty</code> สำหรับ <strong>PWM Duty Cycle</strong> ไปยังช่องสัญญาณ <code>channel</code>
+และค่าจะต้องอยู่ในช่วง <script type="math/tex">0 .. 2^n</script>, <script type="math/tex">n</script> คือ จำนวนบิตสำหรับค่า <strong>PWM Resolution</strong></li>
+<li><code>void ledcAttachPin(uint8_t pin, uint8_t channel)</code>
+เป็นการเริ่มต้นใช้งานขา <code>pin</code> ซึ่งเป็นหมายเลขขา <strong>GPIO</strong> ของ <strong>ESP32</strong>
+กับช่องสัญญาณ <code>channel</code></li>
+<li><code>void ledcDetachPin(uint8_t pin)</code>
+เป็นการเลิกใช้งานขา <code>pin</code> สำหรับช่องสัญญาณ <strong>PWM Channel</strong></li>
+</ul>
+<p>ตัวอย่างโค้ดต่อไปนี้ สาธิตการทำให้ <strong>LED</strong> แต่ละดวงของโมดูล <strong>8-bit LED Bar</strong>
+(เลือกใช้แบบ <strong>Active-Low</strong>) ค่อย ๆ สว่างขึ้นแล้วดับลง เรียงไปตามลำดับของ <strong>LED</strong> 
+โดยใช้สัญญาณ <strong>PWM</strong> ความถี่ <strong>1kHz</strong> และมีค่า <strong>PWM Resolution</strong>
+เท่ากับ 8 บิต ดังนั้นจึงใช้ค่า <strong>Duty Cycle</strong> ในช่วง <strong>0 .. 255</strong></p>
+<pre><code class="language-c">const int LED_PINS[] = {22,19,23,18,5,17,16,4}; // ESP32 pins
+const int NUM_LEDS   = sizeof(LED_PINS)/sizeof(int);
+
+#define OFF (HIGH) // active-low LED
+
+void setup() {
+  for ( int i=0; i &lt; NUM_LEDS; i++ ) {
+    // set the direction of the i-th LED pin
+    pinMode( LED_PINS[i], OUTPUT ); 
+    digitalWrite( LED_PINS[i], OFF );
+  }
+}
+
+const int PWM_RESOLUTION = 8;
+const int PWM_FREQ = 1000;
+const int DUTY_MAX = (1 &lt;&lt; PWM_RESOLUTION);
+
+void loop() {
+  for ( int i=0; i &lt; NUM_LEDS; i++ ) {
+      ledcSetup( i /*channel*/, PWM_FREQ, PWM_RESOLUTION );
+      ledcAttachPin( LED_PINS[i] /*pin*/, i /*channel*/ );
+      for ( int x=0; x &lt; 2*DUTY_MAX; x++ ) {
+         int duty = (x &gt;= DUTY_MAX) ? 2*DUTY_MAX-1-x : x; 
+         ledcWrite( i, DUTY_MAX-1-duty );
+         delay(5);
+      }
+      ledcDetachPin( LED_PINS[i] ); 
+      digitalWrite( LED_PINS[i], OFF );
+      delay(200);
+  }
+}
+</code></pre>
+<hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอการใช้งานโมดูล <strong>8-bit LED Bar</strong> และการเขียนโค้ด <strong>Arduino Sketch</strong>
 โดยทดลองใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> และ <strong>Arduino Nano</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-09-06 | Last Updated: 2022-09-06</p></div>
+<p>Created: 2022-09-06 | Last Updated: 2022-09-07</p></div>
             </div>
         </div>
 
