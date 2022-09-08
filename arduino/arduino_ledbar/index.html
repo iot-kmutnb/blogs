@@ -106,6 +106,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#pwm-arduino-nano" class="nav-link">&#9655; การสร้างสัญญาณ PWM สำหรับ Arduino Nano</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -247,12 +251,21 @@ void loop() {
 <strong>ESP32 DevKit V1</strong>) และโมดูล
 <strong>8-bit LED Bar</strong> แบบ <strong>COM=VCC</strong> และเลือกใช้ขา
 <strong>ESP32 GPIO Pins = {22, 19, 23, 18, 5, 17, 16, 4}</strong></p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="pwm-esp32">&#9655; <strong>การสร้างสัญญาณ PWM สำหรับ ESP32</strong><a class="headerlink" href="#pwm-esp32" title="Permanent link">#</a></h2>
 <p>ชิป <strong>ESP32</strong> มีวงจรภายในที่เรียกว่า <strong>LED Control (LEDC) Peripheral</strong>
 สามารถสร้างสัญญาณดิจิทัล-เอาต์พุตตามรูปแบบที่เรียกว่า <strong>PWM (Pulse-Width Modulation)</strong>
-ซึ่งเป็นสัญญาณที่มีความถี่คงที่ แต่ปรับความกว้างของพัลส์ที่เป็น <strong>HIGH</strong> ได้ (เรียกว่า ค่า <strong>Duty Cycle</strong>)
+ซึ่งเป็นสัญญาณที่มีความถี่คงที่ แต่ปรับความกว้างของพัลส์ที่เป็น <strong>HIGH</strong> ได้ (เรียกว่า <strong>Duty Cycle</strong>)
 และสามารถสร้างสัญญาณได้สูงสุด 16 ช่อง (<strong>PWM Channels</strong>)</p>
+<p>
+<script type="math/tex; mode=display">
+  Duty\,Cycle = \frac{High\,Pulse\,Duration}{PWM\,Period} \times 100\%
+</script>
+</p>
+<p><img alt="" src="arduino_pwm_signals.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณ <strong>PWM</strong> ที่มีค่า <strong>Duty Cycle</strong> แตกต่างกัน (Source: arduino.cc)</p>
+<p>&nbsp;</p>
 <p>การเขียนโปรแกรมด้วย <strong>Arduino-ESP32</strong> ก็มีคำสั่งที่เกี่ยวข้องกับการใช้งาน 
 <a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/ledc.html"><strong>LEDC</strong></a> ดังนี้</p>
 <ul>
@@ -272,7 +285,8 @@ void loop() {
 </ul>
 <p>ตัวอย่างโค้ดต่อไปนี้ สาธิตการทำให้ <strong>LED</strong> แต่ละดวงของโมดูล <strong>8-bit LED Bar</strong>
 (เลือกใช้แบบ <strong>Active-Low</strong>) ค่อย ๆ สว่างขึ้นแล้วดับลง เรียงไปตามลำดับของ <strong>LED</strong> 
-โดยใช้สัญญาณ <strong>PWM</strong> ความถี่ <strong>1kHz</strong> และมีค่า <strong>PWM Resolution</strong>
+โดยใช้สัญญาณ <strong>PWM</strong> ที่มีค่า  <strong>Duty Cycle</strong> เปลี่ยนแปลงได้ เพื่อปรับความสว่างของ
+<strong>LED</strong>  มีการตั้งค่าความถี่เท่ากับ <strong>1kHz</strong> และค่า <strong>PWM Resolution</strong>
 เท่ากับ 8 บิต ดังนั้นจึงใช้ค่า <strong>Duty Cycle</strong> ในช่วง <strong>0 .. 255</strong></p>
 <pre><code class="language-c">const int LED_PINS[] = {22,19,23,18,5,17,16,4}; // ESP32 pins
 const int NUM_LEDS   = sizeof(LED_PINS)/sizeof(int);
@@ -306,6 +320,60 @@ void loop() {
   }
 }
 </code></pre>
+<p>&nbsp;</p>
+<p><strong>คำแนะนำ:</strong> ให้ลองเปลี่ยนมาใช้ <strong>LED</strong> แทน <strong>LED Bar</strong> ในกรณีที่ใช้ <strong>WokWi Simulator</strong>
+จำลองการทำงาน เพราะจะทำให้เห็นการเปลี่ยนแปลงและสังเกตดูความสว่างของ <strong>LED</strong> ได้ชัดเจนกว่าขณะที่จำลองการทำงานของวงจร</p>
+<p><img alt="" src="wokwi_esp32_ledc.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรสำหรับ <strong>WokWi Simulator</strong> และเลือกใช้ขาของบอร์ด
+<strong>ESP32 DevKit V1</strong> จำนวน 4 ขา <strong>{5, 18, 19, 21}</strong> และต่อวงจร <strong>LED</strong> จำนวน 4 ชุด
+ให้ทำงานแบบ <strong>Active-Low</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pwm-arduino-nano">&#9655; <strong>การสร้างสัญญาณ PWM สำหรับ Arduino Nano</strong><a class="headerlink" href="#pwm-arduino-nano" title="Permanent link">#</a></h2>
+<p>ในการสร้างสัญญาณ <strong>PWM</strong> โดยใช้บอร์ด <strong>Arduino Uno</strong> หรือ <strong>Nano</strong>
+จะต้องเลือกใช้ขา <strong>{3, 5, 6, 9, 10 ,11}</strong> ซึ่งมีเพียง 6 ขา เท่านั้น สำหรับสัญญาณ <strong>PWM</strong>
+ด้วยใช้วงจร <strong>Timers</strong> ของชิปไมโครคอนโทรลเลอร์ <strong>ATmega328P</strong> และมีคำสั่ง
+<a href="https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/"><code>analogWrite()</code></a>
+ให้ใช้กับขาเหล่านั้น ความถี่ของสัญญาณ <strong>PWM</strong> ได้ถูกกำหนดไว้แล้ว และมีจำนวนบิตของสัญญาณ <strong>PWM</strong> เท่ากับ 8 บิต </p>
+<ul>
+<li><strong>490 Hz: 3, 9, 10, 11 pins</strong></li>
+<li><strong>980 Hz: 5, 6 pins</strong></li>
+</ul>
+<p>โค้ดต่อไปนี้ สาธิตการสร้างสัญญาณ <strong>PWM</strong> จำนวน 4 ช่องสัญญาณ โดยเลือกใช้งานขาหมายเลข 
+<strong>{5, 6, 9, 10}</strong> เพื่อนำมาใช้ควบคุมความสว่างของ <strong>LED</strong> จำนวน 4 ดวง
+(ต่อวงจรให้ทำงานแบบ <strong>Active-High</strong>)</p>
+<pre><code class="language-c">const int LED_PINS[] = {5,6,9,10}; // Arduino PWM pins
+const int NUM_LEDS   = sizeof(LED_PINS)/sizeof(int);
+
+#define OFF (LOW) // active-high LED
+
+void setup() {
+  for ( int i=0; i &lt; NUM_LEDS; i++ ) {
+    // set the direction of the i-th LED pin
+    pinMode( LED_PINS[i], OUTPUT ); 
+    digitalWrite( LED_PINS[i], OFF );
+  }
+}
+
+#define DUTY_MAX (256) // 8-bit PWM resolution
+
+void loop() {
+  for ( int i=0; i &lt; NUM_LEDS; i++ ) {
+    int pin = LED_PINS[i];
+    analogWrite( pin, 0 );
+      for ( int x=0; x &lt; 2*DUTY_MAX; x++ ) {
+         int duty = (x &gt;= DUTY_MAX) ? 2*DUTY_MAX-1-x : x; 
+         analogWrite( pin, duty );
+         delay(5);
+      }
+      digitalWrite( pin, OFF );
+      delay(200);
+  }
+}
+</code></pre>
+<p><img alt="" src="wokwi_nano_led_pwm.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรและจำลองการทำงานโดยใช้ <strong>WokWi Simulator</strong></p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอการใช้งานโมดูล <strong>8-bit LED Bar</strong> และการเขียนโค้ด <strong>Arduino Sketch</strong>
@@ -313,7 +381,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-09-06 | Last Updated: 2022-09-07</p></div>
+<p>Created: 2022-09-06 | Last Updated: 2022-09-08</p></div>
             </div>
         </div>
 
