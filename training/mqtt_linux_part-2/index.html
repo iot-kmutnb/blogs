@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/training/mqtt_linux_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>MQTT และการใช้งานสำหรับ Linux (ตอนที่ 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mqtt-linux-2" class="nav-link">MQTT และการใช้งานสำหรับ Linux (ตอนที่ 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#public-mqtt-broker" class="nav-link">&#9655; การทดลองใช้งาน Public MQTT Broker</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การส่งข้อความที่มีการเข้ารหัสข้อมูลและยืนยันตัวตน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mqtt-linux-2">MQTT และการใช้งานสำหรับ Linux (ตอนที่ 2)<a class="headerlink" href="#mqtt-linux-2" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="public-mqtt-broker">&#9655; <strong>การทดลองใช้งาน Public MQTT Broker</strong><a class="headerlink" href="#public-mqtt-broker" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการติดตั้งและลองใช้คำสั่งของ <strong>Mosquitto Client</strong> สำหรับระบบปฏบิติการ <strong>Linux</strong>
+(ใช้ <strong>Ubuntu 22.04 LTS</strong>) ให้ทำคำสั่งติดตั้งแพ็กเกจดังนี้</p>
+<pre><code class="language-bash">$ sudo apt update
+$ sudo apt install mosquitto-clients -y
+</code></pre>
+<p>คำสั่งเพื่อทำการติดตั้งแพ็กเกจซึ่งเป็นไลบรารี <strong>Mosquitto Client C Library</strong>
+ในกรณีที่ต้องการเขียนโปรแกรมภาษา <strong>C</strong></p>
+<pre><code class="language-bash">$ sudo apt install build-essential libmosquitto-dev -y
+</code></pre>
+<p>เมื่อได้ติดตั้งแพ็กเกจแล้ว ทดลองเรียกใช้คำสั่ง <code>mosquitto_pub</code> และ <code>mosquitto_sub</code>
+(ในข้อความเอาต์พุตที่เป็นตัวอย่าง จะแสดงเวอร์ชัน <strong>2.0.11</strong>)</p>
+<pre><code class="language-bash">$ mosquitto_pub --version
+mosquitto_pub version 2.0.11 running on libmosquitto 2.0.11.
+
+$ mosquitto_sub --version
+mosquitto_sub version 2.0.11 running on libmosquitto 2.0.11.
+</code></pre>
+<p>&nbsp;</p>
+<p>ให้ทำคำสั่งต่อไปนี้ ในหน้าต่าง <strong>Terminal</strong> เพื่อเชื่อมต่อและสมัครรับข้อความตามหัวข้อ เช่น
+<code>'test/1234/#'</code> และคอยรับข้อความจาก <strong>test.mosquitto.org</strong>
+(ถ้าต้องการจบการทำงานของคำสั่ง ให้กด <code>Ctrl</code>+<code>c</code>)</p>
+<pre><code class="language-bash"># command to subscribe to a specific topic on localhost
+$ mosquitto_sub -h test.mosquitto.org -p 1883 -t 'test/1234/#'
+</code></pre>
+<p>ในอีกหน้าต่าง <strong>Terminal</strong> (เปิดหน้าต่าง <strong>Terminal</strong> ใหม่ เพื่อทำคำสั่งใน <strong>Bash Shell</strong>)
+ให้ทำคำสั่งต่อไปนี้ เพื่อเชื่อมต่อกับ  <strong>test.mosquitto.org</strong>
+และส่งข้อความไปยังโบรกเกอร์ โดยใช้หัวข้อ <code>test/1234/msg</code> ลองส่งข้อความหลาย ๆ ครั้ง 
+แล้วสังเกตดูว่า ได้รับข้อความกลับมาหรือไม่ ซึ่งจะแสดงผลในอีก <strong>Terminal</strong> ที่ได้เปิดไว้ก่อนหน้านั้น</p>
+<pre><code class="language-bash"># command to publish a message to a specific topic on localhost
+$ mosquitto_pub -h test.mosquitto.org -p 1883 -t 'test/1234/msg' -m 'hello'
+</code></pre>
+<p>ถ้าเพิ่ม <code>-d</code> ในบรรทัดคำสั่ง <code>mosquitto_pub</code> ก็จะมีข้อความเอาต์พุตที่แสดงสถานะขั้นตอนการทำงานของโปรแกรม
+และช่วยในการดีบัก หรือ <strong>Debug Messages</strong></p>
+<pre><code class="language-bash">$ mosquitto_pub -h test.mosquitto.org -p 1883 -t 'test/1234/msg' -m 'hello' -d
+Client (null) sending CONNECT
+Client (null) received CONNACK (0)
+Client (null) sending PUBLISH (d0, q0, r0, m1, 'test/1234/msg', ... (5 bytes))
+Client (null) sending DISCONNECT
+</code></pre>
+<p>การทำคำสั่ง <code>mosquitto_pub</code> สามารถระบุค่าตัวเลือกได้ เช่น</p>
+<ul>
+<li><code>-h host</code> ชื่อหรือหมายเลขไอพีของเครื่องแม่ข่ายที่ทำหน้าที่เป็นโบรกเกอร์ที่ต้องการเชื่อมต่อ</li>
+<li><code>-p port</code> หมายเลขพอร์ตของโบรกเกอร์</li>
+<li><code>-t topic</code> ชื่อหัวข้อในการเผยแพร่ข้อความ</li>
+<li><code>-m message</code> ข้อความที่ต้องการส่งไปยังโบรกเกอร์</li>
+<li><code>-q qos</code> ระดับ <strong>QoS</strong> {<code>0</code>,<code>1</code>,<code>2</code>} เพื่อกำหนดระดับคุณภาพของการบริการส่งข้อมูล</li>
+<li><code>-d</code> ให้แสดงข้อความดีบักเมื่อโปรแกรมทำขั้นตอนต่าง ๆ </li>
+<li><code>-u user -P password</code> ชื่อบัญชีผู้ใช้และรหัสผ่านเพื่อขอใช้บริการกับโบรกเกอร์</li>
+<li><code>-i client-id</code> ตัวระบุชื่อสำหรับ <strong>MQTT client</strong></li>
+<li><code>-k keepalive</code> ระยะเวลา (วินาที) สำหรับ <strong>Clean Session Lifetime</strong> (default: <code>60</code>)</li>
+<li><code>-c</code> เชื่อมต่อแบบ <strong>Persistent Session</strong> </li>
+<li><code>-V protocol-version</code> ระบุเวอร์ชันของโพรโทคอลที่จะใช้งาน 
+{<code>mqttv5</code>, <code>mqttv311</code>, <code>mqttv31</code>} (default = <code>mqttv311</code>)</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="mosquitto_pub_sub-1.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code>
+เชื่อมต่อกับ <strong>test.mosquitto.org:1883</strong></p>
+<p>&nbsp;</p>
+<p>ถ้าจะลองใช้ <strong>Public EMQX Broker</strong> ก็ให้เปลี่ยนเป็น <code>-h broker.emqx.io -p 1883</code></p>
+<p><img alt="" src="mqtt_pubsub_emqx-1.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code>
+เชื่อมต่อกับ <strong>broker.emqx.io:1883</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การส่งข้อความที่มีการเข้ารหัสข้อมูลและยืนยันตัวตน</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการทดลองเชื่อมต่อและส่งข้อความไปยังโบรกเกอร์ <strong>test.mosquitto.org</strong>
+โดยเลือกใช้พอร์ต เช่น <strong>8884</strong> ในกรณีนี้ จะต้องมีการเตรียมไฟล์ <strong>Client Certificate</strong>
+เอาไว้ใช้งาน </p>
+<p>ขั้นตอนการสร้างไฟล์ดังนี้ (อ้างอิงจาก: <a href="https://test.mosquitto.org/ssl/"><strong>TLS Client Certificate</strong></a>)
+เริ่มต้นด้วยการสร้างไฟล์ <strong>CSR</strong> (<em>Certificate Signing Request</em>) และบันทึกไว้ในรูปแบบที่เรียกว่า
+<strong>PEM Format</strong> โดยใช้คำสั่ง <code>openssl</code> และในการสร้างไฟล์ <strong>CSR</strong> จะต้องใส่ข้อมูลที่เรียกว่า
+<strong>Distinguished Name (DN)</strong> ประกอบด้วย</p>
+<ul>
+<li><strong>Common Name / FQDN</strong> (<strong><em>required</em></strong>) เช่น ใช้ชื่อ  <code>iot-kmutnb.github.io</code></li>
+<li><strong>Organization</strong> (<em>optional</em>)</li>
+<li><strong>Organization Unit (OU)</strong> (<em>optional</em>)</li>
+<li><strong>City or Locality</strong> (<em>optional</em>)</li>
+<li><strong>State or Province</strong> (<em>optional</em>)</li>
+<li><strong>Two-letter Country Code</strong> (<em>optional</em>)</li>
+<li><strong>Email Address</strong> (<em>optional</em>)</li>
+<li><strong>Challenge Password</strong> (<em>optional</em>)</li>
+</ul>
+<pre><code class="language-bash"># Install the openssl utility
+$ sudo apt install openssl -y
+
+# Generate the RSA 2048-bit private key file (client.key)
+# and the CSR file (client.csr)
+$ openssl req -new -newkey rsa:2048 -nodes \
+  -keyout client.key -out client.csr
+
+# Download the CA signed Server Certificate of Mosquitto.org
+$ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
+</code></pre>
+<p>เมื่อทำคำสั่ง <code>openssl</code> แล้ว จะได้ไฟล์ <code>client.key</code> ซึ่งต้องเก็บรักษาไว้เป็นความลับ และอีกไฟล์หนึ่งคือ
+<code>client.csr</code> จากนั้นให้นำข้อความในไฟล์  <code>client.csr</code> ไปกรอกใส่ในฟอร์มบนหน้าเว็บของ <strong>Mosquitto</strong>
+ซึ่งทำหน้าที่เป็น <strong>Online Client Certificate Generator</strong>
+<a href="https://test.mosquitto.org/ssl/">https://test.mosquitto.org/ssl/</a>
+แล้วกดปุ่ม <strong>Submit</strong> จะได้ไฟล์ <code>client.crt</code> ซึ่งเป็น <strong> SSL/TLS Client Certificate</strong>
+มาใช้งานและมีอายุการใช้งานได้ 90 วัน</p>
+<p><img alt="" src="mosquitto_gen_csr.png" /></p>
+<p>รูป: หน้าเว็บของ <strong>Mosquitto</strong> สำหรับกรอกข้อมูล <strong>CSR</strong> ของไคลเอนต์
+เพื่อให้ตรวจสอบและสร้างไฟล์ <code>client.crt</code> (<strong>CA-signed Certificate for Client</strong>)</p>
+<p><img alt="" src="mqtt_client_crt_file.png" /></p>
+<p>รูป: ข้อความภายในไฟล์ <code>client.crt</code></p>
+<p><img alt="" src="mqtt_broker_crt_file.png" /></p>
+<p>รูป: ข้อความภายในไฟล์ <code>mosquitto.org.crt</code></p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นการลองใช้คำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code> เพื่อเชื่อมต่อกับพอร์ต <strong>8884</strong>
+ใช้ <strong>QoS 2</strong> และโพรโทคอล <strong>MQTT v5.0</strong> และให้สังเกตว่า จะต้องมีการใช้ไฟล์ต่อไปนี้ (เก็บอยู่ในไดเรกทอรีเดียวกัน)</p>
+<ul>
+<li><code>mosquitto.org.crt</code> (<strong>Server Certificate for Mosquitto</strong>)</li>
+<li><code>client.crt</code> (*<em>Client Cerficate</em>)</li>
+<li><code>client.key</code> (<strong>Client Private Key</strong>)</li>
+</ul>
+<p>ทำคำสั่งบรรทัดเดียว เพื่อสมัครและรอรับข้อความ </p>
+<pre><code class="language-bash">$ mosquitto_sub -h test.mosquitto.org -p 8884 -d \
+ --cafile mosquitto.org.crt --cert client.crt --key client.key \
+ -t 'test/1234/#' -V mqttv5 -q 2
+</code></pre>
+<p>ทำคำสั่งบรรทัดเดียว เพื่อส่งข้อความ</p>
+<pre><code class="language-bash">$ mosquitto_pub -h test.mosquitto.org -p 8884 -d \
+  --cafile mosquitto.org.crt --cert client.crt --key client.key \
+  -t 'test/1234/msg' -m 'hello' -V mqttv5 -q 2
+</code></pre>
+<p><img alt="" src="mosquitto_pub_sub_8884.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code>
+เชื่อมต่อกับ <strong>test.mosquitto.org:8884</strong> </p>
+<p>แต่ถ้าจะลองใช้พอร์ต <strong>8885</strong> จะต้องระบุชื่อบัญชีผู้ใช้และรหัสผ่านด้วย ดังนี้</p>
+<pre><code class="language-bash">$ mosquitto_pub -h test.mosquitto.org -p 8885 -d \
+ --cafile mosquitto.org.crt --cert client.crt --key client.key \
+ -t 'test/1234/msg' -m 'hello' -V mqttv5 -q 2 \
+ -u 'rw' -P 'readwrite'
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าต้องการทดสอบกับ <strong>EMQX MQTT Broker</strong> ให้ลองใช้พอร์ต <strong>8883</strong> 
+ซึ่งจะมีการเข้ารหัสข้อมูลเท่านั้น ดังนั้นจึงไม่ต้องใช้ไฟล์  <strong> SSL/TLS Client Certificate</strong>
+แต่จะต้องดาวน์โหลดไฟล์สำหรับ <strong> SSL/TLS Server Certificate</strong> สำหรับ <strong> EMQX Broker</strong>
+มาใช้งานด้วย
+(อ้างอิงจาก: <a href="https://www.emqx.com/en/mqtt/public-mqtt5-broker">"<strong>Public MQTT Broker for IoT Testing</strong>"</a>)</p>
+<pre><code class="language-bash"># Download the CA Certificate of the EMQX broker
+$ wget https://assets.emqx.com/data/broker.emqx.io-ca.crt
+</code></pre>
+<p>จากนั้นให้ลองทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code> เพื่อเชื่อมต่อกับพอร์ต <strong>8883</strong>
+ใช้ <strong>QoS 2</strong> และโพรโทคอล <strong>MQTT v5.0</strong></p>
+<p>ทำคำสั่งเพื่อสมัครและรอรับข้อความ</p>
+<pre><code class="language-bash">$ mosquitto_sub -h broker.emqx.io -p 8883 -d \
+ --cert client.crt --key client.key \
+ -t 'test/1234/#' -V mqttv5 -q 2
+</code></pre>
+<p>ทำคำสั่งเพื่อเผยแพร่ข้อความ</p>
+<pre><code class="language-bash">$ mosquitto_pub -h broker.emqx.io -p 8883 -d \
+  --cert client.crt --key client.key \
+  -t 'test/1234/msg' -m 'hello' -V mqttv5 -q 2
+</code></pre>
+<p><img alt="" src="mosquitto_pub_sub_8884.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code>
+เชื่อมต่อกับ <strong>broker.emqx.io:8883</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้สาธิตการเชื่อมต่อไปยังโบรกเกอร์สาธารณะ เช่น  <strong>Mosquitto Broker</strong>
+และ <strong>EMQX Broker</strong> สำหรับการลองใช้งาน <strong>MQTT</strong> โดยใช้คำสั่งของ
+<strong>Mosquitto Pub/Sub Client</strong> ใน <strong>Linux</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-10 | Last Updated: 2022-09-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

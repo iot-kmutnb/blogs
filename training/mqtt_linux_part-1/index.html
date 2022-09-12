@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/training/mqtt_linux_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>MQTT และการใช้งานสำหรับ Linux (ตอนที่ 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mqtt-linux-1" class="nav-link">MQTT และการใช้งานสำหรับ Linux (ตอนที่ 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#mqtt" class="nav-link">&#9655; MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mqtt_1" class="nav-link">&#9655; หลักการทำงานของ MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mqtt-connection" class="nav-link">&#9655; MQTT Connection</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mqtt-message-publication-subscription" class="nav-link">&#9655; MQTT Message Publication / Subscription</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mqtt-topics" class="nav-link">&#9655; MQTT Topics</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#qos-of-message-delivery" class="nav-link">&#9655; QoS of Message Delivery</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#public-mqtt-brokers" class="nav-link">&#9655; Public MQTT Brokers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#open-source-mqtt-brokers" class="nav-link">&#9655; Open Source MQTT Brokers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mqtt_2" class="nav-link">&#9655; แหล่งข้อมูลสำหรับศึกษาเพิ่มเติมเกี่ยวกับ MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mqtt-linux-1">MQTT และการใช้งานสำหรับ Linux (ตอนที่ 1)<a class="headerlink" href="#mqtt-linux-1" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="mqtt">&#9655; <strong>MQTT</strong><a class="headerlink" href="#mqtt" title="Permanent link">#</a></h2>
+<p><a href="https://mqtt.org/"><strong>MQTT</strong></a> ("เอ็ม-คิว-ที-ที") ย่อมาจากคำว่า <strong>Message Queuing Telemetry Transport</strong>
+เป็นโพรโทคอล (<strong>Protocol</strong>) สำหรับการติดต่อสื่อสารกันระหว่างคอมพิวเตอร์ (<strong>Machine-to-Machine: M2M</strong>)
+เพื่อใช้ในการส่งข้อความ (<strong>Message Delivery</strong>) ผ่านระบบเครือข่าย
+เหมาะสำหรับงานด้าน <strong>IoT (Internet of Things)</strong></p>
+<p><strong>MQTT</strong> ได้รับการกำหนดให้เป็นมาตรฐานตั้งแค่ปีค.ศ. 2014 โดยองค์กรที่เรียกว่า 
+<a href="https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=mqtt"><strong>OASIS</strong></a></p>
+<ul>
+<li><a href="http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html"><strong>MQTT v3.1.1 Specification (December 2015)</strong></a>
+และได้เป็นมาตรฐาน <strong>ISO/IEC 20922</strong> ในปีค.ศ. 2016</li>
+<li>เวอร์ชันล่าสุดคือ <a href="http://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html"><strong>MQTT v5.0 Specification (March 2019)</strong></a></li>
+</ul>
+<p>ในปัจจุบัน  มีไลบรารีในภาษาต่าง ๆ ที่เป็น <strong>Open Source</strong> สำหรับการเขียนโปรแกรม เพื่อให้ทำงานเป็น <strong>MQTT Client</strong> 
+เช่น ภาษา <strong>Arduino</strong>, <strong>C/C++</strong>, <strong>Python</strong>, <strong>Java</strong>, <strong>JavaScript / NodeJS</strong> เป็นต้น</p>
+<ul>
+<li><a href="https://www.eclipse.org/paho/"><strong>Eclipse Paho Library</strong></a> (C, Python, ...)</li>
+<li><a href="https://github.com/hivemq/hivemq-mqtt-client"><strong>HiveMQ MQTT Client Library</strong></a> (Java)</li>
+<li><a href="https://github.com/mqttjs"><strong>MQTT.js</strong></a>
+และ <a href="https://github.com/mqttjs/async-mqtt"><strong>Async-MQTT.js</strong></a> (Node.js)</li>
+</ul>
+<p><img alt="" src="paho_mqtt_lib.png" /></p>
+<p>รูป: <strong>Paho MQTT Client (v1.4) Comparison</strong> (Source: Eclipse.org)</p>
+<p>ถ้าเป็นแอปพลิเคชันสำหรับการลองใช้งาน <strong>MQTT</strong> ก็มีตัวเลือกดังนี้</p>
+<p><strong>GUI-based MQTT Client Applications</strong></p>
+<ul>
+<li><a href="https://mqttfx.jensd.de/"><strong>MQTT.fx</strong></a></li>
+<li><a href="https://github.com/thomasnordquist/MQTT-Explorer"><strong>MQTT Explorer</strong></a></li>
+<li><a href="https://github.com/workswithweb/MQTTBox"><strong>MQTTBox</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mqtt_1">&#9655; <strong>หลักการทำงานของ MQTT</strong><a class="headerlink" href="#mqtt_1" title="Permanent link">#</a></h2>
+<p><strong>MQTT</strong> ทำงานอยู่บนชั้นของโพรโทคอล <strong>Transmission Control Protocol / Internet Protocol (TCP/IP)</strong>
+ตามการแบ่งชั้นของ <a href="https://en.wikipedia.org/wiki/OSI_model"><strong>7- Layer OSI Model</strong></a>
+และใช้วิธีการส่งและรับข้อความได้ทั้งสองทิศทาง สถาปัตยกรรมของระบบ <strong>MQTT</strong> เป็นไปตามรูปแบบที่เรียกว่า <strong>Client-Server Pattern</strong>
+(ผู้ขอรับบริการ / ผู้ให้บริการ) และ <strong>Publisher-Subscriber Pattern</strong> (ผู้เผยแพร่ข้อความ / ผู้สมัครรับข้อความ)</p>
+<p>การทำงานของ <strong>MQTT</strong> ประกอบด้วยสองส่วนหลักคือ <strong>MQTT Server</strong> ("เซิร์ฟเวอร์") หรือ เรียกว่า <strong>MQTT Broker</strong>
+("โบรกเกอร์" หรือ "ตัวกลาง" หรือ "นายหน้า") ทำหน้าที่คอยรับและกระจายข้อความ และ <strong>MQTT Client</strong> ("ไคลเอนต์") หรือ ผู้ส่งหรือรับข้อความและติดต่อกับโบรกเกอร์
+ซึ่งอาจเป็นอุปกรณ์ <strong>IoT</strong> และมีได้หลายอุปกรณ์ ทั้งสองฝ่ายไม่จำเป็นต้องติดต่อหรือเชื่อมต่อกันทางเครือข่ายตลอดเวลา
+(การเชื่อมต่ออาจเป็นแบบ <strong>Always-connected</strong> หรือ <strong>Sometime-connected</strong> ก็ได้)</p>
+<p>การส่งข้อความด้วย <strong>MQTT</strong> เป็นแบบอะซิงโครนัส (<strong>Asynchronous Message Queuing</strong>) หมายความว่า
+ทั้งสองฝ่าย (ผู้เผยแพร่ข้อความและผู้สมัครรับข้อความ) ไม่จำเป็นต้องตอบสนองกันทันที และไม่ต้องสื่อสารกันโดยตรง</p>
+<p><strong>MQTT</strong> มีความแตกต่างจากการทำงานของโพรโทคอล <strong>HTTP (Hyper Text Transfer Protocol)</strong> ในหลายประเด็น
+เช่น <strong>HTTP</strong> ใช้วิธีการสื่อสารแบบ <strong>Peer-to-Peer</strong> และ
+<strong>HTTP Client</strong> จะต้องเป็นฝ่ายเริ่มก่อนโดยการส่ง <strong>HTTP Request</strong> 
+เพื่อขอใช้บริการจาก <strong>HTTP Server</strong> และได้รับการตอบกลับมาเป็น <strong>HTTP Response</strong> เป็นต้น</p>
+<p><img alt="" src="mqtt_iot_devices.png" />
+รูป:  ตัวอย่างรูปแบบการใช้งาน <strong>MQTT</strong> สำหรับอุปกรณ์ <strong>IoT</strong> (Source: mqtt.org)</p>
+<p><img alt="" src="mqtt_pubsub_hivemq.png" />
+รูป:  การเผยแพร่และสมัครรับข้อความในระบบ <strong>MQTT</strong> (Source: HiveMQ)</p>
+<p>&nbsp;</p>
+<p>การส่งข้อความจากอุปกรณ์ (เรียกส่วนนี้ว่า <strong>Message Publication</strong>) ต้องทำผ่านโบรกเกอร์ 
+ซึ่งเป็นตัวกลางและทำหน้าที่กระจายข้อความที่รับได้นั้น หากอุปกรณ์ใดต้องการรับข้อความ จะต้องสมัครรับข้อความตามหัวข้อก่อน 
+(เรียกส่วนนี้ว่า <strong>Topic-based Message Subscription</strong>) โดยสามารถระบุหัวข้อที่สนใจได้ 
+หัวข้อแบ่งได้เป็นหลายระดับ (<strong>Topic Levels</strong>) และเลือกสมัครรับข้อความตามหัวข้อที่แบ่งระดับชั้นได้</p>
+<p>อุปกรณ์ <strong>MQTT Client</strong> สามารถทำหน้าที่เป็นได้ทั้ง <strong>Publisher</strong> และ <strong>Subscriber</strong>
+หรืออย่างใดอย่างหนึ่งในแต่ละช่วงเวลา และยกเลิกการสมัครรับข้อความจากโบรกเกอร์</p>
+<p>โบรกเกอร์ทำหน้าที่กรองข้อความที่ได้รับเข้ามาตามหัวข้อที่อุปกรณ์ได้สมัครการรับข้อความเอาไว้ 
+(<strong>Topic-based Message Filtering</strong>) ก่อนส่งหรือกระจายข้อความออกไป 
+หรือสามารถเก็บรักษาไว้ในคิวของข้อความ (<strong>Message Queue</strong>)
+เช่น สำหรับกรณีที่อุปกรณ์ที่ได้สมัครรับข้อความ ยังไม่ได้เชื่อมต่อเข้ามา
+หรือเกิดปัญหาชั่วคราวกับระบบเครือข่ายในการเชื่อมต่อ เป็นต้น</p>
+<p><strong>MQTT</strong> รองรับการเข้ารหัสข้อมูล (<strong>Data Encryption</strong>)
+เพื่อความปลอดภัยในการสื่อสารข้อมูล การยืนยันตัวตนเพื่อเข้าใช้บริการ
+(<strong>Authentication and Authorization</strong>)
+และรองรับการเชื่อมต่อด้วยโพรโทคอล <strong>WebSockets</strong> ที่ทำงานอยู่บน <strong>TCP/IP</strong> ได้เช่นกัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mqtt-connection">&#9655; <strong>MQTT Connection</strong><a class="headerlink" href="#mqtt-connection" title="Permanent link">#</a></h2>
+<p>อุปกรณ์แต่ละตัวจะต้องเริ่มต้นด้วยการสร้างการเชื่อมต่อ (<strong>MQTT Connection</strong>)
+และสร้าง <strong>MQTT Session</strong> โดยส่งแพ็กเกตตามรูปแบบที่กำหนดไว้ไปยังโบรกเกอร์ </p>
+<p>ตารางแสดงแพ็กเกตที่เกี่ยวข้องกับการทำงานของ <strong>MQTT</strong> เรียกว่า (<strong>MQTT Control Packets</strong>)</p>
+<table>
+<thead>
+<tr>
+<th align="left">Control Packet</th>
+<th align="left">Direction of Packet Flow</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">CONNECT</td>
+<td align="left">Client to Broker</td>
+<td align="left">Connection request</td>
+</tr>
+<tr>
+<td align="left">CONNACK</td>
+<td align="left">Broker to Client</td>
+<td align="left">Connect acknowledgment</td>
+</tr>
+<tr>
+<td align="left">SUBSCRIBE</td>
+<td align="left">Client to Broker</td>
+<td align="left">Subscribe request</td>
+</tr>
+<tr>
+<td align="left">SUBACK</td>
+<td align="left">Broker to Client</td>
+<td align="left">Subscribe acknowledgment</td>
+</tr>
+<tr>
+<td align="left">UNSUBSCRIBE</td>
+<td align="left">Client to Broker</td>
+<td align="left">Unsubscribe request</td>
+</tr>
+<tr>
+<td align="left">UNSUBACK</td>
+<td align="left">Broker to Client</td>
+<td align="left">Unsubscribe acknowledgment</td>
+</tr>
+<tr>
+<td align="left">PINGREQ</td>
+<td align="left">Client to Broker</td>
+<td align="left">PING request</td>
+</tr>
+<tr>
+<td align="left">PINGRESP</td>
+<td align="left">Broker to Client</td>
+<td align="left">PING response</td>
+</tr>
+<tr>
+<td align="left">DISCONNECT</td>
+<td align="left">Bidirectional</td>
+<td align="left">Disconnect notification</td>
+</tr>
+<tr>
+<td align="left">PUBLISH</td>
+<td align="left">Bidirectional</td>
+<td align="left">Publish message</td>
+</tr>
+<tr>
+<td align="left">PUBACK</td>
+<td align="left">Bidirectional</td>
+<td align="left">Publish acknowledgment (QoS 1)</td>
+</tr>
+<tr>
+<td align="left">PUBREC</td>
+<td align="left">Bidirectional</td>
+<td align="left">Publish received (QoS 2)</td>
+</tr>
+<tr>
+<td align="left">PUBREL</td>
+<td align="left">Bidirectional</td>
+<td align="left">Publish released (QoS 2)</td>
+</tr>
+<tr>
+<td align="left">PUBCOMP</td>
+<td align="left">Bidirectional</td>
+<td align="left">Publish complete (QoS 2)</td>
+</tr>
+<tr>
+<td align="left">AUTH</td>
+<td align="left">Bidirectional</td>
+<td align="left">Authentication</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>การส่งข้อความ (<strong>MQTT Message Delivery</strong>) แบ่งเป็นสองกรณี จำแนกตามผู้ส่งและผู้รับ
+และไม่มีการสื่อสารกันระหว่างไคลเอนต์</p>
+<ul>
+<li>ตัวส่งคือ ผู้เผยแพร่ข้อความ (<strong>MQTT Publisher</strong>) และตัวรับคือ โบรกเกอร์ (<strong>MQTT Broker</strong>)</li>
+<li>ตัวส่งคือ โบรกเกอร์ และตัวรับคือ ผู้สมัครรับข้อความ (<strong>MQTT Subscriber</strong>)</li>
+</ul>
+<p>ไคลเอนต์เริ่มต้นด้วยการส่งแพ็กเกต <code>CONNECT</code> ไปยังโบรกเกอร์ และจะได้รับการตอบกลับจากโบรกเกอร์ด้วยแพ็กเกต <code>CONNACK</code>
+เมื่อได้สร้างการเชื่อมต่อได้แล้ว หลังจากนั้นจะต้องมีการส่งข้อความไปยังโบรกเกอร์เป็นระยะ ๆ 
+โดยส่งข้อความที่เรียกว่า <strong>Keep-Alive Message</strong> ในรูปแบบของแพ็กเกต <code>PINGREQ</code>
+แล้วรอการตอบกลับด้วยแพ็กเกต <code>PINGRESP</code> เช่น ทำการส่งแพ็กเกตภายใน 60 วินาที ต่อหนึ่งครั้ง 
+ซึ่งกำหนดโดยค่าพารามิเตอร์ <code>keepAlive</code></p>
+<p>ข้อมูลที่จะถูกส่งไปในแพ็กเกต <code>CONNECT</code> ได้แก่</p>
+<ul>
+<li><code>clientId</code> เป็นตัวระบุชื่อของ <strong>MQTT Client</strong> ที่ต้องการเชื่อมต่อกับโบรกเกอร์
+แนะนำให้ใช้ <strong>Universal Unique Identifier (UUID)</strong> ขนาด 36 ตัวอักขระ (<strong>MQTTv5.0</strong>)</li>
+<li><code>cleanSession</code> เป็นค่าบูลีน ถ้ามีค่าเป็น <code>true</code> หมายความว่า เมื่อจบการเชื่อมต่อ
+จะไม่มีการเก็บข้อมูลเกี่ยวกับ <strong>MQTT Client</strong> หรือถ้าเคยเชื่อมต่อแบบ <strong>Persistent Session</strong> ไว้ก่อนหน้าแล้ว 
+จะยกเลิกและเคลียร์ข้อมูลที่เก็บไว้ทิ้งไป เช่น หัวข้อต่าง ๆ ที่เคยสมัครรับข้อความเอาไว้ หรือ ข้อความที่ยังไม่ได้รับและยังค้างอยู่
+แต่ถ้ามีค่าเป็น <code>false</code> หมายถึง การเริ่มต้นแบบที่เรียกว่า <strong>Persistent Session</strong></li>
+<li><code>username</code> (<em>optional</em>) เป็นชื่อผู้ใช้สำหรับตรวจสอบสิทธิ์การใช้งาน</li>
+<li><code>password</code> (<em>optional</em>) เป็นรหัสผ่านสำหรับตรวจสอบสิทธิ์การใช้งาน</li>
+<li><code>keepAlive</code> เป็นระยะเวลามากที่สุด (หน่วยเป็นวินาที) ที่ไม่มีการส่งแพ็กเกตสื่อสารกัน แต่ยังถือว่ายังเชื่อมต่อกันอยู่
+หรือจะตั้งค่าเป็น 0 ก็ได้</li>
+</ul>
+<p>ยังมีส่วนอื่นอีกในแพ็กเกต  <code>CONNECT</code> (แต่ไม่จำเป็นต้องมี) เช่น หาก <strong>MQTT Client</strong> 
+ไม่ได้จบการเชื่อมต่อโดยการส่งแพ็กเกต <code>DISCONNECT</code> ไปยังโบรกเกอร์ แต่หายไปเอง นานเกินช่วงเวลาที่กำหนดไว้
+(เกินระยะเวลาของ <strong>Session Lifetime</strong>)
+เมื่อเกิดกรณีแบบนี้ (เรียกว่า <strong>Unexpected Client Disconnection</strong>) 
+ต้องการจะให้โบรกเกอร์ส่งข้อความแทนหรือไม่ เป็นการส่งครั้งสุดท้าย (<strong>Last Will &amp; Testament Message</strong>) 
+โดยใช้ข้อความและหัวข้อตามที่ระบุไว้เมื่อเชื่อมต่อกับโบรกเกอร์ครั้งแรก เป็นต้น</p>
+<ul>
+<li><code>lastWillTopic</code> (<em>optional</em>)</li>
+<li><code>lastWillQos</code> (<em>optional</em>)</li>
+<li><code>lastWillMessage</code> (<em>optional</em>)</li>
+<li><code>lastWillRetain</code> (<em>optional</em>)</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mqtt-message-publication-subscription">&#9655; <strong>MQTT Message Publication / Subscription</strong><a class="headerlink" href="#mqtt-message-publication-subscription" title="Permanent link">#</a></h2>
+<p>เมื่อเชื่อมต่อกับโบรกเกอร์ได้แล้ว ก็สามารถส่งข้อความไปยังโบรกเกอร์ได้
+โดยส่งแพ็กเกต <code>PUBLISH</code> ซึ่งมีข้อมูล เช่น</p>
+<ul>
+<li><code>packetId</code> เป็นตัวระบุแพ็กเกตที่ส่งไป (<strong>Packet Identifier</strong>)</li>
+<li><code>topicName</code> เป็นหัวข้อสำหรับข้อความที่ส่งไป</li>
+<li><code>qos</code> เป็นค่า <strong>Quality of Service (QoS) Level</strong> เลือกได้ 3 ระดับคือ  <strong>0</strong>, <strong>1</strong>, <strong>2</strong></li>
+<li><code>retainFlag</code> มีค่าเป็นบูลีน ถ้าเป็น <code>true</code> หมายความว่า 
+ข้อความตามหัวข้อที่ส่งไปนั้น ให้เก็บเอาไว้ที่โบรกเกอร์ด้วย (เรียกว่า <strong>Retained Message</strong>)
+และหลังจากนั้นถ้ามี <strong>MQTT Client</strong> เชื่อมต่อเข้ามาใหม่
+และสมัครรับข้อความในหัวข้อเดียวกัน จะได้รับข้อความดังกล่าวจากโบรกเกอร์โดยอัตโนมัติ</li>
+<li><code>payload</code> เป็นข้อความที่ส่งไป</li>
+<li><code>dupFlag</code> เป็นค่าบูลีน (<strong>Duplicate Flag</strong>) และระบุว่า ข้อความนี้เป็นการส่งซ้ำหรือไม่
+เนื่องจากการส่งข้อความก่อนหน้านั้น (ด้วย <strong>QoS</strong> ที่มากกว่า <strong>0</strong>) ไม่มีการตอบกลับจากโบรกเกอร์</li>
+</ul>
+<p>แพ็กเกต <code>PUBLISH</code> จะถูกส่งจากผู้ส่งไปยังผู้รับ มีสองกรณี คือ
+1) จากผู้เผยแพร่ข้อความไปยังโบรกเกอร์  และ 2) จากโบรกเกอร์ไปยังผู้สมัครรับข้อความ
+และทั้งสองกรณีนี้เกิดขึ้นอิสระจากกัน ต่างช่วงเวลากัน</p>
+<p>หากต้องการสมัครรับข้อความ จะต้องส่งแพ็กเกต <code>SUBSCRIBE</code> ไปยังโบรกเกอร์ ซึ่งจะต้องมีการระบุหัวข้อ
+และ <strong>QoS Level</strong> สำหรับหัวข้อดังกล่าว จากนั้นโบรกเกอร์จะต้องตอบกลับด้วยแพ็กเกต 
+<code>SUBACK</code> (<strong>Subscription Acknowledgement</strong>)</p>
+<p>แต่หากว่า จะยกเลิกการสมัครรับข้อความ ให้ส่งแพ็กเกต <code>UNSUBSCRIBE</code> ไปยังโบรกเกอร์ และจะได้รับแพ็กเกต
+<code>UNSUBACK</code> ตอบกลับมา เพื่อยืนยันการยกเลิก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mqtt-topics">&#9655; <strong>MQTT Topics</strong><a class="headerlink" href="#mqtt-topics" title="Permanent link">#</a></h2>
+<p>หัวข้อสำหรับการเผยแพร่หรือสมัครรับข้อความ มีลักษณะดังนี้</p>
+<ul>
+<li>เป็นข้อความแบบ  <strong>UTF-8 String</strong> โดยทั่วไปก็เป็นข้อความ <strong>ASCII</strong>
+จำแนกความแตกต่างของตัวพิมพ์ใหญ่และเล็ก (<strong>Case-Sensitive</strong>) 
+และจะต้องไม่มีช่องว่าง (<strong>Space</strong>)</li>
+<li>มีสัญลักษณ์ <code>/</code> เป็นตัวแบ่งระดับ (<strong>Topic Level Separator</strong>)</li>
+<li>ข้อความในแต่ละระดับของหัวข้อ จะต้องมีอย่างน้อย 1 ตัวอักษระ</li>
+<li>หากไม่ต้องการเจาะจง คือ จะเป็นข้อความอะไรก็ได้ ก็จะใช้สัญลักษณ์สำหรับ <strong>MQTT Wildcards</strong><ul>
+<li><code>+</code> เป็น <strong>Single-level Wildcard</strong> ใช้แทนข้อความอะไรก็ได้หนึ่งระดับในชื่อหัวข้อ</li>
+<li><code>#</code> เป็น <strong>Multi-level Wildcard</strong> ใช้แทนข้อความอะไรก็ได้ในหลายระดับต่อกันในชื่อหัวข้อ</li>
+</ul>
+</li>
+<li>หากเริ่มต้นด้วย <code>$</code> เช่น <code>$SYS/</code> จะใช้กับชื่อหัวข้อที่สงวนไว้ใช้งานโดย <strong>MQTT Broker</strong></li>
+<li>พยายามเลือกหรือตั้งชื่อหัวข้อให้สั้น ได้ความหมาย ไม่ยาวเกินไป</li>
+<li>ไม่ควรสมัครรับข้อความโดยใช้หัวข้อ <code>#</code> เพราะเป็นการรับข้อความทั้งหมดที่ถูกส่งเข้ามา</li>
+</ul>
+<p>ตัวอย่างการกำหนดชื่อหัวข้อ (<strong>Topic Names</strong>) ที่มีการแบ่งเป็นหลายระดับชั้น</p>
+<ul>
+<li><code>home/livingroom/sensor1/get</code></li>
+<li><code>home/livingroom/sensor2/get</code> </li>
+<li><code>home/kitchen/sensor3/get</code></li>
+<li><code>home/kitchen/sensor4/get</code></li>
+<li><code>home/kitchen/light-switch1/get</code></li>
+<li><code>home/kitchen/light-switch1/set</code></li>
+</ul>
+<p>ตัวอย่างการใช้ <strong>MQTT Wildcards</strong></p>
+<ul>
+<li><code>home/livingroom/sensor1/#</code></li>
+<li><code>home/livingroom/#</code></li>
+<li><code>home/kitchen/+/get</code></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="qos-of-message-delivery">&#9655; <strong>QoS of Message Delivery</strong><a class="headerlink" href="#qos-of-message-delivery" title="Permanent link">#</a></h2>
+<p>ในการเผยแพร่หรือสมัครรับข้อความ สามารถระบุระดับคุณภาพการให้บริการได้ หรือ <strong>QoS (Quality of Service)</strong>
+มี 3 ระดับ ดังนี้ แต่ถ้าไม่ระบุจะเป็นระดับ <strong>QoS=0</strong> </p>
+<ul>
+<li><strong>0</strong> (<em>at most once</em>) มีการส่งแพ็กเกต <code>PUBLISH</code>จากตัวส่งไปยังตัวรับ 
+แต่ไม่มีการการันตีหรือการรับประกันว่าจะได้รับหรือไม่ ไม่มีการยืนยันการได้รับข้อความ หากได้ผู้รับได้รับแพ็กเกต
+ก็จะมีแค่แพ็กเกตเดียวเท่านั้น ถ้าหากว่าเครือข่ายมีความเสถียร และยอมรับได้ หากมีข้อความสูญหายบ้างในระหว่างการส่งหรือไม่ได้รับ
+ก็อาจเลือกใช้ <strong>QoS=0</strong></li>
+<li><strong>1</strong> (<em>at least once</em>) มีการส่งแพ็กเกต <code>PUBLISH</code> ไปยังตัวรับ
+ตัวส่งเก็บข้อความนั้นเอาไว้ในหน่วยความจำแบบคิว และรอจนกว่าจะได้ <code>PUBACK</code> จากตัวรับตอบกลับมา 
+ถ้าเกินระยะเวลาที่กำหนดไว้ จะส่งแพ็กเกตไปอีกครั้ง (DUP flag=1) และทำขั้นตอนนี้ซ้ำไปจนกว่าจะได้รับ
+<code>PUBACK</code> เมื่อได้รับ <code>PABACK</code> แล้ว ตัวส่งจะลบข้อความที่เก็บไว้ในคิวออกไป
+ในกรณีนี้ อาจเป็นได้ว่า มีการส่งข้อความไปมากกว่าหนึ่งครั้ง และตัวรับอาจได้รับข้อความเดียวกันมากกว่าหนึ่งครั้ง
+หรือ <strong>Duplicates</strong> (จากหลายแพ็กเกตที่มีการส่งซ้ำ)</li>
+<li><strong>2</strong> (exactly once) มีการส่งแพ็กเกต <code>PUBLISH</code> ไปยังตัวรับ
+และตัวส่งเก็บข้อความดังกล่าวนั้นเอาไว้ในหน่วยความจำแบบคิว รอจนกว่าอีกฝ่ายจะส่งแพ็กเกต <code>PUBREC</code> ตอบกลับมา
+แต่ถ้ายังไม่ได้รับ จะมีการส่งแพ็กเกต <code>PUBLISH</code> (DUP flag=1) ไปอีกครั้ง
+หากว่าได้รับแพ็กเกต <code>PUBREC</code> (<strong>Publish Received</strong>) จากตัวรับมาแล้ว 
+ตัวส่งจะลบข้อความที่เก็บไว้ในคิวออกไป แล้วส่งแพ็กเกต <code>PUBREL</code>(<strong>Publish Released</strong>) ไปยังตัวรับ
+จากนั้นตัวรับจะต้องตอบกลับด้วย <code>PUBCOMP</code> (<strong>Publish Completed</strong>) 
+แต่ถ้าตัวส่งไม่ได้รับ  <code>PUBCOMP</code> จะส่ง <code>PUBREL</code> ไปยังตัวรับอีกครั้ง 
+การใช้ <strong>QoS=2</strong> เป็นการสื่อสารในลักษณะที่เรียกว่า <strong>Four-Step Handshaking</strong>
+และตัวรับจะได้รับเพียงข้อความเดียวเท่านั้น แต่การใช้ <strong>QoS=2</strong> จะมีขั้นตอนและใช้เวลามากกว่าในการส่งข้อความ</li>
+</ul>
+<hr />
+<h2 id="public-mqtt-brokers">&#9655; <strong>Public MQTT Brokers</strong><a class="headerlink" href="#public-mqtt-brokers" title="Permanent link">#</a></h2>
+<p>การให้บริการโดยโบรกเกอร์ <strong>MQTT</strong> แบ่งได้เป็น 2 ประเภท คือ</p>
+<ul>
+<li><strong>Private</strong>: โบรกเกอร์เพื่อใช้งานภายใน ไม่เปิดให้ผู้อื่นเข้ามาใช้งาน
+มีการตรวจสอบชื่อบัญชีผู้ใช้และรหัสผ่าน (เป็นการทำ <strong>User Authentication</strong> ในระดับแอปพลิเคชัน)  เป็นต้น<ul>
+<li>ตัวอย่างการใช้งาน เช่น การใช้คอมพิวเตอร์บอร์ดเดียว <strong>Raspberry Pi</strong> ติดตั้งระบบปฏิบัติการ <strong>Linux</strong>
+และ <strong>Mosquitto MQTT Broker</strong> ให้บริการกับอุปกรณ์ภายในบ้าน (<strong>Smart Home</strong>)</li>
+</ul>
+</li>
+<li><strong>Public</strong>: โบรกเกอร์ที่เปิดให้ใช้งานได้ฟรี อาจมีข้อกำจัดอยู่บ้าง เช่น จำนวนการส่งข้อความต่อช่วงเวลา
+อาจมีผู้ใช้งานจำนวนมากและให้บริการอยู่ในต่างประเทศ ซึ่งส่งผลต่อความล่าช้าในการรับส่งข้อความหรือไม่ได้รับข้อความบางส่วน<ul>
+<li><a href="https://test.mosquitto.org/"><strong>Mosquitto Broker</strong></a></li>
+<li><a href="http://broker.hivemq.com/"><strong>HiveMQ Broker</strong></a></li>
+<li><a href="https://www.emqx.com/en/mqtt/public-mqtt5-broker"><strong>EMQX Broker</strong></a></li>
+</ul>
+</li>
+</ul>
+<p><strong>MQTT Brokers</strong> สามารถเปิดพอร์ตบริการได้หลายหมายเลข เพื่อให้บริการหลายรูปแบบ เช่น </p>
+<ul>
+<li><strong>Encryption</strong>: การเข้ารหัสข้อมูลสำหรับ <strong>MQTT payload</strong> <ul>
+<li>ถ้าไม่มีการเข้ารหัสป้องกันข้อมูล ก็นิยมใช้พอร์ต <strong>1883</strong> (<strong>default port</strong>)</li>
+<li>ถ้ามีการเข้ารหัส ก็ใช้วิธีที่เรียกว่า <strong>Asymmetric (Public/Private) Key Encryption</strong>
+โดยใช้ช่องทางสื่อสารที่ปลอดภัย (<strong>Secure Transmission Channel</strong>) </li>
+</ul>
+</li>
+<li><strong>Authentication</strong>: การยืนยันตัวตน<ul>
+<li><strong>Username/Password Authentication</strong>: การยืนยันตัวตนด้วยชื่อผู้ใช้และรหัสผ่าน</li>
+<li><strong>Client Authentication</strong>: การเชื่อมต่อไปยังโบรกเกอร์ ทุกไคลเอนต์จะต้องใช้ไฟล์ที่เรียกว่า
+ <strong>X.509 Digital Certificate</strong> เพื่อยืนยันตัวตนกับโบรกเกอร์</li>
+</ul>
+</li>
+<li><strong>MQTT over WebSockets</strong>: มีการติดต่อสื่อสารด้วยโพรโทคอล <strong>WebSockets</strong> 
+(รองรับการใช้งานโพรโทคอล <strong>TLS: Transport Layer Security v1.3 / v1.2 / v1.1</strong>) หรือไม่</li>
+</ul>
+<p>มาดูตัวอย่างหมายเลขพอร์ตของ <a href="https://test.mosquitto.org/"><code>test.mosquitto.org</code></a>
+เป็น <strong>Public Mosquitto MQTT Broker</strong>
+ที่เปิดบริการให้ทดลองใช้งานได้ฟรี
+(ดูไฟล์การตั้งค่าใช้งาน <a href="https://test.mosquitto.org/config/"><strong>Config File</strong></a>)  </p>
+<ul>
+<li><strong>1883</strong> (<em>unencrypted, unauthenticated</em>)</li>
+<li><strong>1884</strong> (<em>unencrypted, authenticated</em>)</li>
+<li><strong>8883</strong> (<em>encrypted, unauthenticated</em>)</li>
+<li><strong>8884</strong> (<em>encrypted, client certificate required</em>)</li>
+<li><strong>8885</strong> (<em>encrypted, authenticated</em>)</li>
+<li><strong>8886</strong> (<em>encrypted, unauthenticated</em>)</li>
+<li><strong>8887</strong> (<em>encrypted, server certificate deliberately expired</em>)</li>
+</ul>
+<p>หมายเลขพอร์ตต่อไปนี้ ใช้สำหรับการเชื่อมต่อผ่าน <strong>WebSockets</strong> และใช้งานได้กับ <strong>Web Browser / Web App</strong> </p>
+<ul>
+<li><strong>8080</strong> (<em>MQTT over WebSockets, unencrypted, unauthenticated</em>)</li>
+<li><strong>8081</strong> (<em>MQTT over WebSockets, encrypted, unauthenticated</em>)</li>
+<li><strong>8090</strong> (<em>MQTT over WebSockets, unencrypted, authenticated</em>)</li>
+<li><strong>8091</strong> (<em>MQTT over WebSockets, encrypted, authenticated</em>)</li>
+</ul>
+<p>จากข้อมูลเกี่ยวกับหมายเลขพอร์ตของ <code>test.mosquitto.org</code> จะเห็นได้ว่า</p>
+<ul>
+<li>การเลือกใช้พอร์ต <code>1883</code> จะเป็นวิธีที่ง่ายที่สุด ไม่ต้องระบุชื่อผู้ใช้และรหัสผ่าน
+แต่ไม่มีการเข้ารหัสข้อมูล แต่ถ้าเลือกพอร์ต <code>1884</code>  ต้องระบุชื่อผู้ใช้และรหัสผ่าน เช่น  <code>rw</code> : <code>readwrite</code> สำหรับ <code>#</code> (ทุกหัวข้อ) </li>
+<li>ถ้าเลือกพอร์ต <code>8883</code>  จะมีการเข้ารหัสข้อมูลตามรูปแบบของ <strong>TLS</strong> แต่ไม่ต้องระบุชื่อผู้ใช้และรหัสผ่าน
+และจะต้องใช้ไฟล์ <strong>X.509 Server Certificate</strong>
+ของ <strong>Test Mosquitto Broker</strong> ในการเข้ารหัสข้อมูลก่อนส่งไปยังโบรกเกอร์</li>
+<li>ถ้าเลือกพอร์ต <code>8884</code> จะเหมือนกรณี <code>8883</code> แต่จะต้องใช้อีกหนึ่งไฟล์ คือ
+<strong>X.509 Client Certificate</strong> (<strong>signed/verified by mosquitto.org</strong>)
+ถูกนำไปใช้การตรวจสอบและยืนยันตัวตนของ <strong>MQTT Client</strong> แต่ถ้าใช้พอร์ต <code>8885</code> จะต้องระบุชื่อผู้ใช้และรหัสผ่านด้วย</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="open-source-mqtt-brokers">&#9655; <strong>Open Source MQTT Brokers</strong><a class="headerlink" href="#open-source-mqtt-brokers" title="Permanent link">#</a></h2>
+<p>ตัวอย่างซอฟต์แวร์นำมาใช้เป็นโบรกเกอร์ได้ และเป็น <strong>Open Source</strong>  รองรับโพรโทคอล <strong>MQTT v3.1/3.1.1</strong> 
+และ <strong>v5.0</strong> ได้แก่</p>
+<ul>
+<li><a href="https://mosquitto.org/"><strong>Eclipse Mosquitto (C-based)</strong></a><ul>
+<li><strong>GitHub</strong>: <a href="https://github.com/eclipse/mosquitto">https://github.com/eclipse/mosquitto</a></li>
+</ul>
+</li>
+<li><a href="https://www.hivemq.com/developers/community/"><strong>HiveMQ CE (Java-based)</strong></a><ul>
+<li><strong>GitHub</strong>: <a href="https://github.com/hivemq/hivemq-community-edition">https://github.com/hivemq/hivemq-community-edition</a></li>
+</ul>
+</li>
+<li><a href="https://www.emqx.io/"><strong>EMQX (Elixir-based)</strong></a><ul>
+<li><strong>GitHub</strong>: <a href="https://github.com/emqx">https://github.com/emqx</a></li>
+</ul>
+</li>
+</ul>
+<p><strong>Mosquitto Broker</strong> มีไฟล์สำหรับการติดตั้งใช้งานได้หลายระบบปฏิบัติการ เช่น
+<strong>Linux</strong>, <strong>Windows</strong> และ <strong>macOS</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mqtt_2">&#9655; <strong>แหล่งข้อมูลสำหรับศึกษาเพิ่มเติมเกี่ยวกับ MQTT</strong><a class="headerlink" href="#mqtt_2" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="https://mqtt.org/getting-started/">"MQTT Getting Started" by mqtt.org</a></li>
+<li><a href="https://www.hivemq.com/mqtt-essentials">"MQTT Essentials" by HiveMQ</a></li>
+<li><a href="http://www.steves-internet-guide.com/mqtt/">"Beginners Guide To The MQTT Protocol"</a></li>
+<li><a href="http://www.steves-internet-guide.com/mqtt-basics-course/">"MQTT for Beginners - Tutorials and Course"</a></li>
+<li><a href="https://mosquitto.org/">"The Mosquitto Project by Eclipse"</a></li>
+<li><a href="https://github.com/HiveMQ">"HiveMQ Open Source MQTT Broker"</a></li>
+<li><a href="https://www.eclipse.org/paho/">"Paho MQTT Client Library" (C, C++, Python, Java, Lua)</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอความรู้เกี่ยวกับโพรโทคอล <strong>MQTT</strong> และหลักการทำงานในเบื้องต้น
+และซอฟต์แวร์ประเภท <strong>Open Source</strong> และผู้ใช้บริการ <strong>Public MQTT Brokers</strong>
+สำหรับทดสอบการใช้งาน <strong>MQTT</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-10 | Last Updated: 2022-09-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
