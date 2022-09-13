@@ -94,6 +94,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#micropython-esp32-mqtt" class="nav-link">&#9655; การเขียนโค้ด MicroPython สำหรับ ESP32 เพื่อใช้งาน MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -111,7 +115,7 @@
 <p><strong>Eclipse Paho MQTT</strong> เป็นไลบรารีสำหรับการเขียนโค้ดเพื่อเชื่อมต่อกับโบรกเกอร์ 
 ด้วยโพรโทคอล <strong>MQTT</strong> ในบทความนี้จะนำเสนอตัวอย่างการเขียนโค้ดด้วย 
 <a href="https://www.eclipse.org/paho/index.php?page=clients/python/index.php"><strong>Python Paho MQTT Library</strong></a>
-เพื่อเชื่อมต่อและเผยแพร่ข้อความไปยังโบรกเกอร์  <strong>test.mosquito.org</strong> หรือสมัครรับข้อความ</p>
+เพื่อเชื่อมต่อและเผยแพร่ข้อความไปยังโบรกเกอร์  <a href="test.mosquito.org"><strong>test.mosquito.org</strong></a> หรือสมัครรับข้อความ</p>
 <p>แนะนำให้ศึกษาเพิ่มเติมจากเอกสารออนไลน์: <a href="https://www.eclipse.org/paho/index.php?page=clients/python/docs/index.php"><strong>Python Paho MQTT API</strong></a></p>
 <p><img alt="" src="paho_mqtt_lib.png" /></p>
 <p>รูป: แสดงไลบรารีของ <strong>Eclipse Paho MQTT</strong> ซึ่งมีหลายภาษาคอมพิวเตอร์ให้เลือกใช้งานได้</p>
@@ -152,7 +156,7 @@ id = str( uuid.uuid4() )
 user_pass = None
 
 try:
-    cnt = 1
+    cnt = 1 # message counter 
     while cnt &lt;= 10: # repeat 10 times
         # connect to the MQTT broker, publish a message and
         # disconnect cleanly after a message has been published..
@@ -224,7 +228,7 @@ client.connect( &quot;test.mosquitto.org&quot;, 1883, 60 )
 # start the event-processing loop (use a background thread)
 client.loop_start()
 
-cnt=1
+cnt = 1 # message counter
 try:
     topic = &quot;test/1234/msg&quot;
     while cnt &lt;= 10: # repeat 10 times
@@ -341,8 +345,8 @@ finally:
 <p>รูป: ตัวอย่างการรันโค้ด <code>paho_mqtt_sub_demo-1.py</code> และ <code>paho_mqtt_pub_demo-1.py</code> </p>
 <p>&nbsp;</p>
 <hr />
-<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_pubsub_demo-1.py</code> </p>
-<p>สาธิตการรับสมัครข้อความและส่งข้อความไปยังโบรกเกอร์  (<strong>MQTT Publisher &amp; Subscriber</strong>)
+<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_pubsub_demo.py</code> </p>
+<p>สาธิตการสมัครรับข้อความและส่งข้อความไปยังโบรกเกอร์  (<strong>MQTT Publisher &amp; Subscriber</strong>)
 โดยใช้ชื่อหัวข้อเดียวกัน และเลือกใช้พอร์ต <code>8884</code> ซึ่งจะต้องมีไฟล์ต่อไปนี้
 (ได้จากขั้นตอนการสร้างไฟล์ <strong>Certificate</strong> ในบทความ <a href="../mqtt_linux_part-2/"><strong>"ตอนที่ 2"</strong></a> )</p>
 <ul>
@@ -423,15 +427,230 @@ except Exception as ex:
 </code></pre>
 <p>&nbsp;</p>
 <hr />
+<h2 id="micropython-esp32-mqtt">&#9655; <strong>การเขียนโค้ด MicroPython สำหรับ ESP32 เพื่อใช้งาน MQTT</strong><a class="headerlink" href="#micropython-esp32-mqtt" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการติดตั้งและใช้งาน <strong>MicroPython</strong>
+(อ้างอิงจาก <a href="https://docs.micropython.org/en/latest/esp32/tutorial/intro.html"><strong>"Getting started with MicroPython on the ESP32"</strong></a>)</p>
+<ol>
+<li>ดาวน์โหลดและติดตั้งซอฟต์แวร์ <a href="https://www.python.org/downloads/"><strong>Python3</strong></a>
+เช่น สำหรับระบบปฏิบัติการ <strong>Windows</strong></li>
+<li>ดาวน์โหลดและติดตั้งซอฟต์แวร์ <a href="https://thonny.org/"><strong>Thonny IDE</strong></a> เช่น สำหรับระบบปฏิบัติการ <strong>Windows</strong></li>
+<li>ติดตั้งแพ็กเกจ <a href="https://pypi.org/project/esptool/"><strong>esptool.py</strong></a> สำหรับ <strong>Python3</strong></li>
+<li>ดาวน์โหลดและติดตั้งไฟล์เฟิร์มแวร์ (<strong>.bin</strong>) <a href="https://micropython.org/download/esp32/"><strong>MicroPython for ESP32</strong></a></li>
+</ol>
+<p>ทำคำสั่งต่อไปนี้ เพื่อติดตั้งไฟล์เฟิร์มแวร์ (ทดลองใช้ไฟล์ <code>esp32-20220618-v1.19.1.bin</code>)
+ไปยังบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> (ทดลองกับบอร์ด <strong>Wemos Lolin32 Lite, 4MB Flash</strong>)</p>
+<pre><code class="language-bash"># erase the on-chip Flash
+esptool.py --chip esp32 erase_flash
+
+# write the firwmare file
+esptool.py --chip esp32 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin
+</code></pre>
+<p><img alt="" src="micropython_esp32_firmware_flashing.png" /></p>
+<p>รูป: แสดงขั้นตอนการทำคำสั่งเพื่อเขียนไฟล์เฟิร์มแวร์ <strong>MicroPython</strong> ไปยังบอร์ด <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<p>การเขียนโค้ด <strong>MicroPython</strong> เพื่อสื่อสารด้วยโพรโทคอล <strong>MQTT</strong> 
+จะใช้คำสั่งของโมดูลชื่อ <code>umqtt</code> (<strong>Simple MQTT Client for MicroPython</strong>)
+แนะนำให้ศึกษาการใช้งานจาก <a href="https://mpython.readthedocs.io/en/master/library/mPython/umqtt.simple.html"><strong>API</strong></a></p>
+<p>ถัดไปเป็นการทดลองใช้ <strong>Thonny IDE</strong> สำหรับ <strong>Windows 10</strong></p>
+<ol>
+<li>เปิดใช้งาน <strong>Thonny IDE</strong> ไปที่เมนู <strong>Run &gt; Select Interpreter</strong> เลือก <strong>MicroPython (ESP32)</strong>
+และหมายเลขพอร์ตอนุกรมของบอร์ด <strong>ESP32</strong> ที่เชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ แล้วกดปุ่ม <strong>OK</strong></li>
+<li>ให้เปิดไฟล์ <code>boot.py</code> ที่มีอยู่ระบบไฟล์ในหน่วยความแฟลชของบอร์ด <strong>ESP32</strong> ตั้งแต่เริ่มต้น
+ใน <strong>Editor</strong> ของ <strong>Thonny IDE</strong> รายการในระบบไฟล์ของ <strong>MicroPython</strong>
+จะมองเห็นได้ใน <strong>Tab</strong> ด้านซ้ายมือชื่อ <strong>"Files"</strong>
+ไฟล์นี้จะถูกเรียกให้ทำงานทุกครั้งเมื่อมีการรีเซตการทำงานของบอร์ด (หรือกดปุม <code>Ctrl</code>+<code>d</code> ในหน้าต่าง <strong>Shell</strong>
+ของ <strong>Thonny IDE</strong>) จากนั้นแก้ไขตามโค้ดตัวอย่าง
+ซึ่งจะทำหน้าที่เชื่อมต่อกับ <strong>Wi-Fi</strong> ตามค่า <strong>SSID</strong>
+และรหัสผ่านที่กำหนดไว้ ถ้าเชื่อมต่อได้ จะแสดงข้อความที่เป็นหมายเลขไอพี (<strong>IP Address</strong>)
+ที่ได้รับมาจาก <strong>DHCP Server</strong> ในระบบเครือข่ายไร้สาย</li>
+<li>ให้สร้างไฟล์ใหม่แล้วอัปโหลดไปยังบอร์ด <strong>ESP32</strong> ด้วย <strong>Thonny IDE</strong> ได้แก่<ul>
+<li>ไฟล์ <code>config.json</code> ซึ่งมีข้อมูลแบบ <strong>JSON</strong> ใช้สำหรับตั้งค่า <strong>SSID</strong> 
+และรหัสผ่านสำหรับการเชื่อมต่อ <strong>Wi-Fi</strong> และจำเป็นต้องใช้เมื่อ <code>boot.py</code> เริ่มทำงาน</li>
+<li>ไฟล์ <code>main.py</code> ซึ่งจะถูกเรียกให้ทำงานต่อจาก <code>boot.py</code> โดยอัตโนมัติ และแก้ไขตามโค้ดตัวอย่าง
+ซึ่งจะทำการเชื่อมต่อไปยังโบรกเกอร์ <strong>test.mosquitto.org</strong>
+(ทดลองใช้พอร์ต <code>1883</code> หรือ <code>1884</code>)  มีการสมัครรับข้อความตามหัวข้อที่กำหนด และส่งข้อความไปยังโบรกเกอร์ซ้ำไปเรื่อย ๆ
+เลือกใช้ <strong>QoS=1</strong> เว้นระยะเวลาประมาณ 1 วินาที ต่อหนึ่งครั้งการส่งข้อความ
+(หากต้องการจบการทำงาน ให้กดปุ่ม <strong>Stop</strong>)</li>
+</ul>
+</li>
+</ol>
+<p><img alt="" src="thonny_esp32_connect.png" /></p>
+<p>รูป: การเปิดใช้งาน <strong>Thonny IDE</strong> และเชื่อมต่อกับบอร์ด <strong>ESP32</strong> ที่ได้มีการติดตั้งไฟล์เฟิร์มแวร์
+<strong>MicroPython</strong> ไว้พร้อมใช้งานแล้ว</p>
+<p>&nbsp;</p>
+<p>ไฟล์: <code>config.json</code></p>
+<pre><code class="language-json">{
+  &quot;ssid&quot;: &quot;XXXXXXXXXXX&quot;,
+  &quot;pwd&quot;:  &quot;XXXXXXXXXXX&quot;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างสำหรับไฟล์ <code>boot.py</code></p>
+<pre><code class="language-python">import utime
+import network
+import ujson
+import ntptime
+import gc
+
+#---------------------------------------------------------
+JSON_CONFIG_FILE = 'config.json'
+config = {}
+try:
+    with open( JSON_CONFIG_FILE ) as json_file:
+        config = ujson.load(json_file)
+except OSError as ex:
+    print( 'Cannot open JSON file' )
+    sys.exit(-1)
+
+# connect the WiFi network
+def wifi_connect( max_retry_count=10 ):
+    global config
+    sta_if = network.WLAN( network.STA_IF )
+    sta_if.active( False )
+    utime.sleep_ms( 1 )
+    sta_if.active( True )
+    sta_if.connect( config['ssid'], config['pwd'] )
+    retry_count = 1
+    while not sta_if.isconnected():
+        retry_count += 1
+        if retry_count &gt;= max_retry_count:
+            return False
+        utime.sleep(0.5)
+    #show IP address assigned by DHCP server
+    print( 'Connected:', sta_if.ifconfig()[0] )
+    return True
+
+# connect the NTP (Network Time Protocol) server
+def ntp_connect( max_retry_count=10 ):
+    ntptime.host = &quot;th.pool.ntp.org&quot;
+    ntp_retry_count = 0
+    while True:
+        try:
+            ntptime.settime()
+            utime.sleep(0.1)
+            break
+        except OSError:
+            ntp_retry_count += 1
+            if ntp_retry_count &gt;= max_retry_count:
+                break
+
+print( 'Connecting WiFi....' )
+if not wifi_connect():
+    print( 'Cannot connect WiFi' )
+else:
+    print( 'Connecting NTP....' )
+    ntp_connect()
+    print( 'Current time: ' + str(utime.localtime()) )
+
+# call the garbage collector
+gc.collect()
+</code></pre>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างสำหรับไฟล์ <code>main.py</code></p>
+<pre><code class="language-python">import machine
+import gc
+import network
+import ubinascii
+import utime
+from umqtt.simple import MQTTClient
+
+# set the client ID based on the ESP32's unique ID
+id = ubinascii.hexlify( machine.unique_id() )
+# set port number (either 1883 or 1884)
+port = 1883
+
+if port == 1884:
+    user='rw'
+    password='readwrite'
+else:
+    user=None
+    password=None
+
+# create an MQTTClient instance
+client = MQTTClient( client_id=id,
+    server = b'test.mosquitto.org', port=port, keepalive=60,
+    user=user, password=password )
+
+# define the callback function for a subscription message  
+def sub_cb( topic, msg ):
+    print( &quot;received: topic='%s',&quot; % topic.decode(),
+           &quot;message='%s'&quot; % msg.decode() )
+
+# set the callback function
+client.set_callback( sub_cb )
+
+count = 0 # message counter
+try:
+    client.connect( clean_session=True )
+    print( &quot;MQTT broker connected&quot; )
+    client.subscribe( b'test/1234/#' )
+    topic = b'test/1234/msg'
+    while True:
+        count += 1
+        msg = &quot;hello #&quot; + str(count)
+        client.publish( topic, msg, qos=1, retain=False )
+        print( &quot;published:&quot;, msg )
+        gc.collect() # call garbage collector
+        print( 'free:', gc.mem_free() )
+        utime.sleep_ms( 500 )
+        client.check_msg() # non-blocking, check the message
+        utime.sleep_ms( 500 )
+except Exception as ex:
+    print( &quot;error&gt;&quot;, ex )
+finally:
+    client.disconnect()
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="thonny_esp32_mqtt_demo.png" /></p>
+<p>รูป: สาธิตการรันโค้ดตัวอย่างซึ่งแสดงให้เห็นว่าสามารถส่งข้อความและรับข้อความจากโบรกเกอร์ได้สำเร็จ</p>
+<p><strong>ข้อสังเกต:</strong>  </p>
+<ul>
+<li>ฟังก์ชันในโมดูล <code>umqtt</code> สำหรับ <strong>MicroPython</strong> อาจมีข้อจำกัดอยู่บ้าง
+เนื่องจากมีข้อจำกัดเรื่องหน่วยความจำ <strong>SRAM</strong> ของ <strong>ESP32</strong></li>
+<li><code>umqtt</code> รองรับการใช้งานโพรโทคอล <strong>MQTT v3.1.1</strong> เท่านั้น</li>
+<li>การสมัครรับข้อความและส่งข้อความ ยังไม่รองรับ <strong>QoS=2</strong> (ใช้ได้เฉพาะ <strong>QoS=0</strong> หรือ <strong>QoS=1</strong>)</li>
+<li>หัวข้อและข้อความ จะถูกส่งเป็นข้อมูลไบต์ (<strong>bytes encoded</strong>) และไม่ใช่ข้อความแบบ <strong>UTF-8</strong>
+เพื่อลดปริมาณการใช้หน่วยความจำของระบบ</li>
+<li><a href="https://github.com/micropython/micropython-lib/tree/master/micropython/umqtt.robust"><code>umqtt.robust</code></a>
+ สามารถใช้แทน  <a href="https://github.com/micropython/micropython-lib/tree/master/micropython/umqtt.simple"><code>umqtt.simple</code></a>
+ ได้ ซึ่งมีข้อดีคือ สามารถเชื่อมต่อกับโบรกเกอร์ได้อัตโนมัติ เมื่อขาดการเชื่อมต่อชั่วคราว (<strong>Auto-Reconnect</strong>)
+และเชื่อมต่อกับโบรกเกอร์เพื่อสร้าง <strong>Persistent Session</strong> ได้</li>
+<li>นอกจากนั้นยังมีโมดูล <a href="https://github.com/fizista/micropython-umqtt.simple2"><code>umqtt.simple2</code></a>
+และ <a href="https://github.com/fizista/micropython-umqtt.robust2"><code>umqtt.robust2</code></a> เป็นตัวเลือกอื่นอีกให้ลองใช้งาน</li>
+</ul>
+<p>หากต้องการเชื่อมต่อกับโบรกเกอร์ โดยใช้พอร์ต <code>8883</code> จะต้องใช้ไฟล์ <code>mosquitto.org.crt</code>
+นำไปใส่ไว้ในระบบไฟล์ของ <strong>MicroPython</strong> และแก้ไขโค้ดตัวอย่างในส่วนที่เกี่ยวข้องกับการเชื่อมต่อ ดังนี้</p>
+<pre><code class="language-python"># set port number 
+port = 8883
+
+# open the CA signed certificate for mosquitto.org
+with open('mosquitto.org.crt', 'rb') as f:
+    cert = f.read()
+
+ssl_params = { 'cert': cert }
+
+# create an MQTTClient instance
+client = MQTTClient( client_id=id,
+    server = b'test.mosquitto.org', port=port, keepalive=60,
+    ssl=True, ssl_params=ssl_params )
+</code></pre>
+<p>&nbsp;</p>
+<p>หากไม่มีบอร์ด <strong>ESP32</strong> ก็สามารถทดลองใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> ได้ 
+ให้ตั้งค่า <strong>SSID</strong> เป็น <strong>"Wokwi-GUEST"</strong> และรหัสผ่าน <strong>""</strong> </p>
+<p><img alt="" src="wokwi_esp32_mqtt.png" /></p>
+<p>รูป: การทดลองใช้งาน  <strong>Wokwi Simulator</strong> สำหรับรันโค้ด <strong>MicroPython</strong> สำหรับบอร์ด <strong>ESP32</strong>
+(บอร์ด: <code>wokwi-esp32-devkit-v1</code> และเฟิร์มแวร์: <code>micropython-20220618-v1.19.1</code>)</p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้สาธิตการเชื่อมต่อไปยังโบรกเกอร์สาธารณะ  <strong>Mosquitto Broker</strong> 
 โดยเลือกใช้ <strong>Test Mosquitto Broker</strong> 
 และสาธิตวิธีการเขียนโค้ด <strong>Python</strong> ด้วยคำสั่งต่าง ๆ ของไลบรารี <strong>Paho MQTT Client</strong>
-เพื่อส่งข้อความและสมัครรับข้อความ</p>
+และ <strong>MicroPython</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> เพื่อส่งข้อความและสมัครรับข้อความ </p>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-09-12 | Last Updated: 2022-09-12</p></div>
+<p>Created: 2022-09-12 | Last Updated: 2022-09-13</p></div>
             </div>
         </div>
 
