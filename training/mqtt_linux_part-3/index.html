@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/training/mqtt_linux_part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>MQTT และการใช้งานสำหรับ Linux (ตอนที่ 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mqtt-linux-3" class="nav-link">MQTT และการใช้งานสำหรับ Linux (ตอนที่ 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#python-paho-mqtt" class="nav-link">&#9655; การเขียนโค้ด Python ด้วยไลบรารี Paho MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mqtt-linux-3">MQTT และการใช้งานสำหรับ Linux (ตอนที่ 3)<a class="headerlink" href="#mqtt-linux-3" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="python-paho-mqtt">&#9655; <strong>การเขียนโค้ด Python ด้วยไลบรารี Paho MQTT</strong><a class="headerlink" href="#python-paho-mqtt" title="Permanent link">#</a></h2>
+<p><strong>Eclipse Paho MQTT</strong> เป็นไลบรารีสำหรับการเขียนโค้ดเพื่อเชื่อมต่อกับโบรกเกอร์ 
+ด้วยโพรโทคอล <strong>MQTT</strong> ในบทความนี้จะนำเสนอตัวอย่างการเขียนโค้ดด้วย 
+<a href="https://www.eclipse.org/paho/index.php?page=clients/python/index.php"><strong>Python Paho MQTT Library</strong></a>
+เพื่อเชื่อมต่อและเผยแพร่ข้อความไปยังโบรกเกอร์  <strong>test.mosquito.org</strong> หรือสมัครรับข้อความ</p>
+<p>แนะนำให้ศึกษาเพิ่มเติมจากเอกสารออนไลน์: <a href="https://www.eclipse.org/paho/index.php?page=clients/python/docs/index.php"><strong>Python Paho MQTT API</strong></a></p>
+<p><img alt="" src="paho_mqtt_lib.png" /></p>
+<p>รูป: แสดงไลบรารีของ <strong>Eclipse Paho MQTT</strong> ซึ่งมีหลายภาษาคอมพิวเตอร์ให้เลือกใช้งานได้</p>
+<p>ก่อนจะทดลองโค้ดตัวอย่าง ให้ติดตั้งแพ็กเกจ  <code>paho-mqtt</code> โดยใช้คำสั่ง <code>pip3</code> ดังนี้
+(ทดลองใช้กับ <strong>Python 3.10.4</strong> สำหรับระบบปฏิบัติการ <strong>Linux / Ubuntu 22.04 LTS</strong>)</p>
+<pre><code class="language-python">$ python3 -V
+Python 3.10.4
+
+# install the paho-mqtt package using pip3
+$ pip3 install --user paho-mqtt
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_pub_demo-1.py</code> </p>
+<p>โค้ดสาธิตการใช้คำสั่ง <code>paho.mqtt.publish()</code>
+เพื่อเชื่อมต่อและส่งข้อความไปยังโบรกเกอร์  (<strong>MQTT Publisher Only</strong>)
+แล้วจบการทำงานหลังจากส่งข้อความได้แต่ละครั้ง และมีการตั้งค่าดังนี้</p>
+<ul>
+<li>เชื่อมต่อไปยังโบรกเกอร์  <strong>Test MQTT Broker</strong> พอร์ต <code>1883</code>
+เพื่อส่งข้อความทั้งหมด 10 ครั้ง และใช้ชื่อหัวข้อ <code>test/1234/msg</code></li>
+<li>ตั้งค่า <strong>Client ID</strong> โดยใช้ฟังก์ชัน <code>uuid.uuid4()</code> เพื่อสร้างข้อความ <strong>UUID</strong> ที่มีขนาด 36 อักขระ</li>
+<li>เลือกใช้ <strong>QoS=2</strong> และโพรโทคอล <strong>MQTT v3.1.1</strong></li>
+</ul>
+<pre><code class="language-python">#!/usr/bin/env python3
+
+import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
+import sys, time, uuid
+
+# specify the MQTT broker and the listening port (1883)
+mqtt_hostname = &quot;test.mosquitto.org&quot;
+mqtt_port = 1883
+
+# MQTT client ID (36-char random UUID)
+id = str( uuid.uuid4() )
+
+# No user and password specified
+user_pass = None
+
+try:
+    cnt = 1
+    while cnt &lt;= 10: # repeat 10 times
+        # connect to the MQTT broker, publish a message and
+        # disconnect cleanly after a message has been published..
+        topic = &quot;test/1234/msg&quot;
+        msg = &quot;hello-&quot; + str(cnt)
+        print( f&quot;Publish a message: '{msg}'&quot; )
+        publish.single(
+            topic=topic, payload=msg,
+            hostname=mqtt_hostname, port=mqtt_port,
+            client_id=id, qos=2, keepalive=0,
+            protocol=mqtt.MQTTv311, transport=&quot;tcp&quot;,
+            retain=False, will=None,
+            auth=user_pass, tls=None )
+        # wait for 5 seconds before proceeding to the next iteration
+        time.sleep( 5.0 )
+        cnt += 1
+except KeyboardInterrupt:
+     print( &quot;Terminated&quot; )
+     sys.exit(0)
+except Exception as ex:
+     print( &quot;error&gt;&quot;, ex )
+     sys.exit(-1)
+finally:
+     print( &quot;Done....&quot; )
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าจะเปลี่ยนมาลองใช้พอร์ต <code>1884</code> เพื่อเชื่อมต่อกับ  <strong>Test MQTT Broker</strong> ให้แก้ไขโค้ด
+เช่น เปลี่ยนหมายเลขของพอร์ต</p>
+<pre><code class="language-python">mqtt_port = 1884
+</code></pre>
+<p>และกำหนดค่าของตัวแปร <code>user_pass</code> ดังนี้</p>
+<pre><code class="language-python">user_pass = { 'username': 'rw', 'password': 'readwrite' }
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_pub_demo-2.py</code> </p>
+<p>โค้ดสาธิตการใช้ฟังก์ชันที่เกี่ยวข้องกับ <code>paho.mqtt.client</code>
+เพื่อเชื่อมต่อและส่งข้อความไปยังโบรกเกอร์หลายครั้ง (<strong>MQTT Publisher Only</strong>)
+และมีการใช้คำสั่ง <code>loop_start()</code> 
+เพื่อสร้างเธรดที่คอยทำงานอยู่เบื้องหลัง (<strong>Background Thread</strong>)
+ให้จัดคอยจัดการเหตุการณ์ต่าง ๆ ที่เกิดขึ้นจากการทำงานของ <strong>MQTT</strong></p>
+<pre><code class="language-python">#!/usr/bin/env python3
+
+import sys, time, uuid
+import paho.mqtt.client as mqtt
+
+### define callback functions
+
+def on_connect(client, userdata, flags, rc):
+    print( f&quot;CONNACK received with code {rc}&quot; )
+
+def on_publish(client, userdata, mid):
+    print( f&quot;Published: message id={mid}&quot; )
+
+# MQTT client ID (36-char random UUID)
+id = str( uuid.uuid4() )
+
+# create MQTT client
+client = mqtt.Client( client_id=id,
+    clean_session=True, protocol=mqtt.MQTTv311 )
+
+# set callback functions before connecting to the MQTT broker
+client.on_connect = on_connect
+client.on_publish = on_publish
+
+# connect to MQTT broker, localhost on port 1883
+client.connect( &quot;test.mosquitto.org&quot;, 1883, 60 )
+
+# start the event-processing loop (use a background thread)
+client.loop_start()
+
+cnt=1
+try:
+    topic = &quot;test/1234/msg&quot;
+    while cnt &lt;= 10: # repeat 10 times
+        msg = &quot;hello-&quot; + str(cnt)
+        (result,mid)=client.publish( topic, msg, qos=2 )
+        time.sleep(5.0) # sleep for 5 seconds
+        cnt += 1
+except KeyboardInterrupt:
+    print( &quot;Terminated...&quot; )
+except Exception as ex:
+    print( &quot;error&gt;&quot;, ex )
+finally:
+    client.loop_stop()  # stop the MQTT background thread
+    client.disconnect() # disconnect
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_pub_demo-3.py</code></p>
+<p>โค้ดสาธิตการเชื่อมต่อและส่งข้อความไปยังโบรกเกอร์หนึ่งครั้ง และเลือกใช้หมายเลขพอร์ต <code>8883</code>
+ซึ่งจะมีการเข้ารหัสข้อมูล และจะต้องใช้ไฟล์ <strong>CA signed Certificate</strong> ของ
+<strong>Test Mosquitto Broker</strong> ร่วมด้วย</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+
+import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
+import sys, time, ssl, uuid
+
+mqtt_hostname = 'test.mosquitto.org'
+mqtt_port = 8883
+
+mqtt_tls = {
+  'ca_certs': &quot;./mosquitto.org.crt&quot;,  # server certificate
+  'tls_version': ssl.PROTOCOL_TLSv1_2 # use the TLS v1.2
+}
+
+# MQTT client ID (36-char random UUID)
+id = str( uuid.uuid4() )
+
+try:
+    publish.single(
+        topic=&quot;test/1234/msg&quot;,
+        payload=&quot;hello&quot;,
+        hostname=mqtt_hostname,
+        client_id=id,
+        auth=None,
+        tls=mqtt_tls,
+        port=mqtt_port,
+        protocol=mqtt.MQTTv311 )
+except Exception as ex:
+    print( &quot;error&gt;&quot;, ex)
+    sys.exit(-1)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_sub_demo-1.py</code> </p>
+<p>โค้ดสาธิตการใช้ฟังก์ชันที่เกี่ยวข้องกับ <code>paho.mqtt.client</code>
+เพื่อเชื่อมต่อและสมัครรับข้อความจากโบรกเกอร์ (<strong>MQTT Subscriber Only</strong>) โดยใช้ชื่อหัวข้อ <code>test/1234/#</code> และ <strong>QoS=2</strong></p>
+<p>การทำงานของโปรแกรมเป็นแบบ <strong>Event-driven Processing</strong>
+และมีการเรียกใช้ <strong>Callbacks</strong> คือ จะมีการเรียกฟังก์ชันที่ถูกกำหนดให้เป็น <strong>Callback Functions</strong>
+สำหรับเหตุการณ์ต่าง ๆ ที่เกี่ยวข้องกับการทำงานของ <strong>MQTT Client</strong> เช่น</p>
+<ul>
+<li><code>on_connect()</code> เป็นฟังก์ชันที่จะถูกเรียกหลังจากที่ได้เชื่อมต่อกับโบรกเกอร์แล้ว</li>
+<li><code>on_subscribe()</code> เป็นฟังก์ชันที่จะถูกเรียกหลังจากที่ได้สมัครรับข้อความกับโบรกเกอร์แล้ว</li>
+<li><code>on_message()</code> เป็นฟังก์ชันที่จะถูกเรียกหลังจากที่ได้รับข้อความจากโบรกเกอร์ในแต่ละครั้ง</li>
+</ul>
+<pre><code class="language-python">#!/usr/bin/env python3
+
+import paho.mqtt.client as mqtt
+import sys, time, uuid
+
+# define callback functions for MQTT actions
+
+def on_connect(client, userdata, flags, rc):
+    print( &quot;Connected with result code &quot; + ['failed','ok'][(rc==0)] )
+    client.subscribe( 'test/1234/#', qos=2 )
+
+def on_subscribe(client, userdata, mid, qos):
+    print( f&quot;Subscribed&quot; )
+
+def on_message(client, userdata, msg):
+    print( f&quot;Received: '{msg.topic}', QoS={msg.qos},&quot;,
+           f&quot;payload='{msg.payload.decode('utf-8')}'&quot; )
+
+# set the MQTT client ID (36-char random UUID)
+id = str( uuid.uuid4() )
+
+# create a MQTT client
+client = mqtt.Client( client_id=id,
+    clean_session=True, protocol=mqtt.MQTTv311 )
+
+# set the callback functions
+client.on_connect   = on_connect
+client.on_message   = on_message
+client.on_subscribe = on_subscribe
+
+# connect to MQTT broker on port 1883 to create a clean session
+try:
+    client.connect( &quot;test.mosquitto.org&quot;, 1883, keepalive=60 )
+except Exception as ex:
+    print( &quot;error&gt;&quot;, ex )
+    sys.exit(-1)
+
+try:
+    # enter the event-processig forever loop (blocking)
+    client.loop_forever()
+except KeyboardInterrupt:
+    print( &quot;Terminated...&quot; )
+except Exception as ex:
+    print( &quot;error&gt;&quot;, ex )
+finally:
+    client.disconnect() # disconnect
+</code></pre>
+<p><img alt="" src="python_paho_pub_sub_demo-1.png" /></p>
+<p>รูป: ตัวอย่างการรันโค้ด <code>paho_mqtt_sub_demo-1.py</code> และ <code>paho_mqtt_pub_demo-1.py</code> </p>
+<p>&nbsp;</p>
+<hr />
+<p><strong>โค้ดตัวอย่าง:</strong> <code>paho_mqtt_pubsub_demo-1.py</code> </p>
+<p>สาธิตการรับสมัครข้อความและส่งข้อความไปยังโบรกเกอร์  (<strong>MQTT Publisher &amp; Subscriber</strong>)
+โดยใช้ชื่อหัวข้อเดียวกัน และเลือกใช้พอร์ต <code>8884</code> ซึ่งจะต้องมีไฟล์ต่อไปนี้
+(ได้จากขั้นตอนการสร้างไฟล์ <strong>Certificate</strong> ในบทความ <a href="../mqtt_linux_part-2/"><strong>"ตอนที่ 2"</strong></a> )</p>
+<ul>
+<li><strong>Server Certificate (.crt)</strong> ของ <strong>MQTT Broker</strong>: <code>mosquitto.org.crt</code></li>
+<li><strong>Client Certificate</strong>: <code>client.crt</code></li>
+<li><strong>Client Key</strong>: <code>client.key</code></li>
+</ul>
+<pre><code class="language-python">#!/usr/bin/env python3
+
+import paho.mqtt.client as mqtt
+import sys, time, uuid, ssl
+
+mqtt_hostname = &quot;test.mosquitto.org&quot;
+mqtt_port = 8884
+
+cnt   = 1
+run   = True
+topic = 'test/1234/msg' # topic for message publication
+
+def on_message_test(client, obj, msg):
+    global cnt, run, topic
+    print( f&quot;topic='{msg.topic}', qos={msg.qos}, payload={msg.payload}&quot; )
+    cnt += 1
+    if cnt &lt;= 10:
+        client.publish( topic=topic, payload='hello-'+str(cnt), 
+                        qos=1, retain=False )
+    else:
+        run = False
+
+def on_message(client, obj, msg):
+    print( f&quot;topic='{msg.topic}', qos={msg.qos}, payload={msg.payload}&quot; )
+
+def on_publish(client, userdata, mid):
+    print( f&quot;message published: message id={mid}&quot; )
+
+def on_subscribe(client, obj, mid, qos):
+    print( &quot;client subscribed&quot; )
+
+def on_connect(client, userdata, flags, rc):
+    global cnt
+    print( &quot;client connected&quot; )
+    client.subscribe( &quot;test/1234/#&quot;, qos=1 )
+    client.publish( topic=topic,
+                    payload='hello-'+str(cnt) , qos=1, retain=False )
+
+# MQTT client ID (36-char random UUID)
+id = str( uuid.uuid4() )
+
+# create a MQTT client
+client = mqtt.Client( client_id=id )
+
+# set callback functions
+client.on_message   = on_message
+client.on_publish   = on_publish
+client.on_subscribe = on_subscribe
+client.on_connect   = on_connect
+
+# add a callback function for incoming messages on a specific topic
+client.message_callback_add( topic, on_message_test )
+
+# set the TLS certificate files
+client.tls_set( ca_certs='./mosquitto.org.crt',
+    certfile='./client.crt', keyfile='./client.key',
+    cert_reqs=ssl.CERT_REQUIRED,
+    tls_version=ssl.PROTOCOL_TLSv1_2 )
+
+# connect to the MQTT broker
+client.connect( mqtt_hostname, mqtt_port, 60 )
+
+try:
+    while run:
+        client.loop() # a polling loop (non-blocking call)
+        time.sleep( 1.0 )
+except KeyboardInterrupt:
+    print( 'Terminated....' )
+except Exception as ex:
+    print( &quot;error&gt;&quot;, ex )
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้สาธิตการเชื่อมต่อไปยังโบรกเกอร์สาธารณะ  <strong>Mosquitto Broker</strong> 
+โดยเลือกใช้ <strong>Test Mosquitto Broker</strong> 
+และสาธิตวิธีการเขียนโค้ด <strong>Python</strong> ด้วยคำสั่งต่าง ๆ ของไลบรารี <strong>Paho MQTT Client</strong>
+เพื่อส่งข้อความและสมัครรับข้อความ</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-12 | Last Updated: 2022-09-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
