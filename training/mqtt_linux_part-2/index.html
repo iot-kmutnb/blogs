@@ -178,9 +178,6 @@ Client (null) sending DISCONNECT
 เชื่อมต่อกับ <strong>test.mosquitto.org:1883</strong></p>
 <p>&nbsp;</p>
 <p>ถ้าจะลองใช้ <strong>Public EMQX Broker</strong> ก็ให้เปลี่ยนเป็น <code>-h broker.emqx.io -p 1883</code></p>
-<p><img alt="" src="mqtt_pubsub_emqx-1.png" /></p>
-<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code>
-เชื่อมต่อกับ <strong>broker.emqx.io:1883</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>การส่งข้อความที่มีการเข้ารหัสข้อมูลและยืนยันตัวตน</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -229,11 +226,14 @@ $ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
 <p>ถัดไปเป็นการลองใช้คำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code> เพื่อเชื่อมต่อกับพอร์ต <strong>8884</strong>
 ใช้ <strong>QoS 2</strong> และโพรโทคอล <strong>MQTT v5.0</strong> และให้สังเกตว่า จะต้องมีการใช้ไฟล์ต่อไปนี้ (เก็บอยู่ในไดเรกทอรีเดียวกัน)</p>
 <ul>
-<li><code>mosquitto.org.crt</code> (<strong>Server Certificate for Mosquitto</strong>)</li>
-<li><code>client.crt</code> (*<em>Client Cerficate</em>)</li>
+<li><code>mosquitto.org.crt</code> (<strong> CA Certificate / Server Certificate for Mosquitto</strong>)</li>
+<li><code>client.crt</code> (<strong>Client Cerficate</strong>)</li>
 <li><code>client.key</code> (<strong>Client Private Key</strong>)</li>
 </ul>
 <p>ทำคำสั่งบรรทัดเดียว เพื่อสมัครและรอรับข้อความ </p>
+<pre><code class="language-bash">$ mosquitto_sub -h test.mosquitto.org -p 8883 -d \
+   --cafile mosquitto.org.crt -t 'test/1234/#' -V mqttv5 -q 2
+</code></pre>
 <pre><code class="language-bash">$ mosquitto_sub -h test.mosquitto.org -p 8884 -d \
  --cafile mosquitto.org.crt --cert client.crt --key client.key \
  -t 'test/1234/#' -V mqttv5 -q 2
@@ -255,27 +255,19 @@ $ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
 <p>&nbsp;</p>
 <p>ถ้าต้องการทดสอบกับ <strong>EMQX MQTT Broker</strong> ให้ลองใช้พอร์ต <strong>8883</strong> 
 ซึ่งจะมีการเข้ารหัสข้อมูลเท่านั้น ดังนั้นจึงไม่ต้องใช้ไฟล์  <strong> SSL/TLS Client Certificate</strong>
-แต่จะต้องดาวน์โหลดไฟล์สำหรับ <strong> SSL/TLS Server Certificate</strong> สำหรับ <strong> EMQX Broker</strong>
-มาใช้งานด้วย
 (อ้างอิงจาก: <a href="https://www.emqx.com/en/mqtt/public-mqtt5-broker">"<strong>Public MQTT Broker for IoT Testing</strong>"</a>)</p>
-<pre><code class="language-bash"># Download the CA Certificate of the EMQX broker
-$ wget https://assets.emqx.com/data/broker.emqx.io-ca.crt
-</code></pre>
 <p>จากนั้นให้ลองทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code> เพื่อเชื่อมต่อกับพอร์ต <strong>8883</strong>
 ใช้ <strong>QoS 2</strong> และโพรโทคอล <strong>MQTT v5.0</strong></p>
-<p>ทำคำสั่งเพื่อสมัครและรอรับข้อความ</p>
+<p>ทำคำสั่งเพื่อสมัครและรอรับข้อความ (<strong>Client Authentication</strong>)</p>
 <pre><code class="language-bash">$ mosquitto_sub -h broker.emqx.io -p 8883 -d \
- --cert client.crt --key client.key \
- -t 'test/1234/#' -V mqttv5 -q 2
+ --capath /etc/ssl/certs/ -t 'test/1234/#' -V mqttv5 -q 2
 </code></pre>
 <p>ทำคำสั่งเพื่อเผยแพร่ข้อความ</p>
 <pre><code class="language-bash">$ mosquitto_pub -h broker.emqx.io -p 8883 -d \
-  --cert client.crt --key client.key \
-  -t 'test/1234/msg' -m 'hello' -V mqttv5 -q 2
+  --capath /etc/ssl/certs/ -t 'test/1234/msg' -m 'hello' -V mqttv5 -q 2
 </code></pre>
-<p><img alt="" src="mosquitto_pub_sub_8884.png" /></p>
-<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code>
-เชื่อมต่อกับ <strong>broker.emqx.io:8883</strong> </p>
+<p><img alt="" src="mosquitto_emqx.png" /></p>
+<p>รูป: การเชื่อมต่อกับ <strong>broker.emqx.io:8883</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
@@ -285,7 +277,7 @@ $ wget https://assets.emqx.com/data/broker.emqx.io-ca.crt
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-09-10 | Last Updated: 2022-09-12</p></div>
+<p>Created: 2022-09-10 | Last Updated: 2022-09-17</p></div>
             </div>
         </div>
 
