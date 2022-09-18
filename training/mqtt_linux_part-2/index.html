@@ -182,29 +182,34 @@ Client (null) sending DISCONNECT
 <hr />
 <h2 id="_1">&#9655; <strong>การส่งข้อความที่มีการเข้ารหัสข้อมูลและยืนยันตัวตน</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>ถัดไปเป็นการทดลองเชื่อมต่อและส่งข้อความไปยังโบรกเกอร์ <strong>test.mosquitto.org</strong>
-โดยเลือกใช้พอร์ต เช่น <strong>8884</strong> ในกรณีนี้ จะต้องมีการเตรียมไฟล์ <strong>Client Certificate</strong>
+โดยเลือกใช้พอร์ต เช่น <strong>8884</strong> ในกรณีนี้ จะต้องมีการเตรียมไฟล์ <strong>TLS Client Certificate</strong>
 เอาไว้ใช้งาน </p>
 <p>ขั้นตอนการสร้างไฟล์ดังนี้ (อ้างอิงจาก: <a href="https://test.mosquitto.org/ssl/"><strong>TLS Client Certificate</strong></a>)
 เริ่มต้นด้วยการสร้างไฟล์ <strong>CSR</strong> (<em>Certificate Signing Request</em>) และบันทึกไว้ในรูปแบบที่เรียกว่า
-<strong>PEM Format</strong> โดยใช้คำสั่ง <code>openssl</code> และในการสร้างไฟล์ <strong>CSR</strong> จะต้องใส่ข้อมูลที่เรียกว่า
-<strong>Distinguished Name (DN)</strong> ประกอบด้วย</p>
+<strong>PEM Format</strong> โดยใช้คำสั่ง <code>openssl</code> และในการสร้างไฟล์ <strong>CSR</strong> จะต้องใส่ชุดข้อมูลที่เรียกว่า
+<strong>Distinguished Name (DN)</strong> ซึ่งประกอบด้วย</p>
 <ul>
-<li><strong>Common Name / FQDN</strong> (<strong><em>required</em></strong>) เช่น ใช้ชื่อ  <code>iot-kmutnb.github.io</code></li>
-<li><strong>Organization</strong> (<em>optional</em>)</li>
+<li><strong>Common Name (CN) / FQDN</strong> (<strong><em>required</em></strong>) เช่น ใช้ชื่อ  <code>iot-kmutnb.github.io</code></li>
+<li><strong>Organization Name (O)</strong> (<em>optional</em>)</li>
 <li><strong>Organization Unit (OU)</strong> (<em>optional</em>)</li>
-<li><strong>City or Locality</strong> (<em>optional</em>)</li>
-<li><strong>State or Province</strong> (<em>optional</em>)</li>
-<li><strong>Two-letter Country Code</strong> (<em>optional</em>)</li>
+<li><strong>City or Locality (L)</strong> (<em>optional</em>)</li>
+<li><strong>State or Province (ST)</strong> (<em>optional</em>)</li>
+<li><strong>Two-letter Country Code (C)</strong> (<em>optional</em>)</li>
 <li><strong>Email Address</strong> (<em>optional</em>)</li>
 <li><strong>Challenge Password</strong> (<em>optional</em>)</li>
 </ul>
 <pre><code class="language-bash"># Install the openssl utility
 $ sudo apt install openssl -y
 
-# Generate the RSA 2048-bit private key file (client.key)
-# and the CSR file (client.csr)
-$ openssl req -new -newkey rsa:2048 -nodes \
-  -keyout client.key -out client.csr
+# Generate the RSA 2048-bit key pair stored in a file (client.key)
+# and generate the CSR file (client.csr)
+
+$ CN=&quot;iot-kmutnb.github.io&quot;
+
+$ SUBJECT_CLIENT=&quot;/C=TH/ST=Bangkok/L=Bangsue/O=IoT/OU=Client/CN=$CN&quot;
+
+$ openssl req -new -nodes -sha256 -subj &quot;$SUBJECT_CLIENT&quot; \
+  -keyout client.key -out client.csr 
 
 # Download the CA-signed Certificate of Mosquitto.org
 $ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
@@ -213,7 +218,8 @@ $ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
 <code>client.csr</code> จากนั้นให้นำข้อความในไฟล์  <code>client.csr</code> ไปกรอกใส่ในฟอร์มบนหน้าเว็บของ <strong>Mosquitto</strong>
 ซึ่งทำหน้าที่เป็น <strong>Online Client Certificate Generator</strong>
 <a href="https://test.mosquitto.org/ssl/">https://test.mosquitto.org/ssl/</a>
-แล้วกดปุ่ม <strong>Submit</strong> จะได้ไฟล์ <code>client.crt</code> ซึ่งเป็น <strong> TLS Client Certificate</strong>
+แล้วกดปุ่ม <strong>Submit</strong> เพื่อตรวจสอบและลงนามโดยใช้ <strong>Mosquitto CA (Certificate Authority)</strong>
+แล้วจะได้ไฟล์ <code>client.crt</code> ซึ่งเป็น <strong> TLS Client Certificate</strong>
 มาใช้งานและมีอายุการใช้งานได้ 90 วัน</p>
 <p><img alt="" src="mosquitto_gen_csr.png" /></p>
 <p>รูป: หน้าเว็บของ <strong>Mosquitto</strong> สำหรับกรอกข้อมูล <strong>CSR</strong> ของไคลเอนต์
@@ -222,6 +228,17 @@ $ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
 <p>รูป: ข้อความภายในไฟล์ <code>client.crt</code></p>
 <p><img alt="" src="mqtt_broker_crt_file.png" /></p>
 <p>รูป: ข้อความภายในไฟล์ <code>mosquitto.org.crt</code></p>
+<p>ลองทำคำสั่งต่อไปนี้ เพื่อดูรายละเอียดเกี่ยวกับไฟล์  <code>mosquitto.org.crt</code> (<strong>X.509 v3 Certificate</strong>)</p>
+<pre><code class="language-bash">$ openssl x509 -in mosquitto.org.crt -text -noout
+</code></pre>
+<p>ซึ่งจะเห็นข้อมูลเกี่ยวกับหัวข้อต่าง ๆ เช่น</p>
+<ul>
+<li><strong>Signature Algorithm</strong></li>
+<li><strong>Issuer</strong></li>
+<li><strong>Validity (Not Before / Not After)</strong></li>
+<li><strong>Subject Public Key Info - Public Key Algorithm / RSA Public-Key)</strong></li>
+<li><strong>X509v3 extensions - X509v3 Basic Constraints - CA (TRUE or FALSE)</strong></li>
+</ul>
 <p>&nbsp;</p>
 <p>ถัดไปเป็นการลองใช้คำสั่ง <code>mosquitto_sub</code> และ <code>mosquitto_pub</code> เพื่อเชื่อมต่อกับพอร์ต <strong>8884</strong>
 ใช้ <strong>QoS 2</strong> และโพรโทคอล <strong>MQTT v5.0</strong> และให้สังเกตว่า จะต้องมีการใช้ไฟล์ต่อไปนี้ (เก็บอยู่ในไดเรกทอรีเดียวกัน)</p>
@@ -274,10 +291,11 @@ $ wget http://test.mosquitto.org/ssl/mosquitto.org.crt
 <p>บทความนี้สาธิตการเชื่อมต่อไปยังโบรกเกอร์สาธารณะ เช่น  <strong>Mosquitto Broker</strong>
 และ <strong>EMQX Broker</strong> สำหรับการลองใช้งาน <strong>MQTT</strong> โดยใช้คำสั่งของ
 <strong>Mosquitto Pub/Sub Client</strong> ใน <strong>Linux</strong></p>
-<p>&nbsp;</p>
+<hr />
+<p>อ่านเนื้อหา <a href="../mqtt_linux_part-1/"><strong>ตอนที่ 1</strong></a> | <a href="../mqtt_linux_part-3/"><strong>ตอนที่ 3</strong></a></p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-09-10 | Last Updated: 2022-09-17</p></div>
+<p>Created: 2022-09-10 | Last Updated: 2022-09-18</p></div>
             </div>
         </div>
 
