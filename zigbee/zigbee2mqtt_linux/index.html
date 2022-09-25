@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/zigbee/zigbee2mqtt_linux/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การติดตั้ง Zigbee2MQTT สำหรับ Linux และใช้งานในเบื้องต้น - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#zigbee2mqtt-linux" class="nav-link">การติดตั้ง Zigbee2MQTT สำหรับ Linux และใช้งานในเบื้องต้น</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#zigbee2mqtt" class="nav-link">&#9655; Zigbee2MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#zigbee-usb-adapters" class="nav-link">&#9655; ZigBee USB Adapters</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#zigbee2mqtt-linux_1" class="nav-link">&#9655; การติดตั้ง Zigbee2MQTT สำหรับ Linux</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zigbee2mqtt-linux">การติดตั้ง Zigbee2MQTT สำหรับ Linux และใช้งานในเบื้องต้น<a class="headerlink" href="#zigbee2mqtt-linux" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="zigbee2mqtt">&#9655; <strong>Zigbee2MQTT</strong><a class="headerlink" href="#zigbee2mqtt" title="Permanent link">#</a></h2>
+<p>ในปัจจุบัน ซอฟต์แวร์ประเภท <strong>Open Source</strong> ที่เป็นแพลตฟอร์มสำหรับการใช้งาน <strong>Smart Home</strong>
+มีอยู่หลายตัวเลือก เช่น  <a href="https://www.home-assistant.io/"><strong>Home Assistant</strong></a>, 
+<a href="https://www.openhab.org/"><strong>openHAB</strong></a>, <a href="https://www.domoticz.com/"><strong>Domoticz</strong></a> 
+และ <a href="https://www.iobroker.net/"><strong>ioBroker</strong></a> เป็นต้น
+บทความนี้กล่าวถึง <a href="https://www.zibee2mqtt.io/"><strong>Zigbee2MQTT</strong></a> 
+ซึ่งเป็นซอฟต์แวร์ที่สามารถนำมาใช้ในการพัฒนาแพลตฟอร์มสำหรับ <strong>Smart Home</strong> ได้เช่นกัน</p>
+<p><strong>Zigbee2MQTT</strong> ใช้ <a href="https://nodejs.org/en/"><strong>Nodejs</strong></a>
+(<strong>JavaScript Runtime Engine</strong>) ในการทำงาน
+มีความสามารถเชื่อมต่อกับอุปกรณ์ประเภท <strong>ZigBee Coordinator - USB Adapter</strong> ผ่านทางพอร์ต <strong>USB</strong>
+ทำให้เครื่องคอมพิวเตอร์สามารถสื่อสารข้อมูลกับอุปกรณ์อื่นในเครือข่ายไร้สายด้วยโพรโทคอล <strong>IEEE 802.15.4 / ZigBee 3.0</strong> 
+และสามารถเชื่อมต่อกับ <strong>MQTT Broker</strong> ได้ด้วย หรือกล่าวได้ว่า <strong>Zigbee2MQTT</strong>
+ทำหน้าที่เป็นเกตเวย์ (<strong>Gateway</strong>) ที่เชื่อมต่อระหว่างเครือข่ายไร้สาย <strong>ZigBee</strong> กับ <strong>MQTT Broker</strong></p>
+<p><img alt="" src="zigbee_smart_home.png" /></p>
+<p>รูป: การใช้งานโพรโทคอล <strong>ZigBee</strong> สำหรับ <strong>Smart Home</strong>
+(Source: <a href="https://csa-iot.org/all-solutions/zigbee/">Connectivity Standards Alliance</a>)</p>
+<p><strong>Zigbee2MQTT</strong> สามารถนำไปติดตั้งใช้งานได้กับคอมพิวเตอร์บอร์ดเดี่ยว (<strong>Single-Board Computer: SBC</strong>)
+เช่น บอร์ด <strong>Raspberry Pi</strong> ที่ทำงานด้วยระบบปฏิบัติการ <strong>Linux</strong> เช่น <strong>Raspberry Pi OS</strong>
+หรือจะทดลองใช้งานกับคอมพิวเตอร์ทั่วไปที่ใช้ <strong>Windows</strong> หรือ <strong>macOS</strong> ก็ได้เช่นกัน</p>
+<p>ลองดูรายการอุปกรณ์ <a href="https://www.Zigbee2MQTT.io/supported-devices/"><strong>ZigBee End Devices</strong></a>
+ที่สามารถนำมาใช้ร่วมกับ <strong>Zigbee2MQTT</strong> ได้ ในปัจจุบันมีมากกว่า 2000 รายการ จากหลายผู้ผลิต
+เช่น โมดูลเซนเซอร์ประเภทต่าง ๆ สวิตซ์ไฟฟ้า หลอดไฟ <strong>LED</strong> ปลั้กไฟฟ้าที่ควบคุมการทำงานได้ เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="zigbee-usb-adapters">&#9655; <strong>ZigBee USB Adapters</strong><a class="headerlink" href="#zigbee-usb-adapters" title="Permanent link">#</a></h2>
+<p>อุปกรณ์ <strong>ZigBee USB Adapters</strong> ที่ใช้งานได้กับ <strong>Zigbee2MQTT</strong> 
+ส่วนใหญ่จะใช้ชิปของบริษัท <strong>Texas Instruments (TI)</strong>
+หรือชิปของบริษัท <strong>Silicon Labs</strong> ก็เป็นอีกตัวเลือกหนึ่ง เช่น</p>
+<ul>
+<li><strong>TI CC2530</strong> และ <strong>CC2531</strong>
+&mdash; ชิปรุ่นเก่า ใช้ซีพียู 8 บิต และไม่แนะนำให้ใช้งานอีกต่อไป</li>
+<li><strong>TI CC2538 (Arm Cortex-M3)</strong>, <strong>CC1352R (Arm Cortex-M4F)</strong>
+   และ <strong>CC2652R / CC2652P (Arm Cortex-M4F)</strong>
+&mdash; ชิปรุ่นใหม่กว่า ใช้ซีพียู 32 บิต แต่มีราคาอุปกรณ์แพงกว่ารุ่นเก่า</li>
+<li><strong>Silicon Labs EFR32MG2x / MGM21x (ARM Cortex-M33)</strong>
+และ <strong>EFR32MG1x / MGM1x (ARM Cortex-M4F)</strong></li>
+</ul>
+<p>ตัวอย่างอุปกรณ์  <strong>ZigBee USB Adapters</strong>
+(ดูรายการอุปกรณ์: <a href="https://www.zigbee2mqtt.io/guide/adapters/"><strong>Zigbee2MQTT Supported Adapters</strong></a>) เช่น</p>
+<ul>
+<li><a href="https://itead.cc/product/cc2531-usb-dongle/"><strong>Itead CC2531 USB Dongle</strong></a></li>
+<li><a href="https://itead.cc/product/zigbee-3-0-usb-dongle/"><strong>Itead / Sonoff Zigbee 3.0 USB Dongles</strong></a>
+ซึ่งมีสายอากาศภายนอก (<strong>External Antenna</strong>) และกล่องใส่ที่ทำมาจากอะลูมิเนียม (<strong>Metal Case</strong>)<ul>
+<li><strong>"ZBDongle-P" (CC2652P)</strong> ใช้เฟิร์มแวร์ <strong>Z-Stack (ZNP) 3.x.0 Coordinator Firmware</strong></li>
+<li><strong>"ZBDongle-E" (EFR32MG21)</strong> 
+ใช้เฟิร์มแวร์  <strong>Silicon Labs EmberZNet Application Firmware / EmberZNet Serial Protocol (EZSP)</strong></li>
+</ul>
+</li>
+<li><strong>ZB-GW01 V1.1 ZigBee 3.0 USB Dongle (EFR32MG21)</strong> 
+ทำงานได้เหมือน <strong>"ZBDongle-E" (EFR32MG21)</strong> แต่อาจไม่มีสายอากาศภายนอก และมีกล่องพลาสติก</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="cc2531_usb_dongle.png" /></p>
+<p>รูป: อุปกรณ์ <strong>CC2531 USB Dongle</strong></p>
+<p><img alt="" src="sonoff_usb_dongle.jpg" /></p>
+<p>รูป: อุปกรณ์  <strong>Itead / Sonoff Zigbee 3.0 USB Dongle Plus (CC2562P)</strong>
+และสายอากาศภายนอก</p>
+<p><img alt="" src="sonoff_zigbee_usb_dongle_cc2652p.png" /></p>
+<p>รูป: ภายในอุปกรณ์  <strong>Itead / Sonoff Zigbee 3.0 USB Dongle-P</strong>
+(Source: Itead / Sonoff)</p>
+<p><img alt="" src="sonoff_zigbee_usb_dongle_efr32mg21.png" /></p>
+<p>รูป: ภายในอุปกรณ์  <strong>Itead / Sonoff Zigbee 3.0 USB Dongle-E</strong>
+(Source: Itead / Sonoff)</p>
+<p><img alt="" src="sonoff_zigbee_usb_dongles_comparison.png" /></p>
+<p>ตาราง: เปรียบเทียบความแตกต่างของอุปกรณ์ <strong>ZBDongle-P</strong> และ <strong>ZBDongle-E</strong></p>
+<p><img alt="" src="ZB-GW01_zigbee_usb_dongle.png" /></p>
+<p>รูป: อุปกรณ์ <strong>ZB-GW01 ZigBee USB Dongle</strong> (ไม่ใส่กล่องพลาสติก)</p>
+<p>&nbsp;</p>
+<p>วิธีการติดตั้งหรืออัปเกรดเฟิร์มแวร์และอุปกรณ์ที่เกี่ยวข้องได้ ศึกษาได้จากบทความต่อไปนี้</p>
+<ul>
+<li><a href="../cc2531_zigbee_firmware/">"การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ <strong>CC2531 USB Dongle</strong>"</a></li>
+<li><a href="../cc2562p_zigbee_firmware_flashing/">"การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ <strong>CC2562P USB Dongle</strong>"</a></li>
+</ul>
+<hr />
+<h2 id="zigbee2mqtt-linux_1">&#9655; <strong>การติดตั้ง Zigbee2MQTT สำหรับ Linux</strong><a class="headerlink" href="#zigbee2mqtt-linux_1" title="Permanent link">#</a></h2>
+<p>เนื่องจากการทำงานของ <strong>Zigbee2MQTT</strong> จำเป็นต้องใช้ <strong>NodeJS</strong> ดังนั้นให้ติดตั้ง
+<strong>NodeJS</strong> ในระบบให้พร้อมใช้งานก่อน และในบทความนี้ได้เลือกติดตั้ง <strong>NodeJS v14.x</strong>
+โดยทำคำสั่งดังนี้</p>
+<pre><code class="language-bash">$ sudo apt install -y curl
+$ curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+$ sudo apt install -y nodejs
+</code></pre>
+<p>ทำคำสั่งตรวจสอบเวอร์ชันของคำสั่ง <code>node</code> และ <code>npm</code> (<strong>Node Package Manager</strong>)</p>
+<pre><code class="language-bash">$ node -v
+v14.20.1
+$ npm -v
+6.14.17
+</code></pre>
+<p>ขั้นตอนถัดไปคือ การดาวน์โหลดไฟล์ซอร์สโค้ดของ <strong>Zigbee2MQTT</strong> จาก <strong>Github</strong>
+(ทดลองใช้เวอร์ชัน <strong>v1.27.2</strong>) แล้วทำการติดตั้งโปรแกรมในระบบ โดยทำคำสั่งตามลำดับดังนี้</p>
+<pre><code># Clone the Zigbee2MQTT repository.
+$ git clone https://github.com/Koenkk/zigbee2mqtt.git
+
+# Move the zigbee2mqtt directory to /opt
+$ sudo mv zigbee2mqtt /opt
+
+# Change the owner of the /opt/zigbee2mqtt directory.
+$ sudo chown -R $USER:$USER /opt/zigbee2mqtt
+
+# Change the current directory to '/opt/zigbee2mqtt'.
+$ cd /opt/zigbee2mqtt
+
+# Install package dependencies
+$ npm ci
+</code></pre>
+<p>ก่อนเริ่มต้นการทำงานของโปรแกรม <strong>ZigBee2MQTT</strong>
+ให้สร้างและเปิดไฟล์ <code>data/configuration.yml</code> ภายในไดเรกทอรี <code>/opt/zigbee2mqtt</code>
+โดยใช้คำสั่ง <code>nano</code> เพื่อตั้งค่าการใช้งานสำหรับ <strong>ZigBee2MQTT</strong></p>
+<pre><code class="language-bash">$ nano data/configuration.yml
+</code></pre>
+<p>เขียนข้อความต่อไปนี้ลงในไฟล์ดังกล่าว และบันทึกการแก้ไขลงไฟล์ (กดปุ่ม <code>Ctrl</code>+<code>o</code> แล้ว <code>Enter</code>)
+และจบการทำงานของ <code>nano</code> (กดปุ่ม <code>Ctrl</code>+<code>x</code>)</p>
+<pre><code>homeassistant: false
+permit_join: true
+mqtt:
+  base_topic: zigbee2mqtt
+  ## specify the IP address or hostname of your MQTT broker
+  server: 'mqtt://localhost:1883'
+  #user: xxxx
+  #password: xxxx
+serial:
+  ## specify the serial COM port: /dev/ttyACM0 or /dev/ttyUSB0
+  port: /dev/ttyUSB0
+advanced:
+  ## specify the ZigBee channel number
+  channel: 15
+frontend:
+  port: 8080
+</code></pre>
+<p>จากตัวอย่างการตั้งค่าใช้งาน จะเห็นว่า ได้เลือกใช้ <strong>MQTT Broker</strong> แบบ <code>localhost</code>
+(<code>127.0.0.1</code>) หมายเลขพอร์ตเป็น <code>1883</code> (ไม่มีการเข้ารหัสข้อมูล ไม่ต้องระบุชื่อผู้ใช้และรหัสผ่านในการเชื่อมต่อกับโบรกเกอร์)
+ดังนั้นจะต้องมีการติดตั้งโบรกเกอร์  (เช่น เลือกใช้ <strong>Mosquitto</strong>) ไว้ในระบบแล้ว 
+หรือจะลองเปลี่ยนไปใช้ <strong>Public MQTT Broker</strong> ก็ได้สำหรับการทดลองใช้งานในเบื้องต้น</p>
+<p>ในส่วนที่มีชื่อว่า <code>mqtt:</code> มีการกำหนดชื่อหัวข้อเริ่มต้น หรือเป็น <code>base_topic</code>
+ให้เป็น <code>zigbee2mqtt</code> สำหรับการรับส่งข้อความต่าง ๆ ระหว่าง <strong>Zigbee2MQTT</strong> กับ <strong>MQTT Broker</strong></p>
+<p><code>permit_join: true</code> หมายถึง อนุญาตให้อุปกรณ์อื่นสามารถเชื่อมต่อเข้ากับระบบเครือข่าย <strong>ZigBee</strong>
+ที่จัดการโดยอุปกรณ์ <strong>USB Dongle</strong> ที่ทำหน้าที่เป็น <strong>ZigBee Coordinator</strong></p>
+<p>ในส่วนที่มีชื่อว่า <code>serial:</code> มีการระบุหมายเลขพอร์ตอนุกรมซึ่งจะต้องตรงกับอุปกรณ์ <strong>USB Dongle</strong>
+ที่เสียบใช้งานอยู่ โดยทั่วไปจะเป็น <code>/dev/ttyACM0</code> หรือ <code>/dev/ttyUSB0</code></p>
+<p>ในส่วนที่มีชื่อว่า <code>advanced:</code> มีการกำหนดหมายเลขช่องสัญญาณ <code>channel:</code> เป็น <code>15</code> 
+โดยทั่วไปแล้ว <strong>ZigBee</strong> ที่ใช้ความถี่ในย่าน <strong>2.4GHz</strong> จะมีช่วงความถี่ให้เลือกใช้ได้ โดยระบุเป็นหมายเลข
+<strong>11 - 25</strong> แต่แนะนำให้เลือกหมายเลข <strong>15</strong>, <strong>20</strong> หรือ <strong>25</strong>  เพื่อช่วยลดปัญหาการรบกวนกันของสัญญาณ <strong>WiFi</strong></p>
+<p>ในส่วนที่มีชื่อว่า <code>frontend: true</code> มีการเปิดใช้งาน <strong>Web Frontend</strong> สำหรับ <strong>Zigbee2MQTT</strong>
+ให้ทำงานแบบ <code>localhost</code> หมายเลขพอร์ต <code>8080</code> เป็นต้น</p>
+<p><strong>คำแนะนำ/เอกสารออนไลน์สำหรับการติดตั้งใช้งาน </strong>Zigbee2MQTT:** </p>
+<ul>
+<li><a href="https://www.zigbee2mqtt.io/guide/installation/01_linux.html">วิธีการติดตั้ง <strong>Zigbee2MQTT</strong> สำหรับ <strong>Linux</strong></a></li>
+<li><a href="https://www.zigbee2mqtt.io/guide/installation/02_docker.html">วิธีการติดตั้ง <strong>Zigbee2MQTT</strong> ด้วยวิธี <strong>Docker</strong></a></li>
+<li><a href="https://www.zigbee2mqtt.io/guide/configuration">วิธีการตั้งค่า <strong>Zigbee2MQTT Configuration</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<p>ทำคำสั่งเพื่อเพิ่มชื่อผู้ใช้เข้ากลุ่ม <code>dialout</code> ซึ่งจะทำให้ได้สิทธิ์ในการเข้าถึงอุปกรณ์ที่เป็นพอร์ตอนุกรม</p>
+<pre><code class="language-bash"># Add the current user to the 'dialout' group
+$ sudo usermod -a -G dialout $USER
+</code></pre>
+<p>ลองทำคำสั่งต่อไปนี้ เพื่อให้ <strong>ZigBee2MQTT</strong> เริ่มต้นทำงาน</p>
+<pre><code class="language-bash"># Start ZigBee2MQTT 
+$ npm start
+</code></pre>
+<p><img alt="" src="sonoff_zigbee_usb_dongle_xiaomi.jpg" /></p>
+<p>รูป: อุปกรณ์ <strong>Sonoff USB Dongle Dongle-P</strong>
+และ <strong>Xiaomi MiJia ZigBee Sensor Device (WSDCGQ01LM)</strong></p>
+<p><img alt="" src="zigbee2mqtt_ubuntu_vm-1.png" /></p>
+<p>รูป: ข้อความเอาต์พุตเมื่อโปรแกรม <strong>Zigbee2MQTT</strong> เริ่มทำงาน</p>
+<p>ถ้าลองนำอุปกรณ์ เช่น <strong>Xiaomi MiJia Temperature &amp; Humidity Sensor (WSDCGQ01LM)</strong>
+มาลองเชื่อมต่อเข้ากับ <strong>ZigBee Network</strong> โดยกดปุ่มที่ด้านข้างอุปกรณ์ค้างไว้ประมาณ 5 วินาที จะเห็นแสงสีน้ำเงิน
+กระพริบหลายครั้ง ซึ่งแสดงสถานะการเชื่อมต่อและเข้าร่วมกับเครือข่าย (<strong>ZigBee Network Joining</strong>)</p>
+<p><img alt="" src="zigbee2mqtt_ubuntu_vm-2.png" /></p>
+<p>รูป: ข้อความเอาต์พุตที่แสดงให้เห็นว่า มีอุปกรณ์ <strong>ZigBee Device</strong> เชื่อมต่อเข้ากับระบบ</p>
+<p><img alt="" src="zigbee2mqtt_ubuntu_vm-2.png" /></p>
+<p>รูป: ข้อความเอาต์พุตที่แสดงให้เห็นว่า มีอุปกรณ์ <strong>ZigBee Device</strong> เชื่อมต่อเข้ากับระบบ</p>
+<p><img alt="" src="zigbee2mqtt_ubuntu_vm-3.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่แสดงข้อความแบบ <strong>JSON</strong> ที่ได้รับอุปกรณ์ 
+ <strong>Xiaomi MiJia Device (WSDCGQ01LM)</strong> ซึ่งมีข้อมูลตัวเลขเกี่ยวกับอุณหภูมิ
+ความชื้นสัมพันธ์ แรงดันของแบตเตอรี่  (หน่วยเป็นโวลต์) และระดับพลังงานของแบตเตอรี่ (หน่วยเป็นเปอร์เซ็นต์) เป็นต้น</p>
+<p><img alt="" src="zigbee2mqtt_frontend-1.png" /></p>
+<p>รูป: หน้าเว็บของ <strong>Zigbee2MQTT Frontend</strong> แสดงรายการอุปกรณ์เซนเซอร์ที่เชื่อมต่อกับเครือข่าย <strong>ZigBee</strong></p>
+<p><img alt="" src="zigbee2mqtt_frontend-2.png" /></p>
+<p>รูป:  หน้าเว็บของ <strong>Zigbee2MQTT Frontend</strong> แสดงข้อมูลที่ได้รับจากอุปกรณ์เซนเซอร์</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการติดตั้งและใช้งาน <strong>Zigbee2MQTT</strong> ในเบื้องต้นสำหรับผู้ที่ใช้งานระบบปฏิบัติการ 
+<strong>Linux</strong> ซึ่งอาจจะลองใช้งานในรูปแบบของ <strong>Ubuntu Desktop</strong> 
+หรือ <strong>Ubuntu Virtual Machine</strong> หรือ บอร์ด <strong>Raspberry Pi</strong> ก็ได้</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-24 | Last Updated: 2022-09-25</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

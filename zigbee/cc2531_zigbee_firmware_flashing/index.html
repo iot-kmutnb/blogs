@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/zigbee/cc2531_zigbee_firmware_flashing/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ CC2531 USB Dongle - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#zigbee-coordinator-cc2531-usb-dongle" class="nav-link">การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ CC2531 USB Dongle</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#cc2531-usb-dongle" class="nav-link">&#9655; อุปกรณ์  CC2531 USB Dongle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#zigbee-protocol-stack" class="nav-link">&#9655; ZigBee Protocol Stack</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ubuntu-vm-oracle-virtualbox" class="nav-link">&#9655; การใช้ Ubuntu VM ร่วมกับ Oracle VirtualBox</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zigbee-coordinator-cc2531-usb-dongle">การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ CC2531 USB Dongle<a class="headerlink" href="#zigbee-coordinator-cc2531-usb-dongle" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="cc2531-usb-dongle">&#9655; <strong>อุปกรณ์  CC2531 USB Dongle</strong><a class="headerlink" href="#cc2531-usb-dongle" title="Permanent link">#</a></h2>
+<p>อุปกรณ์ที่ได้นำมาทดลองใช้งานคือ <strong>CC2531 USB Dongle</strong> (<em>Clone</em>) ผลิตในประเทศจีน
+ทำงานได้เหมือนกับอุปกรณ์ <strong>TI C2531EMK — CC2531 USB Evaluation Module Kit</strong> 
+ของบริษัท <strong>Texas Instruments (TI)</strong> 
+และใช้ชิปไมโครคอนโทรลเลอร์ <a href="https://www.ti.com/product/CC2531"><strong>CC2531F256</strong></a>
+(<a href="https://www.ti.com/lit/ds/symlink/cc2531.pdf"><strong>Datasheet</strong></a>)</p>
+<p><img alt="" src="cc2531_usb_dongle-1.png" /></p>
+<p>รูป: อุปกรณ์ <strong>CC2531 USB Dongle</strong> (Source: 
+<a href="https://itead.cc/product/cc2531-usb-dongle/">https://itead.cc/product/cc2531-usb-dongle/</a>)</p>
+<p>ข้อสังเกต: อุปกรณ์ <strong>CC2531 USB Dongle</strong> มีสายอากาศบนแผ่น <strong>PCB</strong> 
+(<strong>PCB Trace Antenna</strong>) หรือ มีคอนเนกเตอร์ให้ต่อสายอากาศภายนอก
+(<strong>External Antenna</strong>)</p>
+<p>ภายในมีไมโครคอนโทรลเลอร์ 8 บิต (<strong>8051 Core</strong>) มีหน่วยความจำภายใน <strong>256kB Flash</strong> และ <strong>8kB SRAM</strong> 
+ชิปรุ่นนี้มีวงจรที่สามารถสื่อสารไร้สายด้วยโพรโตคอล <strong>2.4GHz IEEE 802.15.4 / ZigBee</strong>
+และสามารถเชื่อมต่อกับพอร์ต <strong>USB 2.0</strong> ได้</p>
+<p>ชิปรุ่นนี้มีการใช้งานมานาน (มากกว่า 10 ปี) และในปัจจุบัน ทางบริษัท <strong>TI</strong> ก็ได้พัฒนาชิปที่ใช้ซีพียูแบบ 32 บิต 
+ที่ทำงานได้มีประสิทธิภาพดีกว่า และมีหน่วยความจำมากกว่า เช่น 
+<a href="https://www.ti.com/product/CC2530"><strong>CC2538</strong></a> และ
+<a href="https://www.ti.com/product/CC2652P"><strong>CC2562P</strong></a> ตามลำดับ
+ดังนั้นอาจจะกล่าวได้ว่า ชิป <strong>CC2531</strong> และโมดูล <strong>CC2531 USB Dongle</strong>
+จะอยู่ในกลุ่ม <strong>Legacy Device</strong> ไม่แนะนำให้นำมาใช้ในการออกแบบอุปกรณ์ใหม่</p>
+<p>แต่ถ้ามีอยู่แล้ว ก็สามารถนำมาใช้งานร่วมกับซอฟต์แวร์ที่เป็น <strong>Open Source</strong>
+เช่น <a href="https://www.Zigbee2MQTT.io/"><strong>Zigbee2MQTT</strong></a>
+เพื่อใช้ในการเชื่อมต่อกับอุปกรณ์ประเภทต่าง ๆ ที่สื่อสารด้วยโพรโทคอล <strong>ZigBee</strong> (สำหรับ <strong>Smart Home</strong>)
+และสามารถแปลงเป็นข้อความเพื่อสื่อสารกับ <strong>MQTT Broker</strong> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="zigbee-protocol-stack">&#9655; <strong>ZigBee Protocol Stack</strong><a class="headerlink" href="#zigbee-protocol-stack" title="Permanent link">#</a></h2>
+<p>โดยปรกติแล้วอุปกรณ์ เช่น <strong>CC2531</strong> จะต้องมีการติดตั้งเฟิร์มแวร์ 
+<a href="https://www.ti.com/tool/Z-STACK"><strong>ZigBee Protocol Stack (Z-Stack)</strong></a>
+ของบริษัท <strong>TI</strong> ซึ่งมีหลายเวอร์ชัน เช่น</p>
+<ul>
+<li><strong>Z-Stack Firmware v1.2</strong> (<em>ZigBee Home Automation - ZHA compliant</em>)</li>
+<li><strong>Z-Stack Firmware v3.0</strong></li>
+</ul>
+<p>ในบทความนี้จะกล่าวถึง วิธีการติดตั้งเฟิร์มแวร์ 
+<a href="https://github.com/Koenkk/Z-Stack-firmware"><strong>Koenkk / Z-Stack-firmware</strong></a>
+โดยเลือกใช้  <strong>Z-Stack v1.2</strong> ซึ่งเหมาะกับอุปกรณ์ <strong>CC2531</strong> มากกว่า <strong>Z-Stack v3.0</strong>
+และจะนำมาใช้งานเป็น  <strong>ZigBee Coordinator (default)</strong> 
+ร่วมกับซอฟต์แวร์ <strong>Zigbee2MQTT</strong> สำหรับเครื่องคอมพิวเตอร์ของผู้ใช้ หรือ คอมพิวเตอร์ขนาดเล็กที่ทำหน้าที่เป็น
+<strong>Zigbee-to-MQTT Gateway</strong> ในระบบเครือข่าย</p>
+<p>ข้อสังเกต: </p>
+<ul>
+<li>อุปกรณ์ <strong>CC2531</strong> ที่ใช้เฟิร์มแวร์ <a href="https://github.com/Koenkk/Z-Stack-firmware/tree/master/coordinator/Z-Stack_Home_1.2"><strong>Z-Stack v1.2 Coordinator</strong></a>
+สามารถรองรับจำนวนอุปกรณ์ <strong>ZigBee Device</strong> ได้ค่อนข้างจำกัด</li>
+<li>แต่ถ้าต้องการจะเพิ่มระยะทางในการเชื่อมต่อและจำนวนของอุปกรณ์ในเครือข่าย
+จะต้องเพิ่มจำนวนอุปกรณ์ <strong>CC2531</strong> เพื่อทำหน้าที่เป็น <strong>ZigBee Router</strong> ในเครือข่าย <strong>ZigBee</strong>
+และติดตั้งเฟิร์มแวร์สำหรับ <a href="https://github.com/Koenkk/Z-Stack-firmware/tree/master/router/Z-Stack_Home_1.2"><strong>Z-Stack v1.2 Router</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<p>ซอฟต์แวร์สำหรับ <strong>Linux</strong> ที่จะใช้ร่วมกับ <strong>CC Debugger</strong> คือ <a href="https://github.com/dashesy/cc-tool"><strong>CC-Tool</strong></a>
+และมีขั้นตอนการติดตั้งดังนี้ (การคอมไพล์ซอร์สโค้ด)</p>
+<pre><code class="language-bash"># Install necessary software packages.
+$ sudo apt install -y libusb-1.0-0-dev libboost-all-dev \
+  pkg-config autoconf automake libtool build-essential git
+
+# Clone the cc-tool repository from github.
+$ git clone https://github.com/dashesy/cc-tool.git
+
+# Change working directory to 'cc-tool'.
+$ cd cc-tool
+
+# Run the configure script to generate a Makefile.
+$ ./bootstrap
+$ ./configure
+
+# Run the make command to compile the source code.
+$ make -j4
+
+# Install the program (executable files and libraries).
+$ sudo make install
+$ cd ../
+</code></pre>
+<p>หรือจะติดตั้งแพ็กเกจ <code>cc-tool</code> ก็เป็นวิธีที่สะดวกกว่า</p>
+<pre><code class="language-bash">$ sudo apt install -y cc-tool
+</code></pre>
+<p>การติดตั้งเฟิร์มแวร์ จะต้องใช้อุปกรณ์ <strong>Programmer/Debugger</strong> โดยในบทความนี้ได้เลือกใช้อุปกรณ์ที่เรียกว่า 
+<a href="https://www.ti.com/tool/CC-DEBUGGER"><strong>TI CC Debugger</strong></a></p>
+<p>แต่ก็มีวิธีการอื่นอีกที่ใช้บอร์ดไมโครคอนโทรลเลอร์ เช่น <strong>ESP8266</strong> หรือ <strong>Raspberry Pi</strong>
+มาใช้ในการอัปโหลดไฟล์เฟิร์มแวร์ไปยังชิป <strong>CC2531</strong> ได้
+(ดูรายละเอียดได้จาก <strong><a href="https://www.Zigbee2MQTT.io/guide/adapters/flashing/alternative_flashing_methods.html">Zigbee2MQTT: "Alternative firmware flashing methods"</a></strong>)</p>
+<p>นอกจากอุปกรณ์ <strong>TI CC Debugger</strong> จะต้องอุปกรณ์ <strong>PCB Adapter</strong>
+เพื่อเชื่อมต่อสายไฟไปยังขาของคอนเนกเตอร์แบบ <strong>2x5 pins</strong> (ระยะห่างระหว่างขาเพียง 1.28mm)
+ที่มีอยู่บนแผ่น <strong>PCB</strong> ของ <strong>CC2531 USB Dongle</strong></p>
+<p><img alt="" src="ti_cc_debugger.png" /></p>
+<p>รูป: อุปกรณ์  <strong>TI CC Debugger</strong></p>
+<p><img alt="" src="cc_debugger_adapter.jpg" /></p>
+<p>รูป: อุปกรณ์  <strong>PCB Adapter + Cable</strong></p>
+<p><img alt="" src="cc2531_cc_debugger.jpg" /></p>
+<p>รูป: อุปกรณ์  <strong>TI CC Debugger</strong> และ <strong>CC2531 USB Dongle</strong></p>
+<p><img alt="" src="cc2531_usb_dongle-4.jpg" /></p>
+<p>รูป: อุปกรณ์  <strong>CC2531 USB Dongle</strong> ที่มีสายอากาศภายนอก</p>
+<p>&nbsp;</p>
+<p>ขั้นตอนถัดไปคือ การเชื่อมต่ออุปกรณ์ <strong>CC2531 USB Dongle</strong> และ <strong>CC Debugger</strong>
+ที่พอร์ต <strong>USB</strong> ของคอมพิวเตอร์ผู้ใช้ <strong>Linux</strong> (จะใช้งานแบบ <strong>Native</strong>
+หรือเป็น <strong>Ubuntu Virtual Machine</strong> หรือ ใช้บอร์ด <strong>Raspberry Pi</strong> ก็ได้)</p>
+<p>ทำคำสั่งตรวจสอบอุปกรณ์ที่กำลังเชื่อมต่อกับพอร์ต <strong>USB</strong></p>
+<pre><code class="language-bash">$ lsusb | grep -E &quot;Texas&quot;
+Bus 001 Device 007: ID 0451:16a8 Texas Instruments, Inc. CC2531 ZigBee
+Bus 001 Device 006: ID 0451:16a2 Texas Instruments, Inc. CC Debugger
+
+$ ls -l /dev/serial/by-id
+usb-Texas_Instruments_TI_CC2531_USB_CDC__XXXXX -&gt; ../../ttyACM0
+</code></pre>
+<p>จากข้อความเอาต์พุตจะเห็นได้ว่า <code>0451:16a8</code> เป็น <strong>VendorID:ProductID</strong> ของอุปกรณ์ <strong>CC2531 USB Dongle</strong>
+(และมีพอร์ตอนุกรมสำหรับใช้งานชื่อ <code>/dev/ttyACM0</code>)
+และ <code>0451:16a2</code> เป็น <strong>ID</strong> ของอุปกรณ์ <strong>TI CC Debugger</strong></p>
+<p>ทำคำสั่ง <code>cc-tool</code> เพื่อตรวจสอบอุปกรณ์ <strong>USB</strong></p>
+<pre><code class="language-bash">$ sudo cc-tool --test
+  Programmer: CC Debugger
+  Target: CC2531
+  Device info: 
+   Name: CC Debugger
+   Debugger ID: 0972
+   Version: 0x05CC
+   Revision: 0x0044
+
+  Target info: 
+   Name: CC2531
+   Revision: 0x24
+   Internal ID: 0xB5
+   ID: 0x2531
+   Flash size: 256 KB
+   Flash page size: 2
+   RAM size: 8 KB
+   Lock data size: 16 B
+</code></pre>
+<p>&nbsp;</p>
+<p>เมื่อดาวน์โหลดไฟล์เฟิร์มแวร์มาแล้ว (ไฟล์ <a href="https://github.com/Koenkk/Z-Stack-firmware/blob/master/coordinator/Z-Stack_Home_1.2/bin/default/CC2531_DEFAULT_20211115.zip"><code>CC2531_DEFAULT_20211115.zip</code></a>)
+ให้ทำคำสั่งต่อไปนี้ เพื่อลบหน่วยความจำแฟลชของชิป <strong>CC2531</strong>
+แล้วจึงเขียนข้อมูลจากไฟล์เฟิร์มแวร์ไปยังหน่วยความจำแฟลช และตรวจสอบความถูกต้องของข้อมูลด้วยการคำนวณค่า <strong>CRC-16</strong></p>
+<pre><code class="language-bash"># Extract the firmware file from the archive file.
+$ unzip CC2531_DEFAULT_*.zip -d ./firmware
+
+# Erase flash, write firmware, verify flash using CRC-16 
+# and preserve the secondary MAC address.
+$ sudo cc-tool -e -w ./firmware/CC2531ZNP-Prod.hex -v crc -p
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ubuntu-vm-oracle-virtualbox">&#9655; <strong>การใช้ Ubuntu VM ร่วมกับ Oracle VirtualBox</strong><a class="headerlink" href="#ubuntu-vm-oracle-virtualbox" title="Permanent link">#</a></h2>
+<p>ในกรณีที่ติดตั้งและใช้งาน <strong>Ubuntu Virtual Machine (VM)</strong> โดยใช้ซอฟต์แวร์ <strong>Oracle VirtualBox</strong>
+จะต้องมีการตั้งค่าให้ <strong>Ubuntu VM</strong> เข้าถึงอุปกรณ์ <strong>USB</strong> ใน <strong>Host OS</strong> ซึ่งเป็น <strong>Windows 10</strong>
+ในตัวอย่างนี้ </p>
+<p><img alt="" src="ubuntu_vm.png" /></p>
+<p>รูป: การใช้งาน <strong>Oracle VirtualBox VM</strong> และ <strong>Ubuntu 22.04 LTS Desktop</strong></p>
+<p><img alt="" src="ubuntu_usb_devices-1.png" /></p>
+<p>รูป: การเลือกอุปกรณ์  <strong>USB</strong> จากรายการ เพื่อให้เข้าถึงได้จาก <strong>Ubuntu VM</strong></p>
+<p><img alt="" src="ubuntu_usb_devices-2.png" /></p>
+<p>รูป: การเลือกอุปกรณ์  <strong>USB</strong> และ <strong>CC2531 USB Dongle</strong> และ <strong>CC Debugger</strong></p>
+<p><img alt="" src="ubuntu_vm_cc_tool.png" /></p>
+<p>รูป: การทำคำสั่ง <code>cc-tool</code> ใน <strong>Bash Shell</strong> ของ <strong>Ubuntu 22.04 VM</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอวิธีการและอุปกรณ์สำหรับการติดตั้งเฟิร์มแวร์  <strong>Z-Stack ZigBee Coordinator</strong>
+สำหรับอุปกรณ์ <strong>CC2531 USB Dongle</strong> เพื่อนำมาใช้งานร่วมกับซอฟต์แวร์  <strong>Zigbee2MQTT</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-24 | Last Updated: 2022-09-24</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
