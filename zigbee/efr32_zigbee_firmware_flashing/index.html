@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/zigbee/efr32_zigbee_firmware_flashing/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การติดตั้งเฟิร์มแวร์ ZigBee 3.0 สำหรับชิป Silicon Labs EFR32 SoC - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#zigbee-30-silicon-labs-efr32-soc" class="nav-link">การติดตั้งเฟิร์มแวร์ ZigBee 3.0 สำหรับชิป Silicon Labs EFR32 SoC</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#efr32-based-zigbee-30-usb-devices" class="nav-link">&#9655; EFR32-based ZigBee 3.0 USB Devices</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#e-byte-e180-zg120b-tb" class="nav-link">&#9655; E-Byte E180-ZG120B-TB</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#serial-bootloader" class="nav-link">&#9655; การติดตั้งเฟิร์มแวร์ Serial Bootloader</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#emberznet-ezsp-efr32mg1b" class="nav-link">&#9655; การติดตั้งเฟิร์มแวร์ EmberZNet / EZSP สำหรับ EFR32MG1B</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#emberznet-ezsp-efr32mg21" class="nav-link">&#9655; การติดตั้งเฟิร์มแวร์ EmberZNet / EZSP สำหรับ EFR32MG21</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zigbee-30-silicon-labs-efr32-soc">การติดตั้งเฟิร์มแวร์ ZigBee 3.0 สำหรับชิป Silicon Labs EFR32 SoC<a class="headerlink" href="#zigbee-30-silicon-labs-efr32-soc" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="efr32-based-zigbee-30-usb-devices">&#9655; <strong>EFR32-based ZigBee 3.0 USB Devices</strong><a class="headerlink" href="#efr32-based-zigbee-30-usb-devices" title="Permanent link">#</a></h2>
+<p>ในปัจจุบัน อุปกรณ์ประเภท <strong>ZigBee 3.0 Devices</strong> ที่ใช้ชิป 
+<a href="https://www.silabs.com/wireless/zigbee/efr32mg1-series-1-socs"><strong>EFR32MG1 Series 1 SoC</strong></a>
+และ <a href="https://www.silabs.com/wireless/zigbee/efr32mg21-series-2-socs"><strong>EFR32MG21 Series 2 SoC</strong></a>
+ของบริษัท <strong>Silicon Labs</strong> เช่น 
+<strong>EFR32MG1B (Series 1, ARM Cortex-M4F, 40MHz)</strong> หรือ
+<strong>EFR32MG21 (Series 2, ARM Cortex-M33, 80MHz)</strong> ตามลำดับ
+ก็เป็นอีกตัวเลือกหนึ่งสำหรับการนำไปใช้ร่วมกับซอฟต์แวร์อย่างเช่น <strong>ZHA</strong> หรือ <strong>Zigbee2MQTT</strong>
+เพื่อใช้กับระบบ <strong>Smart Home</strong></p>
+<p>ตัวอย่างอุปกรณ์ได้แก่</p>
+<ul>
+<li><strong>Chengdu E-Byte E180-ZG120B-TB (Test Board)</strong>
+[<a href="https://www.ebyte.com/en/product-view-news.html?id=896">&#8594;</a>]
+เป็นบอร์ดทดลองที่ใช้ชิป <strong>EFR32MG1B232F256GM48</strong></li>
+<li><strong>Itead / Sonoff ZigBee 3.0 USB Dongle</strong>
+ใช้ชิป <strong>EFR32MG21A020F768IM32</strong> แต่ไม่มีสายอากาศภายนอก</li>
+<li><strong>Itead / Sonoff ZigBee 3.0 USB Dongle "ZBDongle-E"</strong>
+[<a href="https://itead.cc/product/zigbee-3-0-usb-dongle/">&#8594;</a>]
+เป็นรุ่นที่มีสายอากาศภายนอกและกล่องใส่ที่เป็นโลหะ และได้ติดตั้งเฟิร์มแวร์  <strong>EmberZNet 6.10.3</strong> มาให้แล้ว</li>
+<li><strong>ZB-GW04 V1.1 ZigBee 3.0 USB Dongle</strong>
+ใช้โมดูล <strong>SM-011 V1.0</strong> ซึ่งมีชิป <strong>EFR32MG21A020F768IM32</strong>
+และใช้สายอากาศแบบ <strong>PCB Antenna</strong> และได้ติดตั้งเฟิร์มแวร์  <strong>EmberZNet 6.7.9</strong> มาให้แล้ว</li>
+<li><strong>Itead / Sonoff ZBBridge</strong> [<a href="https://itead.cc/product/sonoff-zbbridge/">&#8594;</a>]
+ใช้ชิป <strong>EFR32MG21</strong> + <strong>ESP8266/8285</strong></li>
+</ul>
+<p><img alt="" src="e180_zg120b_tb.png" /></p>
+<p>รูป: บอร์ดทดลอง <strong>E-Byte E180-ZG120B-TB</strong></p>
+<p><img alt="" src="../zigbee2mqtt_linux/ZB-GW04_zigbee_usb_dongle.png" /></p>
+<p>รูป: <strong>ZB-GW04 V1.1 ZigBee 3.0 USB Dongle</strong></p>
+<hr />
+<h2 id="e-byte-e180-zg120b-tb">&#9655; <strong>E-Byte E180-ZG120B-TB</strong><a class="headerlink" href="#e-byte-e180-zg120b-tb" title="Permanent link">#</a></h2>
+<p><strong>E-Byte E180-ZG120B-TB</strong>
+เป็นบอร์ดไมโครคอนโทรลเลอร์ที่มีโมดูล <strong>Ebyte E180-ZG120B</strong> แบบ <strong>SMD</strong> และมีฝาครอบโลหะ</p>
+<ul>
+<li>ภายในโมดูลมีชิป <strong>Silicon Labs EFR32MG1B232F256GM48</strong> (MG1B232)
+(<em>EFM32 Mighty Gecko 1B Family</em>)<ul>
+<li>มีตัวประมวลผล  <strong>32-bit ARM Cortex-M4F (38.4MHz)</strong>, <strong>on-chip Flash 256KB, SRAM 32KB</strong></li>
+<li>สามารถสื่อสารไร้สายด้วยโพรโทคอล <strong>2.4GHz / Sub-GHz IEEE 802.15.4</strong> (รองรับการใช้งาน <strong>Zigbee 3.0 &amp; Thread</strong>)
+   มีกำลังส่งสูงสุด <strong>+19.5dB</strong></li>
+</ul>
+</li>
+<li>มีวงจร <strong>USB-to-Serial</strong> (ใช้ชิป <strong>CP2102G</strong>) ที่เชื่อมต่อกับคอนเนกเตอร์ <strong>MicroUSB</strong><ul>
+<li><strong>CP2102 TXD &rarr; MCU PA1/RX</strong></li>
+<li><strong>CP2102 RXD &larr; MCU PA0/TX</strong></li>
+</ul>
+</li>
+<li>มีคอนเนกเตอร์แบบ <strong>IPEX</strong> สำหรับเชื่อมต่อกับสายอากาศภายนอก
+(<em>ให้ต่อสายอากาศภายนอกก่อนนำไปใช้งาน !!!</em>)</li>
+<li>แต่ไม่ได้ติดตั้งเฟิร์มแวร์ <strong>EZNet</strong> </li>
+</ul>
+<p><img alt="" src="e180_zg120b_layout.png" /></p>
+<p>รูป: ผังของบอร์ดที่แสดงตำแหน่งของขาและอุปกรณ์บนแผ่น <strong>PCB</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="serial-bootloader">&#9655; <strong>การติดตั้งเฟิร์มแวร์ Serial Bootloader</strong><a class="headerlink" href="#serial-bootloader" title="Permanent link">#</a></h2>
+<p>ในกรณีที่ชิป <strong>EFR32</strong> ไม่มีเฟิร์มแวร์ <strong>Serial Bootloader</strong> อยู่ในหน่วยความจำ <strong>Flash</strong>
+จำเป็นต้องติดตั้งเฟิร์มแวร์ดังกล่าวก่อน
+(เพื่อความสะดวกในการอัปโหลดเฟิร์มแวร์ที่เป็น <strong>Application Firwmare</strong>)
+และจะต้องใช้อุปกรณ์ฮาร์ดแวร์ที่เรียกว่า <strong>SWD (Serial-Wire-Debug) Programmer/Debugger</strong> ที่ใช้ขาสัญญาณเพียงสองเส้นคือ
+<strong>SWCLK</strong> และ <strong>SWDATA</strong> นอกจากนั้นแล้วจะต้องมีแรงดันไฟเลี้ยง <strong>VDD=3.3V</strong> และ <strong>GND</strong>
+สำหรับการทำงานของตัวชิปด้วย</p>
+<p>ตัวอย่างอุปกรณ์ <strong>SWD Programmer/Debugger</strong> ที่สามารถนำมาใช้ได้ เช่น
+<a href="https://www.segger.com/products/debug-probes/j-link/"><strong>SEGGER J-Link</strong></a>
+และอุปกรณ์อื่นที่ถือว่าเป็น <strong>Arm CMSIS DAP-Link Compatible</strong> (เลือกใช้อุปกรณ์ <strong>DAP-Link</strong> ในบทความนี้)</p>
+<p><img alt="" src="daplink_e180_tb_flashing.jpg" /></p>
+<p>รูป: การใช้อุปกรณ์ <strong>DAP-Link (SWD Interface)</strong> ร่วมกับบอร์ด <strong>E-Byte E180-ZG120B-TB</strong></p>
+<p>ถัดไปเป็นการอธิบายขั้นตอนการติดตั้งเฟิร์มแวร์ <strong>Serial Bootloader</strong>
+ให้กับชิป <strong>EFR32MG1B</strong> บนบอร์ด <strong>E-Byte E180-ZG120B-TB</strong></p>
+<p>ซอฟต์แวร์และการทำคำสั่งต่าง ๆ จะใช้สำหรับคอมพิวเตอร์ผู้ใช้ <strong>Linux / Ubuntu</strong> 
+(อาจเป็น <strong>Ubuntu VM</strong> ที่ทำงานด้วย <strong>Oracle VirtualBox</strong> ก็ได้)</p>
+<p>1) ทำคำสั่งเพื่อติดตั้งโปรแกรม <code>srecord</code> และ <code>openocd</code> สำหรับ <strong>Ubuntu</strong> ดังนี้</p>
+<pre><code class="language-bash">sudo apt install -y srecord openocd
+</code></pre>
+<p>2) ดาวน์โหลดไฟล์ที่เป็น <strong> Gecko Bootloader</strong>
+จาก <a href="https://github.com/zha-ng/EZSP-Firmware/tree/master/EByte-E180-Z120B">https://github.com/zha-ng/EZSP-Firmware</a>
+โดยได้เลือกใช้ไฟล์ <code>efr32mg1b-bootloader-1.10.3-combined.s37</code> สำหรับชิป <strong>EFR32MG1B</strong>
+(ใช้ขา <strong>PB12</strong> เป็นตัวเลือกเข้าสู่ <strong>Bootloader Mode</strong>)</p>
+<p>3) ทำคำสั่งเพื่อแปลงไฟล์ <code>.s37</code> (<strong>Motorola SREC Format</strong>) 
+ให้เป็น <code>.hex</code> (<strong>Intel Hex Format</strong>)</p>
+<pre><code class="language-bash"># Set the bootloader filename (without the file extension).
+$ BOOTLOADER=efr32mg1b-bootloader-1.10.3-combined
+
+# Convert the bootloader file from SREC to Intel hex format.
+$ srec_cat ${BOOTLOADER}.s37 -Motorola \
+  -o ${BOOTLOADER}.hex -Intel
+</code></pre>
+<p>4) ทำคำสั่ง <code>openocd</code> เพื่อเขียนไฟล์ <strong>Serial Bootloader (.hex)</strong> ไปยังบอร์ดเป้าหมาย
+โดยใช้อุปกรณ์ <strong>CMSIS DAP-Link</strong> ที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ <strong>Ubuntu</strong></p>
+<pre><code class="language-bash"># Write the bootloader firmware to the target board.
+$ openocd -f interface/cmsis-dap.cfg -f target/efm32.cfg \
+  -c &quot;init; reset init; halt; poll;&quot; \
+  -c &quot;flash write_image erase ${BOOTLOADER}.hex;&quot; \
+  -c &quot;reset; shutdown&quot;
+</code></pre>
+<p>เมื่อติดตั้ง <strong>Serial Bootloader</strong> ได้สำเร็จแล้ว 
+การอัปโหลดเฟิร์มแวร์ไปยังชิป <strong>EFR32MG1B</strong> ในครั้งถัดไป
+ก็สามารถทำได้ง่าย ผ่านทาง <strong>USB-to-Serial</strong> (ใช้ขา  <strong>PA0 / PA1</strong> ของชิป สำหรับ <strong>UART TX / RX</strong> ตามลำดับ)
+และไม่จำเป็นต้องใช้อุปกรณ์ <strong>CMSIS DAP-Link</strong> อีกต่อไป</p>
+<p><img alt="" src="ubuntu_efr32_bootloader_flash.png" /></p>
+<p>รูป: การทำคำสั่งใน <strong>Ubuntu VM</strong> เพื่อติดตั้ง <strong>Serial Bootloader</strong></p>
+<hr />
+<h2 id="emberznet-ezsp-efr32mg1b">&#9655; <strong>การติดตั้งเฟิร์มแวร์ EmberZNet / EZSP สำหรับ EFR32MG1B</strong><a class="headerlink" href="#emberznet-ezsp-efr32mg1b" title="Permanent link">#</a></h2>
+<p>ขั้นตอนต่อไปนี้ ได้ทดลองใช้กับบอร์ด <strong>E-Byte E180-ZG120B-TB</strong> (<strong>EFR32MG1B</strong>)</p>
+<p>1) ดาวน์โหลดซอร์สโค้ดของโปรแกรม 
+<a href="https://github.com/Elelabs/elelabs-zigbee-ezsp-utility"><strong>Elelabs' EZSP Firmware Update Utility</strong></a>
+จาก <strong>Github</strong> แล้วติดตั้งแพ็กเกจต่าง ๆ สำหรับ <strong>Python 3</strong> เพื่อใช้งาน</p>
+<pre><code class="language-bash"># Clone the repository of Elelabs' EZSP Firmware Update Utility.
+$ git clone https://github.com/Elelabs/elelabs-zigbee-ezsp-utility
+
+# Change the working directory
+$ cd elelabs-zigbee-ezsp-utility/
+
+# Install necessary Python packages.
+$ pip3 install -r requirements.txt
+</code></pre>
+<p>2) ทำคำสั่งเพื่อตรวจสอบอุปกรณ์ (บอร์ดไมโครคอนโทรลเลอร์) ที่เชื่อมต่อกับพอร์ต <code>/dev/ttyUSB0</code></p>
+<pre><code class="language-bash">$ python3 Elelabs_EzspFwUtility.py probe -p /dev/ttyUSB0
+
+Elelabs_EzspFwUtility: EZSP adapter in bootloader mode detected:
+Elelabs_EzspFwUtility: Gecko Bootloader v1.A.3
+</code></pre>
+<p>จากข้อความเอาต์พุต จะเห็นได้ว่า สามารถมองเห็นอุปกรณ์และแสดงเวอร์ชันของ <strong>Gecko Bootloader</strong> ได้</p>
+<p>3) ดาวน์โหลด <a href="https://github.com/zha-ng/EZSP-Firmware/tree/master/EByte-E180-Z120B"><strong>NCP Application Firmware (.gbl)</strong></a>
+ที่ได้จัดเตรียมไว้โดย <strong>Elelab</strong> และเฟิร์มแวร์นี้ได้ใช้ไลบรารี <a href="https://www.silabs.com/developers/zigbee-emberznet"><strong>EmberZNet PRO Stack / EmberZNet Serial Protocol (EZSP)</strong></a>
+ของ <strong>Silicon Labs</strong> ในการพัฒนา และจะทำให้  <strong>EFR32MG1B</strong> สามารถทำงานเป็น
+<strong>ZigBee 3.0 Coordinator</strong> ได้</p>
+<p>4) เชื่อมต่อขา <strong>PB12</strong> ของชิป <strong>EFR32MG1B</strong> ไปยัง<strong> GND</strong> แล้วกดปุ่มรีเซต <strong>nRESET</strong> บนบอร์ด
+เพื่อทำให้ชิปเริ่มต้นทำงานใหม่โดยเข้าสู่โหมด <strong>Bootloader</strong> แล้วทำคำสั่งเพื่อเขียนเฟิร์มแวร์
+<strong>NCP Application Firmware</strong> ไปยังชิป <strong>EFR32MG1B</strong> </p>
+<p>จากนั้นจึงทำคำสั่งต่อไปนี้ โดยเลือกใช้ไฟล์ <code>efr32mg1b-v8-6910-115200.gbl</code> ซึ่งดาวน์โหลดได้จาก
+<a href="https://github.com/zha-ng/EZSP-Firmware/tree/master/EByte-E180-Z120B">https://github.com/zha-ng/EZSP-Firmware</a></p>
+<pre><code class="language-bash">$ python3 Elelabs_EzspFwUtility.py flash -p /dev/ttyUSB0 \
+  -f efr32mg1b-v8-6910-115200.gbl
+</code></pre>
+<p>5) กดปุ่มรีเซตบนบอร์ด เพื่อให้ชิป  <strong>EFR32MG1B</strong> เริ่มต้นทำงานในโหมดปรกติ แล้วทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-bash">$ python3 Elelabs_EzspFwUtility.py probe -p /dev/ttyUSB0
+
+Elelabs_EzspFwUtility: Generic Zigbee EZSP adapter detected:
+Elelabs_EzspFwUtility: Firmware: 6.9.1-214
+Elelabs_EzspFwUtility: EZSP v8
+</code></pre>
+<p>จากตัวอย่างข้อความเอาต์พุต จะเห็นได้ว่า อุปกรณ์ทำงานด้วยเฟิร์มแวร์ <strong>EmberZNet v6.9.1 build 214</strong> 
+และใช้ <strong>Silicon Labs EZSP (EmberZNet Serial Protocol)</strong>
+ในการสื่อสารข้อมูลแบบอนุกรม</p>
+<p>เมื่อนำไปใช้กับ <strong>Zigbee2MQTT</strong> จะต้องมีการตั้งค่าในไฟล์ <code>data/configuration.yaml</code>
+ในส่วนที่เป็น <code>serial</code> จะต้องมี <code>adapter: ezsp</code> ดังนี้</p>
+<pre><code class="language-yaml">serial:
+  adapter: ezsp
+  port: /dev/ttyUSB0
+</code></pre>
+<p><img alt="" src="ubuntu_ncp_upload.png" /></p>
+<p>รูป: การทำคำสั่งใน <strong>Ubuntu VM</strong> เพื่อติดตั้งเฟิร์มแวร์ <strong>EmberZNet / EZSP</strong> (<strong>EFR32MG1B</strong>)</p>
+<hr />
+<h2 id="emberznet-ezsp-efr32mg21">&#9655; <strong>การติดตั้งเฟิร์มแวร์ EmberZNet / EZSP สำหรับ EFR32MG21</strong><a class="headerlink" href="#emberznet-ezsp-efr32mg21" title="Permanent link">#</a></h2>
+<p>อุปกรณ์ที่นำมาทดลองคือ  <strong>ZB-GW04 V1.1 ZigBee 3.0 USB Dongle</strong>
+ซึ่งใช้ขา <strong>PB00 / PB01</strong> ของ <strong> EFR32MG21</strong> สำหรับ <strong>UART RX / TX</strong> ตามลำดับ
+และใช้ขา <strong>PA00</strong> สำหรับ <strong>Bootloader Pin</strong></p>
+<p>เฟิร์มแวร์ <strong>ZigBee 3.0 NCP firmware</strong> ที่สามารถนำมาใช้ได้ สามารถดาวน์โหลดได้จาก
+<a href="https://github.com/xsp1989/zigbeeFirmware/tree/master/firmware/Zigbee3.0_Dongle-NoSigned">https://github.com/xsp1989/zigbeeFirmware/</a>
+มีสองตัวเลือกคือ</p>
+<ul>
+<li><strong>Coordinator firmware</strong>: <code>ncp-uart-sw_v6.10.3_115200.gbl</code></li>
+<li><strong>Router firmware</strong>: <code>efr32mg21_zigbee_router_6.7.10.gbl</code></li>
+</ul>
+<p>ก่อนทำคำสั่งถัดไป จะต้องทำให้ชิป <strong>EFR32MG21</strong> เข้าสู่โหมด <strong>Bootloader</strong> ก่อน
+โดยการกดปุ่ม <strong>Bootloader</strong> หรือ เชื่อมต่อขา <strong>PA00</strong> กับ <strong>GND</strong> ด้วยตัวต้านทาน
+100-300 &Omega; ชั่วขณะ</p>
+<pre><code class="language-bash">$ python3 Elelabs_EzspFwUtility.py flash -p /dev/ttyUSB0 \
+  -f ncp-uart-sw_v6.10.3_115200.gbl
+</code></pre>
+<p><img alt="" src="ubuntu_ncp_efr32mg21.png" /></p>
+<p>รูป: การทำคำสั่งใน <strong>Ubuntu VM</strong> เพื่อติดตั้งเฟิร์มแวร์ <strong>EmberZNet / EZSP</strong> (<strong>EFR32MG21</strong>)</p>
+<p>ถ้านำไปทดลองใช้กับ <strong>Zigbee2mqtt</strong> เมื่อเริ่มต้นทำงาน จะเห็นข้อความในลักษณะนี้</p>
+<pre><code class="language-json">Coordinator firmware version: '{&quot;meta&quot;:{&quot;maintrel&quot;:&quot;3 &quot;,
+&quot;majorrel&quot;:&quot;6&quot;,&quot;minorrel&quot;:&quot;10&quot;,&quot;product&quot;:8,
+&quot;revision&quot;:&quot;6.10.3.0 build 297&quot;},&quot;type&quot;:&quot;EZSP v8&quot;}'
+</code></pre>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอวิธีการและอุปกรณ์สำหรับการติดตั้งเฟิร์มแวร์สำหรับอุปกรณ์ที่ใช้ชิป 
+<strong>Silicon Labs EFR32MG1B (Series 1)</strong>
+และ <strong>EFR32MG21 (Series 2)</strong> เพื่อนำมาใช้งานร่วมกับ <strong>Zigbee2MQTT</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-26 | Last Updated: 2022-09-26</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
