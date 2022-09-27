@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/zigbee/cc2530_zigbee_firmware_flashing/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ CC2530 USB Dongle - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#zigbee-coordinator-cc2530-usb-dongle" class="nav-link">การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ CC2530 USB Dongle</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#zigbee-cc2530" class="nav-link">&#9655; อุปกรณ์ ZigBee - CC2530</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cc2530-based-e18-series-test-boards" class="nav-link">&#9655; การติดตั้งเฟิร์มแวร์สำหรับ CC2530-based E18-Series Test Boards</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zigbee-coordinator-cc2530-usb-dongle">การติดตั้งเฟิร์มแวร์ ZigBee Coordinator สำหรับอุปกรณ์ CC2530 USB Dongle<a class="headerlink" href="#zigbee-coordinator-cc2530-usb-dongle" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="zigbee-cc2530">&#9655; <strong>อุปกรณ์ ZigBee - CC2530</strong><a class="headerlink" href="#zigbee-cc2530" title="Permanent link">#</a></h2>
+<p>อุปกรณ์ที่ได้นำมาทดลองใช้งานคือ บอร์ดหรือโมดูลแบบ <strong>SMD</strong> ในซีรีย์ <strong>E18</strong> 
+ของบริษัท <a href="https://www.ebyte.com/en/"><strong>Chengdu Ebyte</strong></a> ในประเทศจีน
+ซึ่งใช้ชิป <strong>CC2530F256 (8051-based, 256 KB Flash, 8KB SRAM)</strong>
+ของบริษัท <strong>Texas Instruments (TI)</strong> สามารถสื่อสารข้อมูลไร้สายด้วยโพรโทคอล
+<strong>IEEE 802.15.4 / ZigBee</strong> ในย่านความถี่
+<strong>2.400 ~ 2.480 GHz (ISM band)</strong>
+และสามารถติดตั้งเฟิร์มแวร์ <strong>Z-Stack Protocol Stack</strong> ได้ 
+(ดังนั้นจึงใช้งานร่วมกับ <strong>Zigbee2MQTT</strong> และ <strong>ZHA / Home Assistant</strong> ได้ด้วย)</p>
+<p>โมดูล <strong>E18 Series</strong>
+(<a href="../zigbee2mqtt_linux/doc/E18_Series_ZigBee3.0_UserManual_EN_v1.2.pdf"><strong>User Manual</strong></a>)
+จำแนกได้เป็น 3 กลุ่มย่อย ตามกำลังส่งคลื่นวิทยุ (<strong>RF Transmission Power</strong>) และมีประเภทของสายอากาศให้เลือกใช้ได้คือ
+<strong>PCB Trace</strong> กับ <strong>External Antenna (IPEX connector)</strong> </p>
+<ul>
+<li>โมดูล <strong>E18-MS1-PCB</strong> และ <strong>E18-MS1-IPX</strong>
+สำหรับสื่อสารระยะใกล้ (ไม่เกิน 200 เมตร ใช้งานในที่โล่ง)<ul>
+<li>Vcc: 2.0V ~ 3.6V</li>
+<li>Tx power: 4dBm / 2.5mW max. (current: 30mA peak.)</li>
+<li>Built-in PA (Power Amplifier): No</li>
+</ul>
+</li>
+<li>โมดูล <strong>E18-MS1PA2-PCB</strong> และ <strong>E18-MS1PA2-IPX</strong>
+สำหรับสื่อสารระยะกลาง (ไม่เกิน 600 เมตร ใช้งานในที่โล่ง)<ul>
+<li>Vcc: 2.0V ~ 3.6V</li>
+<li>Tx power: 20dBm / 100mW max. (current: 100mA peak.)</li>
+<li>Built-in PA+LNA / CC2592 RF Range Extender: Yes </li>
+</ul>
+</li>
+<li>โมดูล <strong>E18-2G4Z27SP</strong> และ <strong>E18-2G4Z27SI</strong>
+สำหรับสื่อสารระยะไกล (ไม่เกิน 800 เมตร ใช้งานในที่โล่ง)<ul>
+<li>Vcc: 2.5V ~ 3.6V</li>
+<li>Tx power: 27dBm / 250 mW max. (current: 500mA peak.)</li>
+<li>Built-in PA+LNA / CC2592 RF Range Extender: Yes</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="ebyte_e18_series_cc2530_modules.png" /></p>
+<p>รูป: โมดูล <strong>E18 Series</strong> ของ <strong>Ebyte</strong></p>
+<p>แต่หากจะนำมาทดลองใช้งาน ก็แนะนำให้เลือกเป็นบอร์ดทดสอบ (<strong>Test Board</strong>)
+เพื่อความสะดวกในการใช้งาน เนื่องจาก <strong>CC2530</strong> ไม่สามารถเชื่อมต่อกับ <strong>USB</strong> ได้โดยตรง
+ดังนั้นจึงมีการเพิ่มวงจร <strong>USB-To-TTL Serial Port (CH340G)</strong> มีไอซีแปลงแรงดัน
+<strong>5V</strong> (จากพอร์ต <strong>USB</strong>) ให้เป็น <strong>3.3V</strong> สำหรับ <strong>VCC</strong> มีปุ่มกด 
+และมีขา <strong>I/O pins</strong> ที่มีระยะห่างระหว่างขาเท่ากับ 2.54 มม. ตัวอย่างเช่น</p>
+<ul>
+<li><strong>E18-TBL-01 Test Kit (Module: E18-MS1-PCB)</strong></li>
+<li><strong>E18-TBH-01 Test Kit (Module: E18-MS1PA2-PCB)</strong></li>
+<li><strong>E18-TBH-27 Test Kit (Module: E18-2G4Z27SI)</strong></li>
+</ul>
+<p><img alt="" src="ebyte_e18_cc2530_test_kits.png" /></p>
+<p>รูป: ตัวอย่างบอร์ดทดสอบ <strong>Ebyte E18 Test Kits</strong> </p>
+<hr />
+<h2 id="cc2530-based-e18-series-test-boards">&#9655; <strong>การติดตั้งเฟิร์มแวร์สำหรับ CC2530-based E18-Series Test Boards</strong><a class="headerlink" href="#cc2530-based-e18-series-test-boards" title="Permanent link">#</a></h2>
+<p><strong>อุปกรณ์ที่นำมาใช้งาน</strong></p>
+<p>เตรียมอุปกรณ์ฮาร์ดแวร์ที่เกี่ยวข้อง ได้แก่ </p>
+<ul>
+<li>บอร์ดทดสอบ <strong>CC2530</strong></li>
+<li>อุปกรณ์ <strong>SmartRF04EB Programmer</strong> หรือ <strong>CC Debugger</strong></li>
+</ul>
+<p>เริ่มต้นด้วยการเชื่อมต่ออุปกรณ์ <strong>Programmer / Debugger</strong> เข้ากับบอร์ด <strong>CC2530</strong> 
+และนำไปเสียบเข้ากับพอร์ต <strong>USB</strong> ของคอมพิวเตอร์ผู้ใช้</p>
+<p>ขา <strong>P2.1 / P2.2</strong> ของชิป <strong>CC2530</strong>
+เป็นขาสัญญาณ <strong>Debug Data (DD) / Debug Clock (DC)</strong> สำหรับ
+อุปกรณ์ <strong>SmartRF04EB Programmer</strong> หรือ <strong>CC Debugger</strong></p>
+<p><img alt="" src="cc_debugger_smartrf04eb.png" /></p>
+<p>รูป: อุปกรณ์ <strong>CC Debugger</strong> (ซ้าย) และ <strong>SmartRF04EB Programmer</strong> (ขวา)</p>
+<p><img alt="" src="cc_debugger_connector.png" /></p>
+<p>รูป: คอนเนกเตอร์ (<strong>Socket</strong>) และตำแหน่งของขา (<strong>2x5 Pins</strong>)</p>
+<p><img alt="" src="smartrf04eb_programmer.jpg" /></p>
+<p>รูป: อุปกรณ์ <strong>SmartRF04EB Programmer</strong> (ไม่มีกล่องใส่) ที่ได้เลือกมาใช้งาน
+(ขา <strong>Pin Headers</strong> เรียงจากซ้ายไปขวา: <strong>GND, RST, DC, DD, 3.3V</strong>)</p>
+<p>&nbsp;</p>
+<p><strong>ขั้นตอนการดำเนินการ</strong> (สำหรับคอมพิวเตอร์ผู้ใช้ <strong>Linux / Ubuntu</strong>)</p>
+<p>1) ติดตั้งแพ็กเกจ <code>cc-tool</code> สำหรับ <strong>Ubuntu</strong> </p>
+<pre><code class="language-bash">$ sudo apt install -y cc-tool
+</code></pre>
+<p>2) ทำคำสั่งต่อไปนี้ เพื่อตรวจสอบดูว่า มองเห็นอุปกรณ์ <strong>USB</strong> หรือไม่
+(เลือกใช้ <strong>SmartRF04EB</strong> เพื่อการสาธิต)</p>
+<pre><code class="language-bash">$ lsusb | grep Chipcon
+Bus 002 Device 005: ID 11a0:eb20 Chipcon AS SmartRF04EB
+</code></pre>
+<p>จากข้อความเอาต์พุต จะเห็นได้ว่า มองเห็นอุปกรณ์ "<strong> Chipcon AS SmartRF04EB</strong>"
+(<strong>ID: <code>11a0:eb20</code></strong>)</p>
+<p>3) ทำคำสั่ง <code>cc-tool</code> เพื่อตรวจสอบดูว่า 
+มองเห็นอุปกรณ์เป้าหมาย (<strong>Target Device</strong>) หรือไม่</p>
+<pre><code class="language-bash">$ sudo cc-tool --test
+  Programmer: SmartRF04EB
+  Target: CC2530
+  Target is locked.
+  Device info: 
+   Name: SmartRF04EB
+   Debugger ID: 0050
+   Version: 0x0400
+   Revision: 0x0047
+  No operations allowed on locked target without erasing
+</code></pre>
+<p>4) ทำคำสั่งเพื่อลบข้อมูลในหน่วยความจำแฟลชทั้งหมด </p>
+<pre><code class="language-bash">$ sudo cc-tool -e
+  Programmer: SmartRF04EB
+  Target: CC2530
+  Target is locked.
+  Erasing flash...
+  Completed
+
+$ sudo cc-tool --test
+  Programmer: SmartRF04EB
+  Target: CC2530
+  Device info: 
+   Name: SmartRF04EB
+   Debugger ID: 0050
+   Version: 0x0400
+   Revision: 0x0047
+
+  Target info: 
+   Name: CC2530
+   Revision: 0x24
+   Internal ID: 0xA5
+   ID: 0x2530
+   Flash size: 256 KB
+   Flash page size: 2
+   RAM size: 8 KB
+   Lock data size: 16 B
+</code></pre>
+<p>ทำคำสั่งอ่านค่า <strong>Primary &amp; Secondary MAC Addresses</strong> ของอุปกรณ์</p>
+<pre><code class="language-bash"># Read the primary and secondary MAC addresses.
+$ sudo cc-tool -a
+  Programmer: SmartRF04EB
+  Target: CC2530
+  MAC addresses, primary: XX:XX:XX:XX:XX:XX:XX:XX, 
+               secondary: FF:FF:FF:FF:FF:FF:FF:FF
+</code></pre>
+<p>5) ดาวน์โหลดไฟล์เฟิร์มแวร์  <strong>Koenkk's Z-Stack Firmware</strong> 
+เลือกใช้ <strong>Z-Stack_Home_1.2</strong> เป็นใช้งานเป็น <strong>ZigBee Coordinator</strong>
+ไฟล์ <a href="https://github.com/Koenkk/Z-Stack-firmware/blob/master/coordinator/Z-Stack_Home_1.2/bin/default/CC2530_CC2592_DEFAULT_20211115.zip"><code>CC2530_CC2592_DEFAULT_20211115.zip</code></a></p>
+<pre><code class="language-bash"># Extract firmware files (.hex / .bin) from the zip file.
+$ unzip CC2530_CC2592_DEFAULT_*.zip -d firmware/
+
+# Erase flash, write firmware, verify flash using CRC-16 
+# and preserve the secondary MAC address.
+$ sudo cc-tool -e -w ./firmware/CC2530ZNP-Prod.hex -v crc -p
+</code></pre>
+<p><img alt="" src="ubuntu_cc_tool.png" /></p>
+<p>รูป: การทำคำสั่ง <code>cc-tool</code> ใน <strong>Bash Shell</strong> ของ <strong>Ubuntu 22.04 LTS (VM)</strong></p>
+<p>&nbsp;</p>
+<p>เนื่องจากบอร์ด <strong>Ebyte E18 Test Board</strong> ใช้ขา <strong>P1.4</strong> และ <strong>P1.5</strong> ของชิป <strong>CC2530</strong> 
+สำหรับสัญญาณ <strong>UART TXD (Output) / RXD (Input)</strong> ตามลำดับ เพื่อนำไปต่อกับชิป
+<strong>CH340G</strong> แต่เฟิร์มแวร์ <strong>Z-Stack_Home_1.2 / Coordinator</strong> ใช้ขา
+ขา <strong>P0.2</strong> และ <strong>P0.3</strong> ตามลำดับ ดังนั้นจะต้องมีการต่อสายสำหรับสัญญาณ <strong>TXD / RXD</strong>
+ให้ถูกต้อง</p>
+<p><img alt="" src="E18-TBH-01_board-1.jpg" /></p>
+<p><img alt="" src="E18-TBH-01_board-2.jpg" /></p>
+<p><img alt="" src="E18-TBH-01_board-3.jpg" /></p>
+<p>รูป: การต่อสายไฟโดยใช้ขา <strong>P0.2</strong> และ <strong>P0.3</strong> (แทนที่ <strong>P1.4</strong> และ <strong>P1.5</strong>)
+เพื่อเชื่อมต่อกับชิป <strong>CH340G</strong> ที่อยู่บนบอร์ด <strong>E18-TBH-01</strong>
+สำหรับสัญญาณ <strong>TXD</strong> และ <strong>RXD</strong> ตามลำดับ  </p>
+<p>&nbsp;</p>
+<p>ถ้านำไปใช้กับ <strong>Zigbee2MQTT</strong> จะต้องแก้ไขไฟล์ <code>data/configuration.yaml</code> 
+เพื่อตั้งค่าใช้งาน <strong>USB-to-Serial</strong> ให้ถูกต้อง ดังนี้</p>
+<pre><code class="language-yaml">serial:
+  port: /dev/ttyUSB0
+advanced:
+  baudrate: 115200
+  rtscts: false
+</code></pre>
+<p>&nbsp;</p>
+<p>เมื่อ <strong>Zigbee2MQTT</strong> เริ่มต้นทำงาน และเชื่อมต่อกับบอร์ด <strong>E18-TBH-01</strong> ได้สำเร็จ
+จะมองเห็นข้อความเอาต์พุต ตามตัวอย่างดังนี้</p>
+<pre><code class="language-text">Zigbee2MQTT:info 2022-09-27 20:19:26: Coordinator firmware version: 
+'{&quot;meta&quot;:{&quot;maintrel&quot;:3,&quot;majorrel&quot;:2,&quot;minorrel&quot;:6,&quot;product&quot;:0,
+&quot;revision&quot;:20211115,&quot;transportrev&quot;:2},&quot;type&quot;:&quot;zStack12&quot;}'
+</code></pre>
+<p><img alt="" src="ubuntu_zigbee2mqtt.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตเมื่อโปรแกรม <strong>Zigbee2MQTT</strong> เริ่มต้นทำงาน </p>
+<p>ถ้ามีข้อความ <strong>error</strong> ในลักษณะนี้</p>
+<pre><code class="language-text">Zigbee2MQTT:error 2022-09-27 20:19:26: Failed to call 'Bridge' 
+'start' (TypeError: Cannot read property 'ieeeAddr' of undefined
+</code></pre>
+<p>ให้เริ่มต้นการทำงานของ <code>Zigbee2MQTT</code> ใหม่อีกครั้ง </p>
+<p><img alt="" src="zigbee2mqtt_dashboard.png" /></p>
+<p>รูป: ตัวอย่างการทำงานของ <strong>Zigbee2MQTT Web Front-end</strong></p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอวิธีการและอุปกรณ์ในการติดตั้งเฟิร์มแวร์  <strong>Z-Stack ZigBee Coordinator</strong>
+สำหรับอุปกรณ์ <strong>CC2530 USB Dongle</strong> เพื่อนำมาใช้งานร่วมกับซอฟต์แวร์  <strong>Zigbee2MQTT</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-27 | Last Updated: 2022-09-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
