@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/esp32/linux_pio_esp32/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งาน PlatformIO (PIO) Core สำหรับ WSL2 Ubuntu ในเบื้องต้น - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#platformio-pio-core-wsl2-ubuntu" class="nav-link">การใช้งาน PlatformIO (PIO) Core สำหรับ WSL2 Ubuntu ในเบื้องต้น</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#pio-core-command-line" class="nav-link">&#9655; PIO Core และการทำคำสั่งแบบ Command Line</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pio-core" class="nav-link">&#9655; ขั้นตอนการติดตั้ง PIO Core</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wsl2-linux-ubuntu-usb" class="nav-link">&#9655; การทำให้ WSL2-Linux / Ubuntu มองเห็นและใช้งานอุปกรณ์ USB ได้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32" class="nav-link">&#9655; การเริ่มต้นสร้างโปรเจกต์สำหรับ Arduino-ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="platformio-pio-core-wsl2-ubuntu">การใช้งาน PlatformIO (PIO) Core สำหรับ WSL2 Ubuntu ในเบื้องต้น<a class="headerlink" href="#platformio-pio-core-wsl2-ubuntu" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="pio-core-command-line">&#9655; <strong>PIO Core และการทำคำสั่งแบบ Command Line</strong><a class="headerlink" href="#pio-core-command-line" title="Permanent link">#</a></h2>
+<p><a href="https://platformio.org/platformio-ide"><strong>PlatformIO IDE</strong></a> เป็นแอปพลิเคชันแบบ <strong>GUI</strong> และเป็น <strong>Open Source</strong>
+สำหรับการเขียนโค้ด <strong>C/C++</strong> เพื่อนำไปใช้กับบอร์ดไมโครคอนโทรลเลอร์ได้หลายตระกูลหลายรุ่น
+การทำงานของโปรแกรมนี้อาศัยโปรแกรมอีกตัวหนึ่งเป็นพื้นฐานในการทำงาน คือ <strong>PlatformIO (PIO) Core</strong>
+ซึ่งใช้ภาษา <strong>Python</strong> และมีการใช้งานเป็นแบบ <strong>Command Line Interface (CLI)</strong>
+(เหมาะสำหรับการเขียนสคริปต์คำสั่งและการคอมไพล์โค้ดแบบ <strong>Automated Build Process</strong>) ดังนั้นจึงทำงานได้แบบ
+<strong>Cross-platform</strong> ใช้ได้กับระบบปฏิบัติการต่าง ๆ ที่รองรับการใช้งาน <strong>Python 3</strong></p>
+<p>บทความนี้กล่าวถึง การติดตั้งและใช้งาน <strong>PIO Core</strong> ในเบื้องต้น และลองเขียนโค้ด <strong>Arduino Sketch</strong>
+สำหรับบอร์ด <strong>ESP32</strong> (<strong>WeMos Lolin32 Lite</strong>) 
+แต่ถ้าได้ติดตั้งซอฟต์แวร์  <strong>PlatformIO IDE</strong> เป็น <strong>Extension</strong> สำหรับ <strong>VS Code</strong> ไว้แล้ว
+ก็สามารถใช้คำสั่งต่าง ๆ ของ <strong>PIO Core</strong> ได้โดยไม่ต้องติดตั้งเพิ่ม</p>
+<hr />
+<h2 id="pio-core">&#9655; <strong>ขั้นตอนการติดตั้ง PIO Core</strong><a class="headerlink" href="#pio-core" title="Permanent link">#</a></h2>
+<p>ทำคำสั่งเพื่อติดตั้ง <strong>PIO Core</strong> ดังนี้ </p>
+<pre><code class="language-bash"># Set the URL of the Python installation script.
+$ URL=https://raw.githubusercontent.com/
+
+# Set the remote path to the script.
+$ SCRIPT=platformio/platformio-core-installer/master/get-platformio.py
+
+# Get the installation script file using wget.
+$ wget ${URL}${SCRIPT} -O ./get-platformio.py
+
+# Run the script to install PIO Core.
+$ python3 ./get-platformio.py
+</code></pre>
+<p>เมื่อทำคำสั่งแล้ว จะมีการติดตั้งแพ็กเกจต่าง ๆ ที่จำเป็นสำหรับ <strong>PIO Core</strong> ไว้ใน 
+<code>$USER/.platformio/penv</code> (ใช้งานแบบ <strong>Python Virtual Environment</strong>)</p>
+<p>เพิ่มโค้ด <strong>Bash Script</strong> ตามตัวอย่างต่อไปนี้ ไว้ในไฟล์ <code>$HOME/.profile</code>
+(ใช้คำสั่ง <code>nano</code> เพื่อแก้ไขไฟล์ตามตัวอย่าง) เพื่อทำให้ระบบสามารถค้นหาและเรียกใช้คำสั่ง <code>pio</code> ได้</p>
+<pre><code class="language-bash">$ nano $HOME/.profile
+</code></pre>
+<pre><code class="language-bash"># set PATH so it includes user's private bin if it exists
+if [ -d &quot;$HOME/.local/bin&quot; ] ; then
+    PATH=&quot;$PATH:$HOME/.local/bin&quot;
+fi
+
+if [ -d &quot;$HOME/.platformio/penv/bin&quot; ] ; then
+    PATH=&quot;$PATH:$HOME/.platformio/penv/bin&quot;
+fi
+</code></pre>
+<p>และทำคำสั่ง</p>
+<pre><code class="language-bash"># Update the PATH environment variable
+export PATH=$PATH:$HOME/.platformio/penv/bin:$HOME/.local/bin
+</code></pre>
+<p>หลังจากนั้นจึงสามารถเรียกใช้คำสั่ง <code>platformio</code> หรือ <code>pio</code> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wsl2-linux-ubuntu-usb">&#9655; <strong>การทำให้ WSL2-Linux / Ubuntu มองเห็นและใช้งานอุปกรณ์ USB ได้</strong><a class="headerlink" href="#wsl2-linux-ubuntu-usb" title="Permanent link">#</a></h2>
+<p>สำหรับผู้ใช้ <strong>WSL2</strong> ร่วมกับ <strong>Ubuntu</strong> ถ้าใช้ <strong>WSL Kernel</strong>
+ตั้งแต่เวอร์ชัน <strong>5.10.60.1</strong> เป็นต้นไป
+ก็สามารถใช้โปรแกรม <a href="https://github.com/dorssel/usbipd-win/wiki/WSL-support"><code>usbipd</code></a>
+(<strong>USB-over-IP server daemon</strong>) เพื่อทำให้มองเห็นอุปกรณ์ <strong>USB</strong> ได้ใน <strong>WSL2</strong>
+แต่มีขั้นตอนที่จะต้องดำเนินการก่อนใช้งาน </p>
+<p>ทำคำสั่งต่อไปนี้ใน <strong>WSL2 - Ubuntu Terminal</strong> เพื่อติดตั้งแพ็กเกจสำหรับ <strong>Ubuntu</strong></p>
+<pre><code class="language-text">$ sudo apt install linux-tools-virtual hwdata -y
+$ sudo update-alternatives --install /usr/local/bin/usbip usbip \
+  `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
+</code></pre>
+<p>ลองทำคำสั่งต่อไปนี้ เพื่อตรวจสอบดูว่า สามารถเรียกใช้คำสั่ง <code>usbpip</code> ได้หรือไม่ </p>
+<pre><code class="language-text">$ which usbip
+/usr/local/bin/usbip
+</code></pre>
+<p>ถัดไปให้เปิดใช้งาน <strong>Windows PowerShell (Adminstrator)</strong> แล้วทำคำสั่งต่อไปนี้
+เพื่อแสดงรายการอุปกรณ์ <strong>USB</strong> ที่มองเห็นได้ใน <strong>Windows</strong></p>
+<pre><code class="language-bash"># Show version.
+&gt; usbipd --version
+
+# List USB devices.
+&gt; usbipd wsl list
+</code></pre>
+<p>เชื่อมต่อบอร์ด <strong>ESP32</strong> กับพอร์ต  <strong>USB</strong> ของคอมพิวเตอร์ผู้ใช้
+แล้วทำคำสั่งเพื่อเลือกใช้อุปกรณ์ <strong>USB</strong> ตาม <strong>Bus ID</strong> ที่ต้องการใช้งานกับ
+<strong>WSL2 - Ubuntu</strong> เช่น <code>6-1</code> ซึ่งตรงกับชิป <strong>USB-SERIAL CH340</strong> ของบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong></p>
+<pre><code>&gt; usbipd wsl attach --busid 6-1
+</code></pre>
+<p><img alt="" src="powershell_usbipd.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>usbpid</code> เพื่อเลือกใช้อุปกรณ์ <strong>USB</strong> กับ <strong>WSL2</strong> </p>
+<p>&nbsp;</p>
+<p>ถัดไปให้ทำคำสั่งใน <strong>Bash Shell</strong> ของ <strong>WSL2 - Ubuntu</strong> เพื่อดูว่า มองเห็นอุปกรณ์
+เช่น <strong>USB-to-Serial CH340</strong> ตามตัวอย่าง</p>
+<pre><code class="language-bash">$ lsusb | grep CH340
+Bus 001 Device 002: ID 1a86:7523 QinHeng Electronics CH340 serial converter
+</code></pre>
+<p>&nbsp;</p>
+<p>สำหรับผู้ใช้ <strong>Linux</strong> โดยทั่วไป หากจะใช้โปรแกรมคำสั่งต่าง ๆ เข้าถึงอุปกรณ์ <strong>USB</strong>
+ในระบบได้โดยไม่ต้องใช้สิทธิ์ <code>root</code> ก็แนะนำให้เพิ่มไฟล์ <strong>.rules</strong> สำหรับโปรแกรม <code>udev</code>
+เพื่ออนุญาตให้ผู้ใช้ทั่วไปเข้าถึงอุปกรณ์เหล่านั้นได้</p>
+<p>ผู้พัฒนา <strong>PIO</strong> ได้จัดทำไฟล์
+<a href="https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules"><code>99-platformio-udev.rules</code></a>
+ให้ผู้ใช้ดาวน์โหลดไปใช้งาน โดยนำไปใส่ไว้ในไดเรกทอรี <code>/etc/udev/rules.d/</code>
+แล้วอัปเดทการทำงานของ <code>udev</code></p>
+<pre><code class="language-bash">$ sudo mv 99-platformio-udev.rules /etc/udev/rules.d/
+
+# update the udev rules
+$ sudo service udev restart
+# or
+$ sudo udevadm control --reload-rules
+$ sudo udevadm trigger
+</code></pre>
+<p>สำหรับผู้ใช้ <strong>Ubuntu / Debian / Raspberry Pi OS</strong>
+ให้เพิ่มชื่อผู้ใช้ <code>$USER</code> ให้เป็นส่วนหนึ่งของกลุ่ม  <code>dialout</code> และ <code>plugin</code> </p>
+<pre><code class="language-bash">$ sudo usermod -a -G dialout $USER
+$ sudo usermod -a -G plugdev $USER
+</code></pre>
+<p>ทำคำสั่งเพื่อตรวจสอบดูว่า สามารถมองเห็นอุปกรณ์ <strong>USB</strong> ได้หรือไม่ เช่น พอร์ต <code>/dev/ttyUSB0</code>
+สำหรับบอร์ด <strong>ESP32</strong></p>
+<p><img alt="" src="ubuntu_usb_device_list.png" /></p>
+<p>รูป: การทำคำสั่งเพื่อตรวจสอบดูรายการอุปกรณ์ <strong>USB</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32">&#9655; <strong>การเริ่มต้นสร้างโปรเจกต์สำหรับ Arduino-ESP32</strong><a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h2>
+<p>เริ่มต้นด้วยการทำคำสั่งเพื่อลองดูว่า มีรายการบอร์ดไมโครคอนโทรลเลอร์ใดบ้างให้เลือกใช้ได้ เช่น
+ค้นหาตามชื่อของบอร์ดไมโครคอนโทรลเลอร์ที่ขึ้นต้นด้วย <code>esp32dev</code> หรือ <code>lolin</code></p>
+<pre><code class="language-bash">$ pio boards esp32 | grep -E &quot;^(esp32dev|lolin)&quot;
+esp32dev          ESP32    240MHz  4MB  320KB   Espressif ESP32 Dev Module
+lolin_c3_mini     ESP32C3  160MHz  4MB  320KB  WEMOS LOLIN C3 Mini
+lolin_d32         ESP32    240MHz  4MB  320KB  WEMOS LOLIN D32
+lolin_d32_pro     ESP32    240MHz  4MB  320KB  WEMOS LOLIN D32 PRO
+lolin_s2_mini     ESP32S2  240MHz  4MB  320KB  WEMOS LOLIN S2 Mini
+lolin_s2_pico     ESP32S2  240MHz  4MB  320KB  WEMOS LOLIN S2 PICO
+lolin32           ESP32    240MHz  4MB  320KB  WEMOS LOLIN32
+lolin32_lite      ESP32    240MHz  4MB  320KB  WEMOS LOLIN32 Lite
+</code></pre>
+<p>เริ่มต้นสร้างโปรเจกต์ใหม่ เช่น ใช้ชื่อว่า <code>pio_demo</code> ในไดเรกทอรี <code>$HOME</code> ของผู้ใช้</p>
+<pre><code class="language-text"># Create a new project under a new directory.
+$ mkdir -p $HOME/pio_demo &amp;&amp; cd $HOME/pio_demo
+$ pio project init --board lolin32_lite
+</code></pre>
+<p>แต่ถ้าจะสร้างโปรเจกต์และเปิดใช้งานกับ <strong>VS Code IDE</strong> ให้ทำคำสั่งโดยเพิ่ม
+<code>--ide vscode</code> และจะมีการติดตั้ง <strong>PlatformIO Extension</strong>
+ให้กับ <strong>VS Code IDE</strong></p>
+<pre><code class="language-text">$ pio project init --board lolin32_lite --ide vscode
+</code></pre>
+<p>โครงสร้างภายในไดเรกทอรีสำหรับโปรเจกต์ มีลักษณะดังนี้</p>
+<pre><code class="language-text">$ tree -L 1
+.
+├── include
+├── lib
+├── platformio.ini
+├── src
+└── test
+</code></pre>
+<p>ไฟล์ <code>platformio.ini</code> ถูกสร้างขึ้นและมีการตั้งค่าใช้งานในเบื้องต้นสำหรับ <strong>PIO</strong> ดังนี้</p>
+<pre><code class="language-yaml">[env:lolin32_lite]
+platform = espressif32
+board = lolin32_lite
+framework = arduino
+</code></pre>
+<p>ลองเขียนโค้ดในไฟล์ <code>src/main.cpp</code> (<strong>LED Blink</strong>) ตามตัวอย่างดังนี้</p>
+<pre><code class="language-bash">$ nano src/main.cpp
+</code></pre>
+<pre><code class="language-cpp">#include &quot;Arduino.h&quot;
+
+#ifndef LED_BUILTIN
+#define LED_BUILTIN   (22) // WeMos Lolin32 Lite
+#endif
+
+void setup() {
+  // initialize LED digital pin as an output.
+  pinMode( LED_BUILTIN, OUTPUT );
+}
+
+void loop() {
+  static int state = 0;
+  // turn the LED on (HIGH is the voltage level)
+  state ^= 1; // toggle the LED state
+  digitalWrite( LED_BUILTIN, state );
+  delay( 500 );
+}
+</code></pre>
+<p>ทำคำสั่งคอมไพล์โค้ดและไฟล์ต่าง ๆ ในโปรเจกต์</p>
+<pre><code class="language-bash"># Build project from the current directory.
+$ pio run
+</code></pre>
+<p>เมื่อคอมไพล์โค้ดได้สำเร็จ ทำคำสั่งเพื่ออัปโหลดไฟล์เฟิร์มแวร์ที่ได้ ไปยังบอร์ด <strong>ESP32</strong></p>
+<pre><code class="language-bash"># List attached target boards.
+$ pio device list
+/dev/ttyUSB0
+------------
+Hardware ID: USB VID:PID=1A86:7523 LOCATION=1-1
+Description: USB Serial
+</code></pre>
+<pre><code class="language-bash"># Upload firmware to the target board.
+$ pio run -t upload --upload-port /dev/ttyUSB0
+</code></pre>
+<p>หากจะลองเปิดไฟล์ของโปรเจกต์ใน <strong>VS Code IDE</strong> 
+(ถ้าได้มีการติดตั้งซอฟต์แวร์นี้ไว้ใน <strong>Windows</strong> ของผู้ใช้แล้ว) ก็ให้ทำคำสั่งดังนี้</p>
+<pre><code class="language-bash">$ code .
+</code></pre>
+<p>ผู้ใช้สามารถเปิดไฟล์ <code>src/main.cpp</code> แก้ไขโค้ด และทำคำสั่ง <code>pio</code> ใน
+<strong>Terminal</strong> เพื่อคอมไพล์โค้ดได้เช่นกัน</p>
+<p><img alt="" src="vscode_pio-1.png" /></p>
+<p>รูป: การใช้งานโปรแกรม <strong>VS Code</strong> </p>
+<p><img alt="" src="vscode_pio-2.png" /></p>
+<p>รูป: การใช้งานโปรแกรม <strong>VS Code</strong> &mdash; ทำคำสั่ง <code>pio</code> เพื่ออัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด</p>
+<p>ในกรณีที่ไม่ได้สร้างโปรเจกต์สำหรับ <strong>VS Code IDE</strong> ตั้งแต่เริ่มต้น 
+และต้องการให้ <strong>C/C++ Extension - Indexer &amp; IntelliSense</strong> ใน <strong>VS Code</strong>
+ทำงานได้อย่างถูกต้อง จะต้องมีการแก้ไขการตั้งค่าในไฟล์ <code>.vscode/c_cpp_properties.json</code> ดังนี้</p>
+<pre><code class="language-json">{
+    &quot;configurations&quot;: [
+      {
+         &quot;name&quot;: &quot;Linux&quot;,
+         &quot;includePath&quot;: [
+            &quot;${HOME}/.platformio/packages/framework-arduinoespressif32/**&quot;,
+            &quot;${workspaceFolder}/**&quot;
+         ],
+         &quot;browse&quot;: {
+            &quot;path&quot;: [
+              &quot;${workspaceFolder}&quot;
+            ],
+            &quot;limitSymbolsToIncludedHeaders&quot;: false
+          },
+         &quot;defines&quot;: [],
+         &quot;cStandard&quot;: &quot;c11&quot;,
+         &quot;cppStandard&quot;: &quot;c++17&quot;,
+         &quot;intelliSenseMode&quot;: &quot;${default}&quot;,
+         &quot;compilerPath&quot;: &quot;${HOME}/.espressif/tools/xtensa-esp32-elf/esp-2021r2-patch3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc&quot;
+      }
+   ],
+   &quot;version&quot;: 4
+}
+</code></pre>
+<p>ข้อสังเกต:  <code>"compilerPath:"</code> มีไว้เพื่อระบุชื่อไดเรกทอรีที่มีคำสั่งคอมไพเลอร์
+<code>xtensa-esp32-elf</code> และในตัวอย่างเป็นเวอร์ชัน <code>esp-2021r2-patch3-8.4.0</code>
+ดังนั้นจะต้องระบุเวอร์ชันให้ตรงกับที่ใช้งานจริงด้วย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอขั้นตอนการติดตั้งซอฟต์แวร์ เพื่อใช้งาน <strong>PlatformIO (PIO) Core</strong>
+สำหรับ <strong>WSL2 / Ubuntu Linux</strong> ทำคำสั่งคอมไพล์โค้ดในโปรเจกต์ตัวอย่าง
+และอัปโหลดไปยังบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> ที่ได้เลือกมาสาธิตการใช้งาน</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2022-09-29 | Last Updated: 2022-09-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
