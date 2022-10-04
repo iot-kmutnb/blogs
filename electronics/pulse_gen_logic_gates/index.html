@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/electronics/pulse_gen_logic_gates/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การต่อวงจรดิจิทัลพื้นฐานเพื่อสร้างสัญญาณพัลส์เมื่อกดปุ่มแล้วปล่อย - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">การต่อวงจรดิจิทัลพื้นฐานเพื่อสร้างสัญญาณพัลส์เมื่อกดปุ่มแล้วปล่อย</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; วงจรลอจิกเกตสำหรับสร้างสัญญาณพัลส์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#tinkercad-easyeda" class="nav-link">&#9655; การจำลองการทำงานของวงจรด้วย Tinkercad และ EasyEDA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; ตัวอย่างการต่อวงจรทดลองจริง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; โจทย์การทดลองฝึกปฏิบัติ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="_1">การต่อวงจรดิจิทัลพื้นฐานเพื่อสร้างสัญญาณพัลส์เมื่อกดปุ่มแล้วปล่อย<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Logic Gates</em>, <em>NI MultiSim Live</em>,
+<em>EasyEDA/LTspice</em>, <em>AUTODESK Tinkercad</em>, <em>Single Shot Pulse Generation Circuit</em></p>
+<hr />
+<h2 id="_2">&#9655; <strong>วงจรลอจิกเกตสำหรับสร้างสัญญาณพัลส์</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการสร้างวงจรอิเล็กทรอนิกส์ โดยใช้ลอจิกเกตพื้นฐาน (<strong>Basic Logic Gates</strong>)
+เป็นองค์ประกอบสำคัญของวงจร และสามารถสร้างสัญญาณพัลส์ (<strong>Pulse</strong>) ที่มีความกว้างช่วง <strong>High</strong>
+ไม่มากนัก (ในระดับมิลลิวินาที) และเป็นแบบ <strong>One-Shot</strong> เมื่อกดปุ่มแล้วปล่อยหนึ่งครั้ง จะมีแนวทางอย่างไร ? ลองมาดูแผนผังของวงจรตัวอย่าง</p>
+<p><img alt="" src="multisim_pulse_gen-1.png" /></p>
+<p>รูป: แผนผังวงจรตัวอย่าง</p>
+<p>วงจรตามรูปแผนผังวงจรต่อไปนี้ (วาดด้วยซอฟต์แวร์ <strong>NI MultiSim Live</strong>) มีรายละเอียดดังนี้</p>
+<ul>
+<li>ในวงจรนี้ มีปุ่มกดทำหน้าที่สร้างสัญญาณ <strong>Trigger</strong> เพื่อทำให้เกิดการสร้างสัญญาณพัลส์หลังจากกดปุ่มแต่ละครั้ง</li>
+<li>วงจรนี้ใช้แรงดันไฟเลี้ยงคงที่  <strong>+5V</strong> จากแหล่งจ่าย <strong>DC</strong> (ใช้ชื่ออ้างอิงเป็น <code>VDC</code> ในแผนผังวงจร)</li>
+<li>มีวงจรปุ่มกด <strong>Push Button</strong> หรือ <strong>On/Off Switch</strong>
+ในวงจรคือ <code>S1</code> เป็นสวิตช์แบบ <strong>SPST</strong> (<em>Single-Pole-Single-Throw</em>)
+และมีตัวต้านทาน <strong>10k&Omega;</strong> ทำหน้าที่ <strong>Pull-up</strong> ทำให้จุด <code>A</code>
+เชื่อมต่อด้วยตัวต้านทานนี้ไปยัง <strong>5V</strong> การต่อวงจรสวิตช์หรือปุ่มกดในลักษณะนี้ทำงานแบบ <strong>Active-Low</strong> </li>
+<li>เมื่อยังไม่กดปุ่ม สวิตช์อยู่ในตำแหน่งเปิด หรือ <strong>Open</strong> จุด <code>A</code> จะได้ระดับแรงดันไฟฟ้าเท่ากับ  <strong>5V</strong>
+แต่ถ้ากดปุ่มค้างไว้ช่วงเวลาหนึ่ง สวิตช์เปลี่ยนไปอยู่ในตำแหน่งปิด หรือ <strong>Close</strong>
+จะมีกระแสไหลจากแหล่งจ่ายขั้วบวก <strong>+5V</strong> ผ่านตัวต้านทาน <strong>Pull-up</strong>
+และไหลผ่านตัวสวิตช์ไปยัง <strong>GND</strong> ของวงจร และแรงดันไฟฟ้าที่จุด <code>A</code> เทียบกับ <strong>GND</strong> 
+จะเป็น <strong>0V</strong> แต่ถ้าปล่อยปุ่ม แรงดันไฟฟ้าที่จุด <code>A</code> จะเปลี่ยนระดับไปเป็น <strong>+5V</strong></li>
+<li>สัญญาณไฟฟ้าจากวงจรปุ่มกดที่จุด <code>A</code> นำไปต่อกับอินพุตของลอจิกเกตแบบ <strong>NOT</strong> หรือ <strong>Inverter</strong>
+(<code>U1</code> ในแผนผังวงจร) แล้วไปต่อกับวงจร <strong>RC</strong> ที่มีค่าตัวต้านทาน <strong>1k&Omega;</strong>
+และตัวเก็บประจุ <strong>10uF</strong> </li>
+<li>สัญญาณไฟฟ้าที่จุด <code>B</code> จะถูกนำไปใช้เป็นสัญญาณอินพุตขาหนึ่งของลอจิกเกตแบบ <strong>AND</strong> 
+(<code>U2</code> ในแผนผังวงจร) สัญญาณอินพุตอีกขาหนึ่งได้จากวงจรปุ่มกดที่จุด <code>A</code></li>
+<li>แม้ว่าไม่ได้แสดงไว้ให้เห็นอย่างชัดเจน ลอจิกเกตในวงจรนี้ ใช้แรงดันไฟเลี้ยงคงที่ <strong>5V</strong> ในการทำงาน</li>
+<li>ลอจิกเกต <strong>NOT</strong> จะให้สถานะลอจิกตรงข้ามกันระหว่างอินพุตกับเอาต์พุต เช่น
+ถ้าอินพุตเป็นลอจิก <strong>High</strong> หรือมีระดับแรงดันใกล้เคียง <strong>+5V</strong> ซึ่งเป็นแรงดันไฟเลี้ยง
+ก็จะได้เอาต์พุตเป็นลอจิก <strong>Low</strong> และมีแรงดันใกล้เคียง <strong>0V</strong></li>
+<li>ลอจิกเกต <strong>AND</strong> มี 2 ขาอินพุต  (มีเอาต์พุตอ้างอิงโดยใช้ชื่อ <code>OUT</code> ในแผนผังวงจร) 
+ถ้าอินพุตทั้งสองขาเป็นลอจิก <strong>High</strong> เหมือนกัน
+ก็จะได้เอาต์พุตเป็น <strong>High</strong> เช่นกัน แต่ในกรณีอื่น จะได้เอาต์พุตเป็น <strong>Low</strong></li>
+<li>หากต่อวงจรทดลองจริง และสังเกตจากการวัดสัญญาณด้วยเครื่องออสซิลโลสโคป เห็นว่า มีการกระเด้งของปุ่มกด (<strong>Button Bounce</strong>)
+เกิดขึ้น กล่าวคือ กดปุ่มแล้วปล่อยหนึ่งครั้ง แต่มีการเปลี่ยนแปลงสัญญาณหลายครั้ง 
+แนะนำให้ใช้ตัวเก็บประจุ เช่น <strong>100nF</strong> (<strong>0.1uF</strong>) ต่อคร่อมที่ขาทั้งสองของตัวสวิตช์ <code>S1</code> 
+และเลือกใช้ลอจิกเกตที่มีอินพุตเป็นแบบ <strong>Schmitt-Trigger Input</strong></li>
+</ul>
+<p>หากต้องการจำลองการทำงานของวงจรแบบ <strong>Interactive</strong> ด้วย
+<a href="https://www.multisim.com/"><strong>NI MultiSim Live - Online Circuit Simulator</strong></a> 
+เมื่อได้วาดแผนผังวงจรถูกต้องและครบถ้วนแล้ว จะต้องมีการตั้งค่าก่อนเริ่ม</p>
+<ul>
+<li>ในส่วนที่เป็น <strong>Simulation Settings</strong> ให้เลือก 
+<strong>Maximum time step</strong> เป็น <strong>Manual time step</strong> และมีค่าเท่ากับ
+<strong>1e-5 sec</strong> (หรือ <strong>10 usec</strong>) เพื่อกำหนดค่าความละเอียดเชิงเวลาในการจำลองการทำงานของวงจร</li>
+<li>คลิกเลือกที่ลอจิกเกต <strong>AND</strong> แล้วตั้งค่าให้เป็น <strong>Logic Levels &gt; Mode: Simplified</strong></li>
+<li>กำหนดตำแหน่งในวงจรที่ต้องการวัดค่าและแสดงผล
+เช่น วัดแรงดันไฟฟ้าที่จุดขาอินพุตทั้งสองและขาเอาต์พุตของลอจิกเกต <strong>AND</strong> เป็นต้น
+(เลือกใช้ <strong>Voltage Probe</strong> จากแถบเครื่องมือซ้ายมือ <strong>"Analysis and Annotation"</strong>)</li>
+</ul>
+<p><img alt="" src="multisim_pulse_gen-2.png" /></p>
+<p>รูป: การตั้งค่าสำหรับลอจิกเกต <strong>AND</strong> โดยเลือกใช้เป็น <strong>Logic Levels: Simplified Model</strong></p>
+<p><img alt="" src="multisim_pulse_gen-3.png" /></p>
+<p>รูป: การตั้งค่าเพื่อกำหนดระยะเวลาในการจำลองการทำงานแบบ <strong>Interactive</strong>
+และความละเอียดเชิงเวลา</p>
+<p>&nbsp;</p>
+<p>เมื่อตั้งค่าแล้ว ให้กดปุ่ม <strong>Start Simulation</strong> และตัวจับเวลาจะเริ่มทำงาน
+จะเห็นตัวเลขเวลาในการจำลองการทำงาน (<strong>Simulation Time</strong>) เพิ่มขึ้นเรื่อย ๆ 
+ในขณะนั้นก่อนหมดเวลา ให้ลองกดปุ่มเพื่อเปลี่ยนสถานะของปุ่มกดในวงจร (<strong>State Toggle</strong>) หลาย ๆ ครั้ง </p>
+<p><img alt="" src="multisim_pulse_gen-4.png" /></p>
+<p>รูป: การจำลองการทำงานของวงจรแบบ <strong>Interactive</strong>
+ซึ่งสามารถกดคลิกที่ปุ่มกดเปลี่ยนสถานะลอจิกของปุ่มกดได้โดยผู้ใช้</p>
+<p><strong>คำถาม:</strong> หากกดปุ่มแล้วปล่อยในแต่ละครั้ง สัญญาณเอาต์พุตจากลอจิกเกต <strong>AND</strong> จะเป็นอย่างไร ?</p>
+<p>ผลจากการจำลองการทำงาน จะทำให้เห็นสัญญาณภายในวงจรและสัญญาณเอาต์พุตของวงจร
+ในลักษณะรูปคลื่นสัญญาณ (<strong>Waveforms</strong>) คล้ายกับการวัดสัญญาณด้วยอุปกรณ์จริง
+เช่น ใช้เครื่องวัดออสซิลสโคปแบบดิจิทัล เป็นต้น</p>
+<p><img alt="" src="multisim_pulse_gen-5.png" /></p>
+<p>รูป: ผลการจำลองการทำงาน แสดงผลด้วยคลื่นสัญญาณ</p>
+<p><img alt="" src="multisim_pulse_gen-6.png" /></p>
+<p>รูป: การเลือกช่วงเวลาและขยายช่วงเวลาเพื่อตรวจสอบดูค่าลอจิกของสัญญาณในวงจร</p>
+<p><img alt="" src="multisim_pulse_gen-7.png" /></p>
+<p>รูป: การใช้เคอร์เซอร์ (<strong>Cursors</strong>) เพื่อวัดความกว้างของพัลส์ (วัดได้ค่าประมาณ <strong>6.84 msec</strong>)</p>
+<p>จากรูปคลื่นสัญญาณ เมื่อกดปุ่ม  สัญญาณ <code>A</code> จะเปลี่ยนจาก <strong>High (5V)</strong> เป็น <strong>Low (0V)</strong>
+อย่างรวดเร็ว (มีค่า <strong>Fall Time</strong> น้อยมาก)
+ในขณะที่สัญญาณ <code>B</code> จะเปลี่ยนจาก <strong>0V</strong> ค่อย ๆ เพิ่มขึ้น จนถึง <strong>5V</strong> (ไม่เปลี่ยนแบบทันทีทันใด)
+ซึ่งขึ้นอยู่กับค่าของตัวต้านทานและตัวเก็บประจุในวงจร (หรือเรียกว่า <strong>RC Time Constant</strong>)</p>
+<p>เมื่อปล่อยปุ่มกด  สัญญาณ <code>A</code> จะเปลี่ยนจาก <strong>0V</strong> ไปเป็น <strong>5V</strong> 
+อย่างรวดเร็ว (มีค่า <strong>Rise Time</strong> น้อยมาก) สัญญาณ <code>B</code> จะเปลี่ยนจาก <strong>5V</strong>
+ค่อย ๆ ลดลง จนถึง <strong>0V</strong></p>
+<p>จากการจำลองการทำงานจะเห็นได้ว่า สัญญาณ <code>A</code> มีความเป็นสัญญาณดิจิทัลมากกว่า <code>B</code>
+เนื่องจาก <code>A</code> มีการเปลี่ยนสถานะลอจิกหรือระดับแรงดันไฟฟ้าระหว่าง <strong>0V</strong> และ <strong>5V</strong>
+ได้อย่างรวดเร็ว แต่ในขณะที่ <code>B</code> มีการเปลี่ยนแปลงช้ากว่า (มีค่า <strong>Transition Time</strong> มากกว่า) 
+และในทางทฤษฎี สัญญาณ <code>B</code> จึงไม่เหมาะกับการใช้งานในวงจรดิจิทัล</p>
+<p>อย่างไรก็ตาม ถ้านำทั้งสองสัญญาณ <code>A</code> และ <code>B</code> ไปใช้เป็นอินพุตของลอจิกเกต <strong>AND</strong>
+ก็จะได้สัญญาณเอาต์พุตเป็นสัญญาณดิจิทัล ถ้าสัญญาณอินพุตทั้งสองอยู่ในระดับใกล้เคียง
+<strong>5V</strong> จะได้เอาต์พุตเป็นลอจิก <strong>High</strong> แต่ถ้าสัญญาณ <code>A</code> ยังเป็น <strong>High</strong>
+แต่สัญญาณ <code>B</code> เริ่มลดระดับลง จนถึงระดับหนึ่ง เอาต์พุตของลอจิกเกต <strong>AND</strong> 
+จะเปลี่ยนจาก <strong>High</strong> เป็น <strong>Low</strong> ตามที่ปรากฏในผลการจำลองการทำงานของวงจร</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="tinkercad-easyeda">&#9655; <strong>การจำลองการทำงานของวงจรด้วย Tinkercad และ EasyEDA</strong><a class="headerlink" href="#tinkercad-easyeda" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการวาดแผนผังวงจรและจำลองการทำงานด้วยซอฟต์แวร์ <strong>EasyEDA</strong>
+แต่มีการใช้ลอจิกเกตแบบ <strong>NAND</strong> ในวงจร แทนที่ลอจิกเกต <strong>NOT</strong> และ <strong>AND</strong>
+ในวงจรตัวอย่างแรก</p>
+<p>เพื่อให้ง่ายต่อการจำลองการทำงานในโหมด <strong>Transient Simulation</strong>
+เมื่อใช้ <strong>EasyEDA</strong> ได้ตัดส่วนที่เป็นวงจรปุ่มกดออกไป
+และแทนที่ด้วยแหล่งจ่ายที่สร้างสัญญาณแบบ <strong>PULSE</strong> และใช้เป็นสัญญาณ <strong>Trigger</strong>
+แทนการกดปุ่ม </p>
+<p><img alt="" src="easyeda_sim-1.png" /></p>
+<p>รูป:  การจำลองการทำงานของวงจรด้วย <strong>EasyEDA</strong>
+(ใช้ตัวต้านทาน <strong>1k&Omega;</strong> และ <strong>C=10uF</strong>) 
+และเลือกใช้โมเดลของไอซี <strong>74HC00</strong> ที่สามารถจำลองการทำงานได้ด้วย<br />
+<strong>SPICE / LTspice Circuit Simulator</strong></p>
+<p><img alt="" src="easyeda_sim-2.png" /></p>
+<p>รูป:  คลื่นสัญญาณอินพุต (บน) และเอาต์พุต (ล่าง) ได้จากการจำลองการทำงานของวงจรด้วย <strong>EasyEDA</strong>
+(ความกว้างของพัลส์ของสัญญาณเอาต์พุต ได้ประมาณ <strong>6.54 msec</strong>)</p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการต่อวงจรเสมือนจริงด้วย <strong>AUTODESK Tinkercad</strong>
+และทดลองจริงบนเบรดบอร์ด โดยมีการใช้ไอซี <strong>74HC00N</strong>
+ซึ่งภายในมีลอจิกเกต <strong>2-Input NAND</strong> จำนวน 4 ตัว</p>
+<p><img alt="" src="74hct00n_dip.png" /></p>
+<p>รูป: ไอซี <a href="https://www.ti.com/lit/gpn/sn74hct00"><strong>TI SN74HCT00</strong></a>
+(IC Package: <strong>PDIP-14</strong>) มุมมองแบบ <strong>Top View</strong></p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการจำลองการทำงานของวงจรแบบเสมือนจริงด้วย <strong>Tinkercad</strong>
+สามารถจำลองการทำงานได้แบบ <strong>Interactive</strong> และกดปุ่มได้</p>
+<p><img alt="" src="tinkercad_sim-1.png" /></p>
+<p>รูป: เมื่อกดปุ่มแล้วปล่อย จะเห็นสัญญาณพัลส์</p>
+<p><img alt="" src="tinkercad_sim-1.png" /></p>
+<p>รูป: เมื่อกดปุ่มแล้วปล่อย จะเห็นสัญญาณพัลส์ที่เกิดจากวงจร <strong>RC</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>ตัวอย่างการต่อวงจรทดลองจริง</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ด</p>
+<p><img alt="" src="experiment_breaboard.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองบนเบรดบอร์ด (ใช้ไอซี <strong>74HCT00N</strong>) และวัดสัญญาณด้วยออสซิลโลสโคป
+(ใช้แรงดันไฟเลี้ยงจาก <strong>USB</strong> ประมาณ <strong>5V</strong>)</p>
+<p><img alt="" src="input_vs_out-1uF-1.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณเมื่อใช้ตัวเก็บประจุ <strong>1uF</strong>: ช่อง 1 สัญญาณจากปุ่มกด (จุด <code>A</code>)
+และช่อง 2 สัญญาณเอาต์พุต
+(ตั้งค่า <strong>TIME/DIV = 5msec</strong> และ <strong>VOLT/DIV = 2V</strong>)</p>
+<p><img alt="" src="input_vs_out-10uF-1.png" /></p>
+<p>รูป:  ตัวอย่างคลื่นสัญญาณเมื่อใช้ตัวเก็บประจุ <strong>10uF</strong>: ช่อง 1 สัญญาณจากปุ่มกด (จุด <code>A</code>) 
+และช่อง 2 สัญญาณเอาต์พุต
+(ตั้งค่า <strong>TIME/DIV = 20msec</strong> และ <strong>VOLT/DIV = 2V</strong>)</p>
+<p><img alt="" src="nand_inputs-1.png" /></p>
+<p>รูป:  ตัวอย่างคลื่นสัญญาณช่อง 1 และ 2 วัดที่จุด <code>A</code> และ <code>B</code> ในวงจรตัวอย่างตามลำดับ 
+เมื่อมีการกดปุ่มแล้วปล่อย ช่วงที่สัญญาณจุด <code>A</code> เป็น <strong>Low</strong> มีระยะเวลาประมาณ <strong>40 msec</strong></p>
+<p><img alt="" src="nand_inputs-2.png" /></p>
+<p>รูป:  ตัวอย่างคลื่นสัญญาณช่อง 1 และ 2  วัดที่จุด <code>A</code> และ <code>B</code> ในวงจรตัวอย่างตามลำดับ 
+เมื่อมีการกดปุ่มแล้วปล่อย ช่วงที่สัญญาณจุด <code>A</code> เป็น <strong>Low</strong> มีระยะเวลาประมาณ <strong>100 msec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>โจทย์การทดลองฝึกปฏิบัติ</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p><strong>คำถามสำหรับการทดลองฝึกปฏิบัติ</strong></p>
+<p>1) ออกแบบวงจรและวาดแผนผังวงจร โดยให้ใช้ลอจิกเกต <strong>NAND</strong> 
+และวางแผนการต่อวงจรบนเบรดบอร์ด โดยใช้ไอซีลอจิกเกต <strong>7400 (Quad 2-input NAND Logic Gate)</strong> 
+<strong><em>เพียงหนึ่งตัว</em></strong> เช่น เลือกใช้ไอซี <strong>74HCT00N (TTL)</strong> หรือ <strong>74HC00N (CMOS)</strong>
+ซึ่งภายในมีลอจิกเกตแบบ <strong>NAND</strong> อยู่ 4 ตัว แล้วนำมาใช้สร้างวงจรจริงตามโจทย์ข้อ 1</p>
+<p>2) วัดความกว้างของสัญญาณพัลส์จากวงจรจริงเมื่อกดปุ่มแต่ละครั้ง โดยใช้เครื่องออสซิลโลสโคป
+(เลือกใช้ <strong>Trigger Mode</strong> ให้เหมาะสม)
+และให้เลือกค่า <strong>R</strong> และ <strong>C</strong> ดังต่อไปนี้ 
+บันทึกภาพคลื่นสัญญาณและเปรียบเทียบกับผลการจำลองการทำงานในแต่ละกรณี</p>
+<ul>
+<li>R=1k&Omega;, C=1uF</li>
+<li>R=1k&Omega;, C=10uF</li>
+<li>R=10k&Omega;, C=1uF</li>
+<li>R=10k&Omega;, C=10uF</li>
+</ul>
+<p>3)  ค่า <strong>RC Time Constant</strong> จากข้อ 2
+ส่งผลอย่างไรต่อความกว้างของสัญญาณพัลส์ (ช่วงที่เป็น <strong>High</strong>)
+ที่เป็นเอาต์พุตของวงจร ? จงเขียนอธิบาย</p>
+<p>4) ระยะเวลาในการกดปุ่มหรือสวิตช์ค้างไว้ มีผลต่อความกว้างของสัญญาณพัลส์ที่เป็นสัญญาณเอาต์พุตของวงจรหรือไม่ ? </p>
+<p>5) ถ้ากดปุ่มค้างไว้แล้วยังไม่ปล่อย จะเกิดสัญญาณพัลส์ที่เอาต์พุตของวงจรหรือไม่ ? จงเขียนเหตุผลอธิบายคำตอบ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
+<p>เอกสารนี้นำเสนอตัวอย่างวงจรที่ใช้ลอจิกเกตพื้นฐาน นำมาต่อวงจรเพื่อสร้างสัญญาณพัลส์เมื่อมีการกดปุ่มแล้วปล่อย
+มีตัวอย่างการใช้งานซอฟต์แวร์ เช่น <strong>NI MultiSim Live</strong> <strong>EasyEDA</strong> และ <strong>Tinkercad</strong> 
+สำหรับการวาดแผนผังวงจรและจำลองการทำงาน รวมถึงการทดลองต่อวงจรจริงและวัดสัญญาณด้วยเครื่องออสซิลโลสโคป</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-10-04 | Last Updated: 2022-10-04</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
