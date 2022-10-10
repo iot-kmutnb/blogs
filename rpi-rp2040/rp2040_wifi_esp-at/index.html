@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/rpi-rp2040/rp2040_wifi_esp-at/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูล ESP01S (ESP8285) WiFi-Serial สำหรับบอร์ด Raspberry Pi Pico - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#esp01s-esp8285-wifi-serial-raspberry-pi-pico" class="nav-link">การใช้งานโมดูล ESP01S (ESP8285) WiFi-Serial สำหรับบอร์ด Raspberry Pi Pico</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#esp01-esp01s" class="nav-link">&#9655; โมดูล ESP01 / ESP01S</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cytron-maker-pi-pico-esp01s" class="nav-link">&#9655; บอร์ด Cytron Maker Pi Pico + ESP01S</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch-serial-passthrough" class="nav-link">&#9655; ตัวอย่าง Arduino Sketch - Serial Passthrough</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp-m3-esp8285-pico" class="nav-link">&#9655; การใช้งานโมดูล ESP-M3 (ESP8285) ร่วมกับบอร์ด Pico</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wifiespat" class="nav-link">&#9655; การใช้งานไลบรารี WiFiEspAT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#mqtt" class="nav-link">&#9655; การส่งข้อความด้วยโพรโทคอล MQTT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp01s-esp8285-wifi-serial-raspberry-pi-pico">การใช้งานโมดูล ESP01S (ESP8285) WiFi-Serial สำหรับบอร์ด Raspberry Pi Pico<a class="headerlink" href="#esp01s-esp8285-wifi-serial-raspberry-pi-pico" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>WiFi-to-Serial Module</em>, <em>EPS8266 / ESP8285</em>, <em>ESP-AT</em>,
+<em>Raspberry Pi</em>, <em>RP2040</em>, <em>Arduino</em>, <em>WiFiEspAT</em></p>
+<p>บทความนี้นำเสนอการใช้งานโมดูล <strong>ESP01S</strong> ร่วมกับบอร์ด <strong>Raspberry Pi Pico</strong> ที่ใช้ชิป
+<a href="https://www.raspberrypi.com/products/rp2040/"><strong>RP2040 SoC</strong></a>
+และมีโค้ดตัวอย่างเพื่อนำไปใช้กับซอฟต์แวร์ <a href="https://www.arduino.cc/en/software"><strong>Arduino IDE</strong></a>
+และ <a href="https://github.com/earlephilhower/arduino-pico/"><strong>Arduino RP2040 Core</strong></a>
+แนะนำให้ศึกษาการใช้งานได้จากบทความภาษาไทยที่เกี่ยวข้องต่อไปนี้</p>
+<ul>
+<li><a href="../arduino_rp2040_core/">"การใช้งาน <strong>Arduino IDE + Arduino RP2040 Core</strong>
+สำหรับบอร์ด <strong>Raspberry Pi Pico</strong>"</a></li>
+<li><a href="../../esp32/esp_at_firmware/">"การติดตั้งเฟิร์มแวร์ <strong>ESP-AT</strong> สำหรับโมดูล <strong>ESP01 / ESP01S</strong>"</a></li>
+</ul>
+<hr />
+<h2 id="esp01-esp01s">&#9655; <strong>โมดูล ESP01 / ESP01S</strong><a class="headerlink" href="#esp01-esp01s" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>ESP01 / ESP01S</strong> ใช้ชิป <strong>ESP8266EX</strong> และ <strong>ESP8285</strong> ตามลำดับ
+และมีชิปหน่วยความจำแฟลชเป็นแบบ <strong>SPI Flash</strong> (หรือรวมไว้ในชิปเดียวกัน) 
+โดยทั่วไป โมดูลมีความจุของแฟลช <strong>1MB</strong></p>
+<p><img alt="" src="esp01s_module.png" /></p>
+<p>รูป: โมดูล <strong>ESP01S</strong> และโมดูล <strong>PCB Adapter</strong></p>
+<p>โมดูล  <strong> ESP01 / ESP01S</strong>
+มีขาคอนเนกเตอร์เชื่อมต่อเป็นแบบ <strong>2x4 Pin Header</strong> 
+หากจะนำไปใช้ในการต่อวงจรบนเบรดบอร์ด ก็แนะนำให้ใช้โมดูล <strong>PCB Adapter</strong> ร่วมด้วย 
+จะทำให้เสียบขาลงบนเบรดบอร์ดได้ง่าย แต่ถ้าไม่มี ก็ใช้วิธีการต่อสาย <strong>Jumper Wires</strong>
+ที่มีด้านปลายเป็นตัวผู้-ตัวเมีย (<strong>Male-Female</strong>) </p>
+<p>การใช้งานโมดูล  <strong> ESP01 / ESP01S</strong> เป็นอุปกรณ์ <strong>WiFi-to-Serial</strong>
+จะใช้วิธีเชื่อมต่อทาง <strong>Serial</strong> ขา <strong>TX / RX</strong>
+และนำไปใช้งานกับบอร์ดไมโครคอนโทรลเลอร์ที่ไม่สามารถสื่อสารด้วย <strong>Wi-Fi</strong></p>
+<p>การทำงานของโมดูล จะต้องมีการติดตั้งเฟิร์มแวร์ที่เรียกว่า <a href="https://github.com/espressif/esp-at"><strong>ESP-AT</strong></a>
+ของบริษัท <strong>Espressif</strong> และเป็นซอฟต์แวร์ <strong>Open Source</strong> </p>
+<p>ในปัจจุบัน (ขณะที่เขียนบทความ) ก็มีการแบ่งเป็นสองเวอร์ชันคือ <strong>v1.7.x</strong> และ <strong>v2.2.x</strong>
+ทางบริษัท <strong>Espressif</strong> ก็ได้ประกาศไว้ว่า จะไม่พัฒนาเฟิร์มแวร์ <strong>ESP-AT</strong>
+สำหรับชิป <strong>ESP8266 / ESP8285</strong> อีกต่อไป (ยกเว้นการอัปเดตและแก้ไข <strong>Bug Fixes</strong>)
+แต่จะเน้นใช้กับชิปรุ่มใหม่กว่า เช่น <strong>ESP32 / S2 / C2 / C3</strong> เป็นต้น</p>
+<ul>
+<li><a href="https://docs.espressif.com/projects/esp-at/en/latest/esp32/AT_Command_Set/index.html"><strong>Espressif AT Command Set</strong></a></li>
+<li><a href="https://github.com/espressif/esp-at"><strong>ESP-AT Repository</strong></a></li>
+<li><a href="https://espressif-docs.readthedocs-hosted.com/_/downloads/esp-at/en/release-v2.2.0.0_esp8266/pdf/"><strong>ESP-AT User Guide v2.2.0.0 (.pdf)</strong></a></li>
+</ul>
+<p>สำหรับผู้ที่ต้องการใช้โมดูลงาน <strong>ESP01 / ESP01S</strong> ที่มีหน่วยความจำแฟลช อย่างน้อย <strong>1MB</strong> บริษัท <strong>Cytron</strong> ได้เผยแพร่ไฟล์เฟิร์มแวร์ 
+<a href="https://github.com/CytronTechnologies/esp-at-binaries">"<strong>Cytron_ESP_AT V2.2.0.bin</strong>"</a>
+(<a href="Cytron_ESP-01S_AT_Firmware_V2.2.0.bin.zip"><em>local copy</em></a>)
+สำหรับโมดูล  <strong>ESP-01S (ESP8285-based)</strong> ไว้ใน <strong>Github</strong>
+หากมีโมดูล <strong>ESP-01S</strong> แต่ใช้เฟิร์มแวร์เวอร์ชันเก่า และต้องการใช้เวอร์ชันใหม่ 
+ก็สามารถดาวน์โหลดไฟล์ดังกล่าวมา แล้วใช้โปรแกรม <a href="https://pypi.org/project/esptool/"><strong>esptool.py</strong></a>
+ในการอัปเกรดเฟิร์มแวร์ใหม่ได้</p>
+<hr />
+<h2 id="cytron-maker-pi-pico-esp01s">&#9655; <strong>บอร์ด Cytron Maker Pi Pico + ESP01S</strong><a class="headerlink" href="#cytron-maker-pi-pico-esp01s" title="Permanent link">#</a></h2>
+<p>บอร์ด <a href="https://th.cytron.io/p-maker-pi-pico"><strong>Maker Pi Pico by Cytron (Malaysia)</strong></a>
+ที่ได้มีการออกแบบมาเพื่อใช้งานร่วมกับบอร์ด <strong>Raspberry Pi RP2040</strong> ช่วยให้ง่ายต่อการต่อวงจรรอบข้าง 
+และหากต้องการใช้งานโมดูล <strong>ESP01 / ESP01S</strong> ก็มีคอนเนกเตอร์เป็นแบบ <strong>2x4-pin Socket</strong>
+อยู่บนบอร์ดแล้ว ทำให้ง่ายต่อการเชื่อมต่อกับโมดูลดังกล่าว</p>
+<ul>
+<li><a href="maker-pi-pico_datasheet.pdf"><strong>Maker Pi Pico Datasheet (.pdf)</strong></a></li>
+<li><a href="maker-pi-pico_v1.2.0_schematic.pdf"><strong>Maker Pi Pico Schematic (.pdf)</strong></a></li>
+</ul>
+<p><img alt="" src="maker_pi_pico_esp01s.jpg" /></p>
+<p>รูป:  บอร์ด <strong>Maker Pi Pico v1.2.0 + ESP01S</strong></p>
+<p><a href="maker-pi-pico_schematic_large.png"><img alt="" src="maker-pi-pico_schematic.png" /></a></p>
+<p>รูป: แผนผังวงจรของบอร์ด <strong>Maker Pi Pico v1.2.0</strong> (Source: Cytron.io)</p>
+<p>จากผังวงจรจะเห็นได้ว่า ขา <strong>TXD / RXD</strong> ของโมดูล <strong>ESP01S</strong> เชื่อมต่อกับขา <strong>GP17 / GP16</strong>
+ของ <strong>Pico RP2040</strong> ตามลำดับ</p>
+<pre><code class="language-plain">Pico GP17 (UART0_RX) &lt;-- ESP01S TXD
+Pico GP16 (UART0_TX) --&gt; ESP01S RXD
+</code></pre>
+<p>&nbsp;</p>
+<p>ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>RP2040</strong> และ <strong>ESP8285</strong> หรือ <strong>ESP32-C3</strong>
+เพื่อใช้ในการสื่อสาร <strong>WiFi (2.4GHz)</strong> และใช้วิธีเชื่อมต่อแบบ <strong>Serial / UART</strong> หรือ <strong>SPI</strong> ได้แก่</p>
+<ul>
+<li>บอร์ดของบริษัท <strong>Invector Labs / iLabs Electronics (Sweden)</strong><ul>
+<li><a href="https://ilabs.se/product/rpico32/"><strong>RPICO32 RP2040 / WiFi Module &mdash; ESP8285 (UART, baudrate 921600)</strong></a></li>
+<li><a href="https://ilabs.se/product/challenger-rp2040-wifi-ble-with-chip-antenna/"><strong>Challenger RP2040 WiFi / BLE (Chip Antenna) &mdash; ESP32-C3FN4 (UART &amp; SPI)</strong></a></li>
+<li><a href="https://ilabs.se/product/challenger-rp2040-wifi-u-fl/"><strong>Challenger RP2040 WiFi (U.FL connector) &mdash; ESP8285 (SPI)</strong></a></li>
+</ul>
+</li>
+<li>บอร์ดของบริษัท <strong>Seeedstudio</strong><ul>
+<li><a href="https://www.seeedstudio.com/Wio-RP2040-Module-p-4932.html"><strong>Wio RP2040 Module - ESP8285 (SPI)</strong></a>
+(<a href="https://wiki.seeedstudio.com/Wio_RP2040_Module_Build-in_Wireless_2.4G/"><strong>WiKi</strong></a>)</li>
+</ul>
+</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch-serial-passthrough">&#9655; <strong>ตัวอย่าง Arduino Sketch - Serial Passthrough</strong><a class="headerlink" href="#arduino-sketch-serial-passthrough" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Arduino Sketch</strong> เพื่อทำให้บอร์ด <strong>Pico</strong> 
+เป็นตัวกลางเชื่อมต่อระหว่างคอมพิวเตอร์ของผู้ใช้กับโมดูล <strong>ESP01S</strong>
+(มีค่า <strong>Default Serial Baudrate</strong> เท่ากับ <strong>115200</strong>)
+โดยใช้ขา <strong>UART0 TX / RX (GP16 / GP17 pins)</strong> ของชิป <strong>RP2040</strong> สื่อสารกับโมดูล <strong>ESP01S</strong>
+และตรงกับการทำงานของ <code>Serial1</code> ในโค้ด <strong>Arduino Sketch</strong></p>
+<pre><code class="language-cpp">#define LED_PIN  LED_BUILTIN
+
+#define ESP_SERIAL_BAUD    (115200)
+
+#define ESP_SERIAL   Serial1
+#define ESP_SERIAL_TX_PIN  (16)
+#define ESP_SERIAL_RX_PIN  (17)
+
+//#define ESP_SERIAL   Serial2
+//#define ESP_SERIAL_TX_PIN  (8)
+//#define ESP_SERIAL_RX_PIN  (9)
+//#define ESP_RESET_PIN      (15)
+
+#define PACKET_SIZE        (64)
+char buf[ PACKET_SIZE+1 ]; // serial data buffer up to 64 bytes
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+
+  // Set baudrate for Serial (USB-CDC).
+  Serial.begin( 115200 );
+
+  // Set ESP Serial TX/RX pins and baudrate.
+  ESP_SERIAL.setTX( ESP_SERIAL_TX_PIN );
+  ESP_SERIAL.setRX( ESP_SERIAL_RX_PIN );
+  ESP_SERIAL.begin( ESP_SERIAL_BAUD );
+
+  // Wait until the USB-CDC port is open on the PC side.  
+  while ( !Serial ); 
+  Serial.println( &quot;Arduino RP2040 - Serial Passthrough&quot; );
+  Serial.flush();
+
+#ifdef ESP_RESET_PIN
+  // Reset the ESP module.
+  pinMode( ESP_RESET_PIN, OUTPUT );
+  digitalWrite( ESP_RESET_PIN, LOW );
+  delay(10);
+  digitalWrite( ESP_RESET_PIN, HIGH );
+  delay(100);
+#endif
+
+  Serial.setTimeout( 200 );
+  ESP_SERIAL.setTimeout( 200 );
+  digitalWrite( LED_PIN, HIGH );
+}
+
+void loop() {
+  if ( Serial.available() ) {
+    size_t received = Serial.readBytes( buf, PACKET_SIZE );
+    if ( received &gt; 0 ) { 
+      // Send data received from PC Serial to ESP Serial.
+      ESP_SERIAL.write( buf, received );
+    }
+  }
+  if ( ESP_SERIAL.available() ) {
+    size_t received = ESP_SERIAL.readBytes( buf, PACKET_SIZE );
+    if ( received &gt; 0 ) 
+      // Send data received from ESP Serial to PC Serial.
+      Serial.write( buf, received );
+    }
+  }
+}
+</code></pre>
+<p>เมื่ออัปโหลด <strong>Arduino Sketch</strong> ไปยังบอร์ด <strong>Pico</strong> แล้วเปิด <strong>Serial Monitor</strong>
+ตั้งค่า <strong>Baudrate 115200</strong> แล้วส่งข้อความที่เป็นคำสั่ง เช่น <code>AT</code> ก็จะได้ข้อความตอบกลับเป็น <code>OK</code>
+หรือถ้าส่งคำสั่ง <code>AT+GMR</code> ก็จะได้ข้อความตอบกลับแสดงเวอร์ชันของเฟิร์มแวร์ที่ใช้กับโมดูล <strong>ESP01S</strong>
+ตามรูปตัวอย่างต่อไปนี้</p>
+<p><img alt="" src="rp2040_esp01s_passthrough.png" /></p>
+<p>รูป: ตัวอย่างการส่งคำสั่ง <strong>ESP-AT Command</strong> และรับข้อความตอบกลับจากโมดูล <strong>ESP01S</strong>
+ใน <strong>Arduino Serial Monitor</strong></p>
+<p>ลองส่งคำสั่ง <code>AT+UART?</code> เพื่อตรวจสอบการตั้งค่าสำหรับ <strong>UART</strong> ของโมดูล <strong>ESP01S</strong>
+หากถ้าต้องการตั้งค่า <strong>Baudrate</strong> จากเดิม <strong>115200</strong>  ไปใช้ค่าอื่น เช่น <strong>921600</strong>
+ก็ทำคำสั่งต่อไปนี้ (จบท้ายด้วย <strong>Newline</strong> หรือ <code>\n</code>)</p>
+<p><code>AT+UART_DEF=921600,8,1,0,0</code></p>
+<p>คำสั่งนี้จะเปลี่ยนค่า <strong>Baudrate</strong> เป็น <strong>921600</strong>  (ใช้ข้อมูลแบบ 8 บิต  มี 1 <strong>Stop Bit</strong> 
+ไม่มี <strong>Parity Bit</strong> และไม่มี <strong>Hardware Flow Control</strong> ใด ๆ) 
+และบันทึกค่าลงในหน่วยความจำภายในชิป และจะใช้ค่านี้เมื่อมีการรีเซตหรือจ่ายไฟเลี้ยงให้โมดูลครั้งถัดไป</p>
+<p>เมื่อสามารถเชื่อมต่อระหว่าง <strong>Pico</strong> กับ <strong>ESP01S</strong> ผ่านทาง <strong>Serial</strong> ได้แล้ว
+ถัดไปเป็นการทดลองใช้งานไลบรารี <code>WiFiEspAT</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp-m3-esp8285-pico">&#9655; <strong>การใช้งานโมดูล ESP-M3 (ESP8285) ร่วมกับบอร์ด Pico</strong><a class="headerlink" href="#esp-m3-esp8285-pico" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>ESP-M3</strong> ใช้ชิป <strong>ESP8285</strong> ที่ได้รวมหน่วยความจำแฟลชไว้ภายในแล้ว (มีขนาด <strong>1MB</strong>
+หรือ <strong>2MB</strong>) และสามารถใช้งานเฟิร์มแวร์ <strong>ESP-AT</strong> ได้เหมือนโมดูล <strong>ESP01S</strong> </p>
+<p>โมดูล <strong>ESP-M3</strong> มีความแตกต่างจาก <strong>ESP01S</strong> เช่น ผู้ใช้สามารถบัดกรีขา <strong>Pin Header</strong>
+แบบแถวเดียว ซึ่งมีระยะห่างขาเท่ากับ <strong>2.54mm</strong> และมีขา <strong>GPIO</strong> มากกว่า (แม้ว่าจะมีอยู่ค่อนข้างน้อยเช่นกัน)</p>
+<p><img alt="" src="esp-m3_pinout.png" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขาของโมดูล <strong>ESP-M3</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wifiespat">&#9655; <strong>การใช้งานไลบรารี WiFiEspAT</strong><a class="headerlink" href="#wifiespat" title="Permanent link">#</a></h2>
+<p>ในการใช้งานโมดูล <strong>ESP01 / ESP01S</strong> และสื่อสารโดยใช้ชุดคำสั่ง <strong>ESP-AT Command Set</strong>
+มีไลบรารีชื่อ <a href="https://github.com/JAndrassy/WiFiEspAT/"><strong>WiFiEspAT</strong></a>
+ให้นำมาลองใช้งานได้สำหรับการเขียนโค้ดด้วย <strong>Arduino Sketch</strong> 
+(ดูตัวอย่างโค้ดตัวอย่างการใช้งานไลบรารี <a href="https://github.com/jandrassy/WiFiEspAT/blob/master/examples/"><strong>WiFiEspAT - Examples</strong></a>) </p>
+<p>ไปที่เมนู <strong>Tools-&gt;Manage Libraries..</strong> ในหน้าต่าง <strong>Pop Up</strong> ให้ค้นหาชื่อ <code>WiFiEspAT</code>
+แล้วเลือกติดตั้งเวอร์ชันล่าสุด</p>
+<p><img alt="" src="install_wifi-esp-at_lib.png" /></p>
+<p>รูป: การค้นหาและติดตั้งไลบรารีใน <strong>Arduino IDE</strong></p>
+<p><code>WiFiEspAT</code> รองรับการใช้งาน <strong>ESP-AT Firmware</strong> แบ่งเป็นสองเวอร์ชันคือ 
+<strong>v1.7.x</strong> และเวอร์ชันใหม่คือ <strong>2.2.x</strong> ดังนั้นจะต้องแก้ไขไฟล์ <code>src/util/EspAtDrvTypes.h</code>
+ก่อนใช้งานถ้าเป็นเวอร์ชันใหม่</p>
+<p><img alt="" src="esp-wifi-at_v2_change.png" /></p>
+<p>รูป: การตั้งค่าใช้งาน <strong>ESP-AT v2</strong> สำหรับไลบรารี <strong>WiFiEspAT</strong></p>
+<p>เนื่องจากโค้ดตัวอย่างมีการใช้ไลบรารี <a href="https://www.arduino.cc/reference/en/libraries/time/"><strong>Arduino Timelib</strong></a> 
+เพื่อเชื่อมต่อกับ <strong>NTP (Network Time Protocol) Server</strong> และจัดการเวลาของระบบ
+ดังนั้นจะต้องมีการติดตั้งไลบรารีให้กับ <strong>Arduino IDE</strong> ก่อนคอมไพล์โค้ดตัวอย่าง</p>
+<p><img alt="" src="install_arduino_timelib.png" /></p>
+<p>รูป: การติดตั้งไลบรารี <strong>TimeLib</strong></p>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างสาธิตการใข้งานโมดูล <strong>ESP01S</strong> เพื่อเชื่อมต่อกับ <strong>WiFi Access Point</strong>
+และอ่านข้อมูลวันเวลาปัจจุบันจาก <strong>NTP Server</strong></p>
+<pre><code class="language-cpp">// Import Arduino libraries:
+// - https://github.com/JAndrassy/WiFiEspAT/
+// - https://github.com/PaulStoffregen/Time
+#include &lt;WiFiEspAT.h&gt;
+#include &lt;TimeLib.h&gt; 
+
+// This file defines the WIFI_SSID and WIFI_PASS strings.
+#include &quot;arduino_secrets.h&quot;
+
+#define LED_PIN   LED_BUILTIN
+#define ESP_SERIAL         Serial1
+#define ESP_SERIAL_TX_PIN  (16)
+#define ESP_SERIAL_RX_PIN  (17)
+#define ESP_SERIAL_BAUD    (921600)
+#define NTP_SERVER  &quot;us.pool.ntp.org&quot;
+#define SERIAL_TIMEOUT_DEFAULT   (1000)
+
+bool is_wifi_serial_ready() {
+  bool ready_flag = false;
+  int timeout = 10;
+  String rdy = &quot;&quot;;
+  ESP_SERIAL.setTimeout( 100 );
+  while( timeout-- ) {
+    ESP_SERIAL.println( &quot;AT&quot; );
+    rdy = ESP_SERIAL.readStringUntil( '\n' );
+    if ( rdy.startsWith( &quot;OK&quot; ) ) {
+      ready_flag = true;
+      break;
+    }
+  }
+  ESP_SERIAL.setTimeout( SERIAL_TIMEOUT_DEFAULT );
+  return ready_flag;
+}
+
+void toggle_led( int delay_ms = 500 ) {
+  digitalWrite( LED_PIN, !digitalRead( LED_PIN ) );
+  delay( delay_ms );
+}
+
+bool connect_ntp( int8_t timezone ) {
+  int cnt = 20;
+  WiFi.sntp( NTP_SERVER );
+  Serial.println( &quot;Waiting for NTP&quot; );
+  while ( WiFi.getTime() &lt; SECS_YR_2000 &amp;&amp; cnt-- ) {
+    toggle_led( 1000 );
+    Serial.print( '.' );
+  }
+  Serial.println();
+  if (cnt &gt; 0) {
+    setTime( WiFi.getTime() + (SECS_PER_HOUR * timezone) );
+    return true;
+  }
+  return false;
+}
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  // Set baudrate and the TX / RX pins for ESP Serial.
+  ESP_SERIAL.setTX( ESP_SERIAL_TX_PIN ); 
+  ESP_SERIAL.setRX( ESP_SERIAL_RX_PIN );
+  ESP_SERIAL.begin( ESP_SERIAL_BAUD );
+  ESP_SERIAL.flush();
+
+  // Set baud rate for Serial.
+  Serial.begin( 115200 ); 
+  while (!Serial) ; // Wait until the USB-CDC port is open.
+
+  // Show the version of Arduino RP2040 Core.
+  Serial.printf( &quot;Arduino Pico Core v%s\n&quot;, ARDUINO_PICO_VERSION_STR );
+
+  // Check whether the ESP module is ready.
+  Serial.printf( &quot;ESP module: %s\n&quot;, 
+                 is_wifi_serial_ready() ? &quot;ready&quot; : &quot;timeout&quot; );
+
+  // Initialize WiFi and use ESP Serial for serial communication.
+  WiFi.init( ESP_SERIAL );
+  if ( WiFi.status() == WL_NO_MODULE ) {
+    Serial.println( &quot;Communication with ESP module failed!&quot; );
+    while (1) { toggle_led( 100 ); yield(); } 
+  }
+
+  // Get the firmware versionof the ESP module.
+  String s = WiFi.firmwareVersion();
+  Serial.printf( &quot;WiFiEspAT library version: %s\n&quot;, s.c_str() );
+
+  // Show the MAC address of the ESP module
+  byte mac[6];
+  WiFi.macAddress( mac );
+  Serial.printf( &quot;MAC: %02x:%02x:%02x:%02x:%02x:%02x\n&quot;,
+                  mac[0],mac[1],mac[2],mac[3],mac[4],mac[5] );
+
+  WiFi.disconnect();
+  // Try to connect to the WiFi AP
+  int status = WiFi.begin( WIFI_SSID, WIFI_PASS );
+  Serial.println( &quot;Waiting for connection to WiFi&quot; );
+  int cnt = 20;
+  while ( WiFi.status() != WL_CONNECTED &amp;&amp; --cnt ) {
+     toggle_led( 500 );
+     Serial.print('.');
+  }
+  if (  WiFi.status() == WL_CONNECTED ) {
+    // Show the local IP address.
+    IPAddress ip = WiFi.localIP();
+    Serial.println( ip );
+  }
+  // Try to connect the NTP server
+  if ( !connect_ntp( 7 /*UTC+7*/ ) ) {
+     Serial.println( &quot;NTP server connection failed!&quot; );    
+  } 
+}
+
+void loop() {
+  static char buf[32];
+  sprintf( buf, &quot;Now: %02d-%02d-%02d %02d:%02d:%02d&quot;, 
+           year(), month(), day(), hour(), minute(), second() );
+  Serial.println( buf );
+  delay(1000);
+}
+</code></pre>
+<p>เมื่อคอมไพล์โค้ดตัวอย่างและอัปโหลดไปยังบอร์ดทดลองแล้ว และโปรแกรมทำงานได้อย่างถูกต้อง
+จะได้รับข้อความเอาต์พุตตามรูปแบบต่อไปนี้</p>
+<p><img alt="" src="arduino_wifi_esp_at_ntp.png" /></p>
+<p>รูป: ข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong> ที่ไดัรับจากบอร์ด <strong>Pico</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mqtt">&#9655; <strong>การส่งข้อความด้วยโพรโทคอล MQTT</strong><a class="headerlink" href="#mqtt" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการใช้ไลบรารี <a href="https://github.com/knolleary/pubsubclient"><strong>PubSubClient</strong></a>
+เพื่อใช้งานโพรโทคอล <strong>MQTT v3.1.1</strong> 
+ในการส่งข้อความทุก ๆ  5 วินาที ไปยัง <strong>Public MQTT Broker</strong> เช่น <code>test.mosquitto.org</code> พอร์ตหมายเลข <code>1883</code>
+และใช้  <strong>QoS=0</strong> ในการส่งข้อความ </p>
+<pre><code class="language-cpp">// Import Arduino libraries:
+// - https://github.com/JAndrassy/WiFiEspAT/
+// - https://github.com/knolleary/pubsubclient
+#include &lt;WiFiEspAT.h&gt;
+#include &lt;WiFiClient.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+// This file defines the WIFI_SSID and WIFI_PASS strings.
+#include &quot;arduino_secrets.h&quot;
+
+#define LED_PIN   LED_BUILTIN
+
+//#define ESP_SERIAL_BAUD    (921600)
+//#define ESP_SERIAL         Serial1
+//#define ESP_SERIAL_TX_PIN  (16)
+//#define ESP_SERIAL_RX_PIN  (17)
+
+#define ESP_SERIAL         Serial2
+#define ESP_SERIAL_TX_PIN  (8)
+#define ESP_SERIAL_RX_PIN  (9)
+#define ESP_SERIAL_BAUD    (115200)
+#define ESP_RESET_PIN      (15)
+
+#define SERIAL_TIMEOUT_DEFAULT   (1000)
+
+#define MQTT_BROKER     &quot;test.mosquitto.org&quot;
+#define MQTT_PORT       1883
+#define MQTT_PUB_TOPIC  &quot;test/1234/msg&quot;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+bool is_wifi_serial_ready() {
+  bool ready_flag = false;
+  int timeout = 10;
+  String rdy = &quot;&quot;;
+  ESP_SERIAL.setTimeout( 100 );
+  while( timeout-- ) {
+    ESP_SERIAL.println( &quot;AT&quot; );
+    rdy = ESP_SERIAL.readStringUntil( '\n' );
+    if ( rdy.startsWith( &quot;OK&quot; ) ) {
+      ready_flag = true;
+      break;
+    }
+  }
+  ESP_SERIAL.setTimeout( SERIAL_TIMEOUT_DEFAULT );
+  return ready_flag;
+}
+
+void toggle_led( int delay_ms = 500 ) {
+  digitalWrite( LED_PIN, !digitalRead( LED_PIN ) );
+  delay( delay_ms );
+}
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  // Set baudrate and the TX / RX pins for ESP Serial.
+  ESP_SERIAL.setTX( ESP_SERIAL_TX_PIN ); 
+  ESP_SERIAL.setRX( ESP_SERIAL_RX_PIN );
+  ESP_SERIAL.begin( ESP_SERIAL_BAUD );
+  ESP_SERIAL.flush();
+
+  // Set baud rate for Serial.
+  Serial.begin( 115200 ); 
+  while (!Serial) ; // Wait until the USB-CDC port is open.
+
+#ifdef ESP_RESET_PIN
+  // Reset the ESP module.
+  pinMode( ESP_RESET_PIN, OUTPUT );
+  digitalWrite( ESP_RESET_PIN, LOW );
+  delay(10);
+  digitalWrite( ESP_RESET_PIN, HIGH );
+  delay(100);
+#endif
+
+  // Show the version of Arduino RP2040 Core.
+  Serial.printf( &quot;Arduino Pico Core v%s\n&quot;, ARDUINO_PICO_VERSION_STR );
+
+  // Check whether the ESP module is ready.
+  Serial.printf( &quot;ESP module: %s\n&quot;, 
+                 is_wifi_serial_ready() ? &quot;ready&quot; : &quot;timeout&quot; );
+
+  // Initialize WiFi and use ESP Serial for serial communication.
+  WiFi.init( ESP_SERIAL );
+  if ( WiFi.status() == WL_NO_MODULE ) {
+    Serial.println( &quot;Communication with ESP module failed!&quot; );
+    while (1) { toggle_led( 100 ); yield(); } 
+  }
+
+  // Get the firmware versionof the ESP module.
+  String s = WiFi.firmwareVersion();
+  Serial.printf( &quot;WiFiEspAT library version: %s\n&quot;, s.c_str() );
+
+  // Show the MAC address of the ESP module
+  byte mac[6];
+  WiFi.macAddress( mac );
+  Serial.printf( &quot;MAC: %02x:%02x:%02x:%02x:%02x:%02x\n&quot;,
+                  mac[0],mac[1],mac[2],mac[3],mac[4],mac[5] );
+
+  WiFi.disconnect();
+  // Try to connect to the WiFi AP
+  int status = WiFi.begin( WIFI_SSID, WIFI_PASS );
+  Serial.println( &quot;Waiting for connection to WiFi&quot; );
+  int cnt = 20;
+  while ( WiFi.status() != WL_CONNECTED &amp;&amp; --cnt ) {
+     toggle_led( 500 );
+     Serial.print('.');
+  }
+  if (  WiFi.status() == WL_CONNECTED ) {
+    // Show the local IP address.
+    IPAddress ip = WiFi.localIP();
+    Serial.println( ip );
+  }
+
+  WiFi.sleepMode( WIFI_NONE_SLEEP ); 
+  client.setServer( MQTT_BROKER, MQTT_PORT );
+}
+
+void loop() {
+  static uint32_t ts = 0; 
+  static uint32_t count = 0; 
+  if ( !client.connected() ) {
+    if ( client.connect( &quot;arduino_rp2040_client&quot; ) )  {
+      Serial.println( &quot;Mosquitto broker connected..&quot; );
+    } 
+    delay(1000);
+    return;
+  } 
+  client.loop();
+  if ( millis() - ts &gt;= 5000 ) { // every 5 seconds
+    char message[64];
+    ts = millis();
+    sprintf( message, &quot;{count: %d}&quot;, ++count );
+    int result = client.publish( MQTT_PUB_TOPIC, message );
+    Serial.printf( &quot;published: '%s' (%s)\n&quot;, 
+                   message, result ? &quot;ok&quot; : &quot;failed&quot; );
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_mqtt_pub_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong> แสดงสถานะการทำงานของโค้ดตัวอย่าง</p>
+<p><img alt="" src="mosquitto_sub_output.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>mosquitto_sub</code> ใน <strong>Ubuntu (WSL2)</strong> เพื่อสมัครรับข้อความจาก
+<strong>MQTT Broker</strong> ภายใต้หัวข้อ (<strong>MQTT Topic</strong>) ที่กำหนดไว้ ในขณะที่บอร์ด <strong>Pico</strong>
+กำลังส่งข้อความไปยัง <strong>MQTT Broker</strong></p>
+<p><img alt="" src="rp2040_esp-m3_breadboard-1.jpg" /></p>
+<p>รูป:  การใช้งานบอร์ด <strong>Raspberry Pi Pico</strong> (เลือกใช้ขา <strong>UART2 TX / RX</strong> ของ <strong>RP2040</strong>)
+ร่วมกับโมดูล <strong>ESP-M3</strong> (ใช้ค่า <strong>Baudrate 115200</strong>) และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> จากบอร์ด <strong>Pico</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้งานบอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico - RP2040</strong>
+ร่วมกับโมดูล <strong>ESP01S</strong> ที่ใช้ชิป <strong>ESP8285</strong> ทำหน้าที่เป็นโมดูล <strong>WiFi-to-Serial</strong>
+และเขียนโปรแกรมทดลองการใช้งานด้วย <strong>Arduino RP2040 Core</strong> ร่วมกับไลบรารี <strong>WiFiEspAT</strong>
+มีการสาธิตการเชื่อมต่อกับ <strong>NTP Server</strong> และส่งข้อความไปยัง <strong>MQTT Broker</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-10-09 | Last Updated: 2022-10-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
