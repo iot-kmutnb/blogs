@@ -264,8 +264,12 @@ compile time:May 20 2016 15:08:19
 <h2 id="lilygo-t-01c3">&#9655; โมดูล <strong>LILYGO T-01C3</strong><a class="headerlink" href="#lilygo-t-01c3" title="Permanent link">#</a></h2>
 <p>ตัวอย่างของโมดูลที่มีลักษณะเหมือน <strong>ESP01 / ESP01S</strong>
 ซึ่งมีตำแหน่งขาและฟังก์ชันเหมือนกัน แต่ใช้ชิป <strong>ESP32-C3 (QFN32 package)</strong> 
-(มีทั้ง <strong>WiFi</strong> และ <strong>BLE 5.0</strong>) และมีหน่วยความจำแฟลชภายนอก <strong>4MB</strong> 
-ได้แก่ โมดูล <a href="https://github.com/Xinyuan-LilyGO/T-01C3"><strong>LILYGO T-01C3</strong></a>  สามารถเลือกใช้สายอากาศสองแบบ คือ <strong>PCB Antenna (default)</strong> และ <strong>External Antenna</strong> โดยต่อกับ <strong>IPEX connector</strong> (ผู้ใช้จะต้องแก้ไขด้วยการบัดกรีตัวต้านทาน  <strong>0R</strong> แบบ <strong>SMD</strong> เพื่อเปลี่ยนเส้นทางสัญญาณไปยังสายอากาศ) โมดูลนี้ยังมี <strong>Green LED (Active-High)</strong> ต่อกับขา <strong>GPIO3</strong> </p>
+(มีทั้ง <strong>WiFi</strong> และ <strong>BLE 5.0</strong>) และมีหน่วยความจำแฟลชภายนอก <strong>4MB W25Q32FVSS</strong> 
+ได้แก่ โมดูล <a href="https://github.com/Xinyuan-LilyGO/T-01C3"><strong>LILYGO T-01C3</strong></a>
+(<a href="https://github.com/Xinyuan-LilyGO/T-01C3/blob/main/ESP32-C3-Schematic.pdf"><strong>Schematic</strong></a>)
+สามารถเลือกใช้สายอากาศสองแบบ คือ <strong>PCB Antenna (default)</strong>
+และ <strong>External Antenna</strong> โดยต่อกับ <strong>IPEX connector</strong> (ผู้ใช้จะต้องแก้ไขด้วยการบัดกรีตัวต้านทาน  <strong>0R</strong> แบบ <strong>SMD</strong> เพื่อเปลี่ยนเส้นทางสัญญาณไปยังสายอากาศ) โมดูลนี้ยังมี <strong>Green LED (Active-High)</strong> ต่อกับขา <strong>GPIO3</strong> 
+โมดูลนี้ใช้ขา <strong>U0TXD=GPIO21 / U0RXD=GPIO20</strong> ในการเชื่อมต่อผ่าน <strong>UART</strong></p>
 <p><img alt="" src="lilygo_esp01-c3_modules.png" /></p>
 <p>รูป: โมดูล <strong>LILYGO T-01C3</strong> </p>
 <p>&nbsp;</p>
@@ -324,7 +328,7 @@ compile time:May 20 2016 15:08:19
 <p>&nbsp;</p>
 <hr />
 <h2 id="esp-at-firmware">&#9655; <strong>ESP-AT Firmware</strong><a class="headerlink" href="#esp-at-firmware" title="Permanent link">#</a></h2>
-<p>ในขณะที่เขียนบทความนี้ เวอร์ชันล่าสุดของ <strong>ESP-AT Firmware</strong> 
+<p>ในขณะที่เขียนบทความนี้ เวอร์ชันล่าสุดของ <a href="https://docs.espressif.com/projects/esp-at/en/latest/esp32/AT_Binary_Lists/ESP32_AT_binaries.html"><strong>ESP-AT Firmware</strong></a>
 คือ <strong>v2.4.0.0 (Release Date: May 20, 2022)</strong>
 เป็น <strong>Open Source</strong> และสามารถดาวน์โหลดได้จาก <strong>Github</strong> 
 (<a href="https://github.com/espressif/esp-at/">https://github.com/espressif/esp-at/</a>) </p>
@@ -424,16 +428,66 @@ AT version:2.2.0.0(b097cdf - ESP8266 - Jun 17 2021 12:57:45)
 SDK version:v3.4-22-g967752e2
 compile time(6800286):Aug  4 2021 17:20:05
 Bin version:2.2.0(Cytron_ESP-01S)
+
+OK
+</code></pre>
+<p>ไฟล์เฟิร์มแวร์อีกตัวเลือกหนึ่งเป็นไฟล์
+<a href="https://github.com/jandrassy/UnoWiFiDevEdSerial1/wiki/files/ESP8266-1MB-tx1rx3-AT_V2.2.zip"><strong>ESP8266-1MB-tx1rx3-AT_V2.2.zip</strong></a>
+ที่แชร์โดย <strong>J. Andrássy</strong> ซึ่งจะใช้ได้กับโมดูล <strong>ESP8266 (1MB Flash)</strong>
+ที่ใช้ขา <strong>GPIO1 / GPIO3</strong> สำหรับ <strong> TX / RX</strong> ตามลำดับ</p>
+<p>ตัวอย่างการทำคำสั่งมีดังนี้</p>
+<pre><code class="language-bash">$ unzip ESP8266-1MB-tx1rx3-AT_V2.2.zip
+$ cd ESP8266-1MB-tx1rx3-AT_V2.2/
+$ esptool.py --chip esp8266 --baud 460800 \
+  --before default_reset --after hard_reset \
+  write_flash -z --flash_mode dout --flash_freq 80m \
+  --flash_size 1MB \
+  0x8000 partition_table/partition-table.bin \
+  0x9000 ota_data_initial.bin \
+  0x0 bootloader/bootloader.bin \
+  0x20000 esp-at.bin \
+  0x18000 at_customize.bin \
+  0x1A000 customized_partitions/client_cert.bin \
+  0x1B000 customized_partitions/client_key.bin \
+  0x1C000 customized_partitions/client_ca.bin \
+  0x1D000 customized_partitions/mqtt_cert.bin \
+  0x1E000 customized_partitions/mqtt_key.bin \
+  0x1F000 customized_partitions/mqtt_ca.bin \
+  0x19000 customized_partitions/factory_param.bin
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต เมื่อส่งคำสั่ง <code>AT+GMR</code> หลังจากที่ได้ติดตั้งเฟิร์มแวร์แล้ว</p>
+<pre><code class="language-plain">AT+GMR
+AT version:2.2.0.0(s-b097cdf - ESP8266 - Jun 17 2021 12:58:29)
+SDK version:v3.4-22-g967752e2
+compile time(6800286):Jul 11 2021 11:09:32
+Bin version:2.2.0(ESP8266_1MB)
+
+OK
 </code></pre>
 <p>&nbsp;</p>
-<p>ในกรณีที่ใช้โมดูล <strong>ESP32-C3 (2MB)</strong> ไฟล์ <strong>ESP-AT Firmware</strong> สามารถดาวน์โหลดได้จากเว็บไซต์ของ <a href="https://www.waveshare.com/wiki/ESP-C3-32S-Kit#AT_Firmware"><strong>WaveShare Wiki - ESP-C3-32S-Kit</strong></a>:
+<p>ในกรณีที่ใช้โมดูล <strong>LILYGO T-01C3 (4MB Flash)</strong> ไฟล์ <strong>ESP-AT Firmware</strong>
+สามารถดาวน์โหลดได้จากเว็บไซต์ของ <a href="https://www.waveshare.com/wiki/ESP-C3-32S-Kit#AT_Firmware"><strong>WaveShare Wiki - ESP-C3-32S-Kit</strong></a>:
 (<a href="esp32-c3-at_firmware_2mb.zip"><strong>local copy</strong></a>)</p>
 <pre><code class="language-bash">$ esptool.py erase_flash
 $ esptool.py -c esp32c3 -b 460800 \
   --after hard_reset write_flash \
-  --flash_mode dio --flash_freq keep --flash_size 2MB \
-  0x0 ESP32-C3-AT_Firmware.bin
+  --flash_mode dio --flash_freq keep --flash_size detect \
+  0x0 factory_MINI-2M-v2.3.0.bin
 </code></pre>
+<p>เมื่อได้ติดตั้งเฟิร์มแวร์แล้ว ลองส่งคำสั่ง <code>AT+GMR</code> ไปยังโมดูล จะได้ข้อความเอาต์พุตในลักษณะต่อไปนี้</p>
+<pre><code class="language-plain">AT+GMR
+AT version:2.3.0.0(s-e98993f - ESP32C3 - Dec 23 2021 09:03:59)
+SDK version:v4.3.1-354-g98d34e5f6d
+compile time(f468678):Jan 18 2022 16:58:32
+Bin version:2.3.0(MINI-1)
+
+OK
+</code></pre>
+<p>&nbsp;</p>
+<p>ข้อสังเกต: เฟิร์มแวร์ <a href="https://docs.espressif.com/projects/esp-at/en/latest/esp32c3/AT_Binary_Lists/index.html"><strong>ESP32-C3-MINI-1</strong></a>
+ของ <strong>Espressif</strong> ใช้ขา <strong>TX=GPIO7, RX=GPIO6, CTS=GPIO5, RTS=GPIO4</strong> สำหรับการเชื่อมต่อกับไมโครคอนโทรลเลอร์ด้วย <strong>UART</strong>
+และใช้ขาต่อไปนี้สำหรับ <strong>Output Log</strong>: <strong>TX=GPIO1, RX=GPIO3</strong>
+แต่จะนำมาใช้กับโมดูล <strong>LILYGO T-01C3</strong> ไม่ได้ เนื่องจากการเลือกใช้ขาสำหรับ <strong>UART</strong> ไม่เหมือนกัน</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="ft232rl-breakout">&#9655; <strong>การใช้โมดูล FT232RL Breakout</strong><a class="headerlink" href="#ft232rl-breakout" title="Permanent link">#</a></h2>
@@ -527,7 +581,7 @@ $ esptool.py --baud 115200 --before usb_reset \
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-07-30 | Last Updated: 2022-10-08</p></div>
+<p>Created: 2022-07-30 | Last Updated: 2022-10-10</p></div>
             </div>
         </div>
 
