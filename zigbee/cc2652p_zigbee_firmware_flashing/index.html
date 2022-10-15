@@ -99,6 +99,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#segger-j-link-v9-jtag-programmer" class="nav-link">&#9655; การใช้งาน SEGGER J-Link V9 / JTAG Programmer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -151,6 +155,7 @@ $ git clone https://github.com/JelmerT/cc2538-bsl
 usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_XXXXX -&gt; ../../ttyUSB0
 </code></pre>
 <pre><code class="language-bash">$ sudo python3 ./cc2538-bsl/cc2538-bsl.py --bootloader-sonoff-usb
+
 sonoff
 Opening port /dev/ttyUSB0, baud 500000
 Connecting to target...
@@ -184,13 +189,54 @@ $ sudo udevadm trigger
 </code></pre>
 <p>&nbsp;</p>
 <hr />
+<h2 id="segger-j-link-v9-jtag-programmer">&#9655; <strong>การใช้งาน SEGGER J-Link V9 / JTAG Programmer</strong><a class="headerlink" href="#segger-j-link-v9-jtag-programmer" title="Permanent link">#</a></h2>
+<p>นอกเหนือจากการเข้าสู่โหมด <strong>Serial Bootloader</strong> เพื่ออัปโหลดเฟิร์มแวร์ใหม่ไปยังชิป <strong>CC2652P</strong>
+ผ่านทาง <strong>USB-to-Serial</strong> ยังมีวิธีการเชื่อมต่อแบบ <strong>JTAG</strong> อีกหนึ่งวิธี</p>
+<p>อุปกรณ์ <strong>CC2652P USB Dongle</strong> บางรุ่น (ตามรูปประกอบด้านล่าง) มีคอนเนกเตอร์สำหรับเชื่อมต่อแบบ <strong>JTAG</strong> ด้วยขา 4 ขาสัญญาณ ได้แก่
+<strong>TCK, TMS, TDI, TDO</strong> (แต่ถ้าเป็นแบบ <strong>cJTAG</strong> จะใช้ขาสัญญาณน้อยกว่า) </p>
+<p><img alt="" src="cc2652p_usb_dongle_jtag_connector.png" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ <strong>CC2652P USB Dongle</strong> ที่มีคอนเนกเตอร์แบบ <strong>2x5 Pins</strong> สำหรับ <strong>JTAG Programming / Debugging</strong></p>
+<p>อุปกรณ์ในรูปตัวอย่าง มีปุ่มกด 3 ปุ่ม ได้แก่ <strong>RESET</strong>, <strong>KEY1</strong>, <strong>KEY2</strong> และมีปุ่ม <strong>KEY1</strong> สำหรับการเข้าสู่โหมด
+<strong>Serial Bootloader</strong> ดังนั้นจึงสามารถใช้วิธี <strong>Serial Bootloader</strong> ในการอัปโหลดเฟิร์มแวร์ได้เช่นกัน
+ไม่จำเป็นต้องใช้วิธี <strong>JTAG</strong></p>
+<p>ถัดไปเป็นขั้นตอนในการลองใช้วิธี <strong>JTAG</strong> โดยเลือกใช้โปรแกรม
+<strong>OpenOCD</strong> ที่เป็น <strong>Open Source</strong> (ทดลองใช้เวอร์ชัน
+<strong>v0.11.0</strong>) สำหรับ <strong>Linux / Ubuntu</strong> </p>
+<pre><code class="language-bash"># install openocd
+$ sudo apt install openocd
+</code></pre>
+<p>อุปกรณ์อีกอย่างหนึ่งที่จะต้องนำมาใช้ร่วมกับโปรแกรม <strong>OpenOCD</strong> คือ <strong>SEGGER J-Link V9</strong> </p>
+<p><img alt="" src="jlink_pcb_adapter.png" /></p>
+<p>รูป: อุปกรณ์  <strong>SEGGER J-Link V9</strong> และอุปกรณ์เสริมสำหรับเชื่อมต่อสายสัญญาณ</p>
+<p><img alt="" src="segger_jlink_jtag_connector.png" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขาของคอนเนกเตอร์สำหรับอุปกรณ์ <strong>SEGGER J-Link V9</strong> </p>
+<p><img alt="" src="cc2652p_jlink_jtag_flashing.jpg" /></p>
+<p>รูป: การเชื่อมต่อระหว่างอุปกรณ์ <strong>SEGGER JLink V9</strong> และโมดูล <strong>CC2652P</strong> สำหรับ <strong>JTAG Programming</strong></p>
+<p>&nbsp;</p>
+<p>เมื่อเตรียมอุปกรณ์ฮาร์ดแวร์ทั้งสองอย่างพร้อมแล้ว และเชื่อมต่อสายสัญญาณ <strong>JTAG</strong> ได้ถูกต้องแล้ว
+ให้นำอุปกรณ์ทั้งสองไปเสียบที่พอร์ต <strong>USB</strong> ของเครื่องคอมพิวเตอร์ผู้ใช้ <strong>Linux / Ubuntu</strong></p>
+<p>ในการใช้คำสั่ง <code>openocd</code> เพื่อความสะดวกในการตั้งค่าใช้งาน ได้สร้างไฟล์ <code>custom.cfg</code> มีคำสั่งภายในดังนี้</p>
+<pre><code class="language-plain">source [find interface/jlink.cfg]
+transport select jtag
+adapter speed 2500
+source [find target/ti_cc26x2.cfg]
+</code></pre>
+<p>คำสั่งสำหรับการอัปโหลดไฟล์เฟิร์มแวร์ (.hex) ที่ได้เตรียมไว้แล้ว ไปยังอุปกรณ์ <strong>CC2652P USB Dongle</strong> โดยใช้ 
+<strong>SEGGER JLink V9</strong> มีดังนี้</p>
+<pre><code class="language-bash">$ FIRMWARE=./CC1352P2_CC2652P_launchpad_coordinator_20220219.hex
+$ openocd -f custom.cfg -c &quot;init; halt; program $FIRMWARE verify exit&quot;
+</code></pre>
+<p><img alt="" src="cc2652_jtag_openocd_flash.png" /></p>
+<p>รูป: สาธิตการทำคำสั่ง <code>openocd</code> เพื่ออัปโหลดเฟิร์มแวร์ไปยัง  <strong>CC2652P</strong></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอวิธีการและอุปกรณ์ในการติดตั้งเฟิร์มแวร์  <strong>Z-Stack ZigBee 3.0.x Coordinator</strong>
 สำหรับอุปกรณ์ <strong>CC2652P USB Dongle</strong> เพื่อนำมาใช้งานร่วมกับซอฟต์แวร์  <strong>Zigbee2MQTT</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-09-24 | Last Updated: 2022-09-27</p></div>
+<p>Created: 2022-09-24 | Last Updated: 2022-10-15</p></div>
             </div>
         </div>
 
