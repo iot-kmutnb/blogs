@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/sensors/hc-sr04/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูล HC-SR04 Ultrasonic Sensor - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#hc-sr04-ultrasonic-sensor" class="nav-link">การใช้งานโมดูล HC-SR04 Ultrasonic Sensor</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#hc-sr04" class="nav-link">&#9655; HC-SR04</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pulsein" class="nav-link">&#9655; การใช้คำสั่ง pulseIn() เพื่อวัดความกว้างพัลส์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การใช้อินเทอร์รัพท์เพื่อวัดความกว้างพัลส์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#freertos-isr" class="nav-link">&#9655; การใช้คำสั่ง FreeRTOS เพื่อสื่อสารระหว่าง ISR และทาสก์หลักของโปรแกรม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#freertos" class="nav-link">&#9655; การสร้างทาสก์ใน FreeRTOS เพื่ออ่านค่าจากโมดูลเซนเซอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c" class="nav-link">&#9655; การใช้งานโมดูลเซนเซอร์ในโหมด I2C</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="hc-sr04-ultrasonic-sensor">การใช้งานโมดูล HC-SR04 Ultrasonic Sensor<a class="headerlink" href="#hc-sr04-ultrasonic-sensor" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="hc-sr04">&#9655; <strong>HC-SR04</strong><a class="headerlink" href="#hc-sr04" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้งาน <strong>HC-SR04</strong> ซึ่งเป็นโมดูลเซนเซอร์อัลตราโซนิก 
+(<strong>Ultrasonic Sensor Module</strong>) </p>
+<p>โมดูล <strong>HC-SR04</strong> เมื่อมองดูจากด้านหน้า จะมีลักษณะเหมือนกัน แต่ให้สังเกตจากด้านหลัง 
+จะมองเห็นไอซีหรือวงจรอิเล็กทรอนิกส์ บางรุ่นจะใช้กับแรงดันไฟเลี้ยง <strong>5V</strong> เท่านั้น
+แต่โมดูลที่ได้นำมาทดลองใช้งาน สามารถใช้ได้กับแรงดันไฟเลี้ยง <strong>3V</strong> ถึง <strong>5V</strong> 
+ด้านหลังของโมดูลมีไอซี <strong>RCWL-9206 (Communication IC)</strong>, <strong>RCWL-9300A (MCU)</strong>
+และ <strong>LM324 (Quad Op-Amp)</strong> </p>
+<ul>
+<li>แรงดันไฟเลี้ยง (<strong>VCC</strong>): <strong>3.3V</strong> หรือ <strong>5V</strong> (ใช้กระแสไฟฟ้าประมาณ <strong>2.2mA @3.3V</strong>)</li>
+<li>ระยะทางที่วัดได้ (<strong>Measurement Range</strong>): เริ่มต้นตั้งแต่ <strong>2cm</strong> ถึงประมาณ <strong>450cm</strong></li>
+<li>ความละเอียดของค่าที่วัดได้ (<strong>Resolution</strong>): <strong>0.3cm</strong> </li>
+<li>โหมดการทำงาน: <strong>Pulse (Trigger/Echo)</strong></li>
+<li>คอนเนกเตอร์มี  4 ขา (2.54mm pin spacing)<ul>
+<li><strong>Pin1: VCC</strong></li>
+<li><strong>Pin2: Trigger/SCL/RX</strong></li>
+<li><strong>Pin3: Echo/SDA/TX</strong></li>
+<li><strong>Pin4: GND</strong></li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="hc_sr04_modules.png" /></p>
+<p>รูป: ตัวอย่างโมดูลเซนเซอร์ <strong>HC-SR04</strong> และการเปรียบเทียบด้านหลังของโมดูลเซนเซอร์ที่มีความแตกต่างกัน</p>
+<p>ด้านหลังของโมดูลมี <strong>Solder Pads</strong> สำหรับเอาไว้บัดกรีตัวต้านทาน <strong>10k&Omega;</strong> แบบ <strong>SMD (0603)</strong>
+ที่ตำแหน่ง <strong>R4</strong> หรือ <strong>R5</strong> เพื่อให้เลือกใช้งานโหมด<strong>I2C</strong> หรือ <strong>UART</strong> ตามลำดับ
+ในเบื้องต้นได้เลือกใช้งานโหมด <strong>GPIO</strong> (<em>default</em>) ที่ใช้ขาสัญญาณ
+<strong>Trigger</strong> และ <strong>Echo</strong></p>
+<p>การทำงานในโหมด <strong>GPIO</strong> หรือ <strong>Pulse</strong> จะต้องส่งสัญญาณพัลส์ไปยังขา <strong>Trigger</strong> ของโมดูลเซนเซอร์
+เพื่อเริ่มต้นการวัดระยะทาง ซึ่งจะมีการส่งคลื่นเสียงออกไป (ความถี่ประมาณ 40kHz)
+จากนั้นก็รอสัญญาณพัลส์ที่ขา <strong>Echo</strong> เป็นสัญญาณตอบกลับ และใช้ในการวัดความกว้างของสัญญาณดังกล่าว 
+ความกว้างของสัญญาณพัลส์ที่ขา <strong>Echo</strong> แปรผันตรงกับระยะเวลาในการเดินทางของคลื่นเสียง
+และสะท้อนกลับจากวัตถุกีดขวาง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pulsein">&#9655; <strong>การใช้คำสั่ง pulseIn() เพื่อวัดความกว้างพัลส์</strong><a class="headerlink" href="#pulsein" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการทดลองใช้งานโมดูลเซนเซอร์ และเลือกใช้  <strong>GP16</strong> และ <strong>GP17</strong> ของ <strong>ESP32</strong>
+เป็นขา <strong>Echo (Input)</strong> และ <strong>Trigger (Output)</strong> ตามลำดับ</p>
+<p>ตัวอย่างโค้ดสาธิตมีดังนี้</p>
+<pre><code class="language-cpp">#define SOUND_SPEED   (342)
+#define US_TO_CM(t)   ((SOUND_SPEED*t)/20000.0)
+#define TIMEOUT_USEC  (40000)
+#define ECHO_PIN      (16)
+#define TRIG_PIN      (17)
+
+void setup() {
+  pinMode( ECHO_PIN, INPUT );
+  pinMode( TRIG_PIN, OUTPUT );
+  Serial.begin( 115200 );
+  Serial.println( &quot;\n\n\nHC-SR04 Ultrasonic Sensor Demo&quot; );
+  Serial.flush();
+  digitalWrite( TRIG_PIN, LOW );
+  while ( digitalRead( ECHO_PIN) ) { delay(1); }
+}
+
+uint32_t read_sensor() {
+  digitalWrite( TRIG_PIN, HIGH );
+  delayMicroseconds( 10 );
+  digitalWrite( TRIG_PIN, LOW );
+  // Measure the HIGH pulse width (in usec) 
+  return pulseIn( ECHO_PIN, HIGH, TIMEOUT_USEC );
+}
+
+void loop() {
+  uint32_t t_usec = read_sensor();
+  Serial.print( &quot;distance(cm): &quot; );      
+  if ( t_usec == 0 ) { // no pulse detected
+    Serial.println( &quot;---&quot; );    
+  } else {   
+    Serial.printf( &quot;%.1f\n&quot;, US_TO_CM(t_usec) );
+  }
+  delay(100);
+}
+</code></pre>
+<p>ในโค้ดตัวอย่าง เมื่อได้สร้างสัญญาณเอาต์พุตที่ขา <strong>Trigger</strong> เป็นพัลส์ความกว้างอย่างน้อย 10 ไมโครวินาทีแล้ว
+ขั้นตอนถัดไปคือ การวัดความกว้างของพัลส์ที่เกิดกับสัญญาณ <strong>Echo</strong> โดยใช้ฟังก์ชัน
+<code>pulseIn()</code> ซึ่งเป็นคำสั่งของ <strong>Arduino API</strong>
+โดยจะต้องระบุหมายเลขขา <strong>Echo</strong> สำหรับสัญญาณพัลส์ช่วงที่เป็น <strong>HIGH</strong>
+และมีการกำหนดระยะเวลาในการรอเพื่อวัดความกว้างของพัลส์ที่เกิดขึ้น (<strong>Pulse Width Measurement</strong>)
+และกำหนดค่าสำหรับการรอ (<strong>"Waiting Timeout"</strong>) เช่น ไม่เกิน <strong>40000</strong> (ไมโครวินาที)</p>
+<p>ความกว้างของสัญญาณพัลส์ คือ ระยะเวลาในการเดินทางไปและกลับของคลื่นเสียงอัตราโซนิกเมื่อสะท้อนกลับจากวัตถุกีดขวางด้านหน้า 
+ถ้ากำหนดให้ความเร็วเสียงในอากาศ (<script type="math/tex">v_{Sound}</script>) เช่น 342 เมตร/วินาที โดยประมาณ (ขึ้นอยู่กับปัจจัย เช่น
+อุณหภูมิและความชื้นสัมพัทธ์ของอากาศด้วย) จะสามารถเขียนสูตรคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  distance\,[cm] = \frac{v_{Sound}\,[m/s] \times 10^2 \times t\,[usec] \times 10^{-6}}{2}
+</script>
+หรือเขียนใหม่ได้เป็น
+<script type="math/tex; mode=display">
+  distance\,[cm] = \frac{v_{Sound}\,[m/s] \times t\,[usec] }{20000}
+</script>
+</p>
+<p><img alt="" src="esp32_hc_sr04_demo.jpg" /></p>
+<p>รูป: อุปกรณ์ที่ได้นำมาทดลอง (บอร์ดไมโครคอนโทรลเลอร์ <strong>WeMos Lolin32 Lite</strong> และโมดูล <strong>HC-SR04</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การใช้อินเทอร์รัพท์เพื่อวัดความกว้างพัลส์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การใช้คำสั่ง <code>pulseIn()</code> ของ <strong>Arduino API</strong> เป็นการทำคำสั่งซ้ำ
+เพื่อคอยตรวจสอบดูสถานะลอจิกที่ขาสัญญาณ <strong>Echo</strong> 
+และดูว่า มีการเปลี่ยนแปลงขอบขาขึ้น (<strong>Rising Edge</strong>) และขอบขาลง (<strong>Falling Edge</strong>)
+หรือไม่ และเมื่อเกิดเหตุการณ์ทั้งสองกรณี ก็จะมีการบันทึกเวลา หรือ <strong>Timestamps</strong> แล้วนำมาลบกัน
+เพื่อให้ได้ความกว้างของพัลส์ (<strong>Pulse Width</strong>)</p>
+<p>โค้ดตัวอย่างนี้สาธิตการเปิดใช้งานอินเทอร์รัพท์ของไมโครคอนโทรลเลอร์ โดยใช้คำสั่งของ <strong>Arduino API</strong>
+เช่น <code>attachInterrupt()</code> และมีการสร้างฟังก์ชัน <code>echo_isr()</code> เพื่อทำหน้าที่เป็น
+<strong>Interrupt Service Routine (ISR)</strong> 
+ซึ่งจะถูกเรียกให้ทำงานเมื่อเกิดเหตุการณ์ขอบขาขึ้นหรือขาลงที่ขา <strong>Echo</strong> </p>
+<p>เมื่อฟังก์ชัน <code>echo_isr()</code> ทำงาน ก็จะอ่านค่าเวลาของระบบ หน่วยเป็นไมโครวินาที แล้วบันทึกลงในอาร์เรย์ชื่อ
+<code>timestamps</code> ในตำแหน่ง <code>0</code> ถ้าเกิดเหตุการณ์ขอบขาขึ้น และในตำแหน่ง <code>1</code> ถ้าเกิดขอบขาลง</p>
+<p>เมื่อต้องการวัดระยะทาง ก็ให้สร้างสัญญาณพัลส์ที่ขา <strong>Trigger</strong> แล้วเปิดใช้งานอินเทอร์รัพท์
+และรอเวลาประมาณ 50 มิลลิวินาที หากมีเหตุการณ์ขอบขาขึ้นและขาลงเกิดขึ้นตามลำดับที่ขา <strong>Echo</strong>
+ก็ให้อ่านค่าเวลาที่ได้บันทึกไว้ในอาร์เรย์ที่ตำแหน่ง <code>timestamps[1]</code> และ
+<code>timestamps[0]</code> แล้วนำค่ามาลบกัน จึงจะได้ความกว้างของพัลส์ที่เกิดขึ้น</p>
+<pre><code class="language-cpp">#define SOUND_SPEED   (342)
+#define US_TO_CM(t)   ((SOUND_SPEED*t)/20000.0)
+#define ECHO_PIN      (16)
+#define TRIG_PIN      (17)
+
+void setup() {
+  pinMode( ECHO_PIN, INPUT );
+  pinMode( TRIG_PIN, OUTPUT );
+  Serial.begin( 115200 );
+  Serial.println( &quot;\n\n\nHC-SR04 Ultrasonic Sensor Demo&quot; );
+  Serial.flush();
+  digitalWrite( TRIG_PIN, LOW );
+  delay(20);
+  while ( digitalRead( ECHO_PIN) ) { delay(1); }
+}
+
+volatile uint32_t timestamps[2] = {0,0};
+
+IRAM_ATTR void echo_isr() { // ISR code executed from SRAM
+  uint32_t t_now = micros(); // Get the current time (usec)
+  if ( digitalRead( ECHO_PIN ) ) { // rising-edge event
+     timestamps[0] = t_now; // Save the timestamp. 
+  } else { // falling-edge event
+     timestamps[1] = t_now; // Save the timestamp.
+  }
+}
+
+uint32_t read_sensor() {
+  // Clear timestamps for rising-edge and falling-edge events.
+  timestamps[0] = timestamps[1] = 0;
+  // Enable GPIO interrrupt on the Echo pin. 
+  attachInterrupt( ECHO_PIN, echo_isr, CHANGE ); 
+  // Create a short pulse on the Trigger pin.
+  digitalWrite( TRIG_PIN, HIGH );
+  delayMicroseconds( 10 );
+  digitalWrite( TRIG_PIN, LOW );
+  // Wait for 50 msec.
+  delay(50);
+  // Disable the interrupt on the Echo pin.
+  detachInterrupt( ECHO_PIN ); 
+  // Check the timestamps for valid pulse width
+  if ( timestamps[0] &lt; timestamps[1] ) {
+     return (timestamps[1] - timestamps[0]);
+  }
+  return 0; // no pulse
+}
+
+void loop() {
+  uint32_t t_usec = read_sensor();
+  Serial.print( &quot;distance(cm): &quot; );      
+  if ( t_usec == 0 ) { // no pulse detected
+    Serial.println( &quot;---&quot; );    
+  } else {   
+    Serial.printf( &quot;%.1f\n&quot;, US_TO_CM(t_usec) );
+  }
+  delay(100);
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="freertos-isr">&#9655; <strong>การใช้คำสั่ง FreeRTOS เพื่อสื่อสารระหว่าง ISR และทาสก์หลักของโปรแกรม</strong><a class="headerlink" href="#freertos-isr" title="Permanent link">#</a></h2>
+<p><strong>Arduino-ESP32</strong> ใช้ระบบปฏิบัติการเวลาจริง <strong>FreeRTOS</strong> เป็นพื้นฐานในการทำงาน
+มีการจัดการในรูปแบบของทาสก์ (<strong>Task</strong>) และการทำงานของคำสั่งต่าง ๆ ในฟังก์ชัน <code>setup()</code>
+และ <code>loop()</code> เป็นหน้าที่ของทาสก์หลัก (<strong>Main Task</strong>)</p>
+<p>โค้ดต่อไปนี้สาธิตการใช้คำสั่งของ <strong>FreeRTOS</strong> เพื่อสื่อสารกันระหว่างการทำงานของฟังก์ชัน 
+<code>echo_isr()</code> และทาสก์หลักของโปรแกรม  เช่น <code>vTaskNotifyGiveFromISR()</code>
+และ <code>ulTaskNotifyTake()</code></p>
+<p>การทำคำสั่ง <code>ulTaskNotifyTake()</code> โดยทาสก์หลัก
+เป็นการรอให้มีการแจ้งเหตุการณ์ (<strong>Event Notification</strong>)
+จาก <strong>ISR</strong> แต่มีการกำหนดระยะเวลารอไว้ด้วย (<strong>Timeout</strong>)
+เช่น <strong>50 Ticks</strong> ซึ่งจะเท่ากับ 50 มิลลิวินาที
+(โดยทั่วไปแล้ว <strong>1 Tick</strong> ถูกกำหนดไว้ให้เท่ากับ 1 มิลลิวินาที สำหรับ <strong>FreeRTOS</strong> 
+ที่นำมาใช้งานกับ <strong>Arduino-ESP32</strong>)</p>
+<pre><code class="language-cpp">#define SOUND_SPEED   (342)
+#define US_TO_CM(t)   ((SOUND_SPEED*t)/20000.0)
+#define ECHO_PIN      (16)
+#define TRIG_PIN      (17)
+
+volatile uint32_t timestamps[2] = {0,0};
+
+TaskHandle_t mainTask = NULL;
+
+void setup() {
+  pinMode( ECHO_PIN, INPUT );
+  pinMode( TRIG_PIN, OUTPUT );
+  Serial.begin( 115200 );
+  Serial.println( &quot;\n\n\nHC-SR04 Ultrasonic Sensor Demo&quot; );
+  Serial.flush();
+  digitalWrite( TRIG_PIN, LOW );
+  delay(20);
+  while ( digitalRead( ECHO_PIN) ) { delay(1); }
+  // Get the main task handle.
+  mainTask = xTaskGetCurrentTaskHandle(); 
+}
+
+IRAM_ATTR void echo_isr() { // ISR code executed from SRAM
+  uint32_t t_now = micros();
+  if ( digitalRead( ECHO_PIN ) ) { // rising-edge event
+     timestamps[0] = t_now; 
+  } else { // falling-edge event
+     timestamps[1] = t_now; 
+     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+     // Notify the main task.
+     vTaskNotifyGiveFromISR( mainTask, &amp;xHigherPriorityTaskWoken );
+     if (xHigherPriorityTaskWoken) {
+        portYIELD_FROM_ISR();
+     }
+  }
+}
+
+uint32_t read_sensor() {
+  timestamps[0] = timestamps[1] = 0;
+  attachInterrupt( ECHO_PIN, echo_isr, CHANGE ); 
+  digitalWrite( TRIG_PIN, HIGH );
+  delayMicroseconds( 10 );
+  digitalWrite( TRIG_PIN, LOW );
+
+  // Wait for the notification from ISR (with timeout).
+  if ( ulTaskNotifyTake( pdTRUE, 50 /* Timeout (ticks) */ ) ) {
+     detachInterrupt( ECHO_PIN ); 
+     if ( timestamps[0] &lt; timestamps[1] ) {
+       return (timestamps[1] - timestamps[0]);
+     }
+  } else {
+     detachInterrupt( ECHO_PIN ); 
+  }
+  return 0; // no pulse
+}
+
+void loop() {
+  uint32_t t_usec = read_sensor();
+  Serial.print( &quot;distance(cm): &quot; );      
+  if ( t_usec == 0 ) { // no pulse detected
+    Serial.println( &quot;---&quot; );    
+  } else {   
+    Serial.printf( &quot;%.1f\n&quot;, US_TO_CM(t_usec) );
+  }
+  delay(100);
+}
+</code></pre>
+<p><img alt="" src="arduino_esp32_hc_sr04_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="freertos">&#9655; <strong>การสร้างทาสก์ใน FreeRTOS เพื่ออ่านค่าจากโมดูลเซนเซอร์</strong><a class="headerlink" href="#freertos" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไป สาธิตการใช้คำสั่งของ <strong>FreeRTOS</strong> เพื่อสร้างทาสก์ใหม่สำหรับการอ่านค่าจากโมดูลเซนเซอร์
+ในขณะที่ทาสก์หลักมีหน้าที่แค่ทำให้ <strong>LED</strong> กระพริบได้ด้วยอัตราคงที่ หลังจากที่ได้สร้างทาสก์สำหรับอ่านค่าเซนเซอร์แล้ว</p>
+<p><strong>ESP32</strong> มีซีพียูแบบ 2 แกน หรือ <strong>Dual CPU Cores</strong> (หมายเลข 0 กับ 1)
+โดยปรกติแล้ว ทาสก์หลักทำงานด้วย <strong>Core 1</strong>
+และในตัวอย่างนี้ ทาสก์สำหรับอ่านค่าเซนเซอร์ และโค้ดของฟังก์ชัน <strong>ISR</strong> จะทำงานบน <strong>Core 0</strong></p>
+<pre><code class="language-cpp">#define SOUND_SPEED   (342)
+#define US_TO_CM(t)   ((SOUND_SPEED*t)/20000.0)
+#define ECHO_PIN      (16)
+#define TRIG_PIN      (17)
+
+#ifndef LED_BUILTIN
+#define LED_BUILTIN   (22)
+#endif
+
+volatile uint32_t timestamps[2] = {0,0};
+
+TaskHandle_t task_handle = NULL;
+
+void sensor_task_func( void *parameter ) {
+  Serial.printf( &quot;Sensor task runs on Core %d.\n&quot;, xPortGetCoreID() );
+  delay(10);
+  for (;;) {
+    uint32_t t_usec = read_sensor();
+    Serial.print( &quot;distance(cm): &quot; );      
+    if ( t_usec == 0 ) { // no pulse detected
+      Serial.println( &quot;---&quot; );    
+    } else {   
+      Serial.printf( &quot;%.1f\n&quot;, US_TO_CM(t_usec) );
+    }
+    delay(100);
+  }
+}
+
+void setup() {
+  pinMode( LED_BUILTIN, OUTPUT );
+  pinMode( ECHO_PIN, INPUT );
+  pinMode( TRIG_PIN, OUTPUT );
+  Serial.begin( 115200 );
+  Serial.println( &quot;\n\n\nHC-SR04 Ultrasonic Sensor Demo&quot; );
+  Serial.flush();
+
+  digitalWrite( TRIG_PIN, LOW );
+  delay(20);
+  while ( digitalRead( ECHO_PIN) ) { delay(1); }
+
+  Serial.printf( &quot;Main task runs on Core %d.\n&quot;, xPortGetCoreID() );
+
+  // Create a new task that runs on Core 0.
+  xTaskCreatePinnedToCore( 
+      sensor_task_func,
+      &quot;Sensor Task&quot;, 
+      10000 /* task stack size */,
+      NULL,
+      1 /* task priority */, 
+      &amp;task_handle,  
+      0 /* Core 0 */ );
+}
+
+IRAM_ATTR void echo_isr() { // ISR code executed from SRAM
+  uint32_t t_now = micros();
+  core_id = xPortGetCoreID();
+  if ( digitalRead( ECHO_PIN ) ) { // rising-edge event
+     timestamps[0] = t_now; 
+  } else { // falling-edge event
+     timestamps[1] = t_now; 
+     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+     // Notify the main task.
+     vTaskNotifyGiveFromISR( task_handle, &amp;xHigherPriorityTaskWoken );
+     if (xHigherPriorityTaskWoken) {
+        portYIELD_FROM_ISR();
+     }
+  }
+}
+
+uint32_t read_sensor() {
+  timestamps[0] = timestamps[1] = 0;
+  attachInterrupt( ECHO_PIN, echo_isr, CHANGE ); 
+  digitalWrite( TRIG_PIN, HIGH );
+  delayMicroseconds( 10 );
+  digitalWrite( TRIG_PIN, LOW );
+
+  // Wait for the notification from ISR (with timeout).
+  if ( ulTaskNotifyTake( pdTRUE, 50 /* Timeout (ticks) */ ) ) {
+     detachInterrupt( ECHO_PIN ); 
+     if ( timestamps[0] &lt; timestamps[1] ) {
+       return (timestamps[1] - timestamps[0]);
+     }
+  } else {
+     detachInterrupt( ECHO_PIN ); 
+  }
+  return 0; // no pulse
+}
+
+void loop() {
+  // Main task toggles the LED state.
+  digitalWrite( LED_BUILTIN, !digitalRead(LED_BUILTIN) );
+  delay(100);
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c">&#9655; <strong>การใช้งานโมดูลเซนเซอร์ในโหมด I2C</strong><a class="headerlink" href="#i2c" title="Permanent link">#</a></h2>
+<p>หากต้องการลองใช้งานโมดูล <strong>HC-SR04</strong> ในโหมด <strong>I2C</strong> ซึ่งจะทำงานเป็นอุปกรณ์
+<strong>I2C Slave</strong> และมีแอดเดรสเท่ากับ <code>0x57</code> ไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+จะทำหน้าที่เป็นอุปกรณ์ <strong>I2C Master</strong> ในการเชื่อมต่อด้วยบัส <strong>I2C</strong>
+และใช้สัญญาณ <strong>SDA (Data)</strong> และ <strong>SCL (Clock)</strong> 
+ในการทดลองใช้งานจริง จะต้องมีการบัดกรีตัวต้านทาน <strong>10k</strong> โอห์ม ที่ตำแหน่ง <strong>R4</strong> บนแผงวงจรด้านหลังของโมดูล</p>
+<p>ตัวอย่างการเขียนโค้ดมีดังนี้ โดยมีการสร้างและใช้ฟังก์ชัน <code>i2c_scan()</code> เพื่อตรวจสอบดูว่า มีอุปกรณ์เชื่อมต่อกับบัส
+<strong>I2C</strong> อยู่หรือไม่ จากนั้นจะใช้ฟังก์ชัน <code>read_sensor()</code> ที่ถูกสร้างขึ้นมาสำหรับอ่านค่าระยะทางจากเซนเซอร์
+และได้ค่าเป็นเลขจำนวนเต็มบวก (หน่วยเป็นมิลลิเมตร)</p>
+<pre><code class="language-cpp">#include &lt;Wire.h&gt;
+
+#define I2C_SDA_PIN (16)
+#define I2C_SCL_PIN (17)
+
+#define I2C_ADDR  (0x57) // default 7-bit address of the module
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.println( &quot;\n\n\nESP32 + HC-SR04 (I2C Mode)&quot; );
+
+  Wire.setClock( 100000 ); // Set I2C speed to 100kHz
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+  delay(200);
+  i2c_scan();
+}
+
+void i2c_scan() {
+  int n_devices = 0;
+  Serial.println( &quot;Scanning I2C bus...&quot; );
+  Serial.print( &quot;   &quot; );
+  for ( uint8_t col=0; col &lt; 16; col++ ) {
+    Serial.printf( &quot;%3x&quot;, col );
+  }
+  Serial.println( &quot;&quot; );
+
+  uint8_t addr=0;
+  for( uint8_t row=0; row &lt; 8; row++ ) {
+    Serial.printf( &quot;%02x:&quot;, row &lt;&lt; 4 );
+    for ( uint8_t col=0; col &lt; 16; col++ ) {
+      if ( row == 0 &amp;&amp; addr&lt;=1 ) {
+        Serial.print(&quot;   &quot;);
+      } else {
+        Wire.beginTransmission( addr );
+        if ( Wire.endTransmission()&gt;0 ) {
+          Serial.printf( &quot; --&quot; );
+        } else {
+          Serial.printf( &quot; %2x&quot;, addr );
+          n_devices++;
+        }
+      }
+      addr++;
+    }
+    Serial.println( &quot;&quot; );
+  }
+  Serial.println( &quot;---------------------\n\n&quot; );
+  Serial.flush();
+}
+
+uint32_t read_sensor() {
+  Wire.beginTransmission( I2C_ADDR );
+  Wire.write( 0x01 );   // send Start meansurement command
+  Wire.endTransmission();
+  delay(100); // Wait approx. 100msec. 
+  Wire.requestFrom( I2C_ADDR, 3 );  // read 3 bytes
+  uint32_t value = 0;
+  if ( Wire.available() == 3 ) {
+     value = (value &lt;&lt; 8) | Wire.read(); // the first byte
+     value = (value &lt;&lt; 8) | Wire.read(); // the second byte
+     value = (value &lt;&lt; 8) | Wire.read(); // the third byte
+     value /= 1000; // distance in mm.
+  } 
+  Wire.endTransmission();
+  return value; // error
+}
+
+void loop() {
+  uint32_t distance = read_sensor();  
+  if ( distance &gt; 0 ) {
+    Serial.printf( &quot;distance(cm): %3.1f\n&quot;, distance/10.0 );
+  }
+  else {
+    Serial.println( &quot;distance(cm): ---&quot;  );
+  }
+  delay(100);
+}
+</code></pre>
+<p><img alt="" src="esp32_hc_sr04_i2c_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต เมื่อทดลองใช้งานโมดูล <strong>HC-SR04</strong> ในโหมด <strong>I2C</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานโมดูลเซนเซอร์อัลตราโซนิก <strong>HC-SR04</strong> 
+และตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+เพื่ออ่านค่าจากโมดูลเซนเซอร์ และมีรูปแบบการเขียนโค้ดได้หลายวิธี</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li>การใช้งานโมดูล <a href="../gy-us042v2/"><strong>GY-US042v2 Ultrasonic Sensor</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-10-18 | Last Updated: 2022-10-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
