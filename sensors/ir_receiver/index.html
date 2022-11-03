@@ -8,7 +8,7 @@
         <meta name="author" content="RSP">
         <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/sensors/ir_receiver/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>การใช้งานโมดูลอินฟราเรดเป็นอุปกรณ์ควบคุมแบบไร้สาย - IoT Engineering Education</title>
+        <title>การใช้งานโมดูลรีโมตตัวส่งและตัวรับแสงอินฟราเรดเป็นอุปกรณ์ควบคุมแบบไร้สาย - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">การใช้งานโมดูลอินฟราเรดเป็นอุปกรณ์ควบคุมแบบไร้สาย</a>
+            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">การใช้งานโมดูลรีโมตตัวส่งและตัวรับแสงอินฟราเรดเป็นอุปกรณ์ควบคุมแบบไร้สาย</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; การสื่อสารข้อมูลด้วยแสงอินฟราเรด</a>
               <ul class="nav flex-column">
@@ -103,7 +103,15 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; กล่าวสรุป</a>
+            <li class="nav-item" data-level="2"><a href="#rmt-esp32" class="nav-link">&#9655; การใช้วงจร RMT ของ ESP32 สำหรับการรับสัญญาณจากรีโมตอินฟราเรด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; แนวทางและกิจกรรมเรียนรู้เพิ่มเติม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -114,7 +122,7 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="_1">การใช้งานโมดูลอินฟราเรดเป็นอุปกรณ์ควบคุมแบบไร้สาย<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<h1 id="_1">การใช้งานโมดูลรีโมตตัวส่งและตัวรับแสงอินฟราเรดเป็นอุปกรณ์ควบคุมแบบไร้สาย<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
 <hr />
 <h2 id="_2">&#9655; <strong>การสื่อสารข้อมูลด้วยแสงอินฟราเรด</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอการใช้งานอุปกรณ์ตัวรับและตัวส่งสัญญาณแสงอินฟราเรดและเขียนโปรแกรมด้วย <strong>Arduino</strong>
@@ -267,15 +275,11 @@
 ตามโพรโทคอลของ <strong>NEC</strong> และจะได้รหัสตัวเลข 32 บิต
 ฟังก์ชัน <code>ir_decode()</code> จะใช้สำหรับการตรวจสอบดูว่า ได้รับสัญญาณจากการกดปุ่มของอุปกรณ์รีโมตอินฟราเรดหรือไม่ 
 และฟังก์ชันนี้จะต้องถูกเรียกซ้ำไปเรื่อย ๆ</p>
-<pre><code class="language-cpp">#ifdef __AVR__
+<pre><code class="language-cpp">#if defined(__AVR__)
 #define IR_PIN    (2) // use Arduino D2 pin
-#endif
-
-#ifdef ESP32
+#else if defined(ESP32)
 #define IR_PIN    (18) // use GPIO-18 pin
 #endif
-
-#define DEBUG
 
 #define BUF_SIZE          (128)
 #define HEADER_MARK_MIN   (8000)
@@ -290,9 +294,16 @@
 #define INVALID_CODE      (0x00000000)
 #define REPEATED_CODE     (0xffffffff)
 
+#define DEBUG
+
+#define BUF_SIZE  (128)
+volatile uint32_t pulse_widths_count;
 volatile uint16_t pulse_widths[ BUF_SIZE ];
 volatile uint32_t ts_saved;
-volatile int32_t  ts_index;
+
+#if defined(ESP32)
+IRAM_ATTR void ir_recv_isr();
+#endif
 
 void setup() {
   Serial.begin( 115200 );
@@ -300,18 +311,27 @@ void setup() {
   pinMode( IR_PIN, INPUT );
 }
 
-#ifdef ESP32
-IRAM_ATTR void ir_recv_isr();
-#endif 
+void loop() {
+  uint32_t ir_code = ir_decode();
+  if ( ir_code != INVALID_CODE ) {
+    if ( ir_code == REPEATED_CODE ) {
+      Serial.println( &quot;Repeated Code&quot; );
+    } else {
+      Serial.print( &quot;Code: &quot; );
+      Serial.println( ir_code, HEX );
+    }
+  }
+  delay(5);
+}
 
-void ir_recv_isr() {
+void ir_recv_isr() { // ISR
   uint32_t ts_now = micros();
-  if ( ts_index &gt;= 0 ) {
-    pulse_widths[ ts_index ] = (ts_now - ts_saved);
+  if ( pulse_widths_count &gt; 0 ) {
+    pulse_widths[ pulse_widths_count-1 ] = (ts_now - ts_saved);
   }
   ts_saved = ts_now;
-  if ( ts_index &lt; BUF_SIZE ) {
-     ts_index++;
+  if ( pulse_widths_count &lt; BUF_SIZE ) {
+    pulse_widths_count++;
   }
 }
 
@@ -324,50 +344,53 @@ uint32_t ir_decode() {
 
   switch (state) {
     case S0:
-       ts_index = -1;
-       attachInterrupt( digitalPinToInterrupt(IR_PIN), ir_recv_isr, CHANGE );
-       state = S1;
-       break;
+      pulse_widths_count = 0;
+      // Enable the external interrupt on the IR pin.
+      attachInterrupt( digitalPinToInterrupt(IR_PIN), 
+                        ir_recv_isr, CHANGE );
+      state = S1;
+      break;
 
     case S1:
-       if ( ts_index &gt; 2 ) {
-          ts_start = millis();
-          state = S2;
-       }
-       break;
+      if ( pulse_widths_count &gt; 2 ) {
+        ts_start = millis();
+        state = S2;
+      }
+      break;
 
     case S2:
-       if ( millis() - ts_start &gt;= TIMEOUT_MS ) {
-          detachInterrupt( digitalPinToInterrupt(IR_PIN) );
-          uint32_t n = (ts_index-1);
-          volatile uint16_t *p = pulse_widths;          
-          if ( HEADER_MARK_MIN &lt; p[0] &amp;&amp; p[0] &lt; HEADER_MARK_MAX ) {
-             if ( HEADER_SPACE_MIN &lt; p[1] &amp;&amp; p[1] &lt; HEADER_SPACE_MAX ) {
-                // message header found
-                uint32_t code = 0;
-                for ( uint32_t i=2; i &lt; n; i+=2 ) {
+      if ( millis() - ts_start &gt;= TIMEOUT_MS ) {
+        // Disable the external interrupt on the IR pin.
+        detachInterrupt( digitalPinToInterrupt(IR_PIN) );
+        uint32_t n = pulse_widths_count-2;
+        volatile uint16_t *p = pulse_widths;
+        if ( HEADER_MARK_MIN &lt; p[0] &amp;&amp; p[0] &lt; HEADER_MARK_MAX ) {
+          if ( HEADER_SPACE_MIN &lt; p[1] &amp;&amp; p[1] &lt; HEADER_SPACE_MAX ) {
+            // message header found
+            uint32_t code = 0;
+            for ( uint32_t i=2; i &lt; n; i+=2 ) {
 #ifdef DEBUG                   
-                  Serial.print( p[i] );
-                  Serial.print( ' ' );
-                  Serial.println( p[i+1] );
+              Serial.print( p[i] );
+              Serial.print( ' ' );
+              Serial.println( p[i+1] );
 #endif
-                  if ( BIT_MARK_MIN &lt; p[i] &amp;&amp; p[i] &lt; BIT_MARK_MAX ) {
-                    code = (code &lt;&lt; 1) | (p[i+1] &gt; BIT_MARK_MAX);
-                  } else { // bit timing error
-                    code = INVALID_CODE;
-                    break;
-                  }
-                }
-                if ( code != INVALID_CODE ) {
-                  ret_code = code; 
-                }
-             }
-             else if ( REPEAT_SPACE_MIN &lt; p[1] &amp;&amp; p[1] &lt; REPEAT_SPACE_MAX ) {
-                // repeated code found
-                ret_code = REPEATED_CODE;
-             }
+              if ( BIT_MARK_MIN &lt; p[i] &amp;&amp; p[i] &lt; BIT_MARK_MAX ) {
+                code = (code &lt;&lt; 1) | (p[i+1] &gt; BIT_MARK_MAX);
+              } else { // bit timing error
+                code = INVALID_CODE;
+                break;
+              }
+            } // end-for
+            if ( code != INVALID_CODE ) {
+              ret_code = code; 
+            }
           }
-          state = S0;
+          else if ( REPEAT_SPACE_MIN &lt; p[1] &amp;&amp; p[1] &lt; REPEAT_SPACE_MAX ) {
+            // repeated code found
+            ret_code = REPEATED_CODE;
+          }
+        }
+        state = S0;
        }
        break;
 
@@ -376,51 +399,51 @@ uint32_t ir_decode() {
   }
   return ret_code;
 }
-
-void loop() {
-  uint32_t ir_code = ir_decode();
-  if ( ir_code != INVALID_CODE ) {
-     if ( ir_code == REPEATED_CODE ) {
-        Serial.println( &quot;Repeated Code&quot; );
-     } else {
-        Serial.print( &quot;Code: &quot; );
-        Serial.println( ir_code, HEX );
-     }
-  }
-  delay(5);
-}
 </code></pre>
 <p><img alt="" src="esp32_nano_demo.png" /></p>
 <p>รูป: การทดลองตัวรับและตัวส่งสัญญาณแสงอินฟราเรดร่วมกับบอร์ด <strong>ESP32</strong> และ <strong>Arduino Nano</strong></p>
 <p><img alt="" src="arduino_serial_output-1.png" /></p>
 <p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับใน <strong>Arduino Serial Monitor</strong></p>
 <p>&nbsp;</p>
+<p>นอกจากการทดลองโดยใช้อุปกรณ์ฮาร์ดแวร์จริงแล้ว การทดสอบและสาธิตการทำงานของโค้ด ยังสามารถทำได้โดยใช้วิธีการจำลองการทำงาน
+เช่น การใช้ <a href="https://wokwi.com/projects/"><strong>Wokwi Simulator</strong></a> บนหน้าเว็บเบราว์เซอร์</p>
+<p><img alt="" src="wokwi_esp32_ir_sim.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานด้วย <strong>WokWi Simulator</strong>
+โดยเลือกใข้บอร์ด <strong>ESP32 DevKit</strong> ร่วมกับโมดูลตัวส่ง <strong>IR Remote</strong> และโมดูลตัวรับ
+<strong>IR Receiver</strong></p>
+<p>&nbsp;</p>
 <p>ถัดไปเป็นตัวอย่างการเขียนโค้ดและใช้ไลบรารีที่มีชื่อว่า <a href="https://github.com/Arduino-IRremote/Arduino-IRremote"><strong>"IRRemote"</strong></a>
 โดยจะต้องมีการติดตั้งไลบรารี ก่อนใช้งาน โดยใช้ <strong>Arduino IDE - Library Manager</strong></p>
 <p><img alt="" src="irremote_lib.png" /></p>
 <p>รูป:  การติดตั้งไลบรารี <strong>"IRremote"</strong></p>
-<pre><code class="language-cpp">#ifndef DECODE_NEC
-#define DECODE_NEC 
-#endif
-
-#include &lt;IRremote.hpp&gt; 
+<pre><code class="language-cpp">#include &lt;IRremote.hpp&gt; 
 // see: https://github.com/Arduino-IRremote/Arduino-IRremote
 
-#ifdef __AVR__
+#if defined(__AVR__)
 #define IR_PIN    (2) // use Arduino D2 pin
-#endif
-
-#ifdef ESP32
+#else if defined(ESP32)
 #define IR_PIN    (18) // use GPIO-18 pin
 #endif
 
-#define REPEATED_CODE     (0)
-
-void setup() {
+void setup(){
   Serial.begin( 115200 );
-  Serial.println( F(&quot;Arduino Infrared Sender - Receiver&quot;) );
+  // Set IR receiver pin
   pinMode( IR_PIN, INPUT );
+  // Start IR receiver
   IrReceiver.begin( IR_PIN, false );
+}
+
+void loop(){
+  static char sbuf[32];
+  if ( IrReceiver.decode() ){
+    // IrReceiver.printIRResultMinimal( &amp;Serial );
+    uint32_t code = IrReceiver.decodedIRData.decodedRawData;
+    Serial.print( code, HEX );
+    Serial.print( &quot; &quot; );
+    Serial.println( reverse_bits(code), HEX );
+    IrReceiver.resume(); // Receive next code
+  }
+  delay(5);
 }
 
 uint32_t reverse_bits( uint32_t value ) {
@@ -430,36 +453,160 @@ uint32_t reverse_bits( uint32_t value ) {
   }
   return result;
 }
+</code></pre>
+<p><img alt="" src="wokwi_esp32_irremote_sim.png" /></p>
+<p>รูป: การจำลองการทำงานด้วย <strong>WokWi Simulator</strong> (ใช้บอร์ด <strong>ESP32</strong>)</p>
+<p><img alt="" src="wokwi_esp32_irremote_nano.png" /></p>
+<p>รูป: การจำลองการทำงานด้วย <strong>WokWi Simulator</strong> (ใช้บอร์ด <strong>Arduino Nano</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rmt-esp32">&#9655; <strong>การใช้วงจร RMT ของ ESP32 สำหรับการรับสัญญาณจากรีโมตอินฟราเรด</strong><a class="headerlink" href="#rmt-esp32" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ESP32</strong> มีวงจรภายในที่เรียกว่า 
+<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/rmt.html"><strong>RMT (Remote Control Transceiver)</strong></a>
+เหมาะสำหรับการส่งหรือรับชุดข้อมูลบิตด้วยแสงอินฟราเรด ตัวอย่างนี้สาธิตการใช้ฟังก์ชันที่ได้มีการประกาศไว้ในไฟล์ 
+<a href="https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-rmt.h"><code>esp32-hal-rmt.h</code></a>
+เช่น <code>rmtInit()</code>, <code>rmtSetTick()</code>, <code>rmtRead()</code> เป็นต้น
+เพื่อเปิดใช้งาน <strong>RMT Channel</strong> และอินเทอร์รัพท์ที่เกี่ยวข้องสำหรับการรับข้อมูลจากโมดูลอินฟราเรด</p>
+<p>วงจร <strong>RMT</strong> จะทำหน้าที่ตรวจสอบดูว่า มีสัญญาณพัลส์เข้ามาหรือไม่ และให้วัดความกว้างของพัลส์ช่วงที่เป็น 
+<strong>Low</strong> และ <strong>High</strong> ตามลำดับ แล้วบันทึกลงในโครงสร้างข้อมูล (<code>rmt_data_t</code>)</p>
+<pre><code class="language-cpp">#if !defined(ESP32)
+#error &quot;This Arduino sketch is targeted at ESP32.&quot;
+#endif
+
+#include &quot;esp32-hal-rmt.h&quot;
+// https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-rmt.h
+
+// Set the GPIO pin for IR receiver 
+#define IR_PIN            (GPIO_NUM_18)
+
+#define BUF_SIZE          (128)
+#define HEADER_MARK_MIN   (8000)
+#define TIMEOUT_MS        (70)
+#define HEADER_MARK_MAX   (HEADER_MARK_MIN+2000)  
+#define HEADER_SPACE_MIN  (4000)
+#define HEADER_SPACE_MAX  (HEADER_SPACE_MIN+1000)  
+#define REPEAT_SPACE_MIN  (2000)
+#define REPEAT_SPACE_MAX  (REPEAT_SPACE_MIN+1000)
+#define BIT_MARK_MIN      (500)
+#define BIT_MARK_MAX      (BIT_MARK_MIN+200)
+#define INVALID_CODE      (0x00000000)
+#define REPEATED_CODE     (0xffffffff)
+
+rmt_obj_t* rmt_recv = NULL;
+uint32_t rmt_tick;
+
+#define BUF_SIZE  (128)
+volatile uint32_t pulse_widths_count;
+volatile uint16_t pulse_widths[ BUF_SIZE ];
+
+IRAM_ATTR
+void rmt_recv_data_callback( uint32_t *rmt_data, size_t len, void *arg ) {
+  rmt_data_t* data = (rmt_data_t*)rmt_data;
+  pulse_widths_count = 2*len;
+  if ( 0 &lt; len &amp;&amp; pulse_widths_count &lt; BUF_SIZE ) {
+    for ( int i=0; i &lt; len; i++ ) {
+      pulse_widths[2*i]   = data[i].duration0; // low pulse width
+      pulse_widths[2*i+1] = data[i].duration1; // high pulse width
+     }
+  }
+  else { pulse_widths_count = 0; }
+}
+
+void setup() {
+  Serial.begin( 115200 );
+  delay( 1000 );
+  Serial.println( &quot;\n\nESP32 - RMT IR Receiver Demo...&quot; );
+  Serial.flush();
+
+  // Initialize the RMT channel to capture up to 192 items.
+  rmt_recv = rmtInit( IR_PIN, RMT_RX_MODE, RMT_MEM_192 );
+  if ( rmt_recv != NULL ) {
+    Serial.println( &quot;Initialized RMT Receiver...&quot; );
+  }
+  // Set RMT tick period (in usec): 1 usec.
+  rmt_tick = rmtSetTick(rmt_recv, 1000) / 1000;
+  Serial.printf( &quot;RMT tick = %lu usec\n&quot;, rmt_tick );
+  // Set RMT receive filter.
+  rmtSetFilter( rmt_recv, true, 255 );
+  // Set RMT receiver threshold.
+  rmtSetRxThreshold( rmt_recv, 10000 / rmt_tick );
+  // Set RMT receiver callback.
+  rmtRead( rmt_recv, rmt_recv_data_callback, NULL );
+}
 
 void loop() {
-  if ( IrReceiver.decode() ) { // decode NEC raw data
-     uint32_t code = IrReceiver.decodedIRData.decodedRawData;
-     if ( code == REPEATED_CODE ) {
-        Serial.println( F(&quot;Repeated Code&quot;) );
-     } else {
-        // NEC MSB-first data format
-        Serial.print( &quot;Code: &quot; );
-        Serial.println( reverse_bits(code), HEX );
-     }
-     IrReceiver.resume(); 
+  uint32_t ir_code = ir_decode();
+  if ( ir_code != INVALID_CODE ) {
+    if ( ir_code == REPEATED_CODE ) {
+      Serial.println( &quot;Repeated Code&quot; );
+    } else {
+      Serial.print( &quot;Code: &quot; );
+      Serial.println( ir_code, HEX );
+    }
   }
   delay(5);
 }
+
+uint32_t ir_decode() {
+  uint32_t ret_code = INVALID_CODE; 
+  int32_t n = pulse_widths_count-2; // 'n' must be an even number.
+  volatile uint16_t *p = pulse_widths;
+
+  if ( n &lt;= 0 ) return ret_code;
+  if ( HEADER_MARK_MIN &lt; p[0] &amp;&amp; p[0] &lt; HEADER_MARK_MAX ) {
+    if ( HEADER_SPACE_MIN &lt; p[1] &amp;&amp; p[1] &lt; HEADER_SPACE_MAX ) { 
+      // message header found
+      uint32_t code = 0;
+      for ( uint32_t i=2; i &lt; n; i+=2 ) {
+        if ( BIT_MARK_MIN &lt; p[i] &amp;&amp; p[i] &lt; BIT_MARK_MAX ) {
+          code = (code &lt;&lt; 1) | (p[i+1] &gt; BIT_MARK_MAX);
+        } else { // bit timing error
+          code = INVALID_CODE;
+          break;
+        }
+      } // end-for
+      if ( code != INVALID_CODE ) {
+        ret_code = code; 
+      }
+    }
+    else if ( REPEAT_SPACE_MIN &lt; p[1] &amp;&amp; p[1] &lt; REPEAT_SPACE_MAX ) {
+      // repeated code found
+      ret_code = REPEATED_CODE;
+    }
+  }
+  pulse_widths_count = 0;
+  return ret_code;
+}
 </code></pre>
-<p>จากตัวอย่างโค้ด ก็มีแนวทางในการนำไปประยุกต์ใช้งานได้หลายแบบ เช่น 
-การรับสัญญาณจากรีโมตคอนคอนโทรลด้วย <strong>ESP32</strong> แล้วแปลงเป็นโค้ดตัวเลข 
-และส่งข้อมูลเข้าไปยัง <strong>MQTT Broker</strong> ด้วย <strong>Wi-Fi</strong> 
-สำหรับนำไปใช้กับระบบ <strong>Smart Home</strong> เป็นต้น</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="_4">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<h2 id="_4">&#9655; <strong>แนวทางและกิจกรรมเรียนรู้เพิ่มเติม</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโจทย์และกิจกรรมฝึกปฏิบัติ โดยใช้อุปกรณ์อิเล็กทรอนิกส์สำหรับการสื่อสารข้อมูลด้วยแสงอินฟราเรด ได้แก่</p>
+<ul>
+<li>การวัดสัญญาณไฟฟ้าจากโมดูลรับแสงอินฟราเรด โดยใช้เครื่องออสซิลโลสโคปแบบดิจิทัล
+แล้วลองวัดความกว้างพัลส์ของข้อมูลแต่บิตที่ได้รับ และแปลงเป็นค่าบิตของข้อมูลที่ได้รับ
+การตั้งค่าสำหรับ <strong>Trigger Type</strong> (เช่น <strong>Edge Type</strong> หรือ <strong>Pulse Type</strong> เป็นต้น)
+และ <strong>Trigger Mode</strong> สำหรับการทำงานของเครื่องออสซิลโลสโคป
+เพื่อคอยตรวจจับการเริ่มต้นของการรับสัญญาณ-บิตข้อมูล เป็นต้น </li>
+<li>การสร้างสัญญาณด้วยเครื่องกำเนิดสัญญาณ (<strong>Function Generator</strong>) แบบดิจิทัล
+เช่น การสร้างสัญญาณแบบพัลส์เป็นชุด การทดลองเปลี่ยนความถี่ (เช่น ในช่วง <strong>38kHz +/- 10kHz</strong>) ค่า <strong>Duty Cycle</strong> 
+และจำนวนพัลส์ในการส่งข้อมูลในหนึ่งชุด และดูการเปลี่ยนแปลงที่สัญญาณเอาต์พุตที่โมดูลตัวรับแสงอินฟราเรด</li>
+<li>ระยะทางและทิศทางจากตัวส่งไปยังตัวรับแสงอินฟราเรด มีผลอย่างไรบ้าง ?</li>
+<li>การเลือกใช้ <strong>LDR (Light-Dependent Resistor)</strong> และเซนเซอร์แสงอย่างเช่น <strong>TEMT6000 (Ambient Light Sensor)</strong> เป็นตัวรับสัญญาณแสงอินฟราเรด จะให้ผลอย่างไร ?</li>
+<li>การรับสัญญาณจากรีโมตคอนคอนโทรลด้วยโมดูลรับแสงและประมวลผลด้วยบอร์ด <strong>ESP32</strong> แล้วแปลงเป็นโค้ดตัวเลข 
+และส่งข้อมูลเข้าไปยัง <strong>MQTT Broker</strong> ด้วย <strong>Wi-Fi</strong> 
+สำหรับนำไปใช้กับระบบ <strong>Smart Home</strong> เป็นต้น</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอการใช้งานโมดูลตัวรับและตัวส่งสัญญาณอินฟราเรด การวัดสัญญาณไฟฟ้าที่ได้จากการทดลองใช้งานอุปกรณ์
 และตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับทดลองใช้งานกับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> 
 และ <strong>Arduino Nano</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-10-20 | Last Updated: 2022-10-22</p></div>
+<p>Created: 2022-10-20 | Last Updated: 2022-11-03</p></div>
             </div>
         </div>
 
