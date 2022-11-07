@@ -423,7 +423,13 @@ void setup() {
   Serial.printf( &quot;MAC: %02x:%02x:%02x:%02x:%02x:%02x\n&quot;,
                   mac[0],mac[1],mac[2],mac[3],mac[4],mac[5] );
 
+  // Clear existing WiFi connection
   WiFi.disconnect();
+  // Set the following WiFi connection as persistent
+  WiFi.setPersistent(); 
+  // Disable default automatic start of persistent AP at startup.
+  WiFi.endAP(); 
+
   // Try to connect to the WiFi AP
   int status = WiFi.begin( WIFI_SSID, WIFI_PASS );
   Serial.println( &quot;Waiting for connection to WiFi&quot; );
@@ -466,6 +472,7 @@ void loop() {
 <pre><code class="language-cpp">// Import Arduino libraries:
 // - https://github.com/JAndrassy/WiFiEspAT/
 // - https://github.com/knolleary/pubsubclient
+#define WIFIESPAT2
 #include &lt;WiFiEspAT.h&gt;
 #include &lt;WiFiClient.h&gt;
 #include &lt;PubSubClient.h&gt;
@@ -475,16 +482,22 @@ void loop() {
 
 #define LED_PIN   LED_BUILTIN
 
-//#define ESP_SERIAL_BAUD    (921600)
-//#define ESP_SERIAL         Serial1
-//#define ESP_SERIAL_TX_PIN  (16)
-//#define ESP_SERIAL_RX_PIN  (17)
+#if 0
+ #define ESP_SERIAL         Serial1
+ #define ESP_SERIAL_TX_PIN  (16)
+ #define ESP_SERIAL_RX_PIN  (17)
+ #define ESP_SERIAL_BAUD    (115200)
+#else // use RP2040 Serial2 port
+ #define ESP_SERIAL         Serial2
+ #define ESP_SERIAL_TX_PIN  (8)
+ #define ESP_SERIAL_RX_PIN  (9)
+ #define ESP_SERIAL_BAUD    (115200) // 921600
+ #define ESP_RESET_PIN      (15)
+#endif
 
-#define ESP_SERIAL         Serial2
-#define ESP_SERIAL_TX_PIN  (8)
-#define ESP_SERIAL_RX_PIN  (9)
-#define ESP_SERIAL_BAUD    (115200)
-#define ESP_RESET_PIN      (15)
+#if !defined(ESP_RESET_PIN)
+#define  ESP_RESET_PIN     (-1)
+#endif
 
 #define SERIAL_TIMEOUT_DEFAULT   (1000)
 
@@ -529,24 +542,14 @@ void setup() {
   Serial.begin( 115200 ); 
   while (!Serial) ; // Wait until the USB-CDC port is open.
 
-#ifdef ESP_RESET_PIN
-  // Reset the ESP module.
-  pinMode( ESP_RESET_PIN, OUTPUT );
-  digitalWrite( ESP_RESET_PIN, LOW );
-  delay(10);
-  digitalWrite( ESP_RESET_PIN, HIGH );
-  delay(100);
-#endif
-
   // Show the version of Arduino RP2040 Core.
   Serial.printf( &quot;Arduino Pico Core v%s\n&quot;, ARDUINO_PICO_VERSION_STR );
 
+  // Initialize WiFi and use ESP Serial for serial communication.
+  WiFi.init( ESP_SERIAL, ESP_RESET_PIN );
   // Check whether the ESP module is ready.
   Serial.printf( &quot;ESP module: %s\n&quot;, 
                  is_wifi_serial_ready() ? &quot;ready&quot; : &quot;timeout&quot; );
-
-  // Initialize WiFi and use ESP Serial for serial communication.
-  WiFi.init( ESP_SERIAL );
   if ( WiFi.status() == WL_NO_MODULE ) {
     Serial.println( &quot;Communication with ESP module failed!&quot; );
     while (1) { toggle_led( 100 ); yield(); } 
@@ -554,7 +557,7 @@ void setup() {
 
   // Get the firmware versionof the ESP module.
   String s = WiFi.firmwareVersion();
-  Serial.printf( &quot;WiFiEspAT library version: %s\n&quot;, s.c_str() );
+  Serial.printf( &quot;ESP-AT firmware version: %s\n&quot;, s.c_str() );
 
   // Show the MAC address of the ESP module
   byte mac[6];
@@ -562,15 +565,23 @@ void setup() {
   Serial.printf( &quot;MAC: %02x:%02x:%02x:%02x:%02x:%02x\n&quot;,
                   mac[0],mac[1],mac[2],mac[3],mac[4],mac[5] );
 
+  // Clear existing WiFi connection
   WiFi.disconnect();
+  // Set the following WiFi connection as persistent
+  WiFi.setPersistent(); 
+  // Disable default automatic start of persistent AP at startup.
+  WiFi.endAP(); 
+
   // Try to connect to the WiFi AP
   int status = WiFi.begin( WIFI_SSID, WIFI_PASS );
   Serial.println( &quot;Waiting for connection to WiFi&quot; );
-  int cnt = 20;
+  Serial.flush();
+  int cnt = 10;
   while ( WiFi.status() != WL_CONNECTED &amp;&amp; --cnt ) {
      toggle_led( 500 );
      Serial.print('.');
   }
+  Serial.flush();
   if (  WiFi.status() == WL_CONNECTED ) {
     // Show the local IP address.
     IPAddress ip = WiFi.localIP();
@@ -578,7 +589,13 @@ void setup() {
   }
 
   WiFi.sleepMode( WIFI_NONE_SLEEP ); 
+
+  // Set MQTT server and port.
   client.setServer( MQTT_BROKER, MQTT_PORT );
+  // Set MQTT socket timeout (in seconds).
+  client.setSocketTimeout(1);
+  // Set MQTT keep alive (in seconds)
+  client.setKeepAlive(60);  
 }
 
 void loop() {
@@ -588,11 +605,14 @@ void loop() {
     if ( client.connect( &quot;arduino_rp2040_client&quot; ) )  {
       Serial.println( &quot;Mosquitto broker connected..&quot; );
     } 
-    delay(1000);
-    return;
+    else {
+      Serial.println( &quot;Mosquitto broker is not connected..&quot; );
+      delay(1000);
+      return;
+    }
   } 
   client.loop();
-  if ( millis() - ts &gt;= 5000 ) { // every 5 seconds
+  if ( millis() - ts &gt;= 5000 ) { // Send MQTT message every 5 seconds.
     char message[64];
     ts = millis();
     sprintf( message, &quot;{count: %d}&quot;, ++count );
@@ -609,8 +629,11 @@ void loop() {
 <strong>MQTT Broker</strong> ภายใต้หัวข้อ (<strong>MQTT Topic</strong>) ที่กำหนดไว้ ในขณะที่บอร์ด <strong>Pico</strong>
 กำลังส่งข้อความไปยัง <strong>MQTT Broker</strong></p>
 <p><img alt="" src="rp2040_esp-m3_breadboard-1.jpg" /></p>
+<p><img alt="" src="rp2040_esp-m3_breadboard-3.jpg" /></p>
 <p>รูป:  การใช้งานบอร์ด <strong>Raspberry Pi Pico</strong> (เลือกใช้ขา <strong>UART2 TX / RX</strong> ของ <strong>RP2040</strong>)
 ร่วมกับโมดูล <strong>ESP-M3</strong> (ใช้ค่า <strong>Baudrate 115200</strong>) และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> จากบอร์ด <strong>Pico</strong></p>
+<p><strong>ข้อสังเกต:</strong> สำหรับการจ่ายแรงดันไฟเลี้ยงที่ขา <strong>+3.3V</strong> กับ <strong>GND</strong> ให้กับโมดูล <strong>ESP01</strong>
+หรือ <strong>ESP-M3</strong> แนะนำให้ต่อตัวเก็บประจุไฟฟ้าเพิ่ม (เช่น ขนาด <strong>10uF</strong>) คร่อมที่ขาทั้งสองด้วย</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -621,7 +644,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-10-09 | Last Updated: 2022-10-11</p></div>
+<p>Created: 2022-10-09 | Last Updated: 2022-11-07</p></div>
             </div>
         </div>
 
