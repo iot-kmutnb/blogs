@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/arduino-spi-master-slave/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสื่อสารด้วยบัส SPI และเขียนโปรแกรมด้วย Arduino - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#spi-arduino" class="nav-link">การสื่อสารด้วยบัส SPI และเขียนโปรแกรมด้วย Arduino</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#spi" class="nav-link">&#9655;  การสื่อสารด้วยบัส SPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi_1" class="nav-link">&#9655;  โหมดการทำงานของบัส SPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi-i2c" class="nav-link">&#9655;  การเปรียบเทียบระหว่าง SPI และ I2C ในการใช้งาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-spi" class="nav-link">&#9655;  การเขียนโปรแกรมด้วย Arduino โดยใช้ไลบรารี SPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-spi-master-spi-slave" class="nav-link">&#9655;  ตัวอย่างโค้ด Arduino สำหรับการทำงานแบบ SPI Master และ SPI Slave</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi-atmega328p" class="nav-link">&#9655;  รีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของวงจร SPI ภายในชิป ATmega328P</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi-pwm" class="nav-link">&#9655;  ตัวอย่าง: การส่งข้อมูลหลายไบต์ผ่านบัส SPI เพื่อกำหนดค่า PWM และสร้างสัญญาณเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="spi-arduino">การสื่อสารด้วยบัส SPI และเขียนโปรแกรมด้วย Arduino<a class="headerlink" href="#spi-arduino" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>SPI Bus</em>, <em>SPI Master</em>, <em>SPI Slave</em>, 
+<em>Arduino</em>, <em>AVR / ATmega328P</em></p>
+<hr />
+<h2 id="spi">&#9655;  <strong>การสื่อสารด้วยบัส SPI</strong><a class="headerlink" href="#spi" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอรูปแบบการสื่อสารระหว่าง <strong>SPI Master</strong> และ <strong>Slave</strong> 
+โดยใช้บอร์ด <strong>Arduino</strong> เช่น <strong>Uno</strong> หรือ <strong>Nano</strong> ซึ่งมีชิปไมโครคอนโทรลเลอร์
+<strong>ATmega328P</strong> และตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> </p>
+<p>บัส (<strong>Bus</strong>) หมายถึง การกำหนดรูปแบบการสื่อสารข้อมูลโดยใช้กลุ่มของสายสัญญาณทางไฟฟ้าในระบบดิจิทัล
+และ <strong>SPI</strong> (<em>Serial Peripheral Interface</em>) เป็นรูปแบบหนึ่งของการสื่อสารข้อมูลระหว่างอุปกรณ์แบบดิจิทัลที่พบเห็นได้บ่อย 
+และใช้กับอุปกรณ์สองฝ่ายหรือมากกว่า และนำมาต่อใช้งานร่วมกันให้เป็นระบบบัส</p>
+<p>บัส <strong>SPI</strong> ส่งและรับข้อมูลทีละบิต (<strong>Bit Serial</strong>)
+และใช้สัญญาณนาฬิกา ( <strong>Clock Signal</strong> หรือ <strong>CLK</strong>) 
+เป็นตัวกำหนดจังหวะการทำงาน (ดังนั้นจึงเรียกว่า <strong>Synchronous, 
+Bit-Serial Data Communication</strong>) 
+มีการกำหนดบทบาทในการทำงานของอุปกรณ์ในระบบบัส แบ่งเป็น <strong>SPI Master</strong> ("มาสเตอร์") และ 
+<strong>SPI Slave</strong> ("สเลฟ")</p>
+<ul>
+<li>อุปกรณ์ที่ทำหน้าที่เป็น <strong>SPI Master</strong> เป็นฝ่ายเริ่มการสื่อสารข้อมูล และสร้างสัญญาณ
+<strong>Clock</strong> ซึ่งใช้ชื่อสัญญาณว่า <strong>SCK</strong> หรือ <strong>SCLK</strong> (<em>Serial Clock</em>) 
+มากำหนดจังหวะการส่งและรับข้อมูล</li>
+<li>อุปกรณ์ <strong>SPI Slave</strong> เป็นฝ่ายคอยตอบสนองในระบบบัส <strong>SPI</strong> อาจมีอุปกรณ์ที่เป็น <strong>SPI Slave</strong> 
+ได้มากกว่าหนึ่ง (เรียกกรณีนี้ว่า <strong>Single-Master / Multi-Slave SPI Bus</strong>)</li>
+</ul>
+<p><strong>ข้อสังเกต:</strong> ในปัจจุบันมีการเปลี่ยนชื่อเรียกใหม่ จากเดิม <strong>SPI Master / Slave</strong>
+เป็น <strong>SPI Controller / Peripheral</strong> ตามลำดับ</p>
+<p>โดยทั่วไป <strong>SPI</strong> ใช้สัญญาณ 4 เส้น (ใช้งานตามรูปแบบที่เรียกว่า <strong>4-Wire SPI</strong>) ได้แก่ </p>
+<ul>
+<li><strong>SCK</strong> (<em>Serial Clock</em>) &mdash; 
+เป็นสัญญาณ <strong>CLK</strong> ที่ถูกสร้างโดยอุปกรณ์ที่เป็น <strong>SPI Master</strong></li>
+<li><strong>MOSI</strong> (<em>Master-Out, Slave-In</em>)
+หรือ <strong>COPI</strong> (<em>Controller-Out, Peripheral-In</em>) &mdash; 
+เป็นสัญญาณสำหรับส่งข้อมูลบิตออกจาก <strong>SPI Master</strong> ไปยัง <strong>SPI Slave</strong></li>
+<li><strong>MISO</strong> (<em>Master-In, Slave-Out</em>) 
+หรือ หรือ <strong>CIPO</strong> (<em>Controller-In, Peripheral-Out</em>) &mdash; 
+เป็นสัญญาณสำหรับส่งข้อมูลบิตออกจาก <strong>SPI Slave</strong> ไปยัง <strong>SPI Master</strong></li>
+<li><strong>SS</strong> (<em>Slave Select</em>) หรือ <strong>CS</strong> (<em>Chip Select</em>) &mdash; 
+เป็นสัญญาณที่สร้างโดย <strong>SPI Master</strong> และทำงานแบบ <strong>Active-Low</strong> 
+(เช่น มีสัญลักษณ์ <strong>#</strong> หรือ <strong>/</strong> เขียนกำกับไว้หน้าชื่อสัญญาณ) เพื่อใช้ระบุว่า ต้องการสื่อสารกับ <strong>SPI Slave</strong> หรือไม่ </li>
+</ul>
+<p>ในกรณีที่มีอุปกรณ์ <strong>SPI Slave</strong> มากกว่าหนึ่งชุด จะต้องมีสัญญาณควบคุมมากกว่าหนึ่งเส้น 
+และแยกสำหรับแต่ละอุปกรณ์ (หนึ่งสัญญาณควบคุมต่อหนึ่งอุปกรณ์) แต่ใช้สัญญาณ <strong>SCLK</strong>,
+<strong>MOSI</strong> และ <strong>MISO</strong> ร่วมกัน</p>
+<p>เมื่อจะส่งและรับข้อมูลผ่านบัส <strong>SPI</strong> (เรียกว่า <strong>SPI Data Transfer</strong>) 
+สัญญาณควบคุม <strong>#SS</strong> (หรือ <strong>#CS</strong>) จะต้องเปลี่ยนจากสถานะปรกติ คือ จาก <strong>HIGH</strong> 
+เป็น <strong>LOW</strong> จากนั้นข้อมูลหนึ่งไบต์จะถูกเลื่อนบิตและส่งออกไปทีละบิตจาก <strong>SPI Master</strong> 
+ด้วยวงจรเลื่อนบิต (<strong>Shift Register</strong>)
+ตามจังหวะของสัญญาณ <strong>SCK</strong> </p>
+<p>ในการเลื่อนข้อมูลออกไปทีละบิต จะต้องมีกำหนดด้วยว่า จะให้บิต <strong>MSB</strong> (<em>Most-Significant Bit</em>)
+หรือ <strong>LSB</strong> (<em>Least-Significant Bit</em>) ถูกส่งออกไปก่อน 
+และในขณะเดียวกันก็จะรับข้อมูลทีละบิตจาก <strong>SPI Slave</strong> จนได้ครบหนึ่งไบต์ 
+(หรือกล่าวได้ว่า ข้อมูลจำนวนหนึ่งเฟรม หรือ <strong>Data Frame</strong> เท่ากับ 8 บิต) </p>
+<p>ดังนั้นเมื่อ <strong>SPI Master</strong> ส่งข้อมูลจำนวนหนึ่งไบต์ไปยัง <strong>SPI Slave</strong> 
+ก็จะได้ข้อมูลหนึ่งไบต์จาก <strong>SPI Slave</strong> เช่นกัน ในช่วงเวลาที่สัญญาณควบคุมเป็น <strong>LOW</strong>
+อาจมีการส่ง-รับข้อมูลได้มากกว่าหนึ่งไบต์ (<strong>Multi-Byte SPI Transfer / Transaction</strong>)</p>
+<p><img alt="" src="spi_bus_wiki.png" /></p>
+<p>รูป:  <strong>SPI Bus</strong> (Source: Wikipedia)</p>
+<p><img alt="" src="spi_bus_sparkfun.png" /></p>
+<p>รูป:  <strong>SPI Bus</strong> (Source: Sparkfun)</p>
+<hr />
+<h2 id="spi_1">&#9655;  <strong>โหมดการทำงานของบัส SPI</strong><a class="headerlink" href="#spi_1" title="Permanent link">#</a></h2>
+<p>การทำงานของบัส <strong>SPI</strong> แบ่งได้เป็น 4 โหมด (<strong>SPI Modes: 0,1,2,3</strong>)
+จำแนกตามพารามิเตอร์สองตัวที่เรียกว่า <strong>CPOL</strong> (<em>Clock Polarity</em>)
+และ <strong>CPHA</strong> (<em>Clock Phase</em>) ซึ่งจะเป็นตัวกำหนดลักษณะการทำงานของบัส
+เช่น การเลือกที่จะส่ง-รับบิตที่ขอบขาขึ้น (<strong>Rising</strong>) หรือ ขอบขาลง (<strong>Falling</strong>) ของสัญญาณ <strong>SCK</strong>
+และจะให้สัญญาณ <strong>SCK</strong> อยู่ที่ระดับลอจิก <strong>HIGH</strong> หรือ <strong>LOW</strong> 
+เมื่อไม่อยู่ในช่วงของการส่งข้อมูลใด ๆ ในบัส (ช่วงที่เรียกว่า <strong>Bus Idle</strong>) 
+แต่โดยทั่วไปจะเลือกใช้ <strong>SPI Mode 0</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>SPI Mode</strong></th>
+<th align="center"><strong>Clock Polarity (CPOL)</strong></th>
+<th align="center"><strong>Clock Phase (CPHA)</strong></th>
+<th align="center"><strong>Output Edge</strong></th>
+<th align="center"><strong>Data Capture</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Mode 0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">Falling</td>
+<td align="center">Rising</td>
+</tr>
+<tr>
+<td align="center">Mode 1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">Rising</td>
+<td align="center">Falling</td>
+</tr>
+<tr>
+<td align="center">Mode 2</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">Rising</td>
+<td align="center">Falling</td>
+</tr>
+<tr>
+<td align="center">Mode 3</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">Falling</td>
+<td align="center">Rising</td>
+</tr>
+</tbody>
+</table>
+<p>จากตารางจะเห็นได้ว่า </p>
+<ul>
+<li><strong>โหมด 0</strong>: <ul>
+<li>บัสอยู่ในสถานะ <strong>Idle</strong> (เมื่อยังไม่รับหรือส่งข้อมูลใด ๆ) สัญญาณ <strong>SCK</strong> เป็น <strong>LOW</strong> </li>
+<li>การอ่านค่าบิตอินพุตในแต่ละครั้ง เกิดขึ้นเมื่อมี<strong>ขอบขาขึ้น</strong>ของสัญญาณ <strong>SCK</strong> </li>
+<li>การเปลี่ยนแปลงค่าบิตเอาต์พุต เกิดขึ้นเมื่อมี<strong>ขอบขาลง</strong>ของสัญญาณ <strong>SCK</strong></li>
+</ul>
+</li>
+<li><strong>โหมด 1</strong>: <ul>
+<li>บัสอยู่ในสถานะ <strong>Idle</strong> สัญญาณ <strong>SCK</strong> เป็น <strong>LOW</strong> </li>
+<li>การอ่านค่าบิตอินพุตในแต่ละครั้ง เกิดขึ้นเมื่อมี<strong>ขอบขาลง</strong>ของสัญญาณ <strong>SCK</strong> </li>
+<li>การเปลี่ยนแปลงค่าบิตเอาต์พุต เกิดขึ้นเมื่อมี<strong>ขอบขาขึ้น</strong>ของสัญญาณ <strong>SCK</strong></li>
+</ul>
+</li>
+<li><strong>โหมด 2</strong>: <ul>
+<li>บัสอยู่ในสถานะ <strong>Idle</strong> สัญญาณ <strong>SCK</strong> เป็น <strong>HIGH</strong></li>
+<li>การอ่านค่าบิตอินพุตในแต่ละครั้ง เกิดขึ้นเมื่อมี<strong>ขอบขาลง</strong>ของสัญญาณ <strong>SCK</strong> </li>
+<li>การเปลี่ยนแปลงค่าบิตเอาต์พุต เกิดขึ้นเมื่อมี<strong>ขอบขาขึ้น</strong>ของสัญญาณ <strong>SCK</strong></li>
+</ul>
+</li>
+<li><strong>โหมด 3</strong>: <ul>
+<li>บัสอยู่ในสถานะ <strong>Idle</strong> สัญญาณ <strong>SCK</strong> เป็น <strong>HIGH</strong></li>
+<li>การอ่านค่าบิตอินพุตในแต่ละครั้ง เกิดขึ้นเมื่อมี<strong>ขอบขาขึ้น</strong>ของสัญญาณ <strong>SCK</strong> </li>
+<li>การเปลี่ยนแปลงค่าบิตเอาต์พุต เกิดขึ้นเมื่อมี<strong>ขอบขาลง</strong>ของสัญญาณ <strong>SCK</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>บัส <strong>SPI</strong> แบบปรกติ มีการใช้งาน 4 ขาสัญญาณ คือ <strong>SCLK</strong>,
+<strong>MOSI</strong>, <strong>MISO</strong> และ <strong>SS</strong> แต่ละสัญญาณมีทิศทางเดียว
+(<strong>Unidirectional</strong>) สัญญาณ <strong>MOSI</strong> และ <strong>MISO</strong>
+แยกกัน ดังนั้นจึงสามารถส่ง-รับข้อมูลได้พร้อมกัน (<strong>Full-duplex</strong>)</li>
+<li>บัส <strong>SPI</strong> ที่มีการใช้งานเพียง 3 สัญญาณ หรือที่เรียกว่า <strong>3-Wire SPI</strong>
+หมายถึง การใช้งานขาสัญญาณ <strong>MOSI / MISO</strong> ร่วมกันสำหรับสัญญาณข้อมูล (เช่น เรียกว่า <strong>SDO/SDI</strong>
+หรือ <strong>SDIO</strong>) เป็นสัญญาณแบบสองทิศทาง (<strong>Unidirectional</strong>) มีการกำหนดทิศทางต่างกันในแต่ละช่วงเวลา 
+เมื่อส่งข้อมูลบิตออกไปจาก <strong>SPI Master</strong> ให้เปลี่ยนเป็นเอาต์พุต และหลังจากนั้นรับเข้ามา ให้เปลี่ยนเป็นอินพุต
+ดังนั้นจึงเป็นการรับส่งข้อมูลแบบ <strong>Half-duplex</strong></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi-i2c">&#9655;  <strong>การเปรียบเทียบระหว่าง SPI และ I2C ในการใช้งาน</strong><a class="headerlink" href="#spi-i2c" title="Permanent link">#</a></h2>
+<p><strong>I2C (inter-IC)</strong> เป็นอีกรูปแบบการสื่อสารข้อมูลแบบดิจิทัลในประเภทที่เรียกว่า 
+<strong>Synchronous, Bit-Serial Data Communication</strong> 
+นิยมใช้งานอย่างแพร่หลายเช่นเดียวกับบัส <strong>SPI</strong> </p>
+<p>ลองมาดูตัวอย่างการเปรียบเทียบประเด็นในการใช้งานของบัสทั้งสองแบบ</p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>ประเด็นการเปรียบเทียบ</strong></th>
+<th align="left"><strong>SPI</strong></th>
+<th align="left"><strong>I2C</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">การรับส่งข้อมูลสองทิศทาง</td>
+<td align="left">Full-Duplex</td>
+<td align="left">Half-Duplex</td>
+</tr>
+<tr>
+<td align="left">ความเร็ว</td>
+<td align="left">มากกว่า <strong>10Mbps</strong></td>
+<td align="left">สูงสุดไม่เกิน <strong>3.4Mbps</strong></td>
+</tr>
+<tr>
+<td align="left">จำนวนสัญญาณที่ใช้</td>
+<td align="left">4 หรือมากกว่า</td>
+<td align="left">2 (<strong>SCL /SDA</strong>)</td>
+</tr>
+<tr>
+<td align="left">ขนาดข้อมูลหนึ่งเฟรม</td>
+<td align="left">8 บิต (หรือมากกว่า)</td>
+<td align="left">8 บิต</td>
+</tr>
+<tr>
+<td align="left">การเลือกอุปกรณ์</td>
+<td align="left">ใช้สัญญาณ <strong>Slave Select</strong></td>
+<td align="left">ระบุหมายเลขอุปกรณ์</td>
+</tr>
+<tr>
+<td align="left">การตอบกลับเมื่อได้รับข้อมูล</td>
+<td align="left">ไม่มี <strong>Acknowledge</strong></td>
+<td align="left">มีบิต <strong>ACK / No ACK</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="arduino-spi">&#9655;  <strong>การเขียนโปรแกรมด้วย Arduino โดยใช้ไลบรารี SPI</strong><a class="headerlink" href="#arduino-spi" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรมด้วยคำสั่งของ <strong>Arduino</strong> โดยใช้ไลบรารีที่มีชื่อว่า <a href="https://www.arduino.cc/en/reference/SPI"><strong>SPI</strong></a>
+และใช้คำสั่ง <code>#include &lt;SPI.h&gt;</code> เพื่อใช้งานไลบรารีดังกล่าว โดยให้ไมโครคอนโทรลเลอร์ทำหน้าที่เป็น
+<strong>SPI Master (Controller)</strong></p>
+<p>ขาสัญญาณสำหรับ <strong>SPI</strong> บนบอร์ด <strong>Arduino Uno / Nano (ATmega328P)</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">SPI Signals</th>
+<th align="left">Uno Pins</th>
+<th align="left">MEGA 2560 Pins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">MOSI</td>
+<td align="left">D11</td>
+<td align="left">D51</td>
+</tr>
+<tr>
+<td align="left">MISO</td>
+<td align="left">D12</td>
+<td align="left">D50</td>
+</tr>
+<tr>
+<td align="left">SCK</td>
+<td align="left">D13</td>
+<td align="left">D52</td>
+</tr>
+<tr>
+<td align="left">SS</td>
+<td align="left">D10</td>
+<td align="left">D53</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>โดยทั่วไป ไมโครคอนโทรลเลอร์มีวงจรภายในเพื่อใช้งานสำหรับบัส <strong>SPI</strong> อย่างน้อย 1 หนึ่งชุด
+โปรแกรมให้ทำหน้าที่เป็น <strong>SPI Master</strong> หรือ <strong>SPI Slave</strong> แบบใดแบบหนึ่ง
+แต่อาจมีมากกว่าหนึ่งได้ หรือ มีเพียงหนึ่งชุดแต่มีขาสัญญาณควบคุมมากกว่าหนึ่งได้</li>
+<li>คำสั่งหรือฟังก์ชันของไลบรารี <a href="https://www.arduino.cc/reference/en/language/functions/communication/spi/"><strong>Arduino SPI</strong></a>
+ได้ถูกออกแบบมาใช้กับบอร์ด <strong>Arduino</strong> ที่ใช้ชิป <strong>ATmega</strong> เป็นหลัก ซึ่งมีเพียงหนึ่งชุดเท่านั้น
+หากใช้บอร์ดไมโครคอนโทรลเลอร์ที่มีชิปอื่น อาจมีความแตกต่างไปบ้าง</li>
+<li>บอร์ด  <strong>Arduino Uno</strong> หรือ <strong>Nano</strong> ใช้ชิป <strong>ATmega328P</strong>
+มีวงจรบัส <strong>SPI</strong> เพียงหนึ่งชุดเท่านั้น ถ้าเขียนโค้ดด้วย <strong>Arduino</strong>
+ก็สามารถใช้อ็อบเจกต์ชื่อ <code>SPI</code> ที่สร้างมาจากคลาส <code>SPIClass</code> ของไลบรารี <strong>Arduino SPI</strong></li>
+<li>บอร์ด <strong>Arduino MKR</strong> ที่ใช้ชิป <strong>Atmel ATSAMD21</strong>
+มีวงจรภายในที่มีชื่อว่า <strong>SERCOM</strong> (<em>SERial COMmunication</em>) 
+มากกว่าหนึ่งชุด (มีทั้งหมด 6 ชุด) ซึ่งสามารถโปรแกรมได้ว่า ใช้สำหรับการสื่อสารข้อมูลด้วยบัส
+<strong>SPI</strong>, <strong>I2C (SDA/SCL)</strong> หรือ <strong>UART (TX/RX)</strong> 
+ถ้าเขียนโค้ดด้วย <strong>Arduino</strong> สำหรับ <strong>SAMD21</strong> จะมีอ็อบเจกต์สำหรับการใช้งานบัส <strong>SPI</strong>
+ได้หลายตัวเลือก (ได้แก่ <code>SPI</code>, <code>SPI1</code>, ...,<code>SPI5</code> ซึ่งสร้างมาจากคลาสชื่อ <code>SPIClassSAMD</code>)</li>
+<li>ถ้าเป็นบอร์ด <strong>Arduino</strong> ที่ใช้ชิป <strong>RP2040</strong> ก็สามารถใช้อ็อบเจกต์ชื่อ
+<code>SPI</code> และ <code>SPI1</code> ที่สร้างมาจากคลาส <code>MbedSPI</code></li>
+<li>แนะนำให้ลองศึกษาจากซอร์ซโค้ดในภาษา <strong>C++</strong> ของไลบรารีของ <strong>Arduino</strong> ที่เกี่ยวข้องกับการใช้งานบัส <strong>SPI</strong><ul>
+<li><a href="https://github.com/arduino/ArduinoCore-avr/tree/master/libraries/SPI"><strong>ArduinoCore-avr</strong></a>: คลาส <code>SPIClass</code></li>
+<li><a href="https://github.com/arduino/ArduinoCore-samd/tree/master/libraries/SPI"><strong>ArduinoCore-samd</strong></a>: คลาส <code>SPIClassSAMD</code></li>
+<li><a href="https://github.com/arduino/ArduinoCore-mbed/tree/master/libraries/SPI"><strong>ArduinoCore-mbed</strong></a>: คลาส <code>MbedSPI</code></li>
+</ul>
+</li>
+</ul>
+<p>ตัวอย่างคำสั่งของไลบรารี <a href="https://www.arduino.cc/reference/en/language/functions/communication/spi/"><strong>Arduino SPI</strong></a></p>
+<ul>
+<li><code>SPI.begin()</code> และ <code>SPI.end()</code> 
+เริ่มต้นหรือจบการใช้งานวงจรภายในสำหรับบัส <strong>SPI</strong> และขา <strong>GPIO</strong> ที่เกี่ยวข้องกับ
+จะถูกใช้สำหรับการทำงานของบัส <strong>SPI</strong>
+ขาสัญญาณ  <strong>SCK</strong> และ <strong>MOSI</strong> จะเป็นขาเอาต์พุต
+และขาสัญญาณ <strong>MISO</strong> จะเป็นขาอินพุต</li>
+<li><code>SPI.setBitOrder(...)</code> เป็นการกำหนดลำดับของข้อมูลบิตที่จะถูกส่งออกไป
+ระหว่าง <strong>MSB First</strong> (<code>MSBFIRST</code>) หรือ <strong>LSB First</strong> (<code>LSBFIRST</code>)</li>
+<li><code>SPI.setClockDivider(...)</code> เป็นการกำหนดความถี่สำหรับ <strong>SCLK</strong>
+โดยการตั้งค่าตัวหารความถี่ (<strong>SPI Clock Frequency Divider</strong>)
+เช่น <code>SPI_CLOCK_DIV2</code> และ <code>SPI_CLOCK_DIV4</code> เป็นต้น</li>
+<li><code>SPI.setDataMode(...)</code> เป็นการเลือกโหมดการทำงานของบัส <strong>SPI</strong></li>
+<li><code>SPI.transfer(...)</code> ส่งและรับข้อมูลจำนวนหนึ่งไบต์ (8 บิต)
+หรืออาร์เรย์ที่มีข้อมูลจำนวนหลายไบต์</li>
+<li><code>SPI.transfer16(...)</code> ส่งและรับข้อมูลขนาด 16 บิต (<code>uint16_t</code>)</li>
+<li><code>SPI.beginTransaction(...)</code> เริ่มต้นการทำงาน <strong>SPI Master</strong> 
+และตั้งค่าการใช้งานด้วยอ็อบเจกต์ที่สร้างจากคลาส <code>SPISettings</code>
+เพื่อกำหนดความเร็วของบัสหรือความถี่ของสัญญาณ <strong>SCLK</strong> ลำดับการส่งข้อมูลบิต
+และโหมดการทำงานของบัส <strong>SPI</strong> ในแต่ละครั้งของการใช้งานบัส <strong>SPI</strong></li>
+<li><code>SPI.endTransaction()</code> หยุดการใช้งานบัส <strong>SPI</strong> หลังจากที่มีการใช้คำสั่ง
+<code>SPI.beginTransaction(...)</code> ไปแล้ว</li>
+</ul>
+<p>คำสั่งที่เกี่ยวข้องการใช้งานอินเทอร์รัพท์สำหรับ <strong>SPI</strong> เช่น การเปิดหรือปิดการทำงาน <strong>SPI Interrupt</strong></p>
+<ul>
+<li><code>SPI.attachInterrupt()</code> เปิดการใช้งานอินเทอร์รัพท์สำหรับ <strong>SPI</strong></li>
+<li><code>SPI.detachInterrupt()</code> ปิดการใช้งานอินเทอร์รัพท์สำหรับ <strong>SPI</strong></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-spi-master-spi-slave">&#9655;  <strong>ตัวอย่างโค้ด Arduino สำหรับการทำงานแบบ SPI Master และ SPI Slave</strong><a class="headerlink" href="#arduino-spi-master-spi-slave" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับการสาธิตการทำงานของบอร์ด <strong>Arduino Uno</strong> หรือ <strong>Arduino Nano</strong>
+จำนวน 2 บอร์ด โดยให้บอร์ดหนึ่งทำหน้าที่เป็น <strong>SPI Master</strong> และอีกบอร์ดหนึ่งเป็น
+<strong>SPI Slave</strong> และมีการเชื่อมต่อสายสัญญาณระหว่างกันสำหรับบัส <strong>SPI</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="uno_spi_master_slave_connections.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรระหว่างบอร์ด <strong>Arduino Uno (SPI Master)</strong>
+และ  <strong>Arduino Uno (SPI Slave)</strong></p>
+<p>การเชื่อมต่อสัญญาณระหว่างสองบอร์ดมีดังนี้</p>
+<table>
+<thead>
+<tr>
+<th align="left">SPI Master</th>
+<th align="left">SPI Slave</th>
+<th align="left">Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">D13 / SCK (OUT)</td>
+<td align="left">D13 / SCK  (IN)</td>
+<td align="left">&rarr;</td>
+</tr>
+<tr>
+<td align="left">D12 / MISO (IN)</td>
+<td align="left">D12 / MISO (OUT)</td>
+<td align="left">&rarr;</td>
+</tr>
+<tr>
+<td align="left">D11 / MOSI (OUT)</td>
+<td align="left">D11 / MOSI (IN)</td>
+<td align="left">&larr;</td>
+</tr>
+<tr>
+<td align="left">D10 / SS (OUT)</td>
+<td align="left">D10 /  SS  (IN)</td>
+<td align="left">&rarr;</td>
+</tr>
+<tr>
+<td align="left">GND</td>
+<td align="left">GND</td>
+<td align="left">--</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ด <strong>Arduino Sketch</strong> มีดังนี้ ซึ่งสามารถใช้ได้กับบอร์ด <strong>Arduino</strong>
+และจะทำหน้าที่เป็น <strong>SPI Master</strong> หรือ <strong>SPI Slave</strong> อย่างใดอย่างหนึ่ง</p>
+<pre><code class="language-cpp">#include &lt;SPI.h&gt; // use the Arduino SPI library
+
+#define SPI_MASTER_SLAVE_SEL_PIN  (2)  // SPI Master/Slave Select pin
+#define SS_PIN                   (10)  // SPI Slave Select pin
+
+boolean is_spi_master;
+volatile boolean slave_received  = false;
+volatile uint8_t slave_recv_data = 0xff;
+
+void setup() {
+  Serial.begin( 115200 ); 
+  pinMode( SPI_MASTER_SLAVE_SEL_PIN, INPUT_PULLUP );
+  if ( digitalRead(SPI_MASTER_SLAVE_SEL_PIN) == LOW ) {
+    is_spi_master = true;
+  } else {
+    is_spi_master = false;
+  }
+  if (is_spi_master) { // for SPI master/controller device
+    pinMode( SS_PIN, OUTPUT );      // use the SS pin for output
+    digitalWrite( SS_PIN, HIGH );   // output HIGH to the SS pin
+    SPI.begin();                    // start the SPI master
+    SPI.setDataMode( SPI_MODE0 );   // use SPI mode 0 (CPOL=0,CHPA=0)
+    SPI.setBitOrder( MSBFIRST );    // use MSB-first bit order 
+    // set clock divider for SCK 
+    // use SPI_CLOCK_DIVx, where x=4,8,16,32,64,128
+    SPI.setClockDivider( SPI_CLOCK_DIV16 ); // 16MHz/16 = 1MHz
+    Serial.println( F(&quot;SPI Master...&quot;) );
+    delay( 100 );
+  } 
+  else { // for SPI slave/peripheral device
+    pinMode( MISO, OUTPUT );         // configure the MISO pin as output
+    pinMode( SS_PIN, INPUT_PULLUP ); // enable internal pullup on SS input pin 
+    SPDR  = 0xFF;                    // write 0xFF to SPDR
+    // MSTR=0 (Slave mode), DORD=0 (MSB first), Mode 0 (CPOL=0, CPHA=0)
+    SPCR &amp;= ~_BV(MSTR);              // clear the MSTR bit (MSTR=0)
+    SPCR &amp;= ~_BV(CPOL);              // clear the CPOL bit (CPOL=0)
+    SPCR &amp;= ~_BV(CPHA);              // clear the CPHA bit (CPHA=0)
+    SPCR &amp;= ~_BV(DORD);              // clear the DORD bit (DORD=0)
+    SPCR |=  _BV(SPE);               // set the SPE bit to enable SPI
+    slave_received = false;          // clear the slave data reception flag
+    SPI.attachInterrupt();           // enable the SPI interrupt
+    Serial.println( F(&quot;SPI Slave...&quot;) );
+  } 
+}
+
+void loop() {
+  if ( is_spi_master ) { // SPI master operation
+    static uint8_t send_data = 0x00, recv_data;
+    Serial.print( F(&quot;Master&gt; sent: 0x&quot;) );
+    Serial.print( send_data, HEX );
+    // pull the /SS pin LOW to activate the SPI bus
+    digitalWrite( SS_PIN, LOW );
+    // send-receive one data byte over the SPI bus
+    recv_data = SPI.transfer( send_data ); 
+    // pull the /SS pin HIGH to de-activate the SPI bus
+    digitalWrite( SS_PIN, HIGH );
+    Serial.print( F(&quot;, received: 0x&quot;) );
+    Serial.println( recv_data, HEX ); 
+    send_data += 1; // increment by 1
+    delay( 1000 );
+  } 
+  else { // SPI slave operation
+    if ( slave_received ) {
+      // write the received data byte to SPDR
+      SPDR = slave_recv_data;
+      // clear the slave data reception flag
+      slave_received = false;
+      Serial.print( F(&quot;Slave: received 0x&quot;) );
+      Serial.println( slave_recv_data, HEX );
+    }
+    delay(1);
+  }
+}
+
+// ISR for 'SPI Serial Transfer Complete' (SPI Slave mode)
+ISR(SPI_STC_vect) { 
+  slave_recv_data = SPDR;
+  slave_received  = true;
+} 
+</code></pre>
+<p>เมื่อโปรแกรมเริ่มทำงาน จะมีการตรวจสอบสถานะที่ขา <strong>D2</strong> ซึ่งถูกใช้งานเป็นขาอินพุต-ดิจิทัล
+ถ้าอ่านค่าได้เป็น <strong>LOW (0)</strong> ก็จะทำหน้าที่เป็นอุปกรณ์ <strong>SPI Master</strong>
+แต่ถ้าเป็น <strong>HIGH (1)</strong> ก็ให้เปิดใช้งานเป็นอุปกรณ์ <strong>SPI Slave</strong></p>
+<p>อุปกรณ์ที่เป็น <strong>SPI Master</strong> ตามโค้ดตัวอย่างนี้ จะส่งข้อมูลขนาดหนึ่งไบต์ออกไป
+เริ่มต้นมีค่าเป็น <code>0x00</code> และเพิ่มขึ้นทีละหนึ่ง
+เมื่อส่งข้อมูลหนึ่งไบต์ด้วยบัส <strong>SPI</strong> ในแต่ละครั้ง ก็จะได้รับข้อมูลเข้ามาหนึ่งไบต์เช่นกัน</p>
+<p>อุปกรณ์ที่เป็น <strong>SPI Slave</strong> จะคอยรับข้อมูลครั้งละหนึ่งไบต์ที่มาจาก
+<strong>SPI Master</strong> โดยมีการเปิดใช้งานอินเทอร์รัพท์สำหรับการทำงานของ <strong>SPI</strong>
+ด้วยคำสั่ง <code>SPI.attachInterrupt();</code>
+ถ้าได้รับข้อมูลเข้ามาหนึ่งไบต์ จะเกิดเหตุการณ์อินเทอร์รัพท์ (เรียกว่า  <code>SPI_STC_vect</code> หรือ
+<strong>SPI Transfer Complete Interrupt</strong>) จากวงจร <strong>SPI</strong>  และมีการเรียกฟังก์ชัน
+ที่ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interupt Service Routine</em>) ตามรูปแบบต่อไปนี้
+ขา <strong>/SS</strong> ของชิป <strong>ATmega328P</strong> ตรงกับขา <strong>PB2</strong> หรือ  <strong>D10</strong></p>
+<pre><code class="language-c">ISR(SPI_STC_vect) {
+   // ...
+}
+</code></pre>
+<p>ในโค้ดตัวอย่าง ฟังก์ชันนี้ เมื่อทำงาน จะอ่านค่าจากรีจิสเตอร์ <strong>SPDR</strong> (<em>SPI Data Register</em>)
+ของชิป <strong>ATmega328P</strong> ซึ่งมีข้อมูลไบต์ที่ได้รับล่าสุด
+ข้อมูลไบต์ที่ได้รับมานั้นจะถูกกลับไป โดยเขียนค่าลงในรีจิสเตอร์ <strong>SPDR</strong>
+เมื่อมีการส่งและรับข้อมูลด้วยบัส <strong>SPI</strong> ในครั้งถัดไป</p>
+<p><img alt="" src="nano_spi_master_slave_demo.png" /></p>
+<p>รูป: ตัวอย่างการทดสอบการทำงานของโค้ด <strong>Arduino Sketch</strong> สำหรับ <strong>SPI Master</strong></p>
+<p><img alt="" src="spi_nano_demo.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรจริงโดยใช้บอร์ด <strong>Arduino Nano (Compatible Boards)</strong></p>
+<p>&nbsp;</p>
+<p>จากโค้ดตัวอย่างที่แล้ว ถัดไปเป็นตัวอย่างการใช้คำสั่ง  <code>SPI.beginTransaction(...)</code>
+และ  <code>SPI.endTransaction()</code> สำหรับการทำงานของ <strong>SPI Master</strong>
+โดยใช้ความถี่ <strong>SPI Clock</strong> เท่ากับ <strong>1MHz</strong> ดังต่อไปนี้ </p>
+<pre><code class="language-cpp">#include &lt;SPI.h&gt; // use the Arduino SPI library
+
+#define SPI_MASTER_SLAVE_SEL_PIN  (2)  // SPI Master/Slave Select pin
+#define SS_PIN                   (10)  // SPI Slave Select pin
+
+boolean is_spi_master;
+volatile boolean slave_received = false;
+volatile uint8_t slave_recv_data = 0xff;
+
+void setup() {
+  Serial.begin( 115200 ); 
+  pinMode( SPI_MASTER_SLAVE_SEL_PIN, INPUT_PULLUP );
+  if ( digitalRead(SPI_MASTER_SLAVE_SEL_PIN) == LOW ) {
+    is_spi_master = true;
+  } else {
+    is_spi_master = false;
+  }
+  if (is_spi_master) { // for SPI master/controller device
+    pinMode( SS_PIN, OUTPUT );      // use the SS pin for output
+    digitalWrite( SS_PIN, HIGH );   // output HIGH to the SS pin
+    SPI.begin();                    // initialize SPI master
+    Serial.println( F(&quot;SPI Master...&quot;) );
+    delay( 100 );
+  } 
+  else { // for SPI slave/peripheral device
+    pinMode( MISO, OUTPUT );         // configure the MISO pin as output
+    pinMode( SS_PIN, INPUT_PULLUP ); // enable internal pullup on SS input pin 
+    SPDR  = 0xFF;                    // write 0xFF to SPDR
+    // MSTR=0 (Slave mode), DORD=0 (MSB first), Mode 0 (CPOL=0, CPHA=0)
+    SPCR &amp;= ~_BV(MSTR);              // clear the MSTR bit (MSTR=0)
+    SPCR &amp;= ~_BV(CPOL);              // clear the CPOL bit (CPOL=0)
+    SPCR &amp;= ~_BV(CPHA);              // clear the CPHA bit (CPHA=0)
+    SPCR &amp;= ~_BV(DORD);              // clear the DORD bit (DORD=0)
+    SPCR |= _BV(SPIE);               // enable the SPI interrupt
+    SPCR |= _BV(SPE);                // set the SPE bit to enable SPI
+    sei();                           // enable global interrupt
+    slave_received = false;          // clear the slave data reception flag
+    Serial.println( F(&quot;SPI Slave...&quot;) );
+  } 
+}
+
+void loop() {
+  if ( is_spi_master ) { // SPI master operation
+    static uint8_t send_data = 0x00, recv_data;
+    Serial.print( F(&quot;Master&gt; sent: 0x&quot;) );
+    Serial.print( send_data, HEX );
+    // start the SPI transaction
+    SPI.beginTransaction( SPISettings(1000000, MSBFIRST, SPI_MODE0) ); 
+    // pull the /SS pin LOW to activate the SPI bus
+    digitalWrite( SS_PIN, LOW );
+    // send-receive one data byte over the SPI bus
+    recv_data = SPI.transfer( send_data ); 
+    // pull the /SS pin HIGH to de-activate the SPI bus
+    digitalWrite( SS_PIN, HIGH );
+    // stop the SPI transaction
+    SPI.endTransaction();
+    Serial.print( F(&quot;, received: 0x&quot;) );
+    Serial.println( recv_data, HEX ); 
+    send_data += 1; // increment by 1
+    delay( 1000 );
+  } 
+  else { // SPI slave operation
+    if ( slave_received ) {
+      // write the received data byte to SPDR
+      SPDR = slave_recv_data;
+      // clear the slave data reception flag
+      slave_received = false;
+      Serial.print( F(&quot;Slave: received 0x&quot;) );
+      Serial.println( slave_recv_data, HEX );
+    }
+    delay(1);
+  }
+}
+
+// ISR for 'SPI reception complete' (SPI Slave mode only)
+ISR(SPI_STC_vect) { 
+  slave_recv_data = SPDR;
+  slave_received = true;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi-atmega328p">&#9655;  <strong>รีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของวงจร SPI ภายในชิป ATmega328P</strong><a class="headerlink" href="#spi-atmega328p" title="Permanent link">#</a></h2>
+<p>โดยทั่วไปแล้ว การเขียนโค้ด <strong>Arduino</strong> เพื่อใช้งานบัส <strong>SPI</strong> เป็นอุปกรณ์ <strong>SPI Master</strong>
+ก็มีคำสั่งจากไลบรารี <code>SPI.h</code> ให้ใช้งาน ไม่จำเป็นต้องเข้าถึงรีจิสเตอร์ต่าง ๆ (เรียกว่า 
+<strong>SFRs</strong>: <a href="https://en.wikipedia.org/wiki/Special_function_register"><em>Special Function Registers</em></a>)
+ในส่วนที่เกี่ยวข้องกับการทำงานของวงจร <strong>SPI</strong> ภายในชิป</p>
+<p>รีจิสเตอร์ขนาด  8 บิต ที่เกี่ยวข้องกับการทำงานของ <strong>SPI</strong> สำหรับชิป <strong>ATmega328P</strong> ที่สำคัญได้แก่</p>
+<ul>
+<li><strong>SPCR</strong> (<em>SPI Control Register</em>) เป็นรีจิสเตอร์สำหรับกำหนดค่าในการทำงานของ <strong>SPI</strong>
+เช่น การเปิดใช้งาน <strong>SPI</strong> การเลือกทำงานในโหมด <strong>SPI Master</strong> หรือ <strong>Slave</strong> 
+การกำหนดทิศทางการเลื่อนบิต การกำหนดตัวหารความถี่ของ <strong>Fosc</strong> (16MHz)
+เพื่อนำไปใช้สำหรับ <strong>SCLK</strong> เป็นต้น</li>
+<li><strong>SPSR</strong> (<em>SPI Status Register</em>) เป็นรีจิสเตอร์ที่มีบิตแสดงสถานะการทำงานของ <strong>SPI</strong>
+เช่น บิต <strong>SPIF</strong> (<em>SPI Interrupt Flag</em>) ระบุว่า มีอินเทอร์รัพท์ของ <strong>SPI</strong> เกิดขึ้นหรือไม่
+บิต <strong>WCOL</strong> (<em>Write Collision Flag</em>) ระบุว่า มีการเขียนข้อมูลลงในรีจิสเตอร์ <strong>SPDR</strong>
+ในขณะที่กำลังเลื่อนข้อมูลออกไปหรือไม่ และบิต <strong>SPI2X</strong> (<em>Double SPI Speed</em>)
+ถ้ามีค่าเป็น 1 ให้เพิ่มความถี่ของ <strong>SCLK</strong> เป็นสองเท่า</li>
+<li><strong>SPDR</strong> (<em>SPI Data Register</em>) เป็นรีจิสเตอร์ที่ใช้ในการส่งและรับข้อมูลขนาด 8 บิต จากบัส <strong>SPI</strong></li>
+</ul>
+<p><img alt="" src="328p_spi_regs.png" /></p>
+<p>รูป: <strong>ATmega328P - SPI registers</strong></p>
+<p>จากตัวอย่างโค้ดสำหรับบอร์ด <strong>Arduino Uno</strong> หรือ <strong>Nano</strong> ซึ่งใช้ชิป <strong>ATmega328P</strong>
+ในกรณีที่ใช้งานสำหรับ <strong>SPI Slave</strong> จะต้องมีการกำหนดค่าในรีจิสเตอร์
+<strong>SPCR</strong> (<em>SPI Control Register</em>) ของชิปดังกล่าวก่อนใช้งาน</p>
+<p><strong>SPCR Bits</strong></p>
+<ul>
+<li>Bit 7: <strong>SPIE</strong> (SPI Interrupt Enable)<ul>
+<li>0 = SPI interrupt disable</li>
+<li>1 = SPI interrupt enable</li>
+</ul>
+</li>
+<li>Bit 6: <strong>SPE</strong> (SPI Enable)<ul>
+<li>0 = SPI disable</li>
+<li>1 = SPI enable</li>
+</ul>
+</li>
+<li>Bit 5: <strong>DORD</strong> (Data Order)<ul>
+<li>0 = MSB First</li>
+<li>1 = LSB First</li>
+</ul>
+</li>
+<li>Bit 4: <strong>MSTR</strong> (Master/Slave Select)<ul>
+<li>0 = Slave mode</li>
+<li>1 = Master mode</li>
+</ul>
+</li>
+<li>Bit 3: <strong>CPOL</strong> (Clock Polarity)<ul>
+<li>0 = SCK LOW idle, leading edge = rising, trailing edge = falling</li>
+<li>1 = SCK HIGH idle, leading edge = falling, trailing edge = rising</li>
+</ul>
+</li>
+<li>Bit 2: <strong>CPHA</strong> (Clock Phase)<ul>
+<li>0 = Sample on leading edge, setup on trailing edge</li>
+<li>1 = Sample on trailing edge, setup on leading edge</li>
+</ul>
+</li>
+<li>Bit[1..0]: <strong>SPR1..SPR0</strong> (SPI Clock Rate)<ul>
+<li>Set the SPI clock divider</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="328p_spi_div.png" /></p>
+<p>รูป: ตัวเลือกสำหรับการตั้งค่าตัวหารความถี่สำหรับ <strong>SPI</strong></p>
+<p><img alt="" src="328p_spi_block_diagram.png" /></p>
+<p>รูป: แผนผัง <strong>Block Diagram</strong> หรือ องค์ประกอบทางฮาร์ดแวร์ของวงจร <strong>SPI</strong> ภายในชิป
+(Source: Atmel)</p>
+<p><img alt="" src="328p_spi_connections.png" /></p>
+<p>รูป: แสดงรูปแบบการเชื่อมต่อระหว่าง <strong>SPI Master</strong> และ <strong>SPI Slave</strong> (Source: Atmel)</p>
+<p><img alt="" src="328p_spi_transfers.png" /></p>
+<p>รูป: แสดงรูปคลื่นสัญญาณเมื่อมีการส่ง-รับข้อมูลด้วยบัส <strong>SPI</strong> จำแนกตามโหมดการทำงานด้วย
+ค่าบิต <strong>CPOL</strong> และ <strong>CPHA</strong> (Source: Atmel)</p>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>เมื่อมีการเปลี่ยนลอจิกของสัญญาณ <strong>SCLK</strong> จากสถานะ <strong>Idle</strong> ของบัส
+ขอบสัญญาณแรก เรียกว่า <strong>Leading Edge</strong> และขอบที่ตามมาเรียกว่า <strong>Trailing Edge</strong>
+สำหรับแต่ละไซเคิล (<strong>Cycle</strong>) ของสัญญาณ <strong>SCLK</strong></li>
+<li><strong>CPOL</strong> เป็นตัวกำหนดค่าลอจิกของ <strong>SCLK</strong> เมื่อบัสอยู่ในสถานะ <strong>Idle</strong></li>
+<li><strong>CPHA</strong> เป็นตัวกำหนดว่า จะให้อ่านค่าบิต (<strong>Bit Capture / Sample</strong>)
+และอัปเดตค่าบิต (<strong>Bit Setup / Update</strong>)  สำหรับสัญญาณ 
+<strong>MISO / MOSI</strong> เมื่อเกิด <strong>Leading Edge</strong> หรือ <strong>Trailing Edge</strong> ในแต่ละไซเคิล</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi-pwm">&#9655;  <strong>ตัวอย่าง: การส่งข้อมูลหลายไบต์ผ่านบัส SPI เพื่อกำหนดค่า PWM และสร้างสัญญาณเอาต์พุต</strong><a class="headerlink" href="#spi-pwm" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไป สาธิตการส่งข้อมูลครั้งละ 3 ไบต์ จาก <strong>SPI Master</strong> ไปยัง
+<strong>SPI Slave</strong> แล้วนำค่าที่ได้รับไปกำหนดค่าสำหรับการสร้างสัญญาณ <strong>PWM</strong>
+(<em>Pulse Width Modulation</em>) ด้วยคำสั่ง <code>analogWrite()</code> 
+โดยเลือกใช้ขาเอาต์พุต {<strong>D5</strong>, <strong>D6</strong>, <strong>D9</strong>} ตามลำดับ</p>
+<pre><code class="language-cpp">#include &lt;SPI.h&gt;  // use the Arduino SPI library
+
+#define SPI_MASTER_SLAVE_SEL_PIN (2)  // SPI Master/Slave Select pin
+#define SS_PIN (10)                   // SPI Slave Select pin
+
+boolean is_spi_master;
+
+// used for the SPI master's operation
+#define NUM_COLORS (4)
+const uint8_t COLORS[][3] = {
+  { 0xFF, 0xFF, 0x11 },
+  { 0xFF, 0x22, 0xFF },
+  { 0x33, 0xFF, 0xFF },
+  { 0x88, 0x55, 0xAA },
+};
+uint8_t color_index = 0;
+
+// used for the SPI slave's operation
+const int PWM_PINS[] = { 5, 6, 9 };  // PWM output pins
+volatile boolean rgb_complete = false;
+volatile uint8_t rgb_index = 0;
+volatile uint8_t rgb_data[3] = { 0, 0, 0 };
+
+void setup() {
+  Serial.begin( 115200 );
+  pinMode( SPI_MASTER_SLAVE_SEL_PIN, INPUT_PULLUP );
+  if (digitalRead( SPI_MASTER_SLAVE_SEL_PIN ) == LOW) {
+    is_spi_master = true;
+  } else {
+    is_spi_master = false;
+  }
+  if (is_spi_master) {            // for SPI master/controller device
+    pinMode( SS_PIN, OUTPUT);     // use the SS pin for output
+    digitalWrite( SS_PIN, HIGH);  // output HIGH to the SS pin
+    SPI.begin();                  // initialize SPI master
+    Serial.println( F(&quot;SPI Master...&quot;) );
+    delay(100);
+  } else {                           // for SPI slave/peripheral device
+    pinMode( MISO, OUTPUT );         // configure the MISO pin as output
+    pinMode( SS_PIN, INPUT_PULLUP);  // enable internal pullup on SS input pin
+    SPDR  = 0xFF;                    // write 0xFF to SPDR
+    // MSTR=0 (Slave mode), DORD=0 (MSB first), Mode 0 (CPOL=0, CPHA=0)
+    SPCR &amp;= ~_BV(MSTR);              // clear the MSTR bit (MSTR=0)
+    SPCR &amp;= ~_BV(CPOL);              // clear the CPOL bit (CPOL=0)
+    SPCR &amp;= ~_BV(CPHA);              // clear the CPHA bit (CPHA=0)
+    SPCR &amp;= ~_BV(DORD);              // clear the DORD bit (DORD=0)
+    SPCR |= _BV(SPIE);               // enable the SPI interrupt
+    SPCR |= _BV(SPE);                // set the SPE bit to enable SPI
+    sei();                           // enable global interrupt
+    rgb_complete = false;            // clear the slave data reception flag
+    Serial.println( F(&quot;SPI Slave...&quot;) );
+  }
+}
+
+void loop() {
+  if (is_spi_master) { // SPI master operation
+    uint8_t *values = COLORS[color_index];
+    color_index = (color_index + 1) % NUM_COLORS;
+    // send three data bytes over SPI bus (speed=1MHz, MSB first, Mode 0)
+    SPI.beginTransaction( SPISettings(1000000, MSBFIRST, SPI_MODE0) );
+    digitalWrite( SS_PIN, LOW );  // assert /SS
+    SPI.transfer( values[0] );    // send the first byte
+    delayMicroseconds( 4 );       // add some delay 
+    SPI.transfer( values[1] );    // send the second byte
+    delayMicroseconds(4);         // add some delay 
+    SPI.transfer( values[2] );    // send the third byte
+    digitalWrite( SS_PIN, HIGH ); // de-assert /SS
+    SPI.endTransaction();
+
+    Serial.print(F( &quot;SPI master: 0x&quot;)  );
+    Serial.print( values[0], HEX );
+    Serial.print( &quot; 0x&quot; );
+    Serial.print(values[1], HEX );
+    Serial.print( &quot; 0x&quot; );
+    Serial.print(values[2], HEX );
+    Serial.println( F(&quot; sent&quot;) );
+    delay(1000);
+  } 
+  else { // SPI slave operation
+    static uint8_t buf[3];
+    if (rgb_complete) {
+      memcpy( buf, rgb_data, 3 );
+      rgb_complete = false;
+      rgb_index = 0;
+      Serial.print( F(&quot;SPI Slave received:&quot;) );
+      for ( int i=0; i &lt; 3; i++ ) { // update PWM values (8-bit each)
+        analogWrite( PWM_PINS[i], buf[i] );
+        Serial.print( &quot; 0x&quot; );
+        Serial.print( buf[i], HEX );
+      }
+      Serial.println(&quot;&quot;);
+    }
+  }
+}
+
+// ISR for 'SPI transfer complete' (SPI Slave mode only)
+ISR(SPI_STC_vect) {
+  rgb_data[rgb_index] = SPDR;
+  rgb_index    = (rgb_index + 1) % 3;
+  rgb_complete = (rgb_index == 0);
+}
+</code></pre>
+<p><img alt="" src="spi_pwm_demo.png" /></p>
+<p>รูป: ตัวอย่างการข้อความเอาต์พุตที่ได้จากการทำงานของโปรแกรมเมื่อทำงานเป็น <strong>SPI Slave</strong></p>
+<p><img alt="" src="nano_spi_pwm_demo.jpg" /></p>
+<p>รูป: การใช้โมดูล <strong>PWM RGB</strong> ร่วมกับสัญญาณเอาต์พุต <strong>PWM</strong> จากบอร์ด <strong>Arduino Nano</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอหลักการทำงานของบัส <strong>SPI</strong> ในเบื้องต้น และมีตัวอย่างการเขียนโค้ด
+<strong>Arduino Sketch</strong> และสาธิตการทำงานด้วยบอร์ด <strong>Arduino Uno / Nano</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-11-16 | Last Revision: 2022-11-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
