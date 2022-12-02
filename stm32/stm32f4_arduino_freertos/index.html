@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/stm32/stm32f4_arduino_freertos/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมไมโครคอนโทรลเลอร์ STM32F4 โดยใช้ Arduino - STM32duino และ FreeRTOS - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#stm32f4-arduino-stm32duino-freertos" class="nav-link">การเขียนโปรแกรมไมโครคอนโทรลเลอร์ STM32F4 โดยใช้ Arduino - STM32duino และ FreeRTOS</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#stm32f4" class="nav-link">&#9655; บอร์ดไมโครคอนโทรลเลอร์ STM32F4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-ide" class="nav-link">&#9655; การเริ่มต้นใช้งาน Arduino IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#led-blink-serial-usb" class="nav-link">&#9655; LED Blink + Serial (USB)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#analog-input-pwm-output" class="nav-link">&#9655; Analog Input + PWM Output</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#stm32freertos-multitasking" class="nav-link">&#9655; STM32FreeRTOS: Multitasking</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#analog-input-pwm-output-multitasking" class="nav-link">&#9655; Analog Input + PWM Output: Multitasking</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="stm32f4-arduino-stm32duino-freertos">การเขียนโปรแกรมไมโครคอนโทรลเลอร์ STM32F4 โดยใช้ Arduino - STM32duino และ FreeRTOS<a class="headerlink" href="#stm32f4-arduino-stm32duino-freertos" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>STM32F4</em>, <em>BlackPill Boards</em>, 
+<em>Arduino</em>, <em>STM32duino</em>, <em>FreeRTOS</em></p>
+<hr />
+<h2 id="stm32f4">&#9655; <strong>บอร์ดไมโครคอนโทรลเลอร์ STM32F4</strong><a class="headerlink" href="#stm32f4" title="Permanent link">#</a></h2>
+<p>ไมโครคอนโทรลเลอร์ <a href="https://www.st.com/en/microcontrollers-microprocessors/stm32f4-series.html"><strong>STM32F4 Series</strong></a>
+ของบริษัท <strong>STMicroelectronics</strong> 
+มีตัวประมวลผลหรือซีพียูขนาด 32 บิต ที่ทำงานได้ตามสถาปัตยกรรมชุดคำสั่ง <strong>Arm Cortex-M4</strong> 
+บอร์ดไมโครคอนโทรลเลอร์ <strong>STM32F411CEU6 (BlackPill)</strong> ที่ได้มีการออกแบบและจำหน่ายโดยบริษัท
+<a href="https://github.com/WeActStudio"><strong>WeAct Studio</strong></a> ในประเทศจีน
+เป็นตัวเลือกหนึ่งที่น่าสนใจ เนื่องจากมีราคาถูก </p>
+<p>ในการเขียนโปรแกรมไมโครคอนโทรลเลอร์ <strong>STM32F4</strong> โดยทั่วไป ผู้ใช้สามารถเขียนโปรแกรมด้วยภาษา <strong>C/C++</strong>
+และเลือกใช้ไลบรารีของบริษัท <strong>STMicroelectronics</strong> เช่น <a href="https://github.com/STMicroelectronics/STM32CubeF4"><strong>STM32F4 HAL</strong></a>
+(<em>Hardware Abstraction Layer</em>) ซึ่งมีรายละเอียดตามเอกสาร
+<a href="https://www.st.com/resource/en/user_manual/um1725-description-of-stm32f4-hal-and-lowlayer-drivers-stmicroelectronics.pdf"><strong>UM1725 User manual</strong></a>
+รวมถึงมีซอฟต์แวร์ประเภท <strong>IDE</strong> ให้เลือกใช้ได้ เช่น
+<a href="https://www.st.com/en/development-tools/stm32cubeide.html"><strong>STM32CubeIDE</strong></a> </p>
+<p>อย่างไรก็ตาม ในปัจจุบันการเขียนโปรแกรมสำหรับ <strong>STM32</strong> สามารถทำได้ง่ายขึ้น
+โดยใช้ <strong>Arduino API</strong> เป็นพื้นฐานในการเขียนโค้ด โดยจะต้องมีการติดตั้งซอฟต์แวร์ <strong>Arduino Core</strong> 
+สำหรับชิป <strong>STM32</strong> ที่มีชื่อว่า <a href="https://github.com/stm32duino/Arduino_Core_STM32"><strong>STM32duino</strong></a></p>
+<p>แนะนำให้ศึกษาบทความที่เกี่ยวข้อง: </p>
+<ul>
+<li><a href="../stm32f4-blackpill/">"แนะนำการใช้งานบอร์ดไมโครคอนโทรลเลอร์ <strong>STM32F4x1 BlackPill</strong>"</a></li>
+<li><a href="../../arduino/arduino_nucleo_stm32/">"การเขียนโปรแกรม <strong>Arduino</strong> สำหรับบอร์ด <strong>STM32 Nucleo</strong>"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ide">&#9655; <strong>การเริ่มต้นใช้งาน Arduino IDE</strong><a class="headerlink" href="#arduino-ide" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการใช้งานซอฟต์แวร์ <a href="https://docs.arduino.cc/software/ide-v2"><strong>Arduino IDE v2</strong></a>
+สำหรับการเขียนโปรแกรมบอร์ดไมโครคอนโทรลเลอร์
+<strong>STM32F411CEU6 BlackPill</strong> ผู้ใช้จะต้องติดตั้ง <strong>Arduino Core for STM32</strong> 
+โดยไปที่เมนู "<strong>Files &gt; Preferences &gt; Additional Boards Manager URLs</strong>"
+เพิ่มรายการ <strong>URL</strong> ของไฟล์ <strong>.json</strong> ต่อไปนี้</p>
+<p><code>https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json</code></p>
+<p><img alt="" src="arduino_boards_manager_urls.png" /></p>
+<p>รูป: เพิ่มรายการ <strong>URL</strong> ของไฟล์ <strong>.json</strong> สำหรับ <strong>STM32duino</strong></p>
+<p>จากนั้นไปยังเมนู "<strong>Tools &gt; Board: ... &gt; Boards Manager</strong>
+ในหน้าต่าง <strong>Boards Manager</strong> ให้ค้นหารายการสำหรับ <strong>STM32</strong> แล้วคลิกเลือกและกดปุ่ม <strong>Install</strong>
+เพื่อทำการติดตั้ง <strong>STM32 Cores</strong> ซึ่งจะทำการดาวน์โหลดไฟล์ต่าง ๆ ที่เกี่ยวข้องจากอินเทอร์เน็ต</p>
+<p>เวอร์ชันที่ได้ทดลองใช้คือ <strong>STM32duino v2.3.0</strong></p>
+<ul>
+<li><code>xpack-arm-none-eabi-gcc@10.3.1-2.3</code></li>
+<li><code>STMicroelectronics:STM32Tools@2.1.1</code></li>
+<li><code>STMicroelectronics:CMSIS@5.7.0</code></li>
+</ul>
+<p><img alt="" src="stm32duino_install.png" /></p>
+<p>รูป: การติดตั้ง <strong>STM32duino - Arduino Core for STM32</strong></p>
+<p>ถัดไปให้สร้าง <strong>Arudino Sketch</strong> สำหรับการเขียนโค้ด โดยเลือกจากรายการบอร์ดให้ตรงกับ
+"<strong>Generic STM32F4 series &gt; BlackPill F411CE</strong>"</p>
+<p>ข้อสังเกต: ถ้าเลือกใช้บอร์ด <strong>BlackPill</strong> อีกรุ่นหนึ่งคือ <strong>STM32F401CC</strong>
+หรือ <strong>STM32F401CDU6</strong> ก็ให้เลือก <strong>BlackPill F401CC</strong>"</p>
+<p>ตัวอย่างโค้ดสาธิต: <strong>LED Blink</strong></p>
+<pre><code>#define LED_PIN PC13 // onboard LED
+
+void setup() {
+   pinMode( LED_PIN, OUTPUT ); 
+}
+
+void loop() {
+  static uint32_t state = 0;
+  // Toggle the LED state and update the LED output pin.
+  digitalWrite( LED_PIN, state ^= 1 );
+  // Wait for some delay before re-entering the loop function.
+  delay(100);
+}
+</code></pre>
+<p><img alt="" src="arduino_stm32f4_board_selection.png" /></p>
+<p>รูป: เลือกบอร์ดไมโครคอนโทรลเลอร์ที่ต้องการใช้งาน</p>
+<p>เนื่องจากบอร์ด <strong>STM32F411CE BlackPill</strong> ไม่มีชิป <strong>USB-to-Serial Bridge</strong>
+แต่สามารถใช้พอร์ต <strong>USB-C</strong> เชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ และจะต้องเปิดใช้งาน <strong>USB-CDC</strong>
+ดังนั้นในการโค้ด <strong>Arduino Sketch</strong> และใช้คำสั่ง
+<code>Serial</code> หรือ <code>SerialUSB</code> โดยใช้วงจร <strong>USB</strong> ของชิป <strong>STM32F411CE</strong>
+แนะนำให้เลือกรูปแบบการตั้งค่าดังนี้ "<strong>USB support (if available): enabled</strong>"
+และสำหรับตัวเลือก <strong>U(S)ART support</strong> 
+ให้ตั้งค่าเป็น "<strong>CDC (generic 'Serial' supersede U(S)ART)</strong>"</p>
+<p><img alt="" src="arduino_stm32f4_usb_cdc_enabled.png" /></p>
+<p>รูป: การตั้งค่า <strong>USB Support</strong> สำหรับ <strong>USB-CDC</strong></p>
+<p>การอัปโหลดไฟล์เฟิร์มแวร์ (<strong>.bin</strong>) ที่ได้จากการคอมไพล์โค้ดของ <strong>Arduino Sketch</strong>
+มีให้เลือกได้หลายวิธี เช่น</p>
+<ul>
+<li>การใช้ <strong>SWD Programmer</strong>: วิธีนี้ต้องมีอุปกรณ์ที่เรียกว่า <strong>ST-Link/v2</strong> หรือ <strong>ST-Link/v3</strong>
+และใช้ร่วมกับคำสั่งของซอฟต์แวร์ <a href="https://www.st.com/en/development-tools/stm32cubeprog.html"><strong>STM32CubeProgrammer</strong></a> ของบริษัท <strong>STMicroelectronics</strong></li>
+<li>การใช้ <strong>DFU Bootloader</strong>: ชิป <strong>STM32F4</strong> ได้มีการติดตั้งโปรแกรม <strong>DFU Bootloader</strong> ไว้ภายในชิป
+ในหน่วยความจำแบบ <strong>ROM</strong> มาจากโรงงานแล้ว
+และจะใช้สำหรับการอัปโหลดไฟล์เฟิร์มแวร์ผ่านทางพอร์ต <strong>USB</strong> ในโหมด <strong>DFU</strong>
+และจะต้องใช้ร่วมกับซอฟต์แวร์ <strong>STM32CubeProgrammer</strong> เช่นกัน</li>
+</ul>
+<p>ดังนั้นสำหรับสองวิธีนี้ จะต้องมีการดาวน์โหลดและติดตั้งซอฟต์แวร์ <a href="https://www.st.com/en/development-tools/stm32cubeprog.html"><strong>STM32CubeProgrammer</strong></a> 
+ของบริษัท <strong>STMicroelectronics</strong> ในเครื่องคอมพิวเตอร์ของผู้ใช้ก่อน</p>
+<p><img alt="" src="arduino_dfu_programmer.png" /></p>
+<p>รูป: เลือกวิธีการเพื่อใช้สำหรับการอัปโหลดไฟล์เฟิร์มแวร์: <strong>STM32CubeProgrammer (DFU)</strong></p>
+<p><img alt="" src="stm32cubeprog_stm32f411ce.png" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>STM32CubeProgrammer</strong> เพื่อลองเชื่อมต่อกับบอร์ด
+<strong>STM32F411CE BlackPill</strong> ในโหมด <strong>DFU</strong></p>
+<p>ก่อนการอัปโหลด <strong>Arduino Sketch</strong> ผ่านทางพอร์ต <strong>USB</strong> ให้ทำขั้นตอนดังนี้</p>
+<ol>
+<li>เชื่อมต่อขา <strong>A10 (PA10/USB_FS_ID)</strong> ด้วยสาย <strong>Jumper Wire</strong> 
+กับตัวต้านทาน <strong>10k</strong> แบบ <strong>Pullup</strong> ไปยัง <strong>3.3V</strong></li>
+<li>เสียบสาย <strong>USB-C</strong> เชื่อมต่อบอร์ดไมโครคอนโทรลเลอร์กับคอมพิวเตอร์</li>
+<li>กดปุ่ม <strong>BOOT0</strong> กดค้างไว้ กดปุ่ม <strong>RESET</strong>  เพื่อรีเซตการทำงานของบอร์ด <strong>BlackPill</strong>
+ให้เข้าสู่ <strong>DFU Bootloader Mode</strong> แล้วจึงปล่อยปุ่ม <strong>RESET</strong> และ <strong>BOOT0</strong> ตามลำดับ</li>
+<li>อัปโหลด <strong>Arduino Sketch</strong> หลังจากทำขั้นตอน <strong>Verify</strong> แล้ว ไปยังบอร์ด</li>
+</ol>
+<p>&nbsp;</p>
+<p><img alt="" src="arduino_stm32f4_upload_via_dfu.png" /></p>
+<p>รูป: การอัปโหลดด้วยวิธี <strong>STM32CubeProgrammer (DFU)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink-serial-usb">&#9655; <strong>LED Blink + Serial (USB)</strong><a class="headerlink" href="#led-blink-serial-usb" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการส่งข้อความผ่านทางพอร์ต <strong>USB</strong> ที่เกี่ยวข้องกับการทำคำสั่งของ <code>Serial</code></p>
+<pre><code>#define LED_PIN PC13
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT ); 
+  Serial.begin( 115200 );
+  while ( !Serial );
+  Serial.println( &quot;STM32duino SerialUSB demo...&quot; );
+}
+
+void loop() {
+  static uint32_t state = 0;
+  // Toggle the LED state and update the LED output pin.
+  digitalWrite( LED_PIN, state ^= 1 );
+  // Send the current state of the LED.
+  while (!Serial.availableForWrite()) { delay(1); }
+  Serial.printf( &quot;state: %d\n&quot;, state );
+  // Wait for some delay before re-entering the loop function.
+  delay( 500 );
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="analog-input-pwm-output">&#9655; <strong>Analog Input + PWM Output</strong><a class="headerlink" href="#analog-input-pwm-output" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการอ่านค่าจากขาอินพุตแบบแอนะล็อก โดยใช้คำสั่ง 
+<code>analogRead()</code> ซึ่งจะมีการใช้งานวงจร <strong>ADC</strong> 
+(<em>Analog-to-Digital Converter</em>) ที่อยู่ภายในชิป <strong>STM32F4</strong> 
+และนำค่าที่อ่านได้ไปใช้สำหรับการปรับค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> 
+(<em>Pulse Width Modulation</em>) ที่ถูกสร้างโดยคำสั่ง <code>analogWrite()</code></p>
+<pre><code>#define LED_PIN PC13
+#define AIN_PIN PA0
+#define PWM_PIN PA5
+
+// LDR (high-side, 3.3V) + resistor (low-side, GND)
+// low light intensity -&gt; lower PWM duty cycle, lower analog input voltage
+
+//#define ADC_RESOLUTION  (10)
+//#define PWM_RESOLUTION  (8)
+//#define PWM_FREQ        (1000)
+
+#define ADC_RESOLUTION (12)
+#define PWM_RESOLUTION (10)
+#define PWM_FREQ (10000)
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(115200);
+  while (!Serial);
+  Serial.println(&quot;STM32duino PWM output demo...&quot;);
+  // Set ADC resolution (default: 10 bits)
+  analogReadResolution(ADC_RESOLUTION);
+  // Set PWM resolution (default: 8 bits)
+  analogWriteResolution(PWM_RESOLUTION);
+  // Set PWM frequency  (default: 1kHz)
+  analogWriteFrequency(PWM_FREQ);
+  // Write PWM value (zero)
+  analogWrite(PWM_PIN, 0);
+}
+
+void loop() {
+  // Read analog value.
+  int adc_value = analogRead(AIN_PIN);
+  // Write PWM value.
+  int pwm_value = 0;
+  int diff = (ADC_RESOLUTION - PWM_RESOLUTION);
+  if (diff &gt;= 0) {
+    pwm_value = adc_value &gt;&gt; diff;
+  } else {
+    pwm_value = adc_value &lt;&lt; (-diff);
+  }
+  analogWrite(PWM_PIN, pwm_value);
+  // Send a text to the Serial output.
+  Serial.printf(&quot;ADC: %lu, PWM: %lu\n&quot;, adc_value, pwm_value);
+  // Wait for some delay before re-entering the loop.
+  delay(200);
+}
+</code></pre>
+<p><img alt="" src="arduino_stm32f4_adc_pwm_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับจากบอร์ดและแสดงผลใน <strong>Arduino Serial Monitor</strong></p>
+<p><img alt="" src="arduino_stm32f4_adc_pwm_1khz_waveform.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต <strong>PWM</strong> (ความถี่ <strong>1kHz</strong>)</p>
+<p><img alt="" src="arduino_stm32f4_adc_pwm_10khz_waveform.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต <strong>PWM</strong> (เมื่อมีการตั้งค่าความถี่ให้เป็น <strong>10kHz</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="stm32freertos-multitasking">&#9655; <strong>STM32FreeRTOS: Multitasking</strong><a class="headerlink" href="#stm32freertos-multitasking" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไปสาธิตการเขียนโค้ดโดยใช้ไลบรารี <a href="https://github.com/stm32duino/STM32FreeRTOS"><strong>STM32FreeRTOS</strong></a>
+เพื่อการเขียนโค้ดโดยใช้ <strong>FreeRTOS</strong> ซึ่งระบบปฏิบัติการเวลาจริง (<strong>RTOS</strong>) แบบ  <strong>Open Source</strong>
+ผู้ใช้จะต้องมีการติดตั้งไลบรารี <strong>STM32FreeRTOS</strong> ก่อนทำขั้นตอนคอมไพล์โค้ดตัวอย่าง</p>
+<p>ในโค้ดตัวอย่างมีการสร้าง "ทาสก์" (<strong>Tasks</strong>) ได้แก่ <strong>Task 0</strong> และ <strong>Task 1</strong> ซึ่งงานได้อิสระจากกัน
+ทาสก์ทั้งสองทำหน้าที่สลับสถานะของลอจิกที่ขาเอาต์พุต <code>PC13</code> และ <code>PA5</code> ตามลำดับ
+และทำให้เกิดอัตราการกระพริบของ <strong>LED</strong> ที่แตกต่างกัน (สลับสถานะลอจิกทุก ๆ 100 และ 10 มิลลิวินาที ตามลำดับของทาสก์)</p>
+<pre><code>// Arduino library: https://github.com/stm32duino/STM32FreeRTOS
+#include &lt;Arduino.h&gt;
+#include &lt;STM32FreeRTOS.h&gt; // use FreeRTOS v10.3.1 ported to STM32duino
+#include &lt;STM32FreeRTOSConfig.h&gt; // use custom STM32-FreeRTOS configuration file
+
+#define LED1_PIN PC13  // onboard LED
+#define LED2_PIN PA5
+
+void task0(void *pvParameters);
+void task1(void *pvParameters);
+
+#define TASK_STACK_SIZE (configMINIMAL_STACK_SIZE + 1024)
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial)
+    ;
+  Serial.println(&quot;STM32F411CE BlackPill Started...&quot;);
+  Serial.printf(&quot;SystemCoreClock: %lu MHz\n&quot;, (uint32_t)(SystemCoreClock / 1e6));
+  Serial.printf(&quot;configTICK_RATE_HZ: %lu\n&quot;, configTICK_RATE_HZ);
+  Serial.printf(&quot;configMINIMAL_STACK_SIZE: %lu\n&quot;, configMINIMAL_STACK_SIZE);
+  Serial.printf(&quot;configMAX_PRIORITIES: %lu\n&quot;, configMAX_PRIORITIES);
+  delay(100);
+
+  // Create Task 0
+  xTaskCreate(task0, &quot;T0&quot;,
+              TASK_STACK_SIZE,
+              NULL, tskIDLE_PRIORITY + 1, NULL);
+  xTaskCreate(task1, &quot;T1&quot;,
+              TASK_STACK_SIZE,
+              NULL, tskIDLE_PRIORITY + 1, NULL);
+  vTaskStartScheduler();
+  while (1) {}
+}
+
+void loop() {
+}
+
+// task entry function
+void task0(void *pvParameters) {
+  (void)pvParameters;
+  int state = 0;
+  Serial.println(&quot;Task0 started...&quot;);
+  pinMode(LED1_PIN, OUTPUT);
+  while (1) {
+    digitalWrite(LED1_PIN, state ^= 1);
+    vTaskDelay(pdMS_TO_TICKS(100) /*msec*/);
+  }
+}
+
+// task entry function
+void task1(void *pvParameters) {
+  (void)pvParameters;
+  Serial.println(&quot;Task1 started...&quot;);
+  int state = 1;
+  pinMode(LED2_PIN, OUTPUT);
+  while (1) {
+    digitalWrite(LED2_PIN, state ^= 1);
+    vTaskDelay(10 /*ticks*/);  // 1 Tick = 1msec
+  }
+}
+</code></pre>
+<p>นอกจากการสร้างไฟล์สำหรับ <strong>Arduino Sketch (.ino)</strong> ตามโค้ดตัวอย่างข้างล่าง 
+จะต้องมีการสร้างไฟล์อีกหนึ่งไฟล์ (เพิ่ม <strong>Tab</strong>) แล้วตั้งชื่อไฟล์ <code>STM32FreeRTOSConfig.h</code>
+จากนั้นให้โค้ดจากไฟล์ <a href="https://github.com/stm32duino/STM32FreeRTOS/blob/main/src/FreeRTOSConfig_Default.h"><code>FreeRTOSConfig_Default.h</code></a>
+มาใส่ลงในไฟล์ <code>STM32FreeRTOSConfig.h</code> </p>
+<p><img alt="" src="stm32freertos_config.png" /></p>
+<p>รูป: ตัวอย่างการสร้างไฟล์ <code>STM32FreeRTOSConfig.h</code></p>
+<p>เพิ่มโค้ดหนึ่งบรรทัดดังต่อไปนี้ เพื่อเลือกรูปแบบการใช้งานหน่วยความจำประเภท <strong>Heap</strong> สำหรับ <strong>FreeRTOS</strong>
+ถ้าดูโค้ดในไฟล์ <a href="https://github.com/stm32duino/STM32FreeRTOS/blob/main/src/heap.c"><code>heap.c</code></a>
+จะหมายถึงการใช้โค้ดจากไฟล์ <a href="https://github.com/stm32duino/STM32FreeRTOS/blob/main/portable/MemMang/heap_3.c"><code>heap_3.c</code></a></p>
+<p><code>#define configMEMMANG_HEAP_NB    3</code></p>
+<p>เมื่ออัปโหลดโค้ดไปยังบอร์ด <strong>BlackPill</strong> ได้แล้ว จะต้องมีการเปิดพอร์ต <strong>Serial</strong> เพื่อรับข้อความจากบอร์ด
+และจะเห็นว่า มีการกระพริบของ <strong>LED</strong> บนบอร์ดที่ต่อกับขา <code>PC13</code></p>
+<p><img alt="" src="stm32freertos_demo_output-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับมาจากบอร์ด <strong>STM32F411CE BlackPill</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="analog-input-pwm-output-multitasking">&#9655; <strong>Analog Input + PWM Output: Multitasking</strong><a class="headerlink" href="#analog-input-pwm-output-multitasking" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการสร้างทาสก์ โดยแบ่งเป็นสองทาสก์ที่ทำงานอิสระจากกัน
+ทาสก์แรกทำให้ <strong>LED</strong> บนบอร์ดกระพริบด้วยอัตราคงที่
+ทาสก์ที่สองอ่านค่าจากขาอินพุตแบบแอนะล็อก โดยใช้คำสั่ง 
+<code>analogRead()</code> ซึ่งจะมีการใช้งานวงจร <strong>ADC</strong> 
+(<em>Analog-to-Digital Converter</em>) ที่อยู่ภายในชิป <strong>STM32F4</strong> 
+และนำค่าที่อ่านได้ไปใช้สำหรับการปรับค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> 
+(<em>Pulse Width Modulation</em>) ที่ถูกสร้างโดยคำสั่ง <code>analogWrite()</code></p>
+<pre><code>// Arduino library: https://github.com/stm32duino/STM32FreeRTOS
+#include &lt;Arduino.h&gt;
+#include &lt;STM32FreeRTOS.h&gt; // use FreeRTOS v10.3.1 ported to STM32duino
+#include &lt;STM32FreeRTOSConfig.h&gt; // use custom STM32-FreeRTOS configuration file
+
+#define LED_PIN PC13
+#define AIN_PIN PA0
+#define PWM_PIN PA5
+
+#define ADC_RESOLUTION (12)
+#define PWM_RESOLUTION (10)
+#define PWM_FREQ (10000)
+
+void task0(void *pvParameters);
+void task1(void *pvParameters);
+
+void setup() {
+  Serial.begin(115200);
+  while(!Serial);
+
+  // Create Task 0
+  xTaskCreate(task0, &quot;T0&quot;,
+              configMINIMAL_STACK_SIZE + 400,
+              NULL, tskIDLE_PRIORITY + 1, NULL);
+  xTaskCreate(task1, &quot;T1&quot;,
+              configMINIMAL_STACK_SIZE + 400,
+              NULL, tskIDLE_PRIORITY + 1, NULL);
+  vTaskStartScheduler();
+  while (1) {}
+}
+
+void loop() {
+}
+
+#define MS_TO_TICKS(x)  ((x) * configTICK_RATE_HZ/1000L)
+
+// task entry function
+void task0(void *pvParameters) {
+  (void)pvParameters;
+  int state = 0;
+  pinMode(LED_PIN, OUTPUT);
+  while (1) {
+    digitalWrite(LED_PIN, state ^= 1);
+    vTaskDelay( MS_TO_TICKS(100) );
+  }
+}
+
+// task entry function
+void task1(void *pvParameters) {
+  (void)pvParameters;
+  // Set ADC resolution (default: 10 bits)
+  analogReadResolution(ADC_RESOLUTION);
+  // Set PWM resolution (default: 8 bits)
+  analogWriteResolution(PWM_RESOLUTION);
+  // Set PWM frequency  (default: 1kHz)
+  analogWriteFrequency(PWM_FREQ);
+  // Write PWM value (zero)
+  analogWrite(PWM_PIN, 0);
+
+  while (1) {
+    // Read analog value.
+    int adc_value = analogRead(AIN_PIN);
+    // Write PWM value.
+    int pwm_value = 0;
+    int diff = (ADC_RESOLUTION - PWM_RESOLUTION);
+    if (diff &gt;= 0 ) {
+      pwm_value = adc_value &gt;&gt; diff;
+    } else {
+      pwm_value = adc_value &lt;&lt; (-diff);
+    }
+    analogWrite(PWM_PIN, pwm_value);
+    vTaskDelay( MS_TO_TICKS(100) );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้แนะนำวิธีการเขียนโค้ด <strong>Arduino</strong> และใช้งาน <strong>STM32-FreeSTOS</strong> สำหรับบอร์ด <strong>STM32F411CE BlackPill</strong> ในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2022-12-01 | Last Updated: 2022-12-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
