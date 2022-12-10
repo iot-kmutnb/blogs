@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/bootloader/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Bootloader สำหรับไมโครคอนโทรลเลอร์ - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#bootloader" class="nav-link">Bootloader สำหรับไมโครคอนโทรลเลอร์</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#mcu-bootloader" class="nav-link">&#9655; MCU Bootloader</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="bootloader">Bootloader สำหรับไมโครคอนโทรลเลอร์<a class="headerlink" href="#bootloader" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="mcu-bootloader">&#9655; <strong>MCU Bootloader</strong><a class="headerlink" href="#mcu-bootloader" title="Permanent link">#</a></h2>
+<p><strong>Bootloader</strong> เป็นโปรแกรมที่มีขนาดเล็กที่ถูกใส่ไว้ในหน่วยความจำภายในชิปไมโครคอนโทรลเลอร์
+เช่น เก็บไว้ในหน่วยความจำแบบ <strong>ROM</strong> (อ่านได้เท่านั้นและเขียนทับหรือแก้ไขไม่ได้) จากผู้ผลิตหรือโรงงาน 
+(แบบนี้เรียกว่า <strong>built-in ROM Bootloader</strong>) หรืออีกกรณีหนึ่งคือ 
+เก็บไว้ในหน่วยความจำประเภท <strong>Flash</strong> (เรียกส่วนนี้ว่า <strong>Boot Section</strong>) 
+ผู้ใช้สามารถเขียนทับใหม่ได้ หรืออาจมีการเซตบิตเพื่อป้องกันการเขียนทับได้</p>
+<p>นักพัฒนาได้สร้าง <strong>Bootloader</strong> ด้วยการเขียนโค้ดคำสั่งภาษา <strong>Assembly</strong> หรือภาษา <strong>C</strong> ก็ได้
+จากนั้นก็แปลงให้เป็นไฟล์ไบนารี (เช่น .hex หรือ .bin) สำหรับไมโครคอนโทรลเลอร์เป้าหมาย (<strong>Target Device</strong>) 
+แล้วนำไปเขียนใส่ลงในหน่วยความจำภายในชิป</p>
+<p>ในขั้นตอนการเขียนไฟล์ <strong>Bootloader Firmware</strong> ใส่ลงในชิป ผู้ใช้จะต้องอาศัยอุปกรณ์ฮาร์ดแวร์ที่เรียกว่า 
+<strong>Device Programmer</strong> เช่น เชื่อมต่อกับพอร์ต <strong>USB</strong> ของคอมพิวเตอร์ในด้านหนึ่ง
+และอีกด้านหนึ่งเป็นคอนเนกเตอร์สำหรับเชื่อมต่อกับขาของโครคอนโทรลเลอร์ 
+ยกตัวอย่างกรณีของบอร์ด <strong>Arduino Uno</strong> ก็มีคอนเนกเตอร์ที่เรียกว่า 
+<a href="https://en.wikipedia.org/wiki/In-system_programming"><strong>ISP</strong></a> (<em>In-System Programming</em>) หรือ <strong>ICSP</strong> (<em>In-Circuit Serial Programming</em>) 
+มีการจัดเรียงขาแบบ <strong>2x3</strong> (<strong>Male Pin Headers, 2.54mm pitch</strong>)</p>
+<p><img alt="" src="../images/arduino_bootloader_upload.png" /></p>
+<p>รูป: หลักการทำงานของ <strong>Arduino Bootloader</strong></p>
+<p><img alt="" src="../images/arduino_atmel_programmer.jpg" /></p>
+<p>รูป: อุปกรณ์ <a href="https://www.microchip.com/en-us/development-tool/ATATMEL-ICE"><strong>Atmel ICE Programmer</strong></a> และบอร์ด <strong>Arduino Uno</strong></p>
+<p>&nbsp;</p>
+<p>ไมไครคอนโทรลเลอร์ต่างตระกูลต่างบริษัทกัน ก็อาจใช้อุปกรณ์ที่ไม่เหมือนกัน
+เช่น ถ้าเป็นตระกูล <strong>ARM Cortex-M Series</strong> ก็จะใช้รูปแบบที่เรียกว่า <strong>SWD</strong> (<em>Serial-Wire Debug</em>) 
+เป็นต้น แต่ถ้าเป็นชิป <strong>Atmel AVR</strong> หรือ <strong>Microchip PIC</strong> ก็จะใช้อุปกรณ์และรูปแบบการทำงานที่แตกต่างออกไป</p>
+<p>ประโยชน์ของ <strong>Bootloader</strong> ก็คือ การทำให้ผู้ใช้สามารถนำโปรแกรม <strong>User Application Code</strong>
+ไปใส่ลงในหน่วยความจำ <strong>Flash</strong> ภายในชิป โดยไม่จำเป็นต้องใช้อุปกรณ์เสริมภายนอก (<strong>External Device Programmer</strong>) ที่อาจมีราคาแพง </p>
+<p>ฟังก์ชันการทำงานของ <strong>Bootloader</strong> โดยทั่วไป มีดังนี้</p>
+<ul>
+<li>เมื่อมีการรีเซตหรือบูทระบบ ไมโครคอนโทรลเลอร์จะโหลดและทำคำสั่งแรกที่อยู่ใน <strong>Bootloader</strong>
+และมีการทำคำสั่งต่าง ๆ เพื่อเขียนค่าลงในรีจิสเตอร์ที่เกี่ยวข้อง เพื่อทำให้ไมโครโทรลเลอร์พร้อมที่จะทำงานในลำดับถัดไป 
+เช่น ตั้งค่าวงจรความถี่สัญญาณ <strong>Clock</strong> เป็นต้น </li>
+<li>เมื่อทำขั้นตอน <strong>System Initialization</strong> แล้วจากนั้นจึงส่งต่อการทำงานให้โปรแกรมที่เรียกว่า 
+<strong>User Application Code</strong> ซึ่งเก็บอยู่ในหน่วยความ <strong>Flash</strong> (ในส่วนที่ไม่ใช่ <strong>Boot Section</strong>)
+หรืออาจจะมองว่าเป็นการส่งต่อการทำงานให้ฟังก์ชัน <code>main()</code> ของโปรแกรมที่เขียนด้วยภาษา <strong>C/C</strong>
+ยกเว้นแต่ว่า ต้องการจะเข้าสู่โหมดสำหรับการอัปโหลดใหม่ ก็จะรอการติดต่อกับซอฟต์แวร์ที่ทำงานบนคอมพิวเตอร์ หรือรอจนกว่า 
+<strong>Timeout</strong></li>
+</ul>
+<p>ในบางกรณีก็อาจมีการเก็บข้อมูลสำหรับโปรแกรม <strong>User Application Code</strong> ไว้ภายนอก เช่น 
+ใช้ชิป <strong>External Serial Flash</strong> แทนการเก็บไว้ใน <strong>On-Chip Flash</strong> แล้วโหลดโปรแกรมมาใส่ไว้ใน 
+<strong>SRAM</strong> ที่อยู่ภายในชิป</p>
+<p>ในบางกรณีไมโครคอนโทรลเลอร์จะไม่เข้าสู่โหมด <strong>Bootloader</strong> โดยอัตโนมัติ เมื่อรีเซตระบบ 
+แต่จะเกิดขึ้นเมื่อมีการกำหนดเงื่อนไขโดยผู้ใช้ เช่น การตรวจสอบสถานะลอจิกของขา <strong>GPIO</strong> บางขาสำหรับ <strong>Boot Pin</strong> 
+(เช่น ขา <strong>BOOT0</strong> สำหรับ <strong>STM32</strong>) หรือใช้วิธีการอื่น</p>
+<p>การเชื่อมต่อกับคอมพิวเตอร์มีหลายรูปแบบ</p>
+<ul>
+<li>การสื่อสารกับคอมพิวเตอร์ (เรียกว่า <strong>Host</strong>) มีหลายช่องทางให้เลือก โดยทั่วไป ก็ผ่านทาง <strong>Serial</strong> หรือ <strong>USB</strong> เป็นต้น 
+ถ้าไมโครคอนโทรลเลอร์สามารถรองรับการเชื่อมต่อแบบเครือข่าย (ใช้สายหรือไร้สาย) ก็จะใช้วิธีเชื่อมต่อผ่าน <strong>Ethernet</strong>
+หรือ <strong>WiFi</strong> เป็นต้น การโปรแกรมหรืออัปเดตแบบไร้สาย ก็เรียกว่า <strong>Over-the-Air (OTA) Update</strong></li>
+<li>ถ้า <strong>Bootloader</strong> เชื่อมต่อได้ผ่านทาง <strong>Serial</strong> ก็เรียกว่า "<strong>Serial Bootloader</strong>"
+ถ้าเชื่อมต่อผ่านทาง <strong>USB</strong> ก็เรียกว่า "<strong>USB Bootloader</strong>" เช่น ใช้โพรโตคอลสื่อสารที่เรียกว่า 
+<strong>USB DFU (Device Firmware Update) Protocol</strong> เป็นต้น </li>
+<li>ถ้าเป็นการอัปเดตผ่าน <strong>Ethernet</strong> ก็อาจใช้วิธีเชื่อมต่อกับ <strong>TFTP Server</strong>
+และเรียกว่า "<strong>TFTP Bootloader</strong>"</li>
+<li>ชิป <strong>STM32</strong> หลาย ๆ รุ่น ของบริษัท <strong>STMicroelectronics</strong> ได้มีการใส่ "<strong>DFU ROM Bootloader</strong>" 
+มาให้แล้ว และรองรับการทำงานในโหมดที่เรียกว่า <strong>Device Firmware Upgrade (DFU) Mode</strong> และซอฟต์แวร์สำหรับทำขั้นตอนการโปรแกรมก็คือ <strong>STM32CubeProgrammer</strong> 
+แต่ถ้าเป็น <strong>Open Source</strong> ก็ใช้โปรแกรม <code>dfu-util</code> แบบ <strong>Command Line</strong> </li>
+<li>ชิปไมโครคอนโทรลเลอร์ <strong>ARM Cortex-M Series</strong> ที่รองรับการใช้งาน <strong>Native USB</strong> ในหลาย ๆ รุ่น 
+ก็สามารถใช้งานกับ <strong>Microsoft UF2 Bootloader</strong> ได้ เมื่อเชื่อมต่อกับคอมพิวเตอร์ทางพอร์ต <strong>USB</strong> 
+โดยจะมองเห็นเป็น <strong>USB Mass Storage Device</strong> และถ้าเรามีไฟล์เฟิร์มแวร์ที่แปลงให้เป็นไฟล์ <code>.uf2</code>
+ก็สามารถลากไปวางเพื่อโปรแกรมอุปกรณ์ได้สะดวก</li>
+<li><strong>Bootloader</strong> ในยุคปัจจุบัน เช่น สำหรับ <strong>IoT</strong> และ <strong>Field OTA</strong> 
+อาจมีการเพิ่มมาตรการป้องกันสำหรับความปลอดภัย จึงเรียกว่า <strong>Secure Bootloader</strong> 
+ทำให้การอัปเดทเฟิร์มแวร์มีความปลอดภัยมากขึ้น (<strong>Secure Firmware Update</strong>)
+เช่น มีการเข้ารหัสป้องกัน (<strong>Encryption</strong>) ด้วยอัลกอริทึม <strong>AES</strong> 
+และมีการตรวจสอบยืนอุปกรณ์ด้วย <strong>Digital Signature</strong> 
+เช่น ใช้วิธี <strong>ECDSA</strong> (<em>Elliptic Curve Digital Signature Algorithm</em>) เป็นต้น </li>
+</ul>
+<p><img alt="" src="../images/bootloader_modes.png" /></p>
+<p>รูป: ตัวเลือกและรูปแบบการเชื่อมต่อสำหรับการทำงานของ <strong>Bootloader</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-12-10 | Last Updated: 2022-12-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
