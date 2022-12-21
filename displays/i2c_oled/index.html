@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/displays/i2c_oled/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูลแสดงผลแบบ OLED - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#oled" class="nav-link">การใช้งานโมดูลแสดงผลแบบ OLED</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#oled-displays" class="nav-link">&#9655; OLED Displays</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adafruit-sh110x" class="nav-link">&#9655; การใช้ไลบรารี Adafruit SH110X</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#u8g2-oled-i2c" class="nav-link">&#9655; การใช้ไลบรารี U8g2 สำหรับ OLED (I2C)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#u8g2-oled-spi" class="nav-link">&#9655; การใช้ไลบรารี U8g2 สำหรับ OLED (SPI)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="oled">การใช้งานโมดูลแสดงผลแบบ OLED<a class="headerlink" href="#oled" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="oled-displays">&#9655; <strong>OLED Displays</strong><a class="headerlink" href="#oled-displays" title="Permanent link">#</a></h2>
+<p>โมดูลที่สามารถนำมาใช้ในการแสดงผลเป็นข้อความหรือเชิงกราฟิก สำหรับบอร์ดไมโครคอนโทรลเลอร์
+มีให้เลือกใช้หลายแบบ ประเภทที่ได้รับความนิยมประเภทหนึ่งคือ จอแสดงผล <strong>OLED</strong> 
+(<em>Organic Light-Emitting Diode</em>) แบบ <strong>Dot-Matrix Display</strong> 
+ที่ใช้พลังงานต่ำและให้ภาพคมชัดกว่าจอ <strong>LCD</strong> ทั่วไป 
+และมาพร้อมกับชิปควบคุม (<strong>Display Controller Chip</strong>) </p>
+<p>การเลือกจอแสดงผล <strong>OLED</strong> ขนาดเล็ก มีข้อดีคือ ราคาถูกกว่า
+และใช้หน่วยความจำของไมโครคอนโทรลเลอร์ในการประมวลผลน้อยกว่า
+โปรแกรมเลือกสี (<strong>Display Colors</strong>) แต่ละพิกเซลได้เพียงหนึ่งหรือสองสีเท่านั้น
+เช่น สีขาวหรือสีน้ำเงินและมีพื้นหลังเป็นสีดำ หรือบางกรณีเป็นแบบสองสี (<strong>Bi-color</strong>) เช่น สีน้ำเงิน-เหลือง 
+โดยแบ่ง 1/4 ของความสูงบนหน้าจอเป็นสีเหลือง และอีก 3/4 เป็นสีน้ำเงิน</p>
+<p><img alt="" src="oled_4pin.png" /></p>
+<p>รูป: โมดูล <strong>0.96" OLED (4-Pin, I2C)</strong> </p>
+<p><img alt="" src="oled_7pin.png" /></p>
+<p>รูป: โมดูล <strong>1.3" OLED (7-Pin, SPI)</strong> </p>
+<p>ในปัจจุบัน ก็มีตัวอย่างของชิปควบคุมสำหรับ <strong>OLED</strong> เช่น 
+<strong>SSD1306</strong>, <strong>SSD1315</strong>, <strong>SH1106</strong> และ <strong>SH1107</strong> เป็นต้น
+มักใช้กับโมดูลหรือจอที่มีขนาดเล็กตามจำนวนของพิกเซล (กว้าง x สูง) เช่น <strong>64x32</strong>,
+<strong>128x32</strong>, <strong>128x64</strong> และ <strong>128x128</strong> เป็นต้น
+หรือมีจอภาพวัดความยาวในแนวทแยงมุม เช่น <strong>0.96"</strong> และ <strong>1.3"</strong> เป็นต้น</p>
+<p>ชิปควบคุม เช่น <strong>SSD1306</strong>
+ทำงานด้วยแรงดันไฟเลี้ยง (<strong>Logic Supply Voltage</strong> หรือ <strong>VDD</strong>) ในช่วง <strong>1.65V ~ 3.3V</strong>
+แต่ส่วนที่เป็นแผงจอ <strong>OLED</strong> จะใช้แรงดันไฟเลี้ยงที่มีระดับสูงกว่า <strong>VDD</strong> 
+(เรียกว่า <strong>Panel Driving Voltage: VPP</strong>)
+เช่น ในช่วง <strong> 7V ~ 15V</strong> โดยใช้วงจร <strong>Boost DC-DC Converter</strong> อย่างเช่น 
+ไอซี <strong>LT1308</strong> หรือ <strong>HM1308</strong> แต่ชิปควบคุมก็มีวงจรสร้างแรงดันไฟเลี้ยงอยู่ภายในด้วย 
+(เช่น เรียกว่า <strong>Internal VPP Generator</strong> หรือ <strong>Charge Pump / Switching Capacitor Regulator</strong>) </p>
+<p>ชิปควบคุมมีหน่วยความจำภายใน เรียกว่า 
+<strong>Graphic Display Data RAM (GDDRAM)</strong> หรือ <strong>SRAM Display Buffer</strong>
+สำหรับเก็บข้อมูลเพื่อนำไปใช้แสดงผลเชิงกราฟิกบนจอภาพ โดยทั่วไป ในกรณีของชิปควบคุม <a href="SSD1306_datasheet.pdf"><strong>SSD1306</strong></a>
+ก็มีขนาด 1024 ไบต์ (1KB) สำหรับจอขนาด <strong>128 × 64</strong> พิกเซล 
+โดยแบ่งความสูงของจอภาพได้เป็น 8 ส่วนตามแนวนอน หรือ แถบแนวนอน (เรียกว่า <strong>Pages</strong>)
+แต่ละส่วนประกอบด้วย 128 คอลัมน์ (<strong>Columns</strong> หรือ <strong>Segments</strong>) และหนึ่งคอลัมน์จะมีหน่วยความจำเท่ากับ 8 บิต (1 ไบต์)
+ใช้หนึ่งบิตสำหรับหนึ่งพิกเซล ถ้าจอแสดงผล <strong>OLED</strong> มีขนาด <strong>128 × 32</strong> พิกเซล ก็จะมีเพียง 4 ส่วน</p>
+<p>ในกรณีของชิปควบคุม <a href="SH1107_v2.1_datasheet.pdf"><strong>SH1107</strong></a>
+ก็มีขนาด 2048 ไบต์ (2KB) สำหรับจอขนาดสูงสุด <strong>128 × 128</strong> พิกเซล </p>
+<p><img alt="" src="sh1107_block_diagram.png" /></p>
+<p>รูป: ผังแสดงองค์ประกอบภายในของ <strong>SH1107</strong></p>
+<p>&nbsp;</p>
+<p>การเชื่อมต่อกับชิปควบคุม เพื่อส่งคำสั่งตั้งค่าการใช้งาน และเขียนข้อมูลลงในหน่วยความจำ <strong>GDDRAM</strong>
+มีให้เลือกได้หลายวิธี แต่มีอยู่ 2 วิธีที่ใช้งานบ่อย ได้แก่ การเชื่อมต่อด้วยบัส <strong>I2C</strong> (ความเร็วสูงสุด <strong>400kHz</strong>)
+และการเชื่อมต่อแบบบัส <strong>SPI</strong></p>
+<p>ดังนั้นเวลาเลือกใช้งาน จะต้องดูก่อนว่า โมดูล <strong>OLED</strong> มีรูปแบบการเชื่อมต่อเป็นแบบไหน
+โดยทั่วไป ก็จะเลือกใช้โมดูลแบบ <strong>Breakout Board</strong>
+ที่มี 4 ขา ซึ่งเชื่อมต่อแบบ <strong>I2C</strong> (มีแอดเดรสเป็น <code>0x3C</code> หรือ <code>0x3D</code>) ดังนี้</p>
+<ul>
+<li><strong>GND</strong>: ขากราวด์ (<strong>Ground</strong>) ของวงจร</li>
+<li><strong>VCC</strong>: ขาแรงดันไฟเลี้ยง (<strong>Voltage Supply</strong>) ในช่วง <strong>3.3V ~ 5V</strong>
+และมีวงจรหรือไอซีควบคุมแรงดันไฟเลี้ยง เช่น ไอซี <strong>662K-3.3V</strong> หรือ <strong>XC6206-3.3V</strong></li>
+<li><strong>SCL</strong>: ขาสัญญาณ <strong>Clock</strong> ของบัส <strong>I2C</strong></li>
+<li><strong>SDA</strong>: ขาสัญญาณ <strong>Data</strong> ของบัส  <strong>I2C</strong></li>
+</ul>
+<p>โดยทั่วไปแล้วก็จะมีตัวต้านทาน <strong>Pullup</strong> เช่น ขนาด <strong>4.7k</strong> ต่อไว้ที่ขา <strong>SDA</strong>
+และ <strong>SCL</strong> อย่างละหนึ่งตัว</p>
+<p>ในกรณีที่เชื่อมต่อแบบบัส <strong>SPI</strong> ก็มีขาทั้งหมด 7 ขาของโมดูลดังนี้</p>
+<ul>
+<li><strong>GND</strong>: ขากราวด์ (<strong>Ground</strong>) ของวงจร</li>
+<li><strong>VCC</strong>: ขาแรงดันไฟเลี้ยง (<strong>Voltage Supply</strong>) 
+มีวงจรควบคุมแรงดันไฟเลี้ยงสำหรับ <strong>3.3V ~ 5V</strong></li>
+<li><strong>SCLK / D0</strong>: ขาสัญญาณ <strong>Clock</strong> เพื่อกำหนดจังหวะการทำงานและสื่อสารข้อมูล</li>
+<li><strong>MOSI / D1</strong>: ขาสำหรับการสื่อสารข้อมูลระหว่างไมโครคอนโทรลเลอร์กับโมดูล <strong>OLED</strong> </li>
+<li><strong>RES</strong>: ขารีเซตการทำงานของโมดูล</li>
+<li><strong>D/C</strong>: ขาที่ใช้ระบุว่า สัญญาณ <strong>MOSI</strong> ที่ถูกส่งไปยังโมดูล <strong>OLED</strong> เป็นข้อมูล
+(<strong>DATA</strong>) หรือ คำสั่ง (<strong>CMD</strong>)</li>
+<li><strong>CS</strong>: ขา <strong>Chip Select</strong> สำหรับโมดูล <strong>OLED</strong></li>
+</ul>
+<p><img alt="" src="oled_sh1107_modules.jpg" /></p>
+<p>รูป: โมดูล <strong>OLED</strong> ที่ใช้ชิป <strong>SH1107</strong> ขนาด <strong>1.5"</strong>, <strong>1.3"</strong> และ <strong>0.96"</strong></p>
+<p><img alt="" src="gme64128_oled_130.png" /></p>
+<p>รูป: โมดูล <strong>GME64128</strong> &mdash; <strong>1.3" OLED</strong>, <strong>White Color</strong>, <strong>64x128 Pixels</strong>, 
+<strong>I2C</strong>, <strong>SH1107 Driver</strong>, <strong>662K-3.3V LDO</strong>, <strong>Boost DC-DC Converter for VPP</strong></p>
+<p><img alt="" src="gme64128_oled_096.png" /></p>
+<p>รูป: โมดูล <strong>GME64128</strong> &mdash; <strong>0.96" OLED</strong>, <strong>White Color</strong>, <strong>64x128 Pixels</strong>, 
+<strong>I2C</strong>, <strong>SH1107 Driver</strong>, <strong>662K-3.3V LDO</strong>, <strong>Boost DC-DC Converter for VPP</strong></p>
+<p>สำหรับการเขียนโปรแกรมไมโครคอนโทรลเลอร์เพื่อใช้งานร่วมกับโมดูล  <strong>OLED</strong> ก็แนะนำให้เลือกใช้ไลบรารี
+เช่น ไลบรารีที่ได้พัฒนาโดยบริษัท <strong>Adafruit</strong> และไลบรารี <strong>U8g2</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adafruit-sh110x">&#9655; การใช้ไลบรารี <strong>Adafruit SH110X</strong><a class="headerlink" href="#adafruit-sh110x" title="Permanent link">#</a></h2>
+<p>บริษัท <strong>Adafruit</strong> ได้พัฒนาไลบรารีสำหรับการเขียนโปรแกรม <strong>Arduino</strong> และใช้งานสำหรับโมดูล
+<strong>OLED</strong> ได้หลายรุ่นหลายแบบ จำแนกตามชิปควบคุมที่ใช้งาน เช่น</p>
+<ul>
+<li><a href="https://github.com/adafruit/Adafruit-GFX-Library"><strong>Adafruit GFX Library</strong></a>:
+เป็นไลบารีที่มีคำสั่งสำหรับการวาดรูปกราฟิกหรือแสดงข้อความบนหน้าจอ <strong>OLED</strong></li>
+<li><a href="https://github.com/adafruit/Adafruit_SSD1306"><strong>Adafruit SSD1306 Library</strong></a>: 
+เป็นไลบรารีสำหรับโมดูล  <strong>OLED</strong> แบบสีขาวดำ (<strong>Monochrome</strong>) ที่ใช้ชิปควบคุม <strong>SSD1306</strong></li>
+<li><a href="https://github.com/adafruit/Adafruit_SH110x"><strong>Adafruit SH110X Library</strong></a>:
+เป็นไลบรารีสำหรับโมดูล  <strong>OLED</strong> แบบสีขาวดำที่ใช้ชิปควบคุม <strong>SH1106</strong> หรือ <strong>SH1107</strong></li>
+</ul>
+<p>ถ้าต้องการจะใช้งานไลบรารีร่วมกับ <strong>Arduino IDE</strong> จะต้องมีการติดตั้งก่อน
+โดยไปที่เมนู  <strong>Sketch &gt; Include Library &gt; Manage Libraries</strong> 
+สำหรับ <strong>Arduino Library Manager</strong>
+แล้วค้นหาคำว่า <code>Adafruit SSD1306</code> <code>Adafruit SH110X</code>  และ <code>Adafruit GFX</code> แล้วคลิกเลือกติดตั้งตามลำดับ</p>
+<p><img alt="" src="adafruit_sh110x_install.png" /></p>
+<p>รูป: การติดตั้งไลบรารี <strong>Adafruit SH110X</strong></p>
+<p><img alt="" src="adafruit_gfx_install.png" /></p>
+<p>รูป: การติดตั้งไลบรารี <strong>Adafruit GFX</strong> สำหรับใช้ร่วมกับไลบรารี <strong>Adafruit SH110X</strong></p>
+<p>ตัวอย่างโค้ดสาธิตการใช้งานไลบรารี <strong>Adafruit SH110X</strong> สำหรับโมดูล <strong>OLED (I2C)</strong> ขนาด 128 x 64 พิกเซล
+และเขียนโปรแกรมด้วย <strong>Arduino ESP32</strong> และ <strong>Arduino Nano</strong>  มีดังนี้</p>
+<p>ในโค้ดตัวอย่างได้เลือกใช้ขา <strong>19/22</strong> ของ <strong>ESP32</strong> และ <strong>A4/A5</strong> ของ <strong>Uno / Nano</strong>
+สำหรับ <strong>SDA/SCL pins</strong></p>
+<pre><code>// Date: 2022-12-20
+#include &lt;Wire.h&gt;
+#include &lt;Adafruit_GFX.h&gt;
+// https://github.com/adafruit/Adafruit-GFX-Library/
+#include &lt;Adafruit_SH110X.h&gt;
+// https://github.com/adafruit/Adafruit_SH110x/
+
+#if defined(ESP32)
+#define I2C_SCL_PIN      (22)
+#define I2C_SDA_PIN      (19)
+#endif
+// Note: For Arduino Uno or Nano, A4/A5 pins are used as the SDA/SCL pins.
+
+#define OLED_I2C_ADDR    (0x3C) // The 7-bit I2C address of the OLED module
+#define OLED_WIDTH       (64)   // OLED display width (in pixels)
+#define OLED_HEIGHT      (128)  // OLED display height (in pixels)
+#define OLED_RESET       (-1)   // No reset pin
+#define WHITE_COLOR      (SH110X_WHITE)
+
+Adafruit_SH1107 oled( OLED_WIDTH, OLED_HEIGHT, &amp;Wire, OLED_RESET );
+
+void setup() {
+  Serial.begin( 115200 );
+#if defined(ESP32)
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+#endif
+  // Set I2C clock speed to 400kHz
+  Wire.setClock( 400000 ); 
+  // Initialize the OLED display
+  if ( !oled.begin( OLED_I2C_ADDR, true ) ) {
+    Serial.println( F(&quot;OLED init failed!!!&quot;) );
+  } 
+  // Set the display orientation (0..3)
+  oled.setRotation( 1 ); 
+  // Clear display buffer
+  oled.clearDisplay(); 
+  // Set text color to white
+  oled.setTextColor( WHITE_COLOR );
+  // Update the display
+  oled.display(); 
+}
+
+#define NUM_LINES         (6)
+#define VERTICAL_SPACING  (10)
+
+void demo1() {
+  // Clear the display
+  oled.clearDisplay();
+  // Set the text size
+  oled.setTextSize( 1 );
+  // Set cursor positions and write texts to display buffer
+  oled.setCursor( 0, 4 );
+  oled.println( &quot;Adafruit SH110X&quot; );
+  oled.setCursor( 0, 20 );
+  oled.println( &quot;SH1107 OLED I2C&quot; );
+  oled.setCursor( 0, 36 );
+  oled.println( &quot;64x128 Pixels&quot; );
+  // Update the display
+  oled.display();
+}
+
+void demo2() {
+  static char sbuf[32];
+  // Clear the display
+  oled.clearDisplay();
+  // Set the text size
+  oled.setTextSize( 1 );
+  // Draw a rectangular frame
+  oled.drawRect( 0, 0, oled.width()-1, oled.height()-1, WHITE_COLOR );
+  int x=5, y=2;
+  for ( int i=0; i &lt; NUM_LINES; i++ ) {
+    oled.setCursor( x, y );
+    y += VERTICAL_SPACING;
+    snprintf( sbuf, 32, &quot;Line #%d:__________&quot;, (i+1) );
+    oled.println( sbuf );
+  }
+  // Update the display
+  oled.display();
+}
+
+void loop() {
+  demo1();
+  delay(2000);
+  demo2();
+  delay(2000);
+}
+</code></pre>
+<p><img alt="" src="nano_sh1107_oled-1.jpg" /></p>
+<p><img alt="" src="nano_sh1107_oled-3.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ด โดยใช้บอร์ด <strong>Arduino Nano v3</strong> และ <strong>OLED (SH1107)</strong>
+ใช้แรงดันไฟเลี้ยง <strong>VCC=+5V</strong> และขา <strong>A4/A5</strong> สำหรับ <strong>SDA/SCL</strong></p>
+<p><img alt="" src="esp32_sh1107_oled-1.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ด โดยใช้บอร์ด <strong>WeMos Lolin32 Lite</strong> และ <strong>OLED (SH1107)</strong>
+ใช้แรงดันไฟเลี้ยง <strong>VCC=+3.3V</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="u8g2-oled-i2c">&#9655; การใช้ไลบรารี <strong>U8g2</strong> สำหรับ <strong>OLED (I2C)</strong><a class="headerlink" href="#u8g2-oled-i2c" title="Permanent link">#</a></h2>
+<p>อีกไลบรารีสำหรับการเขียนโปรแกรม <strong>Arduino</strong> ที่สามารถนำมาใช้กับโมดูล <strong>OLED</strong>
+คือ <a href="https://github.com/olikraus/u8g2"><strong>U8g2 (Universal 8-bit Graphics Library V2)</strong></a>
+ซึ่งพัฒนาโดย <strong>Oliver Kraus</strong> คำสั่งต่าง ๆ เกี่ยวกับการใช้งาน <strong>U8g2 Library</strong> สามารถดูได้จาก
+<a href="https://github.com/olikraus/u8g2/wiki/u8g2reference">"<strong>U8g2 Reference</strong>"</a></p>
+<p>ถ้าต้องการจะใช้งานไลบรารีนี้ร่วมกับ <strong>Arduino IDE</strong> จะต้องมีการติดตั้งก่อน
+โดยไปที่เมนู  <strong>Sketch &gt; Include Library &gt; Manage Libraries</strong> 
+สำหรับ <strong>Arduino Library Manager</strong>
+แล้วค้นหาคำว่า <code>U8g2</code> แล้วคลิกเลือกติดตั้ง</p>
+<p><img alt="" src="u8g2_lib_install.png" /></p>
+<p>รูป: การติดตั้งไลบรารี <strong>U8g2</strong> สำหรับ <strong>Arduino IDE</strong></p>
+<p>ตัวอย่างโค้ดสาธิตมีดังนี้ ซึ่งมีการใช้คลาสที่มีชื่อว่า <code>U8G2_SH1107_64X128_F_HW_I2C</code>
+(ประกาศไว้ในไฟล์ <a href="https://raw.githubusercontent.com/olikraus/u8g2/master/cppsrc/U8g2lib.h"><code>U8g2lib.h</code></a>)
+สำหรับการใช้งานโมดูล <strong>OLED</strong> ที่มีชิปควบคุมเป็น <strong>SH1107</strong> และสื่อสารด้วยบัส <strong>I2C</strong></p>
+<pre><code>U8G2_SH1107_64X128_F_HW_I2C u8g2(
+  U8G2_R1 /*rotation 90 deg.*/, 
+  NO_RESET_PIN /*reset pin*/ 
+);
+</code></pre>
+<p>ถ้าใช้โมดูล <strong>OLED (SH1107)</strong> ขนาด <strong>128 x 128</strong> ก็ให้ลองใช้คลาส 
+<code>U8G2_SH1107_128X128_F_HW_I2C</code> ตามตัวอย่างต่อไปนี้</p>
+<pre><code>U8G2_SH1107_128X128_F_HW_I2C u8g2(
+  U8G2_R1 /*rotation 90 deg.*/, 
+  NO_RESET_PIN /*reset pin*/ 
+);
+</code></pre>
+<p>ถ้าใช้โมดูล <strong>OLED (SSD1306)</strong> ขนาด <strong>128 x 64</strong> ก็ให้ลองใช้คลาส 
+<code>U8G2_SSD1306_128X64_NONAME_F_HW_I2C</code> ตามตัวอย่างต่อไปนี้</p>
+<pre><code>U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(
+  U8G2_R2 /*180 deg. rotation */, 
+  NO_RESET_PIN /*reset pin*/ 
+);
+</code></pre>
+<p>ถ้าเป็นโมดูล <strong>0.91" 128x32 OLED</strong>
+ให้ลองใช้คลาส  <code>U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C</code> 
+ตามตัวอย่างต่อไปนี้</p>
+<pre><code>U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(
+  U8G2_R0 /* no rotation */, 
+  NO_RESET_PIN /*reset pin*/ 
+);
+</code></pre>
+<p>ถ้าเป็นโมดูล <strong>0.66" 64x48 SSD1306 OLED - WeMos D1 Mini Shield</strong>
+(ขา <strong>D1/D2</strong> ตรงกับ <strong>SCL/SDA</strong>)
+แนะนำให้ใช้คลาส  <code>U8G2_SSD1306_64X48_ER_F_HW_I2C</code> ตามตัวอย่างต่อไปนี้</p>
+<pre><code>U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(
+  U8G2_R0 /* no rotation */, 
+  NO_RESET_PIN /*reset pin*/ 
+);
+</code></pre>
+<p>และรายการชื่อฟอนต์ที่สามารถใช้ได้กับ <strong>U8g2</strong> ดูได้จาก 
+<a href="https://github.com/olikraus/u8g2/wiki/fntlistall">"<strong>Font List All</strong>"</a></p>
+<pre><code>#include &lt;Wire.h&gt;
+#include &lt;U8g2lib.h&gt; // https://github.com/olikraus/u8g2
+// https://github.com/olikraus/u8g2/wiki/u8g2setupcpp
+
+#if defined (ESP32)
+#define I2C_SDA_PIN    (19)
+#define I2C_SCL_PIN    (22)
+#endif
+
+#define OLED_I2C_ADDR  (0x3C)
+#define NO_RESET_PIN   (U8X8_PIN_NONE)   // No reset pin
+#define U8G2_FONT      (u8g2_font_7x13B_tf)
+// see font list -&gt; https://github.com/olikraus/u8g2/wiki/fntlistall
+
+// Define the OLED display and the SH1107 driver
+// Use full framebuffer, Hardware I2C interfacing
+U8G2_SH1107_64X128_F_HW_I2C u8g2(
+  U8G2_R1 /*rotation 90 deg.*/, 
+  NO_RESET_PIN /*reset pin*/ 
+);
+
+void setup() {
+  Serial.begin(115200);
+  // Initialize the I2C master
+#if defined (ESP32)
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+#else
+  Wire.begin();
+#endif
+
+  // Set SH1107 device address
+  u8g2.setI2CAddress(OLED_I2C_ADDR &lt;&lt; 1);
+  // Set I2C bus clock
+  u8g2.setBusClock(400000);
+  // Show I2C bus clock speed;
+  Serial.print( &quot;I2C bus clock: &quot; );
+  Serial.println( u8g2.getBusClock( ) );
+  // Initialize the OLED display
+  u8g2.begin();
+  // Set the font and font size
+  u8g2.setFont(U8G2_FONT);
+}
+
+void demo() {
+  // Clear the display buffer
+  u8g2.clearBuffer();
+  // Draw text lines on the display buffer
+  u8g2.setCursor(0, 15);
+  u8g2.print(&quot;I2C OLED SH1107&quot;);
+  u8g2.drawStr(0, 30, &quot;64x128 pixels&quot;);
+  u8g2.drawStr(0, 45, &quot;SH1107 (0x3C)&quot;);
+  u8g2.drawStr(0, 60, &quot;Arduino + U8G2&quot;);
+  // Send the display buffer to the OLED display
+  u8g2.sendBuffer();
+}
+
+void loop() {
+  demo();
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="nano_sh1107_oled-4.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ดตัวอย่างเมื่อใช้ไลบรารี <strong>U8g2</strong> โดยใช้บอร์ด <strong>Arduino Nano v3</strong> และ <strong>OLED (SH1107)</strong></p>
+<p><img alt="" src="esp32_sh1107_oled-2.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ดตัวอย่างเมื่อใช้ไลบรารี <strong>U8g2</strong> 
+โดยใช้บอร์ด <strong>WeMos Lolin32 Lite</strong> และ <strong>OLED (SH1107, 64x128 pixels)</strong></p>
+<p><img alt="" src="esp32_sh1107_oled-3.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ดตัวอย่างเมื่อใช้ไลบรารี <strong>U8g2</strong> 
+โดยใช้บอร์ด <strong>WeMos Lolin32 Lite</strong> และโมดูล <strong>OLED (SH1107, 128x128 pixels)</strong></p>
+<p><img alt="" src="esp32_ssd1306_oled-1.jpg" /></p>
+<p>รูป: บอร์ด <strong>WeMos Lolin32 Lite</strong> และโมดูล 
+<strong>OLED (SSD1306, 128x64 pixels)</strong></p>
+<p><img alt="" src="esp32_ssd1306_oled-2.jpg" /></p>
+<p>รูป: บอร์ด <strong>WeMos Lolin32 Lite</strong> และโมดูล
+<strong>WeMos D1 Mini OLED Shield (SSD1306, 64x48 pixels)</strong></p>
+<p><img alt="" src="esp32_ssd1306_oled-3.jpg" /></p>
+<p>รูป: บอร์ด <strong>WeMos Lolin32 Lite</strong> และโมดูล 
+<strong>OLED (SSD1306, 128X32 pixels)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="u8g2-oled-spi">&#9655; การใช้ไลบรารี <strong>U8g2</strong> สำหรับ <strong>OLED (SPI)</strong><a class="headerlink" href="#u8g2-oled-spi" title="Permanent link">#</a></h2>
+<p>ถ้าเป็นโมดูล <strong>SSD1306 (128x64 pixels)</strong> และเชื่อมต่อแบบ <strong>SPI</strong> 
+ก็มีตัวอย่างโค้ดเพื่อทดลองใช้กับบอร์ด <strong>ESP32</strong> ดังนี้</p>
+<p>ในตัวอย่างนี้ได้เลือกใช้ขา <strong>Hardware VSPI</strong> ของ <strong>ESP32</strong> ซึ่งมีขา
+<strong>SCLK</strong> ตรงกับ <strong>GPIO18</strong> ขา <strong>MOSI</strong> ตรงกับ <strong>GPIO23</strong>
+และได้เลือกใช้ขา <strong>GPIO5</strong> สำหรับขา <strong>CS</strong> และขา <strong>GPIO17</strong> สำหรับขา <strong>DC</strong> ตามลำดับ
+ส่วนขา <strong>RES</strong> (รีเซต) ไม่ได้ต่อใช้งาน แต่ต่อกับตัวต้านทานแบบ <strong>Pullup</strong> ไปยัง <strong>3.3V</strong></p>
+<p>การทำงานของ <strong>OLED</strong> ในส่วนที่เกี่ยวข้องกับ <strong>Screen Buffer</strong> มีสองตัวเลือกในตัวอย่างนี้ คือ </p>
+<ul>
+<li><strong>Full Frame Buffer</strong>: อัปเดตจอภาพได้เร็วกว่า แต่ใช้หน่วยความจำมากกว่า</li>
+<li><strong>Single Page Buffer</strong>: อัปเดตจอภาพได้ช้ากว่า เพราะจะต้องมีการแบ่งทำที่ละส่วน (<strong>Page wise</strong>)
+แต่ใช้หน่วยความจำน้อยกว่า </li>
+</ul>
+<pre><code>#include &lt;SPI.h&gt;
+#include &lt;U8g2lib.h&gt; // https://github.com/olikraus/u8g2
+
+// Hardware VSPI of ESP32
+// SCLK = GPIO18
+// MOSI = GPIO23
+// MISO = GPIO19
+#define OLED_SCLK  (18)
+#define OLED_MOSI  (23)
+#define OLED_CS    (5)
+#define OLED_DC    (17)
+#define OLED_RES   (U8X8_PIN_NONE)
+
+#define USE_FULLFRAME
+
+#define U8G2_FONT (u8g_font_unifont)
+// see font list -&gt; https://github.com/olikraus/u8g2/wiki/fntlistall
+
+#ifdef USE_FULLFRAME
+// Use a full framebuffer 
+U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI u8g2(
+  U8G2_R2, OLED_SCLK, OLED_MOSI, OLED_CS, OLED_DC, OLED_RES );
+#else
+// Use a single buffer instead on full framebuffer 
+U8G2_SSD1306_128X64_NONAME_1_4W_SW_SPI u8g2(
+  U8G2_R2, OLED_SCLK, OLED_MOSI, OLED_CS, OLED_DC, OLED_RES );
+#endif;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode( OLED_CS, OUTPUT );
+  pinMode( OLED_DC, OUTPUT );
+  // Initial  the U8g2 library
+  u8g2.begin();
+  // Set the font and font size
+  u8g2.setFont(U8G2_FONT);
+  // Set color to white
+  u8g2.setColorIndex(1);
+}
+
+void loop() {
+  static char sbuf[12];
+  static uint16_t count = 0;
+  static uint32_t ts = 0;
+  uint32_t now = millis();
+  if ( millis() - ts &gt;= 1000 ) { // Update every 1 sec
+    ts = now;
+    sprintf( sbuf, &quot;COUNT: %04d&quot;, count );
+    count = (count+1) % 10000;
+    // Get text width
+    int text_width = u8g2.getStrWidth(sbuf);
+#ifdef USE_FULLFRAME
+    // Clear display
+    u8g2.clearBuffer();
+    // Draw text on the screen
+    u8g2.drawStr( 64-text_width/2, 30, sbuf );
+    // Update the display
+    u8g2.sendBuffer();
+#else
+    // Start drawing the OLED on the first page
+    u8g2.firstPage();
+    do {
+      // Draw text on the screen
+      u8g2.drawStr( 64-text_width/2, 30, sbuf );
+    } while ( u8g2.nextPage() );   
+#endif 
+  }
+}
+</code></pre>
+<p><img alt="" src="esp32_ssd1306_oled_spi-1.jpg" /></p>
+<p>รูป: บอร์ด <strong>WeMos Lolin32 Lite</strong> และโมดูล 
+<strong>OLED (SSD1306, SPI, 128X64 pixels)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานโมดูล <strong>OLED</strong> และการเขียนโปรแกรมด้วย <strong>Arduino</strong> ในเบื้องต้น
+และสาธิตวิธีการใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino Nano v3</strong> และ <strong>WeMos Lolin32 Lite</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-12-20 | Last Updated: 2022-12-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
