@@ -8,7 +8,7 @@
         <meta name="author" content="RSP">
         <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/displays/i2c_oled/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>การใช้งานโมดูลแสดงผลแบบ OLED - IoT Engineering Education</title>
+        <title>การใช้งานโมดูลแสดงผลที่มีจอภาพ OLED - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#oled" class="nav-link">การใช้งานโมดูลแสดงผลแบบ OLED</a>
+            <li class="nav-item" data-level="1"><a href="#oled" class="nav-link">การใช้งานโมดูลแสดงผลที่มีจอภาพ OLED</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#oled-displays" class="nav-link">&#9655; OLED Displays</a>
               <ul class="nav flex-column">
@@ -107,6 +107,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator" class="nav-link">&#9655; การจำลองการทำงานด้วย Wokwi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -118,7 +122,7 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="oled">การใช้งานโมดูลแสดงผลแบบ OLED<a class="headerlink" href="#oled" title="Permanent link">#</a></h1>
+<h1 id="oled">การใช้งานโมดูลแสดงผลที่มีจอภาพ OLED<a class="headerlink" href="#oled" title="Permanent link">#</a></h1>
 <hr />
 <h2 id="oled-displays">&#9655; <strong>OLED Displays</strong><a class="headerlink" href="#oled-displays" title="Permanent link">#</a></h2>
 <p>โมดูลที่สามารถนำมาใช้ในการแสดงผลเป็นข้อความหรือเชิงกราฟิก สำหรับบอร์ดไมโครคอนโทรลเลอร์
@@ -128,7 +132,7 @@
 และมาพร้อมกับชิปควบคุม (<strong>Display Controller Chip</strong>) </p>
 <p>การเลือกจอแสดงผล <strong>OLED</strong> ขนาดเล็ก มีข้อดีคือ ราคาถูกกว่า
 และใช้หน่วยความจำของไมโครคอนโทรลเลอร์ในการประมวลผลน้อยกว่า
-โปรแกรมเลือกสี (<strong>Display Colors</strong>) แต่ละพิกเซลได้เพียงหนึ่งหรือสองสีเท่านั้น
+สามารถโปรแกรมเลือกสี (<strong>Display Colors</strong>) แต่ละพิกเซลได้เพียงหนึ่งหรือสองสีเท่านั้น
 เช่น สีขาวหรือสีน้ำเงินและมีพื้นหลังเป็นสีดำ หรือบางกรณีเป็นแบบสองสี (<strong>Bi-color</strong>) เช่น สีน้ำเงิน-เหลือง 
 โดยแบ่ง 1/4 ของความสูงบนหน้าจอเป็นสีเหลือง และอีก 3/4 เป็นสีน้ำเงิน</p>
 <p><img alt="" src="oled_4pin.png" /></p>
@@ -484,10 +488,10 @@ void loop() {
 U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI u8g2(
   U8G2_R2, OLED_SCLK, OLED_MOSI, OLED_CS, OLED_DC, OLED_RES );
 #else
-// Use a single buffer instead on full framebuffer 
+// Use a single buffer instead of full framebuffer 
 U8G2_SSD1306_128X64_NONAME_1_4W_SW_SPI u8g2(
   U8G2_R2, OLED_SCLK, OLED_MOSI, OLED_CS, OLED_DC, OLED_RES );
-#endif;
+#endif
 
 void setup() {
   Serial.begin(115200);
@@ -535,13 +539,135 @@ void loop() {
 <strong>OLED (SSD1306, SPI, 128X64 pixels)</strong></p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="wokwi-simulator">&#9655; การจำลองการทำงานด้วย <strong>Wokwi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดที่สามารถนำไปทดลองใช้งานกับ <a href="https://wokwi.com/projects/"><strong>Wokwi Simulator</strong></a>
+โดยเลือกใช้บอร์ด <strong>ESP32 DevKit</strong> หรือ <strong>Arduino Nano</strong> ร่วมกับโมดูล <strong>SSD1306 I2C OLED</strong> 
+(<a href="https://docs.wokwi.com/parts/board-ssd1306"><code>board-ssd1306</code></a>)
+ร่วมกับไลบรารี <code>U8g2</code> สำหรับการสาธิต</p>
+<pre><code>// Date: 2022-12-24
+#include &lt;Wire.h&gt;
+#include &lt;U8g2lib.h&gt; // https://github.com/olikraus/u8g2
+
+#if defined (ESP32)
+#define I2C_SDA_PIN    (19)
+#define I2C_SCL_PIN    (22)
+#endif
+
+#define USE_FULLFRAME
+
+#define OLED_I2C_ADDR  (0x3C) // Default address
+#define NO_RESET_PIN   (U8X8_PIN_NONE)  // No reset pin
+#define U8G2_FONT      (u8g2_font_7x13B_tf)
+
+#ifdef USE_FULLFRAME
+// Use a full framebuffer 
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(
+  U8G2_R0, NO_RESET_PIN );
+#else
+// Use a single buffer instead of full framebuffer 
+U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(
+  U8G2_R0, NO_RESET_PIN );
+#endif
+
+void setup() {
+  Serial.begin(115200);
+  // Initialize the I2C master
+#if defined (ESP32)
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+#else
+  Wire.begin();
+#endif
+  // Set OLED device address
+  u8g2.setI2CAddress(OLED_I2C_ADDR &lt;&lt; 1);
+  // Set I2C bus clock
+  u8g2.setBusClock(400000);
+  // Show I2C bus clock speed
+  Serial.print( &quot;I2C bus clock: &quot; );
+  Serial.println( u8g2.getBusClock( ) );
+  // Initialize the OLED display
+  u8g2.begin();
+  // Set the font and font size
+  u8g2.setFont(U8G2_FONT);
+}
+
+void demo1() { // note: This requires a full framebuffer.
+  // Clear the display buffer
+  u8g2.clearBuffer();
+  // Draw text lines on the display buffer
+  u8g2.setCursor(0, 15);
+  u8g2.print(&quot;I2C OLED&quot;);
+  u8g2.drawStr(0, 30, &quot;128x64 pixels&quot;);
+  u8g2.drawStr(0, 45, &quot;SSD1306 (0x3C)&quot;);
+  u8g2.drawStr(0, 60, &quot;Arduino + U8G2&quot;);
+  // Send the display buffer to the OLED display
+  u8g2.sendBuffer();
+}
+
+void demo2() {
+  static char sbuf[12];
+  static uint16_t count = 0;
+  sprintf( sbuf, &quot;COUNT: %04d&quot;, count );
+  count = (count+1) % 10000;
+
+  // Get display width
+  int disp_width = u8g2.getDisplayWidth();
+  // Get text width
+  int text_width = u8g2.getStrWidth(sbuf);
+
+#ifdef USE_FULLFRAME
+  // Clear display
+  u8g2.clearBuffer();
+  // Draw text on the screen
+  u8g2.drawStr( (disp_width-text_width)/2, 32, sbuf );
+  // Update the display
+  u8g2.sendBuffer();
+#else
+  // Start drawing the OLED on the first page
+  u8g2.firstPage();
+  do {
+    // Draw text on the screen
+    u8g2.drawStr( (disp_width-text_width)/2, 32, sbuf );
+  } while ( u8g2.nextPage() );   
+#endif 
+}
+
+void demo3() {
+  static uint8_t progress = 0;
+  int xpos = 10, ypos = 10;
+  u8g2.firstPage();
+  do {
+    u8g2.drawStr(25, 50, &quot;Progress Bar&quot;);
+    u8g2.drawFrame( 0, ypos, 128/*w*/, 20 /*h*/);
+    u8g2.drawBox( xpos, ypos+5, progress /*w*/, 10 /*h*/ );
+  } while ( u8g2.nextPage() );
+  progress = (progress + 4) % (128-2*xpos);
+}
+
+void loop() {
+  static uint32_t ts = 0;
+  uint32_t now = millis();
+  if ( millis() - ts &gt;= 1000 ) { // Update every 1 sec
+    ts = now;
+    // demo1();
+    // demo2();
+    demo3();
+  }
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="wokwi_esp32_oled-2.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริงและจำลองการทำงานของโค้ดด้วย <strong>Wokwi Simulator (ESP32)</strong></p>
+<p><img alt="" src="wokwi_nano_oled-1.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริงและจำลองการทำงานของโค้ดด้วย <strong>Wokwi Simulator (Arduino Nano)</strong></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอการใช้งานโมดูล <strong>OLED</strong> และการเขียนโปรแกรมด้วย <strong>Arduino</strong> ในเบื้องต้น
 และสาธิตวิธีการใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino Nano v3</strong> และ <strong>WeMos Lolin32 Lite</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-12-20 | Last Updated: 2022-12-21</p></div>
+<p>Created: 2022-12-20 | Last Updated: 2022-12-24</p></div>
             </div>
         </div>
 
