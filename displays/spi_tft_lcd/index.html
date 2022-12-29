@@ -95,7 +95,15 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#tft-lcd_2" class="nav-link">&#9655; โค้ดสาธิตการใช้งาน TFT LCD</a>
+            <li class="nav-item" data-level="2"><a href="#tft-lcd-adafruit" class="nav-link">&#9655; โค้ดสาธิตการใช้งาน TFT LCD โดยใช้ไลบรารีของ Adafruit</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#tft-lcd-tft_espi" class="nav-link">&#9655; โค้ดสาธิตการใช้งาน TFT LCD โดยใช้ไลบรารี TFT_eSPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-ili9341-tft-lcd" class="nav-link">&#9655; การจำลองการทำงานของบอร์ด ESP32 และโมดูล ILI9341 TFT LCD</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -197,11 +205,11 @@
 <p>รูป: ตัวอย่างการติดตั้งไลบรารี <strong>Adafruit ST7789</strong> สำหรับ <strong>Arduino IDE</strong></p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="tft-lcd_2">&#9655; โค้ดสาธิตการใช้งาน <strong>TFT LCD</strong><a class="headerlink" href="#tft-lcd_2" title="Permanent link">#</a></h2>
+<h2 id="tft-lcd-adafruit">&#9655; โค้ดสาธิตการใช้งาน <strong>TFT LCD</strong> โดยใช้ไลบรารีของ <strong>Adafruit</strong><a class="headerlink" href="#tft-lcd-adafruit" title="Permanent link">#</a></h2>
 <p>ตัวอย่างโค้ดต่อไปนี้สาธิตการเขียนโปรแกรมด้วย <strong>Arduino-ESP32</strong> ร่วมกับไลบรารีของบริษัท <strong>Adafruit</strong>
 เพื่อใช้งานโมดูล <strong>TFT LCD</strong> ที่มีการเชื่อมต่อด้วย <strong>VSPI</strong> แบ่งเป็น 2 กรณีคือ
 โมดูลที่ใช้ชิปควบคุม <code>ST7789</code> และ <code>ILI9341</code> อย่างใดอย่างหนึ่ง</p>
-<pre><code class="language-c">// Date: 2022-12-26
+<pre><code>// Date: 2022-12-26
 // Demo board: WeMos Lolin32 Lite
 
 #include &quot;SPI.h&quot;
@@ -270,7 +278,6 @@ void setup() {
 }
 
 void loop() {
-
   tft.fillScreen(BLACK_COLOR);
   delay(1000);
   tft.setTextColor(RED_COLOR);
@@ -294,6 +301,81 @@ void loop() {
 (ใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> สำหรับขา <strong>VCC</strong> และขา <strong>LED</strong>)</p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="tft-lcd-tft_espi">&#9655; โค้ดสาธิตการใช้งาน <strong>TFT LCD</strong> โดยใช้ไลบรารี <strong>TFT_eSPI</strong><a class="headerlink" href="#tft-lcd-tft_espi" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ดโดยใช้ไลบรารี <code>TFT_eSPI</code> สำหรับ  <strong>Arduino</strong>
+ดังนั้นจะต้องมีการติดตั้งไลบรารีดังกล่าวสำหรับ <strong>Arduino IDE</strong> ให้พร้อมใช้งานก่อน</p>
+<p><img alt="" src="arduino_tft_espi_lib-1.png" /></p>
+<p>รูป: การติดตั้งไลบรารี <code>TFT_eSPI</code> สำหรับ  <strong>Arduino</strong></p>
+<p>โค้ดตัวอย่างมีดังนี้ (แสดงข้อความหนึ่งบรรทัดตรงกลางจอภาพ)</p>
+<pre><code>#include &lt;SPI.h&gt;
+#include &lt;TFT_eSPI.h&gt;
+
+TFT_eSPI tft = TFT_eSPI();
+
+void setup(void) {
+  Serial.begin(115200);  
+  tft.init();  
+  tft.setRotation(0);
+  Serial.printf( &quot;W x H = %d x %d pixels\n&quot;, tft.width(), tft.height() );
+  // Fill screen with black color
+  tft.fillScreen(ILI9341_BLACK); 
+  // Draw a white rectangle frame
+  tft.drawRect(0, 0, tft.width(), tft.height(), ILI9341_WHITE); 
+  // Set the text alignment to top-left
+  tft.setTextDatum(TL_DATUM);
+  // Set text color to green
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  // Set text size
+  tft.setTextSize(3);
+  // Get the width of the text in pixels
+  char *text = &quot;ILI9341 LCD&quot;;
+  int16_t text_width = tft.textWidth(text);
+  // Draw the text on the display
+  tft.drawString( text, (tft.width() - text_width)/2, tft.height()/2 );
+}
+
+void loop() {
+  delay(10);
+}
+</code></pre>
+<p>นอกจากไฟล์ <strong>Arduino Sketch (.ino)</strong> แล้ว จะต้องมีการสร้างไฟล์ <code>build_opt.h</code> 
+ในไดเรกทอรีเดียวกันกับไฟล์ <strong>Arduino Sketch</strong>
+เพื่อใช้ในการกำหนดหรือตั้งค่าการใช้งานสำหรับไลบรารี <code>TFT_eSPI</code> ซึ่งในกรณีตัวอย่างนี้ จะนำไปใช้กับโมดูล
+<strong>ILI9341 TFT LCD (240x320)</strong> และไม่มีชิป <strong>Touch Screen</strong></p>
+<p>ข้อความในไฟล์ <code>build_opt.h</code> มีดังนี้</p>
+<pre><code class="language-text">-DUSER_SETUP_LOADED=1
+-DILI9341_DRIVER
+-DTFT_WIDTH=240
+-DTFT_HEIGHT=320
+-DTFT_MOSI=23
+-DTFT_SCLK=18
+-DTFT_CS=15
+-DTFT_DC=2
+-DTFT_RST=4
+-DTFT_BL=-1
+-DLOAD_GLCD=1 
+-DSPI_FREQUENCY=24000000 
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-ili9341-tft-lcd">&#9655; การจำลองการทำงานของบอร์ด <strong>ESP32</strong> และโมดูล <strong>ILI9341 TFT LCD</strong><a class="headerlink" href="#esp32-ili9341-tft-lcd" title="Permanent link">#</a></h2>
+<p>หากต้องการจำลองการทำงานของโมดูล <strong>ILI9341 TFT LCD</strong> และเขียนโค้ด
+<strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>ESP32</strong> โดยใช้ <strong>Wokwi Simulator</strong>
+ก็สามารถทำได้เช่นกัน ตามตัวอย่างดังนี้</p>
+<p>ในส่วนที่เรียกว่า <strong>Library Manager</strong> ของ <strong>Wokwi Simulator</strong> จะต้องมีการเพิ่มรายการไลบรารี
+(<strong>Project Libraries</strong>) สำหรับ <strong>Arduino Project</strong> 
+ที่ต้องการใช้งานด้วย (ใส่ชื่อแต่ละไลบรารีต่อหนึ่งบรรทัด) เช่น</p>
+<pre><code class="language-text"># Wokwi Library List
+Adafruit GFX Library
+Adafruit ILI9341
+TFT_eSPI
+</code></pre>
+<p><img alt="" src="wokwi_esp32_ili9341_demo-1.png" /></p>
+<p>รูป:  ตัวอย่างการจำลองการทำงาน (ใช้ไลบรารี <code>Adafruit_ILI9341</code> ในการเขียนโค้ด)</p>
+<p><img alt="" src="wokwi_esp32_tft_espi_ili9341-1.png" /></p>
+<p>รูป:  ตัวอย่างการจำลองการทำงาน (ใช้ไลบรารี <code>TFT_eSPI</code> ในการเขียนโค้ด)</p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอการใช้งานโมดูล <strong>TFT LCD</strong> ในเบื้องต้น และการเขียนโปรแกรม <strong>Arduino</strong>
 สำหรับการเชื่อมต่อกับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> โดยใช้บัส <strong>SPI</strong> และขา <strong>GPIO</strong></p>
@@ -302,10 +384,9 @@ void loop() {
 <li><a href="../../esp32/esp32_spi/">การใช้งาน <strong>SPI</strong> และการเขียนโปรแกรม <strong>Arduino</strong> สำหรับ <strong>ESP32</strong></a></li>
 <li><a href="../i2c_oled/">การใช้งานโมดูลแสดงผลที่มีจอภาพ <strong>OLED</strong></a></li>
 </ul>
-<p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-12-25 | Last Updated: 2022-12-27</p></div>
+<p>Created: 2022-12-25 | Last Updated: 2022-12-29</p></div>
             </div>
         </div>
 
