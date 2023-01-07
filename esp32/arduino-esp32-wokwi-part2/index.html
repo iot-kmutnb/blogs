@@ -99,6 +99,14 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">&#9655; โจทย์ฝึกปฏิบัติข้อที่ 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; โจทย์ฝึกปฏิบัติข้อที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -218,7 +226,7 @@
 </code></pre>
 <p>เมื่อต่อวงจรได้ครบถ้วนแล้ว ถัดไปลองเขียนโค้ดตามตัวอย่างต่อไปนี้ โดยมีขั้นตอนการทำงานดังนี้</p>
 <ul>
-<li>ขา <strong>LED_PIN</strong> และ <strong>BTN_PIN</strong> เป็นขา <strong>4</strong> (D4) และ <strong>5</strong> (D5) บนบอร์ด <strong>ESP32</strong></li>
+<li>ขา <strong>LED_PIN</strong> และ <strong>BTN_PIN</strong> เป็นขา <strong>4</strong> (<strong>D4</strong>) และ <strong>5</strong> (<strong>D5</strong>) บนบอร์ด <strong>ESP32</strong></li>
 <li>คำสั่ง <code>pinMode( LED_PIN, OUTPUT );</code> ทำให้ขา <code>LED_PIN</code> เป็นเอาต์พุตแบบดิจิทัล</li>
 <li>คำสั่ง <code>pinMode( BTN_PIN, INPUT  );</code> ทำให้ขา <code>BTN_PIN</code> เป็นขาอินพุตแบบดิจิทัล</li>
 <li>คำสั่ง <code>digitalWrite( LED_PIN, !digitalRead( BTN_PIN) );</code>
@@ -287,6 +295,126 @@ void loop() {
 </code></pre>
 <p><img alt="" src="wokwi_esp32_led_button_resistors-4.png" /></p>
 <p>รูป: การแก้ไขวงจรและโค้ดตัวอย่าง</p>
+<p>อีกแนวทางหนึ่งในการเขียนโค้ดคือ การเปิดใช้งานอินเทอร์รัพท์ภายนอก (<strong>External Interrupt</strong>) ที่ขาอินพุต
+โดยใช้คำสั่ง <a href="https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/"><code>attachInterrupt(...)</code></a>
+ของ <strong>Arduino API</strong> ซึ่งสามารถนำมาใช้ได้กับ <strong>Arduino-ESP32</strong></p>
+<p>ในตัวอย่างโค้ดต่อไปนี้ ถ้ามีการเปลี่ยนแปลงสถานะลอจิก (<strong>Change</strong>) ที่ขาอินพุต <code>I0</code> หรือ <code>I1</code> ได้ทั้งสองกรณีคือ 
+ขอบขาขึ้น (<strong>Rising Edge</strong>) และขอบขาลง (<strong>Falling Edge </strong>)
+จะถือว่า มีเหตุการณ์ที่เป็นอินเทอร์รัพท์จากภายนอก และจะทำให้ฟังก์ชันที่ทำหน้าที่ตอบสนองต่อเหตุการณ์ดังกล่าว
+ซึ่งในตัวอย่างคือ ฟังก์ชัน <code>isr()</code> ทำงานโดยอัตโนมัติ เพื่ออ่านค่าอินพุตของขา <code>I0</code> และ <code>I1</code> และอัปเดทค่าของเอาต์พุต <code>O</code></p>
+<pre><code>const int LED_PIN = 4;
+const int BTN_PIN = 5;
+
+void isr() {
+  int value = digitalRead( BTN_PIN );
+  digitalWrite( LED_PIN, !value );
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode( LED_PIN, OUTPUT );
+  // Use the  internal pullup resistor on GPIO pin.
+  pinMode( BTN_PIN, INPUT_PULLUP );
+  attachInterrupt( digitalPinToInterrupt(BTN_PIN), 
+                   isr, CHANGE /* Any change */ );
+}
+
+void loop() {}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1">&#9655; <strong>โจทย์ฝึกปฏิบัติข้อที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>การสร้างสัญญาณเอาต์พุตดิจิทัลที่เปลี่ยนสถานะลอจิกตามสัญญาณอินพุต</p>
+<ol>
+<li>เลือกใช้ขาดิจิทัลของบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> ตามความเหมาะสม ใช้ 2 ขา โดยให้ขาที่หนึ่งเป็นอินพุตและ
+ขาที่สองเป็นเอาต์พุต อ้างอิงชื่อเป็น <code>DIN</code> (<strong>Digital Input</strong>) และ <code>DOUT</code> (<strong>Digital Output</strong>) ตามลําดับ</li>
+<li>เขียนโปรแกรม <strong>Arduino Sketch</strong> ให้มีพฤติกรรมการทํางานดังนี้<ul>
+<li>ถ้า <code>DIN</code> มีการเปลี่ยนแปลงสถานะลอจิก เช่น เกิดจากการกดปุ่มแล้วปล่อย จะทําให้เปลี่ยนสถานะจาก
+<strong>HIGH</strong> เป็น <strong>LOW</strong> และ <strong>LOW</strong> เป็น <strong>HIGH</strong> ตามลําดับ 
+ดังนั้นให้สัญญาณที่ขา <code>DOUT</code> เปลี่ยนแปลงค่าลอจิกตาม <code>DIN</code> <em>โดยใช้เวลาให้น้อยที่สุด</em> ดังนั้นหลีกเลี่ยงการใช้คำสั่งที่ไม่จำเป็น
+(ให้ตรวจสอบระยะเวลาที่เกิดขึ้นกับสัญญาณ โดยใช้เครื่องออสซิลโลสโคป เปรียบเทียบกับผลการทดลองเสมือนจริงด้วย <strong>Wokwi Simulator</strong>)</li>
+<li>หากไม่มีการเปลี่ยนแปลงที่ขา <code>DIN</code> ให้ทั้งสองสัญญาณ มีสถานะลอจิกเหมือนกัน</li>
+</ul>
+</li>
+<li>วัดสัญญาณ <code>DIN</code> และ <code>DOUT</code> พร้อมกัน ด้วยเครื่องออสซิลโลสโคป (ช่อง <code>CH1</code> และ <code>CH2</code> ตามลําดับ) และ
+บันทึกรูปคลื่นสัญญาณ</li>
+<li>วัดค่า <strong>Delay Time</strong> ระหว่างสองสัญญาณ นับจากตําแหน่งขอบขาขึ้น หรือ ขอบขาลงของสัญญาณ เช่น ถ้ามี
+การเปลี่ยนแปลงขอบขาขึ้น (หรือขาลง) ที่ <code>DIN</code> สัญญาณ <code>DOUT</code> จะต้องมีการเปลี่ยนแปลงเช่นกัน และเกิดขอบขาขึ้น (หรือขาลง) ตามมา</li>
+</ol>
+<p><strong>คําแนะนํา</strong></p>
+<ul>
+<li>ในการต่อวงจรปุ่มกดบนเบรดบอร์ด เพื่อใช้งานเป็นอินพุตแบบดิจิทัล ให้ต่อวงจรปุ่มกดแบบ <strong>Active-Low</strong>
+(เมื่อกดปุ่มได้ลอจิก 0 และปล่อยปุ่มได้ลอจิก 1) และแนะนําให้เปิดใช้งานตัวต้านทาน <strong>Pull-Up</strong> ที่ขา <strong>I/O</strong>
+สําหรับอินพุตภายในชิปไมโครคอนโทรลเลอร์ โดยสามารถใช้คําสั่ง <code>pinMode()</code> ของ <strong>Arduino API</strong> และ
+กําหนดตัวเลือกให้เป็น <code>INPUT_PULLUP</code></li>
+<li>ใช้คำสั่ง <code>digitalRead(...)</code> และ <code>digitalWrite(...)</code> เพื่ออ่านค่าอินพุตและเขียนค่าเอาต์พุตสำหรับขา
+<strong>GPIO</strong> ที่ได้เลือกใช้งานตามลำดับ</li>
+<li>การต่อใช้งานปุ่มกด <a href="https://docs.wokwi.com/parts/wokwi-pushbutton"><strong>Push Button</strong></a> 
+และจำลองการทำงานใน <strong>Wokwi Simulator</strong> แนะนำให้เพิ่มการตั้งค่าของปุ่มกดในไฟล์ <code>diagram.json</code> 
+ดังนี้: <code>{ "bounce": "0" }</code> เพื่อปิดการกระเด้งของปุ่มกด (<strong>Disable Bouncing Simulation</strong>)</li>
+<li>การวัดสัญญาณที่ขา <strong>GPIO</strong> ของ <strong>ESP32</strong> และหาค่า <strong>Delay</strong>
+สามารถใช้ <strong>Virtual Logic Analyzer (8-channel)</strong> มาต่อในวงจร 
+และเมื่อจำลองการทำงาน จะได้ไฟล์ <code>wokwi-logic.vcd</code> ที่สามารถดาวน์โหลดมายังเครื่องคอมพิวเตอร์ของผู้ใช้
+และนำไปใช้ร่วมกับซอฟต์แวร์ภายนอก เช่น <a href="https://gtkwave.sourceforge.net/"><strong>GTKWave</strong></a> เพื่อแสดงรูปคลื่นสัญญาณ</li>
+</ul>
+<p><img alt="" src="wowki_esp32_button_led_logic_analyzer.png" /></p>
+<p>รูป: ตัวอย่างการวาดผังวงจรเพื่อจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> สำหรับโจทย์ฝึกปฏิบัติข้อที่ 1</p>
+<p><img alt="" src="gtkwave_io_follower.png" /></p>
+<p>รูป: ตัวอย่างการแสดงรูปคลื่นสัญญาณ <strong>DIN</strong> และ <strong>DOUT</strong> ด้วย <strong>GTKWave</strong> 
+และการวัดระยะเวลาระหว่างสองเหตุการณ์ที่เกิดขึ้นกับสัญญาณ เมื่อได้จำลองการทำงานด้วย <strong>Wokwi Simulator</strong>
+(<a href="wokwi_io_follower_solution.png">&rarr;</a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2">&#9655; <strong>โจทย์ฝึกปฏิบัติข้อที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรม <strong>ESP32</strong> เพื่อทำให้มีฟังก์ชันการทำงานได้เหมือนลอจิกเกต <strong>XOR</strong> แบบ 2 ขาอินพุต</p>
+<ol>
+<li>เลือกใช้ขาดิจิทัลเป็นอินพุต 2 ขา (ชื่อขา <code>I0</code> และ <code>I1</code>) และเป็นขาเอาต์พุตอีก 1 ขา (ชื่อขา <code>O</code>)
+ของบอร์ด <strong>ESP32</strong> ตามความเหมาะสม</li>
+<li>เขียนโค้ด <strong>Arduino Sketch</strong> เพื่อทําให้ไมโครคอนโทรลเลอร์ทํางานได้เหมือนลอจิกเกตแบบ <strong>2-input XOR
+(Exclusive OR)</strong></li>
+<li>วัดสัญญาณด้วยเครื่องออสซิลโลสโคป เพื่อระบุค่าหน่วงเวลาที่เกิดขึ้น (หน่วยเป็นไมโครวินาที) 
+เมื่อมีการเปลี่ยนแปลงที่ขาอินพุต <code>I0</code> หรือ <code>I1</code> แล้วทําให้เกิดการเปลี่ยนแปลงลอจิกที่ขาเอาต์พุต <code>O</code> ตามมา</li>
+</ol>
+<p>การหน่วงเวลาของสัญญาณอินพุต-เอาต์พุตที่เกิดขึ้นที่ขาของลอจิกเกต เรียกว่า <strong>Propagation Delay</strong> (<script type="math/tex">t_P</script>) 
+แบ่งเป็น 2 กรณีคือ</p>
+<ul>
+<li>
+<script type="math/tex">t_{PLH}</script> (<em>Low-to-High</em>) 
+เมื่ออินพุตเปลี่ยน แล้วทําให้เอาต์พุตเปลี่ยนจาก <strong>LOW → HIGH</strong></li>
+<li>
+<script type="math/tex">t_{PHL}</script> (<em>High-to-Low</em>) 
+เมื่ออินพุตเปลี่ยน แล้วทําให้เอาต์พุตเปลี่ยนจาก <strong>HIGH → LOW</strong> </li>
+</ul>
+<p><strong>คําแนะนํา</strong></p>
+<ul>
+<li>ในการต่อวงจรและสร้างสัญญาณอินพุต-ดิจิทัล <code>I0</code> และ <code>I1</code> สามารถต่อวงจรปุ่มกด <strong>Push Button</strong>
+บนเบรดบอร์ด จํานวน 2 ปุ่ม หรือ จะใช้สัญญาณจากโมดูล "โรตารี-เอ็นโค้ดเดอร์" 
+(<strong>Rotary Encoder</strong>) ที่มี 2 ช่องสัญญาณ นำมาต่อเป็นอินพุตต่อเข้ากับขาของบอร์ด <strong>ESP32</strong></li>
+</ul>
+<p><img alt="" src="wokwi_esp32_xor2.png" /></p>
+<p>รูป: ตัวอย่างการวาดผังวงจรสำหรับโจทย์ข้อที่ 2 โดยใช้บอร์ด <strong>ESP32</strong> และ
+โมดูล <strong>Rotary Encoder Switch</strong></p>
+<p><img alt="" src="gtkwave_xor2.png" /></p>
+<p>รูป:  ตัวอย่างการแสดงรูปคลื่นสัญญาณ <strong>I0, I1, O</strong> ตามลำดับ ด้วย <strong>GTKWave</strong> </p>
+<p>ในรูปคลื่นสัญญาณตัวอย่าง แสดงให้เห็นการเปลี่ยนแปลงที่ขาอินพุต <code>I0</code> จาก <code>High</code> เป็น <strong>Low</strong> 
+(<strong>Falling Edge</strong>) และทำให้เกิดการเปลี่ยนแปลงที่ขาเอาต์พุต <code>O</code> ตามมา
+โดยเปลี่ยนจาก <strong>High</strong> เป็น <strong>Low</strong> (<strong>Rising Edge</strong>) 
+ระยะเวลาที่วัดได้ในกรณีนี้คือ <script type="math/tex">t_{PLH}</script> ซึ่งวัดจากขอบขาลงขอบสัญญาณ <code>I0</code> และขอบขาขึ้นของสัญญาณ <code>O</code></p>
+<p>&nbsp;</p>
+<p>ข้อสังเกตเกี่ยวกับโมดูล <strong>Rotary Encoder</strong> ที่ได้เลือกมาใช้งาน</p>
+<ul>
+<li>ขา <strong>SW</strong> เป็นขาสัญญาณของปุ่มกด ทำงานแบบ <strong>Active-Low</strong></li>
+<li>โมดูล <strong>Rotary Encoder แบบที่ 1</strong>: 
+ถัาวัดค่าความต้านทานที่ขา <strong>VCC(+)</strong> กับ <strong>S1</strong> หรือ <strong>S2</strong> จะได้ประมาณ <strong>20k</strong> โอห์ม 
+เนื่องจากมีการใส่ตัวต้านทานแบบ <strong>Pullup</strong> ไว้ให้แล้ว แต่ถ้าเป็นขา <strong>Key</strong> 
+จะได้ค่าประมาณ <strong>10k</strong> โอห์ม และถ้าวัดค่าความจุไฟฟ้าที่ขา <strong>GND</strong> กับ <strong>S1</strong> หรือ <strong>S2</strong> 
+จะได้ประมาณ <strong>200nF</strong> เนื่องจากมีการเพิ่มตัวเก็บประจุที่ขาสัญญาณแต่ละขาไปยัง <strong>GND</strong></li>
+<li>โมดูล <strong>Rotary Encoder แบบที่ 2</strong>: 
+ถัาวัดค่าความต้านทานที่ขา <strong>VCC(+)</strong> กับ <strong>CLK</strong> หรือ <strong>DT</strong> 
+จะได้ประมาณ <strong>10k</strong> โอห์ม (บางกรณีได้ <strong>5k</strong> โอห์ม) เนื่องจากมีการใส่ตัวต้านทานแบบ <strong>Pullup</strong> ไว้ให้แล้ว</li>
+</ul>
+<p><img alt="" src="rotary_encoder_switch_modules.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>Rotary Encoder + Switch</strong> แบบที่ 1 (ด้านซ้ายมือ) และแบบที่ 2 (ด้านขวามือ)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -297,13 +425,13 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-11-13 | Last Updated: 2022-11-19</p></div>
+<p>Created: 2022-11-13 | Last Updated: 2023-01-07</p></div>
             </div>
         </div>
 
         <footer class="col-md-12">
             <hr>
-                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
         <script>

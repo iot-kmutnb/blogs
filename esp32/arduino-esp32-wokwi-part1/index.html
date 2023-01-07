@@ -154,7 +154,8 @@
 <strong>Arduino MKR Family</strong>, <strong>Arduino Pro Portenta Family</strong> เป็นต้น
 ในปัจจุบันก็มีบอร์ดไมโครคอนโทรลเลอร์จากนักพัฒนาหรือผู้ผลิตรายอื่นที่สามารถนำมาใช้
 และเขียนโปรแกรมด้วยซอฟต์แวร์ตามรูปแบบของ <strong>Arduino</strong> ได้</p>
-<p><strong>&rarr;</strong> แนะนำให้อ่านบทความเกี่ยวกับ <strong>Arduino</strong> ได้จากบทความภาษาไทย: <a href="../arduino/"><strong>"Arduino &amp; Embedded Systems: อาร์ดุยโนสำหรับการเรียนรู้ระบบสมองกลฝังตัว"</strong></a></p>
+<p><strong>&rarr;</strong> แนะนำให้อ่านบทความเกี่ยวกับ <strong>Arduino</strong> ได้จากบทความภาษาไทย:
+<a href="../../arduino/"><strong>"Arduino &amp; Embedded Systems: อาร์ดุยโนสำหรับการเรียนรู้ระบบสมองกลฝังตัว"</strong></a></p>
 <hr />
 <h3 id="esp32"><strong>ESP32</strong><a class="headerlink" href="#esp32" title="Permanent link">#</a></h3>
 <p><strong>ESP32</strong> เป็นชื่อชิปของบริษัท <a href="https://www.espressif.com/"><strong>Espressif Systems</strong></a> ในประเทศจีน
@@ -175,7 +176,7 @@
 เช่น <a href="https://micropython.org/download/esp32/"><strong>MicroPython</strong></a>
 และ <a href="https://circuitpython.org/downloads?q=esp32"><strong>CircuitPython</strong></a> ซึ่งสามารถนำมาใช้กับชิป <strong>ESP32</strong> ได้เช่นกัน เหมาะสำหรับผู้ที่มีพื้นฐานการเขียนโปรแกรม <strong>Python</strong> มาบ้างแล้ว</p>
 <p><strong>&rarr;</strong> อ่านบทความที่มีเนื้อหาเกี่ยวกับ <strong>Espressif ESP32</strong> 
-ได้จากบทความภาษาไทย: <a href="../esp32/"><strong>"แนะนำ Espressif ESP32 SoCs: ตัวเลือกสำหรับฮาร์ดแวร์และซอฟต์แวร์
+ได้จากบทความภาษาไทย: <a href="../../esp32/"><strong>"แนะนำ Espressif ESP32 SoCs: ตัวเลือกสำหรับฮาร์ดแวร์และซอฟต์แวร์
 "</strong></a></p>
 <hr />
 <h3 id="wokwi"><strong>Wokwi</strong><a class="headerlink" href="#wokwi" title="Permanent link">#</a></h3>
@@ -268,16 +269,19 @@ AVR Simulator</strong> ไลบรารีดังกล่าวซึ่ง
 <p>รูป: ตัวอย่างไฟล์ <code>diagram.json</code> ของโปรเจกต์</p>
 <p>ลองแก้ไขโค้ดตามโค้ดตัวอย่างต่อไปนี้ แล้วทำขั้นตอนจำลองการทำงานของโค้ดสำหรับบอร์ด <strong>ESP32</strong></p>
 <pre><code>void setup() {
+  // Initialize the Serial interface, set baudrate to 115200
   Serial.begin(115200);
+  // Send a message to the Serial interface
   Serial.println(&quot;Hello, ESP32!&quot;);
+  // Configure the onboard LED pin as output
   pinMode( LED_BUILTIN, OUTPUT );
 }
 
 void loop() {
-  digitalWrite( LED_BUILTIN, HIGH ); // LED on
+  digitalWrite( LED_BUILTIN, HIGH ); // Turn LED on
   Serial.println( &quot;LED on&quot; );
   delay(500);
-  digitalWrite( LED_BUILTIN, LOW  ); // LED off
+  digitalWrite( LED_BUILTIN, LOW  ); // Turn LED off
   Serial.println( &quot;LED off&quot; );
   delay(500);
 }
@@ -307,13 +311,43 @@ void loop() {
 บนบอร์ดผ่านทางขา <strong>Digital I/O</strong> เป็นลอจิก 0 (<strong>Low</strong>)</li>
 <li><code>delay(500);</code> เป็นการหน่วงเวลาการทำงาน 500 มิลลิวินาที หรือ 0.5 วินาที ก่อนทำคำสั่งที่อยู่ถัดไป</li>
 </ul>
+<p>ในส่วนของฟังก์ชัน <code>loop()</code> อาจเขียนโค้ดใหม่ให้สั้นลงได้ดังนี้</p>
+<pre><code>void loop() {
+  static bool state = false;
+  // Toggle the LED status
+  state = !state;
+  digitalWrite( LED_BUILTIN, state );
+  Serial.printf( &quot;LED %s\n&quot;, state ? &quot;on&quot; : &quot;off&quot; );
+  delay(500);
+}
+</code></pre>
+<p>หรือถ้าไม่ใช้คำสั่ง <code>delay()</code> ก็ทำได้ดังนี้</p>
+<pre><code>void loop() {
+  static uint32_t last_update = 0;
+  static bool state = false;
+  uint32_t now = millis();
+  if (now - last_update &gt;= 500) { // Update every 500 msec
+    // Save the last update timestamp
+    last_update = now;
+    // Toggle the LED status
+    digitalWrite( LED_BUILTIN, state = !state );
+    Serial.printf( &quot;LED %s\n&quot;, state ? &quot;on&quot; : &quot;off&quot; );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
 <p>เอกสารสำหรับคำสั่งและการเขียนโค้ด <strong>Arduino</strong> สำหรับ <strong>ESP32</strong> สามารถศึกษาได้จาก: 
 <a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/index.html">"<strong>ESP32 Arduino Core’s documentation</strong>"</a>
 และ <a href="https://docs.wokwi.com/guides/esp32">"<strong>Wokwi - ESP32 Simulation Guide</strong>"</a></p>
 <p><img alt="" src="wokwi_esp32_sim.png" /></p>
-<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างในโปรเจกต์</p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างสำหรับบอร์ด <strong>Espressif ESP32 DevKit</strong></p>
 <p>จากผลการจำลองการทำงาน จะเห็นได้ว่า มีข้อความปรากฏซึ่งเกิดจากการคำสั่ง
 <code>Serial.println()</code> และส่งข้อความจากการทำงานของ <strong>ESP32</strong></p>
+<p><img alt="" src="wokwi_esp32c3_sim.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างสำหรับบอร์ด <strong>Espressif ESP32-C3 Mini-1</strong></p>
+<p><img alt="" src="wokwi_esp32s2_sim.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างสำหรับบอร์ด <strong>Espressif ESP32-S2 DevKit</strong></p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอการใช้งาน <strong>Wokwi Online Arduino Simulator</strong> 
@@ -324,13 +358,13 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-11-12 | Last Updated: 2022-11-19</p></div>
+<p>Created: 2022-11-12 | Last Updated: 2023-01-07</p></div>
             </div>
         </div>
 
         <footer class="col-md-12">
             <hr>
-                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
         <script>
