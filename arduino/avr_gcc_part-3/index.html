@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 3 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-3" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 3</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-led-blink" class="nav-link">&#9655; โค้ดตัวอย่างที่ 1: LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-led-blink-using-timers-012" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2: LED Blink (using Timers 0/1/2)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-led-blink-using-wdt" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3: LED Blink (using WDT)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-3">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 3<a class="headerlink" href="#c-avr-atmega328p-3" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 3 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> สำหรับชิป <strong>ATmega328P</strong> 
+มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong> (<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
+และใช้ <strong>Wokwi Simulator</strong> ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
+<p>คำแนะนำ: ถ้าจะลองโค้ดตัวอย่างโดยใช้ <strong>Arduino IDE</strong> เพื่อคอมไพล์และอัปโหลดไปยังบอร์ดทดลอง <strong>Arduino Uno</strong>
+หรือ <strong>Nano</strong> ให้สร้าง <strong>Arduino Sketch</strong> และทำให้ไฟล์ <strong>.ino</strong> ไม่มีโค้ดใด ๆ (<strong>Empty Sketch</strong>)
+และให้สร้างไฟล์ <code>main.c</code> เพื่อเขียนโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-led-blink">&#9655; <strong>โค้ดตัวอย่างที่ 1: LED Blink</strong><a class="headerlink" href="#1-led-blink" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างแรกเป็นการทบทวนการใช้คำสั่ง <code>_delay_ms()</code> ของไลบรารี <strong>avr-libc</strong>
+เพื่อใช้ในการหน่วงเวลาการทำงานของซีพียู ก่อนทำคำสั่งถัดไป ฟังก์ชันนี้ทำคำสั่งเพื่อวนซ้ำและหน่วงเวลา
+(จึงเรียกว่าเป็น <strong>Software-based Delay Function</strong>)</p>
+<p>ในส่วนเอาต์พุต มีการเขียนค่าลงในรีจิสเตอร์ <code>DDRB</code> บิตที่ 5 สำหรับ <strong>Arduino D13 Pin (Onboard LED)</strong> 
+และตรงกับขา <strong>PB5</strong> ของ <strong>ATmega328p</strong>
+การเขียนค่าจะทำให้ขาดังกล่าวเป็นเอาต์พุต และมีค่าเป็น 1 และ 0 สลับกันไป โดยเว้นระยะเวลาประมาณ 500 มิลลิวินาที 
+โดยใช้คำสั่ง <code>_delay_ms()</code> ของไลบรารี <a href="http://savannah.nongnu.org/projects/avr-libc/"><strong>avr-libc</strong></a>
+เพื่อให้ <strong>LED</strong> กระพริบได้</p>
+<pre><code>// Set the CPU speed to 16MHz if F_CPU is not defined
+#ifndef F_CPU
+#define F_CPU   16000000UL 
+#endif
+
+#include &lt;avr/io.h&gt;     // required for ATmega328P's macros
+#include &lt;util/delay.h&gt; // required for _delay_ms(), _delay_us() 
+
+// The delay.h header file contains the _delay_ms() 
+// function used to generate a delay in milliseconds.
+
+int main(void) {
+  // Set the LED pin as output
+  DDRB |= (1 &lt;&lt; PB5);
+  while (1) {
+    // Toggle the LED by using the XOR operation on the PB5 bit.
+    PORTB ^= (1 &lt;&lt; PB5);
+    // Delay for 500 msec
+    _delay_ms(500);
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/arduino_avr_libc_demo.png" /></p>
+<p>รูป: การเขียนโค้ดแและคอมไพล์ด้วย <strong>Arduino IDE</strong> และอัปโหลดไปยังบอร์ดไมโครคอนโทรลเลอร์</p>
+<p><img alt="" src="../avr/images/wokwi_avr_main_sim.png" /></p>
+<p>รูป: การเขียนโค้ดแและคอมไพล์ด้วย <strong>Wokwi Simulator</strong> และจำลองการทำงานแบบเสมือนจริง</p>
+<p>ถ้าต้องการจะลองสร้างฟังก์ชันแทนการใช้ฟังก์ชัน <code>_delay_ms()</code> ที่เรียกใช้จาก <code>&lt;util/delay.h&gt;</code>
+ก็มีแนวทางดังนี้</p>
+<ul>
+<li>ฟังก์ชันแรกที่ถูกสร้างขึ้นใหม่คือ <code>_delay_loop()</code> และทำคำสั่งโดยใช้โค้ดภาษา
+<strong>AVR Assembly (Inline)</strong> เพื่อวนซ้ำตามจำนวนรอบที่กำหนด 
+(นับค่าของตัวแปรที่มีขนาด 16 บิต ลดลงครั้งละ 1 จนถึง 0) โดยหนึ่งรอบจะใช้เวลา 4 ไซเคิลของการทำงานโดยซีพียู </li>
+<li>ฟังก์ชันที่สองคือ <code>_delay_loop_ms()</code> ซึ่งจะเรียกฟังก์ชัน  <code>_delay_loop()</code> เพื่อให้ทำงานและหน่วงเวลาไว้
+ประมาณ 1 มิลลิวินาที และให้วนซ้ำในลูปแบบ <code>for</code> เพื่อเรียกฟังก์ชันดังกล่าว ตามจำนวนครั้งที่ตรงกับหน่วยนับเป็นมิลลิวินาที</li>
+</ul>
+<pre><code>// Set the CPU speed to 16MHz if F_CPU is not defined
+#ifndef F_CPU
+#define F_CPU   16000000UL 
+#endif
+
+#include &lt;avr/io.h&gt; // required for ATmega328P's macros
+
+// 4 cycles per iteration 
+inline void _delay_loop(uint16_t __count) {
+  asm volatile (
+    &quot;1: sbiw %0,1&quot; &quot;\n\t&quot;
+    &quot;   brne 1b&quot;
+    : &quot;=w&quot; (__count) // Write the value of __count to a register pair.
+    : &quot;0&quot;  (__count) // Use the same register pair as the first operand
+  );
+}
+
+void _delay_loop_ms( uint16_t msec) {
+  for (uint16_t i=0; i &lt; msec; i++ ) {
+    _delay_loop( (F_CPU/4)/1000 - 2);
+  }
+}
+
+int main(void) {
+  // Set the LED pin as output
+  DDRB |= (1 &lt;&lt; PB5);
+  while (1) {
+    // Toggle the LED by using the XOR operation on the PB5 bit.
+    PORTB ^= (1 &lt;&lt; PB5);
+    // Delay for 500 msec
+    _delay_loop_ms(500);
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/nano_logic_analyzer_demo-1.jpg" /></p>
+<p>รูป: การวัดสัญญาณที่ขาเอาต์พุตของบอร์ด <strong>Nano</strong> โดยใช้อุปกรณ์ <strong>USB-based Logic Analyzer</strong> </p>
+<p><img alt="" src="../avr/images/pulseview-1.png" /></p>
+<p>รูป: การแสดงผลรูปคลื่นสัญญาณด้วยซอฟต์แวร์ <strong>sigrok-PulseView</strong> (แสดงรูปกราฟเพียงหนึ่งช่องสัญญาณ)  </p>
+<p>จากการวัดสัญญาณเอาต์พุตที่ขา <strong>PB5</strong> ของบอร์ด <strong>Arduino Nano</strong> 
+จะได้ระยะเวลาในการสลับสถานะลอจิกในแต่ละครั้งประมาณ 500 มิลลิวินาที</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-led-blink-using-timers-012">&#9655; <strong>โค้ดตัวอย่างที่ 2: LED Blink (using Timers 0/1/2)</strong><a class="headerlink" href="#2-led-blink-using-timers-012" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ATmega328P</strong> มีวงจรภายในที่เรียกว่า "ไทม์เมอร์"  (<strong>Timer</strong>) หรือวงจรนับตามจังหวะ
+มีโหมดการทำงานให้เลือกได้หลายแบบ สามารถกำหนดเงื่อนไขให้เกิดเหตุการณ์ที่เรียกว่า "อินเทอร์รัพท์" (<strong>Interrupt</strong>)
+เมื่อนับถึงค่าที่กำหนดไว้หรือนับขึ้นค่าสูงสุด แล้ววนกลับมาเริ่มต้นใหม่ที่ 0 รวมถึงการสร้างสัญญาณเอาต์พุต
+ที่เรียกว่า <strong>PWM</strong> (<em>Pulse Width Modulation</em>) โดยใช้ไทม์เมอร์ได้สูงสุด 6 ช่องสัญญาณ</p>
+<p>วงจร <strong>Timer</strong> ใน <strong>ATmega328P</strong> ให้เลือกใช้อยู่ 3 ตัวเลือก คือ </p>
+<ul>
+<li><strong>Timer0 (8-bit)</strong>: คำสั่ง <a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c"><code>millis()</code></a> ของ <strong>Arduino API</strong> ใช้ <strong>Timer0</strong> ในการทำงาน</li>
+<li><strong>Timer1 (16-bit)</strong> ใช้สำหรับคำสั่งของไลบรารี <a href="https://github.com/arduino-libraries/Servo/blob/master/src/avr/Servo.cpp"><code>Servo</code></a> ของ <strong>Arduino API</strong></li>
+<li><strong>Timer2 (8-bit)</strong>: ใช้สำหรับคำสั่ง <a href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/Tone.cpp"><code>tone()</code></a> ของ <strong>Arduino API</strong></li>
+</ul>
+<p>การทำงานของไทม์เมอร์ของชิป <strong>AVR</strong> มีหลายโหมดให้เลือกใช้งาน เช่น</p>
+<ul>
+<li><strong>Normal Mode</strong>: ในโหมดนี้ รีจิสเตอร์ของตัวนับ จะนับขึ้นครั้งละหนึ่ง จาก 0 ไปถึงค่าสูงสุด ตามความถี่ที่ได้กำหนดไว้ 
+ถ้าตัวนับมีขนาด 8 บิต ก็จะนับไปจาก 0 ไปถึง 255 แล้วกลับมาที่ 0 ใหม่ และเรียกกรณีนี้ว่า  <strong>Timer Overflow</strong>
+และสามารถตั้งค่าให้เกิดอินเทอร์รัพท์ตามเหตุการณ์นี้ได้</li>
+<li><strong>Clear Timer on Compare Match (CTC) Mode</strong>: 
+ในโหมดนี้ รีจิสเตอร์ของตัวนับ จะไม่นับถึงค่าสูงสุด แต่จะนับไปถึงค่าที่ได้มีการกำหนดไว้ในรีจิสเตอร์สำหรับการเปรียบเทียบ
+(<strong>Compare Match Register</strong>) แล้ววนกลับไปเริ่มใหม่ที่ 0
+และสามารถตั้งค่าให้เกิดอินเทอร์รัพท์ตามเหตุการณ์นี้ได้</li>
+<li><strong>Fast PWM mode</strong>: โหมดนี้ใช้สำหรับการสร้างสัญญาณ <strong>PWM</strong> 
+ที่ปรับค่าความกว้างของพัลส์ได้ สร้างได้จำนวน 2 ช่องเอาต์พุตต่อหนึ่งไทม์เมอร์
+เหมาะสำหรับการสร้างสัญญาณที่มีความถี่สูง</li>
+<li><strong>Phase Correct PWM Mode</strong>: โหมดนี้ใช้สำหรับการสร้างสัญญาณ <strong>PWM</strong> ได้เช่นกัน
+แต่ใช้วิธีนับขึ้นไปจนถึงค่าที่กำหนดไว้แล้วนับลงจนถึง 0 ดังนั้นจึงแตกต่างจากโหมด <strong>Fast PWM</strong> ในรูปแบบการนับ</li>
+</ul>
+<p>วงจรไทม์เมอร์มีตัวหารความถี่ (<strong>Prescale Factor</strong>) ให้เลือกใช้ได้หลายค่า
+ได้แก่  <code>1</code>, <code>8</code>, <code>64</code>, <code>256</code> และ <code>1024</code> เพื่อทำให้การนับเกิดขึ้นในอัตราที่ช้ากว่าความถี่ของซีพียู</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ดนี้สาธิตการเปิดใช้งานวงจร <strong>Timer1</strong> หรือ ไทม์เมอร์หมายเลข 1 
+และตั้งคาบเวลาให้เกิดอินเทอร์รัพท์ทุก ๆ 0.5 ไมโครวินาที
+เมื่อเกิดอินเทอร์รัพท์ ฟังก์ชัน <code>ISR(TIMER1_COMPA_vect) { ... }</code> จะทำงาน
+และเพิ่มค่าตัวนับ (ตัวแปรชื่อ <code>ticks</code>) ครั้งละหนึ่ง
+ค่าของตัวแปรนี้จะถูกใช้ในการบันทึกเวลาและตรวจสอบเงื่อนไขการอัปเดตสถานะเอาต์พุตของ <strong>LED</strong></p>
+<p>การตั้งค่าและใช้งาน <strong>Timer1</strong> เกี่ยวข้องกับรีจิสเตอร์ เช่น</p>
+<ul>
+<li><code>TCCR1A</code> เลือกโหมดและตั้งค่าการทำงานของ <strong>Timer1</strong></li>
+<li><code>TCCR1B</code> เลือกโหมดและตั้งค่าการทำงานของ <strong>Timer1</strong></li>
+<li><code>TCCR1C</code> เลือกโหมดและตั้งค่าการทำงานของ <strong>Timer1</strong></li>
+<li><code>OCR1A</code> กำหนดค่าของตัวเลขจำนวนเต็มขนาด 16 บิต เพื่อใช้ในการเปรียบเทียบกับค่าในรีจิสเตอร์ตัวนับของ <strong>Timer1</strong></li>
+<li><code>TIMSK1</code> เลือกเปิดหรือปิดการเกิดอินเทอร์รัพท์ของวงจร <strong>Timer1</strong> </li>
+<li><code>TCNT1</code> ตัวนับของไทมเมอร์ที่มีขนาด 16 บิต แบ่งเป็นสองส่วนคือ <code>TCNT1H</code> และ <code>TCNT1L</code> ที่มีขนาดอย่างละหนึ่งไบต์</li>
+<li><code>TIFR1</code> มีค่าบิตที่ระบุว่ามีการเกิดอินเทอร์รัพท์ที่เกี่ยวข้อง (<strong>Timer1 Interrupt Flags</strong>)</li>
+</ul>
+<p><img alt="" src="../avr/images/avr_timer1_regs.png" /></p>
+<p>ตาราง:  ตัวอย่างของรีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของ <strong>Timer1</strong> และองค์ประกอบระดับบิตของแต่ละรีจิสเตอร์
+(Source: ATmega328P Datasheet)</p>
+<p><img alt="" src="../avr/images/avr_timer1_modes.png" /></p>
+<p>ตาราง: ตัวเลือกสำหรับโหมดการทำงานของ <strong>Timer1</strong>
+(Source: ATmega328P Datasheet)</p>
+<p><img alt="" src="../avr/images/avr_timer1_prescaler.png" /></p>
+<p>ตาราง: ตัวเลือกสำหรับตัวหารความถี่และแหล่งที่มาของสัญญาณ <strong>Clock</strong> สำหรับ <strong>Timer1</strong>
+(Source: ATmega328P Datasheet)</p>
+<p>ในตัวอย่างนี้ได้เลือกใช้งาน <strong>Timer1</strong> ในโหมด <strong>CTC</strong> (หรือ <strong>Mode 4</strong>) 
+ดังนั้นจึงต้องกำหนดค่าบิตสำหรับ <code>WGM1[3..0]</code> ให้เท่ากับ <code>0100</code>
+ดังนั้นมีเพียงบิต <code>WGM12</code> ที่จะต้องเป็น <code>1</code> </p>
+<p>ตัวหารความถี่ (<strong>Clock Frequency Divider</strong>) 
+ถูกกำหนดให้มีค่าเท่ากับ 8 และใช้ความถี่จากซีพียู ดังนั้น <code>CS1[2..0]</code> จะต้องเท่ากับ <code>010</code>
+ดังนั้นมีเพียงบิต <code>CS11</code> ที่จะต้องเป็น <code>1</code> </p>
+<p>ตัวนับของรีจิสเตอร์ <code>TCNT1</code> จะนับขึ้นทีละหนึ่งด้วยความถี่ <script type="math/tex">16 \mbox{ MHz}/8 = 2 \mbox{ MHz}</script> หรือ ทุก ๆ 0.5 ไมโครวินาที </p>
+<p>เนื่องจากได้ใช้โหมด <strong>CTC</strong> จะต้องมีการตั้งค่าเพื่อใช้ในการเปรียบเทียบกับค่าของรีจิสเตอร์ <code>OCR1A</code> 
+ซึ่งมีขนาด 16 บิต เช่น นับไปจนถึง 1999 สำหรับตัวอย่างนี้ 
+หรือคำนวณได้ระยะเวลาเท่ากับ <script type="math/tex">2000 \times 0.5\mbox{ usec} = 1000\mbox{ usec}</script>
+</p>
+<p>เมื่อวงจรนับเริ่มต้นจาก 0 ไปจนถึง 1999 จะทำให้ค่าในรีจิสเตอร์ของตัวนับ เริ่มต้นนำใหม่ที่ 0
+และทำเกิดอินเทอร์รัพท์ เรียกว่า <strong>Timer1 Output Compare Match</strong>
+(ชื่อของอินเทอร์รัพท์ที่เกี่ยวข้องคือ <code>TIMER1_COMPA_vect</code>)
+ดังนั้นจะต้องเปิดใช้งานอินเทอร์รัพท์นี้ด้วย โดยกำหนดให้บิต <code>OCIE1A</code> 
+ในรีจิสเตอร์ <code>TIMSK1</code> มีค่าเป็น <code>1</code></p>
+<p>ในส่วนของฟังก์ชันที่ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>) 
+สำหรับ <code>TIMER1_COMPA_vect</code> จะต้องมีการเขียนโค้ดด้วย เช่น ให้เพิ่มค่าของตัวแปร
+<code>ticks</code> ครั้งละหนึ่ง</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt; // required for ISR(TIMER1_COMPA_vect)
+
+// Set the prescaler to 8
+#define PRESCALER  (8)
+
+// Calculate the timer compare value
+#define TIMER_COMP_VAL ((F_CPU / PRESCALER) / 1000)
+
+// global variable used by the ISR
+volatile uint32_t ticks;
+
+// ISR for Timer1
+ISR(TIMER1_COMPA_vect) {
+  // Increment the tick counter
+  ticks++;
+}
+
+// Read the current tick counter (1msec time resolution)
+uint32_t get_ticks() {
+  uint32_t t;
+  cli(); // Disable global interrupts
+  t = ticks;
+  sei(); // Enable global interrupts
+  return t;
+}
+
+// Initialize / setup Timer1 in CTC with interrupt enabled
+void init_timer1() {
+  // Use CTC mode and set CTC mode and prescaler to 8
+  TCCR1A = 0;
+  TCCR1B = (1 &lt;&lt; WGM12) | (1 &lt;&lt; CS11); 
+  // Set the compare match value 
+  OCR1A  = TIMER_COMP_VAL-1; 
+  // Enable Compare Match Interrupt
+  TIMSK1 |= (1 &lt;&lt; OCIE1A);
+}
+
+int main(void) {
+  // Set the LED pin as output
+  DDRB |= (1 &lt;&lt; PB5);
+  // Initialize Timer1
+  init_timer1();
+  // Enable global interrupts
+  sei();
+
+  uint32_t now, ts = 0;
+  while (1) {
+    // Get the current tick count
+    now = get_ticks();
+    if ( now - ts &gt;= 500 ) { // Update LED output every 500msec
+      // Save the last update time
+      ts = now;
+      // Toggle the LED pin
+      PORTB ^= (1 &lt;&lt; PB5);
+    }
+  }
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าเปลี่ยนไปใช้ <strong>Timer0</strong> ก็รีจิสเตอร์ที่เกี่ยวข้องในการทำงานได้แก่</p>
+<ul>
+<li><code>TCCR0A</code></li>
+<li><code>TCCR0B</code></li>
+<li><code>OCR0A</code></li>
+<li><code>TIMSK0</code></li>
+</ul>
+<p>ในตัวอย่างโค้ดต่อไปนี้ ได้กำหนดให้ตัวหารความถี่ มีค่าเท่ากับ 64 และทำงานในโหมด <strong>CTC</strong> ดังนั้น <strong>Timer0</strong> 
+จะนับด้วยความถี่ <script type="math/tex">16\mbox{ MHz}/64 = 250\mbox{ kHz}</script> หรือ นับขึ้นทุก ๆ 4 ไมโครวินาที
+และตั้งค่าของรีจิสเตอร์ <code>OCR0A</code> ซึ่งมีขนาด 8 บิต ให้เท่ากับ 249 เพื่อทำให้เกิดอินเทอร์รัพท์ <code>TIMER0_COMPA_vect</code> ทุก ๆ 1 มิลลิวินาที
+(คำนวณได้จาก <script type="math/tex">250 \times 4\mbox{ usec}</script>)</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+// Set the prescaler to 64
+#define PRESCALER  (64)
+
+// Calculate the timer compare value
+#define TIMER_COMP_VAL ((F_CPU / PRESCALER) / 1000)
+
+// global variable used by the ISR
+volatile uint32_t ticks;
+
+// ISR for Timer0
+ISR(TIMER0_COMPA_vect) {
+  ticks++;
+}
+
+// Read the current tick counter (1msec time resolution)
+uint32_t get_ticks() {
+  uint32_t t;
+  cli();
+  t = ticks;
+  sei();
+  return t;
+}
+
+// Initialize / setup Timer0 in CTC with interrupt enabled
+void init_timer0() {
+  // Use CTC mode
+  TCCR0A = (1 &lt;&lt; WGM01); 
+  // Set the prescaler to 64
+  TCCR0B = (1 &lt;&lt; CS01) | (1 &lt;&lt; CS00); 
+  // Set output compare match register
+  OCR0A = TIMER_COMP_VAL-1;
+  // Enable compare match interrupt on Timer0
+  TIMSK0 |= (1 &lt;&lt; OCIE0A); 
+}
+
+int main(void) {
+  // Set the LED pin as output
+  DDRB |= (1 &lt;&lt; PB5);
+  // Initialize Timer0
+  init_timer0();
+  // Enable global interrupts
+  sei();
+
+  uint32_t now, ts = 0;
+  while (1) {
+    // Get the current tick count
+    now = get_ticks();
+    if ( now - ts &gt;= 500 ) { // Update LED output every 500msec
+      // Save the last update time
+      ts = now;
+      // Toggle the LED pin
+      PORTB ^= (1 &lt;&lt; PB5);
+    }
+  }
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าต้องการเปลี่ยนไปใช้ <strong>Timer2</strong> ก็มีรีจิสเตอร์ที่เกี่ยวข้องได้แก่</p>
+<ul>
+<li><code>TCCR2A</code></li>
+<li><code>TCCR2B</code></li>
+<li><code>OCR2A</code></li>
+<li><code>TIMSK2</code></li>
+</ul>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+// Set the prescaler to 64
+#define PRESCALER  (64)
+
+// Calculate the timer compare value
+#define TIMER_COMP_VAL ((F_CPU / PRESCALER) / 1000)
+
+// global variable used by the ISR
+volatile uint32_t ticks;
+
+// ISR for Timer2
+ISR(TIMER2_COMPA_vect) {
+  ticks++;
+}
+
+// Read the current tick counter (1msec time resolution)
+uint32_t get_ticks() {
+  uint32_t t;
+  cli();
+  t = ticks;
+  sei();
+  return t;
+}
+
+// Initialize / setup Timer2 in CTC with interrupt enabled
+void init_timer2() {
+   // Set CTC mode and set prescaler to 64
+  TCCR2A = (1 &lt;&lt; WGM21); 
+  TCCR2B = (1 &lt;&lt; CS22);
+  OCR2A  = TIMER_COMP_VAL-1;
+  // Enable compare interrupt
+  TIMSK2 |= (1 &lt;&lt; OCIE2A);
+}
+
+int main(void) {
+  // Set the LED pin as output
+  DDRB |= (1 &lt;&lt; PB5);
+  // Initialize Timer0
+  init_timer2();
+  // Enable global interrupts
+  sei();
+
+  uint32_t now, ts = 0;
+  while (1) {
+    // Get the current tick count
+    now = get_ticks();
+    if ( now - ts &gt;= 500 ) { // Update LED output every 500msec
+      // Save the last update time
+      ts = now;
+      // Toggle the LED pin
+      PORTB ^= (1 &lt;&lt; PB5);
+    }
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/pulseview-3.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณเอาต์พุตด้วย <strong>Portable Logic Analyzer</strong>
+(ได้ระยะเวลาในการสลับสถานะลอจิกที่ขาเอาต์พุตประมาณ <strong>500 msec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-led-blink-using-wdt">&#9655; <strong>โค้ดตัวอย่างที่ 3: LED Blink (using WDT)</strong><a class="headerlink" href="#3-led-blink-using-wdt" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ATmega328P</strong> มีวงจรภายในชื่อ <strong>WDT</strong> (<em>Watchdog Timer</em>)
+ซึ่งเป็นวงจรไทม์เมอร์ประเภทหนึ่ง สามารถโปรแกรมให้เริ่มต้นทำงานและนับถอยหลังตามอัตราที่กำหนดไว้
+โดยเขียนค่าลงในรีจิสเตอร์ <code>WDTCSR</code> ของ <strong>WDT</strong>
+เมื่อนับถอยหลังจนถึง 0 โดยไม่มีการรีเซตค่าเริ่มต้นใหม่ จะทำให้เกิดอินเทอร์รัพท์ หรือ ทำให้เกิดการรีเซตการทำงานของชิปได้</p>
+<p>ตัวอย่างนี้สาธิตการเปิดใช้งาน <strong>WDT</strong> และตั้งค่าการใช้งานให้เกิดอินเทอร์รัพท์ ทุก ๆ 500 มิลลิวินาที โดยประมาณ 
+และไม่ทำให้เกิดการรีเซตการทำงานของไมโครคอนโทรลเลอร์</p>
+<p>นอกจากนั้นแล้ว ยังสามารถตั้งค่าโหมดการทำงานของไมโครคอนโทรลเลอร์ ให้เข้าสู่โหมดประหยัดพลังงาน 
+เช่น <strong>Power-Save</strong> และ <strong>Power-Down</strong> ซึ่งทำให้ซีพียูหยุดการทำงานชั่วคราว
+แต่สามารถถูกปลุกให้ตื่นมาทำงานต่อได้ เมื่อเกิดอินเทอร์รัพท์จาก <strong>WDT</strong> </p>
+<p>ไลบรารี <code>avr-libc</code> มีคำสั่งใน <a href="https://www.nongnu.org/avr-libc/user-manual/group__avr__sleep.html"><code>&lt;avr/sleep.h&gt;</code></a>
+ที่เกี่ยวข้องกับการกำหนดโหมดในการทำงานแบบประหยัดพลังงาน เช่น</p>
+<ul>
+<li><code>set_sleep_mode(...)</code></li>
+<li><code>sleep_enable()</code></li>
+<li><code>sleep_cpu()</code></li>
+<li><code>sleep_disable()</code></li>
+</ul>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/wdt.h&gt;    // WDT (watchdog timer)
+#include &lt;avr/sleep.h&gt;  // Power management and sleep modes
+#include &lt;avr/interrupt.h&gt; // sei(), cli(), ISR(WDT_vect)
+
+volatile uint8_t wdt_wakeup_count = 0;
+
+// ISR for WDT interrupt
+ISR(WDT_vect) {
+  wdt_wakeup_count++;
+}
+
+// Initialize / setup the WDT
+void init_wdt() {
+  // Disable system interrupts during watchdog configuration
+  cli(); 
+  // Reset the watchdog timer
+  wdt_reset();
+  // Enable WDT register write operation
+  WDTCSR |= (1&lt;&lt;WDCE) | (1&lt;&lt;WDE); 
+  // Set WDT to 500ms (approximately)
+  WDTCSR =  (1 &lt;&lt; WDP2) | (1 &lt;&lt; WDP0); 
+  WDTCSR |= (1 &lt;&lt; WDIE); // Enable WDT interrupt
+  // Enable global interrupts
+  sei();
+}
+
+int main(void) {
+  // Set the LED pin as output
+  DDRB |= (1 &lt;&lt; PB5);
+  // Initialize WDT
+  init_wdt();
+
+  while (1) {
+    // Disable global interrupts
+    cli();
+    if (wdt_wakeup_count &lt; 10) { 
+      // Toggle the LED pin
+      PORTB ^= (1 &lt;&lt; PB5);
+      // Select the powerdown mode
+      set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+      // Enter sleep mode (3 steps)
+      // (1) Set the sleep enable bit
+      sleep_enable(); 
+      // Enable global interrupts
+      sei();
+      // (2) Execute the SLEEP instruction
+      sleep_cpu();
+      // (3) Clear the sleep enable bit 
+      sleep_disable();
+    } else {
+      wdt_disable(); // Disable WDT
+    }
+    // Enable global interrupts
+    sei();
+  }
+  return 0;
+}
+</code></pre>
+<p>ข้อสังเกต: <strong>Wokwi Similator</strong> ที่ได้ลองใช้งานในขณะที่เขียนบทความนี้
+สามารถจำลองการทำงานของ <strong>WDT</strong> ได้ แต่ไม่รองรับการเปิดใช้งานโหมด <strong>Sleep</strong> ของ <strong>AVR</strong>
+ดังนั้นจึงแนะนำให้นำโค้ดตัวอย่างไปทดลองกับบอร์ดทดลองจริง</p>
+<p><img alt="" src="../avr/images/pulseview-2.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณเอาต์พุตด้วย <strong>Portable Logic Analyzer</strong>
+(ได้ระยะเวลาในการสลับสถานะลอจิกที่ขาเอาต์พุตต่อหนึ่งครั้ง ประมาณ <strong>583.61 msec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> สำหรับชิป <strong>ATmega328p</strong> เพื่อเปิดใช้งานวงจร 
+<strong>Timer</strong> ในรูปแบบต่าง ๆ และใช้งานร่วมกับบอร์ด
+<strong>Arduino Uno</strong> หรือ  <strong>Nano</strong> และจำลองการทำงานโดยใช้ <strong>Wokwi AVR Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-01-15 | Last Updated: 2023-01-15</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

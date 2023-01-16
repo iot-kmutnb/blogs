@@ -132,7 +132,7 @@
 
 <h1 id="c-avr-atmega328p-2">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 2<a class="headerlink" href="#c-avr-atmega328p-2" title="Permanent link">#</a></h1>
 <p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
-<em>Bare-metal C Programming</em>, <em>AVR-GCC</em></p>
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <strong>avr-libc</strong></p>
 <hr />
 <h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
 <p>จากบทความใน <a href="../avr_gcc_part-1/">ตอนที่ 1</a> ซึ่งกล่าวถึง ไมโครคอนโทรลเลอร์ขนาด 8 บิต
@@ -150,11 +150,17 @@
 อย่างไรก็ตาม <strong>AVR-GCC Toolchain</strong> ก็มาพร้อมกับไลบรารีภาษา <strong>C</strong> ที่มีชื่อว่า <a href="https://www.nongnu.org/avr-libc/user-manual/modules.html"><strong>avr-libc</strong></a>
 ก็มีคำสั่งหรือฟังก์ชันพื้นฐานที่นำมาใช้ได้สำหรับการเขียนโค้ด แม้ว่าจะมีคำสั่งน้อยกว่ากรณีที่เขียนโปรแกรมด้วย
 <a href="https://www.arduino.cc/reference/en/"><strong>Arduino C/C++ API</strong></a></p>
-<p>การเขียนโปรแกรมเพื่อกำหนดรูปแบบฟังก์ชันหรือควบคุมการทำงานของวงจรภายในของไมโครคอนโทรลเลอร์
-(<strong>On-chip Peripherals</strong>) จะอาศัยวิธีการเข้าถึงรีจิสเตอร์ 
-(เรียกว่า <strong>Memory-mapped I/O Special-Function Registers</strong> สำหรับ <strong>AVR</strong>) 
-และเพื่อให้ง่ายต่อการใช้งาน จึงได้มีการกำหนดชื่อของรีจิสเตอร์เป็นสัญลักษณ์ หรือ เป็น <strong>C Macros</strong>
-ซึ่งตรงกับรายละเอียดในเอกสาร <strong>Datasheet</strong> ของผู้ผลิต </p>
+<p>การเขียนโปรแกรมเพื่อกำหนดรูปแบบฟังก์ชันหรือควบคุมการทำงานของวงจรภายในของไมโครคอนโทรลเลอร์ 
+จะอาศัยวิธีการเข้าถึงรีจิสเตอร์ (<strong>Registers</strong>) ของไมโครคอนโทรลเลอร์ที่ได้เลือกมาใช้งาน 
+ซึ่งโดยทั่วไปแล้วจะต้องเข้าถึงผ่านพอยน์เตอร์ที่ชี้ไปยังแอดเดรสของรีจิสเตอร์เหล่านั้น</p>
+<p>แต่เพื่อให้ง่ายต่อการใช้งาน จึงได้มีการกำหนดชื่อของรีจิสเตอร์เป็นให้สัญลักษณ์ หรือเรียกว่า "แมโครในภาษาซี" (<strong>C Macros</strong>)
+ซึ่งตรงกับรายละเอียดในเอกสาร <strong>Datasheet</strong> ของผู้ผลิต (แนะนำให้ผู้อ่านได้ศึกษาข้อมูลและรายละเอียดจากไฟล์เอกสารดังกล่าวร่วมด้วย)</p>
+<p>โดยทั่วไป การเขียนโค้ดภาษา <strong>C</strong> สำหรับ <strong>AVR</strong> จะต้องใช้ไฟล์ 
+<a href="https://github.com/vancegroup-mirrors/avr-libc/blob/master/avr-libc/include/avr/io.h"><code>&lt;avr/io.h&gt;</code></a> 
+ซึ่งเป็นไฟล์ประเภท <strong>C Header File</strong> ของไลบรารี <strong>avr-libc</strong> 
+ในไฟล์นี้จะมีการประกาศใช้แมโครสำหรับค่าคงที่ต่าง ๆ ชื่อของรีจิสเตอร์ภายในไมโครคอนโทรลเลอร์ เป็นต้น</p>
+<p>ถ้าชิปเป้าหมายคือ <strong>ATmega328P</strong> ไฟล์ <code>&lt;avr/io.h&gt;</code> จะนำไปสู่ไฟล์ 
+<a href="https://github.com/vancegroup-mirrors/avr-libc/blob/master/avr-libc/include/avr/iom328p.h"><code>&lt;avr/iom328p.h&gt;</code></a></p>
 <p>รูปแบบการกำหนดสัญลักษณ์ต่าง ๆ  ดูได้จากไฟล์
 <a href="https://github.com/vancegroup-mirrors/avr-libc/blob/master/avr-libc/include/avr/iom328p.h"><code>&lt;avr/iom328p.h&gt;</code></a> ของ <strong>AVR-libc</strong> สำหรับชิป <strong>ATmega328P</strong> 
 และไฟล์นี้จะถูกนำเข้าโดยอัตโนมัติจากไฟล์ <code>&lt;avr/io.h&gt;</code>)</p>
@@ -700,13 +706,13 @@ int main(void) {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-02-21 | Last Updated: 2022-03-08</p></div>
+<p>Created: 2022-02-21 | Last Updated: 2023-01-15</p></div>
             </div>
         </div>
 
         <footer class="col-md-12">
             <hr>
-                <p>Copyright &copy; 2021-2022 IoT Engineering Education, Bangkok/Thailand</a></p>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
         <script>
