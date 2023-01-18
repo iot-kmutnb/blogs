@@ -125,7 +125,7 @@
 <h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
 <p>บทความในตอนที่ 3 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> สำหรับชิป <strong>ATmega328P</strong> 
 มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong> (<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
-และใช้ <strong>Wokwi Simulator</strong> ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
+และใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
 <p>คำแนะนำ: ถ้าจะลองโค้ดตัวอย่างโดยใช้ <strong>Arduino IDE</strong> เพื่อคอมไพล์และอัปโหลดไปยังบอร์ดทดลอง <strong>Arduino Uno</strong>
 หรือ <strong>Nano</strong> ให้สร้าง <strong>Arduino Sketch</strong> และทำให้ไฟล์ <strong>.ino</strong> ไม่มีโค้ดใด ๆ (<strong>Empty Sketch</strong>)
 และให้สร้างไฟล์ <code>main.c</code> เพื่อเขียนโค้ด</p>
@@ -135,10 +135,12 @@
 <p>โค้ดตัวอย่างแรกเป็นการทบทวนการใช้คำสั่ง <code>_delay_ms()</code> ของไลบรารี <strong>avr-libc</strong>
 เพื่อใช้ในการหน่วงเวลาการทำงานของซีพียู ก่อนทำคำสั่งถัดไป ฟังก์ชันนี้ทำคำสั่งเพื่อวนซ้ำและหน่วงเวลา
 (จึงเรียกว่าเป็น <strong>Software-based Delay Function</strong>)</p>
-<p>ในส่วนเอาต์พุต มีการเขียนค่าลงในรีจิสเตอร์ <code>DDRB</code> บิตที่ 5 สำหรับ <strong>Arduino D13 Pin (Onboard LED)</strong> 
+<p>ในส่วนที่เป็นขาเอาต์พุต มีการเขียนค่าลงในรีจิสเตอร์ <code>DDRB</code> บิตที่ 5 สำหรับ <strong>Arduino D13 Pin (Onboard LED)</strong> 
 และตรงกับขา <strong>PB5</strong> ของ <strong>ATmega328p</strong>
-การเขียนค่าจะทำให้ขาดังกล่าวเป็นเอาต์พุต และมีค่าเป็น 1 และ 0 สลับกันไป โดยเว้นระยะเวลาประมาณ 500 มิลลิวินาที 
-โดยใช้คำสั่ง <code>_delay_ms()</code> ของไลบรารี <a href="http://savannah.nongnu.org/projects/avr-libc/"><strong>avr-libc</strong></a>
+การเขียนค่าบิตเป็น 1 ใน <code>DDRB</code> จะทำให้ขาดังกล่าวเป็นเอาต์พุต</p>
+<p>การกำหนดสถานะลอจิกที่ขาเอาต์พุตดังกล่าวทำได้โดยเขียนค่าบิตที่ตำแหน่ง <code>PB5</code> ใน <code>PORTB</code>
+ให้เป็น 1 และ 0 สลับกันไป เว้นระยะเวลาประมาณ 500 มิลลิวินาที
+โดยการใช้คำสั่ง <code>_delay_ms()</code> ของไลบรารี <a href="http://savannah.nongnu.org/projects/avr-libc/"><strong>avr-libc</strong></a>
 เพื่อให้ <strong>LED</strong> กระพริบได้</p>
 <pre><code>// Set the CPU speed to 16MHz if F_CPU is not defined
 #ifndef F_CPU
@@ -286,8 +288,7 @@ int main(void) {
 <p>เมื่อวงจรนับเริ่มต้นจาก 0 ไปจนถึง 1999 จะทำให้ค่าในรีจิสเตอร์ของตัวนับ เริ่มต้นนำใหม่ที่ 0
 และทำเกิดอินเทอร์รัพท์ เรียกว่า <strong>Timer1 Output Compare Match</strong>
 (ชื่อของอินเทอร์รัพท์ที่เกี่ยวข้องคือ <code>TIMER1_COMPA_vect</code>)
-ดังนั้นจะต้องเปิดใช้งานอินเทอร์รัพท์นี้ด้วย โดยกำหนดให้บิต <code>OCIE1A</code> 
-ในรีจิสเตอร์ <code>TIMSK1</code> มีค่าเป็น <code>1</code></p>
+ดังนั้นจะต้องเปิดใช้งานอินเทอร์รัพท์นี้ด้วย โดยการเขียนค่าบิต <code>OCIE1A</code> ของรีจิสเตอร์ <code>TIMSK1</code> มีให้มีค่าเป็น <code>1</code></p>
 <p>ในส่วนของฟังก์ชันที่ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>) 
 สำหรับ <code>TIMER1_COMPA_vect</code> จะต้องมีการเขียนโค้ดด้วย เช่น ให้เพิ่มค่าของตัวแปร
 <code>ticks</code> ครั้งละหนึ่ง</p>
@@ -502,7 +503,7 @@ int main(void) {
 <p>ตัวอย่างนี้สาธิตการเปิดใช้งาน <strong>WDT</strong> และตั้งค่าการใช้งานให้เกิดอินเทอร์รัพท์ ทุก ๆ 500 มิลลิวินาที โดยประมาณ 
 และไม่ทำให้เกิดการรีเซตการทำงานของไมโครคอนโทรลเลอร์</p>
 <p>นอกจากนั้นแล้ว ยังสามารถตั้งค่าโหมดการทำงานของไมโครคอนโทรลเลอร์ ให้เข้าสู่โหมดประหยัดพลังงาน 
-เช่น <strong>Power-Save</strong> และ <strong>Power-Down</strong> ซึ่งทำให้ซีพียูหยุดการทำงานชั่วคราว
+เช่น เลือกใช้โหมด <strong>Power-Save</strong> หรือ <strong>Power-Down</strong> ซึ่งทำให้ซีพียูหยุดการทำงานชั่วคราว
 แต่สามารถถูกปลุกให้ตื่นมาทำงานต่อได้ เมื่อเกิดอินเทอร์รัพท์จาก <strong>WDT</strong> </p>
 <p>ไลบรารี <code>avr-libc</code> มีคำสั่งใน <a href="https://www.nongnu.org/avr-libc/user-manual/group__avr__sleep.html"><code>&lt;avr/sleep.h&gt;</code></a>
 ที่เกี่ยวข้องกับการกำหนดโหมดในการทำงานแบบประหยัดพลังงาน เช่น</p>
@@ -586,7 +587,7 @@ int main(void) {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-01-15 | Last Updated: 2023-01-15</p></div>
+<p>Created: 2023-01-15 | Last Updated: 2023-01-17</p></div>
             </div>
         </div>
 
