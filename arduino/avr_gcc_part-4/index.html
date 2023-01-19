@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-4/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 4 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-4" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 4</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#usart" class="nav-link">&#9655; USART</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1-ascii" class="nav-link">&#9655; โค้ดตัวอย่างที่ 1: ส่งข้อมูล ASCII</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2-serial-loopback" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2: ส่งรับและส่งข้อมูลในลักษณะ Serial Loopback</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3-printf" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3: การใช้คำสั่ง printf()</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-4">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 4<a class="headerlink" href="#c-avr-atmega328p-4" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 4 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า <strong>USART</strong> ภายในชิป <strong>ATmega328P</strong>
+มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong> (<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
+และใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> 
+ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
+<p>คำแนะนำ: ถ้าจะลองโค้ดตัวอย่างโดยใช้ <strong>Arduino IDE</strong> เพื่อคอมไพล์และอัปโหลดไปยังบอร์ดทดลอง <strong>Arduino Uno</strong>
+หรือ <strong>Nano</strong> ให้สร้าง <strong>Arduino Sketch</strong> และทำให้ไฟล์ <strong>.ino</strong> ไม่มีโค้ดใด ๆ (<strong>Empty Sketch</strong>)
+และให้สร้างไฟล์ <code>main.c</code> เพื่อเขียนโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="usart">&#9655; <strong>USART</strong><a class="headerlink" href="#usart" title="Permanent link">#</a></h2>
+<p>วงจร "<strong>USART</strong>" (ย่อมาจากคำว่า <strong><em>Universal Synchronous / Asynchronous Serial Receiver &amp; Transmitter</em></strong>)
+ซึ่งมีอยู่ภายในชิป <strong>ATmega328P</strong> และมีเพียงวงจรเดียว (ใช้ชื่ออ้างอิงว่า <code>USART0</code>)
+แต่ถ้าเป็นชิปรุ่นอื่น ก็อาจมีมากกว่าหนึ่งวงจรให้ใช้งานได้ เช่น ชิป <strong>ATmega2560</strong>
+มีวงจรประเภทนี้ (หรือเรียกว่า <strong>Hardware Serial</strong>) ให้ใช้งานได้พร้อมกันสูงสุดถึง 4 ชุด</p>
+<p>วงจร <strong>USART</strong> รองรับการทำงานได้ 2 โหมดคือ</p>
+<ul>
+<li><strong>Asynchronous</strong>: ไม่ใช้สัญญาณ <strong>Clock</strong> ("อะซิงโครนัส") เพื่อกำหนดจังหวะการทำงานสำหรับการรับส่งข้อมูล
+และใช้ขาสัญญาณ 2 ขา ได้แก่ <strong>TxD0</strong> และ *<em>RxD0</em></li>
+<li><strong>Synchronous</strong>: มีการสร้างและใช้สัญญาณ <strong>Clock</strong> ("ซิงโครนัส") เพื่อกำหนดจังหวะการรับส่งข้อมูลแต่ละบิต 
+(เหมือนกรณีที่มีการสื่อสารด้วยบัส <strong>SPI</strong>) และใช้ขาสัญญาณ 3 ขา ได้แก่ <strong>TxD</strong>, <strong>RxD</strong> และ <strong>XCK</strong></li>
+</ul>
+<p>โดยทั่วไปแล้ว  <strong>USART</strong> มักจะนิยมใช้งานในรูปแบบ <strong>Asynchronous</strong> (ดังนั้นจึงเรียกว่า <strong>UART</strong>
+หรือ <strong>Asynchronous Serial</strong>) การส่งข้อมูลบิตของ <strong>UART</strong> เป็นแบบ <strong>Full Duplex</strong> รับและส่งข้อมูลบิตได้สองทิศทางพร้อมกัน
+โดยใช้ขาข้อมูลสำหรับส่งและรับ (<strong>Tx</strong> และ <strong>Rx</strong>) อุปกรณ์ทั้งสองฝ่ายที่จะสื่อสารกันด้วย <strong>UART</strong> จะต้องตกลงใช้ค่า <strong>Baud</strong> หรืออัตราการรับส่งข้อมูลที่เท่ากัน
+(มีหน่วยเป็นบิตต่อวินาที) เช่น <strong>9600</strong> หรือ <strong>115200</strong></p>
+<p>การส่งข้อมูลหนึ่งเฟรมสำหรับ <strong>UART</strong> ประกอบด้วยบิตต่าง ๆ ตามลำดับดังนี้ 
+และมีด้วยระยะเวลาในการสื่อสารข้อมูลแต่ละบิตเท่ากัน</p>
+<ul>
+<li>เริ่มต้นด้วยบิตแรกที่ถูกส่งออกไป เรียกว่า <strong>Start Bit</strong> (มีค่าบิตเป็น 0 หรือ <strong>LOW</strong> เสมอ)</li>
+<li>บิตข้อมูลตามจำนวนที่เลือกใช้ (เช่น มี 8 บิต) เริ่มที่บิต <strong>LSB</strong> (<em>Least Significant Bit</em>) 
+จะถูกส่งออกไปก่อน ขนาดของเฟรมข้อมูลมีให้เลือกใช้ได้ เช่น 5,6,7,8 หรือ 9 บิต (โดยปรกติก็ใช้ 8 บิต)</li>
+<li>บิตสำหรับการตรวจสอบข้อมูลด้วยวิธี <strong>Bit-level XOR (Exclusive OR)</strong> 
+และผลลัพธ์ที่ได้จะถูกนำไปใช้เป็นค่าบิตที่เรียกว่า <strong>Parity Bit</strong> แบ่งเป็นสองกรณี
+คือ <strong>Even Parity Bit</strong> และ <strong>Odd Parity Bit</strong> หรือไม่มีก็ได้  (<strong>No Parity Bit</strong>)</li>
+<li>ปิดท้ายด้วย <strong>Stop Bit</strong> ซึ่งมี 1 หรือ 2 บิต และแต่ละบิตมีค่าเป็น 1 หรือ <strong>HIGH</strong> เสมอ (โดยปรกติก็ใช้เพียงหนึ่งบิต)</li>
+</ul>
+<p>การตั้งค่าการทำงานของ <code>USART0</code> ในโหมด <strong>Asynchronous</strong> (<strong>UART</strong>) มีดังนี้</p>
+<ul>
+<li>ให้ตั้งค่าสำหรับ <strong>Baud Rate Generator</strong> ของวงจร <code>USART0</code> เพื่อกำหนดอัตราการรับส่งข้อมูล
+โดยเขียนค่าลงในรีจิสเตอร์ <code>UBRR0</code> (<strong>UART Baud Rate Generator</strong>) ให้ถูกต้อง ซึ่งมีขนาด 16 บิต
+(<code>UBRR0H:UBRR0L</code>) โดยใช้สัญญาณ <strong>Clock</strong> ภายในระบบ  (<script type="math/tex">f_{OSC}</script>)
+เช่น ความถี่ <strong>16MHz</strong> เป็นต้น</li>
+<li>เลือกใช้โหมดความเร็ว ซึ่งมีอยู่ 2 โหมด (ขึ้นอยู่กับค่าบิต <code>U20X0</code> ใน <code>UCSR0A</code>) คือ <ul>
+<li><strong>Normal Speed</strong>: บิต <code>U20X0</code> เป็น 0 และ
+<script type="math/tex">Baud = \frac{f_{osc}}{16\times (UBRR0+1)}</script>
+</li>
+<li><strong>Double Speed</strong>: บิต <code>U20X0</code> เป็น 1 และ
+<script type="math/tex">Baud = \frac{f_{osc}}{8\times (UBRR0+1)}</script>
+</li>
+</ul>
+</li>
+<li>เขียนค่าลงในรีจิสเตอร์ <code>UCSR0C</code> เพื่อกำหนดขนาดฟรมข้อมูล (<strong>Frame Format</strong>)
+และบิตที่ตามมา เช่น  <strong>Parity Bit</strong> และ <strong>Stop Bit</strong></li>
+<li>เฟรมข้อมูลที่มีขนาดไม่เกิน 8 บิต จะถูกเขียนหรืออ่านจะอยู่ในรีจิสเตอร์สำหรับข้อมูล (<code>UDR0</code>)<ul>
+<li>ถ้าเขียนข้อมูล หมายถึง <code>TXB</code> (<strong>Transmit Data Buffer Register</strong>) </li>
+<li>ถ้าอ่านข้อมูล หมายถึง <code>RXB</code> (<strong>Receive Data Buffer Register</strong>)</li>
+<li>รีจิสเตอร์ <code>TXB</code> และ <code>RXB</code> ใช้แอดเดรสของรีจิสเตอร์ร่วมกัน และเข้าถึงโดยใช้ชื่อ <code>UDR0</code></li>
+</ul>
+</li>
+<li>แต่ถ้ามีจำนวนข้อมูลเท่ากับ 9 บิต จะต้องใช้บิต <code>TXB8</code> ในรีจิสเตอร์  <code>UCSR0B</code> ร่วมด้วย (สำหรับการส่งข้อมูล)
+และบิต <code>RXB80</code> ในรีจิสเตอร์ <code>UCSR0B</code> (สำหรับการรับข้อมูล) </li>
+<li>ในบางกรณีอาจมีการเปิดใช้งานอินเทอร์รัพท์สำหรับ <strong>Tx</strong> และ <strong>Rx</strong> ของวงจร <strong>USART0</strong> ด้วย</li>
+<li>เปิดใช้งานตัวส่งและตัวรับ (<strong>Tx</strong> และ <strong>Rx</strong>)<ul>
+<li><strong>Enable Tx</strong>: เขียนค่าบิต <code>TXEN0</code> ให้เป็น 1 ในรีจิสเตอร์ <code>UCSR0B</code></li>
+<li><strong>Enable Rx</strong>: เขียนค่าบิต <code>RXEN0</code> ให้เป็น 1 ในรีจิสเตอร์ <code>UCSR0B</code></li>
+</ul>
+</li>
+</ul>
+<p>รายละเอียดต่าง ๆ เกี่ยวกับรีจิสเตอร์และบิตที่เกี่ยวข้องกับการทำงานของ <strong>USART0</strong> แนะนำให้ศึกษาจากไฟล์เอกสารของผู้ผลิต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-ascii">&#9655; <strong>โค้ดตัวอย่างที่ 1: ส่งข้อมูล ASCII</strong><a class="headerlink" href="#1-ascii" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างแรกนี้สาธิตการตั้งค่าใช้งาน <code>USART0</code> เพื่อส่งข้อมูลแบบ <strong>Serial</strong>
+ออกทางขา <strong>Tx</strong> ของชิป <strong>ATmega328P</strong> และเลือกใช้ค่า <strong>Baud</strong> เท่ากับ <strong>9600</strong>
+ข้อมูลไบต์ที่ถูกส่งออกมา คือ 'A' ถึง 'Z' ตามลำดับ แล้ววนซ้ำใหม่</p>
+<p>ถ้าใช้บอร์ด <strong>Arduino Uno</strong> หรือ <strong>Nano</strong> ขา <strong>D1/TX (Out)</strong> 
+และ <strong>D0/Rx (In)</strong> ของชิป <strong>ATmega328P</strong> ก็ได้เชื่อมต่อกับวงจร <strong>USB-to-Serial</strong> ไว้แล้ว 
+ดังนั้นจึงสามารถรับและส่งข้อมูลผ่านพอร์ต <strong>USB</strong> ของคอมพิวเตอร์สำหรับผู้ใช้ได้</p>
+<p>ฟังก์ชัน <code>init_uart(...)</code> ทำหน้าที่ตั้งค่าการใช้งาน 
+ให้วงจร <strong>USART</strong> ทำงานในโหมด <strong>Asynchronous</strong> มีค่า <strong>Baud</strong> เท่ากับ <strong>9600</strong>
+และมีขนาดเฟรมของข้อมูลเท่ากับ 8 บิต มี <strong>Stop Bit</strong> จำนวน 1 บิต และไม่มี <strong>Parity Bit</strong></p>
+<p>ฟังก์ชัน <code>uart_write(...)</code> ใช้สำหรับการส่งข้อมูลทีละไบต์ 
+และมีการตรวจสอบก่อนด้วยว่า จะเขียนข้อมูลไบต์ถัดไปลงในรีจิสเตอร์ <code>UDR0</code> ได้หรือไม่
+ถ้ายังไม่ว่าง ก็ให้รอก่อน (ให้วนซ้ำเพื่อตรวจสอบและรอแบบมีระยะเวลาจำกัด หรือ <strong>Timeout</strong>)</p>
+<p>ถ้าเลือกอัตราการรับส่งข้อมูลเท่ากับ <strong>9600</strong> ก็จะคำนวณค่าสำหรับรีจิสเตอร์ <code>UBRR</code> ได้เท่ากับ <code>103</code>
+สำหรับ <strong>Normal Speed Mode</strong> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   \frac{16\mbox{MHz}}{16 \cdot (9600)} - 1 = 103.17
+</script>
+</p>
+<p>แต่ถ้านำตัวเลข <code>103</code> (มีการปัดเศษทิ้งไป) ไปคำนวณเพื่อหาค่า <strong>Baud</strong> จะได้ประมาณ <code>9615</code></p>
+<pre><code>// Date: 2023-01-18
+#include &lt;avr/io.h&gt;         // for AVR macros
+#include &lt;util/delay.h&gt;     // for _delay_ms()
+
+// Macros / Constants
+#define BAUD (9600)         // UART baud rate
+#define CHECK_TIMEOUT (10)  // Timeout value in msec
+
+// Function prototypes
+void init_uart(uint32_t);
+int uart_write(char);
+
+int main() {
+  uint8_t c = 'A';
+  // Initialize UART
+  init_uart(BAUD);
+  // Send 'A' - 'Z' repeatedly
+  while (1) {
+    uart_write(c);
+    if (c == 'Z') {
+      c = 'A';
+      uart_write('\n'); // Send a newline
+      _delay_ms(100);
+    } else {
+      c = c+1;
+    }
+    _delay_ms(10);
+  }
+}
+
+// Initialize UART
+void init_uart(uint32_t baud) {
+  uint16_t value;
+  DDRD &amp;= ~(1 &lt;&lt; DD0); // set RXD (PD0) as input
+  DDRD |= (1 &lt;&lt; DD1);  // set TXD (PD1) as output
+  if (baud &gt;= 115200) {
+    UCSR0A |= _BV(U2X0);
+    value = F_CPU / 8 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  } else {
+    UCSR0A &amp;= ~(_BV(U2X0));
+    value = F_CPU / 16 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  }
+  // Enable both Tx and Rx of USART
+  UCSR0B = (1 &lt;&lt; RXEN0) | (1 &lt;&lt; TXEN0);
+  // Set frame format: 8 data bits, 1 stop bit
+  UCSR0C = (1 &lt;&lt; UCSZ01) | (1 &lt;&lt; UCSZ00);
+}
+
+int uart_write(char c) {
+  // Wait for empty Tx buffer
+  uint8_t timeout = CHECK_TIMEOUT;
+  while (!(UCSR0A &amp; (1 &lt;&lt; UDRE0))) {
+    if (timeout == 0) {
+      return 1;  // timeout occurred
+    }
+    timeout--;
+    _delay_ms(1);
+  }
+  // Write the data byte into data-buffer register of the UART
+  UDR0 = c;
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/wokwi_avr_uart_sim-1.png" /></p>
+<p>รูป: ตัวอย่างผลการจำลองการทำงานของโค้ดตัวอย่างสำหรับบอร์ด <strong>Uno</strong>
+ด้วย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/wokwi_avr_uart_sim-1_vcd.png" /></p>
+<p>รูป: ตัวอย่างการแสดงสัญญาณ <strong>RX0</strong> และ <strong>TX0</strong> ที่วัดได้โดยใช้ <strong>Virtual Logic Analyzer</strong>
+เมื่อจำลองการทำงานด้วย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/wokwi_avr_uart_sim-2_vcd.png" /></p>
+<p>รูป: ตัวอย่างการขยายดูสัญญาณดิจิทัล และวัดความกว้างหรือระยะเวลาสำหรับข้อมูลหนึ่งบิต
+ซึ่งจะได้ประมาณ 104 ไมโครวินาที หรือคิดเป็นอัตรา <strong>Baud</strong> ได้เท่ากับ
+<script type="math/tex">1/(104 \mbox{ usec}) \approx 9615</script> บิตต่อวินาที</p>
+<p><img alt="" src="../avr/images/avr_uart_pulseview-1.png" /></p>
+<p>รูป: ตัวอย่างการวัดและวิเคราะห์สัญญาณด้วย <strong>USB-based Logic Analyzer</strong>
+และแสดงผลด้วยซอฟต์แวร์ <strong>Sigrok-PulseView</strong> 
+(เปิดใช้ <strong>UART Protocol Decoder</strong> เพื่อแปลงสัญญาณให้เป็นข้อมูลตามรหัส <strong>ASCII</strong>)</p>
+<p><img alt="" src="../avr/images/avr_uart_pulseview-2.png" /></p>
+<p>รูป: การวัดความกว้างของบิต (หรือ <strong>Bit Timing Measurement</strong>)
+เมื่อมีการส่งข้อมูลแบบ <strong>Serial/USART</strong> และมีการตั้งค่า <strong>Baud</strong> เท่ากับ <strong>9600</strong> (โดยประมาณ)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-serial-loopback">&#9655; <strong>โค้ดตัวอย่างที่ 2: ส่งรับและส่งข้อมูลในลักษณะ Serial Loopback</strong><a class="headerlink" href="#2-serial-loopback" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการรอรับข้อมูลจาก <strong>UART-Rx</strong> ครั้งละหนึ่งไบต์ 
+และส่งกลับทาง <strong>UART-Tx</strong> ก็มีแนวทางดังนี้
+โดยแก้ไขโค้ดจากตัวอย่างที่ 1 เฉพาะในส่วนของฟังก์ชัน <code>main()</code></p>
+<pre><code>#include &lt;avr/io.h&gt;      // for AVR macros
+#include &lt;util/delay.h&gt;  // for _delay_ms()
+
+// Macros / Constants
+#define BAUD (9600)         // UART baud rate
+#define CHECK_TIMEOUT (10)  // Timeout value in msec
+
+// Function prototypes
+void init_uart(uint32_t);
+int uart_write(char);
+
+int main() {
+  // Initialize UART
+  init_uart(BAUD);
+  while (1) {
+    // Check if a byte has been received
+    if (UCSR0A &amp; (1 &lt;&lt; RXC0)) {
+      uint8_t c = UDR0;  // Read the received data
+      uart_write(c);     // Send the received data back
+    }
+  }
+}
+
+// Initialize UART
+void init_uart(uint32_t baud) {
+  uint16_t value;
+  DDRD &amp;= ~(1 &lt;&lt; DD0); // set RXD (PD0) as input
+  DDRD |= (1 &lt;&lt; DD1);  // set TXD (PD1) as output
+  if (baud &gt;= 115200) {
+    UCSR0A |= _BV(U2X0);
+    value = F_CPU / 8 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  } else {
+    UCSR0A &amp;= ~(_BV(U2X0));
+    value = F_CPU / 16 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  }
+  // Enable both Tx and Rx of USART
+  UCSR0B = (1 &lt;&lt; RXEN0) | (1 &lt;&lt; TXEN0);
+  // Set frame format: 8 data bits, 1 stop bit
+  UCSR0C = (1 &lt;&lt; UCSZ01) | (1 &lt;&lt; UCSZ00);
+}
+
+int uart_write(char c) {
+  // Wait for empty Tx buffer
+  uint8_t timeout = CHECK_TIMEOUT;
+  while (!(UCSR0A &amp; (1 &lt;&lt; UDRE0))) {
+    if (timeout == 0) {
+      return 1;  // timeout occurred
+    }
+    timeout--;
+    _delay_ms(1);
+  }
+  // Write the data byte into data-buffer register of the UART
+  UDR0 = c;
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/pulseview_serial_loopback.png" /></p>
+<p>รูป: การบันทึกสัญญาณดิจิทัลที่ขา <strong>Rx (D0)</strong> และ <strong>Tx (D1)</strong> ของบอร์ด <strong>Arduino Nano</strong>
+ด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> และแสดงผลด้วยซอฟต์แวร์ <strong>PulseView</strong></p>
+<p>ถ้าต้องการจะเปลี่ยนมาใช้วิธีเปิดใช้งานอินเทอร์รัพท์ <code>USART_RX_vect</code> เมื่อได้รับข้อมูลไบต์ในแต่ละครั้ง (<strong>RX Complete Interrupt</strong>)
+ก็สามารถเขียนโค้ดได้ตามตัวอย่างดังนี้</p>
+<pre><code>#include &lt;avr/io.h&gt;      // for AVR macros
+#include &lt;util/delay.h&gt;  // for _delay_ms()
+
+// Macros / Constants
+#define BAUD (9600)         // UART baud rate
+#define CHECK_TIMEOUT (10)  // Timeout value in msec
+
+// Function prototypes
+void init_uart(uint32_t);
+int uart_write(char);
+
+volatile uint8_t data;
+volatile uint8_t data_valid = 0;
+
+ISR(USART_RX_vect) { // ISR for UART-RX 
+  data = UDR0;       // Read data from UDR register
+  data_valid = 1;    // Set the data-valid flag
+}
+
+int main() {
+  // Initialize UART
+  init_uart(BAUD);
+  // Enable global interrupts
+  sei();
+  while (1) {
+    // Check if the next data byte is received 
+    if (data_valid) { 
+      data_valid = 0;   // Clear flag
+      uart_write(data); // Write the received data byte
+    }
+  }
+}
+
+// Initialize UART
+void init_uart(uint32_t baud) {
+  uint16_t value;
+  DDRD &amp;= ~(1 &lt;&lt; DD0); // set RXD (PD0) as input
+  DDRD |= (1 &lt;&lt; DD1);  // set TXD (PD1) as output
+  if (baud &gt;= 115200) {
+    UCSR0A |= _BV(U2X0);
+    value = F_CPU / 8 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  } else {
+    UCSR0A &amp;= ~(_BV(U2X0));
+    value = F_CPU / 16 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  }
+  // Enable both Tx and Rx of USART
+  UCSR0B = (1 &lt;&lt; RXEN0) | (1 &lt;&lt; TXEN0);
+  // Enable RX interrupt
+  UCSR0B |= (1 &lt;&lt; RXCIE0);
+  // Set frame format: 8 data bits, 1 stop bit
+  UCSR0C = (1 &lt;&lt; UCSZ01) | (1 &lt;&lt; UCSZ00);
+}
+
+int uart_write(char c) {
+  // Wait for empty Tx buffer
+  uint8_t timeout = CHECK_TIMEOUT;
+  while (!(UCSR0A &amp; (1 &lt;&lt; UDRE0))) {
+    if (timeout == 0) {
+      return 1;  // timeout occurred
+    }
+    timeout--;
+    _delay_ms(1);
+  }
+  // Write the data byte into data-buffer register of the UART
+  UDR0 = c;
+  return 0;
+}
+</code></pre>
+<p>ถ้าต้องการจะเก็บบันทึกข้อมูลไบต์ที่ได้รับจาก <strong>RX</strong> ลงในบัฟเฟอร์ตามรูปแบบของ <strong>FIFO</strong>
+เมื่อเกิดอินเทอร์รัพท์ <code>USART_RX_vect</code> และให้อ่านข้อมูลออกจาก <strong>FIFO</strong>
+แล้วส่งกลับไปทาง <strong>TX</strong> ในลักษณะ <strong>Serial Loopback</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/delay.h&gt;
+
+#define BAUD (115200)
+#define UART_BUFSIZE (64)
+
+volatile uint8_t rx_buf[UART_BUFSIZE];
+volatile uint8_t rx_buf_tail = 0, rx_buf_head = 0;
+
+void init_uart(unsigned long baud) {
+  uint16_t value;
+  DDRD &amp;= ~(1 &lt;&lt; DD0); // set RXD (PD0) as input
+  DDRD |= (1 &lt;&lt; DD1);  // set TXD (PD1) as output
+  if (baud &gt;= 115200) {
+    UCSR0A |= _BV(U2X0);
+    value = F_CPU / 8 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  } else {
+    UCSR0A &amp;= ~(_BV(U2X0));
+    value = F_CPU / 16 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  }
+  // Enable transmitter, receiver and RX interrupt
+  UCSR0B = (1 &lt;&lt; TXEN0) | (1 &lt;&lt; RXEN0) | (1 &lt;&lt; RXCIE0);
+  // Set frame format: 8 data bits, 1 stop bit
+  UCSR0C = (1 &lt;&lt; UCSZ01) | (1 &lt;&lt; UCSZ00);
+}
+
+ISR(USART_RX_vect) { // ISR for UART-RX
+  // Read the received data byte
+  uint8_t data = UDR0; 
+  // Increment the head pointer
+  uint8_t next_head = (rx_buf_head + 1) % UART_BUFSIZE;
+  // If the buffer is not full, save the data byte into the buffer.
+  if (next_head != rx_buf_tail) {
+    rx_buf[rx_buf_head] = data;
+    rx_buf_head = next_head;
+  }
+}
+
+uint8_t is_uart_buffer_empty() {
+  return (rx_buf_head == rx_buf_tail);
+}
+
+uint8_t uart_read(void) {
+  if (is_uart_buffer_empty()) {
+    return 0; 
+  }
+  uint8_t data = rx_buf[rx_buf_tail];
+  rx_buf_tail = (rx_buf_tail + 1) % UART_BUFSIZE;
+  return data;
+}
+
+void uart_write(uint8_t data) {
+  while (!(UCSR0A &amp; (1 &lt;&lt; UDRE0))) {}
+  UDR0 = data;
+}
+
+int main(void) {
+  init_uart(BAUD); // Initialize USART
+  sei();           // Enable global interrupts
+  uart_write( '\r' );
+  while (1) {
+    // Check if the RX buffer is not empty
+    if (!is_uart_buffer_empty()) {
+      // Read one data byte from buffer and write it to UART
+      uart_write( uart_read() );
+    }
+    _delay_ms(1);
+  }
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3-printf">&#9655; <strong>โค้ดตัวอย่างที่ 3: การใช้คำสั่ง printf()</strong><a class="headerlink" href="#3-printf" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการใช้ฟังก์ชัน <code>printf()</code> จาก <code>&lt;stdio.h&gt;</code>
+ซึ่งเป็น <strong>Standard C Library</strong>
+ในการเขียนโค้ดเพื่อส่งข้อความออกทาง <strong>UART</strong>
+ก็จะต้องสร้างฟังก์ชันตามรูปแบบต่อไปนี้</p>
+<p><code>int uart_putchar(char c, FILE *stream);</code></p>
+<p>เพื่อทำหน้าที่ส่งข้อมูลทีละไบต์ และทำคำสั่งต่อไปนี้ เพื่อเปลี่ยนช่องทางการส่งข้อมูลจาก
+<strong>C Standard Output</strong> ไปยัง <strong>UART</strong> </p>
+<p><code>fdevopen(&amp;uart_putchar, NULL);</code></p>
+<p>ตัวอย่างโค้ดมีดังนี้ เพื่อสาธิตการใช้คำสั่ง <code>printf()</code> เพื่อส่งข้อความออกทาง <strong>UART</strong></p>
+<pre><code>#include &lt;avr/io.h&gt;         // for AVR macros
+#include &lt;util/delay.h&gt;     // for _delay_ms()
+#include &lt;stdio.h&gt;          // for printf()
+
+// Macros / Constants
+#define BAUD (115200)       // UART baud rate
+#define CHECK_TIMEOUT (10)  // Timeout value in msec
+
+int main() {
+  uint32_t count = 0;
+  // Iniitalize UART
+  init_uart(BAUD);
+  // Redirect stdout to UART
+  fdevopen(&amp;uart_putchar, NULL);
+  while (1) {
+    // Send a string to UART every 1 second
+    printf(&quot;Count: %lu\n&quot;, ++count);
+    _delay_ms(1000);
+  }
+}
+
+// Initialize UART
+void init_uart(uint32_t baud) {
+  uint16_t value;
+  if (baud &gt;= 115200) {
+    UCSR0A |= _BV(U2X0);
+    value = F_CPU / 8 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  } else {
+    UCSR0A &amp;= ~(_BV(U2X0));
+    value = F_CPU / 16 / baud - 1;
+    UBRR0H = (uint8_t)(value &gt;&gt; 8);
+    UBRR0L = (uint8_t)(value);
+  }
+  // Enable transmit and receive
+  UCSR0B = (1 &lt;&lt; RXEN0) | (1 &lt;&lt; TXEN0);
+  // Set frame format: 8 data bits, 1 stop bit
+  UCSR0C = (1 &lt;&lt; UCSZ01) | (1 &lt;&lt; UCSZ00);
+}
+
+int uart_putchar(char c, FILE *stream) {
+  // Wait for empty transmit buffer
+  uint8_t timeout = CHECK_TIMEOUT;
+  while (!(UCSR0A &amp; (1 &lt;&lt; UDRE0))) {
+    if (timeout == 0) {
+      return 1;  // timeout occurred
+    }
+    timeout--;
+    _delay_ms(1);
+  }
+  // Write the data byte into data-buffer register of the UART
+  UDR0 = c;
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้งานวงจร <strong>USART</strong> เพื่อการสื่อสารข้อมูลบิตอนุกรมแบบอะซิงโครนัส
+โดยวิธีการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> และทดลองกับบอร์ดไมโครคอนโทรลเลอร์
+โดยใช้อุปกรณ์จริง เช่น <strong>Arduino Nano</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-01-18 | Last Updated: 2023-01-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -103,7 +103,11 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#3-led-blink-using-wdt" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3: LED Blink (using WDT)</a>
+            <li class="nav-item" data-level="2"><a href="#3-led-blink-timer-overflow-interrupt" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3: LED Blink (Timer Overflow Interrupt)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4-led-blink-using-wdt" class="nav-link">&#9655; โค้ดตัวอย่างที่ 4: LED Blink (using WDT)</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -123,7 +127,8 @@
 <em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
 <hr />
 <h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
-<p>บทความในตอนที่ 3 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> สำหรับชิป <strong>ATmega328P</strong> 
+<p>บทความในตอนที่ 3 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อลองใช้งานวงจรที่เรียกว่า "ไทม์เมอร์" (<strong>Timers</strong>) 
+ภายในชิป <strong>ATmega328P</strong> 
 มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong> (<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
 และใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
 <p>คำแนะนำ: ถ้าจะลองโค้ดตัวอย่างโดยใช้ <strong>Arduino IDE</strong> เพื่อคอมไพล์และอัปโหลดไปยังบอร์ดทดลอง <strong>Arduino Uno</strong>
@@ -491,11 +496,108 @@ int main(void) {
 }
 </code></pre>
 <p><img alt="" src="../avr/images/pulseview-3.png" /></p>
-<p>รูป: ตัวอย่างการวัดสัญญาณเอาต์พุตด้วย <strong>Portable Logic Analyzer</strong>
+<p>รูป: ตัวอย่างการวัดสัญญาณเอาต์พุตด้วย <strong>Portable Logic Analyzer / PulseView</strong>
 (ได้ระยะเวลาในการสลับสถานะลอจิกที่ขาเอาต์พุตประมาณ <strong>500 msec</strong>)</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="3-led-blink-using-wdt">&#9655; <strong>โค้ดตัวอย่างที่ 3: LED Blink (using WDT)</strong><a class="headerlink" href="#3-led-blink-using-wdt" title="Permanent link">#</a></h2>
+<h2 id="3-led-blink-timer-overflow-interrupt">&#9655; <strong>โค้ดตัวอย่างที่ 3: LED Blink (Timer Overflow Interrupt)</strong><a class="headerlink" href="#3-led-blink-timer-overflow-interrupt" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเปิดใช้งานวงจร <strong>Timer1</strong> ให้ทำงานในโหมด <strong>Normal</strong>
+โดยนับขึ้นจาก <strong>0</strong> ถึง <strong>65535</strong> ซึ่งเป็นค่าสูงสุด แล้ววนกลับไปเริ่มต้นที่ <strong>0</strong> ใหม่อีกรอบ
+อินเทอร์รัพท์ที่เกี่ยวข้องกับการนับในลักษณะนี้คือ 
+<strong>Timer1 Overflow Interrupt</strong> (<code>TIMER1_OVF_vect</code>)</p>
+<p>วงจร <strong>Timer1</strong> จะถูกตั้งค่าให้มีตัวหารความถี่เท่ากับ <strong>64</strong> ดังนั้นจะเกิดอินเทอร์รัพท์เมื่อนับครบหนึ่งรอบ
+คิดเป็นอัตราเท่ากับ <script type="math/tex">16\mbox{ MHz}/64/65536 = 3.815\mbox{ Hz}</script> 
+(<strong>Toggle Rate</strong>) หรือเป็นช่วงเวลาเท่ากับ <script type="math/tex">262.14 \mbox{ msec}</script>
+</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+// Timer1 overflow rate:
+// 16MHz/64/65536 = 3.815Hz or every 262.14 msec
+void init_timer1() {
+  //Set Timer1 to normal mode
+  TCCR1A &amp;= ~((1 &lt;&lt; WGM10) | (1 &lt;&lt; WGM11));
+  TCCR1B &amp;= ~((1 &lt;&lt; WGM12) | (1 &lt;&lt; WGM13));
+  // Set prescaler value to 64
+  TCCR1B |= (1 &lt;&lt; CS11) | (1 &lt;&lt; CS10);
+  TCCR1B &amp;= ~(1 &lt;&lt; CS12);
+  // Enable Timer1 overflow interrupt
+  TIMSK1 |= (1 &lt;&lt; TOIE1);
+}
+
+int main(void) {
+  // Set PB5 as output for onboard LED
+  DDRB |= (1 &lt;&lt; PB5);
+  // Initialize Timer1
+  init_timer1();
+  // Enable global interrupts
+  sei();
+  while (1) {}
+}
+
+ISR(TIMER1_OVF_vect) {
+  // Toggle onboard LED on PB5
+  PORTB ^= (1 &lt;&lt; PB5);
+}
+</code></pre>
+<p><img alt="" src="../avr/images/pulseview_timer1_ovf-1.png" /></p>
+<p>รูป: ตัวอย่างการวัดและวิเคราะห์สัญญาณจริง (วัดได้ความกว้างของพัลส์เท่ากับ <strong>261.14 msec</strong>)</p>
+<p>&nbsp;</p>
+<p>แต่ถ้าจะให้เกิดอินเทอร์รัพท์ <code>TIMER1_OVF_vect</code> ทุก ๆ <strong>500 msec</strong> ก็สามารถทำได้เช่นกัน
+โดยตั้งค่าหารความถี่เป็น <strong>1024</strong> ดังนั้น <strong>Timer1</strong> จะนับขึ้นด้วยความถี่
+<script type="math/tex">16\mbox{ MHz}/1024 = 15625\mbox{ Hz}</script> หรือใช้เวลานับต่อหนึ่งวินาทีได้ทั้งหมด
+<strong>15625 cycles</strong> หรือ <strong>15625/2</strong> สำหรับ <strong>500 msec</strong></p>
+<p>แต่ถ้าจะให้เกิดอินเทอร์รัพท์ จะต้องนับให้ถึง <strong>65535</strong> ดังนั้นแทนที่จะให้รีจิสเตอร์ <code>TCNT1</code> เริ่มนับที่ <strong>0</strong>
+ก็ให้เริ่มนับที่ค่า <script type="math/tex">65536-(15625/2)</script> ในแต่ละรอบของการนับ ก็จะทำให้เกิด <code>TIMER1_OVF_vect</code>
+ทุก ๆ <strong>500 msec</strong></p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+// Timer1 tick rate: 16MHz/1024 = 15625Hz (cycles/sec)
+#define TIMER_COUNT ((65535-15625/2)+1)
+
+void init_timer1() {
+  //Set Timer1 to normal mode
+  TCCR1A &amp;= ~((1 &lt;&lt; WGM10) | (1 &lt;&lt; WGM11));
+  TCCR1B &amp;= ~((1 &lt;&lt; WGM12) | (1 &lt;&lt; WGM13));
+  // Set prescaler value to 1024
+  TCCR1B |= (1 &lt;&lt; CS12) | (1 &lt;&lt; CS10);
+  TCCR1B &amp;= ~(1 &lt;&lt; CS11);
+  // Enable Timer1 overflow interrupt
+  TIMSK1 |= (1 &lt;&lt; TOIE1);
+  // Reload Timer1 counter
+  TCNT1 = TIMER_COUNT; 
+  // Clear Timer1 overflow flag
+  TIFR1 |= (1 &lt;&lt; TOV1);
+}
+
+int main(void) {
+  // Set PB5 as output for onboard LED
+  DDRB |= (1 &lt;&lt; PB5);
+  // Initialize Timer1
+  init_timer1();
+  // Enable global interrupts
+  sei();
+  while (1) {}
+}
+
+ISR(TIMER1_OVF_vect) {
+  // Toggle onboard LED on PB5
+  PORTB ^= (1 &lt;&lt; PB5);
+  // Clear Timer1 overflow flag
+  TIFR1 |= (1 &lt;&lt; TOV1);
+  // Reload Timer1 counter
+  TCNT1 = TIMER_COUNT; 
+}
+</code></pre>
+<p><img alt="" src="../avr/images/pulseview_timer1_ovf-2.png" /></p>
+<p>รูป: ตัวอย่างการวัดและวิเคราะห์สัญญาณจริง (วัดได้ความกว้างของพัลส์เท่ากับ <strong>500.01 msec</strong>)</p>
+<p><img alt="" src="../avr/images/wokwi_timer1_ovf-2.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong>
+และแสดงผลด้วย <strong>GTkWave</strong> (วัดความกว้างได้ประมาณ <strong>500 msec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-led-blink-using-wdt">&#9655; <strong>โค้ดตัวอย่างที่ 4: LED Blink (using WDT)</strong><a class="headerlink" href="#4-led-blink-using-wdt" title="Permanent link">#</a></h2>
 <p>ชิป <strong>ATmega328P</strong> มีวงจรภายในชื่อ <strong>WDT</strong> (<em>Watchdog Timer</em>)
 ซึ่งเป็นวงจรไทม์เมอร์ประเภทหนึ่ง สามารถโปรแกรมให้เริ่มต้นทำงานและนับถอยหลังตามอัตราที่กำหนดไว้
 โดยเขียนค่าลงในรีจิสเตอร์ <code>WDTCSR</code> ของ <strong>WDT</strong>
@@ -582,12 +684,12 @@ int main(void) {
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> สำหรับชิป <strong>ATmega328p</strong> เพื่อเปิดใช้งานวงจร 
-<strong>Timer</strong> ในรูปแบบต่าง ๆ และใช้งานร่วมกับบอร์ด
-<strong>Arduino Uno</strong> หรือ  <strong>Nano</strong> และจำลองการทำงานโดยใช้ <strong>Wokwi AVR Simulator</strong></p>
+<strong>Timer</strong> ในรูปแบบต่าง ๆ และใช้งานร่วมกับบอร์ด <strong>Arduino Uno</strong> หรือ  <strong>Nano</strong>
+และจำลองการทำงานโดยใช้ <strong>Wokwi AVR Simulator</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-01-15 | Last Updated: 2023-01-17</p></div>
+<p>Created: 2023-01-15 | Last Updated: 2023-01-18</p></div>
             </div>
         </div>
 
