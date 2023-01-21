@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/tools/pulseview_rigol_ds1054z/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานซอฟต์แวร์ PulseView ร่วมกับออสซิลโลสโคป RIGOL DS1054Z - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#pulseview-rigol-ds1054z" class="nav-link">การใช้งานซอฟต์แวร์ PulseView ร่วมกับออสซิลโลสโคป RIGOL DS1054Z</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#pulseview" class="nav-link">&#9655; PulseView</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pulseview-rigol-ds1054z-usb-connection" class="nav-link">&#9655; การใช้งาน PulseView ร่วมกับ RIGOL DS1054Z: USB Connection</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pulseview-rigol-ds1054z-lan-connection" class="nav-link">&#9655; การใช้งาน PulseView ร่วมกับ RIGOL DS1054Z: LAN Connection</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#txrx-serialuart" class="nav-link">&#9655; ตัวอย่างการวัดสัญญาณ Tx/Rx ของ Serial/UART</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sclsda-i2c" class="nav-link">&#9655; ตัวอย่างการวัดสัญญาณ SCL/SDA ของบัส I2C</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="pulseview-rigol-ds1054z">การใช้งานซอฟต์แวร์ PulseView ร่วมกับออสซิลโลสโคป RIGOL DS1054Z<a class="headerlink" href="#pulseview-rigol-ds1054z" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="pulseview">&#9655; <strong>PulseView</strong><a class="headerlink" href="#pulseview" title="Permanent link">#</a></h2>
+<p><a href="https://sigrok.org/wiki/PulseView"><strong>PulseView</strong></a> 
+เป็นซอฟต์แวร์ที่ทำหน้าที่เป็น <strong>Front-end GUI</strong>
+ให้กับซอฟต์แวร์ประเภท <strong>Open Source</strong> ที่มีชื่อว่า <a href="https://sigrok.org/wiki/Main_Page"><strong>Sigrok</strong></a>
+สามารถเชื่อมต่อกับอุปกรณ์เครื่องมือวัดและทดสอบ (<strong>Measurement &amp; Test Equipment</strong>) ได้หลายประเภท
+เช่น ออสซิลโลสโคปแบบดิจิทัล (<strong>Digital Storage Oscilloscope: DSO</strong>)
+และอุปกรณ์บันทึกและวิเคราะห์สัญญาณดิจิทัล (<strong>Logic Analyzer: LA</strong>)
+ผ่านทางพอร์ต <strong>USB</strong> หรือ <strong>LAN/LXI (TCP/IP)</strong> เช่น
+ออสซิลโลโคปของบริษัท <strong>Rigol</strong> รุ่น <strong>DS1054Z</strong>, 
+<strong>DS1074Z</strong>, <strong>DS1104Z</strong>, <strong>DS2000</strong> เป็นต้น</p>
+<p><strong>PulseView</strong> สามารถนำมาใช้ในการวิเคราะห์รูปแบบการสื่อสารข้อมูลแบบต่าง ๆ 
+เนื่องจากมีส่วนเสริมที่เรียกว่า <a href="https://sigrok.org/wiki/Protocol_decoders"><strong>Protocol Decoders (PDs)</strong></a>
+เช่น การสื่อสารข้อมูลแบบ  <strong>UART</strong>, <strong>I2C</strong>, <strong>SPI</strong>, <strong>I2S</strong>, <strong>CAN</strong>, 
+<strong>Modbus</strong>, <strong>JTAG</strong> เป็นต้น</p>
+<p><strong>PulseView</strong> มีให้เลือกใช้สำหรับ <strong>Windows</strong>, <strong>Linux</strong>, <strong>Mac OS X</strong>
+และสามารถดาวน์โหลดมาใช้งานได้ฟรีจากเว็บไซต์
+<a href="https://sigrok.org/wiki/Downloads">https://sigrok.org/wiki/Downloads</a> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pulseview-rigol-ds1054z-usb-connection">&#9655; <strong>การใช้งาน PulseView ร่วมกับ RIGOL DS1054Z: USB Connection</strong><a class="headerlink" href="#pulseview-rigol-ds1054z-usb-connection" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการทดลองใช้งานซอฟต์แวร์ <strong>PulseView</strong> และใช้วิธีการเชื่อมต่อกับออสซิลโลสโคป
+<strong>RIGOL DS1054Z</strong> ด้วยสาย <strong>USB</strong> </p>
+<p><strong>ข้อสังเกต:</strong> ผู้ใช้ <strong>PulseView - Windows Version</strong> จะต้องใช้โปรแกรมอย่างเช่น <a href="https://zadig.akeo.ie/"><strong>Zadig</strong></a> 
+หรือ <a href="https://visualgdb.com/UsbDriverTool/"><strong>SysProgs USB Driver Tool</strong></a>
+เปลี่ยน <strong>USB Driver</strong> สำหรับอุปกรณ์ดังกล่าวให้เป็น <strong>WinUSB</strong> จึงจะใช้งานร่วมกับซอฟต์แวร์ <strong>PulseView</strong> ได้</p>
+<p><img alt="" src="winusb_rigol_ds1054z-1.png" /></p>
+<p>รูป: การใช้โปรแกรม <strong>USB Driver Tool</strong> เพื่อเลือกใช้ <strong>WinUSB Driver</strong>
+เมื่อได้เสียบสาย <strong>USB</strong> เชื่อมต่อ <strong>RIGOL DS1054Z</strong> กับเครื่องคอมพิวเตอร์ของผู้ใช้</p>
+<p><strong>ขั้นตอนการใช้งาน</strong></p>
+<ul>
+<li>เปิดใช้งาน <strong>PulseView</strong> แต่ยังไม่ได้เชื่อมต่อกับอุปกรณ์</li>
+<li>เลือกอุปกรณ์ <strong>Rigol DS</strong> และพอร์ต <strong>USB</strong> แล้วกดปุ่มสแกนหาอุปกรณ์
+<strong>"Scan for devices using driver above"</strong></li>
+<li>เลือกอุปกรณ์ที่ได้ค้นพบเพื่อใช้งาน (จะปรากฎชื่อสำหรับ <strong>RIGOL DS1054Z</strong>)</li>
+<li>กดปุ่ม <strong>Configure Channels</strong> เพื่อเลือกเปิดหรือปิดช่องสัญญาณอินพุต (<strong>CH1</strong> .. <strong>CH4</strong>)
+และตั้งค่าการใช้งานเช่น <strong>Volt/Div</strong></li>
+<li>ตั้งค่าการใช้งาน <ul>
+<li><strong>Frame limit</strong> ตั้งค่าให้เป็น <strong>1</strong>  หรือเป็นจำนวนจำกัด (ไม่ตั้งค่าแบบ <strong>No limit</strong>)</li>
+<li><strong>Data source</strong> ตั้งค่าให้เป็น  <strong>Live</strong></li>
+<li><strong>Time base</strong> ตั้งค่า <strong>Time/Div</strong> เลือกค่าได้จากเมนูแบบ <strong>Dropdown</strong></li>
+<li><strong>Trigger source</strong> เลือกให้เป็น <strong>CH1</strong> หรือหมายเลขช่องอื่นที่มีสัญญาณอินพุต</li>
+<li><strong>Trigger slope</strong> เลือกให้เป็น <strong>'r'</strong> (<strong>Rising Edge</strong>) หรือ <strong>'f'</strong> (<strong>Falling Edge</strong>)</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="pulseview-1.png" /></p>
+<p>รูป: เปิดใช้งาน <strong>PulseView</strong> แต่ยังไม่ได้เชื่อมต่อกับอุปกรณ์</p>
+<p><img alt="" src="pulseview-3.png" /></p>
+<p>รูป: การเลือกอุปกรณ์ <strong>Rigol DS</strong></p>
+<p><img alt="" src="pulseview-2.png" /></p>
+<p>รูป: เลือกอุปกรณ์ <strong>Rigol DS</strong> เลือกพอร์ต <strong>USB</strong> และสแกนหาอุปกรณ์ตามลำดับ</p>
+<p><img alt="" src="pulseview-4.png" /></p>
+<p>รูป:  ตัวอย่างการเลือกอุปกรณ์ <strong>"Rigol DS1054Z with 4 channels"</strong> จากรายการที่ปรากฏ</p>
+<p><img alt="" src="pulseview-5.png" /></p>
+<p>รูป: ตัวอย่างการเปิดใช้งานช่องอินพุต 2 ช่องแรก (<strong>CH1</strong> และ <strong>CH2</strong>) 
+ของอุปกรณ์ <strong>Rigol DS1054Z</strong> จากทั้งหมด 4 ช่อง</p>
+<p><img alt="" src="pulseview-6.png" /></p>
+<p>รูป: การตั้งค่าเพื่อใช้งาน <strong>Rigol DS</strong> เช่น การตั้งค่า <strong>Trigger</strong>
+หรือเงื่อนไขการเริ่มต้นบันทึกสัญญาณ</p>
+<p><img alt="" src="pulseview-7.png" /></p>
+<p>รูป: การเปิดใช้งานและตั้งค่าสำหรับช่องสัญญาณ <strong>CH1</strong> และ <strong>CH2</strong>
+เช่น ตัวคูณของสายโพรบ (<strong>Probe Factor</strong>) การเลือก <strong>Input Coupling</strong>
+เป็น <strong>DC</strong> หรือ <strong>AC</strong> และตั้งค่า <strong>Volt/Div</strong> </p>
+<p><img alt="" src="pulseview-8.png" /></p>
+<p>รูป: ตัวอย่างรูปสัญญาณทดสอบ (<strong>Rectangular Waveform, 1kHz</strong>) 
+เหมือนกัน 2 ช่อง ที่ได้จาก <strong>RIGOL DS1054Z</strong></p>
+<p><img alt="" src="pulseview-9.png" /></p>
+<p>รูป: การใช้เคอร์เซอร์แนวตั้งเพื่อวัดคาบของสัญญาณทดสอบ (ได้คาบเท่ากับ  <strong>1msec</strong> และความถี่ <strong>1kHz</strong>)</p>
+<p><img alt="" src="pulseview-10.png" /></p>
+<p>รูป: คลื่นสัญญาณที่ปรากฏบนหน้าจอแสดงผลของออสซิลโลสโคป</p>
+<p><img alt="" src="pulseview-11.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณไซน์ (<strong>50Hz, 5Vpp</strong>) จำนวน 2 ช่อง ต่างเฟสกัน 90 องศา</p>
+<p><img alt="" src="pulseview-12.png" /></p>
+<p>รูป: คลื่นสัญญาณไซน์ที่ปรากฏบนหน้าจอแสดงผลของออสซิลโลสโคป</p>
+<p><img alt="" src="pulseview-13.png" /></p>
+<p>รูป: ตัวอย่างการใช้ฟังก์ชัน <strong>MATH</strong> และได้รูปคลื่นสัญญาณผลลัพธ์ เช่น 
+ได้จากการนำสัญญาณทั้งสองช่องมาบวกกันแล้วหารด้วยสอง  <strong>"(CH1+CH2)/2"</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pulseview-rigol-ds1054z-lan-connection">&#9655; <strong>การใช้งาน PulseView ร่วมกับ RIGOL DS1054Z: LAN Connection</strong><a class="headerlink" href="#pulseview-rigol-ds1054z-lan-connection" title="Permanent link">#</a></h2>
+<p>สำหรับการใช้งาน <strong>DS1054Z</strong> ในเครือข่าย <strong>LAN</strong> 
+แนะนำให้เชื่อมต่อใช้งานผ่านอุปกรณ์เครือข่ายและมีการเปิดใช้งาน <strong>DHCP Server</strong> ไว้แล้ว</p>
+<p>ในกรณีที่ใช้คอมพิวเตอร์ <strong>Windows 10</strong> หรือ <strong>Windows 11</strong>
+และเชื่อมต่ออินเทอร์เน็ตผ่าน <strong>WiFi</strong> เช่น เชื่อมต่อกับ <strong>WiFi Router</strong>
+หรือ <strong>WiFi HotSpot</strong> ของสมาร์ทโฟน  และคอมพิวเตอร์ของผู้ใช้มีพอร์ต <strong>RJ45</strong> ว่างอยู่
+ก็สามารถใช้สาย <strong>LAN</strong> เชื่อมต่อโดยตรงกับออสซิลโลสโคปได้</p>
+<p>แนะนำให้ตั้งค่า <strong>WiFi</strong> ให้สามารถแชร์การใช้งาน <strong>Internet Connectivity</strong> ของเครื่องผู้ใช้
+ให้กับอุปกรณ์ (ออสซิลโลสโคป) ที่กำลังเชื่อมต่อกับพอร์ต <strong>Ethernet/RJ45</strong>
+(<strong>Sharing Internet from WiFi to Ethernet in Windows 10 / 11</strong>)</p>
+<p>การตั้งค่าใช้งานสำหรับระบบ <strong>LAN/Ethernet</strong> ให้กับออสซิลโลสโคป
+เริ่มต้นด้วยการกดปุ่ม <strong>Utility</strong> แล้วเลือก <strong>IO Setting</strong>
+จากแถบเมนูด้านขวาบนจอภาพของออสซิลโลสโคป</p>
+<p><img alt="" src="rigol_ds1054z_lan-1.png" /></p>
+<p>รูป: เลือกจากเมนู <strong>IO Setting</strong></p>
+<p>เลือก <strong>LAN Conf.</strong> เพื่อตั้งค่าการใช้งาน <strong>LAN</strong> ผ่านพอร์ต <strong>RJ45</strong> 
+(ให้เสียบสาย <strong>LAN</strong> ระหว่างออสซิลโลสโคปกับคอมพิวเตอร์ของเครื่องผู้ใช้)</p>
+<p><img alt="" src="rigol_ds1054z_lan-2.png" /></p>
+<p>รูป:  เลือกจากเมนู <strong>LAN Conf.</strong></p>
+<p><img alt="" src="rigol_ds1054z_lan-3.png" /></p>
+<p>รูป: กดปุ่มเลือก <strong>Configure</strong> และเลือก <strong>DHCP</strong>
+เพื่อให้ออสซิลโลสโคปทำการเชื่อมต่อกับ <strong>DHCP Server</strong> ในเครือข่าย</p>
+<p>กดปุ่ม <strong>Configure</strong> แล้วตั้งค่าเป็น <strong>DHCP</strong> แล้วกดปุ่ม <strong>Apply</strong> 
+เพื่อให้ออสซิลโลสโคป เชื่อมต่อกับระบบเครือข่ายซึ่งจะต้องมีอุปกรณ์ที่ทำหน้าที่เป็น <strong>DHCP Server</strong>
+เมื่อเชื่อมต่อได้สำเร็จแล้ว จะได้หมายเลข <strong>IP (IPv4)</strong> และการตั้งค่าโดยอัตโนมัติจาก <strong>DHCP Server</strong>
+สำหรับ <strong>Subnet</strong>, <strong>Gateway IP</strong> และ <strong>DNS Server</strong> ตามลำดับ
+จากนั้นกดปุ่ม <strong>Enter</strong> เพื่อย้อนกลับไปยังเมนูก่อนหน้า</p>
+<p>ขั้นตอนถัดไปให้เปิดใช้งาน <strong>PulseView</strong> และเลือกอุปกรณ์เพื่อเชื่อมต่อและใช้งาน
+โดยเลือกจากรายการอุปกรณ์ ให้เป็น <strong>Rigol DS (rigol-ds)</strong></p>
+<p>รูปแบบการเชื่อมต่อกับอุปกรณ์คือ <strong>TCP/IP (Raw TCP)</strong> และจะต้องตั้งค่าหมายเลข 
+<strong>IP</strong> ให้ตรงกับออสซิลโสโคปที่มีการตั้งค่าเครือข่ายไว้แล้ว และหมายเลขพอร์ต <strong>5555 (default)</strong>
+จากนั้นให้กดปุ่ม "<strong>Scan for device using driver above</strong>"</p>
+<p><img alt="" src="pulseview_rigol_ds1054z_lan-1.png" /></p>
+<p>รูป: การตั้งค่าเพื่อเชื่อมต่อกับออสซิลโลสโคปในเครือข่ายด้วยโพรโทตอล <strong>TCP/IP</strong>
+(พอร์ตหมายเลข <strong>5555</strong>)</p>
+<p><img alt="" src="pulseview_rigol_ds1054z_lan-2.png" /></p>
+<p>รูป: แสดงรายการอุปกรณ์ <strong>Rigol DS (rigol-ds)</strong> ที่ตรวจพบในเครือข่าย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="txrx-serialuart">&#9655; <strong>ตัวอย่างการวัดสัญญาณ Tx/Rx ของ Serial/UART</strong><a class="headerlink" href="#txrx-serialuart" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการวัดสัญญาณที่ขา <strong>Tx/Rx</strong> ของบอร์ดไมโครคอนโทรลเลอร์
+<strong>Arduino Nano</strong> และใช้ตัวอย่างโค้ด <strong>Arduino Sketch</strong> ต่อไปนี้
+เพื่อทำหน้าที่คอยรับข้อมูลไบต์และส่งกลับไปยังคอมพิวเตอร์ของผู้ใช้ในลักษณะ <strong>Serial Loopback</strong></p>
+<pre><code>void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Check if the next data byte is received
+  while (Serial.available() &gt; 0) {
+    uint8_t c = Serial.read(); // Read data byte from Serial
+    Serial.write(c);           // Write it back to Serial
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_sketch_serial_loopback-1.png" /></p>
+<p>รูป: ตัวอย่างการใช้ <strong>Arduino Serial Monitor</strong> เพื่อส่งข้อความ "<code>Hello</code>"
+ด้วยอัตรา <strong>Baud=9600</strong></p>
+<p><img alt="" src="arduino_sketch_serial_loopback-2.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณที่ขา <strong>Rx</strong> และ <strong>Tx</strong> ของไมโครคอนโทรลเลอร์ ซึ่งได้กำหนดให้เป็นสัญญาณช่อง
+<strong>CH1</strong> และ <strong>CH2</strong> ตามลำดับ</p>
+<p>ถ้าจะวิเคราะห์สัญญาณดิจิทัลที่วัดได้จากออสซิลโลสโคป
+จะต้องแปลงให้เป็นข้อมูลในแต่ละช่อง ให้เป็นสัญญาณแบบดิจิทัลก่อน
+เช่น กำหนดระดับเส้นแบ่งแรงดันไฟฟ้า (<strong>Threashold</strong>) กึ่งกลาง หรือ จะเลือกใช้การแบ่งด้วย
+<strong>Schmitt-Trigger (Signal Average +/-15%)</strong></p>
+<p><img alt="" src="arduino_sketch_serial_loopback-3.png" /></p>
+<p>รูป: ตัวอย่างการแปลงข้อมูลอินพุต <strong>CH1</strong> ให้เป็นสัญญาณดิจิทัล</p>
+<p><img alt="" src="arduino_sketch_serial_loopback-4.png" /></p>
+<p>รูป: ตัวอย่างการแปลงข้อมูลอินพุต <strong>CH2</strong> ให้เป็นสัญญาณดิจิทัล</p>
+<p>เมื่อแปลงเป็นข้อมูลดิจิทัลแล้ว ถัดไปให้เปิดใช้งาน <strong>Protocol Decoder (PDs)</strong> สำหรับ <strong>UART</strong></p>
+<p><img alt="" src="arduino_sketch_serial_loopback-5.png" /></p>
+<p>รูป: เลือก <strong>Protocol Decoder</strong> ให้เป็น <strong>UART</strong></p>
+<p><img alt="" src="arduino_sketch_serial_loopback-7.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่า <strong>Data Source</strong>, <strong>Time base</strong> และ <strong>Trigger</strong></p>
+<p><img alt="" src="arduino_sketch_serial_loopback-8.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่า <strong>UART</strong> เช่น ค่า <strong>Baudrate</strong> ต้องให้ตรงกับที่ใช้งานจริง
+การเลือกช่องสัญญาณอินพุตสำหรับ <strong>UART RX/TX</strong> ตามลำดับ</p>
+<p><img alt="" src="arduino_sketch_serial_loopback-9.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่ได้และข้อมูลที่ถูกแปลงโดย <strong>UART Decoder</strong> หลังจากกดปุ่ม <strong>Run</strong></p>
+<p><img alt="" src="arduino_sketch_serial_loopback-6.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณจริงบนหน้าจอแสดงผลของออสซิลโลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sclsda-i2c">&#9655; <strong>ตัวอย่างการวัดสัญญาณ SCL/SDA ของบัส I2C</strong><a class="headerlink" href="#sclsda-i2c" title="Permanent link">#</a></h2>
+<p>อีกตัวอย่างหนึ่งเป็นการวัดสัญญาณของบัส <strong>I2C</strong>
+โดยใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino Nano</strong>
+นำมาเขียนโปรแกรมเพื่อให้อ่านค่าจากโมดูลเซนเซอร์แสง <strong>BH1750</strong>
+(แอดเดรสของอุปกรณ์คือ <code>0x23</code>) และใช้วิธีเชื่อมต่อด้วยบัส <strong>I2C</strong>
+ที่ขา  <strong>A4/A5</strong> สำหรับสัญญาณ <strong>SDA / SCL</strong> ของบัส <strong>I2C</strong>
+(ตั้งค่าความเร็วในการสื่อสารข้อมูลเท่ากับ <strong>400kHz</strong>)
+และมีการเปิดใช้งาน <strong>I2C Protocol Decoder</strong> เพื่อวิเคราะห์ข้อมูลที่ได้นำเข้าจากออสซิลโลสโคป</p>
+<p>ตัวอย่างโค้ดสำหรับการสาธิต</p>
+<pre><code>#include &lt;Wire.h&gt;
+
+// Note: For arduino Uno or Nano, use A4/A5 pins for SDA/SCL.
+
+// Set the I2C address for the BH1750 device
+#define BH1750_ADDR  (0x23) // 0x23 or 0x5c
+
+void setup() {
+  Serial.begin( 115200 ); // Set Serial baudrate
+  Wire.begin();
+  Wire.setClock( 400000 ); // Set I2C speed
+  delay(100);
+}
+
+void loop() {
+  float lux;
+  // Read a value fro the BH1750 sensor module
+  if ( BH1750_read(BH1750_ADDR, &amp;lux) ) {
+    Serial.print( lux, 1 ); 
+    Serial.println( &quot; [lx]&quot; ); 
+  } else {
+    Serial.println( &quot;Sensor reading error!&quot; );
+  }
+  delay(2000);
+}
+
+char sbuf[32]; // String buffer used for sprintf()
+
+bool BH1750_read( uint8_t addr, float *lux ) {
+  uint8_t buf[2];
+  *lux = 0.0;
+  // Send the addr/write byte
+  // One-shot, Hi-Resolution Mode (1 Lux Resolution) 
+  Wire.beginTransmission( addr ); 
+  // Send the instruction to start measurement
+  Wire.write( 0x20 ); 
+  if( Wire.endTransmission() &gt; 0 ) {
+    Serial.println( &quot;No response from the device!&quot; );
+    return false;
+  }
+  delay(150); // wait at least 120 msec.
+  Wire.requestFrom( addr, 2, true );
+  if ( Wire.available() == 2 ) {
+    buf[0] = Wire.read(); 
+    buf[1] = Wire.read(); 
+  } else {
+    return false;
+  }
+  uint32_t value = buf[0];
+  value  = (value &lt;&lt; 8) | buf[1];
+  // Convert raw data to Lux
+  value /= 1.2f; 
+  *lux = value;
+  sprintf(sbuf,&quot;0x%02x, 0x%02X, 0x%02X (hex)&quot;,
+                addr, buf[0], buf[1] );
+  Serial.println(sbuf);  
+  return true;
+}
+</code></pre>
+<p><img alt="" src="arduino_i2c_demo-1.png" /></p>
+<p>รูป: ตัวอย่างโค้ดและข้อความที่ได้รับผ่านทาง <strong>Arduino Serial Monitor</strong></p>
+<p><img alt="" src="arduino_i2c_demo-2.png" /></p>
+<p>รูป: การเปิดใช้งาน <strong>Protocol Decoder</strong> สำหรับ <strong>I2C</strong></p>
+<p><img alt="" src="arduino_i2c_demo-5.png" /></p>
+<p>รูป: การแปลงสัญญาณที่วัดได้ให้เป็นสัญญาณแบบดิจิทัล (ใช้วิธีการแปลงแบบ <strong>Schmitt-Trigger</strong>)</p>
+<p><img alt="" src="arduino_i2c_demo-3.png" /></p>
+<p>รูป: ตัวอย่างการแปลงสัญญาณ <strong>SCL / SDA</strong> ให้เป็นลำดับข้อมูลไบต์ตามรูปแบบของบัส <strong>I2C</strong></p>
+<p><img alt="" src="arduino_i2c_demo-4.png" /></p>
+<p>รูป: ตัวอย่างลำดับข้อมูลไบต์ที่ได้ในช่วงที่มีการอ่านค่าจากโมดูล <strong>BH1750 (I2C)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้แนะนำการใช้งานอุปกรณ์ <strong>RIGOl DS1054Z</strong>
+ที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ผ่านทาง <strong>USB</strong> หรือ <strong>LAN</strong> ร่วมกับซอฟต์แวร์ 
+<strong>sigrok / PulseView</strong> เพื่อวัดสัญญาณจำนวน 2 ช่องสัญญาณ และมีการเปิดใช้งาน 
+<strong>Protocol Decoders</strong> เช่น <strong>UART</strong> และ <strong>I2C</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-01-20 | Last Updated: 2023-01-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
