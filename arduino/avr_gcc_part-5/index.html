@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-5/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 5 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-5" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 5</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-inter-integrated-circuit-bus" class="nav-link">&#9655; I2C (Inter-Integrated Circuit Bus)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#twi-atmega328p" class="nav-link">&#9655; การใช้งาน TWI ของ ATmega328P</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-scan" class="nav-link">&#9655; การสแกนหาอุปกรณ์สเลฟ (I2C Scan)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#bh1750-digital-light-sensor" class="nav-link">&#9655; การอ่านจากโมดูลเซนเซอร์ BH1750 Digital Light Sensor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#lcd16x2-i2c-pcf8574a" class="nav-link">&#9655; การแสดงผลด้วยโมดูล LCD16x2 I2C PCF8574A</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-5">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 5<a class="headerlink" href="#c-avr-atmega328p-5" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 4 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<strong>Two-Wire Serial Interface (TWI)</strong> ภายในชิป <strong>ATmega328P</strong>
+มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong>
+(<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
+และใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> 
+ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
+<p>คำแนะนำ: ถ้าจะลองโค้ดตัวอย่างโดยใช้ <strong>Arduino IDE</strong> เพื่อคอมไพล์และอัปโหลดไปยังบอร์ดทดลอง <strong>Arduino Uno</strong>
+หรือ <strong>Nano</strong> ให้สร้าง <strong>Arduino Sketch</strong> และทำให้ไฟล์ <strong>.ino</strong> ไม่มีโค้ดใด ๆ (<strong>Empty Sketch</strong>)
+และให้สร้างไฟล์ <code>main.c</code> เพื่อเขียนโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-inter-integrated-circuit-bus">&#9655; <strong>I2C (Inter-Integrated Circuit Bus)</strong><a class="headerlink" href="#i2c-inter-integrated-circuit-bus" title="Permanent link">#</a></h2>
+<p><a href="http://cache.nxp.com/documents/user_manual/UM10204.pdf"><strong>I2C Bus</strong></a> 
+(อ่านว่า  "ไอ-สแควร์-ซี-บัส") เป็นโพรโทคอลสำหรับการสื่อสารข้อมูลดิจิทัล ใช้สัญญาณดิจิทัลสำหรับ <strong>I/O</strong> เพียง 2 เส้น
+คือ <strong>SCL (Serial Clock)</strong>เป็นสัญญาณนาฬิกาเพื่อกำหนดจังหวะในการทำงานในการรับส่งข้อมูล
+และ <strong>SDA (Serial Data)</strong> เป็นสัญญาณสำหรับข้อมูล และสัญญาณแต่ละเส้นจะต้องมีตัวต้านทาน
+<strong>Pullup</strong> ต่ออยู่ด้วย</p>
+<p>ระบบบัส <strong>I2C</strong> ประกอบด้วยอุปกรณ์ที่ทำหน้าที่เป็นมาสเตอร์ (<strong>Master</strong>) หรือ ตัวควบคุม (<strong>Controller</strong>)
+และอุปกรณ์ที่ทำหน้าที่เป็นสเลฟ (<strong>Slave</strong>) หรืออุปกรณ์ที่คอยสื่อสารข้อมูลกับมาสเตอร์ในระบบบัสเดียวกัน (เหมือนกรณีของบัส <strong>SPI</strong>) 
+อุปกรณ์หลายประเภท เช่น ไอซีเซนเซอร์ จะทาหน้าที่เป็นสเลฟเท่านั้น</p>
+<p><img alt="" src="../avr/images/atmel_i2c_bus-1.png" /></p>
+<p>รูป: ตัวอย่างระบบบัส <strong>I2C</strong> ที่มีอุปกรณ์หลายตัวเชื่อมต่อเข้าด้วยกันด้วยสัญญาณ <strong>SDA</strong> และ <strong>SCL</strong>
+(Source: Atmel)</p>
+<p>การทำงานของอุปกรณ์ในระบบบัส <strong>I2C</strong> แบ่งได้ตามหน้าที่ดังนี้</p>
+<ul>
+<li><strong>Master / Slave</strong>: อุปกรณ์ทำหน้าที่เป็นมาสเตอร์หรือสเลฟ</li>
+<li><strong>Transmitter / Receiver</strong>: อุปกรณ์เป็นตัวส่งข้อมูลหรือตัวรับข้อมูล</li>
+</ul>
+<p>โดยทั่วไป ชิปไมโครคอนโทรลเลอร์รองรับการใช้งานบัส <strong>I2C</strong> และแบ่งรูปแบบการทำงานในแต่ละช่วงเวลาได้เป็น 4 โหมด</p>
+<ul>
+<li><strong>Master Transmitter</strong> เป็นมาสเตอร์และเขียนข้อมูลเพื่อส่งไปยังสเลฟ</li>
+<li><strong>Master Receiver</strong> เป็นมาสเตอร์และขอข้อมูลจากสเลฟ</li>
+<li><strong>Slave Transmitter</strong>เป็นสเลฟและรอให้มาสเตอร์มาขอข้อมูลแล้วส่งออกไป</li>
+<li><strong>Slave Receiver</strong> เป็นสเลฟและรอให้มาสเตอร์ส่งข้อมูลมาแล้วคอยรับ</li>
+</ul>
+<p>ในการสื่อสารระหว่างมาสเตอร์และสเลฟ ต้องมีการกำหนดแอดเดรสของอุปกรณ์ (<strong>Device Address</strong>)
+เพื่อระบุว่ามาสเตอร์จะสื่อสารกับสเลฟตัวใดในระบบบัส โดยทั่วไปจะใช้แอดเดรสแบบ 7 บิต (<strong>7-bit Address</strong>)
+ซึ่งใช้ระบุได้ถึง 128 อุปกรณ์ และแอดเดรสของอุปกรณ์สเลฟแต่ละตัวในบัส <strong>I2C</strong> เดียวกันจะต้องไม่ซ้ำกัน</p>
+<p><img alt="" src="../avr/images/atmel_i2c_bus-3.png" /></p>
+<p>รูป: ข้อมูลไบต์แรกที่ถูกส่งออกไปโดยมาสเตอร์ เป็นตัวระบุแอดเดรส 7 บิตของอุปกรณ์ (สเลฟ) และมีบิต <strong>R/W</strong> (Source: Atmel)</p>
+<p>มาสเตอร์เริ่มต้นเข้าใช้บัส <strong>I2C</strong> ด้วยการสร้างสัญญาณเริ่มต้นที่เรียกว่า <strong>Start Condition</strong>
+และจะต้องปิดท้ายด้วยสัญญาณหยุดที่เรียกว่า <strong>Stop Condition</strong>
+เมื่อมาสเตอร์ส่งสัญญาณเริ่มต้นแล้ว จะส่งไบต์แรกซึ่งประกอบด้วยแอดเดรสขนาด 7 บิต ของอุปกรณ์สเลฟ 
+และอีกหนึ่งบิตในตำแหน่ง <strong>LSB</strong> ที่ระบุว่า จะเขียนหรืออ่านข้อมูลถัดไป หรือเรียกว่า บิต <strong>R/W Operation</strong>
+(<strong>Read/Not-Write Bit: 1=Read, 0=Write</strong>) </p>
+<p><img alt="" src="../avr/images/atmel_i2c_bus-2.png" /></p>
+<p>รูป: การเปลี่ยนแปลงลอจิกของสัญญาณ <strong>SDA</strong> และ <strong>SCL</strong>
+ที่เป็นการเริ่มต้น (<strong>Start Condition</strong>)
+และจบการสื่อสาร (<strong>Stop Condition</strong>)
+ซึ่งเกิดจากการส่งสัญญาณโดยมาสเตอร์ในระบบบัส <strong>I2C</strong> (Source: Atmel)</p>
+<p>หลังจากได้ส่งข้อมูลหนึ่งไบต์แล้ว อุปกรณ์ที่เป็นตัวส่งข้อมูลจะต้องตรวจสอบดูว่า มีการตอบรับจากอุปกรณ์อีกฝ่ายหนึ่งหรือไม่
+โดยการอ่านบิตที่เรียกว่า "บิตตอบรับ"" (<strong>Acknowledge Bit</strong>) หรือ บิต <strong>ACK</strong>
+ซึ่งจะต้องมีค่าเป็น 0 แต่ถ้าไม่มีการตอบรับ จะได้ค่าเป็น 1 (เรียกกรณีนี้ว่า <strong>No ACK</strong> หรือ <strong>NACK</strong>)
+และให้จบการทำงานของมาสเตอร์</p>
+<p>เมื่อได้รับหรือส่งข้อมูลครบแล้วและไม่ต้องการใช้บัสอีกต่อไป อุปกรณ์มาสเตอร์จะต้องจบการทำงานโดยการส่งสัญญาณหยุด
+หรือ <strong>Stop Condition</strong> แต่ถ้าจะใช้บัสต่อไปอีก
+(เช่น ในกรณีที่ส่งข้อมูลไบต์ออกไปแล้วตามด้วยการอ่านข้อมูลไบต์จากอุปกรณ์สเลฟ)
+ให้ส่งสัญญาณเริ่มใหม่อีกครั้ง โดยไม่ต้องส่งสัญญาณ <strong>Stop Condition</strong> และเรียกกรณีนี้ว่า 
+<strong>Repeated Start Condition</strong> ซึ่งมีลักษณะเหมือน <strong>Start Condition</strong> ตามปรกติ 
+จากนั้นให้สื่อสารข้อมูลต่อไปและจบด้วย <strong>Stop Condition</strong></p>
+<hr />
+<h2 id="twi-atmega328p">&#9655; <strong>การใช้งาน TWI ของ ATmega328P</strong><a class="headerlink" href="#twi-atmega328p" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ATmega328P</strong> มีวงจรที่เรียกว่า <strong>TWI</strong> เพียง 1 ชุด สามารถโปรแกรมให้ทำงานเป็นมาสเตอร์หรือสเลฟได้
+และใช้ขา <strong>PC4/SDA</strong> และ <strong>PC5/SCL</strong> ซึ่งตรงกับขา <strong>A4</strong> และ <strong>A5</strong> บนบอร์ด
+<strong>Arduino Uno / Nano</strong> ตามลำดับ</p>
+<p>ความถี่ในการทำงานของบัส <strong>I2C</strong> มักจะเป็น <strong>100kHz (Standard Mode)</strong> หรือ
+<strong>400kHz (Fast-mode)</strong> ในการสื่อสารข้อมูล (สำหรับอุปกรณ์บางชนิด สามารถใช้อัตราสูงกว่า <strong>1MHz</strong>)</p>
+<p>ข้อสังเกต: บอร์ด <strong>Arduino Nano v3.0</strong> และ <strong>Uno Rev.3</strong> 
+ไม่มีตัวต้านทาน <strong>Pull-Up</strong> ที่ขา <strong>SCL</strong> และ <strong>SDA</strong>
+ความถี่ของ <strong>SCL</strong> ที่ทำงานได้สูงสุดคือ <strong>400kHz</strong></p>
+<p>รีจิสเตอร์ขนาด 8 บิต ที่เกี่ยวข้องกับการทำงานของ <strong>TWI</strong> ในโหมดมาสเตอร์ ได้แก่</p>
+<ul>
+<li><code>TWCR</code> (<strong>TWI Control Register</strong>) เกี่ยวข้องกับการทำงานของ <strong>TWI</strong> 
+เช่น <ul>
+<li>บิต <code>TWEN</code> (<strong>TWI Enable Bit</strong>) เขียนค่าบิตเป็น 1 เพื่อเริ่มต้นการทำงานของ <strong>TWI</strong></li>
+<li>บิต <code>TWIE</code> (<strong>TWI Interrupt Enable Bit</strong>) เปิดการใช้งานอินเทอร์รัพท์  </li>
+<li>บิต <code>TWINT</code> (<strong>TWI Interrupt Flag</strong>) มีไว้เพื่อตรวจสอบค่าบิตที่ระบุว่าเกิดอินเทอร์รัพท์  </li>
+<li>บิต <code>TWSTA</code> และ <code>TWSTO</code> (*<em>TWI START / STOP Condition Bit</em>) ใช้เพื่อส่งสัญญาณเริ่มต้นหรือสัญญาณจบการใช้งานบัส  </li>
+<li>บิต <code>TWEA</code> (<strong>TWI Enable Acknowledge Bit</strong>)ส่งสัญญาณบิตตอบรับว่าได้รับข้อมูลแล้ว </li>
+<li>บิต <code>TWWC</code> (<strong>TWI Write Collison Bit</strong>) ระบุว่า มีการเขียนข้อมูลไบต์ลงใน <code>TWDA</code> 
+ในขณะที่บิต <code>TWINT</code> ยังเป็น 0 ซึ่งแสดงว่า ยังอยู่ในระหว่างการทำงานของ <strong>TWI</strong>
+(การเขียนข้อมูลไบต์ถัดไปลงใน <code>TWDA</code> จะต้องรอให้การส่งข้อมูลไบต์ก่อนหน้าเสร็จก่อน คือ รอให้บิต <code>TWINT</code> มีค่าเป็น 1
+และการเขียนค่าบิตเป็น 1 ไปยังบิต <code>TWINT</code> ในรีจิสเตอร์ เป็นการเคลียร์บิตดังกล่าว)</li>
+</ul>
+</li>
+<li><code>TWSR</code> (<strong>TWI Status Register</strong>) 
+สำหรับอ่านค่าบิตสถานะหรือ <strong>Status Code</strong> (มี 5 บิต) และกำหนดค่า <strong>TWI Prescaler</strong> 
+(มี 2 บิต สำหรับเลือกค่า <code>1</code>, <code>4</code>, <code>16</code> หรือ <code>64</code> )</li>
+<li><code>TWBR</code> (<strong>TWI Bit Rate Register</strong>) ใช้สำหรับตั้งค่าเพื่อกำหนดความถี่ <strong>SCL</strong> ของ <strong>I2C Master</strong></li>
+<li><code>TWDA</code> (<strong>TWI Data Register</strong>) สำหรับเขียนหรืออ่านค่าไบต์ข้อมูล</li>
+</ul>
+<p><img alt="" src="../avr/images/twi_mt_registers.png" /></p>
+<p>รูป: รายการรีจิสเตอร์ของ <strong>TWI</strong> สำหรับการทำงานในโหมดมาสเตอร์</p>
+<p>ความถี่สำหรับ <strong>SCL</strong> (<script type="math/tex">f_{SCL}</script>) คำนวณได้ตามสูตรต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display"> f_{SCL} = \frac{f_{CPU}}{(16 + 2 \cdot \mbox{TWBR} \cdot \mbox{Prescaler})}
+</script>
+</p>
+<p>โดยทั่วไป ให้เลือกค่า <strong>Prescaler</strong> เท่ากับ <strong>1</strong> (ตั้งค่าบิต <code>TWPS[1:0]</code> ในรีจิสเตอร์ <code>TWSR</code> ให้เท่ากับ <code>00</code>)
+ และ <script type="math/tex">f_{CPU}</script> เท่ากับ <strong>16MHz</strong> สำหรับบอร์ด <strong>Arduino Uno / Nano</strong>
+และจะต้องมากกว่า  <script type="math/tex">f_{SCL}</script> อย่างน้อย 16 เท่า ดังนั้นจะได้ค่าสำหรับ <code>TWBR</code> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display"> \mbox{TWBR} = ((f_{CPU}/f_{SCL})-16)/2
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ไฟล์ <a href="https://github.com/vancegroup-mirrors/avr-libc/blob/master/avr-libc/include/util/twi.h"><code>&lt;util/twi.h&gt;</code></a>
+ซึ่งเป็นส่วนหนึ่งของไลบรารี <strong>avr-libc</strong> สามารถนำเข้ามาใช้เป็น <strong>C Header File</strong> ได้
+เนื่องจากมีการประกาศแมโครหรือค่าคงที่เอาไว้ เช่น 
+ค่าบิตสำหรับสถานะการทำงานต่าง ๆ ของ <strong>TWI</strong> แยกตามโหมดการทำงานสำหรับมาสเตอร์และสเลฟ</p>
+<p>ตัวอย่างค่าคงที่ (บางส่วน) สำหรับการทำงานของ <strong>TWI</strong> ในโหมดมาสเตอร์ เช่น</p>
+<table>
+<thead>
+<tr>
+<th align="left">Macros</th>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>TW_START</code></td>
+<td align="left"><code>0x08</code></td>
+<td align="left">start condition transmitted</td>
+</tr>
+<tr>
+<td align="left"><code>TW_REP_START</code></td>
+<td align="left"><code>0x10</code></td>
+<td align="left">repeated start condition transmitted</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MT_SLA_ACK</code></td>
+<td align="left"><code>0x18</code></td>
+<td align="left">SLA+W transmitted, ACK received</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MT_SLA_NACK</code></td>
+<td align="left"><code>0x20</code></td>
+<td align="left">SLA+W transmitted, NACK received</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MT_DATA_ACK</code></td>
+<td align="left"><code>0x28</code></td>
+<td align="left">data transmitted, ACK received</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MT_DATA_NACK</code></td>
+<td align="left"><code>0x30</code></td>
+<td align="left">data transmitted, NACK received</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MR_SLA_ACK</code></td>
+<td align="left"><code>0x40</code></td>
+<td align="left">SLA+R transmitted, ACK received</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MR_SLA_NACK</code></td>
+<td align="left"><code>0x48</code></td>
+<td align="left">SLA+R transmitted, NACK received</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MR_DATA_ACK</code></td>
+<td align="left"><code>0x50</code></td>
+<td align="left">data received, ACK returned</td>
+</tr>
+<tr>
+<td align="left"><code>TW_MR_DATA_NACK</code></td>
+<td align="left"><code>0x58</code></td>
+<td align="left">data received, NACK returned</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-scan">&#9655; <strong>การสแกนหาอุปกรณ์สเลฟ (I2C Scan)</strong><a class="headerlink" href="#i2c-scan" title="Permanent link">#</a></h2>
+<p>เมื่อต้องการตรวจสอบดูว่า มีอุปกรณ์สเลฟเชื่อมต่ออยู่หรือไม่ มีหลักการทำงานดังนี้
+ให้ลองค่าแอดเดรสในช่วง 0 ถึง 127 ไปทีละค่า และลองส่งไบต์แรกที่ประกอบด้วยแอดเดรส 7 บิต
+และบิต <strong>R/W</strong> เมื่อส่งออกไปข้อมูลไบต์แรกออกแล้วมีการตอบกลับมาด้วยบิต <strong>ACK</strong> 
+แสดงว่ามีอุปกรณ์ที่ตรงกับแอดเดรสดังกล่าว</p>
+<p>โค้ดตัวอย่างมีการแบ่งและแยกเก็บในไฟล์ต่าง ๆ ดังนี้</p>
+<ul>
+<li><a href="../avr/i2c_scan_code/serial.h"><code>serial.h</code></a> 
+และ <a href="../avr/i2c_scan_code/serial.c"><code>serial.c</code></a> มีฟังก์ชันสำหรับใช้งาน <strong>UART</strong>
+เพื่อส่งข้อความไปยังคอมพิวเตอร์ของผู้ใช้โดยใช้ฟังก์ชัน <code>printf()</code> ได้</li>
+<li><a href="../avr/i2c_scan_code/i2c.h"><code>i2c.h</code></a>
+และ <a href="../avr/i2c_scan_code/i2c.c"><code>i2c.c</code></a> มีฟังก์ชันสำหรับการใช้งาน 
+<strong>TWI</strong> ในโหมด <strong>I2C master</strong> และเลือกความถี่สำหรับ <strong>SCL</strong> ได้  เช่น <strong>100kHz</strong> หรือ <strong>400kHz</strong></li>
+<li><a href="../avr/i2c_scan_code/main.c"><code>main.c</code></a> มีฟังก์ชัน <code>main()</code>
+และ <code>scan_i2c_devices(void)</code></li>
+</ul>
+<p>การทำงานในฟังก์ชัน <code>main()</code> ของตัวอย่างโค้ดเพื่อสแกนหาอุปกรณ์สเลฟในระบบบัส <strong>I2C</strong> มีลำดับขั้นตอนดังนี้</p>
+<ul>
+<li>เรียกฟังก์ชัน <code>init_i2c()</code> เพื่อเริ่มต้นใช้งาน <strong>TWI (I2C)</strong> เพื่อทำให้ชิป <strong>ATmega328P</strong> 
+ทำงานในโหมดมาสเตอร์ และใช้ความถี่ <strong>400kHz</strong> สำหรับ <strong>SCL</strong></li>
+<li>เรียกฟังก์ชัน <code>init_uart(115200)</code> เพื่อเริ่มต้นใช้งาน <strong>UART</strong> และใช้ค่า <strong>Baudrate</strong> 115200
+และสามารถใช้คำสั่ง <code>printf()</code> ส่งข้อความออกทาง <strong>Serial/UART</strong> ได้</li>
+<li>ทำขั้นตอนซ้ำ เพื่อตรวจสอบแอดเดรสของอุปกรณ์ โดยเรียกฟังก์ชัน <code>scan_i2c_devices()</code>
+และหน่วงเวลาไว้ประมาณ 4 วินาที ก่อนทำซ้ำ</li>
+</ul>
+<p>ตัวอย่างของโค้ดในไฟล์ <code>main.c</code> มีดังนี้</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;stdio.h&gt;       // for printf()
+#include &lt;util/delay.h&gt;  // for _delay_ms()
+#include &quot;serial.h&quot; 
+#include &quot;i2c.h&quot; 
+
+void scan_i2c_devices(void) {
+  char sbuf[32];
+  int n_devices = 0;
+  printf(&quot;   &quot;);
+  for (uint8_t col = 0; col &lt; 16; col++) {
+    printf(&quot;%3x&quot;, col);
+  }
+  printf(&quot;\n&quot;);
+  uint8_t addr = 0;
+  for (uint8_t row = 0; row &lt; 8; row++) {
+    printf(&quot;%02x:&quot;, row &lt;&lt; 4);
+    for (uint8_t col = 0; col &lt; 16; col++) {
+      if (row == 0 &amp;&amp; addr &lt;= 1) {
+        printf(&quot;   &quot;);
+      } else {
+        uint8_t result = i2c_start_transmission(addr &lt;&lt; 1);
+        i2c_end_transmission();
+        if (result) { // error
+          printf(&quot; --&quot;);
+        } else {
+          n_devices++;
+          printf(&quot; %2x&quot;, addr);
+        }
+      }
+      addr++;
+    }
+    printf(&quot;\n&quot;);
+  }
+  printf(&quot;Devices found: %d\n&quot;, n_devices );
+  printf(&quot;-------------------------------\n\n&quot;);
+}
+
+int main(void) {
+  // Initialize I2C
+  init_i2c(400000);
+  // Initialize the UART and set baudrate to 115200.
+  init_uart(115200);
+  while (1) {
+    printf(&quot;I2C Scan....\n&quot;);
+    scan_i2c_devices();
+    _delay_ms(4000);
+  }
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>เมื่อมีโค้ดตัวอย่างแล้ว ก็สามารถนำไปทดลองใช้กับ <strong>Wokwi Simulator</strong> ตามรูปตัวอย่างต่อไปนี้
+ซึ่งมีการนำบอร์ด <strong>Arduino Nano</strong> มาต่อกับอุปกรณ์ 3 ชนิด เชื่อมต่อผ่านทางบัส <strong>I2C</strong></p>
+<p><img alt="" src="../avr/images/wokwi_i2c_scan_demo-1.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานเพื่อตรวจสอบแอดเดรสของอุปกรณ์ที่เชื่อมต่อกับบัส <strong>I2C</strong></p>
+<hr />
+<h2 id="bh1750-digital-light-sensor">&#9655; <strong>การอ่านจากโมดูลเซนเซอร์ BH1750 Digital Light Sensor</strong><a class="headerlink" href="#bh1750-digital-light-sensor" title="Permanent link">#</a></h2>
+<p>ไฟล์ที่เกี่ยวข้องได้แก่  </p>
+<ul>
+<li><a href="../avr/i2c_scan_code/serial.h"><code>serial.h</code></a> 
+และ <a href="../avr/i2c_scan_code/serial.c"><code>serial.c</code></a></li>
+<li><a href="../avr/i2c_scan_code/i2c.h"><code>i2c.h</code></a>
+และ <a href="../avr/i2c_scan_code/i2c.c"><code>i2c.c</code></a> </li>
+<li><code>main.c</code></li>
+</ul>
+<p>โค้ดไฟล์ใน <code>main.c</code> สาธิตการอ่านค่าจากโมดูล <strong>BH1750 (I2C)</strong>
+เพื่อวัดค่าความเข้มแสง ซึ่งมีหมายเลขแอดเดรสเท่ากับ <code>0x23</code> การอ่านค่าของไอซี
+<strong>BH1750</strong> จะใช้คำสั่ง <code>0x20</code> เพื่อวัดค่าหนึ่งครั้ง (ไม่ได้วัดค่าแบบต่อเนื่อง)  แล้วเว้นระยะเวลาก่อนอ่านค่าใหม่</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;stdio.h&gt;       // for printf()
+#include &lt;util/delay.h&gt;  // for _delay_ms()
+#include &quot;serial.h&quot; 
+#include &quot;i2c.h&quot; 
+
+#define BH1750_ADDRESS  (0x23)
+
+uint8_t init_bh1750() {
+  uint8_t result;
+  // Start I2C transmission for write
+  result = i2c_start_transmission( (BH1750_ADDRESS &lt;&lt; 1) | TW_WRITE);
+  if ( result ) {
+    i2c_end_transmission();
+    printf(&quot;BH1750 initialization failed!\n&quot;);
+    return 1; // error
+  }
+  i2c_write( 0x01 ); // Send POWER_ON command
+  // End I2C transmission
+  i2c_end_transmission();
+  _delay_ms(150);
+  printf(&quot;BH1750 initialization OK!\n&quot;);
+  return 0;
+}
+
+uint8_t bh1750_read( uint16_t *raw_value ) {
+  uint8_t result;
+  // Start I2C transmission for write
+  result = i2c_start_transmission( (BH1750_ADDRESS &lt;&lt; 1) | TW_WRITE);
+  if ( result ) {
+    i2c_end_transmission();
+    printf(&quot;BH1750: I2C operation failed...!\n&quot;);
+    return 1; // error
+  }
+  // Send command to initiate single measurement with 1.0x resolution
+  i2c_write( 0x20 );
+  // End I2C transmission
+  i2c_end_transmission();
+  _delay_ms(120);
+
+  // Start I2C transmission for read
+  result = i2c_start_transmission( (BH1750_ADDRESS &lt;&lt; 1) | TW_READ );
+  if ( result ) {
+    printf(&quot;BH1750: I2C operation failed...!\n&quot;);
+    i2c_end_transmission();
+    return 2; // error
+  }
+  // Read two bytes of light data
+  uint8_t buf[2] = {0x00,0x00};
+  i2c_read(&amp;buf[0], 1 /*ACK*/);
+  i2c_read(&amp;buf[1], 0 /*NACK*/);
+  // End I2C transmission
+  i2c_end_transmission();
+  *raw_value = (buf[0] &lt;&lt; 8) | buf[1];
+  return 0;
+}
+
+int main(void) {
+  // Initialize I2C
+  init_i2c(400000);
+  // Initialize the UART and set baudrate to 115200.
+  init_uart(115200);
+  // Initialize BH1750
+  init_bh1750();
+  while (1) {
+    uint16_t value;
+    uint8_t result;
+    result = bh1750_read(&amp;value);
+    if (!result) {
+      float lux = value/1.2f;
+      printf(&quot;Lux:%u\n&quot;, (uint16_t)lux );
+    } else {
+      printf(&quot;Lux:---- (err=%d)\n&quot;, result );
+    }
+    _delay_ms(100);
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/arduino_bh1750_serial_plotter_demo-1.png" /></p>
+<p>รูป: ตัวอย่างการอ่านค่าจากโมดูล <strong>BH1750</strong> แล้วนำมาแสดงค่าด้วย <strong>Arduino Serial Plotter</strong></p>
+<hr />
+<h2 id="lcd16x2-i2c-pcf8574a">&#9655; <strong>การแสดงผลด้วยโมดูล LCD16x2 I2C PCF8574A</strong><a class="headerlink" href="#lcd16x2-i2c-pcf8574a" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไปสาธิตใช้งานโมดูล <strong>LCD16x2</strong> ที่ใช้งานร่วมกับโมดูล <strong>PCF8574A Adapter</strong>
+ทำให้สามารถเชื่อมต่อด้วยบัส <strong>I2C</strong> ได้ การเขียนคำสั่งหรือข้อมูลไปยังโมดูล <strong>LCD16x2</strong>
+จะทำครั้งละ 4 บิต โดยจะต้องส่งข้อมูลผ่านบัส <strong>I2C</strong> ด้วยสายสัญญาณ <strong>SDA</strong> และ <strong>SCL</strong> 
+ไปยังโมดูล  <strong>PCF8574A Adapter</strong> เพื่อทำหน้าที่เป็นตัวขยายพอร์ต <strong>8-bit I/O</strong></p>
+<p>ไฟล์ที่เกี่ยวข้องได้แก่  </p>
+<ul>
+<li><a href="../avr/i2c_scan_code/serial.h"><code>serial.h</code></a> 
+และ <a href="../avr/i2c_scan_code/serial.c"><code>serial.c</code></a></li>
+<li><a href="../avr/i2c_scan_code/i2c.h"><code>i2c.h</code></a>
+และ <a href="../avr/i2c_scan_code/i2c.c"><code>i2c.c</code></a> </li>
+<li><a href="../avr/i2c_scan_code/lcd_i2c.h"><code>lcd_i2c.h</code></a>
+และ <a href="../avr/i2c_scan_code/lcd_i2c.c"><code>lcd_i2c.c</code></a> มีฟังก์ชันสำหรับการใช้งาน 
+โมดูล * <strong>LCD16x2 (I2C)</strong> ซึ่งมีแอดเดรสเท่ากับ <code>0x3F</code></li>
+<li><code>main.c</code></li>
+</ul>
+<p>โค้ดในไฟล์ <code>main.c</code> มีดังนี้</p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;stdio.h&gt;       // for printf()
+#include &lt;util/delay.h&gt;  // for _delay_ms()
+#include &quot;serial.h&quot; 
+#include &quot;i2c.h&quot; 
+#include &quot;lcd_i2c.h&quot; 
+
+int main(void) {
+  // Initialize I2C
+  init_i2c(400000);
+  // Initialize the UART and set baudrate to 115200.
+  init_uart(115200);
+  // Initialize LCD16x2 (I2C PCF8574A)
+  lcd_init(0x3F);
+  // Set cursor to the first position in the first line
+  lcd_set_cursor(0,0);
+  lcd_write_line(&quot;LCD16x2 I2C Demo&quot;);
+  uint16_t counter = 0;
+  char sbuf[20];
+  while (1) {
+    sprintf( sbuf, &quot;Count: %05u&quot;, counter++);
+    lcd_set_cursor(0,1);
+    lcd_write_line(sbuf);
+    _delay_ms(1000);
+  }
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/atmega328p_lcd16x2_i2c_wokwi_demo-1.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานโดยใช้ <strong>Wokwi Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้งานวงจร <strong>USART</strong> เพื่อการสื่อสารข้อมูลบิตอนุกรมแบบซิงโครนัสตามโพรโทคอล <strong>I2C Bus</strong>
+โดยวิธีการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> และทดลองกับบอร์ดไมโครคอนโทรลเลอร์
+โดยใช้อุปกรณ์จริง เช่น <strong>Arduino Nano</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-01-21 | Last Updated: 2023-01-22</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
