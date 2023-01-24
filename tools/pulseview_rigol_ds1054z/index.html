@@ -111,6 +111,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#rlc" class="nav-link">&#9655; ตัวอย่างการวัดสัญญาณแอนะล็อกจากวงจร RLC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -366,6 +370,60 @@ bool BH1750_read( uint8_t addr, float *lux ) {
 <p>รูป: ตัวอย่างลำดับข้อมูลไบต์ที่ได้ในช่วงที่มีการอ่านค่าจากโมดูล <strong>BH1750 (I2C)</strong></p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="rlc">&#9655; <strong>ตัวอย่างการวัดสัญญาณแอนะล็อกจากวงจร RLC</strong><a class="headerlink" href="#rlc" title="Permanent link">#</a></h2>
+<p>วงจร <strong>RLC</strong> ที่มีตัวต้านทาน (<strong>R</strong>) ตัวเก็บประจุ (<strong>C</strong>) และตัวเหนี่ยวนำไฟฟ้า (<strong>L</strong>)
+ต่ออนุกรมกันในวงจร สามารถนำมาใช้ในการฝึกต่อวงจร และใช้เครื่องออสซิลโลสโคปเพื่อวัดสัญญาณไฟฟ้าจากวงจรดังกล่าว </p>
+<p>วงจร <strong>RLC</strong> ที่จะนำมาใช้สำหรับการทดสอบนั้น (ดูผังวงจรตัวอย่าง) ทำงานให้โหมดที่เรียกว่า <strong>Source RLC (Series)</strong>
+แต่มีเงื่อนไขเริ่มต้นไม่เป็นศูนย์ (<strong>Non-zero Initial Condition</strong>) 
+เช่น ในช่วงเริ่มต้นให้ตัวเก็บประจุไฟฟ้ามีแรงดันตกคร่อมไม่เป็นศูนย์ หรือ มีกระแสไฟฟ้าไหลผ่านตัวเหนี่ยวนำที่ไม่เป็นศูนย์ เป็นต้น</p>
+<p><img alt="" src="rlc_circuit.png" /></p>
+<p>รูป: ผังวงจรตัวอย่างสำหรับการทดสอบ</p>
+<p>เริ่มต้นให้สวิตช์ <strong>SW</strong> อยู่ในตำแหน่งทางซ้ายมือ
+และจะทำให้มีกระแสไฟฟ้าไหลจากแหล่งจ่าย <strong>VS</strong> ผ่านตัวต้านทาน
+<strong>RS</strong> ไปยังตัวเก็บประจุไฟฟ้า <strong>C</strong> จนระดับแรงดันไฟฟ้าตกคร่อมที่
+ตัวเก็บประจุมีเท่ากับ <strong>VS</strong> และไม่มีกระแสไฟฟ้าไหลอีกต่อไป</p>
+<p>หลังจากช่วงการอัดประจุไฟฟ้า ให้เลื่อนสวิตช์ <strong>SW</strong> จากตำแหน่งทางซ้ายไปทางขวามือโดยทันที 
+จะทำให้ได้วงจรใหม่ที่ประกอบด้วย <strong>R</strong>, <strong>L</strong>, <strong>C</strong> แต่ไม่มีแหล่งจ่ายไฟฟ้า <strong>DC</strong> (<strong>Source-free</strong>)
+ตัวเก็บประจุไฟฟ้ามีแรงดันตกคร่อมเริ่มต้นมากกว่า <strong>0V</strong> แต่ตัวเหนี่ยวนำไฟฟ้ายังไม่มีกระแสไหลผ่านก่อนการเปลี่ยนตำแหน่งของสวิตช์ <strong>SW</strong></p>
+<p>ให้ใช้ออสซิลโลสโคปวัดสัญญาณ เช่น วัดแรงดันตกคร่อมที่ตัวเก็บประจุเมื่อมีการเปลี่ยนตำแหน่งสวิตช์
+จากซ้ายไปขวา รูปคลื่นสัญญาณไฟฟ้าที่ได้จะมีลักษณะเหมือนฟังก์ชันไซน์แต่มีแอมพลิจูดลดลงเมื่อเวลาผ่านไป
+(<strong>Damped Sinusoidal Waveform</strong>)</p>
+<p>ถัดไปเป็นตัวอย่างการทดลองวัดสัญญาณจากวงจร <strong>RLC</strong> ที่ได้ต่อวงจรบนเบรดบอร์ด
+เลือกค่าดังนี้</p>
+<ul>
+<li><strong>VS=5V</strong> แรงดันไฟฟ้าคงที่จากแหล่งจ่าย <strong>DC</strong></li>
+<li><strong>RS=20&Omega;</strong> ตัวต้านทานจำกัดกระแสในช่วงการชาร์จประจุ</li>
+<li><strong>C=39nF (+/-10%)</strong> ตัวเก็บประจุ (เลือกใช้คาปาซิเตอร์แบบ <strong>Mylar</strong>)</li>
+<li><strong>L=100uH (+/-10%)</strong> ตัวเหนี่ยวนำหรือคอยล์</li>
+<li><strong>R=1&Omega;</strong> ใช้ค่าความต้านทานภายในของคอยล์ (ใช้มัลติมิเตอร์ดิจิทัลวัดค่าความต้านทาน)</li>
+</ul>
+<p><img alt="" src="rlc_rigol-1.png" /></p>
+<p>รูป: การวัดสัญญาณไฟฟ้าด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="rlc_rigol-2.png" /></p>
+<p>รูป: การวัดความกว้างหรือคาบของสัญญาณไฟฟ้า (ใช้เคอร์เซอร์แนวตั้ง วัดระยะเวลาได้ <strong>12.30 usec</strong>)</p>
+<p><img alt="" src="rlc_pulseview-1.png" /></p>
+<p>รูป: การแสดงรูปสัญญาณด้วย <strong>PulseView</strong> และวัดความกว้างของหนึ่งคาบ
+(วัดระยะเวลาได้ <strong>12.32 usec</strong>)</p>
+<p>จากบทความ <a href="../../electronics/inductance_measurement/">"วิธีการวัดค่าของตัวเหนี่ยวนำหรือคอยล์"</a>
+ได้มีการนำเสนอทฤษฎีที่ใช้ในการวิเคราะห์วงจร <strong>RLC</strong> และมีสูตรการคำนวณความถี่ (<strong>f</strong>) ของสัญญาณเอาต์พุตที่ได้จากวงจรดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  f = \frac{1}{2\pi} \sqrt{ \frac{1}{LC} - (\frac{R}{2L})^2 }
+\quad \mbox{ Hz }
+</script>
+</p>
+<p>ดังนั้นจึงคำนวณคาบสัญญาณ (<strong>Period: T</strong>) ซึ่งเป็นส่วนกลับของความถี่ เป็นตัวเลขได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+T = \frac{2\pi \cdot 1e6}{
+ \sqrt{ 
+   \frac{1}{(100e-6)(39e-9)} - \Big(\frac{(1)}{2 (100e-6)}\Big)^2} 
+ } = 12.41 \; \mbox{ usec }
+</script>
+</p>
+<p>ค่าที่คำนวณได้คือ <strong>12.41 usec</strong> ในขณะที่ค่าที่วัดได้จริงคือ <strong>12.32 usec</strong> (มีความคลาดเคลื่อนไปประมาณ <strong>1%</strong>)</p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้แนะนำการใช้งานอุปกรณ์ <strong>RIGOl DS1054Z</strong>
 ที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ผ่านทาง <strong>USB</strong> หรือ <strong>LAN</strong> ร่วมกับซอฟต์แวร์ 
@@ -374,7 +432,7 @@ bool BH1750_read( uint8_t addr, float *lux ) {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-01-20 | Last Updated: 2023-01-21</p></div>
+<p>Created: 2023-01-20 | Last Updated: 2023-01-23</p></div>
             </div>
         </div>
 
