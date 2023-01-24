@@ -103,7 +103,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#i2c-scan" class="nav-link">&#9655; การสแกนหาอุปกรณ์สเลฟ (I2C Scan)</a>
+            <li class="nav-item" data-level="2"><a href="#scanning-i2c-devices" class="nav-link">&#9655; การสแกนหาอุปกรณ์ (Scanning I2C Devices)</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -111,7 +111,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#lcd16x2-i2c-pcf8574a" class="nav-link">&#9655; การแสดงผลด้วยโมดูล LCD16x2 I2C PCF8574A</a>
+            <li class="nav-item" data-level="2"><a href="#lcd16x2-i2c-pcf8574" class="nav-link">&#9655; การแสดงผลด้วยโมดูล LCD16x2 I2C PCF8574</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -131,7 +131,7 @@
 <em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
 <hr />
 <h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
-<p>บทความในตอนที่ 4 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<p>บทความในตอนที่ 5 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
 <strong>Two-Wire Serial Interface (TWI)</strong> ภายในชิป <strong>ATmega328P</strong>
 มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong>
 (<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
@@ -146,29 +146,30 @@
 <p><a href="http://cache.nxp.com/documents/user_manual/UM10204.pdf"><strong>I2C Bus</strong></a> 
 (อ่านว่า  "ไอ-สแควร์-ซี-บัส") เป็นโพรโทคอลสำหรับการสื่อสารข้อมูลดิจิทัล ใช้สัญญาณดิจิทัลสำหรับ <strong>I/O</strong> เพียง 2 เส้น
 คือ <strong>SCL (Serial Clock)</strong>เป็นสัญญาณนาฬิกาเพื่อกำหนดจังหวะในการทำงานในการรับส่งข้อมูล
-และ <strong>SDA (Serial Data)</strong> เป็นสัญญาณสำหรับข้อมูล และสัญญาณแต่ละเส้นจะต้องมีตัวต้านทาน
+และ <strong>SDA (Serial Data)</strong> เป็นสัญญาณสำหรับข้อมูลหนึ่งบิต และสัญญาณแต่ละเส้นจะต้องมีตัวต้านทาน
 <strong>Pullup</strong> ต่ออยู่ด้วย</p>
 <p>ระบบบัส <strong>I2C</strong> ประกอบด้วยอุปกรณ์ที่ทำหน้าที่เป็นมาสเตอร์ (<strong>Master</strong>) หรือ ตัวควบคุม (<strong>Controller</strong>)
 และอุปกรณ์ที่ทำหน้าที่เป็นสเลฟ (<strong>Slave</strong>) หรืออุปกรณ์ที่คอยสื่อสารข้อมูลกับมาสเตอร์ในระบบบัสเดียวกัน (เหมือนกรณีของบัส <strong>SPI</strong>) 
-อุปกรณ์หลายประเภท เช่น ไอซีเซนเซอร์ จะทาหน้าที่เป็นสเลฟเท่านั้น</p>
+อุปกรณ์หลายประเภท เช่น ไอซีเซนเซอร์ จะทำหน้าที่เป็นสเลฟเท่านั้น แต่ไมโครคอนโทรลเลอร์สามารถเขียนโปรแกรมให้ทำงานได้เป็นมาสเตอร์
+หรือสเลฟก็ได้</p>
 <p><img alt="" src="../avr/images/atmel_i2c_bus-1.png" /></p>
 <p>รูป: ตัวอย่างระบบบัส <strong>I2C</strong> ที่มีอุปกรณ์หลายตัวเชื่อมต่อเข้าด้วยกันด้วยสัญญาณ <strong>SDA</strong> และ <strong>SCL</strong>
 (Source: Atmel)</p>
 <p>การทำงานของอุปกรณ์ในระบบบัส <strong>I2C</strong> แบ่งได้ตามหน้าที่ดังนี้</p>
 <ul>
-<li><strong>Master / Slave</strong>: อุปกรณ์ทำหน้าที่เป็นมาสเตอร์หรือสเลฟ</li>
-<li><strong>Transmitter / Receiver</strong>: อุปกรณ์เป็นตัวส่งข้อมูลหรือตัวรับข้อมูล</li>
+<li><strong>Master</strong> หรือ <strong>Slave</strong>: อุปกรณ์ทำหน้าที่เป็นมาสเตอร์หรือสเลฟ</li>
+<li><strong>Transmitter</strong> หรือ <strong>Receiver</strong>: อุปกรณ์เป็นตัวส่งข้อมูลหรือตัวรับข้อมูล</li>
 </ul>
 <p>โดยทั่วไป ชิปไมโครคอนโทรลเลอร์รองรับการใช้งานบัส <strong>I2C</strong> และแบ่งรูปแบบการทำงานในแต่ละช่วงเวลาได้เป็น 4 โหมด</p>
 <ul>
-<li><strong>Master Transmitter</strong> เป็นมาสเตอร์และเขียนข้อมูลเพื่อส่งไปยังสเลฟ</li>
-<li><strong>Master Receiver</strong> เป็นมาสเตอร์และขอข้อมูลจากสเลฟ</li>
-<li><strong>Slave Transmitter</strong>เป็นสเลฟและรอให้มาสเตอร์มาขอข้อมูลแล้วส่งออกไป</li>
-<li><strong>Slave Receiver</strong> เป็นสเลฟและรอให้มาสเตอร์ส่งข้อมูลมาแล้วคอยรับ</li>
+<li><strong>Master Transmitter (MT)</strong> เป็นมาสเตอร์และเขียนข้อมูลเพื่อส่งไปยังสเลฟ</li>
+<li><strong>Master Receiver (MR)</strong> เป็นมาสเตอร์และขอข้อมูลจากสเลฟ</li>
+<li><strong>Slave Transmitter (ST)</strong> เป็นสเลฟและรอให้มาสเตอร์มาขอข้อมูลแล้วส่งออกไป</li>
+<li><strong>Slave Receiver (SR)</strong> เป็นสเลฟและรอให้มาสเตอร์ส่งข้อมูลมาแล้วคอยรับ</li>
 </ul>
 <p>ในการสื่อสารระหว่างมาสเตอร์และสเลฟ ต้องมีการกำหนดแอดเดรสของอุปกรณ์ (<strong>Device Address</strong>)
 เพื่อระบุว่ามาสเตอร์จะสื่อสารกับสเลฟตัวใดในระบบบัส โดยทั่วไปจะใช้แอดเดรสแบบ 7 บิต (<strong>7-bit Address</strong>)
-ซึ่งใช้ระบุได้ถึง 128 อุปกรณ์ และแอดเดรสของอุปกรณ์สเลฟแต่ละตัวในบัส <strong>I2C</strong> เดียวกันจะต้องไม่ซ้ำกัน</p>
+ซึ่งใช้ระบุได้ถึง 128 อุปกรณ์ที่แตกต่างกัน และแอดเดรสของอุปกรณ์สเลฟแต่ละตัวในบัส <strong>I2C</strong> เดียวกันจะต้องไม่ซ้ำกัน</p>
 <p><img alt="" src="../avr/images/atmel_i2c_bus-3.png" /></p>
 <p>รูป: ข้อมูลไบต์แรกที่ถูกส่งออกไปโดยมาสเตอร์ เป็นตัวระบุแอดเดรส 7 บิตของอุปกรณ์ (สเลฟ) และมีบิต <strong>R/W</strong> (Source: Atmel)</p>
 <p>มาสเตอร์เริ่มต้นเข้าใช้บัส <strong>I2C</strong> ด้วยการสร้างสัญญาณเริ่มต้นที่เรียกว่า <strong>Start Condition</strong>
@@ -182,7 +183,7 @@
 และจบการสื่อสาร (<strong>Stop Condition</strong>)
 ซึ่งเกิดจากการส่งสัญญาณโดยมาสเตอร์ในระบบบัส <strong>I2C</strong> (Source: Atmel)</p>
 <p>หลังจากได้ส่งข้อมูลหนึ่งไบต์แล้ว อุปกรณ์ที่เป็นตัวส่งข้อมูลจะต้องตรวจสอบดูว่า มีการตอบรับจากอุปกรณ์อีกฝ่ายหนึ่งหรือไม่
-โดยการอ่านบิตที่เรียกว่า "บิตตอบรับ"" (<strong>Acknowledge Bit</strong>) หรือ บิต <strong>ACK</strong>
+โดยการอ่านสัญญาณบิตที่เรียกว่า "บิตตอบรับ"" (<strong>Acknowledge Bit</strong>) หรือ บิต <strong>ACK</strong>
 ซึ่งจะต้องมีค่าเป็น 0 แต่ถ้าไม่มีการตอบรับ จะได้ค่าเป็น 1 (เรียกกรณีนี้ว่า <strong>No ACK</strong> หรือ <strong>NACK</strong>)
 และให้จบการทำงานของมาสเตอร์</p>
 <p>เมื่อได้รับหรือส่งข้อมูลครบแล้วและไม่ต้องการใช้บัสอีกต่อไป อุปกรณ์มาสเตอร์จะต้องจบการทำงานโดยการส่งสัญญาณหยุด
@@ -208,7 +209,7 @@
 <li>บิต <code>TWEN</code> (<strong>TWI Enable Bit</strong>) เขียนค่าบิตเป็น 1 เพื่อเริ่มต้นการทำงานของ <strong>TWI</strong></li>
 <li>บิต <code>TWIE</code> (<strong>TWI Interrupt Enable Bit</strong>) เปิดการใช้งานอินเทอร์รัพท์  </li>
 <li>บิต <code>TWINT</code> (<strong>TWI Interrupt Flag</strong>) มีไว้เพื่อตรวจสอบค่าบิตที่ระบุว่าเกิดอินเทอร์รัพท์  </li>
-<li>บิต <code>TWSTA</code> และ <code>TWSTO</code> (*<em>TWI START / STOP Condition Bit</em>) ใช้เพื่อส่งสัญญาณเริ่มต้นหรือสัญญาณจบการใช้งานบัส  </li>
+<li>บิต <code>TWSTA</code> และ <code>TWSTO</code> (<strong>TWI START / STOP Condition Bit</strong>) ใช้เพื่อส่งสัญญาณเริ่มต้นหรือสัญญาณจบการใช้งานบัส  </li>
 <li>บิต <code>TWEA</code> (<strong>TWI Enable Acknowledge Bit</strong>)ส่งสัญญาณบิตตอบรับว่าได้รับข้อมูลแล้ว </li>
 <li>บิต <code>TWWC</code> (<strong>TWI Write Collison Bit</strong>) ระบุว่า มีการเขียนข้อมูลไบต์ลงใน <code>TWDA</code> 
 ในขณะที่บิต <code>TWINT</code> ยังเป็น 0 ซึ่งแสดงว่า ยังอยู่ในระหว่างการทำงานของ <strong>TWI</strong>
@@ -224,7 +225,7 @@
 </ul>
 <p><img alt="" src="../avr/images/twi_mt_registers.png" /></p>
 <p>รูป: รายการรีจิสเตอร์ของ <strong>TWI</strong> สำหรับการทำงานในโหมดมาสเตอร์</p>
-<p>ความถี่สำหรับ <strong>SCL</strong> (<script type="math/tex">f_{SCL}</script>) คำนวณได้ตามสูตรต่อไปนี้</p>
+<p>การกำหนดค่าความถี่สำหรับ <strong>SCL</strong> (<script type="math/tex">f_{SCL}</script>) คำนวณได้ตามสูตรต่อไปนี้</p>
 <p>
 <script type="math/tex; mode=display"> f_{SCL} = \frac{f_{CPU}}{(16 + 2 \cdot \mbox{TWBR} \cdot \mbox{Prescaler})}
 </script>
@@ -303,9 +304,26 @@
 </tr>
 </tbody>
 </table>
+<p>ถ้าอุปกรณ์มาสเตอร์ต้องการเขียนข้อมูลไบต์ไปยังอุปกรณ์สเลฟ ก็มีลำดับดังนี้</p>
+<ul>
+<li>ส่งสัญญาณ <strong>Start Condition</strong></li>
+<li>ส่งข้อมูลไบต์ที่มีแอดเดรส 7 บิต และบิต <strong>R/W</strong> มีค่าเป็น 0 (<code>TW_WRITE</code>) 
+และให้ตรวจสอบบิต <strong>ACK</strong> เพื่อดูว่า มีอุปกรณ์สเลฟตอบกลับมาหรือไม่</li>
+<li>ส่งข้อมูลไบต์ถัดไป (ถ้ามี) และตรวจสอบบิต <strong>ACK</strong> จากสเลฟ หลังจากข้อมูลหนึ่งไบต์ได้ถูกส่งออกไป</li>
+<li>ส่งสัญญาณ <strong>Stop Condition</strong></li>
+</ul>
+<p>ถ้าอุปกรณ์มาสเตอร์ต้องการอ่านข้อมูลไบต์มาจากอุปกรณ์สเลฟ ก็มีลำดับดังนี้</p>
+<ul>
+<li>ส่งสัญญาณ <strong>Start Condition</strong></li>
+<li>ส่งข้อมูลไบต์ที่มีแอดเดรส 7 บิต และบิต <strong>R/W</strong> มีค่าเป็น 1 (<code>TW_READ</code>)
+และให้ตรวจสอบบิต <strong>ACK</strong> เพื่อดูว่า มีอุปกรณ์สเลฟตอบกลับมาหรือไม่</li>
+<li>รับข้อมูลไบต์ทีละไบต์จากอุปกรณ์สเลฟ เมื่อได้รับข้อมูลหนึ่งไบต์แล้วให้ตอบกลับไปด้วยบิต <strong>ACK</strong>
+ยกเว้นข้อมูลไบต์สุดท้าย ให้ตอบกลับด้วย <strong>NACK</strong></li>
+<li>ส่งสัญญาณ <strong>Stop Condition</strong></li>
+</ul>
 <p>&nbsp;</p>
 <hr />
-<h2 id="i2c-scan">&#9655; <strong>การสแกนหาอุปกรณ์สเลฟ (I2C Scan)</strong><a class="headerlink" href="#i2c-scan" title="Permanent link">#</a></h2>
+<h2 id="scanning-i2c-devices">&#9655; <strong>การสแกนหาอุปกรณ์ (Scanning I2C Devices)</strong><a class="headerlink" href="#scanning-i2c-devices" title="Permanent link">#</a></h2>
 <p>เมื่อต้องการตรวจสอบดูว่า มีอุปกรณ์สเลฟเชื่อมต่ออยู่หรือไม่ มีหลักการทำงานดังนี้
 ให้ลองค่าแอดเดรสในช่วง 0 ถึง 127 ไปทีละค่า และลองส่งไบต์แรกที่ประกอบด้วยแอดเดรส 7 บิต
 และบิต <strong>R/W</strong> เมื่อส่งออกไปข้อมูลไบต์แรกออกแล้วมีการตอบกลับมาด้วยบิต <strong>ACK</strong> 
@@ -319,7 +337,7 @@
 และ <a href="../avr/i2c_scan_code/i2c.c"><code>i2c.c</code></a> มีฟังก์ชันสำหรับการใช้งาน 
 <strong>TWI</strong> ในโหมด <strong>I2C master</strong> และเลือกความถี่สำหรับ <strong>SCL</strong> ได้  เช่น <strong>100kHz</strong> หรือ <strong>400kHz</strong></li>
 <li><a href="../avr/i2c_scan_code/main.c"><code>main.c</code></a> มีฟังก์ชัน <code>main()</code>
-และ <code>scan_i2c_devices(void)</code></li>
+และ <code>scan_i2c_devices()</code></li>
 </ul>
 <p>การทำงานในฟังก์ชัน <code>main()</code> ของตัวอย่างโค้ดเพื่อสแกนหาอุปกรณ์สเลฟในระบบบัส <strong>I2C</strong> มีลำดับขั้นตอนดังนี้</p>
 <ul>
@@ -331,7 +349,8 @@
 และหน่วงเวลาไว้ประมาณ 4 วินาที ก่อนทำซ้ำ</li>
 </ul>
 <p>ตัวอย่างของโค้ดในไฟล์ <code>main.c</code> มีดังนี้</p>
-<pre><code>#include &lt;avr/io.h&gt;
+<pre><code>// File: main.c
+#include &lt;avr/io.h&gt;
 #include &lt;stdio.h&gt;       // for printf()
 #include &lt;util/delay.h&gt;  // for _delay_ms()
 #include &quot;serial.h&quot; 
@@ -387,6 +406,7 @@ int main(void) {
 ซึ่งมีการนำบอร์ด <strong>Arduino Nano</strong> มาต่อกับอุปกรณ์ 3 ชนิด เชื่อมต่อผ่านทางบัส <strong>I2C</strong></p>
 <p><img alt="" src="../avr/images/wokwi_i2c_scan_demo-1.png" /></p>
 <p>รูป: ตัวอย่างการจำลองการทำงานเพื่อตรวจสอบแอดเดรสของอุปกรณ์ที่เชื่อมต่อกับบัส <strong>I2C</strong></p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="bh1750-digital-light-sensor">&#9655; <strong>การอ่านจากโมดูลเซนเซอร์ BH1750 Digital Light Sensor</strong><a class="headerlink" href="#bh1750-digital-light-sensor" title="Permanent link">#</a></h2>
 <p>ไฟล์ที่เกี่ยวข้องได้แก่  </p>
@@ -395,12 +415,13 @@ int main(void) {
 และ <a href="../avr/i2c_scan_code/serial.c"><code>serial.c</code></a></li>
 <li><a href="../avr/i2c_scan_code/i2c.h"><code>i2c.h</code></a>
 และ <a href="../avr/i2c_scan_code/i2c.c"><code>i2c.c</code></a> </li>
-<li><code>main.c</code></li>
+<li><code>main.c</code> (ตามตัวอย่างโค้ดข้างล่าง)</li>
 </ul>
 <p>โค้ดไฟล์ใน <code>main.c</code> สาธิตการอ่านค่าจากโมดูล <strong>BH1750 (I2C)</strong>
 เพื่อวัดค่าความเข้มแสง ซึ่งมีหมายเลขแอดเดรสเท่ากับ <code>0x23</code> การอ่านค่าของไอซี
-<strong>BH1750</strong> จะใช้คำสั่ง <code>0x20</code> เพื่อวัดค่าหนึ่งครั้ง (ไม่ได้วัดค่าแบบต่อเนื่อง)  แล้วเว้นระยะเวลาก่อนอ่านค่าใหม่</p>
-<pre><code>#include &lt;avr/io.h&gt;
+<strong>BH1750</strong> จะใช้คำสั่ง <code>0x20</code> เพื่อวัดค่าหนึ่งครั้ง (ไม่ได้เลือกโหมดวัดค่าแบบต่อเนื่อง)  แล้วเว้นระยะเวลาก่อนอ่านค่าใหม่</p>
+<pre><code>// File: main.c
+#include &lt;avr/io.h&gt;
 #include &lt;stdio.h&gt;       // for printf()
 #include &lt;util/delay.h&gt;  // for _delay_ms()
 #include &quot;serial.h&quot; 
@@ -481,13 +502,83 @@ int main(void) {
 </code></pre>
 <p><img alt="" src="../avr/images/arduino_bh1750_serial_plotter_demo-1.png" /></p>
 <p>รูป: ตัวอย่างการอ่านค่าจากโมดูล <strong>BH1750</strong> แล้วนำมาแสดงค่าด้วย <strong>Arduino Serial Plotter</strong></p>
+<p>&nbsp;</p>
 <hr />
-<h2 id="lcd16x2-i2c-pcf8574a">&#9655; <strong>การแสดงผลด้วยโมดูล LCD16x2 I2C PCF8574A</strong><a class="headerlink" href="#lcd16x2-i2c-pcf8574a" title="Permanent link">#</a></h2>
-<p>ตัวอย่างโค้ดถัดไปสาธิตใช้งานโมดูล <strong>LCD16x2</strong> ที่ใช้งานร่วมกับโมดูล <strong>PCF8574A Adapter</strong>
-ทำให้สามารถเชื่อมต่อด้วยบัส <strong>I2C</strong> ได้ การเขียนคำสั่งหรือข้อมูลไปยังโมดูล <strong>LCD16x2</strong>
-จะทำครั้งละ 4 บิต โดยจะต้องส่งข้อมูลผ่านบัส <strong>I2C</strong> ด้วยสายสัญญาณ <strong>SDA</strong> และ <strong>SCL</strong> 
-ไปยังโมดูล  <strong>PCF8574A Adapter</strong> เพื่อทำหน้าที่เป็นตัวขยายพอร์ต <strong>8-bit I/O</strong></p>
-<p>ไฟล์ที่เกี่ยวข้องได้แก่  </p>
+<h2 id="lcd16x2-i2c-pcf8574">&#9655; <strong>การแสดงผลด้วยโมดูล LCD16x2 I2C PCF8574</strong><a class="headerlink" href="#lcd16x2-i2c-pcf8574" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไป สาธิตใช้งานโมดูล <strong>LCD16x2 (HD44780U driver)</strong> 
+(<a href="../avr/lcd16x2_datasheet.pdf"><strong>Datasheet</strong></a>)
+ซึ่งได้นำมาใช้งานร่วมกับโมดูล <strong>PCF8574A Adapter</strong>
+ทำให้สามารถเชื่อมต่อด้วยบัส <strong>I2C</strong> ได้</p>
+<p><img alt="" src="../avr/images/lcd16x2_i2c_adapter.png" /></p>
+<p>รูป: โมดูล <strong>LCD16x2 + PCF8574 I2C Adapter</strong></p>
+<p>โดยปรกติการเขียนคำสั่งหรือข้อมูลไปยังโมดูล <strong>LCD16x2</strong>
+จะทำครั้งละ 4 บิต (<strong>4-bit Parallel Mode</strong>) ที่ขา <strong>DB4 .. DB7</strong>
+รวมถึงจะต้องมีขาสัญญาณควบคุม ได้แก่ <strong>RS</strong> (<em>Register Select</em>), 
+<strong>RW</strong> (<em>Read/Write</em>) และ <strong>E</strong> (<em>Enable</em>) 
+ดังนั้นจึงใช้ขาสัญญาณรวมทั้งหมด 7 ขา</p>
+<p><img alt="" src="../avr/images/lcd16x2_pins.png" /></p>
+<p>รูป: <strong>LCD16x2 Module (16 Pins)</strong> </p>
+<p>โมดูล  <strong>PCF8574 Adapter (<a href="../avr/images/lcd16x2_sch.png">Schematic</a>)</strong> 
+ทำหน้าที่เป็นตัวขยายพอร์ต <strong>8-bit I/O</strong> มีการเชื่อมต่อกับไมโครคอนโทรลเลอร์ในด้านหนึ่งด้วยบัส 
+<strong>I2C</strong> (ใช้สายสัญญาณเพียง 2 เส้น <strong>SDA</strong> และ <strong>SCL</strong>)
+และมีอีกด้านหนึ่งของโมดูล  <strong>PCF8574 Adapter</strong> ที่ใช้ขา <strong>P0 .. P7</strong> 
+เชื่อมต่อกับขาของโมดูล<strong>LCD16x2 (16-pin)</strong> มีดังนี้</p>
+<table>
+<thead>
+<tr>
+<th align="left">PCF8574 Pins</th>
+<th align="left">LCD16x2 Pins</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">P0</td>
+<td align="left">RS</td>
+<td align="left">Register Select</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left">RW</td>
+<td align="left">Read/Write</td>
+</tr>
+<tr>
+<td align="left">P2</td>
+<td align="left">CS</td>
+<td align="left">Chip Select or Enable</td>
+</tr>
+<tr>
+<td align="left">P3</td>
+<td align="left">BL</td>
+<td align="left">Backlight Control (with NPN transitor)</td>
+</tr>
+<tr>
+<td align="left">P4</td>
+<td align="left">D4</td>
+<td align="left">DB4 (Data Bit 4)</td>
+</tr>
+<tr>
+<td align="left">P5</td>
+<td align="left">D5</td>
+<td align="left">DB5 (Data Bit 5)</td>
+</tr>
+<tr>
+<td align="left">P6</td>
+<td align="left">D6</td>
+<td align="left">DB6 (Data Bit 6)</td>
+</tr>
+<tr>
+<td align="left">P7</td>
+<td align="left">D7</td>
+<td align="left">DB7 (Data Bit 7)</td>
+</tr>
+</tbody>
+</table>
+<p>ข้อสังเกต: ไอซี <strong>PCF8574(T)</strong> มีแอดเดรสให้เลือกใช้งานได้ โดยตั้งค่าลอจิกที่ขา <strong>A0 .. A2</strong>
+และมีแอดเดรสที่เลือกได้ในช่วง <code>0x20</code> .. <code>0x27</code> แต่ถ้าเป็นไอซี <strong>PCF8574A</strong>
+จะมีแอดเดรสที่เลือกใช้ได้ในช่วง  <code>0x38</code> .. <code>0x3F</code></p>
+<p>&nbsp;</p>
+<p>ไฟล์ซอร์สโค้ดที่เกี่ยวข้องกับโค้ดตัวอย่างนี้ ได้แก่  </p>
 <ul>
 <li><a href="../avr/i2c_scan_code/serial.h"><code>serial.h</code></a> 
 และ <a href="../avr/i2c_scan_code/serial.c"><code>serial.c</code></a></li>
@@ -495,11 +586,12 @@ int main(void) {
 และ <a href="../avr/i2c_scan_code/i2c.c"><code>i2c.c</code></a> </li>
 <li><a href="../avr/i2c_scan_code/lcd_i2c.h"><code>lcd_i2c.h</code></a>
 และ <a href="../avr/i2c_scan_code/lcd_i2c.c"><code>lcd_i2c.c</code></a> มีฟังก์ชันสำหรับการใช้งาน 
-โมดูล * <strong>LCD16x2 (I2C)</strong> ซึ่งมีแอดเดรสเท่ากับ <code>0x3F</code></li>
-<li><code>main.c</code></li>
+โมดูล <strong>LCD16x2 (I2C)</strong></li>
+<li><code>main.c</code> (ตามตัวอย่างโค้ดข้างล่าง)</li>
 </ul>
 <p>โค้ดในไฟล์ <code>main.c</code> มีดังนี้</p>
-<pre><code>#include &lt;avr/io.h&gt;
+<pre><code>// File: main.c
+#include &lt;avr/io.h&gt;
 #include &lt;stdio.h&gt;       // for printf()
 #include &lt;util/delay.h&gt;  // for _delay_ms()
 #include &quot;serial.h&quot; 
@@ -532,13 +624,14 @@ int main(void) {
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
-<p>บทความนี้นำเสนอการใช้งานวงจร <strong>USART</strong> เพื่อการสื่อสารข้อมูลบิตอนุกรมแบบซิงโครนัสตามโพรโทคอล <strong>I2C Bus</strong>
+<p>บทความนี้นำเสนอการใช้งานวงจร <strong>TWI</strong> ในโหมดการทำงานมาสเตอร์
+เพื่อการสื่อสารข้อมูลบิตอนุกรมแบบซิงโครนัสตามโพรโทคอล <strong>I2C Bus</strong>
 โดยวิธีการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> และทดลองกับบอร์ดไมโครคอนโทรลเลอร์
 โดยใช้อุปกรณ์จริง เช่น <strong>Arduino Nano</strong> </p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-01-21 | Last Updated: 2023-01-22</p></div>
+<p>Created: 2023-01-21 | Last Updated: 2023-01-23</p></div>
             </div>
         </div>
 
