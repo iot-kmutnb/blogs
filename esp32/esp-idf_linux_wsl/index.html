@@ -121,11 +121,15 @@
 <h1 id="esp-idf-wsl-ubuntu">การติดตั้งและใช้งาน ESP-IDF สำหรับ WSL / Ubuntu<a class="headerlink" href="#esp-idf-wsl-ubuntu" title="Permanent link">#</a></h1>
 <hr />
 <h2 id="esp-idf-esp32-cc">&#9655; <strong>ESP-IDF สำหรับการเขียนโค้ด ESP32 ด้วยภาษา C/C++</strong><a class="headerlink" href="#esp-idf-esp32-cc" title="Permanent link">#</a></h2>
-<p>ขั้นตอนการติดตั้ง <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/"><strong>ESP-IDF</strong></a> ของบริษัท <strong>Espressif</strong> สำหรับ <strong>WSL - Ubuntu</strong> มีดังนี้</p>
+<p>ขั้นตอนการติดตั้ง <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/"><strong>ESP-IDF (Espressif IoT Development Framework)</strong></a>
+ของบริษัท <strong>Espressif</strong> สำหรับ <strong>WSL2 - Ubuntu</strong> (ทดลองใช้กับ <strong>Ubuntu 22.04 LTS</strong>) ในเครื่องคอมพิวเตอร์ที่มีระบบปฏิบัติการ <strong>Windows 10</strong> มีดังนี้</p>
 <p><img alt="" src="images/esp_idf_buid_process.png" /></p>
-<p>รูป: <strong>ESP-IDF</strong> ซอฟต์แวร์สำหรับการเขียนโปรแกรม <strong>C/C++</strong> เพื่อใช้งานกับ <strong>ESP32 SoCs</strong> (Source: Espressif)</p>
-<p><img alt="" src="images/esp-idf-v5.png" /></p>
-<p>รูป:  ตารางแสดงความสัมพันธ์ระหว่าง <strong>ESP-IDF Versions</strong> และการใช้งานร่วมกับชิปของ <strong>Espressif</strong> รุ่นต่าง ๆ</p>
+<p>รูป: <strong>ESP-IDF</strong> ซอฟต์แวร์สำหรับการเขียนโปรแกรม <strong>C/C++</strong> เพื่อใช้งานกับ <strong>ESP32 SoCs</strong>
+(Source: Espressif)</p>
+<p><img alt="" src="images/esp-idf-v5.1.png" /></p>
+<p>รูป:  ตารางแสดงความสัมพันธ์ระหว่างเวอร์ชันของ <strong>ESP-IDF</strong> และการใช้งานร่วมกับชิปของ <strong>Espressif</strong> ในแต่ละรุ่น
+(<a href="https://github.com/espressif/esp-idf"><strong>ESP-IDF Github Repository</strong></a>)</p>
+<p>ในขณะที่เขียนบทความนี้เวอร์ชัน <strong>EDF-IDF</strong> ล่าสุดคือ <strong>v5.0</strong> เป็น <strong>Stable Version</strong></p>
 <p>1) เริ่มต้นด้วยการเปิดใช้งาน <strong>Linux Terminal</strong> ของ <strong>WSL - Ubuntu</strong> แล้วทำคำสั่งต่อไปนี้
 เพื่อติดตั้งซอฟต์แวร์ ซึ่งมีหลายแพ็คเกจที่จำเป็นสำหรับการทำงานของ <strong>ESP-IDF</strong></p>
 <pre><code class="language-bash"># install software packages required before using the ESP-IDF
@@ -137,17 +141,17 @@ $ sudo apt install git wget flex bison gperf \
 <p>&nbsp;</p>
 <p><img alt="" src="images/esp_idf_linux_install-1.png" /></p>
 <p>รูป: ตัวอย่างการทำคำสั่งเพื่อติดตั้งซอฟต์แวร์ใน <strong>Ubuntu</strong></p>
-<p>ตรวจสอบเวอร์ชันของ <strong>Python 3</strong> (ในตัวอย่างนี้ จะเห็นได้ว่าเป็น <strong>Python 3.8.10</strong>)</p>
+<p>ตรวจสอบเวอร์ชันของ <strong>Python 3</strong> (ในตัวอย่างนี้ จะเห็นได้ว่าเป็น <strong>Python v3.10.6</strong>)</p>
 <pre><code class="language-bash"># check the version of Python3
 $ python3 --version
-Python 3.8.10
+Python 3.10.6
 </code></pre>
 <p>&nbsp;</p>
 <p>2) สร้างไดเรกทอรีใหม่สำหรับการติดตั้ง <strong>ESP-IDF</strong> ที่มีชื่อว่า <code>~/esp</code> อยู่ในไดเรกทอรีของผู้ใช้
 จากนั้นดาวน์โหลดไฟล์ของ <strong>ESP-IDF</strong> มาจาก <strong>Github</strong> เก็บไว้ใน  <code>~/esp/esp-idf</code></p>
 <pre><code class="language-bash"># create a new directory named 'esp' under the user's home directory
 $ mkdir -p ~/esp &amp;&amp; cd ~/esp
-# clone the esp-idf (latest version is 5.0) repo from github
+# clone the esp-idf (master branch) repo from github
 $ git clone --recursive git://github.com/espressif/esp-idf
 # change directory to '~/esp/esp-idf'
 $ cd ~/esp/esp-idf
@@ -156,18 +160,16 @@ $ git submodule update --init --recursive
 </code></pre>
 <p><img alt="" src="images/esp_idf_linux_install-2.png" /></p>
 <p>รูป: ตัวอย่างการทำคำสั่งเพื่อดาวน์โหลด <strong>ESP-IDF</strong> มาจาก <strong>Github</strong></p>
-<p>&nbsp;</p>
 <p>3) ถัดไปจะต้องดาวน์โหลดและติดตั้งไฟล์ที่เป็นโปรแกรมสำหรับการคอมไพล์โค้ด 
-(เช่น โปรแกรมที่ทำหน้าที่เป็น <strong>C/C++ Toolchains</strong>) ซึ่งแตกต่างกันไปตามชิปที่ใช้ เช่น
+(เช่น โปรแกรมที่ทำหน้าที่เป็น <strong>C/C++ Toolchains</strong>) ซึ่งแตกต่างกันไปตามชิป <strong>SoC</strong> ที่ใช้ เช่น
 <strong>ESP32</strong>, <strong>ESP32-S2</strong>, <strong>ESP32-S3</strong> และ <strong>ESP32-C3</strong></p>
 <pre><code class="language-bash"># Install tools for all supported targets:
 #  all = (esp32 esp32s2 esp32c3, esp32s3)
 $ export IDF_GITHUB_ASSETS=&quot;dl.espressif.com/github_assets&quot;
 $ ./install.sh all
 </code></pre>
-<p><img alt="" src="images/esp_idf_linux_install-3.png" /></p>
-<p>รูป: ตัวอย่างการทำคำสั่ง <code>./install.sh all</code></p>
-<p>รายการไฟล์ที่จะต้องมีการดาวน์โหลดเพื่อใช้เป็นเครื่องมือสำหรับ <strong>ESP-IDF</strong> (ติดตั้งไว้ใน  <code>~/.espressif/tools</code>) มีตัวอย่างดังนี้</p>
+<p>รายการไฟล์ที่จะต้องมีการดาวน์โหลดมาเพื่อใช้เป็นเครื่องมือสำหรับ <strong>ESP-IDF (v5.0)</strong> 
+และได้ติดตั้งไว้ใน  <code>~/.espressif/tools</code>) มีตัวอย่างดังนี้</p>
 <ul>
 <li><code>xtensa-esp32-elf-gcc8_4_0-esp-2021r2-patch3-linux-amd64.tar.gz</code></li>
 <li><code>xtensa-esp32s2-elf-gcc8_4_0-esp-2021r2-patch3-linux-amd64.tar.gz</code></li>
@@ -177,18 +179,18 @@ $ ./install.sh all
 <li><code>binutils-esp32s2ulp-linux-amd64-2.28.51-esp-20191205.tar.gz</code></li>
 <li><code>openocd-esp32-linux-amd64-0.11.0-esp32-20211220.tar.gz</code></li>
 </ul>
-<p>ทุกครั้งที่จะใช้งาน <strong>ESP-IDF</strong> (เช่น การทำคำสั่ง <code>idf.py</code>) จะต้องมีการทำคำสั่งต่อไปนี้ก่อน เพื่อให้สามารถเรียกใช้คำสั่งต่าง ๆ ของ <strong>ESP-IDF Tools</strong> ได้</p>
+<p>ทุกครั้งที่จะใช้งาน <strong>ESP-IDF</strong> (เช่น การทำคำสั่ง <code>idf.py</code>)
+จะต้องมีการทำคำสั่งต่อไปนี้ก่อน เพื่อให้สามารถเรียกใช้คำสั่งต่าง ๆ ของ <strong>ESP-IDF Tools</strong> ได้</p>
 <pre><code class="language-bash"># Set up the environment variables for ESP-IDF tools
 $ . $HOME/esp/esp-idf/export.sh
 </code></pre>
-<p>ลองทำคำสั่ง <code>idf.py</code> เพื่อตรวจสอบเวอร์ชัน</p>
+<p>ลองทำคำสั่ง <code>idf.py</code> เพื่อตรวจสอบเวอร์ชันของ <strong>ESP-IDF</strong></p>
 <pre><code class="language-bash">$ idf.py --version
-ESP-IDF v5.0-dev-1662-g2ac0942dfb
 </code></pre>
-<p><img alt="" src="images/esp_idf_linux_install-5.png" /></p>
-<p>รูป: ตัวอย่างการทำคำสั่ง <code>. $HOME/esp/esp-idf/export.sh</code></p>
+<p>&nbsp;</p>
 <p>ในกรณีที่ต้องการติดตั้งและใช้งาน <strong>ESP-IDF</strong> มากกว่าหนึ่งเวอร์ชัน
-ให้ตั้งชื่อไดเรกทรอรีย่อยตามเวอร์ชันที่ใช้งาน  เช่น  ใช้เวอร์ชัน <strong>v4.4.1</strong> นอกเหนือจาก <strong>v5.0</strong> (เป็น <strong>master branch</strong> ในตัวอย่างนี้) ดังนั้นภายในไดเรกทอรี <code>~/esp</code> จะมีไดเรกทอรีดังนี้</p>
+ให้ตั้งชื่อไดเรกทรอรีย่อยตามเวอร์ชันที่ใช้งาน เช่น มีเวอร์ชัน <strong>v4.4.1</strong> และ <strong>v5.0</strong> ในตัวอย่างนี้
+ดังนั้นภายในไดเรกทอรี <code>~/esp</code> จะมีไดเรกทอรีดังนี้</p>
 <pre><code class="language-bash">~/esp/esp-idf-v5.0
 ~/esp/esp-idf-v4.4.1
 </code></pre>
@@ -196,7 +198,7 @@ ESP-IDF v5.0-dev-1662-g2ac0942dfb
 จะเลือกใช้เวอร์ชันใด เช่น</p>
 <pre><code class="language-bash">$ ln -s ./esp-idf-v4.4.1 esp-idf
 </code></pre>
-<p>ลองทำขั้นตอนติดตั้ง <strong>ESP-IDF v4.4.1</strong> เพิ่มแล้วตั้งค่าเพื่อเรียกใช้งาน </p>
+<p>ตัวอย่างขั้นตอนการติดตั้ง <strong>ESP-IDF v4.4.1</strong> และตั้งค่าเพื่อเรียกใช้งาน </p>
 <pre><code class="language-bash"># change the current working directory to ~/esp
 $ cd ~/esp
 # clone the ESP-IDF v4.4.1 (not the master branch)
@@ -216,6 +218,7 @@ $ . $HOME/esp/esp-idf/export.sh
 # show the ESP-IDF version (=&gt; ESP-IDF v4.4.1)
 $ idf.py --version
 </code></pre>
+<p>หรือถ้าจะเปลี่ยนจากเวอร์ชัน <strong>v4.4.1</strong> เป็น <strong>v4.4.3</strong> ซึ่งใหม่กว่า ก็ให้ทำคำสั่งในลักษณะเดียวกัน</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="esp32">&#9655; <strong>การสร้างโปรเจกต์จากตัวอย่างสำหรับ ESP32</strong><a class="headerlink" href="#esp32" title="Permanent link">#</a></h2>
@@ -237,7 +240,8 @@ $ idf.py set-target esp32
 <p><img alt="" src="images/esp_idf_hello_world-4.png" /></p>
 <p>รูป: ตัวอย่างการทำคำสั่ง <code>idf.py --list-targets</code> และ <code>idf.py set-target esp32</code></p>
 <p>&nbsp;</p>
-<p>ก่อนทำขั้นตอน <strong>Build Target</strong> และหากต้องการแก้ไขการตั้งค่าสำหรับโปรเจกต์  (<strong>Project configuration / customization</strong>) เช่น </p>
+<p>ก่อนทำขั้นตอน <strong>Build Target</strong> และหากต้องการแก้ไขการตั้งค่าสำหรับโปรเจกต์ 
+(<strong>Project configuration / customization</strong>) เช่น</p>
 <ul>
 <li>การกำหนดขนาดของ <strong>Flash Size</strong> และการแบ่ง <strong>Flash Partitions</strong></li>
 <li>การกำหนดความถี่ของซีพียูในการทำงาน (<strong>Component config -&gt; ESP32-specific -&gt; CPU Frequency</strong>)</li>
@@ -304,8 +308,10 @@ $ idf.py build
 
 8 directories, 33 files
 </code></pre>
-<p>หากใช้ระบบปฏิบัติการ <strong>Linux</strong> เช่น <strong>Ubuntu</strong> ตามปรกติ (ไม่ได้ใช้ผ่าน <strong>WSL</strong> ใน <strong>Windows</strong>)
-ให้ทำคำสั่งต่อไปนี้ เพื่อทำขั้นตอน <strong>ESP32 Flashing</strong> (เขียนไฟล์ <code>.bin</code> ไปยังหน่วยความจำแฟลชบนบอร์ด <strong>ESP32</strong>)
+<p>หากใช้ระบบปฏิบัติการ <strong>Linux</strong> เช่น <strong>Ubuntu</strong> ตามปรกติ 
+(ไม่ได้ใช้ผ่าน <strong>WSL</strong> ใน <strong>Windows</strong>)
+ให้ทำคำสั่งต่อไปนี้ เพื่อทำขั้นตอน <strong>ESP32 Flashing</strong> 
+(เขียนไฟล์ <code>.bin</code> ไปยังหน่วยความจำแฟลชบนบอร์ด <strong>ESP32</strong>)
 และจะต้องระบุพอร์ตที่เชื่อมต่อกับบอร์ด <strong>ESP32</strong> เช่น <code>/dev/ttyUSB0</code></p>
 <pre><code class="language-bash">$ idf.py -p /dev/ttyUSB0 flash
 </code></pre>
@@ -344,12 +350,14 @@ $ idfx monitor &lt;COM port&gt;
 ดังนั้นก็สามารถนำไปใช้กับ <strong>VS Code IDE</strong> ซึ่งจะต้องมีการติดตั้ง <strong>Extensions</strong> เช่น
 <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools"><strong>C/C++ Extension</strong></a> และ <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools"><strong>CMake Tools Extension</strong></a> เป็นต้น
 ซึ่งจะช่วยให้ผู้ใช้สามารถเขียนโค้ดและคอมไพล์โค้ดในโปรเจกต์ได้ยิ่งง่ายขึ้น</li>
-<li>จากรูปตัวอย่างการใช้งาน <strong>VS Code IDE</strong> จะเห็นได้ว่า เป็นการใช้งานแบบ <strong>Remote Connection</strong> กล่าวคือ
-<strong>VS Code IDE</strong> ทำให้งานเป็น <strong>Windows App</strong> แต่เชื่อมต่อไปยัง <strong>VS Code Server</strong> ที่รันอยู่ภายใต้ 
+<li>จากรูปตัวอย่างการใช้งาน <strong>VS Code IDE</strong> (ทำคำสั่ง <code>code .</code> ใน <strong>Bash Shell</strong> ภายในไดเรกทอรีของโปรเจกต์)
+จะเห็นได้ว่า เป็นการใช้งานแบบ <strong>Remote Connection</strong> กล่าวคือ
+<strong>VS Code IDE</strong> ทำงานเป็น <strong>Windows App</strong> แต่เชื่อมต่อไปยัง <strong>VS Code Server</strong> ที่รันอยู่ภายใต้ 
 <strong>WSL2 / Ubuntu Linux</strong> ในเครื่องคอมพิวเตอร์เดียวกันของผู้ใช้</li>
 </ul>
 <p><img alt="" src="images/esp_idf_vscode_wsl-1.png" /></p>
-<p>รูป: ตัวอย่างการเปิดไดเรกทอรีของโปรเจกต์เพื่อเขียนโค้ดใน <strong>VS Code IDE</strong></p>
+<p>รูป: ตัวอย่างการเปิดไดเรกทอรีของโปรเจกต์เพื่อเขียนโค้ดใน <strong>VS Code IDE</strong>
+(ใช้งานผ่าน <strong>VS Code Server</strong>)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="led-blink">&#9655; <strong>ลองสร้างโปรเจกต์ใหม่: LED Blink</strong><a class="headerlink" href="#led-blink" title="Permanent link">#</a></h2>
@@ -403,7 +411,7 @@ void app_main(void) {
           (chip_info.features &amp; CHIP_FEATURE_BLE) ? &quot;/BLE&quot; : &quot;&quot; );
   printf( &quot;silicon revision %d\n&quot;, chip_info.revision );
   printf( &quot;SPI flash: %d MB (%s)\n&quot;,
-          spi_flash_get_chip_size() /(1024*1024),
+          spi_flash_get_chip_size()/(1024*1024),
           (chip_info.features &amp; CHIP_FEATURE_EMB_FLASH)
            ? &quot;embedded&quot; : &quot;external&quot;);
   printf( &quot;Minimum free heap size: %d bytes\n&quot;, 
@@ -413,9 +421,8 @@ void app_main(void) {
   vTaskDelay( 1000 / portTICK_PERIOD_MS );
 
   // create a new task
-  if ( xTaskCreatePinnedToCore( task_entry,
-       &quot;led_task&quot;, 2048, NULL, 1,
-        NULL, tskNO_AFFINITY  ) != pdPASS )
+  if ( xTaskCreatePinnedToCore( task_entry, &quot;led_task&quot;, 
+         2048, NULL, 1, NULL, tskNO_AFFINITY ) != pdPASS )
   {
     printf(&quot;Cannot create a task!\n&quot;);
   }
@@ -447,10 +454,11 @@ $ idf.py build
 </ul>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
-<p>บทความนี้นำเสนอขั้นตอนการติดตั้งและใช้งาน <strong>ESP-IDF v5.0</strong> เพื่อใช้งานร่วมกับระบบปฏิบัติการ <strong>Ubuntu 20.04 LTS</strong> โดยใช้งานผ่าน <strong>WSL 2 (Windows Subsystem for Linux version 2)</strong> ในเครื่องคอมพิวเตอร์ที่มีระบบปฏิบัติการ <strong>Windows 10 (64-bit)</strong> และได้ทดลองสร้างโปรเจกต์ที่มีตัวอย่างโค้ดภาษา <strong>C/C++</strong> สำหรับนำไปทดสอบการทำงานของบอร์ด <strong>ESP32</strong> ในเบื้องต้น</p>
+<p>บทความนี้นำเสนอขั้นตอนการติดตั้งและใช้งาน <strong>ESP-IDF v5.0</strong>
+เพื่อใช้งานร่วมกับระบบปฏิบัติการ <strong>Ubuntu 22.04 LTS</strong> โดยใช้งานผ่าน <strong>WSL 2 (Windows Subsystem for Linux version 2)</strong> ในเครื่องคอมพิวเตอร์ที่มีระบบปฏิบัติการ <strong>Windows 10 (64-bit)</strong> และได้ทดลองสร้างโปรเจกต์ที่มีตัวอย่างโค้ดภาษา <strong>C/C++</strong> สำหรับนำไปทดสอบการทำงานของบอร์ด <strong>ESP32</strong> ในเบื้องต้น</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-02-23 | Last Updated: 2022-07-16</p></div>
+<p>Created: 2022-02-23 | Last Updated: 2023-01-27</p></div>
             </div>
         </div>
 
