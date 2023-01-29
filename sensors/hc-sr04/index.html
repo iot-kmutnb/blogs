@@ -145,7 +145,7 @@
 โดยวัดเป็นมุมจากแนวเส้นตรงตัวฉากกับตัวอุปกรณ์ เรียกว่า <strong>Beam Angle</strong>
 หรือ <strong>Radiation Angle</strong> (<script type="math/tex">\theta)</script> เช่น มีมุมกว้างประมาณ 15 องศา หรือมากกว่า เป็นต้น </p>
 <p><img alt="" src="ultrasonic_sensor_principle.png" /></p>
-<p>รูป: หลักการทำงานของโมดูลเซนเซอร์อัตราโซนิก (<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8786810">Image Source</a>)</p>
+<p>รูป: หลักการทำงานของโมดูลเซนเซอร์อัตราโซนิก (Source: <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8786810">IEEE Access</a>)</p>
 <p>ตัวอย่างการประยุกต์ใช้งานของเซนเซอร์อัลตราโซนิกได้แก่ การตรวจจับวัตถุกีดขวางของหุ่นยนต์เคลื่อนที่
 การวัดระดับของเหลวในถังบรรจุ การวัดระดับน้ำใต้สะพาน การวัดระยะความสูงของโดรนหลายใบพัดขณะลงจอด 
 อุปกรณ์ตรวจสอบสิ่งกีดขวางด้านหลังของยานยนต์ขณะถอยหลัง เป็นต้น</p>
@@ -403,7 +403,8 @@ uint32_t read_sensor() {
   digitalWrite( TRIG_PIN, LOW );
 
   // Wait for the notification from ISR (with timeout).
-  if ( ulTaskNotifyTake( pdTRUE, 50 /* Timeout (ticks) */ ) ) {
+  TickType_t timeout = pdMS_TO_TICKS(50 /*msec*/);
+  if ( ulTaskNotifyTake( pdTRUE, timeout) ) {
      // Disable the interrupt on the Echo pin.
      detachInterrupt( ECHO_PIN ); 
      if ( timestamps[0] &lt; timestamps[1] ) {
@@ -429,6 +430,10 @@ void loop() {
 </code></pre>
 <p><img alt="" src="arduino_esp32_hc_sr04_output.png" /></p>
 <p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p><img alt="" src="wokwi_sim_esp32_freertos-1.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong>
+โดยใช้บอร์ด <strong>ESP32 DevKit-V1</strong> 
+(ใช้ขา <strong>GPIO18 / GPIO19</strong> สำหรับ <strong>ECHO / TRIG</strong> ตามลำดับ)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="freertos">&#9655; <strong>การสร้างทาสก์ใน FreeRTOS เพื่ออ่านค่าจากโมดูลเซนเซอร์</strong><a class="headerlink" href="#freertos" title="Permanent link">#</a></h2>
@@ -599,10 +604,10 @@ void i2c_scan() {
 
 uint32_t read_sensor() {
   Wire.beginTransmission( I2C_ADDR );
-  Wire.write( 0x01 );   // send Start meansurement command
+  Wire.write( 0x01 );   // Send Start meansurement command
   Wire.endTransmission();
   delay(100); // Wait approx. 100msec. 
-  Wire.requestFrom( I2C_ADDR, 3 );  // read 3 bytes
+  Wire.requestFrom( I2C_ADDR, 3 );  // Read 3 bytes
   uint32_t value = 0;
   if ( Wire.available() == 3 ) {
      value = (value &lt;&lt; 8) | Wire.read(); // the first byte
@@ -620,7 +625,7 @@ void loop() {
     Serial.printf( &quot;distance(cm): %3.1f\n&quot;, distance/10.0 );
   }
   else {
-    Serial.println( &quot;distance(cm): ---&quot;  );
+    Serial.println( &quot;distance(cm): ---&quot; );
   }
   delay(100);
 }
@@ -640,7 +645,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-10-18 | Last Updated: 2022-10-21</p></div>
+<p>Created: 2022-10-18 | Last Updated: 2023-01-29</p></div>
             </div>
         </div>
 
