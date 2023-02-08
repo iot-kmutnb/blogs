@@ -131,6 +131,14 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#10" class="nav-link">&#9655; โค้ดตัวอย่างที่ 10</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#11" class="nav-link">&#9655; โค้ดตัวอย่างที่ 11</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -143,7 +151,7 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="arduino-io-toggle">Arduino I/O Toggle: ตัวอย่างการเขียนโค้ดและวัดสัญญาณเอาต์พุต<a class="headerlink" href="#arduino-io-toggle" title="Permanent link">#</a></h1>
-<p><strong>Keywords</strong>: <em>AVR</em>, <em>Arduino Uno</em>, <em>I/O Toggle</em></p>
+<p><strong>Keywords</strong>: <em>AVR</em>, <em>ATmega328P</em>, <em>Arduino Uno</em>, <em>I/O Toggle</em></p>
 <hr />
 <h2 id="arduino-io-toggle_1">&#9655; <strong>ตัวอย่างการเขียนโค้ดสำหรับ Arduino: I/O Toggle</strong><a class="headerlink" href="#arduino-io-toggle_1" title="Permanent link">#</a></h2>
 <p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ดภาษา <strong>C/C++</strong> และ <strong>Inline AVR Assembly</strong>
@@ -164,8 +172,8 @@ void setup() {
 }
 
 void loop() { // period 6.76us. 3.2us+, 3.56us-, freq. 148kHz
-  digitalWrite( LED_PIN , HIGH ); 
-  digitalWrite( LED_PIN , LOW ); 
+  digitalWrite( LED_PIN, HIGH ); 
+  digitalWrite( LED_PIN, LOW ); 
 }
 </code></pre>
 <p>เมื่อนำไปทดลองกับบอร์ด <strong>Uno (ATmega328P, 5V, 16MHz)</strong> แล้ววัดสัญญาณเอาต์พุต
@@ -193,7 +201,7 @@ void setup() {
 
 void loop() {
   static uint8_t state = 0;
-  digitalWrite( LED_PIN , state ^= 1 ); // Toggle LED
+  digitalWrite( LED_PIN, state ^= 1 ); // Toggle LED
 }
 </code></pre>
 <p>รูปคลื่นสัญญาณเอาต์พุตที่วัดได้ มีความถี่ <strong>157 kHz</strong> คาบ <strong>6.36 usec</strong> และช่วงที่เป็น <strong>HIGH</strong>
@@ -211,13 +219,13 @@ void loop() {
 #defined LED_PIN (13)
 
 void setup() {
-  pinMode( LED_PIN , OUTPUT );
+  pinMode( LED_PIN, OUTPUT );
 }
 
 void loop() {
   static uint8_t state = 0;
   while(1) {
-    digitalWrite( LED_PIN , state ^= 1 ); // Toggle LED
+    digitalWrite( LED_PIN, state ^= 1 ); // Toggle LED
   }
 }
 </code></pre>
@@ -272,7 +280,7 @@ void loop() { // period 750ns, 376ns+, 374ns-, freq. = 1.33MHz
 <hr />
 <h2 id="6">&#9655; <strong>โค้ดตัวอย่างที่ 6</strong><a class="headerlink" href="#6" title="Permanent link">#</a></h2>
 <p>โค้ดตัวอย่างนี้แตกต่างจากโค้ดตัวอย่างที่ 5 เพียงเล็กน้อย ตรงที่มีการใช้ประโยคคำสั่ง <code>while(1) {...}</code>
-ซึ่งภายในมีเพียงหนึ่งคำสั่ง <code>PINB |= (1 &lt;&lt; 5);</code> ที่ทำให้เกิดการสลับสถานะลอจิกที่ขา <code>PB5</code>
+ซึ่งภายในมีเพียงหนึ่งคำสั่ง <code>PINB |= (1 &lt;&lt; 5);</code> ที่ทำให้เกิดการสลับสถานะลอจิกที่ขา <code>PB5</code> ของพอร์ต <strong>B</strong>
 และจะไม่มีการออกจากการทำงานของคำสั่ง <code>while(1) {...}</code> หนึ่งรอบใช้เวลาเท่ากับ
 <strong>6 CPU Cycles</strong></p>
 <pre><code class="language-cpp">#include &lt;Arduino.h&gt;
@@ -327,7 +335,9 @@ void loop() { // period = 374ns, 126ns+, 248ns-, freq. 2.67MHz
 <p>โค้ดตัวอย่างนี้สาธิตการใช้คำสั่งในภาษา <strong>AVR Assembly</strong> ในฟังก์ชัน <code>loop() {...}</code>
 และมีการเขียนค่าบิตเป็น 1 ลงในตำแหน่ง <code>PINB5</code> ของรีจิสเตอร์ <code>PINB</code> โดยใช้คำสั่ง <code>sbi</code> 
 ซึ่งจะทำให้เกิดการสลับสถานะลอจิก</p>
-<pre><code class="language-cpp">void setup() {
+<pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+
+void setup() {
   DDRB  |= (1 &lt;&lt; 5);  // set  DDRB bit 5 = 1 (output direction)
   PORTB |= (1 &lt;&lt; 5);  // set PORTB bit 5 = 1 (output high at PB5)
 }
@@ -350,25 +360,28 @@ void loop() { // period=500ns, 252ns+, 248ns-, freq. 2MHz
 <p>ตัวอย่างนี้เปรียบเทียบการใช้ตัวแปรที่มีชนิดข้อมูลเป็น <code>float</code> และ <code>uint32_t</code> (ขนาด 32 บิต)
 และใช้เป็นตัวนับของการทำซ้ำในประโยคคำสั่ง <code>for() {...}</code> 
 ซึ่งภายในมีคำสั่งที่ทำให้เกิดการสลับสถานะลอจิกที่ขา <code>PB5</code></p>
-<p>โค้ดที่มีการใช้ตัวแปร <code>float</code> ให้นับขึ้นทีละ <code>0.001f</code> จาก <code>0.0</code> ถึง <code>1000.0f</code> มีดังนี้</p>
-<pre><code class="language-cpp">void setup() {
-  DDRB |= _BV(5); // output direction on PB5 pin
+<p>โค้ดที่มีการใช้ตัวแปร <code>float</code> ให้นับขึ้นทีละ <code>0.001f</code> จาก <code>0.0f</code> ถึง <code>1000.0f</code> มีดังนี้</p>
+<pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+
+void setup() {
+  DDRB |= _BV(PB5); // output direction on PB5 pin
 }
 
 void loop() { // 12.3us+/- period 24.60us, freq=40.6kHz
   for ( float i=0.0f; i &lt; 1000.0f; i+=0.001f ) {
-     PINB |= _BV(5); // Toggle output
+     PINB |= _BV(PB5); // Toggle output
   }
 }
 </code></pre>
+<p>ข้อสังเกต: คำสั่ง <code>_BV(5)</code> ให้ผลเหมือนกับ <code>(1&lt;&lt;5)</code></p>
 <p>โค้ดที่มีการใช้ตัวแปร <code>uint32_t</code> ให้ตัวแปร <code>i</code> นับขึ้นจาก <code>0</code> ถึง <code>1000000</code> ทีละ <code>1</code> มีดังนี้</p>
 <pre><code class="language-cpp">void setup() {
-  DDRB |= _BV(5); // output direction on PB5 pin
+  DDRB |= _BV(PB5); // output direction on PB5 pin
 }
 
 void loop() { // 500ns+, 495ns-, period 995ns, freq=1MHz
   for ( uint32_t i=0; i &lt; 1000000ul; i+=1 ) {
-     PINB |= _BV(5); // Toggle output
+     PINB |= _BV(PB5); // Toggle output
   }
 }
 </code></pre>
@@ -379,6 +392,92 @@ void loop() { // 500ns+, 495ns-, period 995ns, freq=1MHz
 <p><img alt="" src="uno_test-9b.png" /></p>
 <p>รูป: คลื่นสัญญาณเอาต์พุตในกรณีที่ใช้ตัวแปร <code>uint32_t</code> (ได้ความถี่ <strong>1.00 MHz</strong>)</p>
 <hr />
+<h2 id="10">&#9655; <strong>โค้ดตัวอย่างที่ 10</strong><a class="headerlink" href="#10" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการเขียนโปรแกรมเพื่อใช้งานวงจรตัวนับ <strong>Timer1</strong> ภายในชิป
+<strong>ATmega328P</strong> บนบอร์ด <strong>Arduino Uno / Nano</strong>
+วงจร <strong>Timer1</strong> จะถูกตั้งค่าให้ทำงานในโหมด <strong>CTC (Clear Timer on Compare)</strong>
+ให้ทำงานด้วยความถี่เท่ากับความถี่ของซีพียู (ไม่มีตัวหารความถี่) ซึ่งเท่ากับ <strong>16MHz</strong>
+และมีการเปิดใช้งานอินเทอร์รัพท์ที่เกี่ยวข้อง </p>
+<p>ค่าในรีจิสเตอร์  <code>OCR1A</code> ถูกกำหนดให้เป็น 1 ซึ่งใช้สำหรับการเปรียบเทียบกับค่าในรีจิสเตอร์ของตัวนับ <code>TCNT1</code>
+เมื่อ <code>TCNT1</code> เริ่มนับจาก 0 และนับขึ้นจนได้เท่ากับค่าใน <code>OCR1A</code> จะทำให้ <code>TCNT1</code>
+กลับไปเริ่มนับที่ 0 ใหม่อีกครั้ง และจะเกิดอินเทอร์รัพท์ที่มีชื่อว่า <code>TIMER1_COMPA_vect</code>
+จากนั้นฟังก์ชัน <code>ISR(TIMER1_COMPA_vect) {...}</code> จะทำคำสั่งเพื่อสลับสถานะลอจิกของขา
+<code>PB5</code></p>
+<pre><code class="language-cpp">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+ISR(TIMER1_COMPA_vect) {
+  PINB |= _BV(PB5); // Toggle PB5
+}
+
+// Set up Timer1 to toggle the LED pin as fast as possible
+void initTimer1() {
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1  = 0;
+  OCR1A  = 1;
+  // Use CTC (Clear Timer on Compare match) mode 
+  TCCR1B |= (1 &lt;&lt; WGM12) | (1 &lt;&lt; CS10);
+  // Enable Output Compare Match Interrupt
+  TIMSK1 |= (1 &lt;&lt; OCIE1A);
+}
+
+// 275kHz, perdiod=3.64us, pw+=1.82us, pw-=1.82us
+
+int main() {
+  DDRB |= _BV(PB5); // Set output direction on PB5 pin (D13)
+  initTimer1();     // Initialize Timer1
+  sei(); // Enable global interrupts.
+  while(1);
+  return 0;
+}
+</code></pre>
+<p>ตัวอย่างคลื่นสัญญาณเอาต์พุตที่ได้จากการวัดด้วยออสซิลโลสโคป มีลักษณะดังนี้</p>
+<p><img alt="" src="uno_test-10a.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุต (วัดความถี่ได้ <strong>276kHz</strong>)</p>
+<p>ข้อสังเกต: ความเร็วในการสลับสถานะลอจิก ถูกจำกัดด้วยระยะเวลาในการตอบสนองต่ออินเทอร์รัพท์ของชิป <strong>AVR</strong></p>
+<p>ถ้าลองเปลี่ยนค่า <code>OCR1A</code> ให้สูงขึ้นเป็น 15 จะยังไม่เห็นการเปลี่ยนแปลง 
+แต่ถ้าเป็น 31 จะเริ่มเห็นการเปลี่ยนแปลง และความถี่ที่ได้จะลดลง (ได้ประมาณ <strong>252kHz</strong>)
+ตามรูปคลื่นสัญญาณต่อไปนี้</p>
+<p><img alt="" src="uno_test-10b.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุต (วัดความถี่ได้ <strong>252kHz</strong>)</p>
+<hr />
+<h2 id="11">&#9655; <strong>โค้ดตัวอย่างที่ 11</strong><a class="headerlink" href="#11" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการใช้งานวงจรตัวนับ <strong>Timer1</strong> ภายในชิป
+<strong>ATmega328P</strong> โดยจะทำงานในโหมด <strong>Fast PWM (TOP=ICR1)</strong>
+ซึ่งจะต้องกำหนดค่าบิต   <code>WGM10=0</code>, <code>WGM11=1</code>, <code>WGM12=1</code> และ <code>WGM13=1</code> ตามลำดับ</p>
+<p>ค่าในรีจิสเตอร์ <code>ICR1</code> ถูกกำหนดให้เป็นค่าสูงสุดของการนับ
+และเมื่อ  <code>TCINT1</code> นับถึงค่าดังกล่าว จะกลับไปเริ่มนับที่ 0 ใหม่ 
+และทำให้ขาเอาต์พุต <code>PB1/OC1A</code>
+ที่เกี่ยวข้องกับการทำงานของ <strong>Timer1</strong> ในโหมดนี้ (กำหนดค่าบิต <code>COM1A1=1</code> ในรีจิสเตอร์ <code>TCCR1A</code>)
+มีสถานะลอจิกเป็น <strong>HIGH</strong> เมื่อเริ่มนับที่ 0 ในแต่ละรอบ</p>
+<p>สัญญาณเอาต์พุตที่ขาดังกล่าว จะเปลี่ยนสถานะลอจิกจาก <strong>HIGH</strong> เป็น <strong>LOW</strong>
+เมื่อตัวนับ <code>TCINT1</code> ถึงค่าของรีจิสเตอร์ <code>ICR1</code></p>
+<pre><code class="language-cpp">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+void initTimer1() {
+  TCCR1A = 0;
+  TCCR1B = 0;
+  // Set timer1 in fast PWM mode:
+  // f_CPU/2 = 16MHz/(2) = 8MHz, 50% duty cycle
+  ICR1  = (2)-1;
+  OCR1A = ICR1 &gt;&gt; 1; // 50% duty cycle
+  TCCR1A |= (1 &lt;&lt; WGM11) | (1 &lt;&lt; COM1A1);
+  TCCR1B |= (1 &lt;&lt; WGM12) | (1 &lt;&lt; WGM13) | (1 &lt;&lt; CS10);
+}
+
+int main() {  
+  DDRB |= (1 &lt;&lt; PB1); // Set pin PB1 (D9 pin) as output
+  initTimer1();
+  while(1);
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="uno_test-11.png" /></p>
+<p>รูป: คลื่นสัญญาณเอาต์พุต (วัดความถี่ได้ <strong>8MHz</strong>)</p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดสำหรับบอร์ด <strong>Arduino Uno/Nano</strong> ที่ใช้ชิป
 <strong>ATmega328P (8-bit, 16MHz, 5V)</strong> และทำให้เกิดการสลับสถานะลอจิกที่ขาเอาต์พุตหนึ่งขา
@@ -386,7 +485,7 @@ void loop() { // 500ns+, 495ns-, period 995ns, freq=1MHz
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-02-05 | Last Updated: 2023-02-05</p></div>
+<p>Created: 2023-02-05 | Last Updated: 2023-02-06</p></div>
             </div>
         </div>
 
