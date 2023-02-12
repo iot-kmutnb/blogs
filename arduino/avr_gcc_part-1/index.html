@@ -111,6 +111,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#avr_1" class="nav-link">&#9655; การใช้งานหน่วยความจำของ AVR โดยคอมไพเลอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#microchip-studio-ide" class="nav-link">&#9655; การใช้ซอฟต์แวร์ Microchip Studio IDE</a>
               <ul class="nav flex-column">
               </ul>
@@ -132,7 +136,7 @@
 
 <h1 id="c-avr-atmega328p-1">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 1<a class="headerlink" href="#c-avr-atmega328p-1" title="Permanent link">#</a></h1>
 <p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
-<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>Microchip Studio</em></p>
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>Microchip Studio IDE</em></p>
 <hr />
 <h2 id="avr">&#9655; <strong>ไมโครคอนโทรลเลอร์: AVR</strong><a class="headerlink" href="#avr" title="Permanent link">#</a></h2>
 <p>ชิปไมโครคอนโทรลเลอร์ขนาด 8 บิต ของบริษัท <strong>Atmel</strong> มีซีพียูแบบ <strong>RISC</strong> ทำงานตามสถาปัตยกรรมที่เรียกว่า 
@@ -566,14 +570,130 @@ Breakpoint 1, main () at main.c:14
 (gdb)
 </code></pre>
 <p>&nbsp;</p>
-<p>หากต้องการจะจบการทำงานของ <strong>AVR-GDB</strong> ให้กดปุ่ม <code>Ctrl+C</code> </p>
+<p>หากต้องการจบการทำงานของ <strong>AVR-GDB</strong> ให้กดปุ่ม <code>Ctrl+C</code> </p>
 <p><strong>คำแนะนำ:</strong> คำสั่งที่เกี่ยวข้องกับ <strong>AVR-GDB</strong> สามารถศึกษาเพิ่มได้จาก 
 <a href="https://blog.wokwi.com/gdb-avr-arduino-cheatsheet/"><strong>"Arduino/AVR GDB Cheat Sheet by Uri Shaked"</strong></a> (<a href="../avr/Arduino_AVR%20GDB_Cheat_Sheet.pdf">pdf</a>)</p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="avr_1">&#9655; <strong>การใช้งานหน่วยความจำของ AVR โดยคอมไพเลอร์</strong><a class="headerlink" href="#avr_1" title="Permanent link">#</a></h2>
+<p>หน่วยความจำภายในของชิป <strong>AVR</strong> แบ่งเป็นหน่วยความจำแบบแฟลช (<strong>Flash Memory</strong>)
+หน่วยความจำแบบ <strong>SRAM</strong> และหน่วยความจำแบบ <strong>EEPROM</strong> </p>
+<p>หน่วยความจำแบบ <strong>SRAM</strong> ของ <strong>AVR</strong> แบ่งเป็น 2 กรณี คือ หน่วยความจำภายใน (<strong>On-chip SRAM</strong>)
+และอาจมีหน่วยความจำภายนอก (<strong>External SRAM</strong>) สำหรับชิปบางรุ่น
+และสามารถจำแนกได้ตามรูปแบบการใช้งานสำหรับข้อมูลและตัวแปร ดังนี้</p>
+<ul>
+<li>ตัวแปรภายนอก  (<strong>Global Variables</strong>) ทั้งแบบที่มีการกำหนดค่าเริ่มต้น และแบบไม่มีการกำหนดค่าเริ่มต้นเมื่อประกาศใช้ตัวแปร
+และตัวแปรภายในฟังก์ชัน  (<strong>Local Variables</strong>) ที่ได้ประกาศเป็น <code>static</code> </li>
+<li>ตัวแปรที่ใช้หน่วยความจำแบบ <strong>Heap</strong>  เมื่อใช้คำสั่ง <code>malloc()</code> และ <code>free()</code> เป็นต้น</li>
+<li>ตัวแปรที่ใช้หน่วยความจำแบบ <strong>Stack</strong> เช่น ตัวแปรภายในฟังก์ชัน รวมถึงการเรียกใช้ฟังก์ชัน เป็นต้น</li>
+</ul>
+<p>ตัวแปรภายนอกและตัวแปรภายในแบบ <code>static</code> (ที่ไม่ใช่ <strong>Automatic Variables</strong>)
+จะถูกสร้างขึ้นก่อนการเริ่มต้นทำงานของฟังก์ชัน <code>main()</code>
+ตัวแปรประเภทนี้ จะไม่ใช้หน่วยความจำแบบ <strong>Stack</strong> หรือ รีจิสเตอร์ของซีพียู
+แต่จะใช้หน่วยความจำแยกไว้ (ซึ่งก็เป็นส่วนหนึ่งของ <strong>SRAM</strong>) แบ่งเป็นสองส่วน</p>
+<ul>
+<li><code>.data</code> สำหรับตัวแปรที่มีการกำหนดค่าเริ่มต้นไม่เท่ากับ 0 (<strong>non-zero initialized</strong>) 
+เมื่อประกาศใช้ตัวแปร หน่วยความจำสำหรับตัวแปรประเภทนี้ จะได้ค่าคงที่หรือค่าเริ่มต้นจากข้อมูลที่เก็บอยู่ในหน่วยความจำแฟลช
+และการจัดการในส่วนนี้เป็นหน้าที่ของ <strong>C Startup Code</strong></li>
+<li><code>.bss</code> สำหรับตัวแปรที่มีการกำหนดค่าเริ่มต้นเท่ากับ 0 หรือ ไม่มีการกำหนดค่าเริ่มต้นให้ (<strong>unintialized</strong>) 
+เมื่อประกาศใช้ตัวแปร  และตัวแปรประเภทนี้ จะถูกกำหนดค่าเริ่มต้นโดยคอมไพเลอร์ให้มีค่าเป็น 0 โดยอัตโนมัติ</li>
+</ul>
+<p>ตัวแปรสองประเภทนี้ จะเข้าถึงได้โดยการระบุแอดเดรสของตัวแปรในหน่วยความจำ 
+ซึ่งคอมไพเลอร์จะทราบตำแหน่งหรือแอดเดรสเหล่านี้เมื่อทำขั้นตอนคอมไพล์สำหรับชิป <strong>AVR</strong></p>
+<p><strong>C Startup Code</strong> เป็นโค้ดที่ทำหน้าที่เริ่มต้นก่อนส่งต่อให้ฟังก์ชัน <code>main()</code>
+นอกจากการกำหนดค่าเริ่มต้นให้หน่วยความจำในส่วนที่เป็น <code>.data</code> และ <code>.bss</code>
+แล้วยังมีหน้าที่อีก เช่น</p>
+<ul>
+<li>กำหนดค่าเริ่มต้นให้รีจิสเตอร์ที่เป็น <strong>Stack Pointer (SP)</strong> ถ้าเป็น <strong>AVR</strong> ก็จะเริ่มที่แอดเดรสสูงสุด
+(<code>RAMEND</code>)
+และเมื่อมีการใช้งาน <strong>Stack</strong> ด้วยคำสั่ง <code>push</code> ค่าของ <strong>SP</strong> จะลดลง และเพิ่มขึ้นเมื่อทำคำสั่ง <code>pop</code></li>
+<li>ตั้งค่าเริ่มต้นการทำงานของซีพียู และวงจรภายในต่าง ๆ ที่เกี่ยวข้อง</li>
+</ul>
+<p>การคอมไพล์โค้ดด้วย <code>avr-gcc</code> จะได้ไฟล์โปรแกรมแบบไบนารี  <code>.elf</code> แต่จะต้องมีการแปลงให้เป็นไฟล์ <code>.hex</code> อีกขั้นตอนหนึ่ง
+จึงจะนำไปใช้กับชิปไมโครคอนโทรลเลอร์ได้ ไฟล์โปรแกรม <code>.elf</code> ภายในมีการแบ่งออกเป็นส่วนต่าง ๆ และสามส่วนที่สำคัญและเกี่ยวข้องกับการใช้งานหน่วยความจำของ <strong>AVR</strong> ได้แก่</p>
+<ul>
+<li><code>.text</code> (<strong>Program Code</strong>) เป็นส่วนที่เก็บคำสั่งต่าง ๆ ของโปรแกรม และจะถูกนำไปเขียนลงในหน่วยความจำแฟลชของชิป <strong>AVR</strong>
+ขนาดของส่วนนี้เป็นตัวระบุว่า มีขนาดของโปรแกรมกี่ไบต์</li>
+<li><code>.data</code> เป็นส่วนที่เกี่ยวข้องกับการใช้งานตัวแปรภายนอกและตัวแปรภายในแบบ <code>static</code> ที่มีการกำหนดค่าเริ่มต้น
+บางกรณีก็มีการจำแนกย่อยออกเป็น <code>.rodata</code> สำหรับข้อมูลที่อ่านได้เท่านั้น (<strong>read-only</strong>)</li>
+<li><code>.bss</code> เป็นส่วนที่เกี่ยวข้องกับการใช้งานตัวแปรภายนอกและตัวแปรภายในแบบ <code>static</code> ที่ไม่มีการกำหนดค่าเริ่มต้น</li>
+</ul>
+<p>ขนาดและความต้องการใช้หน่วยความจำในแต่ละส่วน สามารถทราบได้โดยทำคำสั่ง <code>avr-size</code></p>
+<p>ตัวอย่างโค้ดสำหรับการสาธิต</p>
+<pre><code>#include &lt;inttypes.h&gt;
+
+// .data sections (non-zero initialized global variables)
+const uint32_t MAX_VALUE = (-1);
+uint8_t arr[] __attribute__((aligned(4))) = {1,2,3};
+
+// .bss section (uninitialized or zero-initialized global variables)
+uint16_t counter = 0;
+char     sbuf[8];
+
+uint16_t inc() {
+  // A static local variable, but initialized with 0
+  static uint16_t cnt = 0;
+  return ++cnt;
+}
+
+int main() {
+  uint16_t ret_val = inc();
+  (void)ret_val; // Suppress the compiler warning for unused variables.
+  return ret_val;
+}
+</code></pre>
+<p>จากตัวอย่างโค้ด สามารถระบุตัวแปรภายนอกและตัวแปรภายในแบบ <code>static</code> ได้ดังนี้</p>
+<ul>
+<li><code>MAX_VALUE</code> (4 ไบต์) เป็นตัวแปรภายนอกที่มีการกำหนดค่าเริ่มต้น
+(และเป็น <code>const</code> ด้วย เปลี่ยนแปลงค่าไม่ได้อีก) ดังนั้นจึงอยู่ใน <code>.data</code></li>
+<li><code>arr</code> (4 ไบต์) เป็นตัวแปรภายนอกซึ่งเป็นอาร์เรย์ของข้อมูลแบบ <code>uint8_t</code> 
+และมีการกำหนดค่าเริ่มต้นด้วยข้อมูล 3 ตัว <code>{1,2,3}</code> ให้เป็นค่าเริ่มต้น แต่มีการใช้คำสั่ง
+<code>__attribute__((aligned(4)))</code> โดยระบุว่า คอมไพเลอร์จะต้องใช้หน่วยความจำสำหรับอาร์เรย์
+ที่มีขนาดหารด้วย 4 ลงตัว ดังนั้นตัวแปรนี้จึงใช้หน่วยความจำ 4 ไบต์ และอยู่ใน <code>.data</code></li>
+<li><code>counter</code> (2 ไบต์)  เป็นตัวแปรภายนอก มีค่าเป็นต้นเป็น 0 ตัวแปรนี้จะอยู่ใน <code>.bss</code></li>
+<li><code>sbuf[8]</code> (8 ไบต์) เป็นตัวแปรภายนอกแบบอาร์เรย์ ไม่ได้กำหนดค่าเริ่มต้น  ตัวแปรนี้จะอยู่ใน <code>.bss</code></li>
+<li><code>cnt</code> (2 ไบต์) เป็นตัวแปรภายในแบบ <code>static</code> อยู่ในฟังก์ชัน <code>inc()</code> 
+แต่มีค่าเป็นต้นเป็น 0 ตัวแปรนี้จะอยู่ใน <code>.bss</code></li>
+<li><code>ret_val</code> (2 ไบต์) เป็นตัวแปรภายในฟังก์ชัน <code>main()</code>
+และมีการกำหนดค่าเริ่มต้นโดยใช้ค่าที่ได้จากการเรียกใช้ฟังก์ชัน <code>inc()</code>
+แต่เนื่องจากเป็นตัวแปรภายในและไม่ใช่ <code>static</code> จึงไม่ได้อยู่ใน <code>.data</code> และ <code>.bss</code>
+โดยทั่วไปแล้ว ก็จะใช้รีจิสเตอร์ของซีพียูสำหรับตัวแปรในลักษณะนี้</li>
+</ul>
+<p>ลองทำคำสั่ง</p>
+<pre><code class="language-bash">$ avr-gcc -mmcu=atmega328p -std=gnu99 -Wall -Os main.c -o main.elf 
+$ avr-size main.elf
+</code></pre>
+<p>จะได้เอาต์พุต</p>
+<pre><code>   text    data     bss     dec     hex filename
+    194       8      12     214      d6 main.elf
+</code></pre>
+<p>แต่ถ้าคอมไพล์โค้ดโดยไม่รวมส่วนที่เรียกว่า <strong>C Startup Code</strong> (การทำคำสั่งต่าง ๆ เมื่อโปรแกรมเริ่มต้นการทำงานก่อนส่งต่อให้ฟังก์ชัน <code>main</code>)
+ ก็เพิ่ม <code>-nostartfiles</code> ในคำสั่ง</p>
+<pre><code>$ avr-gcc -mmcu=atmega328p -std=gnu99 -Wall -Os main.c -nostartfiles -o main.elf 
+$ avr-size main.elf
+</code></pre>
+<p>จะได้เอาต์พุตดังนี้</p>
+<pre><code>   text    data     bss     dec     hex filename
+     62       8      12      82      52 main.elf
+</code></pre>
+<p>ซึ่งจะเห็นได้ว่า ส่วนที่เป็น <code>.text</code> มีขนาดเล็กลง  เพราะตัดคำสั่งต่าง ๆ ของ <strong>C Startup Code</strong> ออกไป</p>
+<p>แต่ถ้าใช้ <strong>Options</strong> เช่น <code>-Wl,--gc-sections</code> ก็จะทำให้คอมไพเลอร์ตัดตัวแปรที่ไม่มีการใช้งานออกไป</p>
+<pre><code>$ avr-gcc -mmcu=atmega328p -std=gnu99 -Wall -Os main.c -Wl,--gc-sections -o main.elf 
+$ avr-size main.elf
+</code></pre>
+<p>จะได้เอาต์พุตดังนี้</p>
+<pre><code>   text    data     bss     dec     hex filename
+    194       0       4     198      c6 main.elf
+</code></pre>
+<p>และจะเห็นได้ว่า ขนาดของ <code>.data</code> เป็น 0 ไบต์  และ <code>.bss</code> ลดลงเหลือ 4 ไบต์ (ตัวแปรใดที่มีการประกาศใช้
+แต่ไม่ถูกอ้างอิง จะไม่มีอยู่จริงในหน่วยความจำ)</p>
+<p><strong>ข้อสังเกต:</strong> ถ้าใช้คอมไพเลอร์ <strong>XC8 C/C++ Compiler</strong> ของ <strong>Microchip</strong> 
+ก็จะมีรายละเอียดที่แตกต่างจากการใช้คอมไพเลอร์ <strong>avr-gcc</strong></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="microchip-studio-ide">&#9655; <strong>การใช้ซอฟต์แวร์ Microchip Studio IDE</strong><a class="headerlink" href="#microchip-studio-ide" title="Permanent link">#</a></h2>
 <p>ขั้นตอนการใช้งาน <a href="https://www.microchip.com/en-us/tools-resources/develop/microchip-studio"><strong>Microchip Studio IDE</strong></a> ในเบื้องต้น 
-เพื่อเขียนโค้ดภาษา <strong>C/C++</strong> สำหรับ <strong>AVR MCU</strong> มีดังนี้</p>
+(ทดลองใช้เวอร์ชัน <strong>v7.0.2542</strong>) เพื่อเขียนโค้ดภาษา <strong>C/C++</strong> สำหรับ <strong>AVR MCU</strong> มีดังนี้</p>
 <ol>
 <li>สร้างโปรเจกต์ใหม่</li>
 <li>ระบุชื่อโปรเจกต์ และ เลือกไดเรกทอรีสำหรับเก็บไฟล์ต่าง ๆ ของโปรเจกต์</li>
@@ -619,6 +739,12 @@ Breakpoint 1, main () at main.c:14
 <li>สามารถกำหนดค่าความถี่ของซีพียู เช่น <strong>16MHz</strong> และดูค่าของ <strong>Stop Watch</strong> หรือ <strong>Cycle Counter</strong>
 ในการจับเวลาการทำงานเมื่อทำคำสั่งต่าง ๆ ในโปรแกรมได้</li>
 </ul>
+<p>หากต้องการแปลงไฟล์ไบนารีที่ได้จากการคอมไพล์ซอร์สโค้ด ให้เป็นโค้ดภาษา <strong>AVR Assembly</strong>
+ก็ทำได้ดังนี้</p>
+<p><img alt="" src="../avr/images/microchip_studio_avr_disassembly-1.png" /></p>
+<p>รูป: การเลือกเมนูเพื่อทำดูผลการแปลงไฟล์ <strong>Disassembly</strong></p>
+<p><img alt="" src="../avr/images/microchip_studio_avr_disassembly-2.png" /></p>
+<p>รูป: ตัวอย่างโค้ด (แสดงเฉพาะส่วนที่เป็นฟังก์ชัน <code>main</code>) ที่ได้จากการแปลงด้วยโปรแกรม <strong>AVR Disassembler</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="wokwi-avr-simulator">&#9655; <strong>การใช้งาน Wokwi AVR Simulator</strong><a class="headerlink" href="#wokwi-avr-simulator" title="Permanent link">#</a></h2>
@@ -672,7 +798,7 @@ Breakpoint 1, main () at main.c:14
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-01-17 | Last Updated: 2022-06-11</p></div>
+<p>Created: 2022-01-17 | Last Updated: 2023-02-11</p></div>
             </div>
         </div>
 
