@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/rpi-rp2040/vscode_pio_rp2040/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Arduino สำหรับบอร์ด Raspberry Pi Pico (RP2040) โดยใช้ VS Code IDE - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-raspberry-pi-pico-rp2040-vs-code-ide" class="nav-link">การเขียนโปรแกรม Arduino สำหรับบอร์ด Raspberry Pi Pico (RP2040) โดยใช้ VS Code IDE</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#vs-code-ide-pio-extension" class="nav-link">&#9655; การติดตั้งซอฟต์แวร์ VS Code IDE และ PIO Extension</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; อุปกรณ์สำหรับการอัปโหลดไฟล์เฟิร์มแวร์และดีบักโค้ด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pico-debug-probe" class="nav-link">&#9655; การใช้บอร์ด Pico เป็นอุปกรณ์ Debug Probe</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wchlink-daplink" class="nav-link">&#9655; โมดูล WCHLink - DAPLink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#source-level-debugging" class="nav-link">&#9655; การดีบักการทำงานของโค้ดด้วยฮาร์ดแวร์: Source-Level Debugging</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-raspberry-pi-pico-rp2040-vs-code-ide">การเขียนโปรแกรม Arduino สำหรับบอร์ด Raspberry Pi Pico (RP2040) โดยใช้ VS Code IDE<a class="headerlink" href="#arduino-raspberry-pi-pico-rp2040-vs-code-ide" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Raspberry Pi Pico</em>, <em>RP2040</em>, <em>Visual Code Studio</em>,
+<em>PlatformIO</em></p>
+<p>บทความนี้นำเสนอการใช้งานซอฟต์แวร์ <strong>Visual Studio Code</strong> ร่วมกับ <strong>PlatformIO (PIO)
+Extension</strong> สำหรับระบบปฏิบัติการ <strong>Windows 10 / 11</strong>
+เพื่อใช้ในการเขียนโปรแกรม <strong>Arduino Sketch</strong> และนำไปทดลองกับบอร์ดไมโครคอนโทรลเลอร์
+<strong>Raspberry Pi Pico (RP2040)</strong> </p>
+<p><img alt="" src="pico_pinout.png" /></p>
+<p>รูป: ผังแสดงตำแหน่งขาของบอร์ด <strong>Raspberry Pico RP2040</strong></p>
+<hr />
+<h2 id="vs-code-ide-pio-extension">&#9655; <strong>การติดตั้งซอฟต์แวร์ VS Code IDE และ PIO Extension</strong><a class="headerlink" href="#vs-code-ide-pio-extension" title="Permanent link">#</a></h2>
+<p>หากยังไม่เคยใช้งาน <strong>VS Code IDE</strong> ก็ให้ดาวน์โหลดไฟล์เพื่อมาติดตั้งโปรแกรมในเครื่องผู้ใช้ได้จาก
+<a href="https://code.visualstudio.com/download#">https://code.visualstudio.com/download#</a>
+เมื่อเปิดใช้งานโปรแกรมแล้ว ให้ค้นหา <strong>Extension</strong> โดยระบุคำค้นหาเป็นชื่อ <strong>PlatformIO</strong> แล้วคลิกเลือกและกดปุ่ม
+<strong>Install</strong> เพื่อทำการติดตั้ง เมื่อเริ่มต้น <strong>VS Code IDE</strong> อีกครั้ง จะเห็นไอคอนในแถบทางซ้ายมือสำหรับ
+<strong>PIO</strong> กดคลิกเพื่อเปิดหน้าหลัก <strong>PIO Home</strong></p>
+<p><img alt="" src="vscode_pio_pico-2.png" /></p>
+<p>รูป: <strong>VS Code IDE</strong> ที่ได้มีการติดตั้ง <strong>PIO Extension</strong> แล้ว</p>
+<p><img alt="" src="vscode_pio_pico-1.png" /></p>
+<p>รูป: หน้าหลักของ <strong>PIO Home</strong></p>
+<p>ในหน้า <strong>PIO Home</strong> ให้กดคลิก "<strong>+New Project</strong>" 
+ในส่วนที่เรียกว่า <strong>Quick Access</strong> และให้กำหนดค่าสำหรับโปรเจกต์ใหม่
+ในหน้าต่าง <strong>Project Wizard</strong> เช่น ชื่อของโปรเจกต์ (<strong>Project Name</strong>)
+ชื่อบอร์ดไมโครคอนโทรลเลอร์ (<strong>Board</strong>) และสิ่งที่ใช้สำหรับการเขียนโค้ด หรือ <strong>Framework</strong>
+แล้วกดปุ่ม <strong>Finish</strong></p>
+<p><img alt="" src="vscode_pio_pico-3.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่</p>
+<p>เมื่อสร้างโปรเจกต์ใหม่แล้ว ให้ลองเปิดไฟล์ <code>platformio.ini</code> และ <code>main.cpp</code>
+ที่ถูกสร้างขึ้นโดยอัตโนมัติและเป็นส่วนหนึ่งของโปรเจกต์</p>
+<p><img alt="" src="vscode_pio_pico-4.png" /></p>
+<p>รูป: ไฟล์ <code>platformio.ini</code> ของโปรเจกต์</p>
+<p><img alt="" src="vscode_pio_pico-5.png" /></p>
+<p>รูป: ไฟล์ <strong>Arduino Sketch</strong> (<code>main.cpp</code>) ที่ถูกสร้างโดยอัตโนมัติ</p>
+<p>ลองเพิ่มเติมโค้ดในไฟล์ <code>main.c</code> แล้วกดปุ่ม &#10003; ในแถบด้านล่าง เพื่อทำขั้นตอน <strong>Build</strong></p>
+<p><img alt="" src="vscode_pio_pico-7.png" /></p>
+<p>รูป: การตั้งค่าเพิ่มเติมสำหรับโปรเจกต์ในไฟล์ <code>platformio.ini</code></p>
+<pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+
+void setup() {
+  Serial.begin(115200);           // Initialize Serial
+  pinMode( LED_BUILTIN, OUTPUT ); // Set pin direction for output
+}
+
+void loop() {
+  int state = !digitalRead(LED_BUILTIN);
+  digitalWrite( LED_BUILTIN, state ); // Update LED output
+  String str = &quot;LED state: &quot;;
+  str += state;
+  Serial.println( str.c_str() ); // Send a message to Serial
+  delay(500);
+}
+
+</code></pre>
+<p>ข้อสังเกต: การเขียนโปรแกรม <strong>Arduino</strong> โดยใช้บอร์ด
+<strong>Raspberry Pi Pico</strong> มีสองตัวเลือกสำหรับการเขียนโค้ด ดังนี้
+และมีความแตกต่างกันในหลายลักษณะการใช้งาน</p>
+<ol>
+<li><a href="https://github.com/arduino/ArduinoCore-mbed"><strong>Arduino Mbed Core for RP2040</strong></a>:
+พัฒนาโดยทีมงานของ <strong>Arduino</strong> และใช้ <strong>Arm Mbed OS</strong> เป็นพื้นฐานในการทำงาน
+โปรเจกต์ที่ถูกสร้างขึ้นใน <strong>VS Code IDE</strong> จะใช้ตัวเลือกนี้
+ดูตัวอย่างการเขียนโค้ดได้จากบทความ
+<a href="../arduino_pico/">"การเขียนโปรแกรมด้วย Arduino Pico Core สำหรับไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico</strong>"</a></li>
+<li><a href="https://github.com/earlephilhower/arduino-pico"><strong>Raspberry Pi Pico Arduino Core</strong></a>:
+พัฒนาโดย <strong>Earle Philhower</strong> ซึ่งไม่ได้ใช้ <strong>Arm Mbed OS</strong>
+และถือว่าเป็นอีกตัวเลือกหนึ่งที่ใช้ได้เช่นกัน</li>
+</ol>
+<p>การอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>Raspberry Pi Pico</strong> 
+ผ่านทางพอร์ต <strong>USB</strong> เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ 
+จะต้องทำให้ชิป <strong>RP2040</strong> เข้าสู่โหมด <strong>USB Bootloader (.uf2)</strong> 
+โดยการกดปุ่ม <strong>BOOTSEL</strong> (<strong>Boot Select</strong>) ค้างไว้แล้วกดปุ่มรีเซตตามลำดับ 
+จากนั้นจึงจะมองเห็น <strong>USB Drive</strong> (ชื่อ  <code>RPI-RP2</code>) สำหรับบอร์ดที่กำลังเชื่อมต่ออยู่</p>
+<p>ในตัวอย่างไฟล์  <code>platformio.ini</code> ได้เลือกใช้วิธีการอัปโหลดด้วยโปรแกรมที่มีชื่อว่า <code>picotool</code>
+และจะต้องระบุชื่อไดร์ฟ เช่น  <code>D:\</code> สำหรับบอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>ข้อสังเกต: บอร์ด <strong>Raspberry Pi Pico</strong> ไม่มีปุ่ม <strong>Reset</strong> มีแต่ปุ่ม <strong>BOOTSEL</strong>
+ดังนั้นแนะนำให้ต่อวงจรปุ่มกดเพิ่ม (แบบ <strong>Active-low</strong>) ที่ขา <strong>RUN</strong> เพื่อความสะดวกในการใช้งาน</p>
+<p>ถ้าต้องการเขียนโค้ดโดยใช้ <a href="https://github.com/arduino/ArduinoCore-mbed"><strong>Arduino Mbed Core for RP2040</strong></a>
+ให้ตั้งค่าการใช้งานดังนี้  </p>
+<pre><code class="language-text">[env:pico]
+platform = raspberrypi
+board = pico
+framework = arduino
+upload_protocol = picotool
+upload_port = D:\
+</code></pre>
+<p>แต่ถ้าต้องการเขียนโค้ด โดยใช้ <a href="https://github.com/earlephilhower/arduino-pico"><strong>Raspberry Pi Pico Arduino Core</strong></a>
+ก็มีตัวอย่างการตั้งค่าการใช้งานดังนี้</p>
+<pre><code class="language-text">[env:pico]
+platform = https://github.com/maxgerhardt/platform-raspberrypi.git
+board = pico
+framework = arduino
+board_build.core = earlephilhower
+upload_protocol = picotool
+upload_port = D:\
+</code></pre>
+<p><strong>PlatformIO</strong> จะติดตั้งโปรแกรมต่าง ๆ ที่เกี่ยวข้อง ภายใต้ไดเรกทอรี
+<code>%homepath%\.platformio\packages</code> สำหรับผู้ใช้ระบบปฏิบัติการ <strong>Windows</strong></p>
+<p><img alt="" src="pio_packages.png" /></p>
+<p>รูป: ตัวอย่างไดเรกทอรีสำหรับโปรแกรมต่าง ๆ ที่ได้มีการติดตั้งและใช้งานโดย <strong>PlatformIO</strong></p>
+<p>เมื่อมีการเปลี่ยนแปลงแก้ไขไฟล์ <code>platformio.ini</code> ให้ทำขั้นตอน <strong>PlatformIO: Build</strong>
+ใหม่อีกครั้ง โดยคลิกเลือกไอคอน &#8594; ในแถบด้านล่าง </p>
+<p><img alt="" src="vscode_pio_pico-8.png" /></p>
+<p>รูป: การคอมไพล์โค้ดในขั้นตอน <strong>PlatformIO: Build</strong> </p>
+<p>เมื่อสามารถคอมไพล์โค้ดและสร้างไฟล์เฟิร์มแวร์ได้แล้ว 
+(สังเกตได้จากข้อความเอาต์พุตในหน้าต่าง <strong>Terminal</strong> จะเห็นว่ามีชื่อไฟล์ 
+<code>.pio\build\pio\firmware.elf</code>) ก็ให้อัปโหลดไฟล์ไปยังบอร์ด <strong>Pico</strong></p>
+<p><img alt="" src="vscode_pio_pico-9.png" /></p>
+<p>รูป: การอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>Pico</strong> ในขั้นตอน <strong>PlatformIO: Upload</strong> </p>
+<p>กดปุ่มจากแถบไอคอนด้านล่าง เพื่อเปิดใช้งาน <strong>Serial Monitor</strong> 
+จะได้รับข้อความจากบอร์ด <strong>Pico</strong> ตามตัวอย่างในรูปต่อไปนี้</p>
+<p><img alt="" src="vscode_pio_pico-10.png" /></p>
+<p>รูป: การแสดงข้อความที่ได้รับจากบอร์ด <strong>Pico</strong></p>
+<p>เมื่อบอร์ด <strong>Pico</strong> ทำงานได้ตามเฟิร์มแวร์ที่ได้อัปโหลดไปแล้ว และมีการใช้งาน <strong>Serial (USB CDC)</strong>
+ในโค้ด <strong>Arduino Sketch</strong> การอัปโหลดไฟล์ครั้งถัดไปโดยใช้โปรแกรม <code>picotool</code> ก็ไม่จำเป็นต้องกดปุ่มเพื่อทำให้บอร์ดเข้าสู่โหมด <strong>USB Bootloader</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>อุปกรณ์สำหรับการอัปโหลดไฟล์เฟิร์มแวร์และดีบักโค้ด</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p><strong>VS Code IDE</strong> และ <strong>PlatformIO / PIO Debug</strong> รองรับการดีบักการทำงานของโปรแกรมในระดับซอร์สโค้ด
+(<strong>Source-Level Debugging</strong>) โดยใช้ฮาร์ดแวร์ ซึ่งมีสองอุปกรณ์ที่สำคัญคือ บอร์ด <strong>Pico</strong> และ <strong>Hardware Debugger</strong>
+ซึ่งจะต้องรองรับโพรโทคอล <strong>Arm CMSIS-DAP</strong> และใช้การเชื่อมต่อแบบ <strong>SWD Interface</strong></p>
+<p>ตัวอย่างอุปกรณ์ที่สามารถนำมาใช้ได้</p>
+<ul>
+<li><a href="https://www.segger.com/products/debug-probes/j-link"><strong>SEGGER J-Link</strong></a> 
+/ <a href="https://www.segger.com/products/debug-probes/j-link/models/j-link-edu/"><strong>J-Link EDU Debug Probe</strong></a></li>
+<li>อุปกรณ์ที่รองรับการดีบักด้วย <strong>JTAG / SWD</strong> และมีราคาถูกกว่า <strong>J-Link Debug Probe</strong></li>
+<li><strong>PicoProbe</strong>: ใช้บอร์ด <strong>Pico</strong> อีกหนึ่งอันมาติดตั้งเฟิร์มแวร์ที่มีชื่อว่า
+<a href="https://github.com/raspberrypi/picoprobe"><strong>picoprobe.uf2</strong></a>
+เพื่อให้บอร์ดทำหน้าที่ได้เหมือนอุปกรณ์ <strong>SWD Debug Probe</strong></li>
+</ul>
+<p><img alt="" src="daplink_debug_probes.png" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ <strong>SWD / DAPLink Debug Probes</strong> ที่มีราคาไม่แพง </p>
+<p>ข้อสังเกต: </p>
+<ul>
+<li>การดีบักโดยใช้อุปกรณ์ประเภทนี้สำหรับระบบปฏิบัติการ <strong>Windows 10 / 11</strong>
+จะต้องติดตั้ง  <strong>WinUSB</strong> เพื่อใช้เป็น <strong>USB Driver</strong> สำหรับอุปกรณ์
+เพื่อให้สามารถใช้งานได้กับโปรแกรม <strong>OpenOCD</strong></li>
+<li>การเลือกใช้ <strong>WinUSB Driver</strong> สำหรับอุปกรณ์ประเภทนี้ สามารถทำได้ไม่ยาก โดยใช้โปรแกรม เช่น
+<a href="https://sysprogs.com/getfile/1372/UsbDriverTool-2.1.exe"><strong>USBDriverTools</strong></a></li>
+</ul>
+<p><img alt="" src="picoprobe_pcb.png" /></p>
+<p>รูป: ตัวอย่างการใช้งานอุปกรณ์ <strong>PicoProbe</strong> เพื่อทำให้บอร์ด
+<strong>Pico</strong> (+ <strong>PCB Adapter</strong>) เป็นอุปกรณ์ <strong>SWD Debug Probe</strong> 
+(Source: <a href="https://github.com/Fabien-Chouteau/picoprobe-pcb">picoprobe-pcb</a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pico-debug-probe">&#9655; <strong>การใช้บอร์ด Pico เป็นอุปกรณ์ Debug Probe</strong><a class="headerlink" href="#pico-debug-probe" title="Permanent link">#</a></h2>
+<p>การใช้บอร์ด <strong>Pico</strong> ทำหน้าที่เป็น <strong>CMSIS-DAP / SWD Debug Probe</strong> 
+และเชื่อมต่อกับบอร์ด <strong>Pico</strong> อีกบอร์ดหนึ่งมีรูปแบบดังนี้</p>
+<p><img alt="" src="picoprobe_wiring.png" /></p>
+<p>รูป: การเชื่อมต่อระหว่างบอร์ด <strong>Pico - PicoProbe</strong> กับบอร์ด <strong>Pico - Target Board</strong> 
+(Source: <a href="https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf">"<strong>Getting started with Raspberry Pi Pico</strong>"</a>)</p>
+<pre><code class="language-text">PicoProbe &lt;--&gt; Pico Target
+--------------------------
+VSYS (5V)      VSYS (5V)
+GND            GND
+--------------------------
+GP2            SWCLK
+GP3            SWDIO
+GP4/UART1_TX   GP1/UART0_RX
+GP5/UART1_RX   GP0/UART0_TX
+--------------------------
+</code></pre>
+<p>การติดตั้งไฟล์เฟิร์มแวร์ <a href="https://github.com/raspberrypi/picoprobe/releases/download/picoprobe-cmsis-v1.0.1/picoprobe.uf2"><code>picoprobe.uf2</code></a>
+จาก <a href="https://github.com/raspberrypi/picoprobe/">https://github.com/raspberrypi/picoprobe/</a>
+จะทำให้บอร์ด <strong>Pico</strong> กลายเป็นอุปกรณ์ <strong>CMSIS-DAP v2</strong> และจะมีการติดตั้ง <strong>WinUSB Driver</strong> โดยอัตโนมัติ</p>
+<p><img alt="" src="picoprobe_cmsis_dap_winusb.png" /></p>
+<p>รูป: ตรวจสอบ <strong>USB Driver</strong> สำหรับ <strong>PicoProbe CMSIS-DAP v2</strong>
+(<strong>VID=0x2E8A</strong> และ <strong>PID=0x000C</strong>)
+โดยใช้โปรแกรม <strong>USBDriverTools</strong></p>
+<p>การตั้งค่าในไฟล์ <code>platformio.ini</code> สำหรับการดีบักโปรแกรมในระดับซอร์สโค้ดโดยใช้บอร์ด <strong>Pico</strong>
+และ <strong>CMSIS-DAP Debug Probe</strong> มีตัวอย่างดังนี้  </p>
+<p>ถ้าใช้ <strong>Raspberry Pi Pico Arduino Core (Earle Philhower)</strong> </p>
+<pre><code class="language-text">[env:pico]
+
+platform  = https://github.com/maxgerhardt/platform-raspberrypi.git
+board     = pico
+framework = arduino
+board_build.core = earlephilhower
+
+; use cmsis-dap debug probe for firmware upload
+upload_protocol = cmsis-dap
+
+; use cmsis-dap as debug tool
+build_type = debug
+debug_build_flags = -O0 -ggdb3 -g3
+debug_tool = cmsis-dap
+
+; specify the serial COM port and baud rate
+monitor_port  = COM11
+monitor_speed = 115200
+</code></pre>
+<p>ถ้าใช้ <strong>Arduino Mbed Core for RP2040</strong> </p>
+<pre><code class="language-text">[env:pico]
+platform   = raspberrypi
+board      = pico
+framework  = arduino
+build_type = debug
+
+; use custom upload protocol
+upload_protocol = custom
+; use openocd for firmware upload
+upload_command = ${platformio.packages_dir}/tool-openocd-rp2040-earlephilhower/bin/openocd.exe -s tcl -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c &quot;adapter speed 25000&quot; -c &quot;program {${BUILD_DIR}/firmware.elf} verify reset; shutdown;&quot;
+
+; use custom debug tool (openocd)
+debug_tool   = custom
+debug_server = 
+    ${platformio.packages_dir}/tool-openocd-rp2040-earlephilhower/bin/openocd.exe
+    -s tcl -f interface/cmsis-dap.cfg -f target/rp2040.cfg 
+    -c &quot;adapter speed 25000&quot;
+
+; specify the serial COM port and baud rate
+monitor_port  = COM11
+monitor_speed = 115200
+
+[env:pico]
+</code></pre>
+<p>เมื่ออัปโหลดไฟล์เฟิร์มแวร์ด้วยวิธี <strong>CMSIS-DAP</strong> ไปยังบอร์ด <strong>RP2040</strong>
+ได้แล้ว ถัดไปเป็นการดีบักโดยใช้ <strong>PIO Debug</strong> (กดปุ่ม <strong>Ctrl+Shift+D</strong>)
+และมีการกำหนดบรรทัดในโค้ดสำหรับ <strong>Breakpoint(s)</strong> ในไฟล์ <code>main.cpp</code>
+ถ้ารันโปรแกรมมาถึงตำแหน่งดังกล่าว ก็จะหยุดชั่วคราว </p>
+<pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+
+void setup() {
+  Serial1.begin(115200);   // initialize Serial1 
+  pinMode( LED_BUILTIN, OUTPUT ); // set pin direction for output
+}
+
+void loop() {
+  int state = !digitalRead(LED_BUILTIN);
+  digitalWrite( LED_BUILTIN, state ); // update LED output
+  String str = &quot;LED state: &quot;;
+  str += state;
+  Serial1.println( str.c_str() );
+  delay(500);
+}
+</code></pre>
+<p><img alt="" src="vscode_openocd_pio_debug.png" /></p>
+<p>รูป: การดีบัก (<strong>PIO Debug</strong>) โดยใช้ <code>openocd</code> และอุปกรณ์ <strong>DAPLink</strong></p>
+<p><img alt="" src="arduino_mbed_cmsis_dap_debug.png" /></p>
+<p>รูป: การดีบัก (<strong>PIO Debug</strong>) โดยใช้ <code>openocd</code>
+สำหรับ <strong>Arduino Mbed Core for RP2040</strong></p>
+<p><img alt="" src="picoprobe_pico.jpg" /></p>
+<p>รูป: การใช้บอร์ด <strong>Pico</strong> เป็น <strong>Debug Probe</strong> สำหรับบอร์ด <strong>Pico</strong> อีกบอร์ดหนึ่ง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wchlink-daplink">&#9655; <strong>โมดูล WCHLink - DAPLink</strong><a class="headerlink" href="#wchlink-daplink" title="Permanent link">#</a></h2>
+<p>อีกหนึ่งอุปกรณ์ที่ได้นำมาลองใช้อีกตัวเลือกหนึ่งคือ <a href="https://github.com/guoccaiLi/wchlink/"><strong>WCHLink v1.1 (CH549F) Mini-DAPLink</strong></a>
+ผลิตโดย <strong>WeAct Studio</strong> มีขา <strong>Pin Headers</strong> </p>
+<ul>
+<li>แถวที่ 1: <strong>+3.3V, TXD, RXD, GND, +5V</strong></li>
+<li>แถวที่ 2: <strong>+3.3V, DIO (SWDIO), CLK (SWCLK), GND, +5V</strong></li>
+</ul>
+<p><img alt="" src="wch_link.png" /></p>
+<p>รูป: โมดูล <strong>WCHLink - DAPLink (VID=0x1A86, PID=0x8011)</strong></p>
+<p><img alt="" src="wchlink_debug_probe_wiring.png" /></p>
+<p>รูป: การเชื่อมต่อสำหรับ <strong>SWD Interface</strong> ซึ่งใช้สายสัญญาณ 2 เส้น <strong>SWDIO</strong> และ <strong>SWCLK</strong></p>
+<p>ตัวอย่างการเชื่อมต่อระหว่างบอร์ด <strong>RP2040</strong> กับ
+โมดูล <strong>WCHLink - DAPLink</strong> แบ่งเป็น  2 ส่วน</p>
+<ul>
+<li>ส่วนแรกคือ การเชื่อมต่อ <strong>SWD Interface</strong></li>
+<li>ส่วนที่สองคือ  การเชื่อมต่อ <strong>Hardware Serial</strong></li>
+</ul>
+<p>บอร์ด <strong>RP2040</strong> ไม่ได้เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ด้วยสาย <strong>USB</strong>
+แต่ได้แรงดันไฟเลี้ยงจากโมดูล <strong>WCHLink</strong></p>
+<pre><code class="language-text">RP2040 &lt;-&gt; WCHLink
+-------------------
+SWDIO      DIO 
+SWCLK      CLK
+-------------------
+GP0/TX0    RXD
+GP1/RX0    TXD
+-------------------
+GND        GND
++3.3V     +3.3V
+</code></pre>
+<p><img alt="" src="wch_link_rp2040.png" /></p>
+<p>รูป: การเชื่อมต่อระหว่างบอร์ด <strong>RP2040</strong> กับโมดูล  <strong>WCHLink</strong></p>
+<p>โค้ดไฟล์ <code>main.cpp</code> ที่มีการเปลี่ยนจากการใช้ <code>Serial</code> (<strong>USB-CDC</strong>) มาเป็น <code>Serial1</code>
+(<strong>Hardware Serial</strong>) ซึ่งใช้ขา <strong>GP0 (UART0_TX) / GP1 (UART0_RX)</strong>
+และเชื่อมต่อกับโมดูล  <strong>WCHLink</strong> ไปยังคอมพิวเตอร์ของผู้ใช้</p>
+<h2 id="source-level-debugging">&#9655; <strong>การดีบักการทำงานของโค้ดด้วยฮาร์ดแวร์: Source-Level Debugging</strong><a class="headerlink" href="#source-level-debugging" title="Permanent link">#</a></h2>
+<p><img alt="" src="vscode_openocd_upload.png" /></p>
+<p>รูป: การอัปโหลดเฟิร์มแวร์ โดยใช้ <code>openocd</code> และอุปกรณ์ <strong>DAPLink</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้งาน <strong>VS Code IDE</strong> ร่วมกับ <strong>PlatformIO Extension</strong>
+เพื่อเขียนโค้ด <strong>Arduino Sketch</strong> และนำไปใช้กับบอร์ดไมโครคอนโทรลเลอร์ 
+<strong>Raspberry Pi Pico</strong> หรือบอร์ดที่ใช้ชิป <strong>RP2040</strong> เป็นตัวประมวผลหลัก
+นอกจากนั้นยังได้สาธิตการใช้อุปกรณ์ <strong>DAPLink</strong> ร่วมกับโปรแกรม <strong>OpenOCD</strong>
+เพื่ออัปโหลดไฟล์เฟิร์มแวร์และทำขั้นตอนดีบักโปรแกรมในระดับซอร์สโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-02-18 | Last Updated: 2023-02-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

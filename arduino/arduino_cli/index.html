@@ -130,7 +130,7 @@
 <p><strong>Keywords</strong>: <em>Arduino</em>, <em>Arduino CLI</em></p>
 <hr />
 <h2 id="arduino-cli_1">&#9655; <strong>Arduino CLI</strong><a class="headerlink" href="#arduino-cli_1" title="Permanent link">#</a></h2>
-<p>บทความนี้นำเสนอตัวอย่างการใช้โปรแกรม <strong>Arduino CLI</strong>
+<p>บทความนี้นำเสนอตัวอย่างการใช้โปรแกรม <strong>Arduino CLI (Command-Line Interface)</strong>
 โดยปรกติแล้ว การเขียนโปรแกรม <strong>Arduino Sketch</strong> ผู้ใช้ส่วนใหญ่ ก็จะเลือกใช้ซอฟต์แวร์
 <strong>Arduino IDE</strong> ทั้งแบบ <strong>Desktop (offline)</strong> และ <strong>Cloud-based (online)</strong>
 หรือ <strong>VS Code IDE + PlatformIO extension</strong> เป็นต้น</p>
@@ -186,7 +186,7 @@ $ arduino-cli config init
 <p>แต่ถ้าเป็น <strong>Windows</strong> จะได้ไฟล์  <code>"$($env:UserProfile)\AppData\Local\Arduino15\arduino-cli.yaml"</code></p>
 <p>เมื่อทำคำสั่งแล้ว จะได้ไฟล์ใหม่ที่มีชื่อว่า <code>arduino-cli.yaml</code> และลองแสดงตัวอย่างข้อความในไฟล์ดังกล่าว
 (แสดงเฉพาะสองบรรทัดแรก)</p>
-<pre><code class="language-text"># Show the first two line of $HOME/.arduino15/arduino-cli.yaml
+<pre><code class="language-text"># Show the first two lines of $HOME/.arduino15/arduino-cli.yaml
 $ cat $HOME/.arduino15/arduino-cli.yaml | head -n 2
 board_manager:
   additional_urls: []
@@ -212,6 +212,7 @@ $ arduino-cli core update-index
 Downloading index: package_index.tar.bz2 downloaded
 Downloading index: package_esp8266com_index.json downloaded
 Downloading index: package_esp32_index.json downloaded
+Downloading index: package_rp2040_index.json downloaded
 ...
 </code></pre>
 <p>&nbsp;</p>
@@ -241,7 +242,11 @@ esp8266:esp8266       3.1.1     esp8266
 <p><img alt="" src="arduino_cli_ubuntu-3.png" /></p>
 <p>หรือจะใช้คำสั่งเพื่อค้นหาและแสดงรายการตามชื่อของ <strong>Arduino Core</strong> แบบเจาะจง เช่น </p>
 <pre><code class="language-text"># Search Arduino core for AVR
-$ arduino-cli core search megaavr
+$ arduino-cli core search arduino:avr
+ID          Version Name
+arduino:avr 1.8.6   Arduino AVR Boards
+
+$ arduino-cli core search arduino:megaavr
 ID              Version Name
 arduino:megaavr 1.8.8   Arduino megaAVR Boards
 
@@ -293,15 +298,34 @@ $ arduino-cli core upgrade
 <p>หรือจะอัปเดตเฉพาะบางรายการ เช่น สำหรับ <strong>Arduino Core for ESP32</strong></p>
 <pre><code class="language-text">$ arduino-cli core upgrade esp32:esp32
 </code></pre>
-<p>เมื่อได้ติดตั้ง <strong>Arduino Cores</strong> ที่ได้เลือกใช้งานแล้ว ถัดไป ก็เป็นคำสั่งเพื่อดูรายการบอร์ดไมโครคอนโทรลเลอร์
+<p>เมื่อได้ติดตั้ง <strong>Arduino Cores</strong> ที่ได้เลือกใช้งานแล้ว ถัดไปก็เป็นคำสั่งเพื่อดูรายการบอร์ดไมโครคอนโทรลเลอร์
 ที่สามารถเลือกใช้ได้  โดยใช้คำสั่ง 
-<code>arduino-cli board listall &lt;board&gt;</code> โดยที่ <code>&lt;board&gt;</code> หมายถึง ชื่อบอร์ด</p>
+<code>arduino-cli board listall &lt;board&gt;</code> โดยที่ <code>&lt;board&gt;</code> หมายถึง ชื่อบอร์ด
+และ <strong>Arduino</strong> จะใช้ชื่อในรูปแบบที่เรียกว่า  <strong>FQBN</strong> (<strong>Fully Qualified Board Name</strong>)</p>
 <pre><code class="language-bash"># List supported Arduino boards and their FQBN strings 
 $ arduino-cli board listall arduino
 </code></pre>
 <p>หรือเจาะจงเฉพาะบอร์ด <code>arduino:avr</code></p>
 <pre><code class="language-text"># List only Arduino-AVR boards
 $ arduino-cli board listall arduino:avr
+
+Board Name                       FQBN
+Arduino Leonardo                 arduino:avr:leonardo
+Arduino Mega or Mega 2560        arduino:avr:mega
+Arduino Micro                    arduino:avr:micro
+Arduino Mini                     arduino:avr:mini
+Arduino Nano                     arduino:avr:nano
+Arduino Pro or Pro Mini          arduino:avr:pro
+Arduino Uno                      arduino:avr:uno
+Arduino Uno Mini                 arduino:avr:unomini
+Arduino Uno WiFi                 arduino:avr:unowifi
+...
+</code></pre>
+<pre><code class="language-text">$ arduino-cli board listall arduino:megaavr
+
+Board Name            FQBN
+Arduino Nano Every    arduino:megaavr:nona4809
+Arduino Uno WiFi Rev2 arduino:megaavr:uno2018
 </code></pre>
 <p><img alt="" src="arduino_cli_ubuntu-5.png" /></p>
 <p>แสดงรายการบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>ESP32</strong> ของ <strong>WeMos Lolin</strong></p>
@@ -337,19 +361,19 @@ Name: &quot;Adafruit ADXL375&quot;
 $ SKETCH_NAME=esp32_blink
 
 # Create a new Arduino sketch with the specified name
-$ arduino-cli sketch new $(SKETCH_NAME)
+$ arduino-cli sketch new $SKETCH_NAME
 </code></pre>
 <p>จากนั้นเขียนโค้ดลงในไฟล์ <code>./esp32_blink/esp32_blink.ino</code> เช่น</p>
 <pre><code class="language-c++">#include &lt;Arduino.h&gt;
 
 void setup() {
-  Serial.begin(115200);
-  pinMode( LED_BUILTIN, OUTPUT  );
+  Serial.begin( 115200 );
+  pinMode( LED_BUILTIN, OUTPUT );
 }
 
 void loop() {
   static uint32_t state = 0;
-  digitalWrite( LED_BUILTIN, state ^= 1);
+  digitalWrite( LED_BUILTIN, state ^= 1 );
   Serial.printf( &quot;LED state: %d&quot;, state );
   delay(500);
 }
@@ -386,6 +410,7 @@ esp32_blink/
 
 5 directories, 15 files
 </code></pre>
+<p>&nbsp;</p>
 <p>ถ้าจะอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด ก็ทำคำสั่งในลักษณะนี้
 (ในตัวอย่างได้เลือกใช้พอร์ตหมายเลข <code>/dev/ttyUSB0</code> ที่เชื่อมต่อกับบอร์ด <strong>ESP32</strong>)</p>
 <pre><code class="language-text">$ arduino-cli upload -p /dev/ttyUSB0 \
@@ -420,7 +445,7 @@ arduino-cli upload -p COM6 `
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-02-15 | Last Updated: 2023-02-15</p></div>
+<p>Created: 2023-02-15 | Last Updated: 2023-02-20</p></div>
             </div>
         </div>
 
