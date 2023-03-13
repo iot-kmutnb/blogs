@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/micropython/micropython_microbit_v2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม MicroPython สำหรับบอร์ด BBC Micro:bit V2 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#micropython-bbc-microbit-v2" class="nav-link">การเขียนโปรแกรม MicroPython สำหรับบอร์ด BBC Micro:bit V2</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ไมไครไพธอนสำหรับไมโครบิต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#micropython-editor-for-microbit-v2" class="nav-link">&#9655; การใช้งาน MicroPython Editor for Micro:bit V2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; โค้ดตัวอย่างแรก</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4" class="nav-link">&#9655; โค้ดตัวอย่างที่ 4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5" class="nav-link">&#9655; โค้ดตัวอย่างที่ 5</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#6" class="nav-link">&#9655; โค้ดตัวอย่างที่ 6</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-bbc-microbit-v2">การเขียนโปรแกรม MicroPython สำหรับบอร์ด BBC Micro:bit V2<a class="headerlink" href="#micropython-bbc-microbit-v2" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>BBC Micro:bit v2 (nRF52833)</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>ไมไครไพธอนสำหรับไมโครบิต</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครบิตสามารถนำมาใช้งานได้กับเฟิร์มแวร์ของไมโครไพธอน (<strong>MicroPython</strong>)
+ดังนั้นผู้ใช้สามารถเขียนโค้ดด้วยภาษา <strong>Python</strong> ได้
+บทความนี้จะกล่าวถึง การทดลองใช้งานไมโครไพธอนสำหรับบอร์ดไมโครบิต เจาะจงเฉพาะ "เวอร์ชัน 2"
+(<strong>BBC Micro:bit v2</strong>) ซึ่งมีชิป <strong>nRF52833</strong> เป็นตัวประมวลผลหลัก</p>
+<p><img alt="" src="microbit_v2_board.png" /></p>
+<p>รูป: บอร์ดไมโครบิต <strong>v2</strong></p>
+<p>ไฟล์เฟิร์มแวร์ของไมโครไพธอน (<strong>MicroPython Firmware: .hex</strong>)
+สำหรับบอร์ด <strong>MicroPython Micro:bit v2</strong> สามารถดาวน์โหลดได้จาก</p>
+<ul>
+<li><a href="https://github.com/microbit-foundation/micropython-microbit-v2/releases/">https://github.com/microbit-foundation/micropython-microbit-v2/releases/</a></li>
+</ul>
+<p>เวอร์ชันที่ได้ลองใช้ในขณะเขียนบทความนี้ คือ <strong>MicroPython for Micro:bit v2.1.1</strong>
+ซึ่งใช้โค้ดของไมโครไพธอน <strong>MicroPython v1.18</strong> เป็นพื้นฐานในการทำงาน</p>
+<p>การติดตั้งเฟิร์มแวร์ของไมโครไพธอน ก็ทำได้ง่าย </p>
+<ul>
+<li><strong>วิธีแรก:</strong> เมื่อเสียบสาย <strong>USB</strong> เข้ากับบอร์ดไมโครไพธอนแล้ว
+จะมองเห็น <strong>USB Flash Drive</strong> ที่มีชื่อว่า <code>MICROBIT</code> จากนั้นให้ลากไฟล์เฟิร์มแวร์ <code>.hex</code>
+ไปยังไดร์ฟดังกล่าว บอร์ดไมโครบิตจะทำการติดตั้งเฟิร์มแวร์โดยอัตโนมัติ</li>
+<li><strong>วิธีที่สอง:</strong> เปิดใช้งาน <a href="https://python.microbit.org/v/3"><strong>MicroPython Editor (v3)</strong></a> และผู้ใช้สามารถลองเขียนโค้ดโดยใช้เว็บเบราว์เซอร์ได้
+และสามารถจำลองการทำงานของโค้ดได้ โดยยังไม่จำเป็นต้องมีอุปกรณ์ฮาร์ดแวร์จริง
+และเมื่อเชื่อมต่อกับบอร์ดไมโครบิตกับคอมพิวเตอร์ของผู้ใช้ผ่านทางพอร์ต <strong>USB</strong>
+ก็สามารถติดตั้งเฟิร์มแวร์ได้เช่นกัน (ใช้วิธีการที่เรียกว่า <strong>WebUSB</strong>)</li>
+</ul>
+<p>หากต้องการดูรายละเอียดเกี่ยวกับคำสั่งต่าง ๆ สำหรับการเขียนโค้ดไมโครไพธอน สามารถดูได้จาก </p>
+<ul>
+<li><a href="https://microbit-micropython.readthedocs.io/en/v2-docs/">https://microbit-micropython.readthedocs.io/en/v2-docs/</a></li>
+</ul>
+<hr />
+<h2 id="micropython-editor-for-microbit-v2">&#9655; <strong>การใช้งาน MicroPython Editor for Micro:bit V2</strong><a class="headerlink" href="#micropython-editor-for-microbit-v2" title="Permanent link">#</a></h2>
+<p>เปิดใช้งานเบราว์เซอร์ไปยัง <a href="https://python.microbit.org/v/3">https://python.microbit.org/v/3</a>
+และจะเห็นได้ว่า มีการสร้างโปรเจกต์ (<strong>Project</strong>)
+พร้อมโค้ดตัวอย่างไว้ให้แล้ว ซึ่งอยู่ในไฟล์ <code>main.py</code> ผู้ใช้สามารถกดปุ่ม <strong>Simulator</strong>
+เพื่อเปิดใช้งานตัวจำลองการทำงานของโค้ด ซึ่งจะมองเห็นรูปบอร์ดไมโครบิตเสมือนจริง ถ้ากดปุ่ม <strong>Play / Run</strong>
+บอร์ดไมโครบิตก็จะเริ่มทำงานตามคำสั่งของโค้ดตัวอย่าง</p>
+<p><img alt="" src="microbit_v2_micropython_editor-1.png" /></p>
+<p>รูป: โปรเจกต์และโค้ดตัวอย่างในไฟล์ <code>main.py</code> เพื่อเริ่มต้นใช้งาน</p>
+<p><img alt="" src="microbit_v2_micropython_editor-2.png" /></p>
+<p>รูป: การใช้งาน <strong>Simulator</strong> เพื่อจำลองการทำงานของบอร์ดไมโครบิต</p>
+<p><img alt="" src="microbit_v2_micropython_editor-3.png" /></p>
+<p>รูป: การเชื่อมต่อระหว่างบอร์ดไมโครบิตกับ <strong>MicroPython Editor</strong> ผ่านทาง <strong>WebUSB</strong></p>
+<p><img alt="" src="microbit_v2_micropython_editor-4.png" /></p>
+<p>รูป: การอัปโหลดเฟิร์มแวร์และโค้ดตัวอย่างไปยังบอร์ดไมโครบิตที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้</p>
+<p>ข้อสังเกต: การอัปโหลดโค้ดไปยังบอร์ดไมโครบิตในครั้งแรก จะใช้เวลานานกว่าครั้งถัดไป 
+เนื่องจากจะต้องมีการติดตั้งไฟล์เฟิร์มแวร์ของไมโครไพธอน (.hex) ในครั้งแรก แล้วจึงอัปโหลดโค้ดในไฟล์
+<code>main.py</code> ไปยังระบบไฟล์ของไมโครไพธอนที่อยู่ในหน่วยความจำ <strong>Flash</strong> ของชิปไมโครคอนโทรลเลอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>โค้ดตัวอย่างแรก</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<pre><code class="language-python"># Imports go at the top
+from microbit import *
+
+# Code in a 'while True:' loop repeats forever
+while True:
+    display.show(Image.HEART)
+    sleep(1000)
+    display.scroll('Hello')
+</code></pre>
+<p>ตัวอย่างโค้ดนี้ เริ่มต้นด้วยการระบุว่า จะใช้คำสั่งต่าง ๆ ของไลบรารี หรือ โมดูลที่มีชื่อว่า <code>microbit</code>
+ถัดไปเป็นประโยคคำสั่ง <code>while True:</code> ซึ่งจะทำคำสั่งที่มีอยู่ภายในซ้ำไปเรื่อย ๆ ได้แก่</p>
+<ul>
+<li><code>display.show(Image.HEART)</code> ที่แสดงรูปสัญลักษณ์ "หัวใจ" (<strong>Heart</strong>)
+บนจอแสดงผลแบบ <strong>5x5 LED Matrix</strong> ของบอร์ดไมโครบิต</li>
+<li>ถัดไปเป็นคำสั่ง <code>sleep(1000)</code> เพื่อหน่วงเวลาไว้ประมาณ 1000 มิลลิวินาที </li>
+<li>ทำคำสั่ง  <code>display.scroll('Hello')</code> ที่จะแสดงข้อความ <code>Hello</code> บนส่วนแสดงผลแบบ
+เมทริกซ์ของ <strong>5x5 LEDs</strong> และให้ข้อความดังกล่าวเลื่อนไปทางซ้ายจนครบทุกตัวอักขระ</li>
+</ul>
+<p>ถ้าต้องการบันทึกไฟล์ <code>main.py</code> มายังคอมพิวเตอร์ของผู้ใช้ 
+ให้กดปุ่ม <strong>Save ... Save Python script</strong>
+(แต่ถ้ากดปุ่ม <strong>Save</strong> จะได้ไฟล์ <code>.hex</code>)</p>
+<p>ไฟล์ <code>.py</code> ที่ได้ดาวน์โหลดมา สามารถนำไปเปิดใช้งานได้อีกครั้งใน <strong>MicroPython Editor</strong>
+บนหน้าเว็บเบราว์เซอร์ โดยกดปุ่ม <code>Open</code> แล้วคลิกเลือกไฟล์ที่ต้องการเปิดใช้งานและอยู่ในเครื่องคอมพิวเตอร์ของผู้ใช้</p>
+<hr />
+<h2 id="2">&#9655; <strong>โค้ดตัวอย่างที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้คำสั่งจากโมดูล <code>machine</code> และ <code>gc</code> เช่น </p>
+<ul>
+<li><code>machine.unique_id()</code> อ่านค่าหมายเลขของบอร์ดซึ่งได้เป็นอาร์เรย์ข้อมูลไบต์</li>
+<li><code>machine.freq()</code> อ่านค่าความถี่ของซีพียูที่ใช้ในการประมวลผล (หน่วยเป็น <strong>Hz</strong>)</li>
+<li><code>gc.enable()</code> เปิดใช้งานการตรวจสอบและจัดการหน่วยความจำประเภท <strong>Heap</strong></li>
+<li><code>gc.mem_alloc()</code> ตรวจสอบดูว่า มีหน่วยความจำประเภท <strong>Heap</strong> ถูกใช้ไปแล้วกี่ไบต์</li>
+<li><code>gc.mem_free()</code> ตรวจสอบดูว่า มีหน่วยความจำประเภท <strong>Heap</strong> ที่ยังไม่ได้ใช้เหลืออยู่กี่ไบต์</li>
+<li><code>gc.collect()</code> ตรวจสอบและทำการคืนพื้นที่ของหน่วยความจำใน <strong>Heap</strong>
+ที่มีการนำไปใช้งานเมื่อทำคำสั่งต่าง ๆ ของโปรแกรม แต่ไม่ได้ใช้แล้ว</li>
+</ul>
+<pre><code class="language-python">import machine
+import gc
+
+# Enable automatic garbage collection (GC)
+gc.enable() 
+
+# Show the free heap memory (in bytes)
+print( &quot;Heap memory (free): %d&quot; % gc.mem_free())
+
+# Get free heap memory (in bytes) 
+heap_free = gc.mem_free()
+
+# Set the threshold for the GC: a half of free heap memory
+threshold = heap_free//2
+gc.threshold(threshold)
+
+# Get the threshold for GC
+print( &quot;GC threshold: %d&quot;  % gc.threshold() )
+
+# Get the machine ID (a bytearray, converted to a hex string)
+id = &quot;&quot;.join([hex(b)[2:] for b in machine.unique_id()] )
+print( &quot;Board ID: %s&quot; % id)
+
+# Get the CPU frequency in MHz
+print( &quot;CPU freq:. %d MHz&quot; % int(machine.freq()/1e6) )
+
+# Get the allocated heap memory (in bytes)
+print( &quot;Heap memory (allocated): %d bytes&quot; % gc.mem_alloc() )
+
+# Run a garbage collection to free some heap memory
+gc.collect() 
+
+# Show the free heap memory (in bytes)
+print( &quot;Heap memory (free): %d&quot; % gc.mem_free() )
+</code></pre>
+<p>ถ้าอัปโหลดโค้ดตัวอย่างนี้ไปยังบอร์ดไมโครบิต (กดปุ่ม <strong>Send to micro:bit</strong>)
+แล้วเปิดรับข้อความผ่านทาง  <strong>Serial</strong> (กดปุ่ม <code>show | hide serial</code>) 
+จะมองเห็นข้อความเอาต์พุตจากการทำงานของไมโครไพธอน</p>
+<p>ส่วนที่รับส่งข้อความได้เรียกว่า <strong>MicroPython REPL</strong> ผู้ใช้สามารถพิมพ์และทำคำสั่งของไมโครไพธอนได้
+ถ้ากดปุ่ม <code>Ctrl+D</code> เป็นการรีเซตการทำงานของไมโครไพธอน แต่ถ้ากดปุ่ม <code>Ctrl+C</code> 
+เป็นการหยุดการทำงานของไมโครไพธอนในขณะที่กำลังทำคำสั่งในไฟล์ <code>main.py</code></p>
+<p><img alt="" src="microbit_v2_micropython_editor-5.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับจากบอร์ดไมโครบิตผ่านทาง  <strong>WebUSB - Serial</strong></p>
+<p><img alt="" src="microbit_v2_micropython_editor-6.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>help("modules")</code> ในช่อง <strong>MicroPython REPL</strong></p>
+<p>การใช้ฟังก์ชันสำหรับการเขียนโค้ดไมโครบิต ได้มีการแบ่งออกเป็นกลุ่มคำสั่งดังนี้</p>
+<p><a href="https://microbit-micropython.readthedocs.io/en/v2-docs/microbit.html"><code>microbit</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/accelerometer.html"><code>accelerometer</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/audio.html"><code>audio</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/ble.html"><code>bluetooth</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/button.html"><code>button</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/compass.html"><code>compass</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/log.html"><code>log</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/display.html"><code>display</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/filesystem.html"><code>filesystem</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/i2c.html"><code>i2c</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/image.html"><code>image</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/machine.html"><code>machine</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/microphone.html"><code>microphone</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/music.html"><code>music</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/neopixel.html"><code>neopixel</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/power.html"><code>power</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/radio.html"><code>radio</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/random.html"><code>random</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/speaker.html"><code>speaker</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/speech.html"><code>speech</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/spi.html"><code>spi</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/uart.html"><code>uart</code></a>
+ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/utime.html"><code>utime</code></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3">&#9655; <strong>โค้ดตัวอย่างที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้คำสั่งของโมดูล <code>microbit</code> เช่น</p>
+<ul>
+<li><code>microbit.display.set_pixel(x,y,brightness)</code> เพื่อกำหนดค่าของพิกเซลที่ตำแหน่ง
+<code>(x,y)</code> บนแผงแสดงผลแบบเมทริกซ์ <strong>5x5</strong> พิกเซล และให้มีค่า <code>brightness</code> อยู่ในช่วง 0..9 ซึ่งเป็นระดับของความสว่างของ <strong>LED</strong> ที่ตำแหน่งดังกล่าว</li>
+<li><code>microbit.display.clear()</code> กำหนดให้ค่าพิกเซลทั้งหมดเป็น 0 </li>
+</ul>
+<pre><code class="language-python">from microbit import *
+
+brightness = 9
+while True:
+    pos = 0
+    for pos in range(25):
+        y = pos // 5
+        x = pos % 5
+        display.set_pixel(x,y,brightness)
+        pos = (pos+1) % 25
+        sleep(100)
+    display.clear()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4">&#9655; <strong>โค้ดตัวอย่างที่ 4</strong><a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้คำสั่งของโมดูล <code>random</code> และ <code>microbit</code> เช่น</p>
+<ul>
+<li><code>microbit.pin0.read_analog()</code> อ่านค่าตัวเลขจำนวนเต็มจากขา <strong>P0</strong> ของไมโครบิต เมื่อใช้งานเป็นขาแอนะล็อก-อินพุต</li>
+<li><code>random.seed( value )</code> กำหนดค่าเริ่มต้น (<strong>Seed Value</strong>) เพื่อใช้งานการสร้างเลขสุ่ม</li>
+<li><code>random.randint( m, n )</code> สร้างเลขสุ่มที่เป็นเลขจำนวนเต็มที่มีค่าอยู่ในช่วง <code>m</code> ถึง <code>n</code></li>
+</ul>
+<p>โค้ดในตัวอย่างนี้ เริ่มต้นด้วยการกำหนดค่าเริ่มต้นสำหรับการสร้างเลขสุ่ม โดยใช้ค่าที่ได้จากการอ่านขาอินพุต
+แบบแอนะล็อกที่ขา <strong>P0</strong> จากนั้นจะสุ่มตัวเลขสำหรับพิกัด <code>(x,y)</code> และความสว่าง
+<code>brightness</code> (เลือกตัวเลขให้อยู่ในช่วง <code>3</code> ถึง <code>9</code>) เพื่อทำให้พิกเซลที่พิกัดดังกล่าวสว่างขึ้น
+ถ้ามีค่าเดิมของพิเซลนั้นเป็น <code>0</code></p>
+<pre><code class="language-python">from microbit import *
+import random 
+
+# Use the analog value from Pin0 to set the seed 
+# of the pseudo-random number generator
+value = pin0.read_analog()
+random.seed( value )
+
+on_pixel_count = 0
+display.clear()
+while True:
+    x = random.randint(0,4)
+    y = random.randint(0,4)
+    brightness = random.randint(3,9)
+    if display.get_pixel(x,y) == 0:
+        print('Turn on the pixel (%d,%d)' % (x,y))
+        display.set_pixel(x,y,brightness)
+        on_pixel_count += 1
+        if on_pixel_count == 25:
+            print('Clear LED matrix display')
+            display.clear()
+            on_pixel_count = 0
+        sleep(100)
+</code></pre>
+<p><img alt="" src="microbit_v2_micropython_editor-7.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5">&#9655; <strong>โค้ดตัวอย่างที่ 5</strong><a class="headerlink" href="#5" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการแสดงค่าพิกเซลบนแผงแสดงผลแบบเมทริกซ์ <strong>5x5</strong> พิกเซล
+โดยการสุ่มค่าตัวเลขที่ได้กำหนดไว้แล้วในอาร์เรย์ <code>bits</code> เพื่อสร้างเป็นรูปกราฟิก
+(<code>Image</code>) และใช้ในการแสดงผล </p>
+<p>การสุ่มค่าพิกเซลและอัปเดทสถานะจะเกิดขึ้น เมื่อมีการเขย่าบอร์ดไมโครบิต 
+ในการตรวจสอบเหตุการณ์ดังกล่าว จะใช้คำสั่ง
+<code>accelerometer.was_gesture('shake')</code> 
+แต่ถ้าไม่มีการเขย่า ระดับความสว่าง (<strong>LED Brightness</strong>)
+หรือค่าของพิกเซลที่มีค่ามากกว่า <code>0</code> จะค่อย ๆ ลดลงเป็น <code>0</code> </p>
+<p>การอ่านและกำหนดค่าของพิกเซลที่พิกัด <code>(x,y)</code> จะใช้คำสั่งต่อไปนี้</p>
+<ul>
+<li><code>display.get_pixel(x,y)</code></li>
+<li><code>display.set_pixel(x,y,brightness)</code></li>
+</ul>
+<pre><code class="language-python">from microbit import *
+import random
+
+bits = [&quot;90000&quot;, &quot;09000&quot;, &quot;00900&quot;, &quot;00090&quot;, &quot;00009&quot;]
+
+def shuffle( choices ):
+    n = len(choices)
+    result = []
+    while True:
+        p = random.randint(0,n-1)
+        if choices[p] not in result:
+            result.append(choices[p])
+            if len(result) == n:
+                break
+    return result
+
+def reduce_brightness():
+    for x in range(5):
+        for y in range(5):
+            brightness = display.get_pixel(x,y)
+            if brightness &gt; 0:
+                display.set_pixel(x,y,brightness-1)
+
+last_update = running_time()
+while True:
+    if accelerometer.was_gesture('shake'):
+        bits = shuffle( bits )
+        display.show( Image( &quot;:&quot;.join(bits) ) )
+    else:
+        now = running_time()
+        if now - last_update &gt;= 200:
+            last_update = now
+            reduce_brightness()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6">&#9655; <strong>โค้ดตัวอย่างที่ 6</strong><a class="headerlink" href="#6" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้คำสั่งของโมดูล <code>microbit</code> เช่น</p>
+<ul>
+<li><code>microbit.temperature()</code> อ่านค่าอุณหภูมิภายในชิปไมโครคอนโทรลเลอร์ (หน่วยเป็นองศาเซลเซียส)</li>
+<li><code>microbit.running_time()</code> อ่านค่าเวลาของระบบตั้งแต่ไมโครไพธอนเริ่มทำงาน (หน่วยเป็นมิลลิวินาที)</li>
+<li><code>microbit.sleep(...)</code> หยุดรอให้เวลาผ่านไปตามาระยะเวลาที่กำหนด (หน่วยเป็นมิลลิวินาที)</li>
+<li><code>microbit.run_every(...)</code> เปิดให้มีการเรียกฟังก์ชันซ้ำไปเรื่อย ๆ เว้นระยะตามที่กำหนดไว้ (หน่วยเป็นมิลลิวินาที)</li>
+<li><code>microbit.button_a.was_pressed()</code> ตรวจสอบดูว่า ได้มีการกดปุ่ม <strong>A</strong> บนบอร์ดไมโครบิตหรือไม่</li>
+<li><code>microbit.display.show(...)</code> แสดงสัญลักษณ์ เช่น <code>Image.HEART</code> หรือ รูปหัวใจบนเมทริกซ์ของ <strong>LEDs</strong> ขนาด <strong>5x5</strong></li>
+<li><code>microbit.display.clear()</code> เคลียร์การแสดงผลบนแผงเมทริกซ์ <strong>LEDs</strong> ขนาด <strong>5x5</strong></li>
+</ul>
+<pre><code class="language-python">from microbit import *
+
+# Read on-chip temperature
+temp_celsius = temperature()
+print( &quot;CPU temperature: %d deg°C&quot; % temp_celsius )
+
+blinking = True
+
+def heart_blink():
+    global blinking
+    if blinking: # If heart blinking is enabled...
+        # show elapsed time in msec
+        print(&quot;Timestamp: %d msec&quot; % running_time() )
+        display.show(Image.HEART)
+        sleep(500)
+        display.clear()
+
+# Start a periodic task which calls the heart_blink() function
+# every 1000 msec.
+run_every(heart_blink, ms=1000)
+
+while True:
+    if button_a.was_pressed():
+        print(&quot;Button A was pressed.&quot;)
+        # Toggle the blinking status
+        blinking = not blinking
+    sleep(1000)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการเขียนโค้ดไมโครไพธอน
+(<strong>MicroPython</strong>) สำหรับบอร์ดไมโครบิต "เวอร์ชันสอง" (<strong>BBC Micro:bit v2</strong>)
+และการเขียนโค้ดโดยใช้ซอฟต์แวร์ <strong>Web-based MicroPython Editor (v3)</strong>
+ซึ่งสามารถจำลองการทำงานได้เสมือนจริง
+และอัปโหลดโค้ดไปยังบอร์ดไมโครบิตที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ผ่านทาง <strong>WebUSB</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-03-12 | Last Updated: 2023-03-13</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

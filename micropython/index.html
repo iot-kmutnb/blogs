@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/micropython/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>แนะนำการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์ด้วย MicroPython - IoT Engineering Education</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../css/extra.css" rel="stylesheet">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#micropython" class="nav-link">แนะนำการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์ด้วย MicroPython</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; มาทำความรู้จักกับไมไครไพธอน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; ประวัติความเป็นมาของไมไครไพธอน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; รูปแบบการเขียนไมไครไพธอนสำหรับบอร์ดไมโครคอนโทรลเลอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython">แนะนำการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์ด้วย MicroPython<a class="headerlink" href="#micropython" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>Microcontrollers</em>, <em>MicroPython</em>, <em>Cyber-Physical Computing</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>มาทำความรู้จักกับไมไครไพธอน</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ไมโครไพธอน (<a href="https://micropython.org/"><strong>MicroPython</strong></a>) 
+เป็นซอฟต์แวร์ประเภท <strong>Open Source (MIT license)</strong>
+ทำหน้าที่เป็นเฟิร์มแวร์สำหรับการรันโค้ดไพธอนภายในชิปไมโครคอนโทรลเลอร์   (<strong>Python Run-Time Interpreter</strong>)
+แม้ว่าไมโครไพธอนจะมีข้อจำกัดอยู่บ้างและมีความสามารถได้ไม่เท่า 
+<strong>Python3 (<a href="https://github.com/python/cpython">CPython</a></strong>)
+ที่ใช้งานได้กับคอมพิวเตอร์ทั่วไป แต่ช่วยให้เราสามารถเขียนและรันโค้ดไพธอนได้ </p>
+<p>การเลือกใช้ไมโครไพธอนเป็นภาษาคอมพิวเตอร์แรกในการเขียนโค้ด ก็อาจช่วยทำให้การเรียนรู้โค้ดดิ้ง (<strong>Coding</strong>)
+และการใช้งานไมโครคอนโทรลเลอร์สำหรับผู้เริ่มต้น ทำได้ง่ายขึ้น เมื่อเปรียบเทียบกับการใช้ภาษา <strong>C/C++</strong> </p>
+<p>ไมโครไพธอนทำให้ผู้ใช้สามารถเขียนโค้ด <strong>Python 3</strong> 
+เพื่อเข้าถึงและใช้งานวงจรหรือฮาร์ดแวร์ภายในชิปไมโครคอนโทรลเลอร์ได้ง่ายขึ้น 
+เช่น วงจรภายในประเภท <strong>GPIO</strong>, <strong>Timer</strong>, <strong>SPI</strong>, <strong>I2C</strong>, <strong>UART</strong>, 
+<strong>ADC</strong>, <strong>DAC</strong> และ <strong>Wi-Fi</strong>  เป็นต้น</p>
+<p>การเขียนโค้ดไพธอนสำหรับฮาร์ดแวร์ อาจมีตัวเลือกอื่นที่ไม่ใช่บอร์ดไมโครคอนโทรลเลอร์ และสามารถนำมาเป็นสื่อการเรียนรู้ทางด้าน
+<strong>Physical Computing</strong> และ <strong>Cyber-Physical Computing</strong> ได้ เช่น
+บอร์ด <strong>Raspberry Pi (RPi)</strong> ซึ่งเป็นคอมพิวเตอร์บอร์ดเดี่ยว 
+(<strong>Single-Board Computer: SBC</strong>) </p>
+<p>บอร์ด <strong>RPi</strong> มีขา <strong>Pin Headers</strong> และเชื่อมต่อกับอุปกรณ์อื่นได้
+โดยใช้ <strong>I2C</strong>, <strong>SPI</strong>, <strong>PWM</strong>, <strong>UART/Serial</strong> เป็นต้น
+และสามารถเขียนโปรแกรมได้โดยใช้ <strong>Python 3</strong> โดยใช้ไลบรารีที่เกี่ยวข้อง</p>
+<p>แต่เนื่องจากบอร์ด <strong>RPi</strong> มีราคาแพงกว่าบอร์ดไมโครโทรลเลอร์ทั่วไป
+และมีโอกาสชำรุดเสียหายได้ง่ายกว่า หากต่อวงจรอิเล็กทรอนิกส์ไม่ถูกต้อง
+จึงถือว่าเป็นความเสี่ยง แต่ถ้าเลือกใช้บอร์ดไมโครโทรลเลอร์
+ก็จะมีค่าใช้จ่ายน้อยกว่า และจัดหามาใช้ได้ในจำนวนที่มากกว่าสำหรับงบประมาณที่เท่ากัน</p>
+<hr />
+<h2 id="_2">&#9655; <strong>ประวัติความเป็นมาของไมไครไพธอน</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>การพัฒนาไมโครไพธอนเพื่อทำให้ผู้ใช้สามารถเขียนโค้ดในภาษา  <strong>Python</strong> กับบอร์ดไมโครคอนโทรลเลอร์ได้ 
+เริ่มต้นโดย <strong>Damien P. George</strong> เมื่อเขาได้ทำงานเป็น <strong>Post-Doctoral Fellow</strong> 
+และทำวิจัยด้านอนุภาคพลังงานสูงในมหาวิทยาลัย  <strong>Cambridge</strong> ประเทศอังกฤษ
+ต่อมาในปีค.ศ. 2014 เขาได้ก่อตั้งบริษัท <strong>George Robotics Limited</strong>
+และได้พัฒนาบอร์ดไมโครคอนโทรลเลอร์ 32 บิต และสร้างบอร์ดรุ่นแรกที่มีชื่อว่า
+<a href="https://store.micropython.org/product/PYBv1.1"><strong>PyBoard</strong></a> 
+ที่มีชิป <strong>STM32F405RG (Arm Cortex-M4F, 168MHz, 1023KB Flash, 192 RAM)</strong>
+และได้นำมาทดลองใช้กับไมโครไพธอน</p>
+<p>เขาได้เปิดการระดมทุนใน <a href="https://www.kickstarter.com/projects/214379695/micro-python-python-for-microcontrollers"><strong>Kickstarter</strong></a>
+โดยใช้ชื่อโครงการว่า <strong>"MicroPython: Python for microcontrollers"</strong>
+ทำให้ได้ผู้เข้าร่วมและสนับสนุนไปเกือบ 2,000 ราย  และระดมทุนเงินสูงเกือบ <strong>£98,000</strong></p>
+<p><a href="https://circuitPython.org"><strong>CircuitPython</strong></a> ของบริษัท <a href="https://adafruit.com/"><strong>Adafruit Industries</strong></a>
+ก็เป็นหนึ่งตัวอย่างที่ได้มีการนำโค้ด <strong>MicroPython</strong> ใช้เป็นพื้นฐานในการพัฒนาและแยกออกไป
+อีกตัวอย่างหนึ่งคือ  <a href="https://github.com/openmv/openmv/"><strong>OpenMV</strong></a>
+ก็ได้มีการนำโค้ดของไมโครไพธอนไปพัฒนาต่อยอด เน้นการใช้งานด้านการประมวลผลภาพ และ "แมชชีนวิชั่น" (<strong>Machine Vision</strong>) เป็นต้น</p>
+<p>ในปัจจุบันได้ การพัฒนาไมโครไพธอนยังเกิดขึ้นอย่างต่อเนื่อง
+และได้มีการนำโค้ดของไมโครไพธอนไปปรับใช้กับชิปและบอร์ดไมโครคอนโทรลเลอร์รุ่นต่าง ๆ เช่น</p>
+<ul>
+<li><strong>STM32</strong></li>
+<li><strong>ATSAMD21 / ATSAMD51</strong></li>
+<li><strong>RP2040 (Raspberry Pi Pico, Arduino Nano RP2040 Connect)</strong></li>
+<li><strong>nRF51822 (BBC Micro:bit v1)</strong> / <strong>nRF52833 (BBC Micro:bit v2)</strong></li>
+<li><strong>ESP32 / ESP32-S2 / ESP32-S3 / ESP32-C3</strong></li>
+</ul>
+<p><img alt="" src="images/micropython_stm32_boards.png" /></p>
+<p>รูป: ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ <strong>STM32</strong> ของ <strong>George Robotics Limited</strong></p>
+<p><img alt="" src="images/arduino_micropython_boards.png" /></p>
+<p>รูป: ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ของ <strong>Arduino.cc</strong> ที่รองรับการใช้งานไมโครไพธอน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>รูปแบบการเขียนไมไครไพธอนสำหรับบอร์ดไมโครคอนโทรลเลอร์</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>ในการเขียนโปรแกรมด้วยไมโครไพธอนเพื่อใช้งานกับบอร์ดไมโครคอนโทรลเลอร์
+ผู้ใช้จะต้องเลือกใช้ไฟล์เฟิร์มแวร์ของไมโครไพทอน ให้ถูกต้องสำหรับบอร์ดไมโครคอนโทรลเลอร์เป้าหมาย
+(สามารถดาวน์โหลดไฟล์ได้จากเว็บไซต์ <a href="https://micropython.org/download/">https://micropython.org/download/</a>)</p>
+<p><img alt="" src="images/micropython_firmware_download.png" /></p>
+<p>รูป: เว็บไซต์สำหรับเลือกไฟล์เฟิร์มแวร์ของไมโครไพธอน โดยจำแนกตามชิปและบอร์ดที่ได้เลือกใช้</p>
+<ul>
+<li><a href="https://micropython.org/download/?mcu=rp2040"><strong>MicroPython firmware for Pico / Pico-W</strong></a></li>
+<li><a href="https://micropython.org/download/?mcu=esp32"><strong>MicroPython firmware for ESP32</strong></a></li>
+<li><a href="https://micropython.org/download/?mcu=esp32c3"><strong>MicroPython firmware for ESP32-C3</strong></a></li>
+</ul>
+<p>โดยทั่วไปก็เป็นไฟล์ <code>.hex</code> หรือ <code>.uf2</code> (ซึ่งขึ้นอยู่กับวิธีการอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ดไมโครคอนโทรลเลอร์)
+เมื่อได้ดาวน์โหลดไฟล์มาแล้ว ก็นำไปติดตั้งลงในชิปของบอร์ดไมโครคอนโทรลเลอร์เป้าหมายก่อนเริ่มต้นใช้งาน </p>
+<p>แม้ว่าไมโครไพธอนจะนำไปใช้ได้กับบอร์ดไมโครคอนโทรลเลอร์ที่แตกต่างกัน และมีการจัดทำไลบรารี หรือ <strong>API</strong>
+ไว้ให้ใช้งานได้เหมือนกัน แต่ก็มีความแตกต่างอยู่ในหลายกรณี และมีฟังก์ชันที่ทำงานได้เฉพาะเจาะจงกับไมโครคอนโทรลเลอร์เป้าหมาย
+เช่น การเชื่อมต่อเครือข่ายไร้สาย <strong>WiFi / BLE</strong> และการเชื่อมต่อเครือข่ายด้วย <strong>Ethernet MAC / PHY</strong></p>
+<p>แต่ถ้าเป็นบอร์ดไมโครบิต (<strong>BBC Micro:bit v1 &amp; v2</strong>) แม้ว่าจะใช้เขียนโค้ดด้วยไมโครไพธอนได้
+แต่คำสั่งต่าง ๆ ของ <strong>API</strong> ก็มีความแตกต่างและเจาะจงใช้สำหรับบอร์ดทั้งสอง 
+ศึกษารายละเอียดได้จาก <a href="https://microbit-micropython.readthedocs.io/en/latest/microbit_micropython_api.html"><strong>Micro:bit Micropython API (v1)</strong></a>
+และ <a href="https://microbit-micropython.readthedocs.io/en/v2-docs/microbit_micropython_api.html"><strong>Micro:bit Micropython API (v2)</strong></a>)</p>
+<ul>
+<li><a href="https://github.com/bbcmicrobit/micropython/releases"><strong>MicroPython firmware for Micro:bit v1</strong></a></li>
+<li><a href="https://github.com/microbit-foundation/micropython-microbit-v2/releases"><strong>MicroPython firmware for Micro:bit v2</strong></a></li>
+</ul>
+<p>เนื่องจากชิปไมโครคอนโทรลเลอร์ มีข้อจำกัดเรื่องหน่วยความจำ ดังนั้นจึงมีการสร้างไลบรารีใหม่จำนวนหนึ่ง 
+(เรียกโดยรวมว่า <a href="https://github.com/micropython/micropython-lib"><strong>MicroPython Libraries</strong></a>)
+และฟังก์ชันให้ใช้งานได้เหมือนกรณีของ 
+<strong>Python 3 Standard Libraries</strong> แต่อาจมีฟังก์ชันไม่ครบ 
+นอกจากนั้นแล้ว ได้มีการตั้งชื่อไลบรารี ให้เริ่มต้นด้วยตัวอักษร <code>'u'</code> 
+เช่น <code>utime</code>, <code>usys</code>, <code>uos</code>, <code>ustruct</code>
+เป็นต้น เพื่อให้สังเกตเห็นความแตกต่าง แต่ทางผู้พัฒนาก็ได้พยายาม นำไลบรารีหรือโมดูลต่าง ๆ ของ <strong>CPython</strong> 
+มาปรับให้สามารถใช้กับไมโครไพอนได้ สามารถดูรายการของไลบรารีที่ใช้ได้จาก <a href="https://docs.micropython.org/en/latest/library/index.html"><strong>Micropython-Lib</strong></a></p>
+<p>ในการเขียนโค้ดไมโครไพธอน ผู้ใช้สามารถใช้ซอฟต์แวร์ประเภท <strong>IDE</strong> ได้เหมือน <strong>Python Editor</strong> 
+แต่ก็มีความแตกต่าง เช่น คอมพิวเตอร์ของผู้ใข้จะต้องสื่อสารกับไมโครไพธอนที่ทำงานโดยใช้บอร์ดไมโครคอนโทรลเลอร์
+โดยจะต้องสื่อสารผ่านทางพอร์ต <strong>USB</strong> (ใช้ <strong>USB-to-Serial</strong> หรือ <strong>USB-CDC</strong>)
+ทำงานในลักษณะโต้ตอบได้ (<strong>interactive</strong>) หรือเรียกรูปแบบนี้ว่า
+<strong>REPL (Read, Eval, Print, Loop)</strong> </p>
+<p>โปรแกรมที่แนะนำให้ลองใช้งานสำหรับเขียนโค้ดไมโครไพธอน เช่น</p>
+<ul>
+<li><a href="https://thonny.org/"><strong>Thonny IDE</strong></a></li>
+<li><a href="https://codewith.mu/en/download"><strong>Mu Editor</strong></a></li>
+<li><a href="https://openmv.io/pages/download"><strong>OpenMV</strong></a></li>
+<li><a href="https://github.com/arduino/lab-micropython-editor"><strong>Arduino Lab for MicroPython</strong></a></li>
+</ul>
+<p><img alt="" src="images/thonny_ide_download.png" /></p>
+<p>รูป: ไฟล์สำหรับการติดตั้งใช้งาน <strong>Thonny IDE (v4.0.2)</strong> </p>
+<p><img alt="" src="images/lab_micropython_editor.png" /></p>
+<p>รูป: ไฟล์สำหรับการติดตั้งใช้งาน <a href="https://github.com/arduino/lab-micropython-editor/releases"><strong>Arduino Lab MicroPython Editor</strong></a></p>
+<p>นอกจาก <strong>Desktop IDEs / Editors</strong> สำหรับการเขียนโค้ดไมโครไพธอนแล้ว ยังมีตัวเลือกอื่นอีก
+ได้แก่ซอฟต์แวร์ที่เป็น <strong>Online / Web-based IDE</strong> เช่น</p>
+<ul>
+<li><a href="https://python.microbit.org/v/3"><strong>MicroPython Editor for BBC Micro:bit</strong></a>:
+สามารถเขียนโค้ดและจำลองการทำงานเสมือนจริงได้ แต่ใช้ได้เฉพาะบอร์ดไมโครบิต 
+และแนะนำให้ใช้กับบอร์ดไมโครบิต <strong>v2 (nRF52833)</strong> เนื่องจากมีความสามารถและหน่วยความจำมากกว่าบอร์ดไมโครบิต <strong>v1 (nRF51822</strong>) </li>
+<li><a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> สามารถใช้ได้กับบอร์ด <strong>Raspberry Pi Pico</strong>
+และบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> และ <strong>ESP32-S2</strong></li>
+</ul>
+<p><img alt="" src="images/microbit_v2_micropython_editor.png" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>MicroPython Editor (v3) for BBC Micro:bit</strong></p>
+<p><img alt="" src="images/wokwi_pico_micropython.png" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>Wokwi Simulator for MicroPython-RP2040 (Pico)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอไมโครไพธอนเป็นตัวเลือกหนึ่งที่น่าสนใจ
+เพื่อนำไปใช้เป็นภาษาคอมพิวเตอร์สำหรับผู้ที่สนใจเรียนรู้ด้านระบบสมองกลฝังตัว
+และการเขียนโปรแกรมควบคุมการทำงานของไมโครคอนโทรลเลอร์ และก็มีบอร์ดไมโครคอนโทรลเลอร์ที่นำมาใช้ได้กับไมโครไพธอนอยู่หลายตัวเลือก</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-03-12 | Last Updated: 2023-03-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
