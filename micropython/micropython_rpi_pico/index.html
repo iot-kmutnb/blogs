@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/micropython/micropython_rpi_pico/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม MicroPython สำหรับบอร์ด Raspberry Pi Pico / Pico-W - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#micropython-raspberry-pi-pico-pico-w" class="nav-link">การเขียนโปรแกรม MicroPython สำหรับบอร์ด Raspberry Pi Pico / Pico-W</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#raspberry-pi-pico" class="nav-link">&#9655; ไมไครไพธอนสำหรับบอร์ด Raspberry Pi Pico</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#onboard-led-blink" class="nav-link">&#9655; โค้ดตัวอย่าง: Onboard LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator" class="nav-link">&#9655; การเขียนโค้ดและจำลองการทำงานด้วย Wokwi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; โค้ดตัวอย่าง:  การระบุเวอร์ชันของไมโครไพธอนและกำหนดความถี่ของซีพียู</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sram-heap" class="nav-link">&#9655; โค้ดตัวอย่าง:  การจัดการหน่วยความจำ SRAM สำหรับ Heap</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rp2040-vbus" class="nav-link">&#9655; โค้ดตัวอย่าง: การอ่านอุณหภูมิภายในชิป RP2040 และวัดแรงดัน VBUS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#flash-storage" class="nav-link">&#9655; โค้ดตัวอย่าง: การเขียนอ่านไฟล์ข้อมูลภายใน Flash Storage</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; แหล่งข้อมูลและเอกสารอ้างอิง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-raspberry-pi-pico-pico-w">การเขียนโปรแกรม MicroPython สำหรับบอร์ด Raspberry Pi Pico / Pico-W<a class="headerlink" href="#micropython-raspberry-pi-pico-pico-w" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Raspberry Pico</em>, <em>RP2040</em>, <em>Thonny IDE</em>, <em>WokWi Simulator</em></p>
+<hr />
+<h2 id="raspberry-pi-pico">&#9655; <strong>ไมไครไพธอนสำหรับบอร์ด Raspberry Pi Pico</strong><a class="headerlink" href="#raspberry-pi-pico" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi (RPi) - Pico (RP2040)</strong> สามารถนำมาใช้และเขียนโปรแกรมได้หลายภาษา
+เช่น <strong>C/C++</strong> และ <strong>Python</strong> แต่ตั้งมีการเปิดตัวบอร์ด <strong>RPi Pico</strong> ในช่วงต้นปีค.ศ. 2020
+ทางทีมผู้พัฒนาของบริษัท <strong>Raspberry Pi (Trading) Ltd.</strong>
+ได้มีการแนะนำให้ลองใช้ภาษา <strong>MicroPython</strong> สำหรับผู้ใช้เริ่มต้น</p>
+<p><img alt="" src="rpi_pico_boards.png" /></p>
+<p>รูป: บอร์ดไมโครคอนโทรลเลอร์  <strong>Raspberry Pi Pico Board Variants: Pico / Pico-H / Pico-W / Pico-WH</strong></p>
+<p><img alt="" src="rpi_pico_pinout-2.png" /></p>
+<p><img alt="" src="rpi_pico_pinout-1.png" /></p>
+<p>รูป: แผนผัง <strong>Pinout Diagram</strong> หรือ <strong>Pin Map</strong> ของบอร์ด <strong>Pico</strong></p>
+<p><img alt="" src="pico_usb_drive.png" /></p>
+<p>รูป: การมองเห็นไดร์ฟ (ชื่อ <code>RPI-RP2</code>) ของบอร์ด <strong>Pico</strong> ในโหมด <strong>UF2 Bootloader</strong>
+สำหรับคอมพิวเตอร์ผู้ใช้ <strong>Windows</strong></p>
+<p>&nbsp;</p>
+<p>ผู้พัฒนาไมโครไพธอน (<strong>Damien George</strong>) ได้นำซอร์สโค้ดของไมโครไพธอน มาปรับใช้กับชิป <strong>RP2040</strong>
+และบอร์ด <strong>Pico</strong> โดยตั้งชื่อว่า <a href="https://github.com/micropython/micropython/tree/master/ports/rp2"><strong>"rp2"</strong></a>
+(เริ่มต้นที่เวอร์ชัน <strong>v1.13</strong> และขณะที่เขียนบทความนี้ ได้พัฒนามาถึงเวอร์ชัน <strong>v1.19</strong>) </p>
+<p>การติดตั้งเฟิร์มแวร์สำหรับไมโครไพธอนไปยังบอร์ด <strong>Pico</strong> ก็ทำได้ไม่ยาก มีขั้นตอนดังนี้</p>
+<p><strong>วิธีที่ 1</strong></p>
+<ol>
+<li>ดาวน์โหลดไฟล์เฟิร์มแวร์สำหรับบอร์ด <strong>Pico</strong> ซึ่งจะเป็นไฟล์ที่มีชื่อลงท้ายด้วย <strong>.uf2</strong>
+มายังเครื่องผู้ใช้  (สามารถเลือกไฟล์ล่าสุดได้จาก
+<a href="https://micropython.org/download/rp2-pico/">https://micropython.org/download/rp2-pico/</a>)</li>
+<li>กดปุ่ม <strong>BOOTSEL</strong> บนบอร์ด <strong>Pico</strong> ค้างไว้ จากนั้นเสียบสาย <strong>MicroUSB</strong> 
+เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ แล้วปล่อยปุ่ม <strong>BOOTSEL</strong> </li>
+<li>จากนั้นจะมองเห็น <strong>USB Drive</strong> ในคอมพิวเตอร์ผู้ใช้ และให้คลิกและลากไฟล์ <strong>.uf2</strong> ไปใส่ลงในไดรฟ์ดังกล่าว 
+รอให้บอร์ด <strong>Pico</strong> รีเซตการทำงานใหม่อีกครั้ง</li>
+</ol>
+<p><img alt="" src="rpi_pico_micropython_firmware.png" /></p>
+<p>รูป: หน้าเว็บไซต์เพื่อให้ผู้ใช้ดาวน์โหลดไฟล์ <a href="https://micropython.org/download/rp2-pico/"><strong>MicroPython - Pico Firmware</strong></a>
+ซึ่งมีรายการไฟล์ <strong>.uf2</strong> ให้เลือกดาวน์โหลด</p>
+<p><img alt="" src="rpi_pico-w_micropython_firmware.png" /></p>
+<p>รูป: หน้าเว็บไซต์เพื่อให้ผู้ใช้ดาวน์โหลดไฟล์ <a href="https://micropython.org/download/rp2-pico-w/"><strong>MicroPython - Pico-W Firmware</strong></a></p>
+<p><strong>วิธีที่ 2</strong></p>
+<ol>
+<li>ดาวน์โหลดและติดตั้งโปรแกรม <strong>Thonny IDE</strong> </li>
+<li>เลือก <strong>Python Interpreter</strong> เป็น <strong>MicroPython</strong> แล้วเชื่อมต่อบอร์ด <strong>Pico</strong> (อยู่ในโหมด <strong>UF2 Boot</strong>)
+กับคอมพิวเตอร์กับผู้ใช้ และอัปโหลดเฟิร์มแวร์ของไมโครไพธอนไปยังบอร์ดได้</li>
+</ol>
+<p>เมื่อได้ติดตั้งไฟล์ไมโครไพธอนไปยังบอร์ด <strong>Pico</strong> แล้วก็สามารถใช้โปรแกรมอย่างเช่น <a href="https://thonny.org/"><strong>Thonny IDE</strong></a>
+เชื่อมต่อกับบอร์ด <strong>Pico</strong> และเริ่มต้นการเขียนโปรแกรมไมโครไพธอน</p>
+<p><strong>Thonny IDE</strong> </p>
+<ul>
+<li>เป็นซอฟต์แวร์ประเภท <strong>Python Editor / IDE</strong> และรองรับการเขียนโค้ดด้วยภาษา <strong>MicroPython / CircuitPython</strong> </li>
+<li>เป็นซอฟต์แวร์ <strong>Open Source</strong> ที่ได้มีการพัฒนาขึ้นที่สถาบัน<br />
+<strong>Institute of Computer Science</strong> มหาวิทยาลัย <strong>University of Tartu</strong>
+ประเทศเอสโตเนีย (<strong>Estonia</strong>) และมีบริษัท <strong>Cybernetica AS</strong> รับช่วงต่อในการพัฒนาและดูแล</li>
+<li>ใช้ภาษา <strong>Python</strong> ในการพัฒนา </li>
+<li>สามารถนำมาใช้ได้กับระบบ <strong>Windows</strong>, <strong>Linux</strong> และ <strong>macOS</strong></li>
+</ul>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต</strong></p>
+<ul>
+<li>หากต้องการลองใช้ไมโครไพธอนสำหรับบอร์ด <strong>Pico</strong> ยังไม่มีอุปกรณ์ ก็สามารถลองเขียนโค้ดและจำลองการทำงานได้เสมือนจริง
+โดยใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> ได้
+โดยเลือกอุปกรณ์เป็น <strong>"MicroPython on Raspberry Pico"</strong></li>
+<li>ในปัจจุบันมีบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>RP2040</strong> เหมือนบอร์ด <strong>Pico</strong> และสามารถเลือกมาใช้
+เป็นตัวเลือกอื่นแทนที่ <strong>Pico</strong> ได้ ผู้ผลิตบอร์ดที่ใช้ <strong>RP2040</strong> ก็อาจมีการเลือกใช้ชิป <strong>QSPI Flash</strong>
+ภายนอกที่มีความจุมากกว่า <strong>2MB</strong> ให้เลือกใช้ได้ (เช่น <strong>4MB / 8MB / 16MB</strong>)</li>
+<li>ไฟล์เฟิร์มแวร์สำหรับบอร์ด <strong>Pico</strong> (ไม่มี <strong>WiFi/BLE </strong>) และ <strong>Pico-W</strong> (มีโมดูล <strong>WiFi/BLE </strong>)
+ได้มีการจัดทำแยกกัน ดังนั้นจึงจะต้องดาวน์โหลดไฟล์ที่ถูกต้องและตรงกับบอร์ดที่จะเลือกใช้งาน</li>
+</ul>
+<p>&nbsp;</p>
+<p>ตัวอย่างการใช้งาน <a href="https://thonny.org/"><strong>Thonny IDE (v4.0.x)</strong></a> (สำหรับระบบปฏิบัติการ <strong>Windows</strong>) มีดังนี้</p>
+<p><img alt="" src="thonny-1.png" /></p>
+<p>รูป: เปิดใช้งาน <strong>Thonny IDE</strong> 
+และเลือก <strong>Run &gt; Select / Configure Interpreter...</strong></p>
+<p><img alt="" src="thonny-2.png" /></p>
+<p>รูป: เลือก <strong>MicroPython (Raspberry Pi Pico)</strong></p>
+<p>ถ้าต้องการติดตั้งไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>Pico</strong> (ในโหมด <strong>UF2 Boot</strong>)
+ให้เชื่อมต่อบอร์ดกับคอมพิวเตอร์ผู้ใช้ แล้วคลิก <strong>"Install or update firmware"</strong>
+เลือก <strong>Target volume</strong> ซึ่งเป็น <strong>USB Flash Drive</strong> ของบอร์ด
+และเลือก <strong>MicroPython variant</strong> เช่น จะใช้กับบอร์ด <strong>Pico</strong> หรือ <strong>Pico-W</strong>
+เป็นต้น</p>
+<p><img alt="" src="thonny-3.png" /></p>
+<p>รูป: ขั้นตอนการติดตั้ง <strong>MicroPython Firmware</strong>  โดยใช้ <strong>Thonny IDE</strong></p>
+<p><img alt="" src="thonny-4.png" /></p>
+<p>รูป: การเลือกไฟล์และการติดตั้งเฟิร์มแวร์สำหรับบอร์ด <strong>Pico-W</strong></p>
+<p><img alt="" src="thonny-5.png" /></p>
+<p>รูป: ข้อความใน <strong>Shell</strong> แสดงให้เห็นว่า สามารถเชื่อมต่อกับบอร์ด <strong>Pico</strong>
+ที่ได้ติดตั้งเฟิร์มแวร์ของไมโครไพธอน  (<strong>MicroPython v1.9.1</strong>) และพร้อมใช้งานแล้ว</p>
+<p>ผู้ใช้สามารถพิมพ์คำสั่งของไมโครไพธอน ในช่องอินพุตของ <strong>Shell</strong> ถัดจากสัญลักษณ์ <code>&gt;&gt;&gt;</code>  ( <strong>Interactive MicroPython REPL Prompt</strong>)  </p>
+<p>ถ้าต้องการรีเซตข้อมูลในหน่วยความจำแฟลช  (<strong>Resetting Flash memory</strong>) ให้ดาวน์โหลดไฟล์
+<a href="https://datasheets.raspberrypi.com/soft/flash_nuke.uf2">flash_nuke.uf2</a>
+แล้วนำไปใช้กับบอร์ด <strong>Pico</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="onboard-led-blink">&#9655; <strong>โค้ดตัวอย่าง: Onboard LED Blink</strong><a class="headerlink" href="#onboard-led-blink" title="Permanent link">#</a></h2>
+<p>โค้ดไมโครไพธอนต่อไปนี้ สาธิตการใช้คำสั่งเพื่อทำให้ <strong>LED</strong> บนบอร์ด <strong>Pico</strong>
+ซึ่งตรงกับขา <strong>GP25</strong> กระพริบด้วยอัตราคงที่</p>
+<pre><code class="language-python">import machine
+import time
+
+# use onboard LED
+led = machine.Pin(25, machine.Pin.OUT)
+try: 
+    while True:
+        state = not led.value()
+        led.value( state )
+        print('LED state:', state)
+        time.sleep(0.5)
+except KeyboardInterrupt:
+    pass
+finally:
+    led.value(0) # turn off LED
+</code></pre>
+<p>ให้ลองเขียนใน <strong>Thonny IDE</strong> แล้วกดปุ่ม <strong>Save As</strong> เลือกชื่อไฟล์ <code>main.py</code>
+แล้วบันทึกไปยังระบบไฟล์ของบอร์ด <strong>Pico</strong> </p>
+<p><img alt="" src="thonny-6.png" /></p>
+<p>รูป: การเขียนโค้ดโดยใช้ <strong>Thonny IDE</strong> และบันทึกไฟล์ <code>main.py</code> ไว้ในหน่วยความจำของบอร์ด <strong>Pico</strong></p>
+<p><img alt="" src="thonny-7.png" /></p>
+<p>รูป: การทำงานของโค้ดไมโครไพธอนในไฟล์ <code>main.py</code> ที่ได้มีการบันทึกไฟล์ไปยังบอร์ด <strong>Raspberry Pi Pico</strong> </p>
+<p>การอ้างอิงชื่อของ <strong>onboard LED</strong> ทำได้โดยการระบุหมายเลข <strong>GPIO</strong>
+ถ้าเป็นบอร์ด <strong>Pico</strong> ก็จะใช้หมายเลข <strong>GP25</strong> (<code>25</code>) แต่ถ้าเป็นบอร์ด <strong>Pico-W</strong>
+จะไม่สามารถใช้งานขาดังกล่าวสำหรับ <strong>Onboard LED</strong> ดังนั้นแนะนำให้เขียนคำสั่งตามรูปแบบต่อไปนี้
+ใช้ชื่อขา  <code>'LED'</code> หรือ <code>'WL_GPIO0'</code></p>
+<pre><code class="language-python">led = machine.Pin('LED', machine.Pin.OUT)
+</code></pre>
+<p>ทุกครั้งที่มีการรีเซตการทำงานของไมโครไพธอน (เช่น กดคีย์ <code>Ctrl</code>+ <code>D</code> เมื่อใช้งาน <strong>Thonny IDE</strong>) 
+จะมีการทำคำสั่งต่าง ๆ ในไฟล์ <code>main.py</code> โดยอัตโนมัติ (ถ้ามีการสร้างไฟล์ชื่อดังกล่าวเอาไว้)</p>
+<p>ถ้าต้องการหยุดการทำงานของโปรแกรม <code>main.py</code> ให้
+กดคีย์ <code>Ctrl</code>+<code>C</code> (เพื่อหยุดการคำสั่งของ <code>main.py</code>)
+หรือ กดปุ่ม  <strong>Stop/Restart backend</strong>
+(เพื่อหยุดการทำคำสั่งของ <code>main.py</code> และเริ่มการทำงานของ <strong>MicroPython REPL</strong> ใหม่อีกครั้ง)
+แต่ถ้ากดคีย์ <code>Ctrl</code>+<code>D</code> เป็นการทำคำสั่ง <strong>Soft Reset</strong> และทำให้บอร์ดเริ่มต้นทำงานใหม่</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator">&#9655; <strong>การเขียนโค้ดและจำลองการทำงานด้วย Wokwi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
+<p><a href="https://github.com/wokwi/rp2040js"><strong>Raspberry Pi Pico Emulator</strong></a>
+และ <a href="https://wokwi.com/"><strong>Wokwi Simulator</strong></a> 
+เป็นอีกหนึ่งตัวเลือกสำหรับการฝึกเขียนโค้ด <strong>C/C++</strong> และ <strong>MicroPython / CircuitPython</strong>
+และรองรับการใช้งานบอร์ดไมโครคอนโทรลเลอร์  <strong>Pico</strong>
+ให้ลองเปิดเว็บเบราว์เซอร์ไปยัง <a href="https://wokwi.com/dashboard/projects">https://wokwi.com/dashboard/projects</a>
+แล้วกดคลิที่ <strong>+NEW PROJECT</strong> เลือกบอร์ดจากรายการ <strong>"MicroPython on Raspberry Pico"</strong></p>
+<p>จากนั้นลองเขียนโค้ดไมโครไพธอนตามตัวอย่าง แล้วกดปุ่ม <strong>"Start the simulation"</strong> เพื่อทดสอบการทำงานของโค้ด</p>
+<p><img alt="" src="wowki_micropython_pico.png" /></p>
+<p>รูป: การเขียนโค้ดไมโครไพธอนและจำลองการทำงานด้วย <strong>Wokwi Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>โค้ดตัวอย่าง:  การระบุเวอร์ชันของไมโครไพธอนและกำหนดความถี่ของซีพียู</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการแสดงข้อมูลเกี่ยวกับเฟิร์มแวร์ไมโครไพธอนที่ได้มีการติดตั้งใช้งาน
+การอ่านและตั้งค่าความถี่สำหรับซีพียู โดยใช้คำสั่ง <code>machine.freq(...)</code>
+และการแสดงข้อมูลเกี่ยวกับความจุและการใช้งานระบบไฟล์ที่ใช้หน่วยความจำแฟลชบนบอร์ด <strong>Pico</strong></p>
+<pre><code class="language-python">import machine
+import sys
+import time
+import os
+
+# Show Micropython information
+print( &quot;sys.version: {}&quot;.format(sys.version) )
+results = os.uname()
+print( 'machine: {}'.format( results.machine) )
+print( &quot;release: {}&quot;.format( results.release) )
+
+# Delay for 0.5 seconds
+time.sleep_ms(500)
+
+# Read the default CPU frequency
+default_freq = machine.freq()
+
+# Set the CPU frequency to a lower value (say 64MHz)
+machine.freq( 64000000 )
+# Read the current CPU frequency
+print ( &quot;CPU freq. = %d MHz&quot; % int(machine.freq()/1e6) )
+
+# Restore the default CPU frequency
+machine.freq( default_freq )
+# Read the current CPU frequency (125 MHz)
+print ( &quot;CPU freq. = %d MHz&quot; % int(machine.freq()/1e6) )
+
+# Get information about VFS (Virtual File Storage)
+vfs_info = os.statvfs('/')
+# vfs_info[0] = block size in bytes
+# vfs_info[2] = total number of blocks in the Flash filesystem
+# vfs_info[3] = total number of free blocks
+total_storage = vfs_info[0]*vfs_info[2]
+free_storage = vfs_info[0]*vfs_info[3]
+print( &quot;Total storage: {} KB&quot;.format(total_storage//1024))
+print( &quot;Free storage: {} KB&quot;.format(free_storage//1024))
+print( &quot;Used storage: {} KB&quot;.format((total_storage - free_storage)//1024))
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">sys.version: 3.4.0; MicroPython v1.19.1-995-g0a3600a9a on 2023-03-31
+machine: Raspberry Pi Pico W with RP2040
+release: 1.19.1
+CPU freq. = 64 MHz
+CPU freq. = 125 MHz
+Total storage: 848 KB
+Free storage: 836 KB
+Used storage: 12 KB
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sram-heap">&#9655; <strong>โค้ดตัวอย่าง:  การจัดการหน่วยความจำ SRAM สำหรับ Heap</strong><a class="headerlink" href="#sram-heap" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการตรวจสอบการใช้งานหน่วยความจำ <strong>on-chip SRAM</strong>
+สำหรับ <strong>Heap</strong> และการใช้งาน <a href="https://docs.micropython.org/en/latest/develop/memorymgt.html"><strong>Runtime Garbage Collection (GC)</strong></a>
+โดยใช้คำสั่งของโมดูล <code>gc</code> เพื่อจัดการคืนหน่วยความจำที่่ไม่ได้ใช้งานสำหรับอ็อปเจกต์ใด ๆ แล้ว ในขณะที่โปรแกรมไมโครไพธอนทำงาน</p>
+<pre><code class="language-python">import machine
+import gc # for MicorPython's runtime garbage collection
+
+# Show information about allocated and free memory 
+print( &quot;Allocated Memory: %d bytes&quot; % gc.mem_alloc() )
+print( &quot;Free: %d bytes&quot; % gc.mem_free() )
+
+# Invoke the garbage collection
+print( &quot;Invoked garbage collection&quot; )
+gc.collect()
+
+# Show information about allocated and free memory 
+print( &quot;Allocated Memory: %d bytes&quot; % gc.mem_alloc() )
+print( &quot;Free: %d bytes&quot; % gc.mem_free() )
+
+mem_free  = gc.mem_free() 
+mem_alloc = gc.mem_alloc()
+mem_total = mem_free + mem_alloc
+text_fmt = 'Memory (total/alloc/free): {:,} / {:,} / {:,} bytes'
+print( text_fmt.format(mem_total, mem_alloc, mem_free) )
+
+# Enable automatic garbage collection
+gc.enable()
+
+# If the GC threshold level is not set.
+if gc.threshold() == -1:
+    # Set the threshold level. This will invoke the GC
+    # if more than 25% of the currently free heap becomes occupied.
+    level = gc.mem_free()//4 + gc.mem_alloc()
+    gc.threshold( level )
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตมีดังนี้</p>
+<pre><code class="language-text">Allocated Memory: 5264 bytes
+Free: 187136 bytes
+Invoked garbage collection
+Allocated Memory: 4784 bytes
+Free: 187616 bytes
+Memory (total/alloc/free): 192,448 / 4,880 / 187,568 bytes
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rp2040-vbus">&#9655; <strong>โค้ดตัวอย่าง: การอ่านอุณหภูมิภายในชิป RP2040 และวัดแรงดัน VBUS</strong><a class="headerlink" href="#rp2040-vbus" title="Permanent link">#</a></h2>
+<p>วงจร <strong>ADC (Analog-to-Digital Converter)</strong> ภายในชิป <strong>RP2040</strong> 
+มีช่องอินพุตทั้งหมด 5 ช่อง (ช่องหมายเลข 0 ถึง 4) และมีความละเอียดในการแปลงข้อมูลเท่ากับ 12 บิต (0..4095) 
+แต่การอ่านค่าด้วยไมโครไพธอน จะแปลงให้เป็นข้อมูลขนาด 16 บิต (0..65535)</p>
+<p>ในกรณีที่ใช้บอร์ด <strong>Raspberry Pi Pico</strong> ช่องอินพุต 3 ช่องแรก (หมายเลข 0, 1, 2) ของ <strong>ADC</strong> 
+ตรงกับขา <strong>GP26</strong>, <strong>GP27</strong> และ <strong>GP28</strong> บนบอร์ด ตามลำดับ 
+ในขณะที่ช่องอินพุตหมายเลข 3 จะใช้สำหรับอ่านแรงดันไฟฟ้าที่ขา <strong>GP29</strong> ซึ่งจะวัดค่า <strong>VSYS/3</strong>
+(แต่ถ้าบอร์ดใช้แรงดันไฟเลี้ยงจาก <strong>VUSB</strong> จะได้เท่ากับ <strong>VBUS/3</strong>)</p>
+<p>โค้ดตัวอย่างนี้สาธิตการอ่านค่าอินพุตด้วยวงจร <strong>ADC</strong> 
+จากขา <strong>GP29</strong> ของบอร์ด <strong>Pico</strong> (เพื่อวัดแรงดันไฟเลี้ยง <strong>VBUS</strong>) และช่องอินพุตที่ 4
+สำหรับวัดอุณหภูมิภายในชิป <strong>RP2040</strong></p>
+<pre><code class="language-python">from machine import Pin, ADC
+import time
+
+conversion_factor = (3.3 / 65535) # 3.3V &lt;-&gt; 16-bit value
+
+# Read analog input on GP29 of the Pico board
+voltage = ADC( 29 ).read_u16() * conversion_factor * 3
+print('VBUS: %.3f V' % voltage)
+
+# Read the on-chip temperature sensor
+sensor_temp = ADC(4)
+
+while True:
+    reading = sensor_temp.read_u16() * conversion_factor
+    # Typical value: 0.706V at 27 degrees C
+    # with a slope of -1.721mV (0.001721) per degree. 
+    temperature = 27 - (reading - 0.706)/0.001721
+    print('On-chip tempreature: {:.2f} deg.C'.format(temperature) )
+    time.sleep(2.0)
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต (เมื่อทดลองกับอุปกรณ์จริงโดยใช้บอร์ด <strong>Pico</strong>)</p>
+<pre><code class="language-text">VBUS: 5.036 V
+On-chip tempreature: 31.26 deg.C
+On-chip tempreature: 30.32 deg.C
+On-chip tempreature: 30.32 deg.C
+On-chip tempreature: 30.79 deg.C
+...
+</code></pre>
+<p>&nbsp;</p>
+<p>แต่ถ้าใช้บอร์ด <strong>Pico-W</strong> จะต้องใช้โค้ดตัวอย่างต่อไปนี้ เนื่องจากมีความแตกต่างในระดับฮาร์ดแวร์
+มีการใช้ขา <strong>GPIO</strong> บางขาของ <strong>RP2040</strong> สำหรับเชื่อมต่อกับโมดูล <strong>WiFi/BLE</strong></p>
+<pre><code class="language-python">from machine import Pin, ADC
+import time
+import sys
+
+conversion_factor = (3.3 / 65535) # 3.3V &lt;-&gt; 16-bit value
+
+#---------------------------------------------------------------------
+# On Pico-W board, the GPIO25 pin is used for WiFi module's SPI CS pin.
+# When GPIO25 is high, it enables GPIO29 ADC pin to read VSYS.
+
+wl_cs = Pin(25)
+# Show WL_CS pin state
+print( &quot;WL_CS (GPIO25), state: {}&quot;.format(wl_cs) )
+
+# Use GPIO25 as digital output and output HIGH.
+wl_cs.init( mode=Pin.OUT, value=1 )
+
+# Show WL_CS pin state
+print( &quot;WL_CS (GPIO25), state: {}&quot;.format(wl_cs) )
+
+# Read analog input on GP29 of the Pico-W board
+voltage = ADC( 29 ).read_u16() * conversion_factor * 3
+print('VBUS: %.3f V' % voltage)
+
+# Restore WL_CS pin state
+wl_cs.init( mode=Pin.ALT, pull=Pin.PULL_DOWN, alt=7 )
+print( &quot;WL_CS (GPIO25), state: {}&quot;.format(wl_cs) )
+
+#---------------------------------------------------------------------
+
+# Read the on-chip temperature sensor
+sensor_temp = ADC(4)
+
+while True:
+    reading = sensor_temp.read_u16() * conversion_factor
+    # Typical value: 0.706V at 27 degrees C
+    # with a slope of -1.721mV (0.001721) per degree. 
+    temperature = 27 - (reading - 0.706)/0.001721
+    print('On-chip tempreature: {:.2f} deg.C'.format(temperature) )
+    time.sleep(2.0)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="flash-storage">&#9655; <strong>โค้ดตัวอย่าง: การเขียนอ่านไฟล์ข้อมูลภายใน Flash Storage</strong><a class="headerlink" href="#flash-storage" title="Permanent link">#</a></h2>
+<p>โค้ดต่อไปนี้สาธิตการใช้ข้อมูล <strong>Dictionary</strong> ในภาษาไมโครไพธอน
+แล้วนำไปเขียนข้อมูลเก็บไว้ในไฟล์ หรืออ่านข้อมูลมาจากไฟล์ แบ่งเป็นสองวิธี คือ
+วิธีแรกเป็นการเขียนข้อมูลเป็นไฟล์แบบ <strong>Text-based</strong> แบ่งข้อมูลด้วย <code>,</code> (<strong>Comma</strong>)
+และวิธีที่สองเป็นการเขียนข้อมูลในรูปแบบ <strong>JSON String</strong> 
+(โดยใช้คำสั่งของไลบรารี <a href="https://docs.micropython.org/en/v1.16/library/ujson.html"><code>ujson</code></a>)</p>
+<pre><code class="language-python">import os
+import time 
+import ujson
+
+#-------------------------------------------------------------
+# Save a dictionary to a text file
+def save_data_to_file(fname, dict_data):
+    with open(fname, &quot;w&quot;) as f:
+        for key in dict_data:
+            f.write(&quot;{},{}\n&quot;.format(key, dict_data[key]))
+
+def load_data_from_file(fname):
+    dict_data = {}
+    with open(fname, &quot;r&quot;) as f:
+        for s in f:
+            name_value = s.strip().split(&quot;,&quot;)
+            dict_data[name_value[0]] = name_value[1]
+    return dict_data
+
+#-------------------------------------------------------------
+# Save a dictonary to a JSON file
+def save_json_to_data(fname, ujson_data):
+    with open(fname, &quot;w&quot;) as f:
+        s = ujson.dumps(data)
+        f.write(s)
+
+def load_json_from_file(fname):
+    data = {}
+    with open(fname, &quot;r&quot;) as f:
+        s = f.read()
+        data = ujson.loads(s)
+    return data
+
+#-------------------------------------------------------------
+# Create a dictionary with sample key-value pairs
+data = {}
+data[&quot;TH&quot;] = &quot;Thailand&quot;
+data[&quot;DE&quot;] = &quot;Germany&quot;
+data[&quot;JP&quot;] = &quot;Japan&quot;
+data[&quot;AU&quot;] = &quot;Australia&quot;
+
+DATA_FILENAME = &quot;/data.txt&quot;
+JSON_FILENAME = &quot;/data.json&quot;
+
+# Save the dictionary to a text file to the Flash
+save_data_to_file( DATA_FILENAME, data )
+# Load data from the text file
+data = load_data_from_file( DATA_FILENAME )
+
+print( &quot;Method 1) Write / Read data (dictionary)&quot; )
+# Show loaded data (key-value pairs)
+for k, v in data.items():
+    # Show the key and the associated value
+    print( &quot;\t %s = %s&quot; % (k,v) ) 
+
+print( &quot;Method 2) Write / Read JSON data&quot; )
+
+# Save the dictionary to a JSON file to the Flash
+save_json_to_data( JSON_FILENAME, data )
+# Load data from the JSON file 
+data = load_json_from_file( JSON_FILENAME )
+
+# Show loaded data (key-value pairs)
+for k, v in data.items():
+    # Show the key and the associated value
+    print( &quot;\t %s = %s&quot; % (k,v) ) 
+
+# List files
+print( &quot;Files:&quot;, os.listdir('/') )
+
+# Remove files
+os.remove( DATA_FILENAME ) 
+os.remove( JSON_FILENAME )
+
+# List files after file removal
+print( &quot;Files:&quot;, os.listdir('/') )
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">Method 1) Write / Read data (dictionary)
+     DE = Germany
+     TH = Thailand
+     AU = Australia
+     JP = Japan
+Method 2) Write / Read JSON data
+     DE = Germany
+     TH = Thailand
+     AU = Australia
+     JP = Japan
+Files: ['data.json', 'data.txt', 'main.py']
+Files: ['main.py']
+</code></pre>
+<p>ตัวอย่างข้อมูลในไฟล์ <code>/data.json</code></p>
+<pre><code class="language-text">{&quot;DE&quot;: &quot;Germany&quot;, &quot;TH&quot;: &quot;Thailand&quot;, &quot;AU&quot;: &quot;Australia&quot;, &quot;JP&quot;: &quot;Japan&quot;}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>แหล่งข้อมูลและเอกสารอ้างอิง</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>e-Book</strong>: 
+<a href="https://hackspace.raspberrypi.com/books/micropython-pico/pdf/download"><strong><em>"Get Started with MicroPython on Raspberry Pi Pico (2021)"</em></strong></a>:<br>
+ISBN: 978-1-912047-86-4</li>
+<li>ไฟล์เอกสาร <strong>.PDF</strong> แนะนำการใช้งาน <strong>MicroPython API / SDK</strong>:<br>
+<a href="https://datasheets.raspberrypi.org/pico/sdk/pico_python_sdk.pdf">https://datasheets.raspberrypi.org/pico/sdk/pico_python_sdk.pdf</a></li>
+<li>ไฟล์โค้ดตัวอย่างสาธิตการทำงานไมโครไพธอนสำหรับ <strong>RP2040</strong>:<br> 
+<a href="https://github.com/raspberrypi/pico-micropython-examples">https://github.com/raspberrypi/pico-micropython-examples</a></li>
+<li><strong>MicroPython - Quick Reference for the RP2</strong>:<br>
+<a href="https://docs.micropython.org/en/latest/rp2/quickref.html">https://docs.micropython.org/en/latest/rp2/quickref.html</a></li>
+</ul>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../rpi-rp2040/">"แนวทางการใช้งานบอร์ด Raspberry Pi Pico สำหรับการเรียนรู้ระบบสมองกลฝังตัว"</a></li>
+<li><a href="../micropython_rpi_pico_led_blink/">"การเขียนโปรแกรม MicroPython สำหรับบอร์ด Pico เพื่อทำให้ LED กระพริบด้วยวิธีที่แตกต่างกัน"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการติดตั้งและใช้งานไฟล์เฟิร์มแวร์ของ <strong>MicroPython</strong> สำหรับนำมาใช้กับบอร์ด
+<strong>Raspberry Pi Pico / Pico-W</strong> และใช้ซอฟต์แวร์ <strong>Thonny IDE</strong> เป็น
+<strong>Desktop IDE</strong> ในการเขียนและอัปโหลดโค้ดไปยังบอร์ด <strong>Pico / Pico-W</strong> หรือทดลองใช้ 
+<strong>Wokwi Simulator</strong> เป็น <strong>Online IDE</strong> สำหรับการเขียนโค้ดและจำลองการทำงานในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-04-02 | Last Updated: 2023-04-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

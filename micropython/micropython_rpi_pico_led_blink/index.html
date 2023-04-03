@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/micropython/micropython_rpi_pico_led_blink/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม MicroPython สำหรับบอร์ด Pico เพื่อทำให้ LED กระพริบด้วยวิธีที่แตกต่างกัน - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#micropython-pico-led" class="nav-link">การเขียนโปรแกรม MicroPython สำหรับบอร์ด Pico เพื่อทำให้ LED กระพริบด้วยวิธีที่แตกต่างกัน</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#micropython-led-blink" class="nav-link">&#9655; MicroPython - LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#software-timer" class="nav-link">&#9655; การใช้ Software Timer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pwm-" class="nav-link">&#9655; การสร้างสัญญาณ PWM สำหรับขาเอาต์พุต-ดิจิทัล</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#multi-threading" class="nav-link">&#9655; การเขียนโปรแกรมแบบ Multi-Threading</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pio-gpio" class="nav-link">&#9655; การใช้งาน PIO ร่วมกับขา GPIO</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-pico-led">การเขียนโปรแกรม MicroPython สำหรับบอร์ด Pico เพื่อทำให้ LED กระพริบด้วยวิธีที่แตกต่างกัน<a class="headerlink" href="#micropython-pico-led" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Raspberry Pico</em>, <em>RP2040</em>, <em>Thonny IDE</em>, <em>WokWi Simulator</em></p>
+<hr />
+<h2 id="micropython-led-blink">&#9655; <strong>MicroPython - LED Blink</strong><a class="headerlink" href="#micropython-led-blink" title="Permanent link">#</a></h2>
+<p>ในการเขียนโค้ดเพื่อกำหนดสถานะลอจิกของขา <strong>GPIO</strong> ซึ่งใช้เป็นขาดิจิทัล-เอาต์พุต และนำไปต่อกับวงจร <strong>LED</strong>
+ซึ่งอาจมีอยู่บนบอร์ดไมโครคอนโทรลเลอร์ หรือ ต่อวงจรเพิ่มภายนอก ก็มีรูปแบบการใช้คำสั่งหรือวิธีเขียนโค้ดที่แตกต่างกันไปและมีมากกว่าหนึ่งวิธี
+บทความนี้สาธิตตัวอย่างโค้ดไมโครไพธอน เพื่อนำไปทดลองใช้กับบอร์ด <strong>Pico</strong> </p>
+<pre><code class="language-python">from machine import Pin
+import time
+
+DELAY_MS  = 500
+DELAY_SEC = DELAY_MS / 1000
+DELAY_US  = DELAY_MS * 1000
+
+# Use onboard LED: Use the GPIO25 pin or 'LED'
+pin = 25
+# Create a Pin object for the onboard LED 
+led = Pin( pin, Pin.OUT ) 
+
+# Method 1
+print( '\nToggle LED using the led.value( 0|1 ) function.' )
+for i in range(10):
+    led.value(1)
+    print( 'LED: {}'.format( led.value() ) )
+    time.sleep( DELAY_SEC )
+    led.value(0)
+    print( 'LED: {}'.format( led.value() ) )
+    time.sleep( DELAY_SEC )
+
+# Method 2
+print( '\nToggle LED using the led.on() / led.off() functions.' )
+for i in range(10):
+    led.on()
+    print( 'LED: {}'.format( led.value() ) )
+    time.sleep_ms( DELAY_MS )
+    led.off()
+    print( 'LED: {}'.format( led.value() ) )
+    time.sleep_ms( DELAY_MS )
+
+# Method 3
+print( '\nToggle LED using the led.toggle() function.' )
+for i in range(10):
+    led.toggle()
+    print( 'LED: {}'.format( led.value() ) )
+    time.sleep_us( DELAY_US )
+
+# Method 4
+print( '\nToggle LED using read-modify-write.' )
+for i in range(10):
+    new_value = not led.value()
+    led.value( new_value )
+    print( 'LED: {}'.format( new_value ) )
+    time.sleep_us( DELAY_US )
+
+# Method 5
+print( '\nToggle LED without delay.' )
+# Get current timestamp (in msec)
+saved_ts = time.ticks_ms()
+count = 0
+while True:
+    # Get current timestamp
+    now = time.ticks_ms()
+    # Compute time difference
+    delta = time.ticks_diff( now, saved_ts )
+    if delta &gt;= DELAY_MS:
+        saved_ts = now  # Update the saved timestamp
+        led.toggle()    # Toggle the LED
+        print( 'LED: {}'.format( led.value() ) )
+        count += 1
+        if count &gt;= 10:
+            break
+
+print('Done....')
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="software-timer">&#9655; <strong>การใช้ Software Timer</strong><a class="headerlink" href="#software-timer" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการเปิดใช้งานไทม์เมอร์ที่ทำงานด้วยซอฟต์แวร์ (<strong>Software Timer</strong>) สำหรับไมโครไพธอน
+โดยกำหนดให้ทำงานแบบมีคาบและทำซ้ำ (<strong>Periodic Mode</strong>) และมีคาบหรือช่วงเวลาเท่ากับ 500 มิลลิวินาที </p>
+<p>เมื่อครบหนึ่งคาบเวลา จะมีการคำสั่งในรูปแบบการเรียกใช้ฟังก์ชัน <strong>Callback</strong> 
+ในตัวอย่างนี้ได้กำหนดให้มีการเปลี่ยนสถานะลอจิกของขา <strong>LED</strong></p>
+<pre><code class="language-python">from machine import Pin, Timer
+import time
+
+# Use onboard LED: Use the GPIO25 pin or 'LED'
+pin = 25
+# Create a Pin object for the onboard LED 
+led = Pin( pin, Pin.OUT ) 
+
+# Set the timer period (in msec)
+PERIOD_MS = 500
+
+# Create a software timer objecte
+timer = Timer() 
+
+# Configure the timer to operate in periodic mode
+# Toggle the LED at the end of each period (500msec)
+timer.init( period=PERIOD_MS,
+    mode=Timer.PERIODIC, 
+    callback=lambda t: led.toggle() )
+
+# Delay for 5 seconds
+time.sleep_ms( 5000 )
+# Stop the timer
+timer.init( callback=None )
+timer.deinit()
+print( 'Done...')
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pwm-">&#9655; <strong>การสร้างสัญญาณ PWM สำหรับขาเอาต์พุต-ดิจิทัล</strong><a class="headerlink" href="#pwm-" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการเปิดใช้งาน <strong>PWM (Pulse Width Modulation)</strong> 
+สำหรับขา <strong>GPIO</strong> โดยเลือกใช้ขา <strong>GP25</strong> ของบอร์ด <strong>Pico</strong>
+และตั้งค่าความถี่ต่ำสำหรับการทำงานของ <strong>PWM</strong> และลดความถี่ของซีพียูลง
+เพื่อให้ใช้ความถี่ต่ำสำหรับ <strong>PWM</strong> ได้ ทำให้มองเห็นการเปลี่ยนแปลงของสถานะลอจิกที่ขา <strong>LED</strong> ได้</p>
+<pre><code class="language-python">from machine import Pin, PWM
+import time
+
+# Use onboard LED
+pin = 25 # Use 25 or 'LED'
+# Create a Pin object for the onboard LED 
+led = Pin( pin, Pin.OUT ) 
+
+# Reduce the CPU frequency: 50MHz
+machine.freq( int(50e6) )
+print( 'CPU freq. {} MHz'.format( machine.freq()//1e6) )
+
+# Create PWM object from a Pin object
+pwm = PWM( led )
+# Set the PWM frequency: 5Hz
+pwm.freq(5)
+# Set the PWM duty cycle (16-bit value) to 50% 
+pwm.duty_u16( 2**15 )
+
+# Wait ofor 5 seconds
+time.sleep_ms( 5000 )
+# Turn off PWM on the LED pin
+pwm.deinit()
+print('Done')
+</code></pre>
+<p>ตัวอย่างการใช้สัญญาณ <strong>PWM</strong> เพื่อทำให้ <strong>LED</strong> สว่างขึ้นและดับลง ก็ใช้เทคนิคการเปลี่ยนค่า 
+<strong>Duty Cycle</strong> ให้เพิ่มขึ้นและลดลง ในโค้ดตัวอย่างต่อไปนี้ มีการสร้างสัญญาณ <strong>PWM</strong>
+ที่มีความถี่ <strong>1000Hz</strong> และมีการเปลี่ยนแปลงค่า <strong>Duty Cycle</strong> เพิ่มขึ้นจาก 0..100% และลดลงจาก 100..0%
+ตามลำดับ</p>
+<pre><code class="language-python">from machine import Pin, PWM
+import time
+
+# Use onboard LED and PWM output pin 
+pwm = PWM( Pin(25) )
+# Set PWM frequency to 1kHz
+pwm.freq(1000)
+# Set the counter variable to 0
+cnt = 0
+try:
+    N = 200
+    while True:
+        if cnt &lt;= N//2:
+            duty = cnt
+        else:
+            duty = (N-1) - cnt
+        value =  duty * (2**16-1)//(N//2) 
+        pwm.duty_u16( value )
+        cnt = (cnt+1) % N
+        time.sleep_ms(5)
+except KeyboardInterrupt:
+    pass
+finally:
+    # Set the PWM duty cycle to 0 (ns)
+    pwm.duty_ns(0)
+    # Deinitialize the GPIO pin used for PWM output
+    pwm.deinit()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="multi-threading">&#9655; <strong>การเขียนโปรแกรมแบบ Multi-Threading</strong><a class="headerlink" href="#multi-threading" title="Permanent link">#</a></h2>
+<p>ไมโครไพธอนรองรับการใช้งานไลบรารี <code>_thread</code> เพื่อใช้สำหรับการเขียนโปรแกรมแบบ "มัลติเธรด"
+หรือการทำงานแบบหลายงานไปพร้อม ๆ กัน ได้ (<strong>Concurrency</strong>)</p>
+<p>ในโค้ดตัวอย่างนี้มีการสร้างเธรด (<strong>Thread</strong>) โดยใช้คำสั่ง  <code>_thread.start_new_thread(...)</code>
+และสร้างฟังก์ชันที่มีชื่อว่า <code>led_task()</code> สำหรับการทำงานของเธรดดังกล่าว 
+ซึ่งจะทำให้ <strong>LED</strong> สลับสถานะลอจิกตามช่วงเวลาที่ได้กำหนดไว้ </p>
+<pre><code class="language-python">from machine import Pin
+import time
+import _thread
+
+def led_task( led_pin, delay_ms ):
+    global thread_running
+    lock.acquire() # Acquire the lock
+    print( 'LED Task: Thread ID=%d' % _thread.get_ident() )
+    lock.release() # Release the lock
+    while thread_running:
+        led_pin.toggle() # Toggle the LED pin
+        time.sleep_ms( delay_ms )
+    thread_running = False
+    lock.acquire() # Acquire the lock
+    print('LED Task: done')
+    lock.release() # Release the lock
+
+lock = None
+thread_running = True
+# Create a lock object
+lock = _thread.allocate_lock()
+# Create an LED pin object
+led_pin = Pin( 25, Pin.OUT )
+# Create a new thread and run it on the second CPU core
+# blink the LED on GPIO25 pin with 500ms delay time
+_thread.start_new_thread( led_task, (led_pin,500) )
+
+try:
+    lock.acquire()
+    print( 'Main: Thread ID=%d' %_thread.get_ident() )
+    lock.release()
+    while thread_running:
+        time.sleep_ms(10)
+except KeyboardInterrupt:
+    pass
+finally:
+    thread_running = False
+    lock.acquire() # Acquire the lock
+    print('Main thread: Done')
+    lock.release() # Release the lock
+    led_pin.value(0)
+try:
+    time.sleep(1.0)
+except KeyboardInterrupt:
+    pass
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pio-gpio">&#9655; <strong>การใช้งาน PIO ร่วมกับขา GPIO</strong><a class="headerlink" href="#pio-gpio" title="Permanent link">#</a></h2>
+<p>ภายในชิป <strong>RP2040</strong> มีวงจรที่เรียกว่า <strong>PIO (Programming I/O)</strong> อยู่ 2 ชุด 
+(เรียกว่า <strong>PIO0</strong> และ <strong>PIO1</strong>) แต่ละชุดประกอบไปด้วยหน่วยย่อยที่เรียกว่า 
+<strong>State Machines (SMs)</strong> จำนวน 4 ชุด ที่ใช้หน่วยความจำร่วมกันสำหรับเก็บคำสั่งได้สูงสุด 32 คำสั่ง
+(เรียกชื่อเป็น <strong>SM0..SM3</strong> และ <strong>SM4..SM7</strong> ตามลำดับ)</p>
+<p><strong>SM</strong> สามารถเข้าถึงขา <strong>GPIO</strong> ได้ และตัวอย่างนี้สาธิตการใช้งาน <strong>SM0</strong> ของ <strong>PIO0</strong>
+และใช้งานร่วมกับขา <strong>GPIO</strong> จำนวน 1 ขา </p>
+<p>การทำงานของ <strong>SM</strong> ต้องใช้สัญญาณ <strong>Clock</strong> โดยมีตัวหารความถี่ทีเรียกว่า 
+<strong>Fractional Clock Divider</strong> ที่โปรแกรมค่าได้ 
+และรับสัญญาณมาจาก <strong>System Clock</strong> ดังนั้นจึงปรับความเร็วในการทำงานได้
+เนื่องจากความเร็วในการทำงานของซีพียูสำหรับ <strong>MicroPython-RP2040</strong> คือ <strong>125 MHz</strong>
+ความถี่ตำสุดที่เลือกใช้ได้คือ </p>
+<p>
+<script type="math/tex; mode=display">
+  f_{SM, min} = \frac{125\,MHz}{65535} \approx 1907.37\,Hz
+</script>
+</p>
+<p>การสร้างอ็อปเจกต์เพื่อใช้งาน <strong>SM</strong> ของ <strong>PIO Unit</strong> ในภาษาไมโครไพธอน จะใช้คำสั่ง 
+<a href="https://docs.micropython.org/en/latest/library/rp2.StateMachine.html"><code>rp.StateMachine(...)</code></a>
+ของไลบรารี <code>rp2</code> </p>
+<p>ในตัวอย่างนี้ ได้เลือกใช้ <strong>SM0</strong> ตั้งค่าความถี่ไว้เท่ากับ <strong>2000 Hz</strong>
+และมีการสร้างฟังก์ชันชื่อ <code>blink_led()</code> ที่เกี่ยวข้องกับการทำงานของ <strong>SM0</strong> ซึ่งประกอบด้วยคำสั่งในระดับ
+<strong>Assembly</strong> เพื่อทำให้สถานะลอจิกที่ขา <strong>GPIO</strong> ที่เกี่ยวข้อง สลับสถานะระหว่าง <code>1</code>  กับ <code>0</code> 
+มีการเว้นระยะเวลาเท่ากับ 1000 ไซเคิล ดังนั้นเมื่อทำคำสั่งใน <code>blink_led()</code> ครบแล้ว 
+(ใช้เวลาทั้งหมด 2000 ไซเคิล) ก็จะทำคำสั่งของฟังก์ชันนี้ซ้ำ</p>
+<p>ในตัวอย่างนี้ได้เลือกใช้ขา <code>22</code> ถ้าต้องการใช้ <strong>Onboard LED</strong> ของบอร์ด <strong>Pico</strong> ให้เปลี่ยนไปใช้ขาหมายเลข <code>25</code></p>
+<pre><code class="language-python">from machine import Pin
+import rp2
+
+@rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+def blink_led():
+    wrap_target()
+    # Cycles: 1 + 7 + 32 * (30 + 1) = 1000  # Cycles
+    set(pins, 1)                            # [1C]
+    set(x, 31)                  [6]         # [7C]
+    label(&quot;delay_high&quot;)
+    nop()                       [29]        # [30C]
+    jmp(x_dec, &quot;delay_high&quot;)                # [1C]
+
+    # Cycles: 1 + 7 + 32 * (30 + 1) = 1000
+    set(pins, 0)                            # [1C]
+    set(x, 31)                  [6]         # [7C]
+    label(&quot;delay_low&quot;)
+    nop()                       [29]        # [30C]
+    jmp(x_dec, &quot;delay_low&quot;)                 # [1C]
+    wrap()
+
+# Create LED pin object
+led_pin = Pin(22)
+
+# Create State Machine 
+#  - Use the SM0
+#  - Set the frequency for SM0 to 2kHz 
+#  - Use 'blink_led' as the callback function
+#  - Set the led pin as the base pin
+sm = rp2.StateMachine(0, blink_led, freq=2000, set_base=led_pin)
+# Activate the SM0
+sm.active(1)
+</code></pre>
+<p><img alt="" src="wokwi_rp2_pio_sim.png" /></p>
+<p>รูป: ตัวอย่างการใช้ <strong>Wokwi Simulator</strong> จำลองการทำงานของโค้ดไมโครไพธอน</p>
+<p><img alt="" src="wokwi_gtkwave_pio_led_toggle.png" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณดิจิทัลที่ได้จากขา <strong>GP22</strong> และวัดความกว้างของพัลส์ได้ 500 msec</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดเพื่อกำหนดค่าและสลับสถานะลอจิกของขาเอาต์พุต-ดิจิทัล 
+ซึ่งจะทำให้วงจร <strong>LED</strong> ที่ใช้งานกับบอร์ด <strong>Pico</strong> กระพริบได้ 
+และได้แสดงให้เห็นว่า มีรูปแบบการเขียนโค้ดได้มากกว่าหนึ่งวิธี</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-04-02 | Last Updated: 2023-04-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
