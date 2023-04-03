@@ -107,6 +107,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#asyncio" class="nav-link">&#9655; การเขียนโปรแกรมโดยใช้ Asyncio สำหรับไมโครไพธอน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#pio-gpio" class="nav-link">&#9655; การใช้งาน PIO ร่วมกับขา GPIO</a>
               <ul class="nav flex-column">
               </ul>
@@ -126,8 +130,9 @@
 <p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Raspberry Pico</em>, <em>RP2040</em>, <em>Thonny IDE</em>, <em>WokWi Simulator</em></p>
 <hr />
 <h2 id="micropython-led-blink">&#9655; <strong>MicroPython - LED Blink</strong><a class="headerlink" href="#micropython-led-blink" title="Permanent link">#</a></h2>
-<p>ในการเขียนโค้ดเพื่อกำหนดสถานะลอจิกของขา <strong>GPIO</strong> ซึ่งใช้เป็นขาดิจิทัล-เอาต์พุต และนำไปต่อกับวงจร <strong>LED</strong>
-ซึ่งอาจมีอยู่บนบอร์ดไมโครคอนโทรลเลอร์ หรือ ต่อวงจรเพิ่มภายนอก ก็มีรูปแบบการใช้คำสั่งหรือวิธีเขียนโค้ดที่แตกต่างกันไปและมีมากกว่าหนึ่งวิธี
+<p>ในการเขียนโค้ดเพื่อกำหนดสถานะลอจิกของขา <strong>GPIO</strong> ซึ่งใช้เป็นขาดิจิทัล-เอาต์พุต
+(เช่น ต่อกับวงจร <strong>LED</strong> บนบอร์ดไมโครคอนโทรลเลอร์ หรือต่อวงจรเพิ่มภายนอก)
+ก็มีรูปแบบการใช้คำสั่งหรือวิธีเขียนโค้ดที่แตกต่างกันไปและมีมากกว่าหนึ่งวิธี
 บทความนี้สาธิตตัวอย่างโค้ดไมโครไพธอน เพื่อนำไปทดลองใช้กับบอร์ด <strong>Pico</strong> </p>
 <pre><code class="language-python">from machine import Pin
 import time
@@ -142,7 +147,7 @@ pin = 25
 led = Pin( pin, Pin.OUT ) 
 
 # Method 1
-print( '\nToggle LED using the led.value( 0|1 ) function.' )
+print( 'Toggle LED using the led.value( 0|1 ) function.' )
 for i in range(10):
     led.value(1)
     print( 'LED: {}'.format( led.value() ) )
@@ -152,7 +157,7 @@ for i in range(10):
     time.sleep( DELAY_SEC )
 
 # Method 2
-print( '\nToggle LED using the led.on() / led.off() functions.' )
+print( 'Toggle LED using the led.on() / led.off() functions.' )
 for i in range(10):
     led.on()
     print( 'LED: {}'.format( led.value() ) )
@@ -162,14 +167,14 @@ for i in range(10):
     time.sleep_ms( DELAY_MS )
 
 # Method 3
-print( '\nToggle LED using the led.toggle() function.' )
+print( 'Toggle LED using the led.toggle() function.' )
 for i in range(10):
     led.toggle()
     print( 'LED: {}'.format( led.value() ) )
     time.sleep_us( DELAY_US )
 
 # Method 4
-print( '\nToggle LED using read-modify-write.' )
+print( 'Toggle LED using read-modify-write.' )
 for i in range(10):
     new_value = not led.value()
     led.value( new_value )
@@ -177,7 +182,7 @@ for i in range(10):
     time.sleep_us( DELAY_US )
 
 # Method 5
-print( '\nToggle LED without delay.' )
+print( 'Toggle LED without delay.' )
 # Get current timestamp (in msec)
 saved_ts = time.ticks_ms()
 count = 0
@@ -201,8 +206,8 @@ print('Done....')
 <h2 id="software-timer">&#9655; <strong>การใช้ Software Timer</strong><a class="headerlink" href="#software-timer" title="Permanent link">#</a></h2>
 <p>ตัวอย่างถัดไปสาธิตการเปิดใช้งานไทม์เมอร์ที่ทำงานด้วยซอฟต์แวร์ (<strong>Software Timer</strong>) สำหรับไมโครไพธอน
 โดยกำหนดให้ทำงานแบบมีคาบและทำซ้ำ (<strong>Periodic Mode</strong>) และมีคาบหรือช่วงเวลาเท่ากับ 500 มิลลิวินาที </p>
-<p>เมื่อครบหนึ่งคาบเวลา จะมีการคำสั่งในรูปแบบการเรียกใช้ฟังก์ชัน <strong>Callback</strong> 
-ในตัวอย่างนี้ได้กำหนดให้มีการเปลี่ยนสถานะลอจิกของขา <strong>LED</strong></p>
+<p>เมื่อครบหนึ่งคาบเวลา จะมีการทำคำสั่งโดยเรียกใช้ฟังก์ชัน <strong>Callback</strong>
+ในตัวอย่างนี้ได้กำหนดให้ฟังก์ชันดังกล่าวทำหน้าที่เปลี่ยนสถานะลอจิกของขา <strong>LED</strong></p>
 <pre><code class="language-python">from machine import Pin, Timer
 import time
 
@@ -262,9 +267,10 @@ time.sleep_ms( 5000 )
 pwm.deinit()
 print('Done')
 </code></pre>
-<p>ตัวอย่างการใช้สัญญาณ <strong>PWM</strong> เพื่อทำให้ <strong>LED</strong> สว่างขึ้นและดับลง ก็ใช้เทคนิคการเปลี่ยนค่า 
-<strong>Duty Cycle</strong> ให้เพิ่มขึ้นและลดลง ในโค้ดตัวอย่างต่อไปนี้ มีการสร้างสัญญาณ <strong>PWM</strong>
-ที่มีความถี่ <strong>1000Hz</strong> และมีการเปลี่ยนแปลงค่า <strong>Duty Cycle</strong> เพิ่มขึ้นจาก 0..100% และลดลงจาก 100..0%
+<p>การใช้สัญญาณ <strong>PWM</strong> เพื่อทำให้ <strong>LED</strong> สว่างขึ้นและดับลง ก็มีอีกเทคนิคหนึ่ง กล่าวคือ
+การเปลี่ยนค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> ให้เพิ่มขึ้นและลดลงต่อเนื่องไปเรื่อย ๆ</p>
+<p>ในโค้ดตัวอย่างต่อไปนี้ มีการสร้างสัญญาณ <strong>PWM</strong> ที่มีความถี่ <strong>1000Hz</strong> 
+และมีการเปลี่ยนแปลงค่า <strong>Duty Cycle</strong> เพิ่มขึ้นจาก 0..100% และลดลงจาก 100..0%
 ตามลำดับ</p>
 <pre><code class="language-python">from machine import Pin, PWM
 import time
@@ -350,6 +356,83 @@ except KeyboardInterrupt:
 </code></pre>
 <p>&nbsp;</p>
 <hr />
+<h2 id="asyncio">&#9655; <strong>การเขียนโปรแกรมโดยใช้ Asyncio สำหรับไมโครไพธอน</strong><a class="headerlink" href="#asyncio" title="Permanent link">#</a></h2>
+<p><code>Asyncio</code> เป็นไลบรารีที่ใช้สำหรับการสร้างและใช้งานฟังก์ชันในรูปแบบที่เรียกว่า
+<strong>Coroutines</strong> และเป็นรูปแบบหนึ่งของการเขียนโปรแกรมแบบมัลติทาสก์
+(เรียกว่า <strong>Cooperative Multitasking</strong>)</p>
+<p>ไมโครไพธอนก็มีไลบรารีชื่อ <a href="https://docs.micropython.org/en/latest/library/uasyncio.html"><code>uasyncio</code></a>
+ไว้ให้ใช้งาน เช่น</p>
+<ul>
+<li><code>uasyncio.create_task(...)</code> สร้างทาสก์ใหม่เพื่อใช้กับฟังก์ชันที่เป็น <strong>Coroutine</strong> และรอให้ถูกเรียกใช้โดย <strong>Async. IO Scheduler</strong></li>
+<li><code>uasyncio.run(...)</code> สร้างทาสก์ใหม่เพื่อใช้กับฟังก์ชันที่เป็น <strong>Coroutine</strong></li>
+<li><code>uasyncio.sleep_ms(...)</code> เป็นฟังก์ชัน <strong>Coroutine</strong>ที่ใช้สำหรับหน่วงเวลา (หน่วยเป็นมิลลิวินาที)</li>
+</ul>
+<pre><code class="language-python">from machine import Pin
+import uasyncio
+
+async def blink(led, period_ms):
+    while True:
+        led.on()
+        await uasyncio.sleep_ms( period_ms//2 )
+        led.off()
+        await uasyncio.sleep_ms( period_ms//2 )
+
+# The entry point for asyncio program
+async def main(led):
+    uasyncio.create_task( blink(led, 1000) )
+    while True:
+        await uasyncio.sleep_ms( 100 )
+
+led = Pin(25, Pin.OUT)
+
+try:
+    # Start event loop and run entry point coroutine
+    uasyncio.run( main(led) )
+except KeyboardInterrupt:
+    pass
+finally:
+    led.off()
+    print('Done...')
+</code></pre>
+<p>ถ้าลองปรับเปลี่ยนโค้ดตัวอย่าง โดยเพิ่มปุ่มกด (<strong>Active-low Push Button</strong>)
+ที่ขา <strong>GP18</strong> และตรวจสอบการกดปุ่ม ถ้ามีการกดปุ่ม ให้หยุดการทำงานของทาสก์และการทำงานของฟังก์ชัน <code>main</code>
+ก็มีแนวทางดังนี้</p>
+<pre><code class="language-python">from machine import Pin
+import uasyncio
+
+async def blink(led, period_ms):
+    while True:
+        led.on()
+        await uasyncio.sleep_ms(period_ms//2)
+        led.off()
+        await uasyncio.sleep_ms(period_ms//2)
+
+# The entry point for asyncio program
+async def main(led,btn):
+    uasyncio.create_task(blink(led, 1000))
+    await wait_button(btn)
+
+async def wait_button(btn):
+    btn_prev = btn.value()
+    while (btn.value() == 1) or (btn.value() == btn_prev):
+        btn_prev = btn.value()
+        await uasyncio.sleep_ms(50)
+    print('Button pressed')
+
+led = Pin(25, Pin.OUT)
+btn = Pin(18, Pin.IN, Pin.PULL_UP)
+
+try:
+    # Start event loop and run entry point coroutine
+    uasyncio.run( main(led, btn) )
+except KeyboardInterrupt:
+    pass
+finally:
+    led.off()
+    print('Done...')
+</code></pre>
+<p>&nbsp;</p>
+<hr />
 <h2 id="pio-gpio">&#9655; <strong>การใช้งาน PIO ร่วมกับขา GPIO</strong><a class="headerlink" href="#pio-gpio" title="Permanent link">#</a></h2>
 <p>ภายในชิป <strong>RP2040</strong> มีวงจรที่เรียกว่า <strong>PIO (Programming I/O)</strong> อยู่ 2 ชุด 
 (เรียกว่า <strong>PIO0</strong> และ <strong>PIO1</strong>) แต่ละชุดประกอบไปด้วยหน่วยย่อยที่เรียกว่า 
@@ -422,7 +505,7 @@ sm.active(1)
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-04-02 | Last Updated: 2023-04-02</p></div>
+<p>Created: 2023-04-02 | Last Updated: 2023-04-03</p></div>
             </div>
         </div>
 
