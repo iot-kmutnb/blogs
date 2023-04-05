@@ -132,7 +132,7 @@
 <h2 id="micropython-led-blink">&#9655; <strong>MicroPython - LED Blink</strong><a class="headerlink" href="#micropython-led-blink" title="Permanent link">#</a></h2>
 <p>ในการเขียนโค้ดเพื่อกำหนดสถานะลอจิกของขา <strong>GPIO</strong> ซึ่งใช้เป็นขาดิจิทัล-เอาต์พุต
 (เช่น ต่อกับวงจร <strong>LED</strong> บนบอร์ดไมโครคอนโทรลเลอร์ หรือต่อวงจรเพิ่มภายนอก)
-ก็มีรูปแบบการใช้คำสั่งหรือวิธีเขียนโค้ดที่แตกต่างกันไปและมีมากกว่าหนึ่งวิธี
+ก็มีรูปแบบการใช้คำสั่งหรือวิธีเขียนโค้ดที่แตกต่างกัน และมีมากกว่าหนึ่งวิธี
 บทความนี้สาธิตตัวอย่างโค้ดไมโครไพธอน เพื่อนำไปทดลองใช้กับบอร์ด <strong>Pico</strong> </p>
 <pre><code class="language-python">from machine import Pin
 import time
@@ -204,7 +204,7 @@ print('Done....')
 <p>&nbsp;</p>
 <hr />
 <h2 id="software-timer">&#9655; <strong>การใช้ Software Timer</strong><a class="headerlink" href="#software-timer" title="Permanent link">#</a></h2>
-<p>ตัวอย่างถัดไปสาธิตการเปิดใช้งานไทม์เมอร์ที่ทำงานด้วยซอฟต์แวร์ (<strong>Software Timer</strong>) สำหรับไมโครไพธอน
+<p>ตัวอย่างนี้สาธิตการเปิดใช้งานไทม์เมอร์ที่ทำงานด้วยซอฟต์แวร์ (<strong>Software Timer</strong>) สำหรับไมโครไพธอน
 โดยกำหนดให้ทำงานแบบมีคาบและทำซ้ำ (<strong>Periodic Mode</strong>) และมีคาบหรือช่วงเวลาเท่ากับ 500 มิลลิวินาที </p>
 <p>เมื่อครบหนึ่งคาบเวลา จะมีการทำคำสั่งโดยเรียกใช้ฟังก์ชัน <strong>Callback</strong>
 ในตัวอย่างนี้ได้กำหนดให้ฟังก์ชันดังกล่าวทำหน้าที่เปลี่ยนสถานะลอจิกของขา <strong>LED</strong></p>
@@ -238,7 +238,7 @@ print( 'Done...')
 <p>&nbsp;</p>
 <hr />
 <h2 id="pwm-">&#9655; <strong>การสร้างสัญญาณ PWM สำหรับขาเอาต์พุต-ดิจิทัล</strong><a class="headerlink" href="#pwm-" title="Permanent link">#</a></h2>
-<p>ตัวอย่างถัดไปสาธิตการเปิดใช้งาน <strong>PWM (Pulse Width Modulation)</strong> 
+<p>ตัวอย่างนี้สาธิตการเปิดใช้งาน <strong>PWM (Pulse Width Modulation)</strong> 
 สำหรับขา <strong>GPIO</strong> โดยเลือกใช้ขา <strong>GP25</strong> ของบอร์ด <strong>Pico</strong>
 และตั้งค่าความถี่ต่ำสำหรับการทำงานของ <strong>PWM</strong> และลดความถี่ของซีพียูลง
 เพื่อให้ใช้ความถี่ต่ำสำหรับ <strong>PWM</strong> ได้ ทำให้มองเห็นการเปลี่ยนแปลงของสถานะลอจิกที่ขา <strong>LED</strong> ได้</p>
@@ -267,11 +267,12 @@ time.sleep_ms( 5000 )
 pwm.deinit()
 print('Done')
 </code></pre>
-<p>การใช้สัญญาณ <strong>PWM</strong> เพื่อทำให้ <strong>LED</strong> สว่างขึ้นและดับลง ก็มีอีกเทคนิคหนึ่ง กล่าวคือ
-การเปลี่ยนค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> ให้เพิ่มขึ้นและลดลงต่อเนื่องไปเรื่อย ๆ</p>
+<p>การใช้สัญญาณ <strong>PWM</strong> เพื่อทำให้ <strong>LED</strong> สว่างขึ้นและดับลง ก็เป็นอีกวิธีหนึ่ง
+กล่าวคือ การเปลี่ยนค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong>
+ให้เพิ่มขึ้นและลดลงต่อเนื่องไปเรื่อย ๆ ดังนั้นจึงทำให้ <strong>LED</strong> กระพริบได้</p>
 <p>ในโค้ดตัวอย่างต่อไปนี้ มีการสร้างสัญญาณ <strong>PWM</strong> ที่มีความถี่ <strong>1000Hz</strong> 
 และมีการเปลี่ยนแปลงค่า <strong>Duty Cycle</strong> เพิ่มขึ้นจาก 0..100% และลดลงจาก 100..0%
-ตามลำดับ</p>
+ตามลำดับ โดยเว้นช่วงเวลาในการเปลี่ยนค่า ทุก ๆ 5 มิลลิวินาที</p>
 <pre><code class="language-python">from machine import Pin, PWM
 import time
 
@@ -284,13 +285,17 @@ cnt = 0
 try:
     N = 200
     while True:
+        # Compute the new value for PWM duty cycle
         if cnt &lt;= N//2:
             duty = cnt
         else:
             duty = (N-1) - cnt
-        value =  duty * (2**16-1)//(N//2) 
+        value = duty * (2**16-1)//(N//2) 
+        # Update the PWM duty cycle
         pwm.duty_u16( value )
+        # Increment the counter value by 1
         cnt = (cnt+1) % N
+        # Delay for 5 msec
         time.sleep_ms(5)
 except KeyboardInterrupt:
     pass
@@ -314,20 +319,20 @@ import _thread
 
 def led_task( led_pin, delay_ms ):
     global thread_running
-    lock.acquire() # Acquire the lock
+    lock.acquire() # Acquire lock
     print( 'LED Task: Thread ID=%d' % _thread.get_ident() )
-    lock.release() # Release the lock
+    lock.release() # Release lock
     while thread_running:
         led_pin.toggle() # Toggle the LED pin
         time.sleep_ms( delay_ms )
     thread_running = False
-    lock.acquire() # Acquire the lock
+    lock.acquire() # Acquire lock
     print('LED Task: done')
-    lock.release() # Release the lock
+    lock.release() # Release lock
 
 lock = None
 thread_running = True
-# Create a lock object
+# Create a lock (mutex) object
 lock = _thread.allocate_lock()
 # Create an LED pin object
 led_pin = Pin( 25, Pin.OUT )
@@ -336,18 +341,18 @@ led_pin = Pin( 25, Pin.OUT )
 _thread.start_new_thread( led_task, (led_pin,500) )
 
 try:
-    lock.acquire()
+    lock.acquire() # Acquire lock
     print( 'Main: Thread ID=%d' %_thread.get_ident() )
-    lock.release()
+    lock.release() # Release lock
     while thread_running:
         time.sleep_ms(10)
 except KeyboardInterrupt:
     pass
 finally:
     thread_running = False
-    lock.acquire() # Acquire the lock
+    lock.acquire() # Acquire lock
     print('Main thread: Done')
-    lock.release() # Release the lock
+    lock.release() # Release lock
     led_pin.value(0)
 try:
     time.sleep(1.0)
@@ -358,7 +363,7 @@ except KeyboardInterrupt:
 <hr />
 <h2 id="asyncio">&#9655; <strong>การเขียนโปรแกรมโดยใช้ Asyncio สำหรับไมโครไพธอน</strong><a class="headerlink" href="#asyncio" title="Permanent link">#</a></h2>
 <p><code>Asyncio</code> เป็นไลบรารีที่ใช้สำหรับการสร้างและใช้งานฟังก์ชันในรูปแบบที่เรียกว่า
-<strong>Coroutines</strong> และเป็นรูปแบบหนึ่งของการเขียนโปรแกรมแบบมัลติทาสก์
+<strong>Coroutine</strong> และเป็นรูปแบบหนึ่งของการเขียนโปรแกรมแบบมัลติทาสก์
 (เรียกว่า <strong>Cooperative Multitasking</strong>)</p>
 <p>ไมโครไพธอนก็มีไลบรารีชื่อ <a href="https://docs.micropython.org/en/latest/library/uasyncio.html"><code>uasyncio</code></a>
 ไว้ให้ใช้งาน เช่น</p>
@@ -458,7 +463,7 @@ finally:
 <strong>Assembly</strong> เพื่อทำให้สถานะลอจิกที่ขา <strong>GPIO</strong> ที่เกี่ยวข้อง สลับสถานะระหว่าง <code>1</code>  กับ <code>0</code> 
 มีการเว้นระยะเวลาเท่ากับ 1000 ไซเคิล ดังนั้นเมื่อทำคำสั่งใน <code>blink_led()</code> ครบแล้ว 
 (ใช้เวลาทั้งหมด 2000 ไซเคิล) ก็จะทำคำสั่งของฟังก์ชันนี้ซ้ำ</p>
-<p>ในตัวอย่างนี้ได้เลือกใช้ขา <code>22</code> ถ้าต้องการใช้ <strong>Onboard LED</strong> ของบอร์ด <strong>Pico</strong> ให้เปลี่ยนไปใช้ขาหมายเลข <code>25</code></p>
+<p>ในตัวอย่างนี้ได้เลือกใช้ขา <code>22</code> แต่ถ้าต้องการใช้ <strong>Onboard LED</strong> ของบอร์ด <strong>Pico</strong> ให้เปลี่ยนไปใช้ขาหมายเลข <code>25</code></p>
 <pre><code class="language-python">from machine import Pin
 import rp2
 
@@ -500,12 +505,12 @@ sm.active(1)
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดเพื่อกำหนดค่าและสลับสถานะลอจิกของขาเอาต์พุต-ดิจิทัล 
-ซึ่งจะทำให้วงจร <strong>LED</strong> ที่ใช้งานกับบอร์ด <strong>Pico</strong> กระพริบได้ 
+ซึ่งจะทำให้วงจร <strong>LED</strong> ที่ใช้งานกับบอร์ด <strong>Pico</strong> กระพริบได้
 และได้แสดงให้เห็นว่า มีรูปแบบการเขียนโค้ดได้มากกว่าหนึ่งวิธี</p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-04-02 | Last Updated: 2023-04-03</p></div>
+<p>Created: 2023-04-02 | Last Updated: 2023-04-04</p></div>
             </div>
         </div>
 
