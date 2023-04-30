@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/esp32/arduino_esp32_pulse_counter/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างสัญญาณพัลส์และวัดความถี่โดยใช้ Arduino-ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-esp32" class="nav-link">การสร้างสัญญาณพัลส์และวัดความถี่โดยใช้ Arduino-ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#pulse-generation-frequency-measurement" class="nav-link">&#9655; Pulse Generation &amp; Frequency Measurement</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ticker-based-pulse-generation" class="nav-link">&#9655; Ticker-based Pulse Generation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timer-based-pulse-generation" class="nav-link">&#9655; Timer-based Pulse Generation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rmt-based-pulse-generation" class="nav-link">&#9655; RMT-based Pulse Generation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ledc-based-pulse-generation" class="nav-link">&#9655; LEDC-based Pulse Generation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-pulse-counter" class="nav-link">&#9655; ESP32 Pulse Counter</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-esp32">การสร้างสัญญาณพัลส์และวัดความถี่โดยใช้ Arduino-ESP32<a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="pulse-generation-frequency-measurement">&#9655; <strong>Pulse Generation &amp; Frequency Measurement</strong><a class="headerlink" href="#pulse-generation-frequency-measurement" title="Permanent link">#</a></h2>
+<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ด <strong>Arduino</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+เพื่อสาธิตการสร้างสัญญาณพัลส์ต่อเนื่องที่มีคาบหรือความถี่คงที่ (<strong>Periodic Signals</strong>) 
+และการนับจำนวนพัลส์ในช่วงเวลาหนึ่งสำหรับการนำไปคำนวณค่าความถี่ของสัญญาณ</p>
+<p>การสร้างสัญญาณพัลส์และสัญญาณที่มีคาบสำหรับ <strong>ESP32</strong> ทำได้หลายวิธี เช่น </p>
+<ul>
+<li>การใช้ไลบรารี <a href="https://github.com/espressif/arduino-esp32/tree/master/libraries/Ticker"><strong>ESP32 Ticker</strong></a></li>
+<li>การใช้วงจร <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/ledc.html"><strong>LEDC (LED Control)</strong></a> ของชิป <strong>ESP32</strong></li>
+<li>การใช้วงจร <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/rmt.html"><strong>RMT (Remote Control Transceiver)</strong></a> ของชิป <strong>ESP32</strong> </li>
+</ul>
+<p>การวัดความถี่ของสัญญาณที่มีคาบ หรือนับจำนวนพัลส์ในหนึ่งช่วงเวลา ก็สามารถใช้เทคนิคที่แตกต่างกันหลายวิธี เช่น</p>
+<ul>
+<li>การใช้คำสั่ง <code>pulseIn()</code> ของ <strong>Arduino API</strong> เพื่อวัดความกว้างของพัลส์</li>
+<li>การตรวจสอบขอบขาขึ้นหรือขาลงของสัญญาณอินพุต และเปิดใช้งานอินเทอร์รัพท์ภายนอก เพื่อนับเหตุการณ์ที่เกิดขึ้น</li>
+<li>การใช้วงจร <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/pcnt.html"><strong>Pulse Counter (PCNT)</strong></a> ของชิป <strong>ESP32</strong></li>
+</ul>
+<p>สำหรับการทดสอบโค้ดโดยใช้ฮาร์ดแวร์จริง ได้เลือกใช้บอร์ด <strong>WeMos LOLIN32 Lite</strong>
+ซึ่งเป็นบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> ที่มีราคาไม่แพง </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ticker-based-pulse-generation">&#9655; <strong>Ticker-based Pulse Generation</strong><a class="headerlink" href="#ticker-based-pulse-generation" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการสร้างสัญญาณที่เป็นพัลส์ 
+โดยใช้ไลบรารี <a href="https://github.com/espressif/arduino-esp32/tree/master/libraries/Ticker"><strong>Ticker</strong></a>
+ที่เป็นส่วนหนึ่งของ <strong>Arduino-ESP32 Core</strong>
+การทำงานของ <strong>Ticker</strong> เกี่ยวข้องกับการใช้งานวงจร <strong>General-Purpose Hardware Timer</strong> ภายในชิป <strong>ESP32</strong>
+มีโหมดการทำงานให้เลือกใช้ 2 โหมด คือ ทำซ้ำ (<strong>Periodic</strong>) และ ทำครั้งเดียว (<strong>Once</strong> หรือ <strong>One-Shot</strong>)</p>
+<p>ในตัวอย่างนี้ ได้เลือกใช้โหมดทำซ้ำ เพื่อเรียกใช้ฟังก์ชัน <strong>User-defined Callback</strong> ด้วยอัตราคงที่ เช่น
+ฟังก์ชัน <code>ticker_callback()</code> ที่ทำหน้าที่สลับสถานะลอจิกที่ขาเอาต์พุต <code>LED_PIN</code> ทุก ๆ <code>250</code> มิลลิวินาที</p>
+<p>หากต้องการจะวัดความกว้างของพัลส์ช่วงที่เป็น <strong>High</strong> (ลอจิก '1') ก็ให้ใช้ลวดสายไฟ
+เชื่อมต่อจากขา <strong>GPIO22</strong> (เอาต์พุต) ไปยังขา <strong>GPIO5</strong> (อินพุต)
+และใช้คำสั่ง <code>pulseIn(...)</code> ของ <strong>Arduino API</strong> เพื่อวัดค่าความกว้างของพัลส์ที่ขาอินพุตดังกล่าว
+และจะได้ค่าตัวเลขในหน่วยเป็นไมโครวินาที </p>
+<pre><code class="language-c++">#include &lt;Ticker.h&gt;  // Import the Ticker library
+
+// Note: Connect GPIO22 (output) to GPIO5 (input)
+#define LED_PIN        (22)
+#define INPUT_PIN      (5)
+#define INTERVAL_MSEC  (250)
+
+Ticker ticker; // Create a Ticker object
+
+void setup() {
+  Serial.begin( 115200 );
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  pinMode( LED_PIN, OUTPUT ); 
+
+  // Attach a callback function (ISR) to the Ticker
+  ticker.attach_ms( INTERVAL_MSEC /*msec*/, ticker_callback );
+}
+
+void loop() {
+  // Measure the high pulse width of the input signal
+  uint32_t pw = pulseIn( INPUT_PIN /*GPIO pin*/, 
+                         1 /*logic level*/,
+                         1000000 /*timeout in usec*/ );
+  // Show the measured pulse width
+  Serial.printf( &quot;Pulse width: %ld usec\n&quot;, pw );
+  delay(1000);
+}
+
+void ticker_callback() { // The callback function for Ticker
+  // Toggle the LED output
+  digitalWrite( LED_PIN, !digitalRead( LED_PIN ) );   
+}
+</code></pre>
+<p><img alt="" src="ticker_wokwi_sim.png" /></p>
+<p>รูป: การจำลองการทำงานโดยใช้ <strong>Wokwi Simulator</strong> </p>
+<p><img alt="" src="ticker_arduino_ide.png" /></p>
+<p>รูป: การคอมไพล์และอัปโหลดโค้ดโดยใช้ <strong>Arduino IDE 2.0.3</strong> และรับข้อความจากบอร์ด <strong>ESP32</strong>
+(วัดความกว้างของพัลส์ได้ <strong>250000</strong> ไมโครวินาที)</p>
+<p><img alt="" src="wemos_lolin32_lite_demo.jpg" /></p>
+<p>รูป: บอร์ด <strong>ESP32 (WeMos Lolin32 Lite)</strong> ที่มีการต่อสายไฟจากขา <strong>GPIO5</strong> ไปยัง <strong>GPIO22</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timer-based-pulse-generation">&#9655; <strong>Timer-based Pulse Generation</strong><a class="headerlink" href="#timer-based-pulse-generation" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการใช้งาน <strong>Hardware Timer</strong> ของ <strong>ESP32</strong> 
+และเขียนโค้ดโดยใช้คำสั่งของ <a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/timer.html"><strong>Arduino-ESP32 Timer API</strong></a>
+หากต้องการศึกษารายละเอียด ก็สามารถดูได้จากไฟล์
+<a href="https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-timer.c"><code>cores/esp32/esp32-hal-timer.c</code></a></p>
+<p>ในโค้ดตัวอย่างนี้ มีการตั้งค่าและใช้งาน <strong>Hardware Timer</strong> 
+โดยใช้คำสั่ง <code>timerBegin(...)</code> เพื่อเลือกใช้ <strong>Timer</strong> หมายเลข 0 (จากทั้งหมด 4 ตัว ที่ให้เลือกใช้งานได้) 
+ตั้งค่าตัวหารความถี่เท่ากับ <strong>80</strong> ดังนั้นจะได้ความถี่ในการนับคำนวณได้จาก
+<strong>APB Clock Frequency (80MHz default)</strong> หารด้วย <strong>80</strong> ได้เท่ากับ <strong>1MHz</strong> หรือ <strong>1 usec per Tick</strong></p>
+<p>นอกจากนั้นยังมีการเปิดใช้งานฟังก์ชัน <strong>Alarm</strong> ของ <strong>Timer</strong>
+โดยใช้คำสั่ง <code>timerAlarmWrite(...)</code> เพื่อให้เกิดเหตุการณ์อินเทอร์รัพท์ เช่น ทุก ๆ 1000 ไมโครวินาที
+และใช้คำสั่ง  <code>timerAttachInterrupt(...)</code> เพื่อกำหนดให้ฟังก์ชันชื่อ <code>timer_isr()</code> 
+เป็นฟังก์ชัน <strong>ISR</strong> หรือ <strong>Callback Function</strong> คอยเพิ่มค่าของตัวแปรภายนอก
+<code>tick_counter</code> ครั้งละหนึ่ง เมื่อเกิดอินเทอร์รัพท์ </p>
+<pre><code class="language-c++">#define ESP_TIMER_NUMBER  (0)
+
+// Declare a global variable
+volatile uint32_t tick_counter = 0;
+
+// Declare a variable to keep the timer struct
+hw_timer_t *timer = NULL;
+
+// Use a FreeRTOS mutex to protect the shared variable (tick_counter)
+portMUX_TYPE timer_mux = portMUX_INITIALIZER_UNLOCKED;
+
+void IRAM_ATTR timer_isr() {
+  portENTER_CRITICAL_ISR( &amp;timer_mux );
+  tick_counter++; // Increment the tick counter
+  portEXIT_CRITICAL_ISR( &amp;timer_mux );
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;\n\nESP32 Hardware Timer Demo...&quot;);
+  // Use the first hardware timer (0)
+  // Set prescaler to 80 -&gt; Timer frequency = 80MHz/80 (1usec per tick)
+  // Note: The start will start automatically.
+  timer = timerBegin( ESP_TIMER_NUMBER /*timer number*/, 
+                      80 /*prescaler*/, true /*count up*/ );
+  // Attach the callback function (ISR) to the timer
+  timerAttachInterrupt( timer, &amp;timer_isr, true );
+  // Set alarm to call the ISR function every 1msec
+  timerAlarmWrite( timer, 1000 /*period (ticks)*/, 
+                   true /*autoreload*/ );
+  // Start the alarm
+  timerAlarmEnable( timer );
+
+  // Reset counter value of the timer to 0
+  timerWrite( timer, 0 /*value*/ );
+
+  // timerStop( timer );
+  // timerStart( timer );
+  // timerDetachInterrupt( timer );
+  // timerEnd( timer ); 
+}
+
+void loop() {
+  portENTER_CRITICAL( &amp;timer_mux );
+  uint32_t value = tick_counter; // Read the current tick counter 
+  portEXIT_CRITICAL( &amp;timer_mux );
+  Serial.printf( &quot;Ticks: %lu\n&quot;, value );
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="arduino_timer_alarm-1.png" /></p>
+<p>รูป: ตัวอย่างการทดสอบโค้ดโดยใช้บอร์ด <strong>ESP32</strong> และข้อความเอาต์พุตที่ได้จากการทำงาน</p>
+<p>ถัดไปเป็นการแก้ไขโค้ดตัวอย่าง เพื่อสร้างสัญญาณเอาต์พุตสำหรับ <strong>LED</strong> และวัดความกว้างของพัลส์ของสัญญาณอินพุต
+โดยใช้ขา <strong>GPIO22</strong> เป็นเอาต์พุต และจะต้องเชื่อมต่อด้วยสายไฟไปยังขา <strong>GPIO5</strong> 
+เพื่อใช้เป็นขาอินพุตและวัดความกว้างของพัลส์</p>
+<p>การทำงานของโค้ดตัวอย่าง จะทำให้เกิดการสลับสถานะลอจิกขา <strong>GPIO22</strong> ทุก ๆ 100 มิลลิวินาที 
+และค่าความกว้างของพัลส์สามารถวัดได้ โดยใช้คำสั่ง <code>pulseIn(...)</code></p>
+<pre><code class="language-c++">// Note: Connect GPIO22 (output) to GPIO5 (input)
+#define LED_PIN           (22)
+#define INPUT_PIN         (5)
+#define ESP_TIMER_NUMBER  (0)
+#define INTERVAL_MSEC     (100)
+
+// Declare a global variable
+volatile uint32_t tick_counter = 0;
+
+// Declare a variable to keep the timer struct
+hw_timer_t *timer = NULL;
+
+void IRAM_ATTR timer_isr() {
+  tick_counter++; // Increment the tick counter
+  if ( tick_counter == INTERVAL_MSEC ) {
+    // Toggle the LED 
+    digitalWrite( LED_PIN, !digitalRead(LED_PIN) );
+    // Reset the tick counter
+    tick_counter = 0;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;\n\nESP32 Hardware Timer Demo...&quot;);
+  pinMode( LED_PIN, OUTPUT );
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  // Use the first hardware timer (0)
+  // Set prescaler to 80 -&gt; Timer frequency = 80MHz/80 (or 1usec per tick)
+  // Note: The start will start automatically.
+  timer = timerBegin( ESP_TIMER_NUMBER /*timer number*/, 
+                      80 /*prescaler*/, true /*count up*/ );
+  // Attach the callback function (ISR) to the timer
+  timerAttachInterrupt( timer, &amp;timer_isr, true );
+  // Set alarm to call the ISR function every 1msec
+  timerAlarmWrite( timer, 1000 /*period (ticks)*/, true /*autoreload*/ );
+  // Start the alarm
+  timerAlarmEnable( timer );
+}
+
+void loop() {
+  // Measure the pulse width (in usec)
+  uint32_t pw = pulseIn( INPUT_PIN, 1, 1000000 );
+  Serial.printf( &quot;Pulse width: %lu usec\n&quot;, pw );
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="arduino_timer_alarm-2.png" /></p>
+<p>รูป: ตัวอย่างการทดสอบโค้ดโดยใช้บอร์ด <strong>ESP32</strong> และข้อความเอาต์พุตที่ได้จากการทำงาน
+(วัดความกว้างของพัลส์ได้ 100000 ไมโครวินาที หรือ 100 มิลลิวินาที)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rmt-based-pulse-generation">&#9655; <strong>RMT-based Pulse Generation</strong><a class="headerlink" href="#rmt-based-pulse-generation" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการสร้างสัญญาณแบบพัลส์ 
+โดยใช้วงจร <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/rmt.html"><strong>RMT</strong></a>
+จำนวนหนึ่งช่องสัญญาณ (เรียกว่า <strong>RMT TX Channel</strong>) 
+ทำหน้าที่เป็นตัวส่งสัญญาณพัลส์หนึ่งลูกคลื่นออกไป และทำซ้ำหรือวนลูปด้วยอัตราคงที่ </p>
+<p>ตัวแปร <code>rmt_tx_cfg</code> ที่มีชนิดข้อมูลเป็น <code>rmt_config_t</code> จะถูกใช้ในการตั้งค่าสำหรับการทำงานของ
+<strong>RMT</strong> จำนวนหนึ่งช่องสัญญาณ (เลือกใช้ <code>RMT_CHANNEL_0</code>) เมื่อเรียกใช้ฟังก์ชัน
+<code>rmt_config(...)</code> และเลือกใช้ขา <strong>GPIO22</strong> เป็นเอาต์พุต</p>
+<p>การส่งสัญญาณออกไปโดยใช้ <strong>RMT</strong> จะต้องมีการกำหนดรูปแบบของข้อมูลในรูปแบบที่เรียกว่า <strong>RMT Symbol</strong>
+ซึ่งจะประกอบด้วยช่วงที่เป็นลอจิก 1 และช่วงที่เป็นลอจิก 0 พร้อมกำหนดความกว้างของแต่ละช่วง</p>
+<p>วงจร <strong>RMT</strong> ภายในชิป <strong>ESP32</strong> ทำงานด้วยสัญญาณ <strong>CLK</strong>
+ที่มีความถี่ <strong>80MHz</strong> หรือใช้ความถี่ต่ำกว่าได้ โดยการกำหนดค่าตัวหารความถี่ 
+ในตัวอย่างนี้ได้เลือกค่าตัวหารความถี่เท่ากับ <strong>80</strong> ดังนั้น <strong>RMT</strong> จะทำงานด้วยความถี่
+<strong>80MHz/80</strong> หรือ <strong>1MHz</strong> หรือ <strong>1usec</strong> ต่อหนึ่งไซเคิล (เรียกว่า <strong>RMT tick</strong>)</p>
+<p>ในโค้ดตัวอย่าง มีการใช้ตัวแปร <code>pulse_item</code> ที่มีชนิดข้อมูลเป็น <code>rmt_item32_t</code>
+และการเรียกใช้ฟังก์ชัน <code>rmt_write_items(...)</code> ทำหน้าที่กำหนดความกว้างของพัลส์
+ช่วงที่เป็นลอจิก 1 และช่วงที่เป็นลอจิก 0 เช่น เท่ากับ <code>500</code>  (เป็นข้อมูลแบบเลขจำนวนเต็ม 15 บิต)  ซึ่งหน่วยเป็น 1 ไมโครวินาที
+ถ้าวัดสัญญาณเอาต์พุตที่ได้ จะมีความถี่เท่ากับ <strong>1kHz</strong> หรือ มีคาบเท่ากับ <strong>1000 usec</strong></p>
+<p>วงจร <strong>RMT</strong> รองรับการมอดูเลตสัญญาณ (<strong>Signal Modulation</strong>)
+ด้วยสัญญาณพาหะ (<strong>Carrier Signal</strong>) ที่มีความถี่สูงกว่า เช่น 
+ในกรณีที่ต้องการสร้างสัญญาณสำหรับอุปกรณ์รีโมตอินฟราเรด แต่ในตัวอย่างนี้ ไม่มีการมอดูเลตสัญญาณเอาต์พุต </p>
+<pre><code class="language-c++">#include &lt;driver/rmt.h&gt; // Required for RMT
+
+// Note: Connect GPIO22 (output) to GPIO5 (input)
+#define INPUT_PIN       (GPIO_NUM_5)
+#define RMT_GPIO_PIN    (GPIO_NUM_22)
+#define RMT_CHANNEL     (RMT_CHANNEL_0)
+
+// Define the RMT configuration parameters
+// - The RMT clock is set to 80MHz/80 = 1MHz (1usec per cycle).
+// - The carrier frequency is not used (no signal modulation).
+const rmt_config_t rmt_tx_cfg = {
+  .rmt_mode = RMT_MODE_TX,         // RMT mode: transmitter
+  .channel  = RMT_CHANNEL,         // RMT channel to use
+  .gpio_num = RMT_GPIO_PIN,        // GPIO number to output the signal
+  .clk_div  = 80,                  // RMT clock divider (80MHz/80 = 1MHz)
+  .mem_block_num = 1,              // Number of memory blocks to use
+  .tx_config = {                   // Configuration for TX
+    .carrier_level = RMT_CARRIER_LEVEL_HIGH, // Carrier level
+    .idle_level = RMT_IDLE_LEVEL_LOW,        // Set idle level to low
+    .carrier_duty_percent = 50,              // Carrier duty cycle
+    .carrier_en = false,                     // Disable carrier
+    .loop_en = true,                         // Enable loop mode
+    .idle_output_en = true,                  // Enable idle level
+  }
+};
+
+// Define the RMT item for a 1kHz square wave
+const rmt_item32_t pulse_item = {
+  {{
+    .duration0 = 500, // High pulse width in cycles 
+    .level0 = 1,      // High level 
+    .duration1 = 500, // Low pulse width in cycles
+    .level1 = 0       // Low level 
+  }}
+};
+
+void setup() {
+  Serial.begin( 115200 );
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  // Initialize RMT for TX mode
+  ESP_ERROR_CHECK( rmt_config( &amp;rmt_tx_cfg ) );
+  ESP_ERROR_CHECK( rmt_driver_install(RMT_CHANNEL, 0, 0) );
+  // Write pulse data and wait for RMT TX done
+  rmt_write_items( RMT_CHANNEL, &amp;pulse_item, 1, true );
+}
+
+void loop() {
+  // Pulse width measurment
+  uint32_t pw = pulseIn( INPUT_PIN /*GPIO pin*/, 
+                         1 /*logic level: high pulse*/,
+                         1000000 /* timeout in usec*/ );
+  Serial.printf( &quot;Pulse width: %ld usec\n&quot;, pw );
+  Serial.printf( &quot;Frequency: %.3lf kHz\n&quot;, 1000.0/(2*pw) );
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="wokwi_esp32_rmt_demo-1.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดด้วย <strong>Wokwi Simulator</strong>
+(วัดความถี่ของสัญญาณ <strong>1kHz</strong>)</p>
+<p><img alt="" src="arduino_esp32_rmt_demo-1.png" /></p>
+<p>รูป: การคอมไพล์และอัปโหลดโค้ดโดยใช้ <strong>Arduino IDE</strong> และรับข้อความจากบอร์ด <strong>ESP32</strong>
+(วัดความถี่ของสัญญาณ <strong>1kHz</strong>)</p>
+<p><img alt="" src="rmt_output_1khz.png" /></p>
+<p>รูป: การวัดสัญญาณด้วยออสซิลโลสโคป (<strong>RIGOL DS1054Z</strong>) และได้ค่าความถี่ <strong>1kHz</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ledc-based-pulse-generation">&#9655; <strong>LEDC-based Pulse Generation</strong><a class="headerlink" href="#ledc-based-pulse-generation" title="Permanent link">#</a></h2>
+<p>วงจร <strong>LEDC</strong> ภายในชิป <strong>ESP32</strong> (ซึ่งมีทั้งหมด 16 ช่องเอาต์พุต) เหมาะสำหรับการสร้างสัญญาณแบบ 
+<strong>PWM (Pulse Width Modultion)</strong> ที่สามารถปรับค่า <strong>Duty Cycle</strong>
+(ความกว้างของพัลส์ช่วงที่มีลอจิกเป็น  <strong>High</strong>) และนำไปใช้ในการปรับความสว่างของ <strong>LED</strong>
+โค้ดตัวอย่างนี้ สาธิตการสร้างสัญญาณแบบพัลส์ โดยใช้ <strong>LEDC</strong> ช่องหมายเลข 0</p>
+<p>ฟังก์ชันที่สำคัญและเกี่ยวข้องกับการทำงานของ <a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/ledc.html"><strong>LEDC</strong></a> ได้แก่</p>
+<ul>
+<li><code>uint32_t ledcSetup(uint8_t channel, uint32_t freq, uint8_t bits)</code>:
+   ตั้งค่าการใช้งาน <strong>LEDC</strong> สำหรับช่องหมายเลข <code>channel</code> ระบุความถี่ <code>freq</code> (หน่วยเป็น Hz) 
+   และความละเอียดหรือจำนวนบิต <code>bits</code> (เลือกได้ในช่วง 1 - 20 บิต) สำหรับการตั้งค่า <strong>Duty Cycle</strong></li>
+<li><code>void ledcAttachPin(uint8_t pin, uint8_t channel)</code>: เลือกใช้ขา <code>pin</code> สำหรับช่องเอาต์พุต <code>channel</code> ของ <strong>LEDC</strong> </li>
+<li><code>void ledcWrite(uint8_t chan, uint32_t duty)</code>: กำหนดค่า <strong>Duty Cycle</strong>  สำหรับช่องเอาต์พุต <code>channel</code></li>
+</ul>
+<p>ในโค้ดตัวอย่างนี้ ได้เลือกใช้จำนวนบิต เท่ากับ 8  บิต และความถี่เท่ากับ <strong>100 kHz</strong> เพื่อสร้างสัญญาณ <strong>PWM</strong>
+โดยใช้ <strong>LEDC (Channel 0)</strong> ที่ขา <strong>GPIO22</strong>
+แต่ถ้าต้องการได้ความถี่ที่สูงขึ้น จะต้องลดจำนวนบิตที่ใช้สำหรับการระบุค่า <strong>Duty Cycle</strong></p>
+<p>การนับจำนวนพัลส์ที่เกิดขึ้น จะใช้วิธีการตรวจจับขอบขาขึ้น (<strong>Rising Edge</strong>)
+และเปิดใช้งานอินเทอร์รัพท์ภายนอก โดยใช้คำสั่ง <code>attachInterrupt(...)</code> ของ <strong>Arduino API</strong>
+และสร้างฟังก์ชัน <code>pulse_isr()</code> เพื่อใช้เป็น <strong>ISR</strong> และถูกเรียกใช้โดยอัตโนมัติ เมื่อเกิดอินเทอร์รัพท์ที่เกี่ยวข้อง</p>
+<p>แม้ว่าวิธีนี้จะใช้นับจำนวนพัลส์ในช่วงเวลาที่กำหนดได้ แต่ก็มีข้อจำกัดเชิงเวลาในการตอบสนองต่อการเกิดอินเทอร์รัพท์ภายนอก
+(<strong>Interrupt Latency</strong>) ดังนั้นถ้าสัญญาณอินพุตมีความถี่สูง (เช่น สูงกว่า <strong>200 kHz</strong>) 
+ก็จะทำให้ค่าที่วัดได้ผิดพลาดจากค่าที่เป็นจริง</p>
+<p>ในตัวอย่างนี้ สัญญาณเอาต์พุตที่ขา <strong>GPIO22</strong> จะถูกป้อนกลับเข้าที่ขา <strong>GPIO5</strong>
+หากให้เวลานับจำนวนพัลส์ที่เกิดขึ้นในช่วงเวลา 1000 มิลลิวินาที (หรือต่อหนึ่งวินาที)
+ก็สามารถนำค่าที่ได้มาคำนวณเป็นค่าความถี่ของสัญญาณ</p>
+<pre><code class="language-c++">// Note: Connect GPIO22 (output) to GPIO5 (input)
+#define INPUT_PIN     (5)
+#define LEDC_GPIO_PIN (22)
+#define LEDC_CHANNEL  (0)
+#define NUM_BITS      (8)
+#define FREQ_HZ       (1000UL)
+
+volatile uint32_t count = 0; 
+uint32_t last_time_msec = 0;
+
+void IRAM_ATTR pulse_isr() { // ISR to handle pulse counter events
+  count++; // Increment the pulse counter
+}
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin( 115200 ); 
+  // Set the LED pin as an output
+  pinMode( LEDC_GPIO_PIN, OUTPUT ); 
+  // Set the input pin for the pulse counter
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  // Attach the ISR to the input pin
+  attachInterrupt( INPUT_PIN, pulse_isr, RISING ); 
+
+  // see: cores/esp32/esp32-hal-ledc.c
+  // Initialize the LEDC channel 0, use 8-bit resolution.
+  ledcSetup( LEDC_CHANNEL, FREQ_HZ, NUM_BITS );  
+  // Attach the GPIO22 pin to the LEDC Channel 0
+  ledcAttachPin( LEDC_GPIO_PIN, LEDC_CHANNEL ); 
+  // Set the duty cycle for the PWM output (50%)
+  ledcWrite( LEDC_CHANNEL, (1&lt;&lt;(NUM_BITS-1))-1 );
+  delay(10);
+  // Read the PWM frequency.
+  Serial.printf( &quot;LEDC Freq.: %ld Hz\n&quot;, ledcReadFreq(LEDC_CHANNEL) );
+  count = 0;
+  last_time_msec = millis();
+}
+
+void loop() {
+  static uint32_t saved_count;
+  uint32_t now = millis();
+  if ( now - last_time_msec &gt;= 1000 ) { // print count every 1 second
+    saved_count = count;
+    // Reset the pulse count
+    count = 0;
+    if (saved_count &gt;= 1000 ) {
+      // Calculate the frequency in kHz
+      float frequency = saved_count/1000.0; 
+      Serial.printf(&quot;Frequency: %.3f kHz\n&quot;, frequency);
+    } else {
+      // Calculate the frequency in Hz
+      int frequency = saved_count; 
+      Serial.printf(&quot;Frequency: %d Hz\n&quot;, frequency);      
+    }
+    // Save the timestamp
+    last_time_msec = now;
+  }
+}
+</code></pre>
+<p><img alt="" src="wokwi_ledc_demo-1.png" /></p>
+<p>รูป: การจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> (สัญญาณเอาต์พุตที่มีความถี่ <strong>1kHz</strong>)</p>
+<p>การสร้างสัญญาณ <strong>PWM</strong> สำหรับ <strong>ESP32</strong> ก็อาจจะใช้คำสั่งของ <strong>Arduino API</strong> ได้ดังนี้</p>
+<pre><code class="language-c++">  // PWM frequency 1kHz
+  analogWriteFrequency( 1000 );      // Frequency:  1kHz 
+  analogWriteResolution( 8 );        // Resolution: 8-bit
+  analogWrite( LEDC_GPIO_PIN, 127 ); // Duty cycle: 50% 
+</code></pre>
+<p><img alt="" src="arduino_ledc_demo-1.png" /></p>
+<p>รูป: การคอมไพล์และอัปโหลดโค้ดโดยใช้ <strong>Arduino IDE</strong> และรับข้อความจากบอร์ด <strong>ESP32</strong>
+(สร้างสัญญาณเอาต์พุตที่มีความถี่ <strong>100 kHz</strong>)</p>
+<p>ถ้าจะใช้ความถี่สูง เช่น <strong>10MHz</strong> จะต้องลดจำนวนบิตลง เช่น มีขนาดเพียง 2 บิต ตามตัวอย่างต่อไปนี้</p>
+<pre><code class="language-c++">  // LEDC Channel 0, 10MHz, 2-bit resolution
+  ledcSetup( LEDC_CHANNEL, 10000000UL /*Hz*/, 2 /*bits*/ ); 
+  // Attach the GPIO22 pin to LEDC Channel 0
+  ledcAttachPin( LEDC_GPIO_PIN, LEDC_CHANNEL ); 
+  // Set the PWM duty cycle (~50%)
+  ledcWrite( LEDC_CHANNEL, 2 ); 
+</code></pre>
+<p><img alt="" src="wave_10mhz.png" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณ <strong>10MHz</strong> เมื่อวัดด้วยออสซิลโลสโคป (<strong>RIGOL DS1054Z</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-pulse-counter">&#9655; <strong>ESP32 Pulse Counter</strong><a class="headerlink" href="#esp32-pulse-counter" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการสาธิตการใช้งานวงจร <strong>Pulse Counter (PCNT)</strong> ของชิป <strong>ESP32</strong>
+เหมาะสำหรับการนับจำนวนพัลส์ของสัญญาณอินพุต หรือนำไปคำนวณค่าความถี่หากเป็นสัญญาณที่มีคาบ</p>
+<p>ในตัวอย่างนี้มีการสร้างและใช้ฟังก์ชันชื่อ <code>init_pcnt()</code> เพื่อตั้งค่าให้ <strong>PCNT</strong> ช่องอินพุตหมายเลข 0 
+รับอินพุตจากขา <strong>GPIO22</strong> และให้ตัวนับขนาด 16 บิต ของ <strong>PCNT</strong> นับขึ้นครั้งละหนึ่ง เมื่อเกิดขอบขาขึ้น
+นอกจากนั้นแล้วยังตั้งค่าสูงสุดไว้ที่ 32767 เมื่อนับถึงค่าดังกล่าว จะทำให้เกิดอินเทอร์รัพท์
+(<strong>Overflow Interrupt</strong>) และฟังก์ชันชื่อ <code>overflow_isr()</code>
+จะถูกเรียกใช้โดยอัตโนมัติ ค่าของตัวแปรภายนอก <code>pcnt_overflows</code> จะถูกเพิ่มขึ้นครั้งละหนึ่ง
+เมื่อเกิดเหตุการณ์ดังกล่าว</p>
+<p>การอ่านค่าปัจจุบันของตัวนับ <strong>PCNT</strong> จะใช้คำสั่ง <code>pcnt_get_counter_value(...)</code>
+และถูกนำมาใช้ในการคำนวณจำนวนพัลส์ที่เกิดขึ้น โดยจะต้องใช้ค่า <code>pcnt_overflows</code> ร่วมด้วย</p>
+<p>คำสั่งต่าง ๆ ที่เกี่ยวข้องกับการใช้งาน <strong>PCNT</strong> สามาารถดูได้จาก
+<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/pcnt.html"><strong>ESP-IDF Programming Guide - PCNT API</strong></a></p>
+<pre><code class="language-c++">#include &quot;driver/periph_ctrl.h&quot;
+#include &quot;driver/gpio.h&quot;
+#include &quot;driver/pcnt.h&quot;
+#include &quot;soc/pcnt_struct.h&quot;
+
+// Settings for PWM generation
+#define PWM_PIN             (22)
+#define PWM_FREQ            (1000000UL)
+#define NUM_BITS            (2)
+
+// Settings for PCNT
+#define PCNT_INPUT_PIN      (5)
+#define PCNT_UNIT           PCNT_UNIT_0
+#define PCNT_H_LIM_VAL      (32767)
+#define PCNT_L_LIM_VAL      (0)
+
+// Declare global variables
+volatile uint32_t pcnt_overflows = 0;
+pcnt_isr_handle_t pcnt_isr_handle = NULL;
+uint32_t last_time_msec = 0;
+
+//------------------------------------------------------------------------------------
+void IRAM_ATTR overflow_isr(void *arg) {
+  PCNT.int_clr.val = BIT( PCNT_UNIT ); 
+  //pcnt_counter_clear( PCNT_UNIT );
+  pcnt_overflows++;
+}  
+
+//------------------------------------------------------------
+void init_pcnt() {
+  // Configure the PCNT Channel 0 to operate in count-up mode
+  pcnt_config_t pcnt_config; 
+  pcnt_config.pulse_gpio_num = PCNT_INPUT_PIN;
+  pcnt_config.ctrl_gpio_num = -1;
+  pcnt_config.hctrl_mode = PCNT_MODE_KEEP;
+  pcnt_config.lctrl_mode = PCNT_MODE_KEEP;
+  pcnt_config.counter_h_lim = PCNT_H_LIM_VAL; 
+  pcnt_config.counter_l_lim = PCNT_L_LIM_VAL; 
+  pcnt_config.pos_mode = PCNT_COUNT_INC;
+  pcnt_config.neg_mode = PCNT_COUNT_DIS;
+  pcnt_config.unit = PCNT_UNIT; 
+  pcnt_config.channel = PCNT_CHANNEL_0; 
+  pcnt_unit_config( &amp;pcnt_config ); 
+
+  // Configure the PCNT filter
+  pcnt_set_filter_value( PCNT_UNIT, 2 );
+  pcnt_filter_enable( PCNT_UNIT );
+
+  // Attach an ISR function to the PCNT interrupt
+  pcnt_counter_pause( PCNT_UNIT );
+  pcnt_counter_clear( PCNT_UNIT );
+  pcnt_event_enable( PCNT_UNIT, PCNT_EVT_H_LIM );
+  pcnt_isr_register( overflow_isr, NULL, 0, &amp;pcnt_isr_handle ); 
+  pcnt_intr_enable( PCNT_UNIT );
+  pcnt_counter_resume( PCNT_UNIT );
+}
+
+//------------------------------------------------------------
+uint32_t read_pcnt()  { 
+  int16_t pcnt_count = 0;
+  pcnt_get_counter_value( PCNT_UNIT, &amp;pcnt_count );
+  pcnt_counter_clear( PCNT_UNIT );
+  uint32_t count = pcnt_count + pcnt_overflows*PCNT_H_LIM_VAL;
+  pcnt_overflows = 0; 
+  return count;
+}
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.println( &quot;\nESP32 PCNT Demo....&quot; );
+  pinMode( PCNT_INPUT_PIN, INPUT_PULLUP );
+
+  // Initialize the PCNT
+  init_pcnt();
+
+  // Create a PWM signal for test purpose 
+  analogWriteResolution( NUM_BITS );       // Set PWM resolution(bits)
+  analogWriteFrequency( PWM_FREQ );        // Set PWM frequency 
+  analogWrite( PWM_PIN, (1&lt;&lt;NUM_BITS)/2 ); // Set PWM duty cycle to 50%
+  delay(1000);
+}
+
+void loop( ) {
+  uint32_t now = millis(); // Read current time in msec
+  if ( now - last_time_msec &gt;= 1000 ) { // Update every 1 second
+    uint32_t count = read_pcnt(); // Read the current value of PCNT
+    if ( count &gt;= 1000 ) {
+      Serial.printf(&quot; Freq. %.3f kHz\n&quot;, count / 1000.0 );
+    } else {
+      Serial.printf(&quot; Freq. %lu Hz\n&quot;, count );
+    }
+    last_time_msec = millis(); // Save the last update time
+  }
+}
+</code></pre>
+<p>ในกรณีที่สร้างสัญญาณ <strong>PWM</strong> ให้มีความถี่ <strong>1MHz</strong> และ <strong>8MHz</strong> ตามลำดับ
+จะได้ข้อความเอาต์พุตในลักษณะต่อไปนี้</p>
+<p><img alt="" src="arduino_pcnt_demo-1.png" /></p>
+<p>รูป: ข้อความจากบอร์ด <strong>ESP32</strong> ที่แสดงค่าความถี่ของสัญญาณที่วัดได้ (ได้ประมาณ <strong>1000 kHz</strong>)</p>
+<p><img alt="" src="arduino_pcnt_demo-2.png" /></p>
+<p>รูป: ข้อความจากบอร์ด <strong>ESP32</strong> ที่แสดงค่าความถี่ของสัญญาณที่วัดได้ (ได้ประมาณ <strong>8000 kHz</strong>)</p>
+<p><img alt="" src="wave_8mhz.png" /></p>
+<p>รูป: การวัดสัญญาณเอาต์พุต (<strong>8MHz</strong>) โดยใช้ออสซิลโลสโคป (<strong>RIGOL DS1054Z</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการเขียนโค้ดสำหรับ <strong>Arduino-ESP32</strong> เพื่อสร้างสัญญาณพัลส์
+และวัดความกว้างของสัญญาณพัลส์ หรือความถี่ของสัญญาณที่มีคาบ โดยใช้วิธีที่แตกต่างกัน
+และเป็นวิธีที่เจาะจงใช้งานวงจรภายในของชิป <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-04-28 | Last Updated: 2023-04-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
