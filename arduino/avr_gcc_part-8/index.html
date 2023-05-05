@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-8/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 8 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-8" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 8</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-fast-pwm-single-channel" class="nav-link">&#9655; Timer/Counter1: Fast PWM (Single Channel)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-fast-pwm-dual-channels" class="nav-link">&#9655; Timer/Counter1: Fast PWM (Dual Channels)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-8-bit-fast-pwm-mode-5" class="nav-link">&#9655; Timer/Counter1: 8-bit Fast-PWM (Mode 5)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-pwm-phase-correct-mode-10" class="nav-link">&#9655; Timer/Counter1: PWM Phase-Correct (Mode 10)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-8">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 8<a class="headerlink" href="#c-avr-atmega328p-8" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 8 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<strong>Timer/Counter1</strong> (วงจรตัวนับหมายเลข 1) ภายในชิป <strong>ATmega328P</strong>
+และนำเสนอเนื้อหาต่อเนื่องจากตอนที่แล้ว ดังนั้นแนะนำให้ศึกษาเนื้อหา <a href="../avr_gcc_part-7/"><strong>ตอนที่ 7</strong></a>
+ด้วยเช่นกัน</p>
+<p>รายละเอียดเกี่ยวกับรีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของ <strong>Timer/Counter1</strong>
+สามารถดูได้เอกสารของผู้ผลิต 
+<a href="../avr/atmega328p_datasheet.pdf"><strong>ATmega328P Datasheet</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-fast-pwm-single-channel">&#9655; <strong>Timer/Counter1: Fast PWM (Single Channel)</strong><a class="headerlink" href="#timercounter1-fast-pwm-single-channel" title="Permanent link">#</a></h2>
+<p>โค้ดนี้สาธิตการทำงานของวงจร <strong>Timer/Counter1</strong> ในโหมด  <strong>Fast PWM</strong>
+โดยจะต้องใช้ขาเอาต์พุตเป็นขา <strong>PB1 / OC1A</strong> </p>
+<p>ในโหมดนี้ จะต้องมีการตั้งค่าให้รีจิสเตอร์ <code>ICR1</code> เพื่อใช้เป็นค่าสูงสุด <code>TOP</code>
+เมื่อตัวนับ <code>TCNT1</code> นับจาก 0 ถึงค่าที่กำหนดไว้ใน <code>ICR1</code> จะเริ่มต้นนับใหม่
+ดังนั้นการกำหนดค่าของ <code>ICR1</code> เป็นการกำหนดคาบของสัญญาณ <strong>PWM</strong></p>
+<p>ในการกำหนดความกว้างช่วงที่เป็น <strong>HIGH</strong> หรือ  เรียกว่า <strong>PWM Duty Cycle</strong>
+จะต้องตั้งค่าในรีจิสเตอร์ <code>OCR1A</code> โดยที่ค่าของรีจิสเตอร์นี้ต้องไม่มากกว่าค่าในรีจิสเตอร์
+<code>ICR1</code> </p>
+<p>ถ้าตั้งค่าของ <code>OCR1A</code> มีค่าเป็นครึ่งหนึ่งของ <code>ICR1</code> ก็จะได้ <strong>PWM Duty Cycle</strong>
+เท่ากับ <strong>50%</strong> สำหรับสัญญาณที่ขาเอาต์พุต <strong>PB1 / OC1A</strong> </p>
+<p>ในตัวอย่างนี้ตั้งค่า <code>ICR1</code> ให้ได้ <strong>PWM Frequency</strong> เท่ากับ <strong>1kHz</strong> หรือ มีคาบเท่ากับ
+<strong>1000 usec</strong> และตั้งค่า <code>OCR1A</code> ให้ได้ <strong>PWM Duty Cycle 25%</strong> 
+(ความกว้างพัลส์เท่ากับ <strong>250 usec</strong>)</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+
+#define PWM_PIN    (PB1)     // Use the OCR1A pin
+#define PRESCALER  (64)      // Define prescaler value as 64
+#define FREQ_HZ    (1000UL)  // Define the frequency as 1000 Hz
+#define TOP_VALUE  (F_CPU/(FREQ_HZ * PRESCALER)) 
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x000;
+  // Set TOP value for the PWM period
+  ICR1  = (uint16_t)(TOP_VALUE-1); 
+  // Set OCR1A value for 25% duty cycle
+  OCR1A = (uint16_t)(TOP_VALUE/4); 
+  // Configure Timer1 in Fast PWM mode (mode 14) with prescaler of 64 
+  // Set non-inverted output on OC1A
+  // Use Fast PWM mode and set prescaler to 64
+  TCCR1A |= (1&lt;&lt;COM1A1) | (1&lt;&lt;WGM11); 
+  TCCR1B |= (1&lt;&lt;WGM13) | (1&lt;&lt;WGM12) | (1&lt;&lt;CS11) | (1&lt;&lt;CS10); 
+}
+
+int main(void) {
+  // Set the DDR for PB1 / OC1A pin as output
+  DDRB |= (1 &lt;&lt; PWM_PIN);
+  initTimer1(); // Initialize Timer1
+  while (1) {}
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/timer1_fast_pwm_wave-1.png" /></p>
+<p>รูป: การวัดคาบของสัญญาณเอาต์พุต (วัดได้ประมาณ<strong>994.67 usec</strong> ใกล้เคียง <strong>1000 usec</strong> โดยทฤษฎี)</p>
+<p><img alt="" src="../avr/images/timer1_fast_pwm_wave-2.png" /></p>
+<p>รูป: การวัดความกว้างพัลส์ของสัญญาณเอาต์พุต  (วัดได้ประมาณ<strong>251.67 usec</strong> ใกล้เคียง <strong>250 usec</strong> โดยทฤษฎี)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-fast-pwm-dual-channels">&#9655; <strong>Timer/Counter1: Fast PWM (Dual Channels)</strong><a class="headerlink" href="#timercounter1-fast-pwm-dual-channels" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้วงจร <strong>Timer/Counter1</strong> ในโหมด <strong>Fast PWM</strong>
+เพื่อสร้างสัญญาณ <strong>PWM</strong> จำนวน 2 ช่อง ที่มีความถี่เท่ากัน โดยเลือกตัวหารความถี่เป็น <strong>/1</strong>
+และตั้งค่า <code>ICR1</code> เท่ากับ <strong>7</strong> ดังนั้นจะได้ความถี่ของสัญญาณ <strong>PWM</strong>
+เท่ากับ <strong>16MHz/8 = 2MHz</strong> หรือ มีคาบเท่ากับ <strong>0.5 usec (500 nsec)</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+
+#define PERIOD_CYC (8)
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x000;
+  ICR1  = (PERIOD_CYC-1);
+  OCR1A = (2)-1;            // for OC1A (2/8 = 25% duty cycle)
+  OCR1B = (PERIOD_CYC/2)-1; // for OC1B (4/8 = 50% duty cycle)
+  // Set timer1 in Fast PWM mode (mode 14)
+  TCCR1A |= (1&lt;&lt;WGM11) | (1&lt;&lt;COM1A1) | (1&lt;&lt;COM1B1);
+  TCCR1B |= (1&lt;&lt;WGM13) | (1&lt;&lt;WGM12) | (1&lt;&lt;CS10);
+}
+
+int main() {  
+  DDRB |= (1 &lt;&lt; PB1); // Set pin PB1 (D9 pin) as output
+  DDRB |= (1 &lt;&lt; PB2); // Set pin PB2 (D10 pin) as output
+  initTimer1();
+  while(1) {}
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/timer1_fast_pwm_dual_wave-1.png" /></p>
+<p>รูป: การวัดคาบของสัญญาณเอาต์พุต (วัดได้ประมาณ<strong>500 usec</strong>)</p>
+<p><img alt="" src="../avr/images/timer1_fast_pwm_dual_wave-2.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ของสัญญาณเอาต์พุต <strong>PB1</strong> (วัดได้ประมาณ<strong>250 usec</strong>)</p>
+<p><img alt="" src="../avr/images/timer1_fast_pwm_dual_wave-3.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ของสัญญาณเอาต์พุต <strong>PB2</strong> (วัดได้ประมาณ<strong>125 usec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-8-bit-fast-pwm-mode-5">&#9655; <strong>Timer/Counter1: 8-bit Fast-PWM (Mode 5)</strong><a class="headerlink" href="#timercounter1-8-bit-fast-pwm-mode-5" title="Permanent link">#</a></h2>
+<p>การทำงานในโหมด <strong>Fast-PWM</strong> ยังมีให้เลือกอีกหลายแบบ เช่น ความละเอียด
+ตั้งแต่ 8 บิต จนถึง 10 บิต และมีค่าสูงสุดตามจำนวนบิต ถ้าใช้ความละเอียด 8 บิต
+ค่าสูงสุดของ <code>TCNT1</code> ที่จะนับได้คือ <code>0x00FF</code> (<strong>255</strong>)</p>
+<p>โค้ดตัวอย่างนี้สาธิตการทำงานในโหมด <strong>8-bit Fast-PWM</strong>
+และสร้างเอาต์พุตที่ขา <strong>PB1</strong> และ <strong>PB2</strong> ที่มีความถี่เท่ากัน แต่มีความกว้างพัลส์ต่างกัน
+(ใช้งาน <strong>Non-inverting Output Compare A / B Match</strong>)</p>
+<p>ในตัวอย่างนี้ได้ตั้งค่าตัวหารความถี่ <strong>/64</strong> ดังนั้นความถี่ของสัญญาณ <strong>PWM</strong> 
+เท่ากับ <strong>16MHz/64/256 = 976.56 Hz</strong> หรือ มีคาบเท่ากับ <strong> 1024 usec</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+
+#define PWM_A_PIN  (PB1)
+#define PWM_B_PIN  (PB2)
+
+// 16MHz/64/256 = 976.56 Hz or 1.024 msec
+void initTimer1() {
+  // Set Fast PWM (Mode 10),
+  // 8-bit mode and non-inverting OC1A and OC1B
+  TCCR1A = (1&lt;&lt;COM1A1) | (1&lt;&lt;COM1B1) | (1&lt;&lt;WGM10); 
+  TCCR1B = (1&lt;&lt;WGM12) | (1&lt;&lt;CS11) | (1&lt;&lt;CS10); // Set prescaler /64
+  OCR1A = (1&lt;&lt;8)*1/4;  // 25% Duty Cycle 
+  OCR1B = (1&lt;&lt;8)*3/4;  // 75% Duty Cycle 
+}
+
+int main() {
+  DDRB |= (1 &lt;&lt; PWM_A_PIN);   // Set PB1/OC1A (pin 9) as output
+  DDRB |= (1 &lt;&lt; PWM_B_PIN);   // Set PB2/OC1B (pin 10) as output
+  initTimer1();
+  while (1) {}
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/timer1_fast_pwm_8bit_wave-1.png" /></p>
+<p>รูป:  การวัดคาบของสัญญาณเอาต์พุต <strong>PB1  / PB2</strong> (วัดได้ประมาณ<strong>1022.62 usec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-pwm-phase-correct-mode-10">&#9655; <strong>Timer/Counter1: PWM Phase-Correct (Mode 10)</strong><a class="headerlink" href="#timercounter1-pwm-phase-correct-mode-10" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งาน <strong>Timer/Counter1</strong> ในโหมด <strong>PWM Phase-Correct (Mode 10)</strong>
+และมีค่าบิต <code>WGM1[3:0]="1010"</code>
+ในโหมดนี้ รีจิสเตอร์ของตัวนับ <code>TCNT1</code> จะนับขึ้นจนถึงค่าสูงสุด (<strong>TOP</strong>) แล้วนับลงจนถึงค่าต่ำสุด (<strong>0</strong>)
+ดังนั้นจึงเป็นการนับขึ้นและลงในสองทิศทางสำหรับการนับหนึ่งรอบ (<strong>Dual-Slope Operation</strong>)
+แตกต่างจากโหมด <strong>Fast PWM</strong> ซึ่งเป็นการนับขึ้นในทิศทางเดียว  (<strong>Single-Slope Operation</strong>)</p>
+<p>การเลือกโหมดเพื่อกำหนดสถานะลอจิกของขาเอาต์พุตที่ขา <strong>PB1 / OC1A</strong>
+ได้ตั้งค่าบิต <code>COM1A[1:0]="10"</code> 
+ทำงานแบบ <strong>Non-inverting Compare Output A</strong>  มีลักษณะดังนี้</p>
+<ul>
+<li>เมื่อตัวนับ <code>TCNT1</code> นับขึ้นได้เท่ากับ <code>OCR1A</code> จะทำให้เอาต์พุตเปลี่ยนเป็นลอจิก <strong>LOW</strong></li>
+<li>เมื่อนับถึงค่าสูงสุด แล้วนับลงมาจนได้ค่าเท่ากับ <code>OCRA1</code> จะทำให้เอาต์พุตเปลี่ยนเป็นลอจิก <strong>HIGH</strong> </li>
+</ul>
+<p>ดังนั้นถ้ากำหนดค่าในรีจิสเตอร์ <code>OCR1A</code> น้อยลง ก็จะได้ความกว้างพัลส์ลดลงเช่นกัน</p>
+<p>ในตัวอย่างนี้ได้เลือกตัวหารความถี่ให้เป็น <strong>/8</strong> ดังนั้นจะนับด้วยความถี่
+<strong>16MHz/8 = 2MHz</strong> และตั้งค่า <code>ICR1</code> ซึ่งเป็นค่าสูงสุดในการนับไว้เท่ากับ <strong>20000</strong>
+(และคูณด้วยสองสำหรับหนึ่งรอบการนับหรือคาบ)
+และจะได้สัญญาณ <strong>PWM</strong> ที่มีความถี่ <strong>50Hz</strong> หรือ คาบเท่ากับ <strong>20 msec</strong> 
+และตั้งค่า <code>OCR1A</code> เพื่อให้ได้ความกว้างพัลส์เท่ากับ <strong>1.5 msec</strong> (คิดเป็น <strong>7.5%</strong>)</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define PWM_PIN    (PB1)
+#define FREQ_HZ    (50UL)
+#define PRESCALER  (8)
+#define TOP_VALUE  (F_CPU/(2 * PRESCALER * FREQ_HZ))
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x0000;
+  // Set the ICR1 register to define the TOP value
+  ICR1 = (uint16_t)(TOP_VALUE-1);
+  // Set the OCR1A register to define the PWM duty cycle
+  OCR1A = (uint16_t)(TOP_VALUE*15/200); // 7.5%
+  // Set Timer1 in Phase-correct PWM mode (mode 10)
+  TCCR1A |= (1 &lt;&lt; WGM11);
+  TCCR1B |= (1 &lt;&lt; WGM13);
+  // Set the output compare mode to clear OC1A on compare match 
+  // and set on TOP (non-inverting)
+  TCCR1A |= (1 &lt;&lt; COM1A1);
+  // Set the prescaler to 8 (CLK/8)
+  TCCR1B |= (1 &lt;&lt; CS11);
+}
+
+int main(void) {
+  // Set the DDR for OC1A pin as output
+  DDRB |= (1 &lt;&lt; PWM_PIN);
+  initTimer1(); // Initialize Timer1
+  while (1) {}
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/timer1_phase_correct_50hz_wave-1.png" /></p>
+<p>รูป: การวัดคาบของสัญญาณเอาต์พุต (วัดได้ประมาณ<strong>19.97 msec</strong> ใกล้เคียงกับ <strong>20 msec</strong> โดยทฤษฎี)</p>
+<p><img alt="" src="../avr/images/timer1_phase_correct_50hz_wave-2.png" /></p>
+<p>รูป:  การวัดความกว้างของพัลส์ของสัญญาณเอาต์พุต (วัดได้ประมาณ<strong>1.5 ms</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดภาษาซีสำหรับ <strong>ATmega328P</strong>
+เพื่อใช้งานวงจร <strong>Timer/Counter1</strong> และสร้างสัญญาณ <strong>PWM</strong>
+เช่น การทำงานในโหมด <strong>Fast PWM</strong> และ <strong>PWM Phase-Correct</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-05-05 | Last Updated: 2023-05-05</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

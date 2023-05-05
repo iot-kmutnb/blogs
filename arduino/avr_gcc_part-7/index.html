@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-7/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 7 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-7" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 7</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1" class="nav-link">&#9655; Timer/Counter1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-normal-mode-mode-0" class="nav-link">&#9655; Timer/Counter1: Normal Mode (Mode 0)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-normal-mode-with-counter-reload" class="nav-link">&#9655; Timer/Counter1: Normal Mode with Counter Reload</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timercounter1-ctc-mode" class="nav-link">&#9655; Timer/Counter1: CTC Mode</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-7">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 7<a class="headerlink" href="#c-avr-atmega328p-7" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 7 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<strong>Timer/Counter1</strong> (วงจรตัวนับหมายเลข 1) ภายในชิป <strong>ATmega328P</strong>
+ซึ่งมีหลายโหมดการทำงานให้เลือกใช้ มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong>
+(<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
+และใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> 
+ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1">&#9655; <strong>Timer/Counter1</strong><a class="headerlink" href="#timercounter1" title="Permanent link">#</a></h2>
+<p>วงจร <strong>Timer/Counter1</strong> ภายในชิป
+<strong>ATmega328P</strong> เป็นวงจรตัวนับขนาด 16 บิต
+มีวงจรเปรียบเทียบค่าของตัวนับสำหรับสร้างสัญญาณเอาต์พุต จำนวน 2 ชุด 
+(<strong>Output Compare Units: OC1A / OC1B</strong>)
+ซึ่งสามารถนำมาใช้ในการสร้างสัญญาณพัลส์ที่มีคาบคงที่ หรือสัญญาณแบบ <strong>PWM (Pulse Width Modulation)</strong> ได้
+นอกจากนั้นแล้วยังมีวงจรรับสัญญาณอินพุตเพื่อตรวจจับการเปลี่ยนแปลงของสัญญาณดิจิทัล (<strong>Input Capture Unit</strong>)
+และนำมาใช้ในการนับขึ้นของวงจรตัวนับ (<strong>Counter</strong>) ได้เช่นกัน</p>
+<p><img alt="" src="../avr/images/timer1_block_diagram.png" /></p>
+<p>รูป: บล็อกไดอะแกรมของวงจร <strong>Timer/Counter1</strong></p>
+<p>รายละเอียดเกี่ยวกับรีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของ <strong>Timer/Counter1</strong>
+สามารถดูได้เอกสารของผู้ผลิต 
+<a href="../avr/atmega328p_datasheet.pdf"><strong>ATmega328P Datasheet</strong></a></p>
+<ul>
+<li><code>TCNT1</code> รีจิสเตอร์ตัวนับขนาด 16 บิต ประกอบด้วยรีจิสเตอร์ขนาด 8 บิต คือ <code>TCNT1H</code> และ <code>TCNT1L</code>
+ดังนั้นค่าต่ำสุดและสูงสุดของตัวนับที่เป็นไปได้คือ <code>0x0000</code> (<strong>BOTTOM</strong>) และ <code>0xFFFF</code> (<strong>MAX</strong>)</li>
+<li><code>TCCR1A</code> (<strong>Timer/Counter1 Control Register A</strong>)<ul>
+<li><code>COM1A[1:0]</code> (<strong>Compare Output Mode for Channel A</strong>)</li>
+<li><code>COM1B[1:0]</code> (<strong>Compare Output Mode for Channel B</strong>)</li>
+<li><code>WGM1[1:0]</code> (<strong>Waveform Generation Mode</strong>)</li>
+</ul>
+</li>
+<li><code>TCCR1B</code> (<strong>Timer/Counter1 Control Register B</strong>)<ul>
+<li><code>ICNC1</code> (<strong>Input Capture Noise Canceler</strong>)</li>
+<li><code>ICES1</code> (<strong>Input Capture Edge Select</strong>)</li>
+<li><code>WGM1[3:2]</code> (<strong>Waveform Generation Mode</strong>)</li>
+<li><code>CS1[2:0]</code> (<strong>Clock Select</strong>)</li>
+</ul>
+</li>
+<li><code>TCCR1C</code> (<strong>Timer/Counter1 Control Register C</strong>)<ul>
+<li><code>FOC1A</code> (<strong>Force Output Compare for Channel A</strong>)</li>
+<li><code>FOC1B</code> (<strong>Force Output Compare for Channel B</strong>)</li>
+</ul>
+</li>
+<li><code>OCR1A</code> (<strong>Output Compare Register 1 A</strong>) รีจิสเตอร์ขนาด 16 บิต <ul>
+<li>ประกอบด้วยรีจิสเตอร์ขนาด 8 บิต <code>OCR1AH</code> และ <code>OCR1AL</code></li>
+<li>ใช้สำหรับเปรียบเทียบกับค่าของ <code>TCNT1</code> เพื่อสร้างสัญญาณเอาต์พุต <strong>OC1A</strong></li>
+</ul>
+</li>
+<li><code>OCR1B</code> (<strong>Output Compare Register 1 B</strong>) รีจิสเตอร์ขนาด 16 บิต <ul>
+<li>ประกอบด้วยรีจิสเตอร์ขนาด 8 บิต <code>OCR1BH</code> และ <code>OCR1BL</code></li>
+<li>ใช้สำหรับเปรียบเทียบกับค่าของ <code>TCNT1</code> เพื่อสร้างสัญญาณเอาต์พุต <strong>OC1B</strong></li>
+</ul>
+</li>
+<li><code>TIMSK1</code> (<strong>Timer/Counter1 Interrupt Mask Register</strong>)
+ใช้สำหรับการเปิดหรือปิดการทำงานของอินเทอร์รัพท์สำหรับวงจรนี้<ul>
+<li><code>OCIE1A</code> (<strong>Timer/Counter1, Output Compare A Match Interrupt Enable</strong>)</li>
+<li><code>OCIE1B</code> (<strong>Timer/Counter1, Output Compare B Match Interrupt Enable</strong>)</li>
+<li><code>TOIE1</code> (<strong>Timer/Counter1, Overflow Interrupt Enable</strong>)</li>
+<li><code>ICIE1</code> (<strong>Timer/Counter1, Input Capture Interrupt Enable</strong>)</li>
+</ul>
+</li>
+<li><code>TIFR1</code> (<strong>Timer/Counter1 Interrupt Flag Register</strong>)
+มีบิตที่แสดงแสดงการเกิดอินเทอร์รัพท์  และสถานะการเปรียบเทียบค่าของตัวนับ <code>TCNT1</code> 
+กับรีจิสเตอร์ <code>OCR1A</code> และ <code>OCRA1B</code> (<strong>Output Compare A / B Match</strong>) เป็นต้น<ul>
+<li><code>TOV1</code> (<strong>Timer/Counter1, Overflow Flag</strong>)</li>
+<li><code>OCF1A</code> (<strong>Timer/Counter1, Output Compare A Match Flag</strong>)</li>
+<li><code>OCF1B</code> (<strong>Timer/Counter1, Output Compare B Match Flag</strong>)</li>
+<li><code>ICF1</code> (<strong>Timer/Counter1, Input Capture Flag</strong>)</li>
+</ul>
+</li>
+</ul>
+<p>ในการใช้งาน <strong>Timer/Counter1</strong> จะเริ่มต้นด้วยการเลือกโหมดการสร้างสัญญาณ
+(<strong>Waveform Generation Mode: WGM</strong>) ซึ่งมีอยู่หลายโหมด ตามตารางต่อไปนี้
+แล้วกำหนดค่าบิตสำหรับ <code>WGM1[3:0]</code> จำนวน 4 บิต ให้ถูกต้อง</p>
+<p><img alt="" src="../avr/images/timer1_wgm_bits.png" /></p>
+<p>รูป: ตัวเลือกสำหรับโหมดการสร้างสัญญาณของวงจร <strong>Timer/Counter1</strong> โหมดหมายเลข <strong>0 - 15</strong></p>
+<p>ถัดไปเป็นการตั้งค่าตัวหารความถี่ของสัญญาณ <code>f_CPU</code> (หรือ เลือกสัญญาณจากภายนอก) ซึ่งจะต้องเลือกจากรายการตัวเลขที่มีการกำหนดไว้
+แล้วกำหนดค่าบิตให้กับ <code>CS1[2:0]</code> ในรีจิสเตอร์ <code>TCCR1B</code></p>
+<p><img alt="" src="../avr/images/timer1_clk_div.png" /></p>
+<p>รูป: ตัวเลือกสำหรับการเลือกตัวหารความถี่สำหรับวงจร <strong>Timer/Counter1</strong></p>
+<p><img alt="" src="../avr/images/timer1_oc_compare.png" /></p>
+<p>รูป: ตัวเลือกสำหรับบิต <code>COM1A[1:0]</code> และ <code>COM1B[1:0]</code> จำแนกตามโหมดที่จะใช้งาน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-normal-mode-mode-0">&#9655; <strong>Timer/Counter1: Normal Mode (Mode 0)</strong><a class="headerlink" href="#timercounter1-normal-mode-mode-0" title="Permanent link">#</a></h2>
+<p>โค้ดนี้สาธิตการทำงานของวงจร <strong>Timer/Counter1</strong> ในโหมด 0 (<strong>Normal Mode</strong>)
+ในโหมดนี้ ค่าของตัวนับ  <code>TCNT1</code> จะนับขึ้นจาก <code>0x000</code> ถึงค่าสูงสุด <code>0xFFFF</code> (65535) แล้วเริ่มต้นนับใหม่ สามารถตั้งค่าให้เกิดอินเทอร์รัพท์ที่เรียกว่า
+<strong>Overflow Interrupt</strong> ได้ </p>
+<p>ในตัวอย่างนี้  ได้ตั้งค่าตัวหารความถี่เท่ากับ 1 ดังนั้นวงจรตัวนับจะนับขึ้นด้วยอัตรา <strong>16MHz</strong>
+และจะเกิดอินเทอร์รัพท์ ทุก ๆ <strong>65536/16MHz = 4.096 msec</strong> </p>
+<p>เมื่อนับครบหนึ่งรอบแล้วเกิดเหตุการณ์อินเทอร์รัพท์ ที่มีชื่อว่า <code>TIMER1_OVF_vect</code> (<strong>Timer1 Overflow Interrupt</strong>) 
+จะมีการเรียกใช้ฟังก์ชัน <code>ISR(TIMER1_OVF_vect)</code>
+ทำให้มีการสลับสถานะลอจิกที่ขา <strong>PB1 / OC1A Pin</strong> (<code>LED_PIN</code>) หรือ <strong>Arduino D9 Pin</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define LED_PIN    (PB1)
+#define PRESCALER  (64) // Use 1, 8 or 64
+
+ISR(TIMER1_OVF_vect) {
+  PORTB ^= (1 &lt;&lt; LED_PIN); // Toggle the LED pin
+}
+
+void initTimer1() {
+  TCCR1A = 0;
+  TCNT1  = 0x000;
+#if PRESCALER == 64
+  TCCR1B = (1&lt;&lt;CS11) | (1&lt;&lt;CS10); // Set prescaler to 64 (CS[2:0]=&quot;011&quot;)
+#elif PRESCALER == 8
+  TCCR1B = (1&lt;&lt;CS11); // Set prescaler to 8 (CS[2:0]=&quot;010&quot;)
+#else
+  TCCR1B = (1&lt;&lt;CS10); // Set prescaler to 1 (CS[2:0]=&quot;001&quot;)
+#endif
+  TIFR1  |= (1&lt;&lt;TOV1);  // Clear Timer1 overflow flag
+  TIMSK1 |= (1&lt;&lt;TOIE1); // Enable Timer1 overflow interrupt
+}
+
+int main() {
+  DDRB |= (1 &lt;&lt; LED_PIN);   // Set LED pin as output
+  initTimer1(); // Initialize Timer1
+  sei(); // Enable global interrupts
+  while (1) {}
+  return 0;
+}
+</code></pre>
+<p><strong>ข้อสังเกต:</strong> ในโค้ดตัวอย่างนี้ ให้เปลี่ยนไปใช้ขา <strong>PB5 / D13 Pin</strong> แทนที่ <strong>PB1 / D9 Pin</strong>
+ถ้าต้องการใช้ <strong>LED</strong> บนบอร์ด <strong>Arduino Uno / Nano</strong></p>
+<p>ในเชิงทฤษฎี การคำนวณระยะเวลาในการเกิดอินเทอร์รัพท์ <code>TIMER1_OVF_vect</code>
+และเกิดการสลับสถานะลอจิกที่ขาเอาต์พุต สามารถคำนวณได้ดังนี้</p>
+<ul>
+<li>ตัวหารความถี่ <strong>/1</strong>:  อัตราการเกิดอินเทอร์รัพท์  <strong>1/(16MHz/1/65536)</strong> หรือได้ช่วงเวลาเท่ากับ <strong>4.096 msec</strong></li>
+<li>ตัวหารความถี่ <strong>/8</strong>: อัตราการเกิดอินเทอร์รัพท์ <strong>1/(16MHz/8/65536)</strong> หรือได้ช่วงเวลาเท่ากับ <strong>32.768 msec</strong></li>
+<li>ตัวหารความถี่ <strong>/64</strong>: อัตราการเกิดอินเทอร์รัพท์ <strong>1/(16MHz/64/65536)</strong> หรือได้ช่วงเวลาเท่ากับ <strong>262.144 msec</strong></li>
+</ul>
+<p><img alt="" src="../avr/images/wokwi_timer1_normal_ovf.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดด้วย <strong>Wokwi Simulator</strong>
+และวัดสัญญาณด้วย  <strong>Virtual Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/wokwi_timer1_normal_ovf_wave.png" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณที่บันทึกได้จาก <strong>Virtual Logic Analyzer</strong>
+โดยใช้โปรแกรม <strong>GTKWave</strong>
+(วัดความกว้างของพัลส์ได้ <strong>262.144 msec</strong> สำหรับตัวหารความถี่ <strong>/64</strong>)</p>
+<p>ลองมาดูตัวอย่างการวัดสัญญาณจริง โดยใช้ <strong>USB Logic Analyzer</strong> วัดสัญญาณที่ขา
+<strong>PB1 / D9</strong> ของบอร์ด <strong>Arduino Nano</strong></p>
+<p><img alt="" src="../avr/images/timer1_normal_ovf_wave-1.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์สำหรับตัวหารความถี่ <strong>/1</strong> (วัดค่าได้ประมาณ <strong>4.091 msec</strong>)</p>
+<p><img alt="" src="../avr/images/timer1_normal_ovf_wave-2.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์สำหรับตัวหารความถี่ <strong>/8</strong> (วัดค่าได้ประมาณ <strong>32.725 msec</strong>)</p>
+<p><img alt="" src="../avr/images/timer1_normal_ovf_wave-3.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์สำหรับตัวหารความถี่ <strong>/64</strong> (วัดค่าได้ประมาณ <strong>261.931 msec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-normal-mode-with-counter-reload">&#9655; <strong>Timer/Counter1: Normal Mode with Counter Reload</strong><a class="headerlink" href="#timercounter1-normal-mode-with-counter-reload" title="Permanent link">#</a></h2>
+<p>การเลือกตัวหารความถี่ จะส่งผลต่อระยะเวลาในการนับในแต่ละรอบของรีจิสเตอร์ <code>TCNT1</code> แต่ยังมีอีกวิธีหนึ่ง
+คือ การกำหนดค่าเริ่มต้นให้รีจิสเตอร์ <code>TCNT1</code> เมื่อเกิดอินเทอร์รัพท์แต่ละครั้ง
+แทนที่จะให้เริ่มนับที่ <strong>0</strong> ไปจนถึง <strong>65535</strong> (<code>0xFFFF</code>) แต่เริ่มต้นด้วยค่ามากกว่า 0</p>
+<p>ในตัวอย่างนี้ สาธิตการใช้งานวงจร <strong>Timer1</strong> ในโหมด <strong>Normal</strong>
+เลือกตัวหารความถี่เท่ากับ <strong>/64</strong>
+และมีการกำหนดค่าเริ่มต้นในการนับให้รีจิสเตอร์ <code>TCNT1</code> เพื่อต้องการให้มีการนับในแต่ละรอบเท่ากับ
+<strong>50000</strong>  ดังนั้นจึงให้เริ่มนับที่ค่า <strong>(65535-50000) = 15535</strong> หรือ ไปจนถึง <strong>65535</strong></p>
+<p>ดังนั้นในกรณีนี้ จะมีระยะเวลาในการเกิดอินเทอร์รัพท์แต่ละครั้งเท่ากับ
+<strong>1/(16MHz/64/50000)</strong> หรือ <strong>200 msec</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define LED_PIN    (PB1)
+#define LOAD_VALUE (65535-50000) // 16-bit initial count value
+
+// 16MHz/64/50000 = 5Hz (interrupt rate) or time interval = 200 msec
+
+// ISR for Timer1 overflow interrupt
+ISR(TIMER1_OVF_vect) {
+  TCNT1 = LOAD_VALUE;    // Load the initial count value
+  PORTB ^= (1&lt;&lt;LED_PIN); // Toggle the LED pin
+}
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = LOAD_VALUE;   // Load the initial count value
+  // Configure Timer1 in Normal mode with prescaler of 64
+  TCCR1B = (1&lt;&lt;CS11) | (1&lt;&lt;CS10); // CS[2:0] = &quot;011&quot; (clk/64)
+  TCNT1 = 0x000;        // Reset Timer1 count register
+  TIFR1  |= (1&lt;&lt;TOV1);  // Clear Timer1 overflow flag
+  TIMSK1 |= (1&lt;&lt;TOIE1); // Enable Timer1 overflow interrupt
+}
+
+int main() {
+  DDRB |= (1&lt;&lt;LED_PIN); // Set LED pin as output
+  initTimer1();  // Initialize Timer1
+  sei();         // Enable global interrupts
+  while(1) {}
+  return 0;
+}
+</code></pre>
+<p><img alt="" src="../avr/images/timer1_normal_ovf_wave-4.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ได้ประมาณ <strong>200 msec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timercounter1-ctc-mode">&#9655; <strong>Timer/Counter1: CTC Mode</strong><a class="headerlink" href="#timercounter1-ctc-mode" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการใช้งานในโหมด <strong>CTC (Clear Timer on Compare Match)</strong>
+ซึ่งแตกต่างจากโหมด <strong>Normal</strong> โดยที่จะมีการนับขึ้นจาก 0 และนับไปจนถึงค่าของ
+รีจิสเตอร์ <code>OC1RA</code> สำหรับการเปรียบเทียบ เมื่อมีค่าเท่ากัน รีจิสเตอร์ <code>TCNT1</code>
+จะถูกรีเซตให้เป็น 0 และเริ่มต้นนับใหม่ </p>
+<p>นอกจากนั้นแล้วยังมีการเปิดใช้งานอินเทอร์รัพท์ 
+<code>TIMER1_COMPA_vect</code> (<strong>Timer1 compare match A Interrupt</strong>) 
+สำหรับเหตุการณ์นี้ด้วย เพื่อให้ฟังก์ชัน <code>ISR(TIMER1_COMPA_vect)</code> ทำงาน
+โดยสลับสถานะลอจิกที่ขา <code>PB1</code></p>
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define LED_PIN     (PB1)        // LED pin
+#define PRESCALER   (64)         // Define prescaler value as 64
+#define RATE_HZ     (1000UL)     // Toggle rate in Hz
+#define COMP_VALUE  (F_CPU/(RATE_HZ * PRESCALER)) 
+
+// 16MHz/64/250 = 1000 Hz (toggle rate) or time interval of 1 ms 
+
+// ISR for Timer1 compare match A
+ISR(TIMER1_COMPA_vect) {
+  PORTB ^= (1&lt;&lt;LED_PIN); // Toggle the LED pin
+}
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x000;
+  OCR1A = (uint16_t)(COMP_VALUE-1); // Set compare match value
+  // Configure Timer1 in CTC mode (mode 4) with prescaler of 64
+  TCCR1B |= (1&lt;&lt;WGM12) | (1&lt;&lt;CS11) | (1&lt;&lt;CS10); // CTC mode, prescaler /64
+  TIMSK1 |= (1&lt;&lt;OCIE1A); // Enable interrupt on compare match A
+}
+
+int main(void) {
+  // Set the Data Direction Register (DDR) of Port B
+  DDRB |= (1&lt;&lt;LED_PIN); // Use LED as output
+  initTimer1(); // Initialize Timer1
+  sei(); // Enable global interrupts
+  while (1) {}
+  return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>เมื่อเลือกโหมด <strong>CTC</strong> ก็สามารถสร้างสัญญาณพัลส์ หรือ <strong>PWM</strong> ที่มีค่า <strong>Duty Cycle 50%</strong> ได้
+เป็นสัญญาณคาบ (<strong>Periodic Signal</strong>) แต่จะต้องใช้ขาเอาต์พุต <strong>PB1 / OC1A</strong> เท่านั้น
+โดยไม่ต้องเปิดใช้งานอินเทอร์รัพท์ และจะสร้างสัญญาณคาบได้เช่นกัน</p>
+<p>เมื่อตัวนับ <code>TCNT1</code> มีนับขึ้นจนได้ค่าเท่ากับ <code>OC1R1A</code> จะทำให้มีการสลับสถานะลอจิกของขา
+<strong>PB1/OC1A</strong> โดยอัตโนมัติ 
+(<strong>Toggle OC1A on Compare Match / Non-PWM Mode</strong>)
+เนื่องจากมีการตั้งค่าบิต <code>COM1A[1:0]</code> เป็น <code>"01"</code></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+
+#define PWM_PIN     (PB1)    // Use the PB1/OCR1A pin
+#define PRESCALER   (64)     // Define prescaler value as 64
+#define RATE_HZ     (1000UL) // Define the toggle rate as 1000 Hz
+#define COMP_VALUE  (F_CPU/(RATE_HZ * PRESCALER)) 
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x0000;
+  OCR1A = (uint16_t)(COMP_VALUE-1); // Set compare match value 
+  // Configure Timer1 in CTC mode (mode 4) with prescaler of 64 
+  TCCR1A |= (1&lt;&lt;COM1A0); // Toggle the OC1A pin on compare match A
+  TCCR1B |= (1&lt;&lt;WGM12) | (1&lt;&lt;CS11) | (1&lt;&lt;CS10);
+}
+
+int main(void) {
+  // Set the DDR for OC1A pin as output
+  DDRB |= (1 &lt;&lt; PWM_PIN); // Use PWM_PIN as output
+  initTimer1(); // Initialize Timer1
+  while (1) {}
+}
+</code></pre>
+<p><img alt="" src="../avr/images/timer1_ctc_toggle_wave-1.png" /></p>
+<p>รูป: การวัดความกว้างของพัลส์ได้ค่าประมาณ  <strong>1 msec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดภาษาซีสำหรับ <strong>ATmega328P</strong>
+เพื่อใช้งานวงจร <strong>Timer/Counter1</strong> ซึ่งมีโหมดการทำงานให้เลือกใช้แตกต่างกัน
+เช่น การนับตามจังหวะเวลาที่กำหนด การสร้างอินเทอร์รัพท์จากการนับตามช่วงเวลาที่กำหนด
+และการสร้างสัญญาณพัลส์เป็นสัญญาณคาบ เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-05-04 | Last Updated: 2023-05-05</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-6/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 6 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-6" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 6</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi-serial-peripheral-interface" class="nav-link">&#9655; SPI (Serial Peripheral Interface)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi-master-with-enabled-interrupt" class="nav-link">&#9655; โค้ดตัวอย่าง: SPI Master with Enabled Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-6">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 6<a class="headerlink" href="#c-avr-atmega328p-6" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 6 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<strong>SPI (Serial Peripheral Interface</strong> ภายในชิป <strong>ATmega328P</strong>
+ในโหมดการทำงานแบบมาสเตอร์ (<strong>SPI Master</strong>)
+มีการใช้คำสั่งหรือฟังก์ชันของไลบรารี <strong>avr-libc</strong>
+(<a href="http://www.nongnu.org/avr-libc/user-manual/"><strong>Online User Manual</strong></a>)
+และใช้ <a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> 
+ในการจำลองการทำงานของโค้ดเพื่อตรวจสอบความถูกต้องในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi-serial-peripheral-interface">&#9655; <strong>SPI (Serial Peripheral Interface)</strong><a class="headerlink" href="#spi-serial-peripheral-interface" title="Permanent link">#</a></h2>
+<p><strong>SPI</strong> เป็นรูปแบบการสื่อสารข้อมูลระหว่างชิป หรือเรียกว่า "โพรโทคอล" (<strong>Protocol</strong>)
+สื่อสารข้อมูลบิตอนุกรมแบบซิงโครนัส (<strong>Synchronous Serial Communication</strong>) 
+ดังนั้นจึงมีการสร้างสัญญาณ <strong>Clock</strong> เป็นตัวกำหนดจังหวะการทำงานของระบบบัส</p>
+<p><strong>SPI</strong> ทำงานตามสถาปัตยกรรมแบบ <strong>Master-Slave</strong> ซึ่งจะต้องมีอุปกรณ์ที่ทำหน้าที่เป็น
+"มาสเตอร์" (<strong>Master</strong>) และ "สเลฟ" (<strong>Slave</strong>) อาจมีหลายอุปกรณ์ได้ในระบบบัสเดียวกัน
+แต่โดยปรกติ จะมีอุปกรณ์ "มาสเตอร์" เพียงหนึ่งตัว</p>
+<ul>
+<li>อุปกรณ์ "มาสเตอร์" ทำหน้าที่สร้างสัญญาณ <strong>Clock</strong> (เรียกว่า <strong>SCK</strong>) สำหรับการทำงานของบัส <strong>SPI</strong>
+และสร้างสัญญาณควบคุม <strong>Slave Select</strong> หรือ <strong>Chip Select</strong>
+(เรียกว่า <strong>SS</strong> หรือ <strong>CS</strong>) เพื่อระบุว่า "มาสเตอร์" จะสื่อสารกับอุปกรณ์ตัวใดที่ทำหน้าที่เป็น "สเลฟ"  ในระบบบัสเดียวกัน</li>
+<li>อุปกรณ์ "สเลฟ" คอยตอบสนองต่อการสื่อสารจาก "มาสเตอร์"</li>
+</ul>
+<p>โดยทั่วไปการสื่อสาร <strong>SPI</strong> จะใช้สัญญาณ 4 เส้น (<strong>4-Wire SPI Protocol</strong>)</p>
+<ul>
+<li><strong>MOSI (Master Out Slave In)</strong>: 
+    สัญญาณข้อมูลที่ใช้สำหรับส่งข้อมูลทีละบิตจาก "มาสเตอร์" ไปยัง "สเลฟ" ทุกตัว</li>
+<li><strong>MISO (Master In Slave Out)</strong>:
+    สัญญาณข้อมูลที่ใช้สำหรับส่งข้อมูลทีละบิตจาก "สเลฟ" ไปยัง "มาสเตอร์"
+    หากมีอุปกรณ์ "สเลฟ" หลายตัว ก็ใช้สัญญาณนี้ร่วมกัน</li>
+<li><strong>SCK (Serial Clock)</strong>:
+    สัญญาณที่ถูกสร้างจาก "มาสเตอร์" เพื่อกำหนดจังหวะการทำงาน หรือ <strong>Clock</strong> 
+    สำหรับอุปกรณ์ "สเลฟ" ทุกตัวในระบบบัส</li>
+<li><strong>SS (Slave Select, Active-Low)</strong> 
+    สัญญาณที่ถูกสร้างจาก "มาสเตอร์" เพื่อเลือกสื่อสารกับอุปกรณ์ "สเลฟ" แต่ละตัวในระบบบัส </li>
+</ul>
+<p>การทำงานของวงจร <strong>SPI</strong> ภายในชิป <strong>ATmega328P</strong>
+ถ้าทำงานเป็น "มาสเตอร์" ขา <strong>SS</strong> จะไม่ถูกควบคุมโดยอัตโนมัติ
+ดังนั้นจะต้องมีการกำหนดสถานะลอจิกให้เป็น <strong>LOW</strong> ก่อนส่งข้อมูลไปยังอุปกรณ์ "สเลฟ" 
+และให้เป็น <strong>HIGH</strong> เมื่อส่งข้อมูลแล้วและจบการสื่อสารข้อมูล</p>
+<p><img alt="" src="../avr/images/spi_block_diagram.png" /></p>
+<p>รูป: ผังแสดงองค์ประกอบของวงจร <strong>SPI</strong> ภายในชิป <strong>ATmega328P</strong>
+(Source: Atmel / ATmega328p Datasheet)</p>
+<p>การทำงานของบัส <strong>SPI</strong> แบ่งได้เป็น 4 โหมด (<strong>SPI Modes: 0,1,2,3</strong>) 
+จำแนกตามพารามิเตอร์สองตัวที่เรียกว่า <strong>CPOL (Clock Polarity)</strong> และ 
+<strong>CPHA (Clock Phase)</strong></p>
+<p><img alt="" src="../avr/images/spi_modes.png" /></p>
+<p>รูป: โหมดการทำงานของ <strong>SPI</strong></p>
+<p><img alt="" src="../avr/images/spi_signals.png" /></p>
+<p>รูป: คลื่นสัญญาณของ <strong>SPI</strong> จำแนกตามโหมดการทำงาน
+(<strong>CPHA</strong> และ <strong>CPOL</strong> แบ่งออกเป็น 4 โหมด)</p>
+<p>วงจร <strong>SPI</strong> ของ <strong>ATmega328P</strong> สามารถเลือกได้ว่า จะให้ทำหน้าที่เป็นอุปกรณ์
+"มาสเตอร์" หรือ "สเลฟ"  และใช้ขาของชิปไมโครคอนโทรลเลอร์ดังนี้</p>
+<ul>
+<li><code>MOSI</code> ตรงกับขา <strong>PB3</strong> หรือ <strong>Arduino D11 pin</strong></li>
+<li><code>MISO</code> ตรงกับขา <strong>PB4</strong> หรือ <strong>Arduino D12 pin</strong></li>
+<li><code>SCK</code>  ตรงกับขา <strong>PB5</strong> หรือ <strong>Arduino D13 pin</strong></li>
+<li><code>SS</code>   ตรงกับขา <strong> PB2</strong> หรือ <strong>Arduino D10 pin</strong>
+(ใช้สำหรับกรณีที่อุปกรณ์ทำหน้าที่เป็น <strong>SPI Slave</strong>)</li>
+</ul>
+<p>แนะนำให้ศึกษาเพิ่มเติมจากบทความ: <a href="../../arduino/arduino-spi-master-slave/">"<strong>การสื่อสารด้วยบัส SPI และเขียนโปรแกรมด้วย Arduino</strong>"</a></p>
+<p>ในการเขียนโค้ดเพื่อใช้งาน <strong>SPI</strong> ของ <strong>ATmega328P</strong> จะต้องศึกษาการทำงานของรีจิสเตอร์ที่เกี่ยวข้อง
+จากเอกสารของผู้ผลิต (<a href="../avr/atmega328p_datasheet.pdf"><strong>ATmega328P Datasheet</strong></a>) เช่น</p>
+<ul>
+<li><strong><code>SPCR</code> (SPI Control Register)</strong> รีจิสเตอร์กำหนดค่าการทำงานของ <strong>SPI</strong> เช่น <ul>
+<li><strong><code>SPE</code> (SPI Enable)</strong> บิตเปิด (1) หรือปิด (0) การทำงานของ <strong>SPI</strong></li>
+<li><strong><code>DORD</code> (Data Order)</strong> บิตเลือก <strong>MST First</strong> (0) หรือ <strong>LSB First</strong> (1)</li>
+<li><strong><code>MSTR</code> (Master / Slave</strong>) บิตเลือกโหมดการทำงาน ให้อุปกรณ์ทำหน้าที่เป็น 
+  <strong>Master</strong> (1) หรือ <strong>Slave</strong> (0)</li>
+<li><strong><code>CPOL</code> (Clock Polarity</strong>) และ <strong><code>CPHA</code> (Clock Phase</strong>) บิตจำนวน 2 บิต เพื่อเลือกโหมดการทำงานของ <strong>SPI</strong></li>
+<li><strong><code>SPR[1..0]</code></strong> บิตจำนวน 2 บิต เพื่อเลือกค่าตัวหารความถี่สำหรับสัญญาณ <strong>SCK</strong> </li>
+</ul>
+</li>
+<li><strong><code>SPSR</code> (SPI Status Register)</strong> รีจิสเตอร์ระบุสถานะการทำงานของ <strong>SPI</strong> เช่น<ul>
+<li><strong><code>SPIF</code> (SPI Interrupt Flag)</strong> บิตสำหรับแสดงสถานะอินเทอร์รัพท์ของ <strong>SPI</strong> หรือสถานะการส่งข้อมูลหนึ่งไบต์ครบแล้ว</li>
+<li><strong><code>SPI2X</code> (Double SPI Speed Bit)</strong> ถ้าเป็น 1 หมายถึง คูณสองสำหรับความถี่ <strong>SCK</strong></li>
+</ul>
+</li>
+<li><strong><code>SPDR</code> (SPI Data Register)</strong> ข้อมูลไบต์จะถูกเขียนลงในไบต์นี้ และถูกส่งข้อมูลออกทาง <strong>MOSI</strong> โดยอัตโนมัติ
+และจะรับข้อมูลเข้ามาทาง <strong>MISO</strong> เพื่อเก็บในรีจิสเตอร์นี้เช่นกัน</li>
+</ul>
+<p><img alt="" src="../avr/images/spi_registers.png" /></p>
+<p>รูป: รีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของ <strong>SPI</strong> ที่สำคัญได้แก่ <code>SPCR</code> <code>SPSR</code> <code>SPDR</code> </p>
+<p><img alt="" src="../avr/images/spi_clock_setting.png" /></p>
+<p>รูป: การกำหนดค่าบิตให้แก่ <code>SPI2X</code>, <code>SPR1</code>, <code>SPR0</code> เพื่อเลือกตัวหารความถี่สำหรับ <strong>SCK</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi-master-with-enabled-interrupt">&#9655; <strong>โค้ดตัวอย่าง: SPI Master with Enabled Interrupt</strong><a class="headerlink" href="#spi-master-with-enabled-interrupt" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการเปิดใช้งานวงจร <strong>SPI</strong> ของชิป <strong>ATmega328P</strong>
+เพื่อส่งออกข้อมูลไบต์จากชุดข้อมูลตัวอย่าง (อ้างอิงโดยอาร์เรย์ <code>data</code> ซึ่งมีข้อมูลจำนวน 8 ไบต์)
+เมื่อมีการเลื่อนบิตข้อมูลออกไปทางขา <strong>MOSI</strong> ก็มีการรับบิตข้อมูลกับเข้ามาทางขา <strong>MOSI</strong>
+ในขณะเวลาเดียวกัน</p>
+<p>ก่อนเริ่มต้นส่งข้อมูล จะต้องมีการกำหนดหรือตั้งค่าการทำงานในวงจร <strong>SPI</strong>
+ซึ่งเป็นหน้าที่ของฟังก์ชัน <code>initSPI()</code> ในโค้ดตัวอย่าง เช่น </p>
+<ul>
+<li>เลือกบทบาทเป็น  "มาสเตอร์" </li>
+<li>เลือกโหมดการส่งข้อมูล (เช่น โหมด 0 หรือ 3)</li>
+<li>กำหนดทิศทาง <strong>I/O</strong> ของขาชิปสำหรับสัญญาณของ <strong>SPI</strong></li>
+<li>ตั้งค่าตัวหารความถี่เพื่อกำหนดความถี่ของสัญญาณ <strong>SCK</strong> (เช่น ใช้ความถี่ <strong>8MHz</strong>)</li>
+</ul>
+<p>ในตัวอย่างนี้ได้เลือกตัวหารความถี่เป็น  <code>4</code> 
+แต่มีการซิตบิต <strong>SPI2X (Double Clock Speed)</strong> ให้เป็น <code>1</code> จึงได้ความถี่
+<strong>(16MHz/4) x 2 = 8MHz</strong></p>
+<p>นอกจากนั้นแล้วยังมีการเปิดใช้งานอินเทอร์รัพท์สำหรับ <strong>SPI</strong> เช่น 
+เมื่อมีส่งข้อมูลไบต์ในแต่ละครั้งได้สำเร็จแล้ว จะมีการสร้างเหตุการณ์อินเทอร์รัพท์ และเรียกใช้ฟังก์ชัน <strong>ISR</strong>
+ที่มีชื่อว่า  <code>ISR(SPI_STC_vect) {...}</code> โดยอัตโนมัติ</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt; // for ISR(SPI_STC_vect)
+#include &lt;util/delay.h&gt;    // for _delay_ms()
+
+#define SS   PB2  // D10
+#define MOSI PB3  // D11
+#define MISO PB4  // D12
+#define SCK  PB5  // D13
+
+#define DATA_LENGTH (8)
+
+const uint8_t data[ DATA_LENGTH ] = {
+   0x55, 0x81, 0xE7, 0x01, 0x02, 0x3, 0x04, 0x05
+};
+
+volatile uint8_t done = 0;
+volatile uint8_t data_index = 0;
+volatile uint8_t data_recv[ DATA_LENGTH ];
+
+ISR(SPI_STC_vect) { // Interrupt Service Routine for SPI
+  data_index++;
+  if (data_index == DATA_LENGTH) {
+     done = 1;          // Set the done flag to 1.
+     PORTB |= (1&lt;&lt;SS);  // Pull SS high
+     SPCR  &amp;= ~((1&lt;&lt;SPE)|(1&lt;&lt;SPIE)); // Disable SPI
+  } else {
+     data_recv[data_index] = SPDR;
+     SPDR = data[data_index];
+  }
+}
+
+void initSPI(void) {
+  PORTB &amp;= ~(1&lt;&lt;SS);  // Pull SS low
+  // Set up the SPI unit: MSB first, Master mode, F_osc/2
+  SPSR = (1&lt;&lt;SPI2X); // Set double speed for SPI clock
+  SPSR |= (1&lt;&lt;SPIF); // Clear the SPI interrupt flag
+  // Set as master and enable SPI interrupt
+  SPCR = (1&lt;&lt;MSTR) | (1&lt;&lt;SPIE); // Use div=4 (default) 
+  //SPCR |= (1&lt;&lt;SPR0);             // Use div=16
+  //SPCR |= (1&lt;&lt;CPOL) | (1&lt;&lt;CPHA); // Use SPI Mode 3
+  SPCR |= (1&lt;&lt;SPE); // Enable SPI
+}
+
+int main(void) {
+  // Set SS, MOSI, and SCK as outputs
+  DDRB  |= (1&lt;&lt;SS)|(1&lt;&lt;MOSI)|(1&lt;&lt;SCK); 
+  DDRB &amp;= ~(1&lt;&lt;MISO);  // Set MISO as input
+  PORTB |= (1&lt;&lt;SS);  // Pull SS high
+  _delay_ms(1);
+  while (1) {
+    cli();              // Disable global interrupts
+    done = 0;           // Clear the done flag
+    data_index = 0;     // Reset the data index
+    PORTB &amp;= ~(1&lt;&lt;SS);  // Pull SS low
+    initSPI();          // Initialize / enable the SPI 
+    SPDR = data[data_index]; // Start sending the first data byte
+    sei();              // Enable global interrupts
+    while (!done);      // Wait until the done flag is set
+    _delay_ms(100);
+  }
+  return 0;
+}
+</code></pre>
+<p>ตัวอย่างการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong>
+และใช้ <strong>Virtual Logic Analyzer</strong> บันทึกรูปคลื่นสัญญาณลงไฟล์ <code>.vcd</code>
+แสดงผลด้วยโปรแกรม <strong>GTKWave</strong></p>
+<p><img alt="" src="../avr/images/wokwi_spi_nano_sim.png" /></p>
+<p>รูป: การจำลองการทำงานด้วย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="../avr/images/wokwi_spi_nano_sim-1.png" /></p>
+<p>รูป:  สัญญาณ <strong>SPI</strong> ในโหมด 0 เมื่อมีการส่งข้อมูล 8 ไบต์ ตามลำดับ (เลือกใช้ความถี่สำหรับ <strong>SCK</strong> เท่ากับ <strong>8MHz</strong> หรือคาบกว้าง <strong>125ns</strong>)</p>
+<p><img alt="" src="../avr/images/wokwi_spi_nano_sim-2.png" /></p>
+<p>รูป: ช่วงเวลาที่มีการส่งข้อมูลไบต์แรก <code>0b01010101</code> หรือ <code>0x55</code></p>
+<p>&nbsp;</p>
+<p>ลองมาดูตัวอย่างสัญญาณที่วัดได้โดยใช้ออสซิลโลสโคปเมื่อทดลองใช้กับอุปกรณ์ฮาร์ดแวร์จริง</p>
+<p><img alt="" src="../avr/images/spi_mode0_ss.png" /></p>
+<p>รูป: สัญญาณ <strong>SCK</strong> (CH1) และ <strong>SS</strong> (CH2) แสดงให้เห็นว่ามีการส่งข้อมูล 8 ไบต์</p>
+<p><img alt="" src="../avr/images/spi_mode0_three_bytes.png" /></p>
+<p>รูป: สัญญาณ <strong>SCK</strong> (CH1) และ <strong>MOSI</strong> (CH2) ช่วงที่มีการส่งข้อมูล 3 ไบต์แรก</p>
+<p><img alt="" src="../avr/images/spi_mode0_1st_byte.png" /></p>
+<p>รูป: สัญญาณ <strong>SCK</strong> (CH1) และ <strong>MOSI</strong> (CH2) 
+ช่วงที่มีการส่งข้อมูลไบต์แรก <code>0b01010101</code> หรือ <code>0x55</code></p>
+<p><img alt="" src="../avr/images/spi_mode0_2nd_byte.png" /></p>
+<p>รูป: สัญญาณ <strong>SCK</strong> (CH1) และ <strong>MOSI</strong> (CH2) 
+ช่วงที่มีการส่งข้อมูลไบต์ที่สอง <code>0b10000001</code> หรือ <code>0x81</code></p>
+<p><img alt="" src="../avr/images/spi_mode0_3rd_byte.png" /></p>
+<p>รูป: สัญญาณ <strong>SCK</strong> (CH1) และ <strong>MOSI</strong> (CH2) 
+ช่วงที่มีการส่งข้อมูลไบต์ที่สาม <code>0b11100111</code> หรือ <code>0xE7</code></p>
+<p>ลองดูตัวอย่างรูปคลื่นสัญญาณดิจิทัล เมื่อใช้ <strong>USB-based 8-channel Logic Analyzer</strong>
+วัดสัญญาณจริงจากบอร์ด <strong>Arduino Nano</strong>
+ใช้งานร่วมกับซอฟต์แวร์ <strong>Sigrok PulseView</strong> โดยตั้งค่า <strong>Sample Rate</strong>
+เท่ากับ <strong>24MHz</strong></p>
+<p><img alt="" src="../avr/images/nano_spi_logic_analyzer.jpg" /></p>
+<p>รูป: การวัดสัญญาณที่ขาของบอร์ด <strong>Arduino Nano</strong> ด้วย <strong>USB Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/pulseview_spi-1.png" /></p>
+<p>รูป: แสดงช่วงเวลาที่มีการส่งข้อมูล 8 ไบต์ (ส่งข้อมูลในโหมด <strong>SPI Mode 0</strong> ความถี่ <strong>8MHz</strong>)
+และมีการเปิดใช้งาน <strong>SPI Decoder</strong> เพื่อแสดงค่าของตัวเลขของข้อมูลไบต์</p>
+<p><img alt="" src="../avr/images/pulseview_spi-2.png" /></p>
+<p>รูป: แสดงช่วงเวลาที่มีการส่งข้อมูล 3 ไบต์แรก ได้แก่ <code>0x55</code> <code>0x81</code> <code>0xE7</code></p>
+<p><img alt="" src="../avr/images/pulseview_spi-3.png" /></p>
+<p>รูป: วัดคาบของสัญญาณ <strong>SCK</strong> (หนึ่งคาบได้ค่าประมาณ <strong>125ns</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดภาษาซีสำหรับ <strong>ATmega328P</strong>
+เพื่อใช้งานวงจร <strong>SPI</strong> โดยตั้งค่าให้ทำงานในโหมด <strong>SPI Master</strong> (มาสเตอร์) 
+และส่งชุดข้อมูลไบต์ตามลำดับ มีการทดสอบโค้ดตัวอย่างด้วยวิธีการจำลองการทำงาน
+และทดลองด้วยอุปกรณ์ฮาร์ดแวร์จริง</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-05-04 | Last Updated: 2023-05-05</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
