@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/avr_gcc_part-9/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 9 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-9" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 9</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-analog-to-digital-converter" class="nav-link">&#9655; ADC (Analog-to-Digital Converter)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-atmega328p" class="nav-link">&#9655; วงจร ADC ของชิป ATmega328P</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-single-conversion" class="nav-link">&#9655; การอ่านค่าจาก ADC (Single Conversion)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-free-running-mode" class="nav-link">&#9655; การอ่านค่าจาก ADC (Free Running Mode)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-auto-trigger-timer1-overflow-interrupt" class="nav-link">&#9655; การอ่านค่าจาก ADC (Auto Trigger - Timer1 Overflow Interrupt)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-auto-trigger-timer1-output-compare-match-b" class="nav-link">&#9655; การอ่านค่าจาก ADC (Auto Trigger - Timer1 Output Compare Match B)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-pwm" class="nav-link">&#9655; การอ่านค่าจาก ADC เพื่อปรับความกว้างพัลส์ของสัญญาณ PWM</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-9">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 9<a class="headerlink" href="#c-avr-atmega328p-9" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 9 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<strong>ADC (Analog-to-Digital Converter)</strong> หรือ
+วงจรสำหรับแปลงระดับแรงดันไฟฟ้าที่ขาแอนะล็อกอินพุตของชิป <strong>ATmega328P</strong> ให้เป็นข้อมูลดิจิทัล
+และเนื่องจากมีการสาธิตใช้งานวงจร <strong>ADC</strong> ร่วมกับ <strong>Timer/Counter1</strong> ดังนั้น
+แนะนำให้ศึกษาเนื้อหา  <a href="../avr_gcc_part-7/"><strong>ตอนที่ 7</strong></a> และ <a href="../avr_gcc_part-8/"><strong>ตอนที่ 8</strong></a> ด้วยเช่นกัน</p>
+<p>รายละเอียดเกี่ยวกับรีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของ  <strong>ADC</strong> และ <strong>Timer/Counter1</strong>
+สามารถดูได้เอกสารของผู้ผลิต 
+<a href="../avr/atmega328p_datasheet.pdf"><strong>ATmega328P Datasheet</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-analog-to-digital-converter">&#9655; <strong>ADC (Analog-to-Digital Converter)</strong><a class="headerlink" href="#adc-analog-to-digital-converter" title="Permanent link">#</a></h2>
+<p>วงจร <strong>ADC</strong> ในชิป <strong>ATmega328P</strong> จัดอยู่ในประเภท 
+<a href="https://en.wikipedia.org/wiki/Successive-approximation_ADC"><strong>Successive-Approximation ADC</strong></a>
+มีไว้สำหรับการแปลงระดับแรงดันไฟฟ้าที่ขาอินพุตแบบแอนะล็อก ให้เป็นข้อมูลดิจิทัล
+ขนาด 10 บิต ได้ค่าเป็นเลขจำนวนเต็ม มีค่าตั้งแต่ 0 ถึง 1023 (<code>0x3FF</code>)</p>
+<p><img alt="" src="../avr/images/sar_adc.png" /></p>
+<p>รูป:  วงจร <strong>SAR ADC</strong> (Source: Wikipedia)</p>
+<p>โดยทั่วไป การทำงานของวงจร <strong> Successive-Approximation ADC</strong> ประกอบด้วย</p>
+<ul>
+<li>วงจรชักตัวอย่างและคงไว้ (<strong>Sample &amp; Hold Circuit</strong>)</li>
+<li>วงจรเปรียบเทียบแรงดัน (<strong>Analog Voltage Comparator</strong>) </li>
+<li>วงจร <strong>DAC</strong> (<strong>Digital-to-Analog Converter</strong>)</li>
+<li>รีจิสเตอร์ <strong>SAR</strong> (<strong>Successive-Approximation Register</strong>) และวงจรลอจิกควบคุม</li>
+</ul>
+<p>วงจร <strong>ADC</strong> ประเภทนี้ จะใช้วิธีสร้างสัญญาณจาก <strong>DAC</strong> 
+เพื่อนำไปเปรียบเทียบระดับแรงดันไฟฟ้ากับสัญญาณอินพุต โดยใช้ค่าบิตในรีจิสเตอร์ <strong>SAR</strong>
+เป็นตัวกำหนดระดับแรงดัน และทำไปทีละบิต เริ่มต้นที่บิต <strong>MSB</strong> และทำซ้ำไปจนถึงบิต <strong>LSB</strong> ของรีจิสเตอร์ <strong>SAR</strong> เช่น ขนาด 10 บิต </p>
+<p>เริ่มด้วยบิต <strong>MSB</strong> แล้วดูว่า แรงดันไฟฟ้าที่ถูกสร้างจาก <strong>DAC</strong> (<script type="math/tex">V_{DAC}</script>) 
+มากกว่าหรือน้อยกว่า แรงดันไฟฟ้าของสัญญาณแอนะล็อกอินพุต (<script type="math/tex">V_{AIN}</script>) หรือไม่ 
+ผลการเปรียบเทียบ ก็นำไปกำหนดค่าให้บิต <strong>MSB</strong> จากนั้นก็เป็นบิตถัดไป เพื่อระบุค่าบิตที่ได้จนครบทุกบิต 
+และแรงดันไฟฟ้าจาก <strong>DAC</strong> ในขั้นตอนสุดท้าย จะเข้าใกล้ระดับของสัญญาณอินพุต (มีผลต่างใกล้เคียง 0)
+วิธีการเปรียบเทียบลักษณะนี้คล้ายกับการค้นหาในช่วงที่แคบลงตามลำดับแบบ <strong>Binary Search</strong>
+ถ้าเพิ่มจำนวนบิต <script type="math/tex">n</script> ให้มากขึ้น ผลการแปลงข้อมูลจะมีค่าใกล้เคียงกับค่าของแรงดันอินพุตมากขึ้น
+และผลการแปลงจะได้ <script type="math/tex">ADC = \frac{V_{AIN} \times 1024}{V_{REF}}</script>
+</p>
+<p>ยกตัวอย่างเช่น ถ้าให้แรงดันอ้างอิงเท่ากับ <script type="math/tex">V_{REF}=5V</script> และข้อมูลที่ได้มีขนาด <script type="math/tex">n=4</script> บิต
+ดังนั้นจึงแบ่งออกเป็น 16 ระดับ และมีระยะห่างกันหรือความละเอียด <script type="math/tex">V_{REF}/2^n</script> หรือ <script type="math/tex">5V/16 = 0.3125V</script>
+</p>
+<p>ตัวอย่าง 1) ถ้าแรงดันอินพุตเท่ากับ <script type="math/tex">V_{AIN}=2.7V</script> จะถูกแปลงให้เป็นข้อมูล 4 บิตได้ดังนี้</p>
+<ol>
+<li>เริ่มต้นด้วย <script type="math/tex">V_{DAC}=0V</script> ซึ่งมีค่าน้อยกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้นให้ <script type="math/tex">V_{DAC}=0V + 5V/2</script> หรือ <script type="math/tex">2.5V</script> (เพิ่มขึ้น) และได้บิต <strong>MSB</strong> เป็น <code>1</code></li>
+<li>ให้ <script type="math/tex">V_{DAC}=2.5V + 5V/4</script> หรือ <script type="math/tex">3.75V</script> ซึ่งมีค่ามากกว่า <script type="math/tex">V_{AIN}</script> 
+ดังนั้นให้ <script type="math/tex">V_{DAC}=2.5V</script> (คงเดิม) และได้บิตถัดไปเป็น <code>0</code></li>
+<li>ให้ <script type="math/tex">V_{DAC}=2.5V + 5V/8</script> หรือ <script type="math/tex">3.125V</script> ซึ่งมีค่ามากกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้นให้  <script type="math/tex">V_{DAC}=2.5V</script> (คงเดิม) และได้บิตถัดไปเป็น <code>0</code></li>
+<li>ให้ <script type="math/tex">V_{DAC}=2.5V + 5V/16</script> หรือ <script type="math/tex">2.8125V</script> ซึ่งมีค่ามากกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้นให้ <script type="math/tex">V_{DAC}=2.5V</script> และได้บิต <strong>LSB</strong> เป็น <code>0</code></li>
+</ol>
+<p>ผลการแปลงข้อมูลจะได้ค่า "1000" เป็นคำตอบ หรือตรงกับ <code>2.5V</code> ซึ่งเป็นระดับที่น้อยกว่าแต่ใกล้เคียง
+<script type="math/tex">V_{AIN}=2.7V</script> มากที่สุด</p>
+<p>ตัวอย่าง 2) ถ้าแรงดันอินพุตเท่ากับ <script type="math/tex">V_{AIN}=4.0V</script> จะถูกแปลงให้เป็นข้อมูล 4 บิตได้ดังนี้</p>
+<ol>
+<li>เริ่มต้นด้วย <script type="math/tex">V_{DAC}=0V</script> ซึ่งมีค่าน้อยกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้นให้ <script type="math/tex">V_{DAC}=0V + 5V/2</script> หรือ <script type="math/tex">2.5V</script> (เพิ่มขึ้น) และได้บิต <strong>MSB</strong> เป็น <code>1</code></li>
+<li>ให้ <script type="math/tex">V_{DAC}=2.5V + 5V/4</script> หรือ <script type="math/tex">3.75V</script> ซึ่งน้อยกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้น <script type="math/tex">V_{DAC}=3.75V</script> (เพิ่มขึ้น) ได้บิตถัดไปเป็น <code>1</code></li>
+<li>ให้ <script type="math/tex">V_{DAC}=3.75V + 5V/8</script> หรือ <script type="math/tex">4.375V</script> ซึ่งมากกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้น <script type="math/tex">V_{DAC}=3.75V</script> (คงเดิม) ได้บิตถัดไป <code>0</code></li>
+<li>
+<script type="math/tex">3.75V + 5V/16</script> หรือ <script type="math/tex">4.0625V</script> ซึ่งมากกว่า <script type="math/tex">V_{AIN}</script>
+ดังนั้น <script type="math/tex">V_{DAC}=3.75V</script> (คงเดิม) ได้บิต <strong>LSB</strong> เป็น <code>0</code></li>
+</ol>
+<p>ผลการแปลงข้อมูลจะได้ค่า "1100" เป็นคำตอบ หรือ <code>3.75V</code> หรือเป็นระดับที่น้อยกว่าแต่ใกล้เคียง
+<script type="math/tex">V_{AIN}=4.0V</script> มากที่สุด</p>
+<p>ตัวอย่างโค้ด <strong>Python</strong> สำหรับการคำนวณระดับของแรงดันไฟฟ้าตามจำนวน <script type="math/tex">n</script> บิต</p>
+<pre><code class="language-python">VCC = 5.0       # Vref
+n = 4           # Number of bits
+steps = (1&lt;&lt;n)  # Number of steps
+print( f&quot;{VCC/steps}&quot; ) # volt / step
+for i in range(steps):
+    print( f&quot;{bin(i)[2:].zfill(4)} {VCC*i/steps:.4f}&quot; )
+</code></pre>
+<p>ตัวอย่างโค้ด <strong>Python</strong> สำหรับการแปลงค่าจำนวน <script type="math/tex">n</script> บิต ตามรูปแบบของ <strong>SAR DAC</strong></p>
+<pre><code class="language-python">n = 4         # Number of bits
+v_ref = 5.0   # Vref for ADC
+v_ain = 2.7   # Analog input voltage
+v_dac = 0.0   # DAC voltage (initially set to zero) 
+bits  = &quot;&quot;    # Bitstring 
+
+for i in range(1,n+1):
+    v_dac_new = v_dac + v_ref/(2**i)
+    if v_dac_new &lt;= v_ain:
+        v_dac = v_dac_new
+        bits += '1'
+        print( f'bit=1, x_dac={v_dac:.4f}V')
+    else:
+        bits += '0'
+        print( f'bit=0, x_dac={v_dac:.4f}V')
+
+print( f'ADC: &quot;0b{bits}&quot;, value={v_ref*int(bits,2)/(1&lt;&lt;n):.4f}V' )
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-atmega328p">&#9655; <strong>วงจร ADC ของชิป ATmega328P</strong><a class="headerlink" href="#adc-atmega328p" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ATmega328P</strong> มีขาแอนะล็อกอินพุตให้เลือกใช้ได้ 8 ขา (<strong>A0</strong> - <strong>A7</strong>)
+โดยต่อสัญญาณอินพุตผ่านวงจร <strong>ADMUX (8-channel Analog Multiplexer)</strong>
+เพื่อเลือกว่า จะใช้สัญญาณอินพุตช่องใดในแต่ละช่วงเวลา ข้อมูลที่ได้จากการอ่านอินพุต จะมีขนาดสูงสุด 10 บิต</p>
+<p><img alt="" src="../avr/images/adc_block_diagram.png" /></p>
+<p>รูป: บล็อกไดอะแกรมของวงจร <strong>ADC</strong> ภายใน <strong>ATmega328P</strong> (Source: Atmel/ ATmega328p Datasheet)</p>
+<p>การทำงานของ <strong>ADC</strong> จะต้องมีการเลือกใช้ระดับแรงดันอ้างอิงสำหรับการทำงานของ <strong>ADC</strong> เช่น</p>
+<ul>
+<li>เลือกจากขา <code>AVCC</code> ซึ่งเป็นขาแรงดันไฟเลี้ยงสำหรับ <strong>ADC</strong> และโดยปรกติแล้ว จะเท่ากับ <strong>VCC</strong>
+(เช่น <strong>5V</strong> สำหรับบอร์ด <strong>Arduino Uno / Nano</strong>) </li>
+<li>เลือกจากขา <code>AREF</code> (<strong>Analog Reference Pin</strong>) ที่ต้องมีตัวเก็บประจุต่ออยู่ด้วย
+ระหว่างขานี้กับ <strong>GND</strong> ของวงจร</li>
+<li>เลือกจากภายในชิป <strong>1.1V</strong> (<strong>Internal Voltage Reference</strong>) 
+และจะใช้ได้กับสัญญาณอินพุตที่มีแรงดันไฟฟ้าไม่เกิน <strong>1.1V</strong></li>
+</ul>
+<p>ขั้นตอนการแปลงสัญญาณแอนะล็อกจากขาอินพุตขาใดขาหนึ่ง ให้เป็นข้อมูลดิจิทัล ทำหนึ่งครั้ง แบบไม่ต่อเนื่อง 
+(<strong>Single ADC Conversion</strong>) มีดังนี้</p>
+<ul>
+<li>เลือกแหล่งที่มาของแรงดันไฟฟ้าอ้างอิง โดยกำหนดค่าบิต <code>REFS[1:0]</code> 
+(<strong>Reference Selection Bits</strong>) ในรีจิสเตอร์ <code>ADMUX</code></li>
+<li>กำหนดค่าบิต <code>ADLAR</code> ในรีจิสเตอร์ <code>ADMUX</code> 
+เพื่อเลือกทิศทางการจัดเรียงข้อมูลขนาด 10 ลงในรีจิสเตอร์ <code>ADC</code> ขนาด 16 บิต 
+ถ้าบิต <code>ADLAR=1</code> ข้อมูลขนาด 10 บิต จะอยู่ชิดซ้ายในรีจิสเตอร์ (<strong>Left-adjust</strong>)
+แต่ถ้าบิต <code>ADLAR=0</code> ข้อมูลขนาด 10 บิต จะอยู่ชิดขวา (<strong>Right-adjust</strong>)</li>
+<li>เลือกตัวหารความถี่ (<strong>Prescaler</strong>) เพื่อกำหนดความถี่ของสัญญาณ <strong>ADC Clock</strong>
+โดยกำหนดค่าบิต <code>ADPS[2:0]</code> ในรีจิสเตอร์ <code>ADCSRA</code><br />
+ซึ่งจะต้องให้ได้ความถี่อยู่ในช่วง <strong>50kHz</strong> ถึง <strong>200kHz</strong> ถ้าต้องการได้ข้อมูลขนาด 10 บิต</li>
+<li>เลือกช่องอินพุตสำหรับ <strong>ADC</strong> โดยกำหนดค่าบิต <code>MUX[3:0]</code> ในรีจิสเตอร์ <code>ADMUX</code> (<strong>ADC Multiplexer Selection Register</strong>)</li>
+<li>เขียนค่าบิต <code>ADEN</code> (<strong>ADC Enable</strong>) ในรีจิสเตอร์ <code>ADCSRA</code> ให้เป็น <strong>1</strong>  เพื่อให้วงจร <strong>ADC</strong> เริ่มทำงาน</li>
+<li>ตรวจสอบบิต <code>ADSC</code> ในรีจิสเตอร์ <code>ADCSRA</code> ถ้าบิต <code>ADSC=1</code> ให้รอก่อน
+แต่ถ้าบิต <code>ADSC=0</code> แสดงว่า การแปลงข้อมูลของ <strong>ADC</strong> เสร็จสิ้นแล้ว</li>
+<li>อ่านค่าที่เป็นข้อมูล 10 บิต จากรีจิสเตอร์ <code>ADC</code> ขนาด 16 บิต
+ซึ่งประกอบด้วยรีจิสเตอร์ 8 บิต <code>ADCH</code> และ <code>ADCL</code></li>
+</ul>
+<p>ถ้าต้องการให้ <strong>ADC</strong> ทำงานในโหมด <strong>Free-Running</strong> (วงจร <strong>ADC</strong> ทำงานต่อเนื่อง) 
+จะต้องกำหนดให้บิต <code>ADTS[2:0]="000"</code> ในรีจิสเตอร์ <code>ADCSRB</code> และบิต <code>ADATE=1</code> ในรีจิสเตอร์ <code>ADCSRA</code></p>
+<p><img alt="" src="../avr/images/adc_registers.png" /></p>
+<p>รูป: รีจิสเตอร์ของวงจร <strong>ADC</strong> เช่น <code>ADMUX</code> <code>ADCSRA</code> <code>ADCSRB</code> <code>DIRR0</code></p>
+<p><img alt="" src="../avr/images/adc_refs_bits.png" /></p>
+<p>รูป: ตัวเลือกสำหรับบิต <code>REFS[1:0]</code> (<strong>Voltage Reference</strong>)</p>
+<p><img alt="" src="../avr/images/adc_mux_bits.png" /></p>
+<p>รูป: ตัวเลือกสำหรับบิต <code>MUX[3:0]</code> (<strong>Analog Multiplexer</strong>)</p>
+<p><img alt="" src="../avr/images/adc_adc_bits.png" /></p>
+<p>รูป: ตัวเลือกสำหรับบิต <code>ADLAR</code> และการจัดเรียงบิตในรีจิสเตอร์ <code>ADCH:ADCL</code></p>
+<p><img alt="" src="../avr/images/adc_adps_bits.png" /></p>
+<p>รูป: ตัวเลือกสำหรับบิต <code>ADPS</code> (<strong>ADC Prescaler Selection</strong>)</p>
+<p><img alt="" src="../avr/images/adc_adts_bits.png" /></p>
+<p>รูป: ตัวเลือกสำหรับบิต <code>ADTS</code> (<strong>ADC Auto Trigger Source Selection</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-single-conversion">&#9655; <strong>การอ่านค่าจาก ADC (Single Conversion)</strong><a class="headerlink" href="#adc-single-conversion" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตอ่านค่าแรงดันอินพุตจากขา <strong>PC0 / A0</strong> และ <strong>PC1 / A1</strong> ตามลำดับ 
+แล้วนำค่าที่อ่านมาเปรียบเทียบกัน เพื่อใช้กำหนดสถานะลอจิกที่ขาเอาต์พุต <strong>PB5 / D13</strong>
+ถ้าอินพุต <strong>A0</strong> มากกว่า <strong>A1</strong> จะทำให้เอาต์พุต <strong>PB</strong> มีสถานะลอจิกเป็น <strong>HIGH</strong>
+ในกรณีตรงข้าม จะได้ลอจิก <strong>LOW</strong></p>
+<p>การใช้งาน <strong>ADC</strong> จะต้องมีการตั้งค่าตัวหารความถี่ โดยเลือกใช้ค่า <strong>/128</strong>
+ซึ่งจะทำให้ได้ความถี่สำหรับ <strong>ADC Clock</strong> เท่ากับ <strong>16MHz/128 = 125kHz</strong>
+หรือคาบเท่ากับ <strong>8 usec</strong></p>
+<p>การทำงานของวงจร <strong>ADC</strong> ภายในชิป <strong>ATmega328P</strong>
+จะต้องใช้ความถี่ในช่วง  <strong>50kHz</strong> ถึง <strong>200kHz</strong> หากต้องการได้ข้อมูล 10 บิต</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define LED_PIN    (PB5) // Arduino D13 pin / Onboard LED
+
+void initADC() {
+  // Set PC0/A0 as an input pin
+  DDRC &amp;= ~(1 &lt;&lt; DDC0); 
+  // Disable Digital Input Buffer on A0
+  DIDR0 |= (1&lt;&lt;ADC0D);
+  // Set reference voltage to AVcc
+  ADMUX = (1 &lt;&lt; REFS0); 
+  // Right-Adjust Result (ADLAR=0)
+  ADMUX  &amp;= ~(1&lt;&lt;ADLAR); 
+  // Set ADC prescaler to 128 (ADPS[2:0]=&quot;111&quot;)
+  // 16MHz/128 = 125kHz ADC clock
+  ADCSRA = (1&lt;&lt;ADPS2) | (1&lt;&lt;ADPS1) | (1&lt;&lt;ADPS0);
+  ADCSRA |= (1&lt;&lt;ADEN); // Enable ADC 
+  ADCSRA |= (1&lt;&lt;ADSC); // Start the first ADC conversion
+  // Wait for ADC conversion to complete
+  while (ADCSRA &amp; (1&lt;&lt;ADSC));
+}
+
+uint16_t readAnalog( uint8_t channel) { // Read A0 or A1 pin
+  // Clear all bits of ADMUX[3:0] (select A0 by default)
+  ADMUX &amp;= ~((1&lt;&lt;MUX3)|(1&lt;&lt;MUX2)|(1&lt;&lt;MUX1)|(1&lt;&lt;MUX0));
+  if (channel == 1) { // Select A1 input
+     ADMUX |= (1&lt;&lt;MUX0); // Set MUX0 bit
+  }
+  // Start a single ADC conversion
+  ADCSRA |= (1&lt;&lt;ADSC);
+  // Wait for ADC conversion to complete
+  while (ADCSRA &amp; (1&lt;&lt;ADSC));
+  // Return the result (10-bit, right-aligned)
+  return ADC;
+}
+
+int main(void) {
+  DDRB |= (1 &lt;&lt; LED_PIN);
+  initADC(); // Initialize ADC
+  while (1) {
+    uint16_t a0 = readAnalog(0); // Read A0 input
+    uint16_t a1 = readAnalog(1); // Read A1 input
+    if (a0 &gt; a1) { // Compare both inputs
+       PORTB |= (1&lt;&lt;LED_PIN); // Output HIGH
+    } else {
+       PORTB &amp;= ~(1&lt;&lt;LED_PIN); // Output LOW
+    }
+  }
+}
+</code></pre>
+<p>ตัวอย่างการเขียนโค้ดและจำลองการทำงานเสมือนจริงโดยใช้ <strong>WokWi Simulator</strong> มีดังนี้
+เลือกใช้บอร์ด <strong>Arduino Nano</strong> และโมดูลตัวต้านทานปรับค่าได้ <strong>Potentiometer</strong>
+จำนวน 2 ชุด (เป็นแบบ <strong>Circular</strong> และ <strong>Linear</strong>) ต่อเข้าที่ขา <strong>A0</strong> และ <strong>A1</strong> ตามลำดับ</p>
+<p><img alt="" src="../avr/images/wokwi_adc_dual_input_demo.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดด้วย <strong>WokWi Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-free-running-mode">&#9655; <strong>การอ่านค่าจาก ADC (Free Running Mode)</strong><a class="headerlink" href="#adc-free-running-mode" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการค่าจากขาแอนะล็อก-อินพุตที่ขา <strong>PC0 / A0</strong> และทำงานในโหมด
+<strong>Free-Running</strong> ซึ่งจะทำให้ <strong>ADC</strong> แปลงระดับแรงดันอินพุตให้เป็นข้อมูล 10 บิต
+ซ้ำไปเรื่อย ๆ  และมีการเปิดใช้งานอินเทอร์รัพท์ของวงจร <strong>ADC</strong> และเมื่อเกิดเหตุการณ์ในแต่ละครั้ง
+ฟังก์ชัน <strong>ISR</strong> จะมีการอ่านค่าที่ได้จากรีจิสเตอร์ <code>ADC</code> เก็บลงในตัวแปร <code>adcValue</code>
+และมีการสลับสถานะลอจิกที่ขา <strong>PB4</strong> (<code>LED2_PIN</code>) หนึ่งครั้ง</p>
+<p>ถ้าแรงดันอินพุตมีมากกว่า <strong>AVCC/2</strong> ซึ่งก็คือประมาณ <strong>5V/2</strong> อ่านได้ค่า <strong>511</strong> หรือมากกว่า
+จะทำให้ขาเอาต์พุต <strong>PB5 / D13</strong> (<code>LED1_PIN</code>) มีลอจิกเป็น <strong>HIGH</strong> ในกรณีอื่นจะได้ลอจิก <strong>LOW</strong> </p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/atomic.h&gt;
+
+#define LED1_PIN     (PB5) // Arduino D13 pin / Onboard LED
+#define LED2_PIN     (PB4) // Arduino D12 pin
+
+volatile uint16_t adcValue = 0;
+
+// The ADC interrupt flag will be cleared automatically
+// after the ISR(ADC_vect) is called. 
+ISR(ADC_vect) { 
+  adcValue = ADC;        // Save the current ADC value
+  PINB |= (1&lt;&lt;LED2_PIN); // Toggle PB4
+  ADCSRA |= (1&lt;&lt;ADIF);   // Clear the ADC interrupt flag (not necessary)
+}
+
+void initADC() {
+  // Set PC0/A0 as an input pin
+  DDRC &amp;= ~(1 &lt;&lt; DDC0);
+  // Disable Digital Input Buffer on A0
+  DIDR0 |= (1&lt;&lt;ADC0D);
+  // Set reference voltage to AVCC
+  ADMUX = (1 &lt;&lt; REFS0); 
+  // Right-Adjust Result (ADLAR=0)
+  ADMUX &amp;= ~(1&lt;&lt;ADLAR); 
+  // Select A0 as ADC input ADMUX[3:0]=&quot;0000&quot;
+  ADMUX &amp;= ~((1&lt;&lt;MUX3)|(1&lt;&lt;MUX2)|(1&lt;&lt;MUX1)|(1&lt;&lt;MUX0));
+  // Set ADC prescaler to 128 (ADPS[2:0]=&quot;111&quot;)
+  // 16MHz/128 = 125kHz ADC clock
+  ADCSRA = (1&lt;&lt;ADPS2) | (1&lt;&lt;ADPS1) | (1&lt;&lt;ADPS0);
+  // Enable ADC (Free running), enable ADC interrupt
+  ADCSRB = 0; // ADTS[2:0]=&quot;000&quot;
+  ADCSRA |= (1&lt;&lt;ADEN) | (1&lt;&lt;ADATE) | (1&lt;&lt;ADIE) | (1&lt;&lt;ADSC);
+  //ADCSRA |= (1&lt;&lt;ADSC); // Start the next conversion
+}
+
+int main(void) {
+  uint16_t value;
+  DDRB |= (1 &lt;&lt; LED1_PIN);
+  DDRB |= (1 &lt;&lt; LED2_PIN);
+  initADC();
+  sei(); // Enable global interrupts
+  while (1) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      value = adcValue;
+    }
+    if (value &gt; 511) {
+      PORTB |= (1&lt;&lt;LED1_PIN);  // Output HIGH
+    } else {
+      PORTB &amp;= ~(1&lt;&lt;LED1_PIN); // Output LOW
+    }
+  }
+}
+</code></pre>
+<p>ลองมาดูตัวอย่างการวัดสัญญาณเอาต์พุตที่ขา <strong>PB5</strong> (<code>LED1_PIN</code>)
+และ <strong>PB4</strong> (<code>LED2_PIN</code>) โดยใช้บอร์ด <strong>Arduino Nano</strong>
+และอุปกรณ์ <strong>USB Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/adc_free_running_wave-1.png" /></p>
+<p>รูป: การวัดสัญญาณที่ขาเอาต์พุต (ช่วงที่ <code>LED1_PIN</code> มีขอบขาขึ้น)</p>
+<p><img alt="" src="../avr/images/adc_free_running_wave-2.png" /></p>
+<p>รูป: การวัดสัญญาณที่ขาเอาต์พุต (ช่วงที่ <code>LED1_PIN</code> มีขอบขาลง)</p>
+<p>จากรูปคลื่นสัญญาณ จะเห็นได้ว่า เป็นช่วงที่มีการเปลี่ยนแปลงลอจิกที่ขา <code>LED1_PIN</code> 
+ซึ่งเกิดจากการเปลี่ยนแปลงระดับอินพุตที่ขา <strong>A0</strong> เพิ่มขึ้นสูงกว่าหรือลดลงต่ำกว่า <strong>VCC/2</strong></p>
+<p>นอกจากนั้นยังเห็นการเปลี่ยนแปลงลอจิกที่ขา <code>LED2_PIN</code> การเกิดพัลส์อย่างต่อเนื่องด้วยอัตราคงที่
+แสดงว่า <strong>ADC</strong> ทำงานในโหมด <strong>Free Running</strong>
+ถ้าวัดความกว้างของพัลส์จะได้ประมาณ <strong>104.1 usec</strong></p>
+<p>เนื่องจาก <strong>ADC Clock</strong> ถูกกำหนดให้เท่ากับ <strong>125kHz</strong> หรือคาบหรือหนึ่งไซเคิลเท่ากับ
+<strong>8 usec</strong> และการแปลงค่าแรงดันอินพุตโดยวงจร <strong>ADC</strong>
+ใช้เวลาอย่างน้อย 13 ไซเคิล ดังนั้นจะใช้เวลาไม่น้อยกว่า <strong>13 x 8 usec = 104 usec</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-auto-trigger-timer1-overflow-interrupt">&#9655; <strong>การอ่านค่าจาก ADC (Auto Trigger - Timer1 Overflow Interrupt)</strong><a class="headerlink" href="#adc-auto-trigger-timer1-overflow-interrupt" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการเปิดใช้งานวงจร <strong>ADC</strong> สำหรับสัญญาณแอนะล็อกอินพุตที่ขา <strong>PC0 / A0</strong>
+ให้ทำงานโดยอัตโนมัติ (<strong>Auto Trigger Mode</strong>) โดยเลือกใช้อินเทอร์รัพท์ของวงจร
+<strong>Timer/Counter1</strong> ซึ่งจะเกิดขึ้นเมื่อนับครบรอบถึงค่าสูงสุดในแต่ละครั้ง (<strong>Overflow Interrupt</strong>)
+ในกรณีนี้จะต้องกำหนดค่าบิต <code>ADTS[2:0]="110"</code></p>
+<p>วงจร <strong>Timer/Counter1</strong> ทำงานในโหมด <strong>Normal</strong> มีการตั้งค่าตัวหารความถี่เท่ากับ <strong>/8</strong>
+ดังนั้นจึงนับขึ้นด้วยความถี่ <strong>16MHz/8 = 2MHz</strong> และได้กำหนดให้รีจิสเตอร์ <code>TCNT1</code>
+ขนาด 16 บิต เริ่มนับด้วยค่า <code>LOAD_VALUE</code> ซึ่งเท่ากับ <strong>(65535-20000)</strong> ดังนั้นในแต่ละรอบการนับ
+และเกิดอินเทอร์รัพท์ จะใช้เวลาเท่ากับ <strong>1/(16MHz/8/20000)</strong> ซึ่งได้เท่ากับ <strong>10 msec</strong></p>
+<p>ในตัวอย่างนี้ได้ เมื่อเกิดอินเทอร์รัพท์จากวงจร <strong>Timer/Counter1</strong>
+ขาเอาต์พุต <strong>PB5</strong> จะเปลี่ยนเป็น <strong>HIGH</strong>
+และเมื่อเกิดอินเทอร์รัพท์จากวงจร <strong>ADC</strong> ตามมา ขาเอาต์พุต <strong>PB5</strong> จะเปลี่ยนเป็น <strong>LOW</strong>
+ดังนั้นความกว้างพัลส์ของสัญญาณเอาต์พุต จะเป็นช่วงเวลาการทำงาน <strong>ADC</strong> ในการแปลงข้อมูลแต่ละครั้ง</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/atomic.h&gt;
+
+#define LED_PIN    (PB5)
+#define LOAD_VALUE (65535-20000)
+
+volatile uint16_t adcValue = 0;
+
+ISR(TIMER1_OVF_vect) {
+  TCNT1 = LOAD_VALUE;    // Reload initial value for Timer1 count
+  PORTB |= (1&lt;&lt;LED_PIN); // Turn on LED
+}
+
+// Interrupt Service Routine for ADC conversion complete
+ISR(ADC_vect) {
+  adcValue = ADC;          // Save the ADC value
+  PORTB &amp;= ~(1&lt;&lt;LED_PIN);  // Turn off LED
+  ADCSRA |= (1&lt;&lt;ADIF);     // Clear ADC interrupt flag (not necessary)
+}
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = LOAD_VALUE;   // Load the initial value for Timer1 count
+  TIFR1  |= (1&lt;&lt;TOV1);  // Clear Timer1 overflow interrupt flag
+  TIMSK1 |= (1&lt;&lt;TOIE1); // Enable Timer1 overflow interrupt
+  // Set up Timer/Counter1 in Normal mode, prescaler = 8
+  TCCR1B |= (1&lt;&lt;CS11);
+}
+
+void initADC() {
+  // Set PC0/A0 as an input pin
+  DDRC &amp;= ~(1&lt;&lt;DDC0); 
+  // Disable Digital Input Buffer on A0
+  DIDR0 |= (1&lt;&lt;ADC0D);
+  // Set reference voltage to AVCC
+  ADMUX |= (1&lt;&lt;REFS0);
+  // Auto-Trigger Source: Timer/Counter1 Overflow interrupt
+  ADCSRB = (1&lt;&lt;ADTS2) | (1&lt;&lt;ADTS1); // ADTS[2:0]=&quot;110&quot;
+  // Enable ADC and set prescaler to 128
+  ADCSRA = (1&lt;&lt;ADPS2) | (1&lt;&lt;ADPS1) | (1&lt;&lt;ADPS0) | (1&lt;&lt;ADIE);
+  ADCSRA |= (1&lt;&lt;ADEN) | (1&lt;&lt;ADATE);
+}
+
+int main(void) {
+  uint16_t value;
+  DDRB |= (1&lt;&lt;LED_PIN);
+  initADC();    // Initialize ADC 
+  initTimer1(); // Initialize Timer1
+  sei();        // Enable global interrupts
+  while (1) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      value = adcValue;
+    }
+    // do something with ADC value
+  }
+  return 0;
+}
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตของบอร์ด <strong>Arduino Nano</strong> โดยใช้
+<strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="../avr/images/adc_timer1_ovf_wave-2.png" /></p>
+<p>รูป: ระยะเวลาห่างกันในการเกิดอินเทอร์รัพท์ (วัดได้ประมาณ <strong>10 msec</strong>)</p>
+<p><img alt="" src="../avr/images/adc_timer1_ovf_wave-1.png" /></p>
+<p>รูป: ความกว้างพัลส์ของสัญญาณเอาต์พุต (วัดได้ประมาณ <strong>108.73 usec</strong>)</p>
+<p>จากรูปคลื่นสัญญาณที่วัดได้ ความกว้างของพัลส์ได้ประมาณ <strong>108.73 usec</strong> ซึ่งมากกว่า <strong>104 usec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-auto-trigger-timer1-output-compare-match-b">&#9655; <strong>การอ่านค่าจาก ADC (Auto Trigger - Timer1 Output Compare Match B)</strong><a class="headerlink" href="#adc-auto-trigger-timer1-output-compare-match-b" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้คล้ายกับโค้ดตัวอย่างที่แล้ว ซึ่งเป็นการเปิดใช้งาน <strong>ADC</strong> ในโหมด <strong>Auto Trigger</strong>
+และใช้งานร่วมกับวงจร <strong>Timer/Counter1</strong> แต่เปลี่ยนมาใช้อินเทอร์รัพท์
+<strong>Timer1 Output Compare Match B</strong> ดังนั้นจึงต้องกำหนดค่าบิต <code>ADTS[2:0]="101"</code></p>
+<p>วงจร <strong>Timer1</strong> มีตัวหารความถี่เท่ากับ <strong>/64</strong> และนับถึงค่าสูงสุด <strong>(2500-1)</strong>
+ดังนั้นหนึ่งรอบในการนับคำนวณได้จาก <strong>1/(16MHz/64/2500)</strong> หรือ เท่ากับ <strong>10 msec</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/atomic.h&gt;
+
+#define LED_PIN  (PB5) // Arduino D13 Pin
+
+volatile uint16_t adcValue = 0;
+
+ISR(TIMER1_COMPB_vect) {
+  PORTB |= (1&lt;&lt;LED_PIN); // Turn on LED
+}
+
+// Interrupt Service Routine for ADC conversion complete
+ISR(ADC_vect) {
+  adcValue = ADC;          // Read the ADC value
+  PORTB &amp;= ~(1&lt;&lt;LED_PIN);  // Turn off LED
+  //ADCSRA |= (1&lt;&lt;ADIF);   // Clear ADC interrupt flag (not necessary)
+}
+
+void initTimer1() {
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x0000;
+  OCR1A = OCR1B = 2500-1; // Set TOP value (10 msec)
+  TIMSK1 |= (1&lt;&lt;OCIE1B);  // Enable OC1B interrupt
+  // Set up Timer/Counter1 in CTC mode, prescaler = 64
+  TCCR1B |= (1&lt;&lt;WGM12) | (1&lt;&lt;CS11) | (1&lt;&lt;CS10);
+}
+
+void initADC() {
+  // Set PC0/A0 as an input pin
+  DDRC &amp;= ~(1&lt;&lt;DDC0); 
+  // Disable digital input buffer on PC0/A0 pin
+  DIDR0 |= (1&lt;&lt;ADC0D);
+  // Set reference voltage to AVCC
+  ADMUX |= (1&lt;&lt;REFS0);
+  // Auto-Trigger Source: Timer/Counter1 Compare Match B
+  ADCSRB = (1&lt;&lt;ADTS2) | (1&lt;&lt;ADTS0); // ADTS[2:0]=&quot;101&quot;
+  // Enable ADC and set prescaler to 128
+  ADCSRA = (1&lt;&lt;ADPS2) | (1&lt;&lt;ADPS1) | (1&lt;&lt;ADPS0) | (1&lt;&lt;ADIE);
+  ADCSRA |= (1&lt;&lt;ADEN) | (1&lt;&lt;ADATE);
+}
+
+int main(void) {
+  uint16_t value;
+  DDRB |= (1&lt;&lt;LED_PIN);
+  initADC();    // Initialize ADC 
+  initTimer1(); // Initialize Timer1
+  sei();        // Enable global interrupts
+  while (1) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      value = adcValue;
+    }
+    // do something with ADC value
+  }
+  return 0;
+}
+</code></pre>
+<p>ถ้าวัดสัญญาณจากอุปกรณ์จริง ก็จะได้เหมือนหรือใกล้เคียงตัวอย่างที่แล้ว</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-pwm">&#9655; <strong>การอ่านค่าจาก ADC เพื่อปรับความกว้างพัลส์ของสัญญาณ PWM</strong><a class="headerlink" href="#adc-pwm" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการสร้างสัญญาณ <strong>PWM</strong> โดยใช้ <strong>Timer/Counter1</strong>
+ในโหมด <strong>PWM Phase-Correct (Mode 10)</strong> และตั้งค่าเพื่อให้ได้ความถี่ <strong>1kHz</strong>
+(หรือมีคาบเท่ากับ <strong>1000 usec</strong> หรือ <strong>1 msec</strong>)
+และเลือกใช้ขา <strong>OC1A / PB1</strong> เป็นเอาต์พุต</p>
+<p>วงจร <strong>ADC</strong> ทำงานในโหมด <strong>Free Running</strong> และมีการเปิดใช้งานอินเทอร์รัพท์
+เมื่อการอ่านค่าด้วย <strong>ADC</strong> เสร็จสิ้นในแต่ละครั้ง จะเกิดอินเทอร์รัพท์ และฟังก์ชัน <code>ISR(ADC_vect)</code>
+ที่เกี่ยวข้องจะทำหน้าที่อ่านค่าจากรีจิสเตอร์ <code>ADC</code> </p>
+<p>ความกว้างพัลส์ หรือค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> ได้จากการอ่านค่าแรงดันอินพุตที่ขา
+<strong>PC0 / A0</strong> แล้วใช้ค่าเฉลี่ยของผลรวมการอ่าน 4 ครั้ง เพื่อนำไปใช้ปรับค่า <strong>Duty Cycle</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define LED_PIN    (PB5) // Arduino PB5/D13 pin 
+#define PWM_PIN    (PB1) // Arduino OC1A/PB1/D9 pin
+
+#define FREQ_HZ    (1000UL)
+#define PRESCALER  (8)
+#define TOP_VALUE  (F_CPU/(2 * PRESCALER * FREQ_HZ))
+
+volatile uint32_t sum = 0;
+volatile uint8_t count = 0;
+
+// The ADC interrupt flag will be cleared automatically
+// after the ISR(ADC_vect) is called. 
+ISR(ADC_vect) { 
+  uint16_t adcValue = ADC; // Save the current ADC value
+  PINB |= (1&lt;&lt;LED_PIN); // Toggle PB5
+  count++;         // Increment sample count
+  sum += adcValue; // Add sample to sum
+  if (count == 4) { // 4 samples
+    // Update the PWM duty cycle: (sum/4/1024) * TOP_VALUE
+    OCR1A = (uint16_t)(TOP_VALUE*sum&gt;&gt;12);
+    sum   = 0; // Clear sum of samples
+    count = 0; // Reset sample count
+  }
+  ADCSRA |= (1&lt;&lt;ADIF); // Clear the ADC interrupt flag (not necessary)
+}
+
+void initADC() {
+  // Set PC0/A0 as an input pin
+  DDRC &amp;= ~(1 &lt;&lt; DDC0);
+  // Disable Digital Input Buffer on A0
+  DIDR0 |= (1&lt;&lt;ADC0D);
+  // Set reference voltage to AVCC
+  ADMUX = (1 &lt;&lt; REFS0); 
+  // Right-Adjust Result (ADLAR=0)
+  ADMUX &amp;= ~(1&lt;&lt;ADLAR); 
+  // Select A0 as ADC input ADMUX[3:0]=&quot;0000&quot;
+  ADMUX &amp;= ~((1&lt;&lt;MUX3)|(1&lt;&lt;MUX2)|(1&lt;&lt;MUX1)|(1&lt;&lt;MUX0));
+  // Set ADC prescaler to 128 (ADPS[2:0]=&quot;111&quot;)
+  // 16MHz/128 = 125kHz ADC clock
+  ADCSRA = (1&lt;&lt;ADPS2) | (1&lt;&lt;ADPS1) | (1&lt;&lt;ADPS0);
+  // Enable ADC (Free running), enable ADC interrupt 
+  ADCSRB = 0; // ADTS[2:0]=&quot;000&quot;
+  ADCSRA |= (1&lt;&lt;ADEN) | (1&lt;&lt;ADATE) | (1&lt;&lt;ADIE) | (1&lt;&lt;ADSC);
+  //ADCSRA |= (1&lt;&lt;ADSC); // Start the next conversion
+}
+
+// Use Timer1 to create a PWM signal (PWM Phase-Correct Mode)
+void initTimer1() { 
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x0000;
+  // Set the ICR1 register to define the TOP value
+  ICR1 = (uint16_t)(TOP_VALUE);
+  // Set the OCR1A register to define the PWM duty cycle
+  OCR1A = 0;
+  // Set Timer1 in Phase-correct PWM mode (mode 10)
+  TCCR1A |= (1 &lt;&lt; WGM11);
+  TCCR1B |= (1 &lt;&lt; WGM13);
+  // Set the output compare mode to clear OC1A on compare match 
+  // and set on TOP (non-inverting)
+  TCCR1A |= (1 &lt;&lt; COM1A1);
+  // Set the prescaler to 8 (CLK/8)
+  TCCR1B |= (1 &lt;&lt; CS11);
+}
+
+int main(void) {
+  uint16_t value;
+  DDRB |= (1 &lt;&lt; LED_PIN);
+  DDRB |= (1 &lt;&lt; PWM_PIN);
+  initADC();
+  initTimer1();
+  sei(); // Enable global interrupts
+  while (1) {}
+}
+</code></pre>
+<p>ถัดไปเป็นตัวอย่างการวัดสัญญาณจริงจากบอร์ด <strong>Arduino Nano</strong> ด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong></p>
+<p><img alt="" src="../avr/images/avr_adc_pwm_wave-1.png" /></p>
+<p>รูป: การวัดสัญญาณที่ขา <code>LED_PIN</code> และ <code>PWM_PIN</code> (วัดคาบได้ประมาณ <strong>999.37 usec</strong>)</p>
+<p><img alt="" src="../avr/images/avr_adc_pwm_wave-2.png" /></p>
+<p>รูป: การวัดสัญญาณที่ขา <code>LED_PIN</code> และ <code>PWM_PIN</code> เมื่อมีการปรับความกว้างของพัลส์เพิ่มขึ้น
+โดยปรับระดับแรงดันที่ขาอินพุต <strong>A0</strong> ให้สูงขึ้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดภาษาซีสำหรับ <strong>ATmega328P</strong> เพื่อใช้งานวงจร <strong>ADC</strong> ที่อยู่ภายในชิป
+สาธิตการทำงานของวงจร <strong>ADC</strong> ในโหมดที่แตกต่างกัน
+เช่น <strong>Single Connversion</strong> และ <strong>Auto Trigger Conversion</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-05-06 | Last Updated: 2023-05-07</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
