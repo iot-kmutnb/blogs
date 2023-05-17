@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="http://iot-kmutnb.github.com/blogs/arduino/arduino_adc_pwm/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโค้ด Arduino เพื่ออ่านค่าอินพุตจาก ADC และสร้างสัญญาณ PWM - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-adc-pwm" class="nav-link">การเขียนโค้ด Arduino เพื่ออ่านค่าอินพุตจาก ADC และสร้างสัญญาณ PWM</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#arduino-adc-pwm_1" class="nav-link">&#9655; คำสั่งของ Arduino สำหรับ ADC และ PWM</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#polling-loop" class="nav-link">&#9655; โค้ดตัวอย่าง: Polling Loop</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-timerone-library" class="nav-link">&#9655; โค้ดตัวอย่าง: Arduino TimerOne Library</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#avr-c-bare-metal" class="nav-link">&#9655; โค้ดตัวอย่าง: AVR C (Bare-Metal)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-polling-loop" class="nav-link">&#9655; โค้ดตัวอย่างสำหรับ ESP32: Polling Loop</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-adc-pwm">การเขียนโค้ด Arduino เพื่ออ่านค่าอินพุตจาก ADC และสร้างสัญญาณ PWM<a class="headerlink" href="#arduino-adc-pwm" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> ด้วยเทคนิคหรือวิธีที่แตกต่างกัน
+เพื่ออ่านค่าอินพุตจากสัญญาณแอนะล็อก จำนวน 1 ช่องสัญญาณด้วย <strong>ADC</strong> 
+แล้วนำไปใช้ในการสร้างสัญญาณเอาต์พุตแบบ <strong>PWM</strong> จำนวน 1 ช่องสัญญาณ และปรับค่าความกว้างของพัลส์
+หรือค่า <strong>PWM Duty Cycle</strong> ตามค่าอินพุตอย่างต่อเนื่อง</p>
+<p><strong>Keywords</strong>: <em>Arduino Nano / Uno</em>, <em>ESP32</em>,
+<em>ADC</em>, <em>PWM</em>, <em>PWM-based LED Dimming</em>, <em>WokWi Simulator</em></p>
+<hr />
+<h2 id="arduino-adc-pwm_1">&#9655; <strong>คำสั่งของ Arduino สำหรับ ADC และ PWM</strong><a class="headerlink" href="#arduino-adc-pwm_1" title="Permanent link">#</a></h2>
+<p>การเขียนโค้ดด้วย <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Arduino</strong>
+เช่น <strong>Uno / Nano (ATmega328P)</strong> มีคำสั่ง <code>analogRead()</code>
+สำหรับอ่านค่าจากอินพุตแบบแอนะล็อกโดยใช้วงจร <strong>ADC</strong> ภายในไมโครคอนโทรลเลอร์ 
+และมีความละเอียดของข้อมูล 10 บิต 
+หรือได้ค่าตัวเลขจำนวนเต็มในช่วง 0..1023 และมีคำสั่ง <code>analogWrite()</code>
+เพื่อใช้ในการสร้างสัญญาณ <strong>PWM (Pulse Width Modulation)</strong> เป็นเอาต์พุตที่มีความถี่คงที่ 
+และมีความละเอียดในการปรับค่าความกว้างของพัลส์ขนาด 8 บิต หรือ
+ค่าตัวเลขในช่วง 0..255 และเลือกใช้ขาใช้งานได้สูงสุด 6 ช่อง 
+(ขาหมายเลข  <strong>3, 5, 6, 9, 10, 11</strong> สำหรับบอร์ด <strong>Uno / Nano</strong>) 
+เนื่องจากต้องใช้วงจร <strong>Timers</strong> ในการสร้างสัญญาณแบบ <strong>SPI</strong></p>
+<hr />
+<h2 id="polling-loop">&#9655; <strong>โค้ดตัวอย่าง: Polling Loop</strong><a class="headerlink" href="#polling-loop" title="Permanent link">#</a></h2>
+<p>หากต้องการอ่านค่าจากอินพุตแอนะล็อก เช่น ขา <strong>A0</strong> แล้วนำมาใช้ในการสร้างสัญญาณ <strong>PWM</strong>
+เช่น ขา <strong>D9</strong> ของบอร์ด <strong>Uno / Nano</strong> โดยทำซ้ำไปเรื่อย ๆ ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">// Arduino D9 pin (PWM frequency 490Hz)
+#define PWM_PIN  (9)  
+// Arduino Analog A0 pin
+#define AIN_PIN  (A0) 
+
+void setup() {}
+
+void loop() {
+  // read an analog value (10-bit) from the A0 pin,
+  // use it to update the PWM duty cycle (8-bit).
+  analogWrite( PWM_PIN, analogRead(A0)&gt;&gt;2 );
+}
+</code></pre>
+<p>เนื่องจากคำสั่ง <code>analogWrite()</code> จะได้ค่าตัวเลขจำนวนเต็มที่มีค่าในช่วง 0..1023
+แต่ค่าที่นำไปใช้กับคำสั่ง <code>analogWrite()</code> จะต้องอยู่ในช่วง 0..255
+ดังนั้นจึงนำค่าที่อ่านได้จาก <strong>ADC</strong> มาสเกลค่าแบบเชิงเส้นในลดลง โดยการหารด้วย 4
+หรือเลื่อนข้อมูลบิตไปทางขวา 2 ตำแหน่ง</p>
+<p>การเลือกใช้ขา <strong>D9</strong> เพื่อสร้างสัญญาณ <strong>PWM</strong> จะทำให้ได้สัญญาณ <strong>PWM</strong>
+ที่มีความถี่ <strong>490 Hz</strong> โดยประมาณ</p>
+<p><img alt="" src="pwm_wave_490hz.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่วัดได้จากขา <strong>D9</strong> ด้วยออสซิลโลสโคป <strong>RIGOL DS1054Z</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-timerone-library">&#9655; <strong>โค้ดตัวอย่าง: Arduino TimerOne Library</strong><a class="headerlink" href="#arduino-timerone-library" title="Permanent link">#</a></h2>
+<p>หากต้องการให้การอ่านค่าจาก <strong>ADC</strong> และอัปเดตค่า <strong>Duty Cycle</strong>
+ของสัญญาณ <strong>PWM</strong> เกิดขึ้นด้วยตามคาบเวลาคงที่ (<strong>Periodic</strong>) 
+ก็สามารถใช้งานวงจร <strong>Timer1</strong> ของชิป <strong>ATmega328P</strong> ได้
+เนื่องจากวงจร <strong>Timer1</strong> จะถูกใช้สำหรับการสร้างสัญญาณ <strong>PWM</strong>
+ดังนั้นจะต้องใช้ขา <strong>D9</strong> หรือ <strong>D10</strong></p>
+<p>ในการใช้งาน <strong>Timer1</strong> จะใช้ไลบรารีที่มีชื่อว่า
+<a href="https://reference.arduino.cc/reference/en/libraries/timerone/"><strong>TimerOne</strong></a>
+ซึ่งทำให้ง่ายและสะดวกในการเขียนโค้ด มีคำสั่งให้ใช้งาน เช่น</p>
+<ul>
+<li><code>initialize( period )</code>: เริ่มต้นใช้งาน <strong>Timer1</strong>
+โดยจะต้องระบุคาบเวลา (หน่วยเป็น ไมโครวินาที)</li>
+<li><code>setPeriod( period )</code>: กำหนดคาบเวลาสำหรับการทำงานของ <strong>Timer1</strong></li>
+<li><code>pwm( pin, duty, period )</code>: สร้างสัญญาณ <strong>PWM</strong> 
+โดยใช้ <strong>Timer1</strong> ซึ่งจะต้องเลือกขาเอาต์พุต  9 หรือ 10 และกำหนดค่า <strong>Duty Cycle</strong>
+ที่ไม่เกินค่าคาบเวลา</li>
+<li><code>setPwmDuty( pin, duty )</code>: ปรับค่า <strong>Duty Cycle</strong> สำหรับขาสัญญาณ
+<strong>PWM</strong> ที่ต้องการ (ขาเอาต์พุต  9 หรือ 10)</li>
+<li><code>attachInterrupt( void (*isr)() )</code> เปิดใช้งาน</li>
+</ul>
+<p>ข้อสังเกต: การใช้ <strong>Timer1</strong> จะส่งผลต่อการใช้คำสั่ง <code>analogWrite()</code>
+สำหรับขา <strong>D9</strong> และ <strong>D10</strong> เช่น ความถี่หรือคาบเวลาของ <strong>PWM</strong> 
+ดังนั้นจะต้องหลีกเลี่ยงการใช้งานฟังก์ชันดังกล่าว</p>
+<p>โค้ดต่อไปนี้สาธิตการใช้งานไลบรารี <strong>TimerOne</strong> เพื่อสร้างสัญญาณ <strong>PWM</strong>
+ที่ขา <strong>D9</strong> และกำหนดคาบเวลาให้เท่ากับ <strong>1024</strong> ไมโครวินาที (ได้ความถี่เท่ากับ <strong>976.56 Hz</strong>)
+และมีการเปิดใช้งานอินเทอร์รัพท์ของ <strong>Timer1</strong> ตามคาบเวลาที่กำหนดไว้
+และฟังก์ชัน <strong>ISR</strong> ที่เกี่ยวข้อง จะทำหน้าที่อ่านค่าจากขาแอนะล็อก <strong>A0</strong>
+แล้วนำมาอัปเดตค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong></p>
+<pre><code class="language-c++">// Use the TimerOne library for Arduino
+#include &quot;TimerOne.h&quot;
+// Arduino D9 pin (PWM output)
+#define PWM_PIN  (9)  
+// Arduino Analog A0 pin
+#define AIN_PIN  (A0)
+// PWM Period
+#define PWM_PERIOD_US (1024)
+
+void setup() {
+  pinMode( PWM_PIN, OUTPUT );
+  Timer1.initialize( PWM_PERIOD_US /* PWM period in usec*/ ); 
+  Timer1.pwm( PWM_PIN, 0, PWM_PERIOD_US ); // PWM output (initially 0%)
+  Timer1.attachInterrupt( []() { // ISR function
+    // Update the PWM duty cycle
+    Timer1.setPwmDuty( PWM_PIN, analogRead(AIN_PIN) );
+  } );  
+}
+
+void loop() {}
+</code></pre>
+<p><img alt="" src="wokwi_nano_adc_pwm_timerone.png" /></p>
+<p>รูป: ผังวงจรและการเขียนโค้ดเพื่อจำลองการทำงานด้วย  <strong>WokWi Simulator</strong></p>
+<p><img alt="" src="wokwi_nano_adc_pwm_timerone_wave.png" /></p>
+<p>รูป: สัญญาณดิจิทัลที่บันทึกได้จากการจำลองการทำงานด้วย <strong>WokWi Simulator</strong>
+และเปิดไฟล์ .vcd ด้วย <strong>GTKWave Viewer</strong> (วัดความกว้างของคาบได้ 1024 usec)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="avr-c-bare-metal">&#9655; <strong>โค้ดตัวอย่าง: AVR C (Bare-Metal)</strong><a class="headerlink" href="#avr-c-bare-metal" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเขียนโดยไม่ใช้คำสั่งหรือไลบรารีของ <strong>Arduino</strong>
+เพื่อเปิดใช้งานวงจร <strong>ADC</strong> โดยใช้ฟังก์ชัน <code>initADC()</code> ให้อ่านค่าที่ขาอินพุต <strong>A0</strong>
+และมีการเปิดใช้งานอินเทอร์รัพท์ของวงจร <strong>ADC</strong> ด้วย </p>
+<p>นอกจากนั้นแล้วยังมีการเปิดใช้งานวงจร <strong>Timer1</strong> โดยใช้ฟังก์ชัน
+<code>initTimer1()</code> สำหรับการสร้างสัญญาณ <strong>PWM</strong>
+ที่ขา <strong>PB1 / D9</strong> และมีความถี่เท่ากับ <strong>1000Hz</strong></p>
+<p>การทำงานของวงจร <strong>Timer1</strong> ในตัวอย่างนี้ 
+จะทำงานในโหมด <strong>Phase-Correct PWM</strong>
+และใช้ตัวหารความถี่ (<strong>Prescaler</strong>) เท่ากับ 8
+มีสูตรการคำนวณค่าเพื่อเขียนลงในรีจิสเตอร์  <code>ICR1</code> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  TOP = \frac{f_{CPU}}{2 \times Prescaler \times f_{PWM}} 
+      = \frac{16\,MHz}{2 \times 8 \times 1000\,Hz} = 1000
+</script>
+</p>
+<p>เมื่อได้ทำคำสั่งในฟังก์ชัน <code>initADC()</code> แล้ว วงจร <strong>ADC</strong> จะเริ่มทำงาน
+และอ่านค่าจากขาอินพุต <strong>A0</strong> แล้วแปลงค่าแอนะล็อก ให้ได้ข้อมูลขนาด 10 บิต
+เก็บไว้ในรีจิสเตอร์ <code>ADC</code> จากนั้นจะเกิดอินเทอร์รัพท์ และเรียกฟังก์ชัน
+<code>ISR(ADC_vect)</code> ให้ทำงานโดยอัตโนมัติ
+ฟังก์ชันนี้มีหน้าที่นำค่าจากรีจิสเตอร์ <code>ADC</code> ไปใช้ในการอัปเดตค่า
+<strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> โดยจะต้องเขียนค่าลงในรีจิสเตอร์ <code>OCR1A</code>
+ของวงจร <strong>Timer1</strong></p>
+<p>ค่าในรีจิสเตอร์ <code>OCR1A</code> ที่มีขนาด 16 บิต  เป็นค่าสำหรับการเปรียบเทียบกับค่าของตัวนับขนาด 16 บิต
+ของ <strong>Timer1</strong> และเป็นตัวกำหนดความกว้างของพัลส์ของสัญญาณเอาต์พุต</p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define PWM_PIN    (PB1) // Arduino OC1A/PB1/D9 pin
+#define FREQ_HZ    (1000UL)
+#define PRESCALER  (8)
+#define TOP_VALUE  (F_CPU/(2 * PRESCALER * FREQ_HZ))
+
+// The ADC interrupt flag will be cleared automatically
+// after the ISR(ADC_vect) is called. 
+ISR(ADC_vect) { 
+  OCR1A = (uint16_t)(ADC*TOP_VALUE&gt;&gt;10);
+}
+
+int main(void) {
+  DDRB |= (1 &lt;&lt; PWM_PIN);
+  initADC();
+  initTimer1();
+  sei(); // Enable global interrupts
+  while (1) {}
+}
+
+void initADC() {
+  // Set PC0/A0 as an input pin
+  DDRC &amp;= ~(1 &lt;&lt; DDC0);
+  // Disable Digital Input Buffer on A0
+  DIDR0 |= (1&lt;&lt;ADC0D);
+  // Set reference voltage to AVCC
+  ADMUX = (1 &lt;&lt; REFS0); 
+  // Right-Adjust Result (ADLAR=0)
+  ADMUX &amp;= ~(1&lt;&lt;ADLAR); 
+  // Select A0 as ADC input ADMUX[3:0]=&quot;0000&quot;
+  ADMUX &amp;= ~((1&lt;&lt;MUX3)|(1&lt;&lt;MUX2)|(1&lt;&lt;MUX1)|(1&lt;&lt;MUX0));
+  // Set ADC prescaler to 128 (ADPS[2:0]=&quot;111&quot;)
+  // 16MHz/128 = 125kHz ADC clock
+  ADCSRA = (1&lt;&lt;ADPS2) | (1&lt;&lt;ADPS1) | (1&lt;&lt;ADPS0);
+  // Enable ADC (Free running), enable ADC interrupt 
+  ADCSRB = 0; // ADTS[2:0]=&quot;000&quot;
+  ADCSRA |= (1&lt;&lt;ADEN) | (1&lt;&lt;ADATE) | (1&lt;&lt;ADIE) | (1&lt;&lt;ADSC);
+  //ADCSRA |= (1&lt;&lt;ADSC); // Start the next conversion
+}
+
+// Use Timer1 to create a PWM signal (PWM Phase-Correct Mode)
+void initTimer1() { 
+  TCCR1A = TCCR1B = 0;
+  TCNT1 = 0x0000;
+  // Set the ICR1 register to define the TOP value
+  ICR1 = (uint16_t)(TOP_VALUE-1);
+  // Set the OCR1A register to define the PWM duty cycle
+  OCR1A = 0;
+  // Set Timer1 in Phase-correct PWM mode (mode 10)
+  TCCR1A |= (1 &lt;&lt; WGM11);
+  TCCR1B |= (1 &lt;&lt; WGM13);
+  // Set the output compare mode to clear OC1A on compare match 
+  // and set on TOP (non-inverting)
+  TCCR1A |= (1 &lt;&lt; COM1A1);
+  // Set the prescaler to 8 (CLK/8)
+  TCCR1B |= (1 &lt;&lt; CS11);
+}
+</code></pre>
+<p><img alt="" src="pwm_wave_1000hz.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่วัดได้จากขา <strong>D9</strong> ด้วยออสซิลโลสโคป <strong>RIGOL DS1054Z</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-polling-loop">&#9655; <strong>โค้ดตัวอย่างสำหรับ ESP32: Polling Loop</strong><a class="headerlink" href="#esp32-polling-loop" title="Permanent link">#</a></h2>
+<p>การเขียนโค้ดสำหรับ <strong>ESP32</strong> ด้วย <strong>Arduino-ESP32 API</strong> 
+มีความแตกต่างจากการใช้ <strong>Arduino API</strong> สำหรับ <strong>Uno / Nano</strong> อยู่บ้าง
+และแนะนำให้ศึกษาการใช้คำสั่งต่าง ๆ ที่เกี่ยวข้องกับการทำงานของวงจรภายในชิป <strong>ESP32</strong>
+เช่น <strong>ADC</strong>, <strong>LEDC (PWM)</strong> และ <strong>Timer</strong>  </p>
+<ul>
+<li><a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/adc.html"><strong>ADC</strong></a></li>
+<li><a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/ledc.html"><strong>LEDC</strong></a></li>
+<li><a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/timer.html"><strong>Timer</strong></a></li>
+</ul>
+<p>ตัวอย่างคำสั่งที่เกี่ยวข้องกับการใช้งาน <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/ledc.html"><strong>Arduino-ESP32 LEDC (LED Control) API</strong></a> ได้แก่</p>
+<ul>
+<li><code>analogWriteResolution(...)</code> กำหนดความละเอียดหรือจำนวนบิตสำหรับสัญญาณ <strong>PWM</strong> ทุกช่อง</li>
+<li><code>analogWriteFrequency(...)</code> กำหนดความถี่ของสัญญาณ <strong>PWM</strong> ทุกช่อง</li>
+<li><code>analogWrite(...)</code> กำหนดค่าความกว้างพัลส์สำหรับสัญญาณ <strong>PWM</strong> ตามขาหมายเลข <strong>GPIO</strong> ที่จะใช้งาน </li>
+<li><code>ledcSetup(...)</code> กำหนดค่าเริ่มต้นสำหรับใช้งานวงจร <strong>LEDC</strong> และเลือกใช้ช่องสัญญาณของ <strong>LEDC</strong> (<strong>LEDC Channel</strong>)</li>
+<li><code>ledcAttachPin(...)</code> เลือกใช้ขา <strong>GPIO</strong> สำหรับช่องสัญญาณของ <strong>LEDC</strong></li>
+</ul>
+<p>ตัวอย่างคำสั่งที่เกี่ยวข้องกับการใช้งาน <a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/adc.html"><strong>Arduino-ESP32 ADC API</strong></a> ได้แก่</p>
+<ul>
+<li><code>analogReadResolution(...)</code> กำหนดความละเอียดหรือจำนวนบิตในการแปลงข้อมูลโดย <strong>ADC</strong></li>
+<li><code>analogSetPinAttenuation(...)</code> กำหนดระดับการลดทอนสัญญาณอินพุตแอนะล็อก</li>
+<li><code>adc1_config_width(...)</code> เป็นคำสั่งของ <strong>ESP-IDF</strong> กำหนดความละเอียดหรือจำนวนบิต</li>
+<li><code>adc1_config_channel_atten(...)</code> เป็นคำสั่งของ <strong>ESP-IDF</strong> กำหนดระดับการลดทอนสัญญาณอินพุตแอนะล็อก</li>
+<li><code>adc1_get_raw(...)</code> เป็นคำสั่งของ <strong>ESP-IDF</strong> เพื่ออ่านค่าจาก <strong>ADC</strong></li>
+</ul>
+<p>ตัวอย่างคำสั่งที่เกี่ยวข้องกับการใช้งาน <a href="https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/timer.html"><strong>Arduino-ESP32 Timer API</strong></a> ได้แก่</p>
+<ul>
+<li><code>timerBegin(...)</code> เลือกใช้งาน <strong>Timer</strong> ตามหมายเลขที่กำหนด ตั้งค่าตัวหารความถี่ เลือกโหมดการนับขึ้น</li>
+<li><code>timerAlarmWrite(...)</code> เปิดใช้งานอินเทอร์รัพท์สำหรับ <strong>Timer</strong> </li>
+<li><code>timerAttachInterrupt(...)</code> ตั้งค่าสำหรับฟังก์ชัน <strong>ISR</strong> ให้ทำงานเมื่อเกิออินเทอร์รัพท์  </li>
+<li><code>timerAlarmEnable(...)</code> เริ่มต้นการทำงานของวงจร <strong>Timer</strong>  </li>
+</ul>
+<p>ชิป <strong>ESP32</strong> มีวงจร <strong>ADC</strong> เป็นแบบ
+<strong>SAR (Successive Approximation Register)</strong>
+ มีอยู่ 2 ชุด คือ <strong>ADC1</strong> (ใช้กับขา <strong>GPIO32 - GPIO39</strong>) และ <strong>ADC2</strong>
+(แต่ไม่แนะนำให้ใช้ <strong>ADC2</strong> ถ้าเปิดใช้งานวงจร <strong>WiFi</strong>)</p>
+<p>ในโค้ดตัวอย่างต่อไปนี้ ได้เลือกใช้ขา <strong>GPIO-34</strong> ซึ่งตรงกับวงจร <strong>ADC2</strong>
+และใช้ขา  <strong>GPIO-18</strong> สำหรับสัญญาณเอาต์พุต <strong>PWM</strong>
+(ตั้งค่าความถี่ <strong>1000 Hz</strong> และความละเอียด 8 บิต)</p>
+<pre><code class="language-c++">#define AIN_PIN 34   // Analog input pin
+#define PWM_PIN 18   // PWM output pin
+
+void setup() {
+#ifdef DEBUG
+  Serial.begin(115200);
+#endif
+  // Set the PWM pin as output
+  pinMode( PWM_PIN, OUTPUT );
+
+  // Configure PWM output: frequency=1000Hz, resolution=8bits 
+  analogWriteResolution( 8 );
+  analogWriteFrequency( 1000 );
+
+  // Set the ADC resolution to 12 bits (0-4095)
+  analogReadResolution( 12 );
+  // Set the input attenuation: ADC_11db 
+  // Measurable input voltage range: 150 mV ~ 2450 mV
+  analogSetPinAttenuation( AIN_PIN, ADC_11db );
+}
+
+void loop() {
+  // Read analog input (12-bit) and 
+  // set the PWM duty cycle (8-bit)
+  uint32_t value = analogRead( AIN_PIN )&gt;&gt;4;
+  analogWrite( PWM_PIN, value );
+  delay(1);
+
+#ifdef DEBUG
+  Serial.print(&quot;Min:0,&quot;);
+  Serial.print(&quot;Max:255,PWM:&quot;);
+  Serial.println( value);
+  delay(10);
+#endif
+}
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตจากบอร์ด <strong>ESP32</strong> โดยใช้อุปกรณ์ <strong>USB Logic Analyzer</strong> 
+มีดังนี้ </p>
+<p><img alt="" src="la_wave-2.png" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณจริง เมื่อใช้โปรแกรม <strong>PulseView</strong> อ่านค่าจากอุปกรณ์ <strong>USB Logic Analyzer</strong> </p>
+<p><img alt="" src="la_wave-1.png" /></p>
+<p>รูป: การวัดสัญญาณ <strong>PWM</strong> (ได้คาบกว้างประมาณ1000 ไมโครวินาที)</p>
+<p>ถ้ามีการเพิ่ม <code>#define DEBUG</code> ในโค้ด ก็จะมีการส่งข้อความจาก <strong>ESP32</strong> ออกมา 
+ซึ่งเป็นค่าตัวเลขสำหรับการอัปเดต <strong>PWM Duty Cycle</strong> อยู่ในช่วง 0..255</p>
+<p><img alt="" src="arduino_serial_plotter.png" /></p>
+<p>รูป: การส่งข้อมูลมาผ่าน <strong>USB-to-Serial</strong> มาแสดงรูปกราฟด้วย <strong>Arduino Serial Plotter</strong>
+ในขณะที่มีการปรับหมุน <strong>Potentiometer</strong> ที่นำมาใช้สำหรับสร้างสัญญาณอินพุต-แอนะล็อก</p>
+<p>&nbsp;</p>
+<p>ถ้าต้องการใช้งาน <strong>ADC</strong> ร่วมกับ <strong>Hardware Timer</strong> เพื่ออ่านค่าจากอินพุตด้วย <strong>ADC</strong>
+และเกิดซ้ำด้วยระยะเวลาคงที่ (เช่น ทุก ๆ 100 มิลลิวินาที) ก็มีแนวทางดังนี้</p>
+<pre><code class="language-c++">#define AIN_PIN 34   // Analog input pin
+#define PWM_PIN 18   // PWM output pin
+#define LEDC_CHAN 0  // PWM channel 0
+
+hw_timer_t *timer = NULL;
+
+void setup() {
+  // Set the PWM pin as output
+  pinMode( PWM_PIN, OUTPUT ); 
+
+  // Configure PWM output on GPIO-18
+  // Set PWM frequency to 1000Hz
+  // Set PWM resolution to 8 bits
+  ledcSetup( LEDC_CHAN, 1000, 8 );
+  ledcAttachPin( PWM_PIN, LEDC_CHAN );
+
+  // Set the ADC resolution to 12 bits (0-4095)
+  analogReadResolution( 12 ); 
+  // Set the input attenuation: ADC_11db 
+  // Measurable input voltage range: 150 mV ~ 2600 mV
+  analogSetPinAttenuation( AIN_PIN, ADC_11db );
+
+  // Use the first timer, clk divider=80, counting up 
+  timer = timerBegin( 0, 80, true ); // 1MHz tick rate
+  // Configure the hardware timer 
+  timerAttachInterrupt( timer, [](){
+    // Read the ADC input and set the PWM duty cycle
+    ledcWrite( LEDC_CHAN, analogRead( AIN_PIN ) &gt;&gt; 4 ); 
+  }, true );  
+  // Attach ISR function to Timer 0, 10000 usec period
+  timerAlarmWrite( timer, 10000, true );       
+  // Enable the timer alarm
+  timerAlarmEnable( timer ); 
+}
+
+void loop() {
+}
+</code></pre>
+<p>หรือจะลองเขียนโค้ด โดยใช้คำสั่งของ <strong>ESP-IDF</strong> สำหรับการตั้งค่าและอ่านค่าจาก <strong>ADC</strong></p>
+<pre><code class="language-c++">#include &quot;driver/adc.h&quot;
+#include &quot;soc/adc_channel.h&quot;
+
+#define ADC1_CHAN  ADC1_GPIO34_CHANNEL
+#define PWM_PIN   18   // PWM output pin
+#define LEDC_CHAN 0    // PWM channel 0
+
+hw_timer_t *timer = NULL;
+
+void setup() {
+  // Set the PWM pin as output
+  pinMode( PWM_PIN, OUTPUT ); 
+
+  // Configure PWM output on GPIO-18
+  // Set PWM frequency to 1000Hz
+  // Set PWM resolution to 8 bits
+  ledcSetup( LEDC_CHAN, 1000, 8 );
+  ledcAttachPin( PWM_PIN, LEDC_CHAN );
+
+  // Configure ADC1 Channel associated with GPIO-34
+  // Set the ADC resolution to 12 bits
+  // Set the ADC attenuation level to 11dB
+  adc1_config_width( ADC_WIDTH_12Bit );
+  adc1_config_channel_atten( ADC1_CHAN, ADC_ATTEN_DB_11 );
+
+  // Use the first timer, counting up, 1MHz tick rate
+  timer = timerBegin( 0, 80, true ); 
+  // Configure the hardware timer 
+  timerAttachInterrupt( timer, [](){
+    // Read the ADC channel and set the PWM duty cycle
+    ledcWrite( LEDC_CHAN, adc1_get_raw(ADC1_CHAN) &gt;&gt; 4 ); 
+  }, true );  
+  // Attach ISR function to Timer 0, 10000 usec period
+  timerAlarmWrite( timer, 10000, true );       
+  // Enable the timer alarm
+  timerAlarmEnable( timer ); 
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="wokwi_esp32_adc_pwm_timer_sim.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดแบบเสมือนจริงด้วย <strong>WokWi Simulator</strong></p>
+<p><img alt="" src="wokwi_esp32_adc_pwm_timer_wave.png" /></p>
+<p>รูป: การวัดคาบของสัญญาณ <strong>PWM</strong> ที่ได้จากการจำลองการทำงานของโค้ดแบบเสมือนจริง</p>
+<p><img alt="" src="la_wave-3.png" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณจริงจากบอร์ด <strong>ESP32</strong> โดยใช้อุปกรณ์ <strong>USB Logic Analyzer</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> ใน 3 รูปแบบ
+เพื่ออ่านค่าจากสัญญาณแอนะล็อกอินพุตแล้วนำมาใช้กำหนดความกว้างพัลส์ของสัญญาณ <strong>PWM</strong>
+สำหรับบอร์ด <strong>Arduino Uno / Nano</strong> และบอร์ด <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-05-17 | Last Updated: 2023-05-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
