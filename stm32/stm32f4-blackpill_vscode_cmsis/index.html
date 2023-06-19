@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/stm32/stm32f4-blackpill_vscode_cmsis/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมบอร์ด STM32F411 BlackPill โดยใช้ Arm CMSIS และ PlatformIO - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#stm32f411-blackpill-arm-cmsis-platformio" class="nav-link">การเขียนโปรแกรมบอร์ด STM32F411 BlackPill โดยใช้ Arm CMSIS และ PlatformIO</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#blackpill-stm32f411ce" class="nav-link">&#9655; บอร์ด BlackPill STM32F411CE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cc-arm-cmsis-framework" class="nav-link">&#9655; การสร้างโปรเจกต์เพื่อเขียนโค้ด C/C++ ด้วย Arm CMSIS Framework</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pio-build-debug" class="nav-link">&#9655; การทำขั้นตอน PIO Build &amp; Debug</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#serial-usart2" class="nav-link">&#9655; การส่งข้อความแบบ Serial โดยใช้วงจร USART2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การกำหนดความถี่ของระบบ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#key" class="nav-link">&#9655; การอ่านค่าอินพุตจากปุ่มกด KEY บนบอร์ด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="stm32f411-blackpill-arm-cmsis-platformio">การเขียนโปรแกรมบอร์ด STM32F411 BlackPill โดยใช้ Arm CMSIS และ PlatformIO<a class="headerlink" href="#stm32f411-blackpill-arm-cmsis-platformio" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>STM32F4</em>, <em>BlackPill Microcontroller Boards</em>,
+<em>Arm CMSIS API</em></p>
+<hr />
+<h2 id="blackpill-stm32f411ce">&#9655; <strong>บอร์ด BlackPill STM32F411CE</strong><a class="headerlink" href="#blackpill-stm32f411ce" title="Permanent link">#</a></h2>
+<p>บอร์ด <a href="https://github.com/WeActStudio/WeActStudio.MiniSTM32F4x1"><strong>BlackPill STM32F411CE</strong></a>
+(Arm 32-bit Cortex-M4 CPU with FPU, 512 KB of Flash, 128KB of SRAM, up to 100MHz ) ของบริษัท <strong>WeAct Studio</strong> จากประเทศจีน
+เป็นบอร์ดไมโครคอนโทรลเลอร์ที่มีราคาไม่แพง สามารถนำมาใช้ฝึกเขียนโค้ดสำหรับชิปตระกูล <strong>STM32F4</strong> 
+หรือใช้เป็นตัวเลือกแทนที่บอร์ด <strong>STM32F401RE Nucleo</strong> </p>
+<p>การอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>STM32F4</strong> ทำได้หลายวิธี เช่น</p>
+<ul>
+<li>การใช้ <strong>USB DFU Bootloader</strong> โดยใช้เพียงสาย <strong>USB</strong> เชื่อมต่อกับพอร์ต <strong>USB</strong> ของคอมพิวเตอร์ผู้ใช้</li>
+<li>การใช้อุปกรณ์ <strong>STLink/v2 USB Dongle</strong></li>
+<li>การใช้อุปกรณ์ <strong>SEGGER J-Link Programmer / Debugger</strong></li>
+<li>การใช้อุปกรณ์ <strong>CMSIS-DAP / DAPLink compatible USB Debug Probe</strong></li>
+</ul>
+<p>บอร์ด <a href="https://stm32-base.org/boards/STM32F411CEU6-WeAct-Black-Pill-V2.0.html"><strong>BlackPill STM32F411CE</strong></a>
+ไม่มีวงจร <strong>ST-Link/v2</strong> เหมือนบอร์ด <strong>STM32 Nucleo</strong>
+ผู้ใช้สามารถอัปโหลดไฟล์เฟิร์มแวร์ผ่านทางพอร์ต <strong>USB Type-C</strong> ได้ โดยใช้สาย <strong>USB</strong> เพียงเส้นเดียว
+ด้วยวิธี <strong>USB DFU Bootloader</strong> ซึ่งเป็นโปรแกรมที่ถูกใส่ไว้ภายในหน่วยความจำของชิป <strong>STM32F4</strong> จากโรงงานแล้ว (กดปุ่ม <strong>BOOT0</strong> ค้างไว้ แล้วกดปุ่ม <strong>RESET</strong> แล้วปล่อย
+ก็จะทำให้ชิป <strong>STM32F4</strong> เข้าสู่โหมด <strong>DFU Bootloader</strong>)</p>
+<p>อีกทางเลือกหนึ่งคือ การใช้อุปกรณ์ <strong>USB CMSIS-DAP Adapter</strong> เชื่อมต่อเข้าที่ขา
+<strong>SWD Interface</strong> (<strong>3.3V, DIO, SCK, GND Pins</strong>)</p>
+<p><img alt="" src="blackpill_stm32f411ceu6_pinout.png" /></p>
+<p>รูป: <strong>BlackPill STM32F411CE v2.0 Pinout</strong></p>
+<p><img alt="" src="blackpill_stm32f411ce_schematic.png" /></p>
+<p>รูป: ผังวงจรของบอร์ด <strong>BlackPill STM32F411CE v2.0</strong></p>
+<p>ตัวเลือกในการเขียนโค้ดภาษา <strong>C/C++</strong> สำหรับ <strong>STM32F4</strong> เช่น</p>
+<ul>
+<li><a href="https://www.keil.com/demo/eval/arm.htm"><strong>ARM Kiel MDK 5.x</strong></a>
+  (community free for non-commercial use)</li>
+<li><a href="https://www.st.com/en/development-tools/stm32cubeide.html"><strong>STM32CubeIDE</strong></a> (free, STM32-HAL)</li>
+<li><a href="https://platformio.org/"><strong>VSCode IDE + PlatformIO</strong></a> (free, opensource)</li>
+<li><a href="https://studio.keil.arm.com/"><strong>Arm Keil Studio</strong></a> (free, Web-based)</li>
+</ul>
+<p>การเขียนโปรแกรมสำหรับ <strong>STM32</strong> (<a href="https://docs.platformio.org/en/stable/platforms/ststm32.html"><code>platform = ststm32</code></a>) โดยใช้  <strong>PlatformIO (PIO)</strong> 
+มีตัวเลือกอยู่หลายวิธี (เรียกว่า <a href="https://github.com/platformio/platform-ststm32/tree/develop/builder/frameworks"><strong>ST-STM32 Framworks</strong></a>) เช่น</p>
+<ul>
+<li><strong>Arm CMSIS</strong> <a href="https://docs.platformio.org/en/stable/frameworks/cmsis.html"><code>cmsis</code></a></li>
+<li><strong>STM32Cube HAL</strong> <a href="https://docs.platformio.org/en/stable/frameworks/stm32cube.html"><code>stm32cube</code></a> </li>
+<li><strong>libOpenCM3</strong> <a href="https://docs.platformio.org/en/stable/frameworks/libopencm3.html"><code>libopencm3</code></a></li>
+<li><strong>Arm Mbed OS</strong> <a href="https://docs.platformio.org/en/stable/frameworks/mbed.html"><code>mbed</code></a></li>
+<li><strong>Zephyr RTOS</strong> <a href="https://docs.platformio.org/en/stable/frameworks/zephyr.html"><code>zephyr</code></a></li>
+<li><strong>Arduino</strong> (stm32duino, arduino-mbed)</li>
+</ul>
+<p>บทความนี้สาธิตการใช้งาน <strong>VS Code IDE + PlatformIO</strong> (ใช้ 
+<a href="https://github.com/platformio/platformio-vscode-ide"><strong>PlatformIO IDE v3.2.0</strong></a>
+และ <a href="https://github.com/platformio/platformio-core/"><strong>PIO Core v6.1.7</strong></a> กับระบบปฏิบัติการ <strong>Windows</strong>)
+และมีตัวอย่างการเขียนโค้ด  โดยใช้  <strong>ARM CMSIS 5.x</strong> เพื่อนำไปทดลองใช้กับบอร์ด <strong>BlackPill STM32F411CE (v2.0)</strong>
+ขั้นตอนการติดตั้งและใช้งาน <strong>PlatformIO</strong> สามารถดูได้จาก
+<a href="https://platformio.org/install/ide?install=vscode"><strong>"Installation of PlatformIO IDE for VSCode"</strong></a></p>
+<p>ในการทดลองกับอุปกรณ์ฮาร์ดแวร์ นอกจากจะได้ลองใช้วิธี <strong>DFU</strong> แล้ว อีกหนึ่งวิธี คือ การอัปโหลดเฟิร์มแวร์ด้วย <strong>SWD</strong> 
+โดยใช้โมดูล เช่น</p>
+<ul>
+<li><a href="https://github.com/guoccaiLi/wchlink"><strong>WCHLink Mini DAPLink v1.1 (CH549F-based)</strong></a></li>
+<li><a href="https://github.com/WeActStudio/WeActStudio.MiniDebugger"><strong>WeAct Studio - Mini Debugger (STM32F103-based)</strong></a></li>
+<li><a href="https://github.com/wuxx/nanoDAP-HS/"><strong>MuseLab - Mini DAPLink-HS Debug Probe (ATSAM3U2C-based)</strong></a></li>
+</ul>
+<p><img alt="" src="wchlink_mini_ch549f_daplink.png" /></p>
+<p>รูป: อุปกรณ์ <strong>WCHLink Mini CH549F DAPLink</strong></p>
+<p><img alt="" src="mini_daplink_hs_debug_probe.png" /></p>
+<p>รูป: อุปกรณ์ <strong>MuseLab - Mini DAPLink-HS Debug Probe</strong></p>
+<p><img alt="" src="blackpill_cmsis_dap.jpg" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ที่ได้นำมาทดลองใช้งาน</p>
+<p>&nbsp;</p>
+<p>การเขียนโค้ดด้วย <a href="https://github.com/ARM-software/CMSIS_5"><strong>Arm CMSIS 5.x API</strong></a> ถือว่า เป็นระดับต่ำกว่า การใช้ <strong>STM32Cube HAL</strong>
+หรือ <strong>Arduino Core (STM32duino)</strong> หรืออาจเรียกรูปแบบการเขียนโค้ดในลักษณะนี้ว่า *<em>Bare-Metal Programming</em>
+ดังนั้นผู้ใช้จะต้องเข้าใจหลักการทำงานของไมโครคอนโทรลเลอร์ในระดับฮาร์ดแวร์ 
+เช่น การกำหนดหรือตั้งค่าบิตในรีจิสเตอร์ต่าง ๆ ของวงจรภายในที่ต้องการใช้งาน</p>
+<p>แนะนำให้ศึกษารายละเอียดจากเอกสาร: <a href="https://www.st.com/resource/en/reference_manual/rm0383-stm32f411xce-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">"<strong>RM0383: Reference Manual STM32F411xC/E Advanced Arm-based 32-bit MCUs</strong>"</a>
+(<a href="rm0383-stm32f411xce-advanced-armbased-32bit-mcus-stmicroelectronics_2018.pdf">local copy</a>)</p>
+<p>การกำหนดชื่อของรีจิสเตอร์ต่าง ๆ ของ <strong>STM32F411xE</strong> และบิตของรีจิสเตอร์ สามารถดูได้จากไฟล์
+<a href="https://github.com/STMicroelectronics/STM32CubeF4/blob/master/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f411xe.h"><code>stm32f411xe.h</code></a></p>
+<p><img alt="" src="regs_gpio.png" /></p>
+<p>รูป:  ตัวอย่างโครงสร้างข้อมูลสำหรับบิตในรีจิสเตอร์ของ <strong>GPIO</strong> (บางส่วน)</p>
+<p><img alt="" src="regs_usart.png" /></p>
+<p>รูป:  ตัวอย่างโครงสร้างข้อมูลสำหรับบิตในรีจิสเตอร์ของ <strong>USART</strong> (บางส่วน)</p>
+<p><img alt="" src="regs_gpio_odr.png" /></p>
+<p>รูป: ตัวอย่างค่าคงที่สำหรับรีจิสเตอร์ <strong>ODR (Output Data Register)</strong> ของพอร์ต <strong>GPIO</strong> </p>
+<p><img alt="" src="regs_gpio_moders.png" /></p>
+<p>รูป: ตัวอย่างค่าคงที่สำหรับรีจิสเตอร์ <strong>MODERS (GPIO Mode Register)</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="cc-arm-cmsis-framework">&#9655; <strong>การสร้างโปรเจกต์เพื่อเขียนโค้ด C/C++ ด้วย Arm CMSIS Framework</strong><a class="headerlink" href="#cc-arm-cmsis-framework" title="Permanent link">#</a></h2>
+<p>เริ่มต้นด้วย <strong>VS Code IDE</strong> แล้วคลิกเลือกที่ไอคอนของ <strong>PlatformIO (PIO)</strong>
+เพื่อเข้าสู่หน้า <strong>PIO Home</strong> เลือกทำคำสั่ง <strong>"+New Project"</strong></p>
+<p><img alt="" src="pio-1.png" /></p>
+<p>รูป: <strong>VS Code IDE + PIO Home</strong></p>
+<p>ในหน้าต่าง <strong>Project Wizard</strong> ให้ตั้งชื่อโปรเจกต์ เลือกบอร์ดไมโครคอนโทรลเลอร์ 
+และเลือก <strong>Framework: CMSIS</strong> ตามลำดับ</p>
+<p><img alt="" src="pio-2.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ด้วย <strong>PIO Project Wizard</strong></p>
+<p>จากนั้นให้เพิ่มไฟล์ <code>main.c</code> ลงในไดเรกทอรี <code>src/</code> ของโปรเจกต์ แล้วลองเขียนโค้ดตามตัวอย่างต่อไปนี้
+ซึ่งจะทำให้ <strong>LED (active-low)</strong> บนบอร์ด (ตรงกับขา <strong>PC13</strong> ) กระพริบได้
+ฟังก์ชัน <code>Init_GPIO()</code> จะใช้สำหรับการตั้งค่าเพื่อใช้งานขา <strong>PC13</strong> เป็นขาเอาต์พุต</p>
+<pre><code class="language-c++">#include &lt;stdint.h&gt;
+#include &quot;stm32f4xx.h&quot;
+
+// The onboard LED is connected to the PC13 pin.
+#define LED1       (13)
+#define GPIOMODER  (GPIO_MODER_MODER13_0)
+
+// Global variables
+volatile uint32_t ticks = 0;
+uint32_t saved_ticks = 0;
+
+void SysTick_Handler(void) { // SysTick interrupt handler
+    ticks++; // Increment the tick count.
+}
+
+void Init_SysTick() {
+    // Disable SysTick.
+    SysTick-&gt;CTRL = 0;
+    // Set SysTick period to 1msec.
+    SysTick-&gt;LOAD = (SystemCoreClock/1000UL) - 1UL;
+    // Set interrupt priority of SysTick to least urgency.
+    NVIC_SetPriority( SysTick_IRQn, (1UL&lt;&lt;__NVIC_PRIO_BITS)-1UL ); 
+    // Reset the SysTick counter value.
+    SysTick-&gt;VAL = 0UL;
+    // Select CPU clock, enable SysTick interrupt and SysTick.
+    SysTick-&gt;CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk;
+}
+
+void Init_GPIO() {
+    // Enable the clock to GPIOC.
+    RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    // Set PC13 pin to be a digital output.
+    GPIOC-&gt;MODER |= GPIOMODER;
+}
+
+int main(void) {
+    SystemInit(); // Initialize the system.
+    SystemCoreClockUpdate(); // Update the system core clock.
+
+    Init_SysTick(); // Initialize SysTick (24-bit SysTick Timer).
+    Init_GPIO();    // Initialize GPIO (for LED pin).
+
+    for (;;) { // Endless loop
+        if ( ticks - saved_ticks &gt;= 500 ) { // every 500 msec
+            GPIOC-&gt;ODR ^= (1&lt;&lt;LED1); // Toggle LED pin.
+            saved_ticks = ticks;     // Save the tick value.
+        }
+    }
+    return 0;
+}
+</code></pre>
+<p>ในตัวอย่างที่มีการเปิดใช้งานวงจรภายในที่มีชื่อว่า <strong>SysTick Timer</strong> ซึ่งเป็นวงจรตัวนับ
+ที่มีขนาด 24 บิต ของซีพียูตระกูล <strong>Arm Cortex-M</strong>
+โดยจะต้องมีการตั้งค่าให้นับถอยหลังจนถึง 0 แล้วจะเกิดอินเทอร์รัพท์และเริ่มต้นนับถอยหลังใหม่
+ฟังก์ชัน <code>Init_SysTick()</code> จะใช้สำหรับการตั้งค่าใช้งานวงจร <strong>SysTick</strong> ตามที่ได้กล่าวไป</p>
+<p>การกำหนดช่วงเวลานับถอยหลัง ตั้งค่าคาบเวลาไว้เท่ากับ 1 msec ในโค้ดตัวอย่างนี้
+และมีการเปิดใช้งานอินเทอร์รัพท์สำหรับวงจรนี้ด้วย ดังนั้นเมื่อนับถึง 0 จะเกิดเหตุการณ์อินเทอร์รัพท์
+และจะมีการเรียกหรือทำคำสั่งในฟังก์ชันชื่อ   <code>SysTick_Handler()</code> โดยอัตโนมัติ 
+ซึ่งจะเกิดขึ้นทุก ๆ 1 มิลลิวินาที</p>
+<p>ฟังก์ชัน <code>SysTick_Handler()</code> ทำหน้าที่เป็น <strong>Interrupt Handler</strong>
+ในตัวอย่างนี้ เมื่อฟังก์ชันดังกล่าวทำงานในแต่ละครั้ง จะมีการเพิ่มค่าของตัวแปรภายนอก <code>ticks</code> 
+เป็นการนับขึ้น หรือเพิ่มค่าตัวเลขครั้งละหนึ่ง </p>
+<p><img alt="" src="pio_main.png" /></p>
+<p>รูป: การสร้างและเพิ่มไฟล์ <code>main.c</code> เป็นส่วนหนึ่งของโปรเจกต์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pio-build-debug">&#9655; <strong>การทำขั้นตอน PIO Build &amp; Debug</strong><a class="headerlink" href="#pio-build-debug" title="Permanent link">#</a></h2>
+<p>ไฟล์ <code>platformio.ini</code> จะใช้สำหรับการตั้งค่าต่าง ๆ ของโปรเจกต์ เช่น 
+การเลือกบอร์ดเป้าหมาย รูปแบบการเขียนโค้ด การเลือกรูปแบบหรือวิธีการอัปโหลดไฟล์เฟิร์มแวร์
+วิธีการดีบักการทำงานของโปรแกรมในฮาร์ดแวร์ เป็นต้น ในตัวอย่างนี้ได้เลือกใช้วิธี <strong>Upload Protocol</strong>
+เป็น <code>cmsis-dap</code> สำหรับการโปรแกรมและเครื่องมือสำหรับการดีบัก (<strong>Debug Tool</strong>) 
+ก็ใช้เป็น <code>cmsis-dap</code> เช่นกัน</p>
+<pre><code class="language-text">[env:blackpill_f411ce]
+platform = ststm32
+board = blackpill_f411ce
+framework = cmsis
+
+; set build type to debug
+build_type = debug
+; set debug tool
+debug_tool = cmsis-dap
+
+; set upload protocol
+; upload_protocol = dfu
+; upload_protocol = stlink
+; upload_protocol = jlink
+upload_protocol = cmsis-dap
+
+; monitor speed (baudrate)
+monitor_speed = 115200
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="platformio_ini.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าในไฟล์ <code>platformio.ini</code> ของโปรเจกต์</p>
+<p>ถัดไปให้ลองทำขั้นตอน <strong>PIO Build</strong> ซึ่งจะได้ไฟล์ชื่อ <code>firmware.bin</code> และ <strong>PIO Debug</strong> ตามลำดับ
+โดยจะต้องเชื่อมต่อบอร์ด <strong>BlackPill</strong> กับคอมพิวเตอร์ผู้ใช้ ผ่านทางพอร์ต <strong>USB</strong>
+และมีอุปกรณ์ <strong>CMSIS / DAPlink Debug Probe</strong> เป็นตัวกลางในการเชื่อมต่อ ก่อนเริ่มขั้นตอนอัปโหลดและดีบัก</p>
+<p><img alt="" src="pio_build.png" /></p>
+<p>รูป: การทำขั้นตอน <strong>PIO Build</strong></p>
+<p>เมื่อทำขั้นตอน <strong>PIO Build</strong> และ <strong>PIO Upload</strong> ได้สำเร็จแล้ว 
+ให้ลองคลิกเลือก <strong>RUN AND DEBUG</strong> จากแถบเมนูซ้ายมือ
+ผู้ใช้สามารถคลิกเลือกหมายเลขบรรทัดในโค้ดของไฟล์ <code>main.c</code> 
+เพื่อใช้เป็นตำแหน่งหยุดชั่วคราว หรือเรียกว่า <strong>Breakpoints</strong>
+(จะมองเห็นสัญลักษณ์วงกลมสีแดง)</p>
+<p><img alt="" src="pio_run_debug-1.png" /></p>
+<p>รูป: การทำขั้นตอน <strong>PIO Debug</strong> (มาหยุดที่ <strong>Breakpoint</strong> ในตำแหน่งแรก)</p>
+<p><img alt="" src="pio_run_debug-2.png" /></p>
+<p>รูป: การทำขั้นตอน <strong>PIO Debug</strong> (มาหยุดที่ <strong>Breakpoint</strong> ในตำแหน่งถัดไป)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="serial-usart2">&#9655; <strong>การส่งข้อความแบบ Serial โดยใช้วงจร USART2</strong><a class="headerlink" href="#serial-usart2" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไป สาธิตการเปิดใช้งานวงจรภายในที่มีชื่อว่า <strong>USART</strong> ซึ่งมีให้เลือกใช้ 2 ชุด สำหรับ <strong>STM32F411CE</strong>
+ในตัวอย่างนี้ ได้เลือกใช้ <strong>USART2</strong> และจะต้องกำหนดขา <strong>GPIO</strong> ที่เกี่ยวข้อง จำนวน 2 ขา
+เพื่อใช้เป็นขา <strong>TX2</strong> และ <strong>RX2</strong> ให้แก่วงจร <strong>USART2</strong> (เลือกใช้ขา <strong>PA2 / PA3</strong> ตามลำดับ)
+ฟังก์ชัน <code>Init_USART()</code> ทำหน้าที่ตั้งค่าการใช้งานวงจร <strong>USART2</strong> โดยสามารถกำหนดค่า <strong>Baudrate</strong>
+ได้ เช่น เลือกใช้ค่า <strong>115200</strong></p>
+<p>หากต้องการจะใช้คำสั่ง <code>printf()</code> เพื่อส่งข้อความออกทาง <strong>USART</strong> จะต้องมีการสร้างฟังก์ชัน
+<code>int _write(int file, char *ptr, int len)</code> และการทำงานของฟังก์ชันนี้
+จะต้องใช้วงจร <strong>USART2</strong> เพื่อส่งข้อความทีละตัวอักขระออกทางขา <strong>TX2</strong></p>
+<p>ในโค้ดตัวอย่างนี้ ได้มีการเรียกใช้ฟังก์ชัน <code>printf()</code> เพื่อแสดงข้อความระบุค่าความถี่งของซีพียู (หน่วยเป็น <strong>MHz</strong>)
+และสถานะเอาต์พุตสำหรับ <strong>LED</strong> ที่มีการอัปเดตในแต่ละครั้งของการวนลูป </p>
+<pre><code class="language-c++">#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+#include &quot;stm32f4xx.h&quot;
+
+// The onboard LED is connected to the PC13 pin.
+#define LED1       (13)
+#define GPIOMODER  (GPIO_MODER_MODER13_0)
+#define USART      (USART2)
+
+// Global variables
+volatile uint32_t ticks = 0;
+uint32_t saved_ticks = 0;
+
+void SysTick_Handler(void) { // SysTick interrupt handler
+    ticks++; // Increment the tick count.
+}
+
+void Init_SysTick() {
+    // Disable SysTick.
+    SysTick-&gt;CTRL = 0;
+    // Set SysTick period to 1msec.
+    SysTick-&gt;LOAD = (SystemCoreClock/1000UL) - 1UL;
+    // Set interrupt priority of SysTick to least urgency.
+    NVIC_SetPriority( SysTick_IRQn, (1UL&lt;&lt;__NVIC_PRIO_BITS)-1UL ); 
+    // Reset the SysTick counter value.
+    SysTick-&gt;VAL = 0UL;
+    // Select CPU clock, enable SysTick interrupt and SysTick.
+    SysTick-&gt;CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk;
+}
+
+void Init_GPIO() {
+    // Configure the Reset &amp; Clock Control (RCC) register
+    // to enable the clock to GPIOC.
+    RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    // Set PC13 pin to be a digital output.
+    GPIOC-&gt;MODER |= GPIOMODER;
+}
+
+void Init_USART( uint32_t baudrate ) {
+    // Set pins PA2 (TX) and PA3 (RX) for serial communication.
+    // Enable RCC for port A.
+    RCC-&gt;AHB1ENR  |= RCC_AHB1ENR_GPIOAEN; 
+
+    // Use PA2 in alternate function mode (Serial TX).
+    GPIOA-&gt;MODER  |= GPIO_MODER_MODER2_1; 
+    GPIOA-&gt;AFR[0] |= (7 &lt;&lt; GPIO_AFRL_AFSEL2_Pos); 
+
+    // Use PA3 in alternate function mode (Serial RX).
+    GPIOA-&gt;MODER  |= GPIO_MODER_MODER3_1; 
+    GPIOA-&gt;AFR[0] |= (7 &lt;&lt; GPIO_AFRL_AFSEL3_Pos); 
+
+    // Enable RCC for USART2.
+    RCC-&gt;APB1ENR  |= RCC_APB1ENR_USART2EN; 
+
+    // Set the baud rate.
+    // Note: When the source clock is the HSI (16MHz) and 
+    // the prescaler for the APB1 is set to 1.
+    // USART2 is attached to the APB1 bus.
+    uint16_t uart_div = (SystemCoreClock / baudrate);
+    USART-&gt;BRR = ( ((uart_div / 16) &lt;&lt; USART_BRR_DIV_Mantissa_Pos) |
+                   ((uart_div % 16) &lt;&lt; USART_BRR_DIV_Fraction_Pos) );
+
+    // Enable the USART peripheral (Enable both Rx and Tx).
+    USART-&gt;CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+}
+
+// Redirect/Retarget printf() output.
+void __io_putchar(uint8_t c) {
+    // Wait until we are able to transmit
+    while( !(USART-&gt;SR &amp; USART_SR_TXE) ) {}; 
+    USART-&gt;DR = c; // Transmit the character
+}
+
+int _write(int file, char *ptr, int len) {
+    for (int idx=0; idx &lt; len; idx++) {
+        __io_putchar(*ptr++);
+    }
+    return len;
+}
+
+int main(void) {
+    SystemInit(); // Initialize the system.
+    SystemCoreClockUpdate(); // Update the system core clock.
+
+    Init_SysTick(); // Initialize SysTick (24-bit SysTick Timer).
+    Init_GPIO();    // Initialize GPIO (for LED pin).
+    Init_USART( 115200 ); // Initialize USART (with baudrate=115200).
+    // Disable I/O buffering, use unbuffered stream for output. 
+    setbuf( stdout, NULL ); 
+
+    printf( &quot;CPU freq.: %lu MHz\r\n&quot;, (uint32_t)(SystemCoreClock/1e6) );
+    for (;;) { // Endless loop
+        if ( ticks - saved_ticks &gt;= 500 ) { // every 500 msec
+            saved_ticks = ticks;     // Save the tick value.
+            GPIOC-&gt;ODR ^= (1&lt;&lt;LED1); // Toggle LED pin.
+            printf( &quot;LED: %lu\r\n&quot;, (GPIOC-&gt;ODR &gt;&gt; LED1)&amp;1 );
+        }
+    }
+    return 0;
+}
+</code></pre>
+<p>เมื่อทำขั้นตอน <strong>PIO Build &amp; Upload</strong> แล้ว ให้เปิด <strong>PIO Serial Monitor</strong>
+และกดปุ่มรีเซตการทำงานของบอร์ดไมโครคอนโทรลเลอร์ สังเกตข้อความที่ได้รับ</p>
+<p><img alt="" src="pio_serial_monitor-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความที่ได้รับผ่านทาง <strong>PIO Serial Monitor</strong> (<strong>baudrate: 115200</strong>)</p>
+<p>จากข้อความเอาต์พุต จะเห็นได้ ความถี่ของระบบคือ <strong>16MHz</strong> ซึ่งเกิดจากการใช้วงจร <strong>HSI 
+- Internal RC Oscillator</strong> สร้างสัญญาณ <strong>Clock</strong> ที่อยู่ภายในชิป </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การกำหนดความถี่ของระบบ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับการตั้งค่าความถี่สำหรับการทำงานของซีพียูให้สูงขึ้น และสำหรับ
+<strong>STM32F411CE</strong> จะได้สูงสุด <strong>100MHz</strong> และในตัวอย่างนี้จะลองตั้งค่าให้ได้ความถี่ <strong>96MHz</strong>
+โดยรับสัญญาณ <strong>Clock</strong> จากวงจรภายนอก <strong>25MHz External Crystal</strong>
+และใช้เป็นสัญญาณอินพุตเพื่อสร้างสัญญาณ <strong>Clock</strong> ด้วยวงจร <strong>PLL</strong> ให้ได้สัญญาณความถี่สูงขึ้น</p>
+<p>ไดอะแกรมต่อไปนี้เป็นผังวงจรภายในของ <strong>STM32F411</strong> แสดงเส้นทางการเลือกใช้สัญญาณ <strong>Clock</strong>
+ความถี่สูงจากภายนอก (<strong>HSE</strong>) เข้ามา แล้วนำไปผ่านวงจร <strong>PLL</strong> ซึ่งจะต้องมีการกำหนดตัวคูณ
+และตัวหารความถี่ (ได้แก่  <strong>PLL_M</strong>, <strong>PLL_N</strong>, <strong>PLL_P</strong> และ <strong>PLL_Q</strong>) 
+เพื่อให้ได้ความถี่ของสัญญาณสำหรับวงจรภายในตามที่ต้องการ</p>
+<p><img alt="" src="stm32f4_clk_paths.png" /></p>
+<p>รูป: <strong>STM32F4 Clock Path &amp; Configuration Settings</strong></p>
+<p>ฟังก์ชัน <code>void Init_SysClkConfig()</code> จะใช้สำหรับการตั้งค่าของระบบเพื่อให้ได้สัญญาณความถี่ตามที่ต้องการ
+และ <strong>Arm CMSIS</strong> ได้ระบุว่า ตัวแปรภายนอกที่มีชื่อว่า <code>SystemCoreClock</code> จะเป็นตัวระบุค่าความถี่ของซีพียู
+(<strong>System Clock Frequency</strong>)</p>
+<pre><code class="language-c++">#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+#include &quot;stm32f4xx.h&quot;
+
+#define LED1       (13)
+#define GPIOMODER  (GPIO_MODER_MODER13_0)
+#define USART      (USART2)
+
+#define PLL_M      (25)
+#define PLL_N      (192)
+#define PLL_P      (2)
+#define PLL_Q      (4)
+
+volatile uint32_t ticks = 0;
+uint32_t saved_ticks = 0;
+
+void Init_SysClkConfig() {  // Use 25MHz external crystal (HSE)
+    // Clear the PLLCFGR register
+    RCC-&gt;PLLCFGR = 0x00000000;
+    // Enable HSE in the RCC-&gt;CR register and wait until it’s ready to use.
+    RCC-&gt;CR |=RCC_CR_HSEON;
+    while ((RCC-&gt;CR &amp; RCC_CR_HSERDY)==0);
+    // Enable the APB1 bus
+    RCC-&gt;APB1ENR |= RCC_APB1ENR_PWREN;
+    // Adjust the voltage scaling options to suit thr operating frequency.
+    PWR-&gt;CR |= PWR_CR_VOS;
+
+    // PLL Source HSE = 25MHz 
+    RCC-&gt;PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
+
+    //  PLL clock = HSE clock / PLL_M * PLL_N / PLL_P
+    //            = 25 / 25 * 192 / 2 = 96 MHz
+    //  USB clock = HSE clock / PLL_M * PLL_N / PLL_Q
+    //            = 25 / 25 * 192 / 2 / 2 = 48 MHz !!!
+    //  AHB clock = PLL clock / HPRE  = 96MHz/1 = 96MHz
+    // APB1 clock = PLL clock / PPRE1 = 96MHz/2 = 48MHz
+    // APB2 clock = PLL clock / PPRE2 = 96MHz/1 = 96MHz
+
+    // Set clock prescalers for AHB, APB1 and APB2 busses
+    RCC-&gt;CFGR |= RCC_CFGR_HPRE_DIV1;
+    RCC-&gt;CFGR |= RCC_CFGR_PPRE1_DIV2;
+    RCC-&gt;CFGR |= RCC_CFGR_PPRE2_DIV1;
+
+    RCC-&gt;PLLCFGR = (RCC_PLLCFGR_PLLSRC_HSE)
+                 | (PLL_M&lt;&lt;0) 
+                 | (PLL_N&lt;&lt;6) 
+                 | (((PLL_P&gt;&gt;1) - 1)&lt;&lt;16)
+                 | (PLL_Q&lt;&lt;24);
+    // Enable main PLL and wait until PLL is ready.
+    RCC-&gt;CR |= RCC_CR_PLLON;  
+    while((RCC-&gt;CR &amp; RCC_CR_PLLRDY)==0);
+
+    // Set the Flash latency (3 wait cycles) and 
+    // enable the Data, Instruction, and Prefetch Cache.
+    FLASH-&gt;ACR |= (FLASH_ACR_ICEN  | FLASH_ACR_PRFTEN | FLASH_ACR_DCEN);
+    FLASH-&gt;ACR |= FLASH_ACR_LATENCY_3WS;
+
+    // Turn on the PLL and wait till PLL is ready.
+    RCC-&gt;CR |=RCC_CR_PLLON;
+    while ((RCC-&gt;CR &amp; RCC_CR_PLLRDY)==0);
+
+    // Switch the system clock to PLL and wait until it is ready.
+    RCC-&gt;CFGR |= RCC_CFGR_SW_PLL;
+
+    // Update SystemCoreClock variable
+    SystemCoreClockUpdate(); 
+}
+
+void SysTick_Handler(void) { // SysTick interrupt handler
+    ticks++; // Increment the tick count.
+}
+
+void Init_SysTick() {
+    // Disable SysTick.
+    SysTick-&gt;CTRL = 0;
+    // Set SysTick period to 1msec.
+    SysTick-&gt;LOAD = (SystemCoreClock/1000UL) - 1UL;
+    // Set interrupt priority of SysTick to least urgency.
+    NVIC_SetPriority( SysTick_IRQn, (1UL&lt;&lt;__NVIC_PRIO_BITS)-1UL ); 
+    // Reset the SysTick counter value.
+    SysTick-&gt;VAL = 0UL;
+    // Select CPU clock, enable SysTick interrupt and SysTick.
+    SysTick-&gt;CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk;
+}
+
+void Init_GPIO() {
+    // Enable the clock to GPIOC.
+    RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    // Set PC13 pin to be a digital output.
+    GPIOC-&gt;MODER |= GPIOMODER;
+}
+
+void Init_USART( uint32_t baudrate ) {
+    // Set pins PA2 (TX) and PA3 (RX) for serial communication.
+    // Enable RCC for port A.
+    RCC-&gt;AHB1ENR  |= RCC_AHB1ENR_GPIOAEN; 
+
+    // Use PA2 in alternate function mode (Serial TX).
+    GPIOA-&gt;MODER  |= GPIO_MODER_MODER2_1; 
+    GPIOA-&gt;AFR[0] |= (7 &lt;&lt; GPIO_AFRL_AFSEL2_Pos); 
+
+    // Use PA3 in alternate function mode (Serial RX).
+    GPIOA-&gt;MODER  |= GPIO_MODER_MODER3_1; 
+    GPIOA-&gt;AFR[0] |= (7 &lt;&lt; GPIO_AFRL_AFSEL3_Pos); 
+
+    // Enable RCC for USART2.
+    RCC-&gt;APB1ENR  |= RCC_APB1ENR_USART2EN; 
+
+    // Set the baud rate.
+    // Note: The prescaler for the APB1 is set to 2.
+    // The APB1 clock is SYSCLK/2.
+    uint16_t uart_div = (SystemCoreClock/2/baudrate);
+    USART-&gt;BRR = ( ((uart_div / 16) &lt;&lt; USART_BRR_DIV_Mantissa_Pos) |
+                   ((uart_div % 16) &lt;&lt; USART_BRR_DIV_Fraction_Pos) );
+
+    // Enable the USART peripheral (Enable both Rx and Tx).
+    USART-&gt;CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+}
+
+// Redirect/Retarget printf() output.
+void __io_putchar(uint8_t c) {
+    // Wait until we are able to transmit
+    while( !(USART-&gt;SR &amp; USART_SR_TXE) ) {}; 
+    USART-&gt;DR = c; // Transmit the character
+}
+
+int _write(int file, char *ptr, int len) {
+    for (int idx=0; idx &lt; len; idx++) {
+        __io_putchar(*ptr++);
+    }
+    return len;
+}
+
+int main(void) {
+    //SystemInit();
+    //SystemCoreClockUpdate();
+
+    Init_SysClkConfig();  // Initialize System Clock Configuration.
+    Init_SysTick(); // Initialize SysTick (24-bit SysTick Timer).
+    Init_GPIO();    // Initialize GPIO (for LED pin).
+    Init_USART( 115200 ); // Initialize USART (with baudrate=115200).
+    // Disable I/O buffering, use unbuffered stream for output. 
+    setbuf( stdout, NULL ); 
+
+    printf( &quot;CPU freq.: %lu MHz\r\n&quot;, (uint32_t)(SystemCoreClock/1e6) );
+    for (;;) { // Endless loop
+        if ( ticks - saved_ticks &gt;= 500 ) { // every 500 msec
+            saved_ticks = ticks;     // Save the tick value.
+            GPIOC-&gt;ODR ^= (1&lt;&lt;LED1); // Toggle LED pin.
+            printf( &quot;LED: %lu\r\n&quot;, (GPIOC-&gt;ODR &gt;&gt; LED1)&amp;1 );
+        }
+    }
+    return 0;
+}
+</code></pre>
+<p><img alt="" src="pio_clk_96mhz.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต (แสดงความถี่ <strong>96MHz</strong>)</p>
+<p><img alt="" src="pio_run_debug-3.png" /></p>
+<p>รูป: ตัวอย่างการทำขั้นตอน <strong>PIO Run &amp; Debug</strong> และแสดงค่าของตัวแปร เช่น <code>SystemCoreClock</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="key">&#9655; <strong>การอ่านค่าอินพุตจากปุ่มกด KEY บนบอร์ด</strong><a class="headerlink" href="#key" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>BlackPill</strong> มีปุ่มกด (<strong>Push Button</strong>) ที่ทำงานแบบ <strong>Active-Low</strong>
+และตรงกับขา <strong>PA0</strong> ของชิป <strong>STM32F411CE</strong> </p>
+<p>ตัวอย่างต่อไปนี้ สาธิตการอ่านค่าสถานะลอจิกจากปุ่ม เพื่อนำมากำหนดหรือสร้างเงื่อนไขในการสลับสถานะลอจิกของ <strong>LED</strong>
+เช่น  <strong>LED</strong> กระพริบด้วยอัตราคงที่  ถ้าไม่กดปุ่มค้างไว้</p>
+<pre><code class="language-c++">#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+#include &quot;stm32f4xx.h&quot;
+
+#define LED1       (13)
+#define KEY        (0)
+#define USART      (USART2)
+
+#define PLL_M      (25)
+#define PLL_N      (192)
+#define PLL_P      (2)
+#define PLL_Q      (4)
+
+volatile uint32_t ticks = 0;
+uint32_t saved_ticks = 0;
+
+void Init_SysClkConfig() {  // Use 25MHz external crystal (HSE)
+    // Clear the PLLCFGR register
+    RCC-&gt;PLLCFGR = 0x00000000;
+    // Enable HSE in the RCC-&gt;CR register and wait until it’s ready to use.
+    RCC-&gt;CR |=RCC_CR_HSEON;
+    while ((RCC-&gt;CR &amp; RCC_CR_HSERDY)==0);
+    // Enable the APB1 bus
+    RCC-&gt;APB1ENR |= RCC_APB1ENR_PWREN;
+    // Adjust the voltage scaling options to suit thr operating frequency.
+    PWR-&gt;CR |= PWR_CR_VOS;
+
+    // PLL Source HSE = 25MHz 
+    RCC-&gt;PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
+
+    //  PLL clock = HSE clock / PLL_M * PLL_N / PLL_P
+    //            = 25 / 25 * 192 / 2 = 96 MHz
+    //  USB clock = HSE clock / PLL_M * PLL_N / PLL_Q
+    //            = 25 / 25 * 192 / 2 / 2 = 48 MHz !!!
+    //  AHB clock = PLL clock / HPRE  = 96MHz/1 = 96MHz
+    // APB1 clock = PLL clock / PPRE1 = 96MHz/2 = 48MHz
+    // APB2 clock = PLL clock / PPRE2 = 96MHz/1 = 96MHz
+
+    // Set clock prescalers for AHB, APB1 and APB2 busses
+    RCC-&gt;CFGR |= RCC_CFGR_HPRE_DIV1;
+    RCC-&gt;CFGR |= RCC_CFGR_PPRE1_DIV2;
+    RCC-&gt;CFGR |= RCC_CFGR_PPRE2_DIV1;
+
+    RCC-&gt;PLLCFGR =  (RCC_PLLCFGR_PLLSRC_HSE)
+                 | (PLL_M&lt;&lt;0) 
+                 | (PLL_N&lt;&lt;6) 
+                 | (((PLL_P &gt;&gt; 1)-1) &lt;&lt; 16)
+                 | (PLL_Q&lt;&lt;24);
+    // Enable main PLL and wait until PLL is ready.
+    RCC-&gt;CR |= RCC_CR_PLLON;  
+    while((RCC-&gt;CR &amp; RCC_CR_PLLRDY)==0);
+
+    // Set the Flash latency (3 wait cycles) and 
+    // enable the Data, Instruction, and Prefetch Cache.
+    FLASH-&gt;ACR |= (FLASH_ACR_ICEN  | FLASH_ACR_PRFTEN | FLASH_ACR_DCEN);
+    FLASH-&gt;ACR |= FLASH_ACR_LATENCY_3WS;
+
+    // Turn on the PLL and wait till PLL is ready.
+    RCC-&gt;CR |=RCC_CR_PLLON;
+    while ((RCC-&gt;CR &amp; RCC_CR_PLLRDY)==0);
+
+    // Switch the system clock to PLL and wait until it is ready.
+    RCC-&gt;CFGR |= RCC_CFGR_SW_PLL;
+
+    // Update SystemCoreClock variable
+    SystemCoreClockUpdate(); 
+}
+
+void SysTick_Handler(void) { // SysTick interrupt handler
+    ticks++; // Increment the tick count.
+}
+
+void Init_SysTick() {
+    // Disable SysTick.
+    SysTick-&gt;CTRL = 0;
+    // Set SysTick period to 1msec.
+    SysTick-&gt;LOAD = (SystemCoreClock/1000UL) - 1UL;
+    // Set interrupt priority of SysTick to least urgency.
+    NVIC_SetPriority( SysTick_IRQn, (1UL&lt;&lt;__NVIC_PRIO_BITS)-1UL ); 
+    // Reset the SysTick counter value.
+    SysTick-&gt;VAL = 0UL;
+    // Select CPU clock, enable SysTick interrupt and SysTick.
+    SysTick-&gt;CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk;
+}
+
+void Init_GPIO() {
+    // Enable the clock to GPIOC.
+    RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    // Enable the clock to GPIOA.
+    RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    // Set PC13 pin to be a digital output.
+    GPIOC-&gt;MODER |= GPIO_MODER_MODER13_0;
+    // Set PA0 pin as input with internal pullup.
+    GPIOA-&gt;PUPDR |= GPIO_PUPDR_PUPDR0_0;
+}
+
+void Init_USART( uint32_t baudrate ) {
+    // Set pins PA2 (TX) and PA3 (RX) for serial communication.
+    // Enable RCC for port A.
+    RCC-&gt;AHB1ENR  |= RCC_AHB1ENR_GPIOAEN; 
+
+    // Use PA2 in alternate function mode (Serial TX).
+    GPIOA-&gt;MODER  |= GPIO_MODER_MODER2_1; 
+    GPIOA-&gt;AFR[0] |= (7 &lt;&lt; GPIO_AFRL_AFSEL2_Pos); 
+
+    // Use PA3 in alternate function mode (Serial RX).
+    GPIOA-&gt;MODER  |= GPIO_MODER_MODER3_1; 
+    GPIOA-&gt;AFR[0] |= (7 &lt;&lt; GPIO_AFRL_AFSEL3_Pos); 
+
+    // Enable RCC for USART2.
+    RCC-&gt;APB1ENR  |= RCC_APB1ENR_USART2EN; 
+
+    // Set the baud rate.
+    // Note: The prescaler for the APB1 is set to 2.
+    // The APB1 clock is SYSCLK/2.
+    uint16_t uart_div = (SystemCoreClock/2/baudrate);
+    USART-&gt;BRR = ( ((uart_div / 16) &lt;&lt; USART_BRR_DIV_Mantissa_Pos) |
+                   ((uart_div % 16) &lt;&lt; USART_BRR_DIV_Fraction_Pos) );
+
+    // Enable the USART peripheral (Enable both Rx and Tx).
+    USART-&gt;CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+}
+
+// Redirect/Retarget printf() output.
+void __io_putchar(uint8_t c) {
+    // Wait until we are able to transmit
+    while( !(USART-&gt;SR &amp; USART_SR_TXE) ) {}; 
+    USART-&gt;DR = c; // Transmit the character
+}
+
+int _write(int file, char *ptr, int len) {
+    for (int idx=0; idx &lt; len; idx++) {
+        __io_putchar(*ptr++);
+    }
+    return len;
+}
+
+int main(void) {
+    //SystemInit();
+    //SystemCoreClockUpdate();
+
+    Init_SysClkConfig();  // Initialize System Clock Configuration.
+    Init_SysTick(); // Initialize SysTick (24-bit SysTick Timer).
+    Init_GPIO();    // Initialize GPIO (for LED pin and PA0).
+    Init_USART( 115200 ); // Initialize USART (with baudrate=115200).
+    // Disable I/O buffering, use unbuffered stream for output. 
+    setbuf( stdout, NULL ); 
+
+    printf( &quot;CPU freq.: %lu MHz\r\n&quot;, (uint32_t)(SystemCoreClock/1e6) );
+    for (;;) { // Endless loop
+        if ( ticks - saved_ticks &gt;= 100 ) { // every 100 msec
+            saved_ticks = ticks;     // Save the tick value.
+            if ( (GPIOA-&gt;IDR &amp; (1&lt;&lt;KEY)) ) { // KEY button not pressed
+               GPIOC-&gt;ODR ^= (1&lt;&lt;LED1); // Toggle LED pin.
+               printf( &quot;LED: %lu\r\n&quot;, (GPIOC-&gt;ODR &gt;&gt; LED1)&amp;1 );
+            }
+        }
+    }
+    return 0;
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานซอฟต์แวร์ <strong>VS Code IDE</strong> ร่วมกับ <strong>PlatformIO</strong>
+เพื่อนำมาใช้ในการเขียนโค้ดสำหรับ <strong>STM32F411CE</strong> และเลือกใช้รูปแบบการเขียนโค้ดแบบ <strong>Arm CMSIS</strong>
+พร้อมตัวอย่างโค้ดเพื่อนำไปทดลองใช้งานกับบอร์ดไมโครคอนโทรลเลอร์ในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2023-06-18 | Last Updated: 2023-06-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
