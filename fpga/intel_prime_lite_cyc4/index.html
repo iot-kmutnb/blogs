@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/intel_prime_lite_cyc4/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทดลองใช้งาน Intel FPGA Prime Lite และบอร์ด Cyclone IV FPGA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#intel-fpga-prime-lite-cyclone-iv-fpga" class="nav-link">การทดลองใช้งาน Intel FPGA Prime Lite และบอร์ด Cyclone IV FPGA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#fpga" class="nav-link">&#9655; ฮาร์ดแวร์และซอฟต์แวร์สำหรับการเรียนรู้การออกแบบวงจรสำหรับชิป FPGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cyclone-iv-ep4cexe22c8" class="nav-link">&#9655; บอร์ด Cyclone IV EP4CExE22C8</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#de0-nano-development-education-board" class="nav-link">&#9655; บอร์ด DE0-Nano Development &amp; Education Board</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#quartus-prime-lite-edition" class="nav-link">&#9655; ขั้นตอนการใช้งาน Quartus Prime Lite Edition</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#de0-nano" class="nav-link">&#9655; การทดลองกับบอร์ด DE0-Nano</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#verilog-hdl" class="nav-link">&#9655; โค้ดตัวอย่าง Verilog HDL</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="intel-fpga-prime-lite-cyclone-iv-fpga">การทดลองใช้งาน Intel FPGA Prime Lite และบอร์ด Cyclone IV FPGA<a class="headerlink" href="#intel-fpga-prime-lite-cyclone-iv-fpga" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>FPGA</em>, <em>Intel/Altera Cyclone IV</em>, 
+<em>Intel FPGA Quartus Prime Lite</em>, <em>VHDL / Verilog Coding</em></p>
+<hr />
+<h2 id="fpga">&#9655; <strong>ฮาร์ดแวร์และซอฟต์แวร์สำหรับการเรียนรู้การออกแบบวงจรสำหรับชิป FPGA</strong><a class="headerlink" href="#fpga" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอ การใช้งานซอฟต์แวร์ที่มีชื่อว่า <strong>Intel Quartus Prime Lite Edition (Free)</strong> 
+เพื่อการออกแบบวงจรดิจิทัล และนำไปใช้กับบอร์ดที่มีชิป <strong>FPGA</strong> (<strong><em>Field-Programmable Gate Array</em></strong>) ของบริษัท <strong>Intel/Altera</strong>
+ซอฟต์แวร์นี้สามารถดาวน์โหลดมาใช้ได้ฟรี (ในบทความนี้ ได้เลือกใช้เวอร์ชัน <strong>v22.1</strong>)
+ มีให้เลือกใช้สำหรับระบบปฏิบัติการ <strong>Windows</strong> หรือ <strong>Linux</strong> ขนาด 64 บิต เท่านั้น </p>
+<p>ในส่วนของฮาร์ดแวร์ ได้เลือกใช้ชิปตระกูล <strong>Cyclone IV</strong> ซึ่งถือว่า เป็นรุ่นราคาถูก (<strong>Low-Cost FPGA Family</strong>)
+และแม้ว่า ชิป <strong>Cyclone IV</strong> จะไม่ใช่ตระกูลใหม่ล่าสุด แต่ก็ถือว่า ยังมีการผลิตและจำหน่ายอยู่ 
+และเหมาะสำหรับการเริ่มต้นในเรียนรู้การออกแบบวงจรสำหรับชิป <strong>FPGA</strong> สำหรับผู้ที่สนใจทั่วไป</p>
+<p>บอร์ด <strong>FPGA</strong> ที่ได้เลือกนำมาทดลอง และสาธิตการใช้งานซอฟต์แวร์ ได้แก่</p>
+<ul>
+<li>บอร์ด <strong>FPGA</strong> จากประเทศจีน ที่มีชิป <strong>Cyclone IV EP4CE6E22C8N</strong> </li>
+<li>บอร์ด <a href="https://www.terasic.com.tw/cgi-bin/page/archive.pl?No=593"><strong>DE0-Nano</strong></a>
+ของบริษัท <strong>Terasic</strong> จากประเทศไต้หวัน (ราคาประมาณ 5,000 บาท)</li>
+</ul>
+<p>บริษัท <a href="https://www.terasic.com.tw/en/#"><strong>Terasic</strong></a> ยังมีบอร์ดทดลองที่ใช้ชิป <strong>FPGA</strong> และ <strong>SoC FPGA</strong> ของ <strong>Intel / Altera</strong>
+ให้เลือกให้อีกหลายแบบ แต่ก็มีราคาที่แตกต่างกันไป แต่บอร์ดจากประเทศจีนจะมีราคาถูกกว่า
+อย่างไรก็ตาม ข้อเสียของบอร์ดราคาถูกจากประเทศจีน อาจเป็นเรื่องเอกสารและคู่มือการใช้งาน</p>
+<p><img alt="" src="chinese_cyc4_boards.png" /></p>
+<p>รูป: ตัวอย่างบอร์ด <strong>FPGA Cyclone IV</strong> จากประเทศจีน</p>
+<hr />
+<h2 id="cyclone-iv-ep4cexe22c8">&#9655; <strong>บอร์ด Cyclone IV EP4CExE22C8</strong><a class="headerlink" href="#cyclone-iv-ep4cexe22c8" title="Permanent link">#</a></h2>
+<p>ลองมาดูบอร์ด <strong>FPGA</strong> ที่มีราคาไม่เกิน 1,000 บาท และผู้เขียนได้เคยซื้อมาลองใช้ ตั้งแต่ปีค.ศ. 2016
+(แต่ปัจจุบันไม่มีจำหน่ายแล้ว)</p>
+<p><img alt="" src="cyc4_board-3.png" /></p>
+<p>รูป: ตัวอย่างบอร์ด <strong>Cyclone IV EP4CE6E22C8N</strong> (ชิปมีความจุลอจิก <strong>6,272 LEs</strong>)</p>
+<p><img alt="" src="cyc4_board_front_back.jpg" /></p>
+<p>รูป:  ตัวอย่างบอร์ด <strong>Cyclone IV EP4CE22E22C8</strong> (ชิปมีความจุลอจิก <strong>22,320 LEs</strong>)</p>
+<p><img alt="" src="cyc4_board-4.png" /></p>
+<p>รูป:  ตัวอย่างบอร์ด <strong>Cyclone IV EP4CE22E22C8</strong> 
++ <strong>USB Blaster (clone)</strong></p>
+<p><strong>ข้อมูลเชิงเทคนิค</strong>:  </p>
+<ul>
+<li><strong>FPGA</strong>: Altera Cyclone IV (<strong>EP4CE6E22C8N-QFP144</strong>)<ul>
+<li>LEs (Logic Elements): 6,272</li>
+<li>PLLs: 2</li>
+<li>Embedded memory: 276,480 bits</li>
+</ul>
+</li>
+<li><strong>Flash Memory</strong>:<ul>
+<li>16Mbit SPI serial (SPI) Flash memory (M25P16 / EPCS16)</li>
+</ul>
+</li>
+<li><strong>JTAG socket for device programming</strong> <ul>
+<li>Altera USB Blaster is required.</li>
+</ul>
+</li>
+<li><strong>Clock Input Pins</strong>:<ul>
+<li><code>PIN_23</code> (with 50MHz crystal osc.)</li>
+<li><code>PIN_24</code> (without crystal osc.)</li>
+</ul>
+</li>
+<li><strong>1x Push Button (K1)</strong><ul>
+<li>for reconfiguring the FPGA chip (connected to <code>nCONFIG</code> pin)</li>
+</ul>
+</li>
+<li><strong>2x Push Buttons</strong>(K2, K3), active-low<ul>
+<li><code>PIN_86</code></li>
+<li><code>PIN_87</code></li>
+</ul>
+</li>
+<li><strong>8x LEDs, active-low</strong><ul>
+<li>Pins: <code>PIN_73</code>, <code>PIN_74</code>, <code>PIN_75</code>, <code>PIN_76</code>, 
+        <code>PIN_77</code>, <code>PIN_83</code>, <code>PIN_84</code>, <code>PIN_85</code></li>
+</ul>
+</li>
+<li><strong>73 I/O pins (support 3.3V logic level)</strong><ul>
+<li>2.54mm spacing, male pin headers (2x20 pins)</li>
+</ul>
+</li>
+<li><strong>Onboard Voltage Regulators</strong><ul>
+<li>3.3V voltage regulator (AMS1085CM-3.3V / 3A max.)</li>
+<li>2.5V voltage regulator (AMS1117-2.5V)</li>
+<li>1.2V voltage regulator (AMS1117-1.2V)</li>
+</ul>
+</li>
+<li><strong>Power Supply: DC jack</strong><ul>
+<li>DC input: 5V..12V (15V max.), center-positive </li>
+</ul>
+</li>
+</ul>
+<p>บอร์ด <strong>FPGA</strong> มีวงจรสร้างสัญญาณ <strong>Clock</strong> ความถี่คงที่ <strong>50MHz</strong> 
+สามารถนำไปใช้เป็นสัญญาณ <strong>Clock</strong> ของวงจรลอจิกที่ทำงานตามแบบ <strong>Synchronous Logic Design</strong> 
+มีวงจรปุ่มกด <strong>K2</strong> และ <strong>K3</strong> ที่ทำงานแบบ <strong>Active-Low</strong> สามารถใช้เป็น <strong>User Inputs</strong> ได้ 
+นอกจากนั้น ยังมีวงจร <strong>LED</strong> จำนวน 8 ชุด หรือ ตำแหน่ง สามารถใช้เป็น <strong>User Outputs / Light Indicators</strong> 
+และจะให้แสงสว่างเมื่อเอาต์พุตเป็นลอจิก <strong>Low</strong></p>
+<p>ในการป้อนแรงดันไฟเลี้ยงกระแสตรงให้บอร์ด <strong>FPGA</strong> ที่ได้เลือกมาใช้งาน ตามข้อมูลเชิงเทคนิคที่ได้เสนอไป
+แนะนำให้ใช้สาย <strong>USB</strong> ที่มีปลายอีกด้านหนึ่งเป็น <strong>Jack</strong>
+ขนาด <strong>5.5x2.1mm</strong> และใช้เสียบใช้งานกับพอร์ต <strong>USB</strong> ของคอมพิวเตอร์ โดยใช้แรงดันไฟเลี้ยง <strong>5VDC</strong></p>
+<p>ขา <strong>I/O</strong> ถูกกำหนดไว้ให้ทำงานที่ระดับแรงดัน <strong>3.3V</strong>
+และสามารถนำขาไปต่อใช้งานกับอุปกรณ์อื่นได้ผ่านคอนเนกเตอร์แบบ <strong>Pin Headers</strong> (สองแถว-ตัวผู้) 
+และมีหมายเลขขา (<strong>Pin Numbers</strong>) ของชิป <strong>FPGA</strong> เขียนกำกับไว้บนบอร์ดด้วย</p>
+<p>บอร์ด <strong>Cyclone IV EP4CE6E22C8N</strong> ที่ได้เลือกมาลองใช้งาน
+ไม่มีวงจร <strong>Altera USB Blaster</strong> อยู่บนบอร์ด
+ดังนั้นจะต้องใช้อุปกรณ์ภายนอก (ราคาถูก) สำหรับทำหน้าที่เป็น 
+<strong>Altera USB Blaster (Clone)</strong> และเชื่อมต่อกับพอร์ต <strong>USB</strong> ของเครื่องผู้ใช้ในด้านหนึ่ง
+และพอร์ต <strong>JTAG</strong> บนบอร์ดอีกด้านหนึ่ง
+และอัปโหลดไฟล์ที่เรียกว่า <strong>FPGA Bitstream</strong> ไปยังชิป <strong>FPGA</strong> บนบอร์ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="de0-nano-development-education-board">&#9655; <strong>บอร์ด DE0-Nano Development &amp; Education Board</strong><a class="headerlink" href="#de0-nano-development-education-board" title="Permanent link">#</a></h2>
+<p>อีกบอร์ดหนึ่งคือ <strong> Terasic DE0-Nano</strong> ซึ่งผู้เขียนได้เคยซื้อมาใช้สำหรับการเรียนการสอนตั้งแต่ปีค.ศ. 2012
+นอกจากชิป <strong>Cyclone IV FPGA (EP4CE22F17C6N)</strong> แล้วยังมีวงจรหรือไอซีประเภทอื่นอยู่บนบอร์ดด้วย</p>
+<p><strong>ข้อมูลเชิงเทคนิค</strong>:  <a href="DE0_nano_user_manual.pdf">ไฟล์คู่มือการใช้งานของบอร์ด</a></p>
+<ul>
+<li><strong>FPGA</strong>: Altera Cyclone IV (<strong>EP4CE22F17C6N</strong>)<ul>
+<li>LEs (Logic Elements): 22,320</li>
+<li>PLLs: 4</li>
+<li>Embedded memory: 594 Kbits</li>
+</ul>
+</li>
+<li><strong>On-board USB-Blaster</strong>: for device programming</li>
+<li><strong>FPGA Serial Configuration Device (EPCS)</strong></li>
+<li><strong>8x Green LEDs</strong></li>
+<li><strong>2x Debounced Push Buttons</strong></li>
+<li><strong>4x DIP Switches</strong> </li>
+<li><strong>SDRAM</strong>: 32MB </li>
+<li><strong>EEPROM (I2C)</strong>: 2Kbits</li>
+<li><strong>ADI ADXL345 (I2C)</strong>: 3-axis accelerometer</li>
+<li><strong>NS ADC128S022</strong>: 8-Channel, 12-bit A/D Converter</li>
+<li><strong>50MHz clock oscillator</strong></li>
+<li><strong>Power Supply</strong><ul>
+<li>USB Type mini-AB port (5V)</li>
+<li>Two DC 5V pins of the GPIO headers (5V)</li>
+<li>2-pin external power header (3.6-5.7V)</li>
+</ul>
+</li>
+<li><strong>Expansion Headers</strong><ul>
+<li>Two 40-pin Headers</li>
+<li>One 26-pin header</li>
+</ul>
+</li>
+<li><strong>Price</strong>: USD $108 (Academic Price: USD $87)</li>
+</ul>
+<p><img alt="" src="de0_nano_front_back.png" /></p>
+<p><img alt="" src="terasic_de0-nano.png" /></p>
+<p>รูป: บอร์ด <strong>DE0-Nano Development &amp; Education Board</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="quartus-prime-lite-edition">&#9655; <strong>ขั้นตอนการใช้งาน Quartus Prime Lite Edition</strong><a class="headerlink" href="#quartus-prime-lite-edition" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการสร้างวงจรสำหรับทดลองใช้กับบอร์ด <strong>FPGA</strong> โดยทั่วไป มีดังนี้</p>
+<ul>
+<li>เปิดโปรแกรม <strong>Intel FPGA Quartus Prime Lite</strong> </li>
+<li>สร้างโปรเจกต์ใหม่ (<strong>Create New Project</strong>)</li>
+<li>เลือกชิปเป้าหมาย (<strong>Select Target FPGA Device</strong>) ที่ตรงกับชิปบนบอร์ดทดลอง</li>
+<li>สร้างไฟล์และแก้ไขโค้ด <strong>VHDL</strong> (<strong>Create New / Edit VHDL File</strong>) และเพิ่มให้เป็นส่วนหนึ่งของโปรเจกต์</li>
+<li>คอมไพล์โค้ดในโปรเจกต์และสังเคราะห์วงจร (<strong>Compile Code &amp; Synthesize Logic Circuit</strong>)</li>
+<li>กำหนดหมายเลขขาของชิปสำหรับสัญญาณ <strong>I/O</strong> ของวงจร (<strong>Assign I/O Pin Numbers</strong>)</li>
+<li>แปลงให้เป็นวงจรสำหรับชิปเป้าหมายและสร้างไฟล์ "บิตสตรีม"  (<strong>Generate Bitstream</strong>)</li>
+<li>ดาวน์โหลดไฟล์บิตสตรีมลงในชิปเป้าหมายบนบอร์ดทดลอง (<strong>Program the Device</strong>) 
+  ผ่าน <strong>JTAG Port</strong></li>
+</ul>
+<p><strong>ข้อสังเกต:</strong> ในบทความนี้ ยังไม่เน้นเรื่องการวิเคราะห์การทำงานเชิงเวลาของวงจรดิจิทัล (<strong>Timing Analysis</strong>)
+และยังไม่กล่าวถึงการจำลองการทำงานของโค้ด <strong>VHDL</strong> และการเขียนโค้ด <strong>VHDL Testbench</strong> 
+เพื่อตรวจสอบการทำงานด้วยการจำลองการทำงานเชิงลอจิก (<strong>Logic Simulation</strong>)
+โดยใช้โปรแกรม อย่างเช่น <strong>ModelSim-Intel FPGA Starter Edition</strong>
+หรือ <strong>Questa-Intel FPGA Starter Edition</strong></p>
+<p><img alt="" src="qt_prime-1.png" /></p>
+<p>รูป: หน้าต่างหลักของโปรแกรม <strong>Intel Quartus Prime Lite</strong> </p>
+<p><img alt="" src="qt_menu_bar.png" /></p>
+<p>รูป: แถบแนวนอนของไอคอนสำหรับการเลือกทำคำสั่งในขั้นตอนต่าง ๆ ของ <strong>FPGA Design Flow</strong></p>
+<p>เริ่มขั้นตอนจากเมนูคำสั่ง <strong>File &gt; New Project Wizard</strong> แล้วทำขั้นตอนการตั้งค่า</p>
+<ul>
+<li>ตั้งชื่อโปรเจกต์ใหม่ และเลือกไดเรกทอรีสำหรับเก็บไฟล์ของโปรเจกต์  (ตัวอย่างนี้ชื่อ <code>led_bargraph</code>)</li>
+<li>เลือกสร้างโปรเจกต์แบบว่างเปล่า (<strong>Empty Project</strong>) ไม่ได้เลือกจากเทมเพลต (<strong>Template</strong>)</li>
+<li>เพิ่มไฟล์เข้าในโปรเจกต์ (ในกรณีนี้่ยังไม่มี ให้กดปุ่ม <strong>Next</strong>)</li>
+<li>เลือกชิปเป้าหมาย (<strong>Target Device</strong>) ในตัวอย่างนี้คือ <strong>Cyclone IV E EP4C6EE22C8</strong></li>
+<li>ตรวจสอบการสรุปข้อมูลเกี่ยวกับการสร้างโปรเจกต์ใหม่ ก่อนทำขั้นตอนถัดไป </li>
+</ul>
+<p><img alt="" src="qt_prime-2.png" /></p>
+<p><img alt="" src="qt_prime-3.png" /></p>
+<p><img alt="" src="qt_prime-4.png" /></p>
+<p><img alt="" src="qt_prime-5.png" /></p>
+<p>&nbsp;</p>
+<p>เมื่อสร้างโปรเจกต์ใหม่แล้ว แต่ยังเป็นโปรเจกต์ว่างเปล่า ยังไม่มีไฟล์ใด ๆ ถัดไป ให้สร้างไฟล์ใหม่ (<strong>New File</strong>) จากเมนูคำสั่ง 
+แล้วเลือกชนิดของไฟล์ <strong>VHDL</strong> เพื่อทดลองเขียนโค้ดตามตัวอย่าง (<strong>LED Bargraph</strong>) เพื่อแสดงสถานะด้วย
+<strong>LED</strong> จำนวน 8 ดวง </p>
+<ul>
+<li>สร้างไฟล์ใหม่ ให้เป็นส่วนหนึ่งของโปรเจกต์ โดยเลือกชนิดของไฟล์ใหม่เป็น <strong>VHDL File</strong><br />
+แล้วใส่โค้ดตัวอย่างลงในไฟล์ <strong>.vhd</strong> บันทึกไฟล์เป็น <code>led_bargraph.vhd</code></li>
+<li>เลือกไฟล์ <strong>VHDL</strong> หรือชื่อ <code>led_bargraph</code> ให้เป็น <strong>Top-level Entity</strong> ของวงจร</li>
+<li>ทำขั้นตอน <strong>Analysis &amp; Synthesis</strong> เพื่อคอมไพล์โค้ดและแปลงโค้ดให้เป็นวงจรดิจิทัล</li>
+<li>ดูผลสรุปการทำขั้นตอน <strong>Analysis &amp; Synthesis</strong> ถ้าไม่มีข้อผิดพลาด ให้ทำขั้นตอนถัดไป</li>
+</ul>
+<p><img alt="" src="qt_prime-6.png" /></p>
+<pre><code class="language-vhdl">------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+------------------------------------------------------------------
+
+entity LED_BARGRAPH is
+  generic ( WIDTH : natural := 8 );
+  port(
+     CLK  : in std_logic;
+     nRST : in std_logic;
+     LEDS : out std_logic_vector(WIDTH-1 downto 0)
+  );
+end LED_BARGRAPH;
+
+architecture SYNTH of LED_BARGRAPH is
+  constant ALL_ONES     : unsigned := to_unsigned(2**WIDTH-1,WIDTH);
+  constant COUNT_PERIOD : integer := 10000000;
+  subtype count_t is integer range 0 to (COUNT_PERIOD-1); 
+  signal  count : count_t := 0;
+  signal  reg   : std_logic_vector(WIDTH-1 downto 0);
+  signal  shift_en : std_logic;
+
+begin
+
+  LEDS &lt;= not reg; -- used the register's bits (inverted) for LEDs
+
+  process (nRST, CLK) begin
+    if nRST = '0' then
+      count &lt;= 0;
+      shift_en &lt;= '0';
+    elsif rising_edge(CLK) then
+      -- check whether the counter reaches the max. value.
+      if count = (COUNT_PERIOD-1) then 
+        count &lt;= 0;       -- reset the counter.
+        shift_en &lt;= '1';  -- enable register shift.
+      else
+        count &lt;= count+1; -- increment counter by 1.
+        shift_en &lt;= '0';  -- disable register shift.
+      end if;
+    end if;
+  end process;
+
+  process (nRST, CLK) begin
+    if nRST = '0' then
+      reg &lt;= (others =&gt; '0'); -- clear the shift register.
+    elsif rising_edge(CLK) then
+      if  shift_en='1' then -- register shifting is enabled.  
+        if reg = std_logic_vector( ALL_ONES ) then
+          -- clear the shift register.
+          reg &lt;= (others =&gt; '0'); 
+        else
+          -- shift left, insert '1' as LSB.
+          reg &lt;= reg(reg'left-1 downto 0) &amp; '1'; 
+        end if;
+        end if;
+    end if;
+  end process;
+
+end SYNTH;
+</code></pre>
+<p><img alt="" src="qt_prime-7.png" /></p>
+<p><img alt="" src="qt_prime-8.png" /></p>
+<p>เมื่อได้ทำขั้นตอนแปลงโค้ด <strong>VHDL</strong> ให้เป็นวงจรดิจิทัลโดยอัตโนมัติ (<strong>Synthesis</strong>) 
+ถัดไป จะต้องกำหนดและเลือกใช้ขาของชิป <strong>FPGA</strong> ระบุว่า 
+ขาใดจะใช้เป็นขาสัญญาณอินพุต-เอาต์พุตของวงจรบ้าง เช่น ขาใดจะเป็นขาอินพุตสำหรับสัญญาณ <strong>Clock</strong> ของวงจร เป็นต้น</p>
+<ul>
+<li>เรียกใช้งานโปรแกรม <strong>Pin Planner</strong> เพื่อกำหนดเลือกขาของชิป <strong>FPGA</strong> สำหรับขา <strong>I/O</strong> ของวงจร 
+(ได้แก่ขาสัญญาณชื่อ  <code>CLK</code>, <code>nRST</code>, <code>LEDS[7:0]</code>)
+เลือกหมายเลขขาของชิป <strong>FPGA</strong> สำหรับสัญญาณต่าง ๆ ของวงจรตามตัวอย่าง และใช้ระดับแรงดัน <strong>3.3V LVCMOS</strong>
+เมื่อกำหนดค่าต่าง ๆ แล้ว ให้ปิดหน้าต่าง <strong>Pin Planner</strong></li>
+<li>ทำขั้นตอน <strong>Start Compilation</strong> เพื่อทำขั้นตอนถัดไป และให้ได้ไฟล์เอาต์พุต <strong>Bitstream (.sof)</strong></li>
+</ul>
+<p>เมื่อได้ตั้งค่าต่าง ๆ สำหรับโปรเจกต์แล้ว เช่น การใช้งาน <strong>GPIO</strong> ของชิปแล้ว ก็สามารถดูรายการในไฟล์ <code>.qdf</code> ของโปรเจกต์
+(แสดงข้อความเป็นตัวอย่างบางส่วนของไฟล์ดังกล่าว)</p>
+<pre><code class="language-tcl">set_global_assignment -name FAMILY &quot;Cyclone IV E&quot;
+set_global_assignment -name DEVICE EP4CE6E22C8
+set_global_assignment -name TOP_LEVEL_ENTITY led_bargraph
+
+set_location_assignment PIN_86 -to nRST
+set_location_assignment PIN_73 -to LEDS[0]
+set_location_assignment PIN_74 -to LEDS[1]
+set_location_assignment PIN_75 -to LEDS[2]
+set_location_assignment PIN_76 -to LEDS[3]
+set_location_assignment PIN_77 -to LEDS[4]
+set_location_assignment PIN_83 -to LEDS[5]
+set_location_assignment PIN_84 -to LEDS[6]
+set_location_assignment PIN_85 -to LEDS[7]
+set_location_assignment PIN_23 -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to nRST
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to CLK
+</code></pre>
+<p><img alt="" src="qt_prime-9.png" /></p>
+<p><img alt="" src="qt_prime-10.png" /></p>
+<p>เมื่อทำขั้นตอนได้เสร็จสมบรูณ์แล้ว ถัดไปเป็นการโปรแกรมไฟล์บิตสตรีม <strong>.sof</strong> ไปยังบอร์ดทดลอง
+โดยใช้โปรแกรมที่มีชื่อว่า <strong>Programmer</strong> ซึ่งเป็นส่วนหนึ่งของ <strong>Intel Quartus Prime Lite</strong></p>
+<p>จากรูปจะเห็นได้ โปรแกรมสามารถมองเห็นอุปกรณ์ <strong>USB Blaster</strong> ที่เชื่อมต่อกับพอร์ต <strong>USB</strong> ของเครื่องผู้ใช้</p>
+<p><img alt="" src="qt_prime-14.png" /></p>
+<p><img alt="" src="qt_prime-15.png" /></p>
+<p>เมื่อกดปุ่ม <strong>Start</strong> เพื่ออัปโหลดไฟล์ไปยังชิป <strong>FPGA</strong> ได้สำเร็จ จะมองเห็นการเปลี่ยนแปลงของ <strong>LEDs</strong>
+ทั้ง 8 ดวง</p>
+<p><img alt="" src="cyc4_board-1.jpg" /></p>
+<p><img alt="" src="cyc4_board.jpg" /></p>
+<p>&nbsp;</p>
+<p>ถ้าจะลองดูว่า โค้ดตัวอย่างในภาษา <strong>VHDL</strong> ที่ใช้อธิบายการทำงานของวงจรดิจิทัล ถูกคอมไพล์และแปลงให้เป็นวงจรดิจิทัล
+ได้อย่างไร ก็สามารถดูได้จากผังวงจรซึ่งแสดงโครงสร้างในระดับ <strong>RTL (Register-Transfer Level)</strong> 
+โดยคลิกดูจากเมนูคำสั่ง <strong>Tools &gt; Netlist Viewer &gt; RTL Viewer</strong></p>
+<p><img alt="" src="qt_prime-11.png" /></p>
+<p>วงจรในระดับ <strong>RTL</strong> จะประกอบด้วยวงจรย่อยหรือบล็อก เช่น  ลอจิกเกตพื้นฐาน ฟลิปฟลอป (<strong>Flip-Flops</strong>)
+วงจรบวกหรือลบเชิงเลข วงจรเปรียบเทียบค่าเชิงเลข วงจรรีจิสเตอร์ 
+วงจรเลือกสัญญาณหรือมัลติเพล็กเซอร์ (<strong>Multiplexers</strong>) เป็นต้น</p>
+<p><img alt="" src="qt_prime-12.png" /></p>
+<p>หรือถ้าจะดูผังวงจรในเชิงโครงสร้าง (<strong>Structural View</strong>) 
+ที่มีการแปลงแล้วให้เป็นวงจรซึ่งประกอบด้วยองค์ประกอบพื้นฐาน (<strong>Logic Elements</strong>) ภายในชิป <strong>FPGA</strong>
+ก็ดูได้จาก <strong>Tools &gt; Netlist Viewer &gt; Post-Fitting Technology Map Viewer</strong></p>
+<p><img alt="" src="qt_prime-13.png" /></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="de0-nano">&#9655; <strong>การทดลองกับบอร์ด DE0-Nano</strong><a class="headerlink" href="#de0-nano" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่าง <strong>VHDL</strong> สามารถนำมาใช้กับบอร์ด <strong>Terasic DE0-Nano</strong> ได้
+แม้ว่าจะใช้ชิป <strong>Cyclone IV FPGA</strong> ในตระกูลเดียวกัน แต่ก็ใช้ชิปเบอร์  <strong>EP4CE22F17C6</strong>
+ที่แตกต่างไป นอกจากนั้น บอร์ด <strong>DE0-Nano</strong> มีวงจร <strong>LED</strong> อยู่ 8 ดวง สามารถใช้งานได้เช่นกัน
+(ทำงานแบบ <strong>Active-High</strong>) แต่จะต้องเลือกหมายเลขขา <strong>Pin Numbers</strong> ให้ถูกต้องด้วย 
+สัญญาณอินพุตสำหรับ <strong>Clock</strong> ก็มีวงจงสร้างสัญญาณ <strong>Clock</strong> ความถี่ <strong>50MHz</strong> เช่นกัน</p>
+<p><img alt="" src="de0_nano_board.jpg" /></p>
+<p>ตัวอย่าง (บางส่วน) สำหรับการตั้งค่าในไฟล์  <code>*.qsf</code> ของโปรเจกต์ เพื่อใช้วงจรตัวอย่างกับบอร์ด 
+<strong>DE0-Nano</strong> มีดังนี้</p>
+<pre><code class="language-tcl">set_global_assignment -name FAMILY &quot;Cyclone IV E&quot;
+set_global_assignment -name DEVICE EP4CE22F17C6
+set_global_assignment -name TOP_LEVEL_ENTITY led_bargraph
+
+set_location_assignment PIN_86 -to nRST
+set_location_assignment PIN_73 -to LEDS[0]
+set_location_assignment PIN_74 -to LEDS[1]
+set_location_assignment PIN_75 -to LEDS[2]
+set_location_assignment PIN_76 -to LEDS[3]
+set_location_assignment PIN_77 -to LEDS[4]
+set_location_assignment PIN_83 -to LEDS[5]
+set_location_assignment PIN_84 -to LEDS[6]
+set_location_assignment PIN_85 -to LEDS[7]
+set_location_assignment PIN_23 -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to nRST
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to CLK
+</code></pre>
+<p>เมื่อตั้งค่าได้ถูกต้องแล้ว ก็ทำขั้นตอน <strong>Start Compilation</strong> เพื่อให้ได้ไฟล์บิตสตรีม
+แล้วอัปโหลดไฟล์ดังกล่าวไปยังบอร์ด <strong>DE0-Nano</strong></p>
+<p><img alt="" src="qt_prime-20.png" /></p>
+<p><img alt="" src="qt_prime-21.png" /></p>
+<p><img alt="" src="qt_prime-22.png" /></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="verilog-hdl">&#9655; <strong>โค้ดตัวอย่าง Verilog HDL</strong><a class="headerlink" href="#verilog-hdl" title="Permanent link">#</a></h2>
+<p>ลองมาดูโค้ดตัวอย่างในภาษา <strong>Verilog HDL</strong> ที่ให้ผลการทำงานเหมือนโค้ดตัวอย่างในภาษา <strong>VHDL</strong>
+โดยให้สร้างไฟล์ <code>led_bargraph.v</code> เพื่อใช้แทนที่ไฟล์ <code>led_bargraph.vhd</code> 
+และกำหนดให้เป็น <strong>Top-level entity</strong> ของวงจร</p>
+<pre><code class="language-verilog">module led_bargraph 
+  #( parameter WIDTH = 8 )
+  (
+    input wire CLK,
+    input wire nRST,
+    output reg [WIDTH-1:0] LEDS
+  );
+
+  localparam COUNT_PERIOD = 10000000;
+
+  wire [WIDTH-1:0] ALL_ONES = (1 &lt;&lt; WIDTH) - 1;
+  reg [WIDTH-1:0] reg_data;
+  reg [31:0] count = 0;
+  reg shift_en;
+
+  always @(posedge CLK or negedge nRST) begin
+    if (nRST == 1'b0) begin
+      count &lt;= 0;       // reset the counter.
+      shift_en &lt;= 1'b0; // clear the shift enable (low).
+    end 
+    else begin
+      // check whether the counter reaches the max. value.
+      if (count == COUNT_PERIOD-1) begin
+        count    &lt;= 0;    // reset counter.
+        shift_en &lt;= 1'b1; // set shift enable (high).
+      end
+      else begin
+        count    &lt;= count + 1; // increment counter by 1.
+        shift_en &lt;= 1'b0; // clear the shift enable (low).
+      end
+    end
+  end
+
+  always @(posedge CLK or negedge nRST) begin
+    if (nRST == 1'b0) begin
+      reg_data &lt;= 0; // reset 8-bit register data.
+    end 
+    else begin
+      if (shift_en == 1'b1) begin // if shift enabled
+        // check whether all bits of the counter are 1's.
+        if (reg_data == ALL_ONES) begin
+          // reset 8-bit register data.
+          reg_data &lt;= 0; 
+        end
+        else begin
+          // shift the 8-bit register to left and
+          // append '1' to the right (LSB).
+          reg_data &lt;= {reg_data[WIDTH-2:0], 1'b1};
+        end
+      end
+    end
+  end
+
+  always @(reg_data) begin
+    // assign 8-bit register to LED outputs.
+    LEDS &lt;= ~reg_data; 
+  end
+
+endmodule
+</code></pre>
+<p><img alt="" src="qt_prime-23.png" /></p>
+<p>รูป: การคอมไพล์โค้ดภาษา <strong>Verilog HDL</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานซอฟต์แวร์ <strong>Intel FPGA Prime Lite</strong> เวอร์ชัน <strong>v22.1</strong>
+สำหรับระบบปฏิบัติการ  <strong>Windows 10 (64-bit)</strong>
+และนำมาทดลองใช้งานในเบื้องต้น เพื่อสาธิตการแปลงวงจรตัวอย่างที่เขียนโค้ดด้วยภาษา <strong>VHDL</strong> และ <strong>Verilog</strong>
+แล้วแปลงให้เป็นวงจรดิจิทัล นำไปสาธิตการทำงานโดยใช้บอร์ด <strong>FPGA Cyclone IV</strong>
+จำนวน 2 บอร์ด ที่มีความแตกต่างกัน</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2023-07-01 | Last Updated: 2023-07-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
