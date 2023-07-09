@@ -115,6 +115,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#tcl-script-intel-quartus-prime" class="nav-link">&#9655; การใช้งาน Tcl Script สำหรับ Intel Quartus Prime</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -550,6 +554,130 @@ endmodule
 </code></pre>
 <p><img alt="" src="qt_prime-23.png" /></p>
 <p>รูป: การคอมไพล์โค้ดภาษา <strong>Verilog HDL</strong></p>
+<hr />
+<h2 id="tcl-script-intel-quartus-prime">&#9655; <strong>การใช้งาน Tcl Script สำหรับ Intel Quartus Prime</strong><a class="headerlink" href="#tcl-script-intel-quartus-prime" title="Permanent link">#</a></h2>
+<p><strong>Tcl (Tool Command Language)</strong> อ่านออกเสียงว่า 
+<strong>“Tickle”</strong> เป็นภาษาประเภท <strong>Scripting Language</strong>
+ซอฟต์แวร์ประเภท <strong>EDA (Electronic Design Automation</strong> 
+ของบริษัทรายใหญ่ เช่น <strong>Cadence</strong> และ <strong>Synopsys</strong> ต่างก็รองรับการเขียนสคริปต์ด้วยภาษา <strong>Tcl</strong></p>
+<p>โปรแกรม <strong>Intel/Altera Quartus</strong>, <strong>Xilinx Vivado</strong> และ <strong>ModelSim</strong> 
+ก็ใช้ภาษา <strong>Tcl</strong> สำหรับรันสคริปต์ (<strong>Automatic Script Execution</strong>) 
+เพื่อทำคำสั่งไปตามขั้นตอนใน <strong>FPGA Design Flow</strong> (เปรียบเทียบได้กับการรันสคริปต์ด้วย <strong>Bash Shell</strong>)</p>
+<p>ถัดไปเป็นขั้นตอนและตัวอย่างการสร้างไฟล์ เพื่อเรียกใช้แบบ <strong>Command Line</strong> ผ่านทาง <strong>WSL-Ubuntu</strong>
+(ใช้กับ <strong>Windows 10</strong>) แต่ถ้าจะใช้กับ <strong>Linux Ubuntu</strong> ก็มีแนวทางเหมือนกัน</p>
+<p>ลองมาดูตัวอย่างไฟล์ <strong>.tcl</strong> (เช่น ตั้งชื่อว่า <code>proj_settings.tcl</code> และนำไปใช้กับคำสั่งชื่อ <code>quartus_sh</code>) 
+และจะใช้กับไฟล์ <code>"led_bargraph.vhd</code></p>
+<p>ไฟล์นี้มีการทำคำสั่งสำหรับการกำหนดค่าต่าง ๆ ให้โปรเจกต์ เช่น ระบุชื่อไฟล์ <strong>.vhd</strong> ที่ใช้เป็น 
+<strong>Top-level Entity</strong> ของดีไซน์ การเลือกชิปเป้าหมาย (<strong>Target Device</strong>) 
+การเลือกขาของชิป <strong>FPGA</strong> ที่จะใช้งานบนบอร์ดทดลอง (ขึ้นอยู่กับบอร์ดที่ใช้และแตกต่างกันไป) 
+สำหรับขาสัญญาณ <strong>I/O</strong> ของวงจร (เช่น <code>CLK</code>, <code>nRST</code>, <code>LEDS</code>) 
+และแรงดันลอจิกสำหรับขา <strong>I/O</strong> (เช่น โดยทั่วไป ก็เลือกเป็น <strong>3.3V LVTTL</strong> หรือ <strong>LVCMOS</strong>) เป็นต้น</p>
+<pre><code class="language-tcl"># File: proj_settings.tcl
+# Load Quartus Prime Tcl Project package
+package require ::quartus::project
+package require ::quartus::flow
+set make_assignments 1
+
+## Set the project name
+set project_name  &quot;led_bargraph_proj&quot;
+## Set the top-level entity name
+set toplevel_name &quot;led_bargraph&quot;
+## Set the device family name
+set device_family_name &quot;Cyclone IV E&quot;
+## Set the device name
+set device_name &quot;EP4CE6E22C8&quot;
+
+set rev_name $toplevel_name 
+
+if {[project_exists $project_name]} {
+  puts &quot;Open the design project....&quot;
+  project_open -revision $rev_name $project_name
+} else {
+  puts &quot;Create a new design project....&quot;
+  project_new -revision $rev_name $project_name -overwrite
+}
+set design_rev [get_current_revision]
+puts &quot;Revision: '$rev_name'&quot;
+# Make assignments
+if {$make_assignments} {
+  puts &quot;Make assignments...&quot;
+  set_global_assignment -name FAMILY $device_family_name
+  set_global_assignment -name DEVICE $device_name
+  set_global_assignment -name VHDL_FILE $toplevel_name.vhd
+  set_global_assignment -name TOP_LEVEL_ENTITY $toplevel_name
+  set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+  set_location_assignment PIN_86 -to nRST
+  set_location_assignment PIN_73 -to LEDS[0]
+  set_location_assignment PIN_74 -to LEDS[1]
+  set_location_assignment PIN_75 -to LEDS[2]
+  set_location_assignment PIN_76 -to LEDS[3]
+  set_location_assignment PIN_77 -to LEDS[4]
+  set_location_assignment PIN_83 -to LEDS[5]
+  set_location_assignment PIN_84 -to LEDS[6]
+  set_location_assignment PIN_85 -to LEDS[7]
+  set_location_assignment PIN_23 -to CLK
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[7]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[6]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[5]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[4]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[3]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[2]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[1]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS[0]
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to LEDS
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to nRST
+  set_instance_assignment -name IO_STANDARD &quot;3.3-V LVCMOS&quot; -to CLK
+  # Commit assignments
+  export_assignments
+}
+puts &quot;Project settings done...&quot;
+# compile the project (execute all tasks of the design flow)
+execute_flow -compile
+# close the project
+project_close
+</code></pre>
+<p>เปิด <strong>Terminal</strong> ใน <strong>WSL-Ubuntu</strong> แล้วทำคำสั่งดังนี้ </p>
+<pre><code class="language-bash"># Set quartus path
+$ export QUARTUS_PATH=/mnt/c/IntelAltera/QuartusPrimeLite/v22.1/quartus
+
+# Set path to the quartus_sh program
+$ export QUARTUS_SH=$QUARTUS_PATH/bin64/quartus_sh.exe
+
+# Show the version of the quartus_sh program
+$ $QUARTUS_SH --version
+
+Quartus Prime Shell
+Version 22.1std.1 Build 917 02/14/2023 SC Lite Edition
+Copyright (C) 2023  Intel Corporation. All rights reserved.
+</code></pre>
+<p>ข้อสังเกต:  ถ้าผู้ใช้ได้ติดตั้งโปรแกรม <strong>Quartus</strong> ไว้ในไดเรกทอรีที่แตกต่างไปจากตัวอย่าง 
+ก็จะต้องระบุ <strong>PATH</strong> ให้ถูกต้องด้วย</p>
+<p>ทำคำสั่งเพื่อทำขั้นตอนต่าง ๆ ใน <strong>FPGA Design Flow</strong></p>
+<pre><code class="language-bash">$ $QUARTUS_SH -t ./proj_settings.tcl
+</code></pre>
+<p><img alt="" src="quartus_sh-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตเมื่อเริ่มทำคำสั่ง</p>
+<p><img alt="" src="quartus_sh-2.png" /></p>
+<p>รูป: แสดงรายการไฟล์ (บางส่วน) เมื่อได้ทำคำสั่งได้สำเร็จแล้ว</p>
+<p>การทำคำสั่งต่าง ๆ ในไฟล์ <code>.tcl</code> ตามตัวอย่างเป็นการทำขั้นตอนเดียวจนได้ไฟล์เอาต์พุต 
+แต่ถ้าต้องการทำคำสั่งทีละขั้นตอนหลักของ <strong>Quartus FPGA Design Flow</strong> ก็มีคำสั่งเช่น</p>
+<ul>
+<li><code>quartus_map</code>: ขั้นตอนคอมไพล์โค้ด การสังเคราะห์วงจรและนำไปใช้กับทรัพยากรภายในชิป <strong>FPGA</strong></li>
+<li><code>quartus_fit</code>: ขั้นตอน <strong>FPGA placement &amp; routing</strong></li>
+<li><code>quartus_asm</code>: ขั้นตอนการสร้างไฟล์เอาต์พุต <strong>Bitstream</strong></li>
+<li><code>quartus_sta</code>: ขั้นตอนการวิเคราะห์การทำงานของวงจรเชิงเวลา (<strong>Static Timing Analysis</strong>)
+ เช่น การหาค่า <strong>Setup &amp; Hold Time</strong> ของ <strong>D-type Flip-Flops</strong>
+สำหรับเส้นทางสัญญาณภายใน การคำนวณค่าความถี่สูงสุด (<strong>Max. Clock Frequency</strong>) ของวงจรที่ได้ เป็นต้น</li>
+</ul>
+<p>เมื่อคอมไพล์โปรเจกต์ได้สำเร็จแล้ว ก็สามารถใช้โปรแกรม <strong>Quartus Programmer</strong> 
+(ใช้คำสั่ง <code>quartus_pgm.exe</code>) เขียนไฟล์ที่ได้เป็นเอาต์พุต <code>.sof</code> ไปยังบอร์ด <strong>FPGA</strong> ได้</p>
+<pre><code class="language-bash">$ $QUARTUS_PATH/bin64/quartus_pgm.exe \
+  -z --mode=JTAG --operation=&quot;p;output_files/led_bargraph.sof@1&quot;
+</code></pre>
+<p><img alt="" src="quartus_sh-3.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตเมื่อได้ทำคำสั่ง <code>quartus_pgm.exe</code> โดยระบุชื่อไฟล์ <code>.sof</code>
+ซึ่งเป็นไฟล์บิตสตรีม และโปรแกรมไปยังชิป <strong>FPGA</strong> ในตำแหน่งแรก (<code>@1</code>) ของ <strong>JTAG Chain</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -561,7 +689,7 @@ endmodule
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2023-07-01 | Last Updated: 2023-07-04</p></div>
+<p>Created: 2023-07-01 | Last Updated: 2023-07-09</p></div>
             </div>
         </div>
 
