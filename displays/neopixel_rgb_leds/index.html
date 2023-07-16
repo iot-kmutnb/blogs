@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/displays/neopixel_rgb_leds/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูล WS2812 RGB LED (NeoPixel) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#ws2812-rgb-led-neopixel" class="nav-link">การใช้งานโมดูล WS2812 RGB LED (NeoPixel)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#ws2812-rgb-led" class="nav-link">&#9655; โมดูล WS2812 RGB LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ws2812-programming" class="nav-link">&#9655; WS2812 Programming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adafruit_neopixel-esp32" class="nav-link">&#9655; โค้ดสาธิตการใช้ไลบรารี Adafruit_NeoPixel สำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi" class="nav-link">&#9655; การส่งข้อมูลบิตโดยใช้บัส SPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-rmt" class="nav-link">&#9655; การเขียนโปรแกรม ESP32 โดยใช้วงจร RMT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-rp2040-pio" class="nav-link">&#9655; การเขียนโปรแกรม Arduino RP2040 โดยใช้วงจร PIO</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="ws2812-rgb-led-neopixel">การใช้งานโมดูล WS2812 RGB LED (NeoPixel)<a class="headerlink" href="#ws2812-rgb-led-neopixel" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="ws2812-rgb-led">&#9655; <strong>โมดูล WS2812 RGB LED</strong><a class="headerlink" href="#ws2812-rgb-led" title="Permanent link">#</a></h2>
+<p><strong>WS2812</strong> เป็นวงจรวม (<strong>IC</strong>) ที่ภายในมีวงจรควบคุมการให้แสงของ <strong>LED</strong> แบบ 3 สี 
+(<strong>RGB LED + driver</strong>) มีโมเดลที่แตกต่างกันให้เลือกใช้ เช่น <strong>WS2812S</strong>, <strong>WS2812B</strong> และ <strong>WS2812C</strong>
+และใช้ตัวถังของไอซีที่มักพบเห็นได้โดยทั่วไป เป็นแบบ <strong>SMD 5050</strong> </p>
+<p>จุดเด่นของไอซี <strong>RGB LED</strong> ประเภทนี้ คือ  การใช้สายสัญญาณเพียงเส้นเดียวในการส่งข้อมูลเข้าไปข้างใน 
+เพื่อกำหนดค่าสี <strong>(R,G,B)</strong> แต่ละสีใช้ข้อมูลจำนวน 8 บิต รวม 24 บิต (หรือ 3 ไบต์) ต่อหนึ่งตำแหน่ง 
+หรือจะเรียกว่า "พิกเซล" (<strong>Pixel</strong>) ก็ได้ และส่งต่อข้อมูลออกไปยังไอซีในตำแหน่งถัดไปได้</p>
+<p>ข้อสังเกต: </p>
+<ul>
+<li><strong>WS2812</strong> ใช้ตัวถังแบบ <strong>SMD</strong> มี <strong>2x3</strong> ขา ใช้แรงดันไฟเลี้ยง <strong>+4.5V ~ +5.5V</strong></li>
+<li><strong>WS2812B</strong> ใช้ตัวถังแบบ <strong>SMD</strong> มี <strong>2x2</strong> ขา ใช้แรงดันไฟเลี้ยง <strong>+3.5V ~ +5.3V</strong></li>
+</ul>
+<p><img alt="" src="ws2812_vs_ws2812b.png" /></p>
+<p>รูป: แสดงความแตกต่างของ <a href="world_semi_ws2812_datasheet.pdf"><strong>WS2812</strong></a> 
+และ <a href="world_semi_ws2812b_datasheet.pdf"><strong>WS2812B</strong></a> </p>
+<p>โดยปรกติแล้ว โมดูล <strong>WS2812</strong> มีไอซี <strong>RGB LED</strong> ที่ถูกจัดเรียงต่อกันไว้มากกว่าหนึ่งดวง
+เช่น เรียงกันเป็นเส้นตรง (<strong>LED Bar</strong>) วงกลม (<strong>LED Ring</strong>) หรือ เมทริกซ์
+(<strong>LED Matrix</strong>) เป็นต้น ผู้ใช้สามารถโปรแกรมค่าสีของ <strong>RGB LED</strong> แต่ละดวงได้แตกต่างกัน</p>
+<p><img alt="" src="ws2812_modules.png" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>WS2812 / WS2812B</strong> ที่มีจำนวนพิกเซลและการจัดวางที่แตกต่างกัน</p>
+<p><img alt="" src="ws2812b_breakout_single.png" /></p>
+<p>รูป: โมดูล <strong>WS2812B Breakout</strong> แบบหนึ่งพิกเซล (ผู้ใช้จะต้องบัดกรีสายไฟหรือขาของคอนเนกเตอร์ก่อนใช้งาน) </p>
+<p><strong>"NeoPixel"</strong> เป็นสินค้าหรือแบรนด์ของบริษัท <strong>Adafruit (USA)</strong>
+สำหรับโมดูล <strong>RGB LED</strong> และมีการเลือกใช้ไอซีที่แตกต่างกันไป เช่น <strong>WS2812/WS2812B</strong>, 
+<strong>WS2811</strong> และ <strong>SK6812</strong> </p>
+<p>บริษัท <strong>Adafruit</strong> ก็ได้พัฒนาไลบรารีสำหรับ <strong>Arduino</strong> 
+ชื่อ <a href="https://github.com/adafruit/Adafruit_NeoPixel"><code>Adafruit_NeoPixel</code></a>
+ให้เป็น <strong>Open Source</strong> และนำไปใช้กับไมโครคอนโทรลเลอร์ได้หลายรุ่นที่เขียนโปรแกรมได้ด้วย 
+<strong>Arduino API</strong> เช่น ชิป <strong>ATmega328P / ATmega32u4</strong>, <strong>ATSAMD21</strong>
+<strong>RP2040</strong> และ <strong>ESP32</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ws2812-programming">&#9655; <strong>WS2812 Programming</strong><a class="headerlink" href="#ws2812-programming" title="Permanent link">#</a></h2>
+<p>การกำหนดค่าสีของ <strong>RGB LED</strong> จะต้องใช้ข้อมูลจำนวน 3 ไบต์ (หรือ 24 บิต) ต่อหนึ่งดวง (หนึ่งพิกเซล)
+ค่า 0 คือ ระดับความสว่างต่ำสุดและ 255 คือ ระดับความสว่างสูงสุดของแต่ละสี</p>
+<p>โมดูล <strong>WS2812</strong> ใช้สัญญาณข้อมูลเพียงเส้นเดียว ในการส่งข้อมูลจากไมโครคอนโทรลเลอร์ไปยังขา 
+<strong>DIN</strong> ของโมดูลดังกล่าว การส่งข้อมูลเป็นส่งข้อมูลแบบทีละบิตตามลำดับ (<strong>Bit Serial</strong>)
+ถ้าใช้ <strong>WS2812</strong> จำนวนหลายตำแหน่ง ข้อมูลบิตจะถูกส่งเข้ามาที่ขา <strong>DIN</strong> 
+และสามารถส่งต่อไปยังตำแหน่งถัดไปที่ขา <strong>DOUT</strong> ในลักษณะ <strong>Daisy Chain (Cascading)</strong></p>
+<p>จำนวนบิตสำหรับค่าสี <strong>RGB</strong> ของ <strong>LED</strong> หนึ่งดวงหรือหนึ่งตำแหน่ง จะเท่ากับ 24 บิต 
+ดังนั้นถ้ามีจำนวน <strong>N</strong> ตำแหน่ง ก็จะต้องใช้ข้อมูล <strong>N &centerdot; 24</strong> บิต 
+หรือ <strong>N &centerdot; 3</strong> ไบต์</p>
+<p>ข้อมูลที่ถูกส่งออกไป ไบต์ที่ 0,1,2 จะใช้สำหรับพิกเซลของไอซีตำแหน่งแรก ไบต์ที่ 3,4,5 จะใช้สำหรับตำแหน่งที่สอง 
+เป็นอย่างนี้ไปตามลำดับจนครบทุกตำแหน่ง</p>
+<p><strong>คำถาม:</strong> ถ้าใช้สายสัญญาณข้อมูลเพียงหนึ่งเส้น แล้วส่งข้อมูลจากไมโครคอนโทรลเลอร์ไปทีละบิต 
+แล้วฝ่ายรับซึ่งเป็นโมดูล <strong>WS2812</strong> จะทราบได้อย่างไรว่า ข้อมูลแต่ละบิตนั้นเป็น 0 หรือ 1 
+แล้วมีขอบเขตของสัญญาณบิตแต่ละบิตอย่างไร ?</p>
+<p>บริษัท <strong>WorldSemi</strong> หนึ่งในบริษัทที่ผลิตไอซี <strong>WS2812B</strong> 
+ได้กำหนดวิธีการส่งข้อมูลหรือโพรโทคอลเอาไว้แล้ว ซึ่งจะต้องเป็นไปตามนั้น มิเช่นนั้น 
+การรับข้อมูลอาจไม่ถูกต้อง หรือไม่ได้รับข้อมูลใด ๆ</p>
+<p>อ้างอิงตามเอกสาร 
+<a href="world_semi_ws2812_datasheet.pdf"><strong>WS2812 Datasheet</strong></a>
+และ 
+<a href="world_semi_ws2812b_datasheet.pdf"><strong>WS2812B Datasheet</strong></a> 
+การจำแนกข้อมูลบิตแต่ละบิต จะใช้ความกว้างของสัญญาณพัลส์ (<strong>Pulse</strong>) เป็นตัวกำหนด (หน่วยเป็นไมโครวินาที) ดังนี้</p>
+<p><img alt="" src="ws2812b_timing.png" /></p>
+<p>รูป: <strong>WS2812B Bit Timing Parameters</strong></p>
+<p>หากพิจารณาสัญญาณข้อมูลบิต จะเริ่มต้นด้วยช่วงที่เป็น <strong>High</strong> ตามด้วย <strong>Low</strong>
+บิตที่มีค่าเป็น 1 จะมีช่วง <strong>High</strong> กว้างกว่าช่วง <strong>Low</strong>
+ในขณะที่บิตที่มีค่าเป็น 0 จะมีช่วง <strong>High</strong> แคบกว่าช่วง <strong>Low</strong></p>
+<ul>
+<li><strong>T1H</strong>: ช่วงที่แรงดันไฟฟ้าเป็น <strong>High</strong> สำหรับบิตที่มีค่าเป็น 1</li>
+<li><strong>T1L</strong>: ช่วงที่แรงดันไฟฟ้าเป็น <strong>Low</strong>  สำหรับบิตที่มีค่าเป็น 1</li>
+<li><strong>T0H</strong>: ช่วงที่แรงดันไฟฟ้าเป็น <strong>High</strong> สำหรับบิตที่มีค่าเป็น 0</li>
+<li><strong>T0L</strong>: ช่วงที่แรงดันไฟฟ้าเป็น <strong>Low</strong> สำหรับบิตที่มีค่าเป็น 0</li>
+<li><strong>Reset</strong>: ชช่วงที่แรงดันไฟฟ้าเป็น <strong>Low</strong> เพื่อจบการส่งข้อมูล</li>
+<li><strong>TH+TL</strong>: ความกว้างของสัญญาณสำหรับหนึ่งบิต</li>
+</ul>
+<p><strong>WS2812 Bit Timing Parameters</strong></p>
+<ul>
+<li><strong>T0H</strong>: 0.40us = 400ns +/- 150ns</li>
+<li><strong>T0L</strong>: 0.85us = 850ns +/- 150ns</li>
+<li><strong>T1H</strong>: 0.80us = 800ns +/- 150ns</li>
+<li><strong>T1L</strong>: 0.45us = 450ns +/- 150ns</li>
+<li><strong>TH+TL</strong>: 1.25us +/- 600ns</li>
+<li><strong>Reset</strong>: &gt;= 50us</li>
+</ul>
+<p><strong>WS2812B Bit Timing Parameters</strong></p>
+<ul>
+<li><strong>T0H</strong>: 0.35us = 350ns +/- 150ns</li>
+<li><strong>T0L</strong>: 0.90us = 900ns +/- 150ns</li>
+<li><strong>T1H</strong>: 0.90us = 900ns +/- 150ns</li>
+<li><strong>T1L</strong>: 0.35us = 350ns +/- 150ns</li>
+<li><strong>TH+TL</strong>: 1.25us +/- 600ns</li>
+<li><strong>Reset</strong>: &gt;= 50us</li>
+</ul>
+<p>ถ้ากำหนดให้ <strong>TH+TL = 1.25us</strong> ซึ่งเป็นความกว้างของสัญญาณสำหรับหนึ่งบิต
+ดังนั้นก็สามารถคำนวณค่าความถี่ได้ประมาณ <strong>1e6/1.25 = 800kHz</strong></p>
+<p>ลำดับของบิตในแต่ละไบต์ จะเป็นแบบ <strong>MSB First</strong> และลำดับข้อมูลไบต์ที่จะถูกส่งออกไป เป็นแบบ 
+<strong>GRB Format</strong> สำหรับ <strong>WS2812B</strong> คือ 
+ไบต์แรกสำหรับสีเขียว (<strong>G: Green</strong>)
+ไบต์ที่สองสำหรับสีแดง (<strong>R: Red</strong>)
+และไบต์ที่สามสำหรับสีเขียว (<strong>B: Blue</strong>) เพื่อใช้กับพิกเซลในตำแหน่งแรก</p>
+<p>การส่งข้อมูลทีละบิตออกไปด้วยการเขียนโปรแกรมไมโครคอนโทรเลอร์ สามารถทำได้หลายวิธี เช่น</p>
+<ul>
+<li>การใช้ขา <strong>GPIO</strong> เพื่อส่งข้อมูลบิตออกไปตามลำดับ แต่จะต้องควบคุมระยะเวลาของบิตให้ถูกต้อง</li>
+<li>การใช้ <strong>SPI</strong> ซึ่งเป็นวงจรภายในไมโครคอนโทรลเลอร์ และโปรแกรมให้ทำงานในโหมด <strong>SPI Master</strong>
+เพื่อเลื่อนบิตข้อมูลออกไปทางขา <strong>SPI MOSI</strong> โดยจะต้องกำหนดค่าบิตของ <strong>SPI Data Frame</strong>
+ให้เหมาะสมเพื่อสร้างพัลส์ช่วง <strong>High</strong> และ <strong>Low</strong> สำหรับแต่ละบิต</li>
+<li>การใช้วงจร <strong>RMT (Remote Control Transceiver )</strong> ในกรณีที่ใช้ไมโครคอนโทรลเลอร์ <strong>Espressif ESP32</strong> </li>
+<li>การใช้วงจร <strong>PIO (Programmable I/O)</strong> ในกรณีที่ใช้ไมโครคอนโทรลเลอร์ <strong>Raspberry Pi RP2040</strong> </li>
+</ul>
+<p>ข้อสังเกต: ถ้าศึกษา <strong>Source Code</strong> ของไลบรารี 
+<a href="https://github.com/adafruit/Adafruit_NeoPixel/"><code>Adafruit_NeoPixel</code></a> ก็จะเห็นได้ว่า
+มีการใช้เทคนิคหรือวิธีการที่แตกต่างกันไปขึ้นอยู่กับไมโครคอนโทรลเลอร์ที่ได้เลือกใช้งาน
+เช่น ไฟล์ <a href="https://github.com/adafruit/Adafruit_NeoPixel/blob/master/esp.c"><code>Adafruit_NeoPixel/esp.c</code></a> สำหรับ <strong>ESP32</strong>
+และ  <a href="https://github.com/adafruit/Adafruit_NeoPixel/blob/master/rp2040_pio.h"><code>Adafruit_NeoPixel/rp2040_pio.h</code></a> สำหรับ <strong>RP2040</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adafruit_neopixel-esp32">&#9655; <strong>โค้ดสาธิตการใช้ไลบรารี Adafruit_NeoPixel สำหรับ ESP32</strong><a class="headerlink" href="#adafruit_neopixel-esp32" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> โดยใช้ไลบรารี <code>Adafruit_NeoPixel</code>
+ซึ่งถือว่าเป็นวิธีการที่สะดวกและง่ายที่สุด และผู้ใช้จะต้องติดตั้งไลบรารีดังกล่าวสำหรับ <strong>Arduino IDE</strong> ก่อนใช้งาน</p>
+<p>โค้ดตัวอย่างนี้จะใช้สำหรับ <strong>Arduino-ESP32</strong> และสาธิตการเขียนโค้ดสำหรับ <strong>ESP32</strong>
+เพื่อกำหนดสีของ <strong>WS2812</strong> จำนวน 8 พิกเซล
+และเลือกใช้ขา <strong>GPIO18</strong> ของ <strong>ESP32</strong> เพื่อเชื่อมต่อกับขา <strong>DIN</strong> ของโมดูล <strong>WS2812</strong></p>
+<p>ค่าสีขนาด 24 บิต (<strong>GRB Format</strong>) จะถูกเลือกมาจากอาร์เรย์ชื่อ
+<code>COLOR_DATA_ARRAY[...]</code> และส่งไปยังโมดูล <strong>WS2812</strong> และเว้นระยะเวลา 0.5 วินาที
+ก่อนเลือกค่าตัวเลขสำหรับ <strong>GRB</strong> ในลำดับถัดไปจากอาร์เรย์ </p>
+<pre><code class="language-c++">// Note: Don't forget to install the Adafruit NeoPixel library.
+// see: https://github.com/adafruit/Adafruit_NeoPixel
+#include &lt;Adafruit_NeoPixel.h&gt; 
+
+const uint32_t COLOR_DATA_ARRAY[] = {
+   0x00FF00, // Starting with the Red color
+   0xFF0000,
+   0x0000FF,
+   0x00FFFF,
+   0xFFFF00,
+   0xFF00FF,
+   0x8F8F8F,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000
+};
+
+#define NUM_PIXELS  (8)           // The number of pixels
+#define WS2812_PIN  (GPIO_NUM_18) // The ESP32 pin for DATA output
+
+// Create an object from the 'Adafruit_NeoPixel' class 
+Adafruit_NeoPixel pixels(NUM_PIXELS, WS2812_PIN, NEO_RGB + NEO_KHZ800);
+
+void setup() {
+  pixels.begin(); // Initialize the NeoPixel WS2812 strip.
+  pixels.setBrightness(255); // Set the brightness to 255.
+}
+
+void loop() {
+  static uint32_t NUM_COLORS  = sizeof(COLOR_DATA_ARRAY)/sizeof(uint32_t);
+  static uint32_t start_index = NUM_COLORS/2 - 1;
+
+  // Set the color for each pixel.
+  for ( uint16_t i=0; i &lt; NUM_PIXELS; i++ ) {
+    // Get the color value from the array.
+    uint32_t color = COLOR_DATA_ARRAY[ (start_index + i) % NUM_COLORS ];
+    // Set the color value of the i-th pixel.
+    pixels.setPixelColor( i, color );
+  }
+  // Update the pixels.
+  pixels.show(); 
+
+  // Increment the start index by 1.
+  start_index = (start_index+1) % NUM_COLORS;
+  delay(500);
+}
+</code></pre>
+<p>ข้อสังเกต: โค้ดนี้ได้เจาะจงใช้ขา <strong>GPIO18</strong> ของ <strong>ESP32</strong> (<code>WS2812_PIN</code>) 
+แต่ก็สามารถนำไปใช้ได้กับบอร์ด <strong>Raspberry Pico (RP2040)</strong> และแก้ไขโค้ดเล็กน้อย
+โดยกำหนดชื่อขา <strong>GPIO</strong> ที่ต้องการจะใช้สำหรับบอร์ด <strong>Pico</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi">&#9655; <strong>การส่งข้อมูลบิตโดยใช้บัส SPI</strong><a class="headerlink" href="#spi" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไปสาธิตการเขียนโปรแกรม <strong>Arduino-ESP32</strong> โดยใช้วงจร <strong>VSPI</strong> ของ <strong>ESP32</strong>
+ตั้งค่าให้ทำงานโหมด <strong>SPI Master</strong> เพื่อส่งข้อมูลบิตสำหรับค่าสีสำหรับ <strong>WS2812</strong> จำนวน 8 พิกเซล
+ข้อมูลบิตนี้จะถูกส่งออกที่ขา <strong>GPIO23</strong> ซึ่งตรงกับขา <strong>SPI MOSI</strong> ของวงจร <strong>VSPI</strong> </p>
+<p>การส่งข้อมูลบิตสำหรับกำหนดค่าสีให้ <strong>WS2812</strong> จะใช้รูปแบบการส่งข้อมูลด้วยบัส <strong>SPI</strong>
+ข้อมูลหนึ่งไบต์ของ <strong>SPI Data</strong> จะใช้สำหรับหนึ่งบิตข้อมูลของ <strong>WS2812</strong></p>
+<p>ในตัวอย่างนี้ได้กำหนดให้ <strong>SPI</strong> มีความถี่ประมาณ <strong>6.4MHz</strong> หรือ หนึ่งไซเคิลของ <strong>SPI Clock (SCK)</strong>
+จะใช้เวลาเท่ากับ <strong>156.25 ns</strong> และ 8 ไซเคิล จะใช้เวลา <strong>1250 ns</strong></p>
+<p>ค่าของแต่ละบิตในการกำหนดค่าสี ซึ่งมี 2 กรณี คือ </p>
+<ul>
+<li>บิตมีค่าเป็น <strong>1</strong>: ให้ส่งข้อมูลไบต์ <code>0b11111000</code> (ช่วง <strong>High</strong> มีความกว้าง "มากกว่า" ช่วง <strong>Low</strong>)<ul>
+<li><strong>T1H: (5/8) x 1250 ns = 781.25 ns</strong></li>
+<li><strong>T1L: (3/8) x 1250 ns = 468.75 ns</strong></li>
+</ul>
+</li>
+<li>บิตมีค่าเป็น <strong>0</strong>: ให้ส่งข้อมูลไบต์ <code>0b11100000</code> (ช่วง <strong>High</strong> มีความกว้าง "น้อยกว่า" ช่วง <strong>Low</strong>)<ul>
+<li><strong>T0H: (3/8) x 1250 ns = 468.75 ns</strong></li>
+<li><strong>T0L: (5/8) x 1250 ns = 781.25 ns</strong></li>
+</ul>
+</li>
+</ul>
+<p>หนึ่งพิกเซลมีจำนวนข้อมูลเท่ากับ 24 บิต ดังนั้นจะต้องสร้างข้อมูลสำหรับ <strong>SPI Data</strong> จำนวน 24 ไบต์ 
+ถ้ามี 8 พิกเซล ก็จะต้องส่งข้อมูลจำนวน <strong>8 x 24 = 192</strong> ไบต์</p>
+<pre><code class="language-c++">#include &quot;SPI.h&quot;
+
+const uint32_t COLOR_DATA_ARRAY[] = {
+   0x00FF00, // Starting with the Red color
+   0xFF0000,
+   0x0000FF,
+   0x00FFFF,
+   0xFFFF00,
+   0xFF00FF,
+   0x8F8F8F,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000
+};
+
+#define SPI_SPEED  (6400000) // SPI clock frequency (6.4MHz)
+#define VSPI_MOSI  (23)  // connected to the WS2812 module's DIN pin 
+#define VSPI_MISO  (19)  // not used
+#define VSPI_SCK   (18)  // not used
+#define VSPI_CS    (5)   // not used
+
+SPIClass spidev(VSPI); // VSPI is SPI3.
+
+#define NUM_PIXELS      (8)    // Number of WS2812 pixels
+#define BITS_PER_PIXEL  (24)   // Number of bits per pixel
+#define BUFSIZE         (NUM_PIXELS * BITS_PER_PIXEL)
+uint8_t wdata[ BUFSIZE ];     // Write data buffer
+
+void setPixelColor( uint32_t index, uint32_t color ) {
+  if (0 &lt;= index &amp;&amp; index &lt; NUM_PIXELS) {
+    uint32_t bits = color;
+    uint32_t mask = 1 &lt;&lt; (BITS_PER_PIXEL-1);
+    // Convert the 24-bit color value into an array of RMT items.
+    for (uint32_t b=0; b &lt; BITS_PER_PIXEL; b++) {
+      wdata[(index * BITS_PER_PIXEL) + b]
+             = (bits &amp; mask) ? 0b11111000 : 0b11100000;
+      mask &gt;&gt;= 1;
+    }
+  }
+}
+
+void showPixels() {
+  spidev.transferBytes( wdata, NULL, BUFSIZE );
+}
+
+void setup() {
+  spidev.begin(VSPI_SCK, VSPI_MISO, VSPI_MOSI, VSPI_CS);
+  // Don't use the hardware SPI chip select pin
+  spidev.setHwCs(false);
+  // Set the SPI bit order to MSB first
+  spidev.setBitOrder(MSBFIRST);
+  // Set the SPI data mode to mode 0
+  spidev.setDataMode(SPI_MODE0);
+  // Set the SPI clock frequency
+  spidev.setFrequency(SPI_SPEED);   
+}
+
+void loop() {
+  static uint32_t NUM_COLORS  = sizeof(COLOR_DATA_ARRAY)/sizeof(uint32_t);
+  static uint32_t start_index = NUM_COLORS/2 - 1;
+
+  // Set the color for each pixel.
+  for ( uint32_t i=0; i &lt; NUM_PIXELS; i++ ) {
+    // Get the color value from the array.
+    uint32_t color = COLOR_DATA_ARRAY[ (start_index + i) % NUM_COLORS ];
+    // Set the color value of the i-th pixel.
+    setPixelColor( i, color );
+  }
+  // Update the pixels.
+  showPixels();
+
+  // Increment the start index by 1.
+  start_index = (start_index+1) % NUM_COLORS;
+  delay(500);
+}
+</code></pre>
+<p>ถัดไปเป็นตัวอย่างการวัดสัญญาณเอาต์พุตโดยใช้อุปกรณ์จริง
+ทำการวัดและบันทึกด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> และแสดงผลด้วยซอฟต์แวร์ <strong>PulseView</strong></p>
+<p><img alt="" src="spi_24bits_waveform.png" /></p>
+<p>รูป: สัญญาณ <strong>DATA (DIN)</strong> จากขา <strong>SPI MOSI / GPIO23</strong> ของ <strong>ESP32</strong>
+(ทดลองส่งข้อมูลเพียง 24 บิต สำหรับหนึ่งพิกเซล)</p>
+<p><img alt="" src="spi_t1h_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วง <strong>High</strong> สำหรับบิตที่มีค่าเป็น <strong>1</strong> (วัดได้ประมาณ <strong>813ns</strong>)</p>
+<p><img alt="" src="spi_t1l_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วง <strong>Low</strong> สำหรับบิตที่มีค่าเป็น <strong>1</strong> (วัดได้ประมาณ <strong>439ns</strong>)</p>
+<p><img alt="" src="spi_t0h_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วง <strong>High</strong> สำหรับบิตที่มีค่าเป็น <strong>0</strong> (วัดได้ประมาณ <strong>498ns</strong>)</p>
+<p><img alt="" src="spi_t0l_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วง <strong>Low</strong> สำหรับบิตที่มีค่าเป็น <strong>0</strong> (วัดได้ประมาณ <strong>813ns</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-rmt">&#9655; <strong>การเขียนโปรแกรม ESP32 โดยใช้วงจร RMT</strong><a class="headerlink" href="#esp32-rmt" title="Permanent link">#</a></h2>
+<p>อีกตัวอย่างหนึ่งเป็นโค้ดสาธิตการใช้วงจร <strong>RMT</strong> ของ <strong>ESP32</strong> เพื่อส่งข้อมูลบิตไปยังโมดูล
+<strong>WS2812</strong> จำนวน 8 พิกเซล เลือกใช้ขา <strong>GPIO18</strong> เป็นขาเอาต์พุต</p>
+<p><strong>RMT</strong> เป็นวงจรภายในของชิป <strong>ESP32</strong> โดยทั่วไป จะใช้สำหรับสร้างสัญญาณพัลส์แบบ <strong>Pulse Train</strong>
+เช่น การสร้างสัญญาณควบคุมสำหรับโมดูล <strong>WS2812 RGB LEDs</strong> เป็นต้น
+วงจร <strong>RMT</strong> มีช่องสัญญาณเอาต์พุตให้เลือกใช้ 8 ช่อง ในตัวอย่างนี้ได้เลือกใช้ช่องส่งข้อมูลออกหมายเลข 0 
+(<code>RMT_CHANNEL_0</code>) </p>
+<p>วงจร <strong>RMT</strong> ใช้สัญญาณ <strong>Clock</strong> ภายใน ที่มีความถี่ <strong>80 MHz</strong> เป็นฐานเวลาในการทำงาน 
+สามารถกำหนดค่าของตัวหารความถี่ (<strong>Clock Divider</strong>) ได้ในช่วง 1..255 (8 บิต) 
+เช่น ถ้าใช้ตัวหารความถี่เท่ากับ 2 จะได้อัตราการนับที่ <strong>80MHz/2 = 40MHz (RMT tick rate)</strong> 
+หรือ <strong>25ns</strong> ดังนั้น ถ้ามีจำนวนไซเคิลเท่ากับ 50 จะได้เท่ากับ <strong>50 x 25ns = 1250ns</strong></p>
+<ul>
+<li>ช่วงที่มีลอจิกเป็น <strong>High</strong>: ถ้ากำหนดช่วงเวลาให้เท่ากับ <strong>34</strong> ไซเคิล จะได้ความกว้าง <strong>34 x 25ns = 850ns</strong></li>
+<li>ช่วงที่มีลอจิกเป็น <strong>Low</strong>: ถ้ากำหนดช่วงเวลาให้เท่ากับ <strong>16</strong> ไซเคิล จะได้ความกว้าง <strong>16  x 25ns = 400ns</strong></li>
+</ul>
+<p>วงจร <strong>RMT</strong> มีหน่วยความจำภายใน (<strong>64 x 32-bit Memory Block</strong> และมีทั้งหมด 8 บล็อก) สำหรับเก็บข้อมูลที่ใช้ระบุความกว้างของช่วง <strong>High</strong> และ <strong>Low</strong>
+ตามลำดับสำหรับข้อมูลแต่ละบิต (เรียกว่า <strong>RMT Symbol</strong>) โดยจะต้องเขียนให้อยู่ในรูปของโครงสร้างข้อมูล
+<code>rmt_item32_t</code> และใช้คำสั่ง <code>rmt_write_items(...)</code> เพื่อเขียนข้อมูลลงในหน่วยความจำสำหรับ <strong>RMT</strong></p>
+<p>โค้ดตัวอย่างต่อไปนี้  (คอมไพล์ด้วย <strong>Arduino-ESP32 v2.0.9, based on ESP-IDF v4.4.4</strong>) ใช้คำสั่งสำหรับการใช้งาน <strong>RMT</strong> ตาม <strong>Espressif API</strong> 
+<a href="https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/api-reference/peripherals/rmt.html"><strong>v4.4.4</strong></a></p>
+<pre><code class="language-c++">#include &lt;driver/rmt.h&gt; // Use the Espressif's RMT driver for ESP32.
+
+const uint32_t COLOR_DATA_ARRAY[] = {
+  // GRB color values
+   0x00FF00, // Starting with the Red color
+   0xFF0000,
+   0x0000FF,
+   0x00FFFF,
+   0xFFFF00,
+   0xFF00FF,
+   0x8F8F8F,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000
+};
+
+#define NUM_PIXELS      (8)             // Set the number of pixels of the WS2812 strip.
+#define RMT_TX_CHANNEL  (RMT_CHANNEL_0) // Use the channel number 0 of the RMT module.
+#define RMT_GPIO_PIN    (GPIO_NUM_18)   // Specify the GPIO18 for WS2812 data line.
+
+#define BITS_PER_PIXEL  (24)   // Number of bits per pixel
+#define WS2812_T1H      (34)   // High interval for bit 1
+#define WS2812_T1L      (16)   // Low interval for bit 1
+#define WS2812_T0H      (16)   // High interval for bit 0
+#define WS2812_T0L      (34)   // Low interval for bit 0
+
+#define NUM_RMT_ITEMS   (NUM_PIXELS * BITS_PER_PIXEL)
+rmt_item32_t rmt_items[ NUM_RMT_ITEMS ]; // data buffer for storing RMT items
+
+void initializeRMT() {
+  rmt_config_t rmt_tx_cfg = {
+     .rmt_mode  = RMT_MODE_TX,
+     .channel   = RMT_TX_CHANNEL,
+     .gpio_num  = RMT_GPIO_PIN,
+     .clk_div   = 2,
+     .mem_block_num = 4, // use up to 4 memory blocks
+     .tx_config =  {
+        .carrier_en = false,
+        .loop_en = false,
+        .idle_output_en = true,
+     }
+  };
+
+  ESP_ERROR_CHECK( rmt_config(&amp;rmt_tx_cfg) );
+  ESP_ERROR_CHECK( rmt_driver_install(rmt_tx_cfg.channel, 0, 0) );  
+}
+
+void setPixelColor( uint32_t index, uint32_t color ) {
+  if (0 &lt;= index &amp;&amp; index &lt; NUM_PIXELS) {
+    uint32_t bits = color;
+    uint32_t mask = 1 &lt;&lt; (BITS_PER_PIXEL-1);
+    // Convert the 24-bit color value into an array of RMT items.
+    for (uint32_t b=0; b &lt; BITS_PER_PIXEL; b++) {
+      rmt_items[(index * BITS_PER_PIXEL) + b] = (bits &amp; mask) ?
+                    (rmt_item32_t){{{WS2812_T1H, 1, WS2812_T1L, 0}}} :
+                    (rmt_item32_t){{{WS2812_T0H, 1, WS2812_T0L, 0}}};
+      mask &gt;&gt;= 1;
+    }
+  }
+}
+
+void showPixels() {
+  rmt_write_items( RMT_TX_CHANNEL, rmt_items, NUM_RMT_ITEMS, false );
+  rmt_wait_tx_done( RMT_TX_CHANNEL, portMAX_DELAY );
+}
+
+void setup() {
+  // Initialize the RMT of the ESP32 for implementing a WS2812 driver.
+  initializeRMT();
+}
+
+void loop() {
+  static uint32_t NUM_COLORS  = sizeof(COLOR_DATA_ARRAY)/sizeof(uint32_t);
+  static uint32_t start_index = NUM_COLORS/2 - 1;
+
+  // Set the color for each pixel.
+  for ( uint32_t i=0; i &lt; NUM_PIXELS; i++ ) {
+    uint32_t color = COLOR_DATA_ARRAY[ (start_index + i) % NUM_COLORS ];
+    setPixelColor( i, color );
+  }
+  // Update the pixels.
+  showPixels();
+
+  // Increment the start index by 1.
+  start_index = (start_index+1) % NUM_COLORS;
+  delay(500);
+}
+</code></pre>
+<p><img alt="" src="rmt_bit_interval_waveform.png" /></p>
+<p>รูป: การวัดความกว้างของข้อมูลหนึ่งบิต (วัดได้ความกว้างประมาณ <strong>1250ns</strong> )</p>
+<p><img alt="" src="rmt_t1h_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วงที่เป็น <strong>High</strong> สำหรับบิตที่มีค่าเป็น 1  (วัดได้ความกว้างประมาณ <strong>833ns</strong> )</p>
+<p><img alt="" src="rmt_t0h_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วงที่เป็น <strong>High</strong> สำหรับบิตที่มีค่าเป็น 0 (วัดได้ความกว้างประมาณ <strong>375ns</strong> )</p>
+<p><img alt="" src="esp32_ws2812_bar-2.jpg" /></p>
+<p>รูป: ตัวอย่างบอร์ด <strong>ESP32</strong> และโมดูล <strong>8-Pixel WS2812 LED Bar</strong> ที่ได้นำมาทดลองใช้งาน
+(ใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> จากบอร์ด <strong>ESP32</strong> สำหรับโมดูล <strong>WS2812</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-rp2040-pio">&#9655; <strong>การเขียนโปรแกรม Arduino RP2040 โดยใช้วงจร PIO</strong><a class="headerlink" href="#arduino-rp2040-pio" title="Permanent link">#</a></h2>
+<p><strong>RP2040</strong> เป็นชิปไมโครคอนโทรลเลอร์ที่ถูกพัฒนาขึ้นโดยบริษัท <strong>Raspberry Pi Trading (UK)</strong>
+รวมถึงบอร์ด <strong>Raspberry Pi Pico</strong> ภายในชิป มีวงจรที่เรียกว่า <strong>PIO (Programmable I/O)</strong>
+และสามารถโปรแกรมได้โดยใช้คำสั่งในภาษาที่เรียกว่า <strong>Pico Assembly (.pio)</strong> </p>
+<p><img alt="" src="pico-w_pinout.png" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งของขาบนบอร์ด <strong>Raspberry Pi Pico-W</strong> (Source: Raspberry Pi)</p>
+<p>โค้ดที่เขียนโดยใช้ภาษา <strong>Pico Assembly</strong> จะต้องมีการแปลงโค้ดให้อยู่ในรูปแบบของไฟล์  <strong>.h</strong> โดยใช้โปรแกรมที่มีชื่อว่า <code>pioasm</code>
+ซึ่งเป็นส่วนหนึ่งของ <strong>Pico C/C++ SDK &amp; Tools</strong> เพื่อนำไปใช้ในการเขียนด้วยภาษา <strong>C</strong> หรือ <strong>Arduino Sketch</strong></p>
+<p>สำหรับผู้ใช้ทั่วไป เพื่อความสะดวกในการใช้งาน สามารถใช้โปรแกรม <code>pioasm</code> แบบออนไลน์ได้บนเว็บของ <strong>Wokwi</strong>
+(<a href="https://wokwi.com/tools/pioasm">https://wokwi.com/tools/pioasm</a>)</p>
+<p><img alt="" src="wokwi_pioasm.png" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>Wokwi - Online picoasm for RP2040</strong></p>
+<p>ภายในชิป <strong>RP2040</strong> มีวงจรที่เรียกว่า <strong>PIO</strong> อยู่ 2 ชุด (เรียกว่า <strong>PIO0</strong> และ <strong>PIO1</strong>) 
+แต่ละชุดประกอบไปด้วยหน่วยย่อยที่เรียกว่า <strong>State Machines (SMs)</strong> อย่างละ 4 ชุด 
+(เรียกชื่อเป็น <strong>SM0..SM3</strong> สำหรับ <strong>PIO0</strong> และ <strong>SM4..SM7</strong> สำหรับ <strong>PIO1</strong>) รวมทั้งหมดเป็น 8 ชุด </p>
+<p>วงจร <strong>PIO</strong> สามารถนำมาใช้และโปรแกรมให้ทำหน้าที่เป็นตัวสร้างสัญญาณควบคุมการทำงานของ <strong>WS2812</strong> ได้
+ลองมาดูตัวอย่างโค้ดบางส่วนสำหรับ <strong>PIO</strong> ที่แสดงให้เห็นโครงสร้างและรูปแบบการใช้คำสั่ง (<strong>PIO instructions</strong>)
+ตัวอย่างโค้ดนี้แสดงให้เห็นว่า มีการใช้คำสั่งเพียงไม่กี่คำสั่ง เช่น <code>out</code>, <code>jmp</code> และ <code>nop</code> เป็นต้น </p>
+<pre><code>.wrap_target
+bitloop:
+    out x, 1       side 0 [T3-1] ; // (1) T3 = 3 cycles
+    jmp !x do_zero side 1 [T1-1] ; // (2) T1 = 3 cycles
+do_one:
+    jmp  bitloop   side 1 [T2-1] ; // (3) T2 = 4 cycles
+do_zero:
+    nop            side 0 [T2-1] ; // (4) T2 = 4 cycles
+.wrap
+</code></pre>
+<p>คำสั่ง  <code>out</code> ใช้สำหรับเลื่อนบิตออกจาก <strong>Output Shift Register (OSR)</strong> ขนาด 32 บิต 
+ครั้งละหนึ่งบิต ในขณะที่ทำคำสั่งแต่ละครั้ง ก็สามารถกำหนดค่าลอจิกให้ขา <strong>GPIO</strong> ที่ได้เลือกใช้งานได้ด้วย 
+(เรียกว่า <strong>Side-Setting</strong>) และหน่วงเวลาก่อนทำคำสั่งถัดไปได้ (<strong>Delay</strong>) แต่ไม่เกิน 31 ไซเคิล</p>
+<p>ข้อมูลขนาด 32 บิต (24 บิต จะใช้สำหรับกำหนดสีของ <strong>WS2812</strong> หนึ่งพิกเซล) จะถูกอ่านมาจาก <strong>FIFO</strong>
+โปรแกรมคำสั่งที่ทำงานโดยซีพียูของ <strong>RP2040</strong> จะคอยเขียนข้อมูลลงใน <strong>FIFO</strong> ด้านหนึ่ง และอีกด้านหนึ่ง <strong>SM</strong> ของ <strong>PIO</strong>
+จะอ่านค่าออกมาใช้</p>
+<p>ลำดับการทำคำสั่งมีดังนี้</p>
+<ul>
+<li>(1) ข้อมูลจาก <strong>FIFO</strong> จะถูกนำไปใส่ลงในรีจิสเตอร์ <strong>OSR</strong> 
+เมื่อทำคำสั่ง <code>out</code> ก็จะเลื่อนบิตครั้งละหนึ่งตำแหน่ง แล้วนำไปค่าบิตไปใส่ลงในรีจิสเตอร์ <code>x</code> 
+ซึ่งเป็น <strong>Scratch Register</strong> ขนาด 32 บิต</li>
+<li>(2) เมื่อเลื่อนบิตแล้ว ในรีจิสเตอร์ <code>x</code> จะมีค่าเป็น  <code>0</code>  หรือ <code>1</code> และใช้ค่านี้ในการสร้างเงื่อนไขว่า 
+จะทำคำสั่งใดถัดไป โดยใช้คำสั่ง <code>jmp</code> (<strong>Jump</strong>) ถ้าค่าใน <code>x</code> เป็น  <code>0</code>  ให้ไปทำคำสั่งเริ่มต้นที่ <code>do_zero:</code>
+แต่ถ้ามีค่าเป็น <code>1</code> ให้ทำคำสั่งในตำแหน่งถัดไปคือ <code>do_one:</code></li>
+<li>(3) ในตำแหน่ง <code>do_one:</code> มีคำสั่ง <code>jnp</code> ซึ่งจะทำให้การทำงานของ <strong>SM</strong> กระโดดย้อนกลับไปทำคำสั่งที่ <code>bitloop:</code> แต่รอเวลาไว้ 5 ไซเคิล และกำหนดค่าลอจิกของขา 
+<strong>GPIO</strong> ที่เกี่ยวข้องให้มีค่าเป็น <code>1</code></li>
+<li>(4) ในตำแหน่ง <code>do_zero:</code> มีคำสั่ง <code>nop</code> (<strong>No Operation</strong>) ไม่ต้องทำอะไร แต่ให้รอเวลาไว้ 5 ไซเคิล 
+และกำหนดค่าลอจิกของขา <strong>GPIO</strong> ที่เกี่ยวข้องให้มีค่าเป็น <code>0</code>   เนื่องจากเป็นคำสั่งสุดท้ายและมีการระบุไว้ว่า
+เป็น <code>.wrap</code> ดังนั้น <strong>SM</strong> จะวนกลับไปเริ่มทำคำสั่งแรกใหม่โดยอัตโนมัติ</li>
+</ul>
+<p>โค้ดสำหรับ <strong>PIO</strong> ในตัวอย่างนี้ จะต้องเลือกค่าความถี่เท่ากับ <strong>8MHz</strong> ซึ่งจะได้ <strong>PIO cycle</strong> เท่ากับ <strong>125ns</strong>
+จากโค้ดตัวอย่าง การสร้างสัญญาณพัลส์สำหรับหนึ่งบิต จะใช้เวลาเท่ากับ <strong>T1 + T2 + T3 = 10 cycles</strong>
+หรือคิดเป็น <strong>1250ns</strong> </p>
+<ul>
+<li>บิต 0: <strong>T0H=375ns</strong> และ <strong>T0L=875ns</strong></li>
+<li>บิต 1: <strong>T0H=875ns</strong> และ <strong>T0L=375ns</strong></li>
+</ul>
+<p>ตัวอย่างโค้ดในไฟล์ <code>ws2812.pio</code> มีดังนี้</p>
+<pre><code class="language-text">.program ws2812
+.side_set 1
+
+.define public T1 3
+.define public T2 4
+.define public T3 3
+
+; bit 1 -&gt; T1H = 7 cycles and T1L = 3 cycles
+; bit 0 -&gt; T0H = 3 cycles and T0L = 7 cycles
+
+.wrap_target
+bitloop:
+    out x, 1       side 0 [T3-1] ; '0' for 3 cycles
+    jmp !x do_zero side 1 [T1-1] ; '1' for 3 cycles
+do_one:
+    jmp  bitloop   side 1 [T2-1] ; '1' for 4 cycles
+do_zero:
+    nop            side 0 [T2-1] ; '0' for 4 cycles
+.wrap
+
+% c-sdk {
+#include &quot;hardware/clocks.h&quot;
+
+static inline void ws2812_program_init(
+   PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw ) 
+{
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    pio_sm_config c = ws2812_program_get_default_config(offset);
+    sm_config_set_sideset_pins(&amp;c, pin);
+    sm_config_set_out_shift(&amp;c, false, true, rgbw ? 32 : 24);
+    sm_config_set_fifo_join(&amp;c, PIO_FIFO_JOIN_TX);
+
+    int cycles_per_bit = ws2812_T1 + ws2812_T2 + ws2812_T3;
+    float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
+    sm_config_set_clkdiv(&amp;c, div);
+
+    pio_sm_init(pio, sm, offset, &amp;c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
+</code></pre>
+<p>ตัวอย่างไฟล์ <code>ws2812.pio.h</code> ที่ได้จากการแปลงโค้ดในไฟล์ <code>ws2812.pio</code> โดยอัตโนมัติ</p>
+<pre><code class="language-c">// -------------------------------------------------- //
+// This file is autogenerated by pioasm; do not edit! //
+// -------------------------------------------------- //
+
+#pragma once
+
+#if !PICO_NO_HARDWARE
+#include &quot;hardware/pio.h&quot;
+#endif
+
+// ------ //
+// ws2812 //
+// ------ //
+
+#define ws2812_wrap_target 0
+#define ws2812_wrap 3
+
+#define ws2812_T1 3
+#define ws2812_T2 4
+#define ws2812_T3 3
+
+static const uint16_t ws2812_program_instructions[] = {
+            //     .wrap_target
+    0x6221, //  0: out    x, 1            side 0 [2] 
+    0x1223, //  1: jmp    !x, 3           side 1 [2] 
+    0x1300, //  2: jmp    0               side 1 [3] 
+    0xa342, //  3: nop                    side 0 [3] 
+            //     .wrap
+};
+
+#if !PICO_NO_HARDWARE
+static const struct pio_program ws2812_program = {
+    .instructions = ws2812_program_instructions,
+    .length = 4,
+    .origin = -1,
+};
+
+static inline 
+pio_sm_config ws2812_program_get_default_config(uint offset) {
+    pio_sm_config c = pio_get_default_sm_config();
+    sm_config_set_wrap(&amp;c, offset + ws2812_wrap_target, 
+                       offset + ws2812_wrap);
+    sm_config_set_sideset(&amp;c, 1, false, false);
+    return c;
+}
+
+#include &quot;hardware/clocks.h&quot;
+static inline 
+void ws2812_program_init(
+   PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw ) 
+{
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_config c = ws2812_program_get_default_config(offset);
+    sm_config_set_sideset_pins(&amp;c, pin);
+    sm_config_set_out_shift(&amp;c, false, true, rgbw ? 32 : 24);
+    sm_config_set_fifo_join(&amp;c, PIO_FIFO_JOIN_TX);
+    int cycles_per_bit = ws2812_T1 + ws2812_T2 + ws2812_T3;
+    float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
+    sm_config_set_clkdiv(&amp;c, div);
+    pio_sm_init(pio, sm, offset, &amp;c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+#endif
+</code></pre>
+<p>&nbsp;</p>
+<p>ลองมาดูตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Raspberry Pico / Pico-W</strong>
+โดยใช้ฟังก์ชันจากไฟล์ <code>ws2812.pio.h</code></p>
+<pre><code class="language-c++">#include &quot;hardware/pio.h&quot;
+#include &quot;ws2812.pio.h&quot; // Includes the 'ws2812.pio.h' file.
+
+const uint32_t COLOR_DATA_ARRAY[] = {
+  // GRB color values
+   0x00FF00, // Starting with the Red color
+   0xFF0000,
+   0x0000FF,
+   0x00FFFF,
+   0xFFFF00,
+   0xFF00FF,
+   0x8F8F8F,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000,
+   0x000000
+};
+
+#define GPIO_PIN    (3)  // Use the GP3 pin.
+#define NUM_PIXELS  (8)  // Specify the number of WS2812 pixels.
+
+#define PIXELS_BUF_SIZE (NUM_PIXELS)
+uint32_t pixels_buffer[ PIXELS_BUF_SIZE ]; // Pixel buffer
+
+const PIO pio = pio0;      // Use either PIO0 or PIO1.
+const uint32_t pio_sm = 0; // Use the first state machine (SM0).
+
+void initWS2812Pio() {
+  // Load the PIO program ('ws2812_program' defined in 'ws2812.pio.h').
+  uint offset = pio_add_program( pio, &amp;ws2812_program );
+  // Initialize the PIO, set the PIO clock (8MHz) and the GPIO pin.
+  ws2812_program_init(pio, pio_sm, offset, GPIO_PIN, 800000, false);
+}
+
+void setPixelColor( uint32_t index, uint32_t pixel_grb ) {
+  if ( index &lt; PIXELS_BUF_SIZE ) {
+     pixels_buffer[ index] = pixel_grb;
+  }
+}
+
+void putPixel( uint32_t pixel_grb ) {
+  pio_sm_put_blocking( pio, pio_sm, pixel_grb &lt;&lt; 8u );
+}
+
+void showPixels(void) {
+  for ( uint16_t i=0; i &lt; PIXELS_BUF_SIZE; i++ ) {
+    uint32_t value = pixels_buffer[ i ];
+    pio_sm_put_blocking( pio, pio_sm, value &lt;&lt; 8u );
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;Pico RP2040 - PIO - WS2812 Demo!\n&quot;);
+  initWS2812Pio();
+}
+
+void loop() {
+  static uint32_t NUM_COLORS  = sizeof(COLOR_DATA_ARRAY)/sizeof(uint32_t);
+  static uint32_t start_index = NUM_COLORS/2 - 1;
+
+  // Set the color for each pixel.
+  for ( uint32_t i=0; i &lt; NUM_PIXELS; i++ ) {
+    uint32_t color = COLOR_DATA_ARRAY[ (start_index + i) % NUM_COLORS ];
+    setPixelColor( i, color );
+  }
+  // Update the pixels.
+  showPixels();
+
+  // Increment the start index by 1.
+  start_index = (start_index+1) % NUM_COLORS;
+  delay(500);
+}
+</code></pre>
+<p><img alt="" src="arduino_rp2040_core.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino Core for RP2040</strong> (ได้ติดตั้งและใช้งาน <strong>Arduino Mbed OS RP2040 Boards v4.0.2</strong>)</p>
+<p><img alt="" src="wokwi_pico-w_neopixel_sim.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของฮาร์ดแวร์เสมือนจริงด้วย <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="pico-w_ws2812_bar.jpg" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ที่ได้นำมาทดลอง</p>
+<p><img alt="" src="pio_ws2812_capture.png" /></p>
+<p>รูป: การวัดสัญญาณ <strong>DATA (DIN)</strong> จากขา <strong>GP3</strong> ของ <strong>RP2040</strong>
+และแสดงรูปคลื่นสัญญาณด้วย <strong>USB Logic Analyzer + PulseView</strong></p>
+<p><img alt="" src="pio_ws2812_bit_timing.png" /></p>
+<p>รูป: การวัดความกว้างของข้อมูลหนึ่งบิต (วัดได้ค่า <strong>1250ns</strong>)</p>
+<p><img alt="" src="pio_ws2812_t1h_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วง <strong>High</strong> สำหรับบิตข้อมูลที่มีค่าเป็น <strong>1</strong> (วัดได้ค่า <strong>875ns</strong>)</p>
+<p><img alt="" src="pio_ws2812_t0h_waveform.png" /></p>
+<p>รูป: การวัดความกว้างช่วง <strong>High</strong> สำหรับบิตข้อมูลที่มีค่าเป็น <strong>0</strong> (วัดได้ค่า <strong>375ns</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานโมดูล <strong>WS2812(B)</strong> และตัวอย่างการเขียนโค้ดสำหรับ
+<strong>Arduino-ESP32</strong> และ <strong>Arduino-RP2040</strong> โดยใช้วิธีการที่แตกต่างกัน และได้นำโค้ดไปทดลองใช้กับฮาร์ดแวร์จริง
+มีการวัดสัญญาณที่ขาเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong>
+เพื่อวัดความกว้างของสัญญาณพัลส์ช่วงลอจิกที่เป็น <strong>High</strong> และ <strong>Low</strong></p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-07-15 | Last Updated: 2023-07-16</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
