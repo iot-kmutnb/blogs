@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/xilinx_vivado_linux/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การติดตั้งซอฟต์แวร์ AMD / Xilinx Vivado Design Suite สำหรับ Ubuntu - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#amd-xilinx-vivado-design-suite-ubuntu" class="nav-link">การติดตั้งซอฟต์แวร์ AMD / Xilinx Vivado Design Suite สำหรับ Ubuntu</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#xilinx-fpgas" class="nav-link">&#9655; ซอฟต์แวร์สำหรับการออกแบบวงจรดิจิทัลและใช้งานชิป Xilinx FPGAs</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#amd-xilinx-vivado-design-suite" class="nav-link">&#9655; การติดตั้งซอฟต์แวร์ AMD / Xilinx Vivado Design Suite</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="amd-xilinx-vivado-design-suite-ubuntu">การติดตั้งซอฟต์แวร์ AMD / Xilinx Vivado Design Suite สำหรับ Ubuntu<a class="headerlink" href="#amd-xilinx-vivado-design-suite-ubuntu" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Xilinx Vivado Design Suite</em>, <em>Xilinx FPGAs / SoCs</em></p>
+<hr />
+<h2 id="xilinx-fpgas">&#9655; <strong>ซอฟต์แวร์สำหรับการออกแบบวงจรดิจิทัลและใช้งานชิป Xilinx FPGAs</strong><a class="headerlink" href="#xilinx-fpgas" title="Permanent link">#</a></h2>
+<p><strong>AMD / Xilinx</strong> เป็นหนึ่งในรายชื่อผู้ผลิตชิปประเภท <strong>FPGAs (Field-Programmable Gate Arrays)</strong>
+และทางบริษัทก็ได้พัฒนาซอฟต์แวร์เพื่อใช้งานกับชิปดังกล่าวของบริษัทด้วย มีทั้งเวอร์ชันของซอฟต์แวร์ที่ใช้งานได้ฟรี
+และเวอร์ชันที่ผู้ใช้จะต้องเสียค่าลิขสิทธิ์ในการใช้งาน</p>
+<p>ตัวอย่างซอฟต์แวร์ของ <strong>AMD / Xilinx</strong> ได้แก่</p>
+<ul>
+<li><a href="https://docs.xilinx.com/r/en-US/ug910-vivado-getting-started/Vivado-Design-Suite-Overview"><strong>Vivado Design Suite</strong></a> (Initial Release: April 2012)
+เป็นซอฟต์แวร์สำหรับการออกแบบวงจรดิจิทัล ผู้ใช้สามารถออกแบบวงจรดิจิทัลโดยใช้ภาษา <strong>HDL (VHDL / Verilog / SystemVerilog)</strong>
+และใช้งานกับชิป <strong>FPGAs / SoCs / Adaptive SoCs</strong><ul>
+<li><strong>7-Series FPGAs</strong>: Artix, Kintex, Virtex-7, Spartan-7</li>
+<li><strong>Zynq SoCs</strong>: Zynq-7000 / Zynq-UltraScale MPSoC/RFSoC</li>
+<li><strong>Versal ACAP (Adaptive SoCs)</strong>: Versal Prime / Premium / AI Core Series</li>
+</ul>
+</li>
+<li><a href="https://www.xilinx.com/products/design-tools/vivado.html"><strong>Vivado ML Edition</strong></a> เป็นเวอร์ชันที่อัปเกรดจาก <strong>Vivado Design Suite</strong> เพื่อรองรับการใช้งานชิป <strong>Versal ACAP Adaptive SoCs</strong>
+ซอฟต์แวร์แบ่งเป็นสองเวอร์ชันให้เลือกใช้งานคือ  <strong>Standard Edition (free)</strong> และ <strong>Enterprise Edition</strong></li>
+<li><a href="https://www.xilinx.com/products/design-tools/vitis/vitis-hls.html"><strong>Vitis HLS Tool</strong></a> เป็นเวอร์ชันที่อัปเกรดจาก <strong>Vivado HLS Tool</strong>
+ซึ่งเป็นคอมไพเลอร์สำหรับการสังเคราะห์วงจรในระดับสูง หรือ <strong>High Level Synthesis (HLS)</strong>
+และแปลงโค้ด  <strong>C/C++</strong> ให้เป็นโค้ดในภาษา <strong>HDL</strong> ในระดับ  <strong>RTL (Register-Transfer Level)</strong> ได้โดยอัตโนมัติ</li>
+<li><a href="https://www.xilinx.com/products/design-tools/vitis.html"><strong>AMD Vitis Unified Software Platform</strong></a>
+เป็นซอฟต์แวร์รวมที่ประกอบด้วยซอฟต์แวร์ เช่น<ul>
+<li><strong>Vitis Core Development Kit</strong> เป็นซอฟต์แวร์สำหรับการพัฒนา
+แอปพลิเคชันฝังตัว (<strong>Embedded Software Development</strong>) และเขียนโค้ดด้วยภาษา <strong>C/C++</strong> หรือ <strong>OpenCL</strong> สำหรับตัวประมวลผลหรือซีพียูภายในชิป <strong>FPGAs / SoCs / Adaptive SoCs</strong></li>
+<li><strong>Vivado Design Suite / Vivado ML Edition</strong> สำหรับการออกแบบวงจรดิจิทัล</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="xilinx_devices.png" /></p>
+<p>รูป: การจำแนกประเภทย่อยของชิป <strong>FPGAs / SoCs</strong> ที่ได้มีการผลิตโดย <strong>AMD / Xilinx</strong></p>
+<p><img alt="" src="xilinx_vitis_ai.png" /></p>
+<p>รูป: ซอฟต์แวร์และฮาร์ดแวร์ที่เกี่ยวข้องกับการพัฒนาแอปพลิเคชัน <strong>AI / ML</strong> (Source: AMD / Xilinx)</p>
+<p><img alt="" src="vivado_system-level_design_flow.png" /></p>
+<p>รูป: <strong>Vivado Design Suite - System-Level Design Flow</strong> (Source: AMD / Xilinx)</p>
+<p>บทความนี้นำเสนอ การใช้งานซอฟต์แวร์ที่มีชื่อว่า <a href="https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html"><strong>Vivado ML Edition</strong></a>
+เพื่อการออกแบบวงจรดิจิทัล และนำไปใช้กับบอร์ด <strong>FPGA</strong> เช่น <strong>Artix-7</strong> หรือ <strong>Spartan-7</strong>
+ซอฟต์แวร์นี้สามารถดาวน์โหลดมาใช้ได้ฟรี มีให้เลือกใช้สำหรับระบบปฏิบัติการ <strong>Windows</strong> หรือ <strong>Linux</strong></p>
+<p>แนะนำให้ผู้ใช้ดาวน์โหลดไฟล์ <strong>Web Installer (AMD Unified Installer for FPGAs &amp; Adaptive SoCs)</strong> จากเว็บไซต์ของบริษัท <strong>AMD / Xilinx</strong>
+ผู้ใช้จะต้องมีบัญชี (<strong>User Account</strong>) หรือ ลงทะเบียนผู้ใช้ก่อนจึงจะดาวน์โหลดไฟล์ได้</p>
+<p>ในบทความนี้ได้เลือกใช้ <a href="https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html"><strong>Vivado ML Edition 2023.1</strong></a>
+และนำมาใช้กับระบบปฏิบัติการ <strong>Linux / Ubuntu 22.04 LTS (64-bit)</strong></p>
+<hr />
+<h2 id="amd-xilinx-vivado-design-suite">&#9655; <strong>การติดตั้งซอฟต์แวร์ AMD / Xilinx Vivado Design Suite</strong><a class="headerlink" href="#amd-xilinx-vivado-design-suite" title="Permanent link">#</a></h2>
+<p>ไฟล์ที่ใช้ในการติดตั้งคือ <code>Xilinx_Unified_2023.1_0507_1903_Lin64.bin</code>
+(<strong>Linux Self Extracting Web Installer</strong>, <strong>Size: 265.94 MB</strong>)
+และใช้สำหรับการติดตั้งโปรแกรมแบบ <strong>Web Installation</strong></p>
+<p>ทำคำสั่งเพื่อสร้างไดเรกทอรี เช่น <code>/opt/Xilinx</code> สำหรับการติดตั้งซอฟต์แวร์</p>
+<pre><code class="language-bash">$ sudo mkdir /opt/Xilinx
+$ sudo chown -R $USER:$USER /opt/Xilinx
+</code></pre>
+<p>จากนั้นให้ทำคำสั่งเพื่อเริ่มต้นขั้นตอนการติดตั้งโปรแกรม</p>
+<pre><code class="language-bash">$ chmod +x ./Xilinx_Unified_2023.1_0507_1903_Lin64.bin 
+$ ./Xilinx_Unified_2023.1_0507_1903_Lin64.bin
+</code></pre>
+<p>เลือกใช้ซอฟต์แวร์ <strong>Vivado Design Suite</strong> สำหรับการออกแบบวงจรดิจิทัล
+ด้วยภาษา <strong>VHDL / Verilog / SystemVerilog</strong>
+และเลือกตระกูลของชิป <strong>FPGA</strong> ของบริษัท <strong>AMD / Xilinx</strong> ที่คาดว่าจะใช้งาน</p>
+<p><img alt="" src="xilinx_inst-1.png" /></p>
+<p>รูป: หน้าต่างเริ่มต้นสำหรับการติดตั้งโปรแกรม</p>
+<p><img alt="" src="xilinx_inst-2.png" /></p>
+<p>รูป: กรอกชื่อผู้ใช้โดยระบุเป็นอีเมล์ และรหัสผ่านตามที่ได้เคยลงทะเบียนผู้ใช้งานไว้กับ <strong>AMD / Xilinx</strong></p>
+<p><img alt="" src="xilinx_inst-3.png" /></p>
+<p>รูป: เลือกซอฟต์แวร์ที่จะติดตั้งเป็น <strong>Vivado</strong></p>
+<p><img alt="" src="xilinx_inst-4.png" /></p>
+<p>รูป: เลือก <strong>Design Tools</strong> และ <strong>Devices</strong> ที่ต้องการจะใช้งาน</p>
+<p><img alt="" src="xilinx_inst-5.png" /></p>
+<p>รูป: ยอมรับเงื่อนไขในการใช้งานซอฟต์แวร์</p>
+<p><img alt="" src="xilinx_inst-6.png" /></p>
+<p>รูป: เลือก <strong>Installation Directory</strong>
+(ในตัวอย่างได้เลือกเป็น <code>/opt/Xilinx/2023.1</code>)</p>
+<p><img alt="" src="xilinx_inst-7.png" /></p>
+<p>รูป: หน้าต่างแสดงสรุปรายละเอียดสำหรับการติดตั้ง (ให้สังเกตขนาดของไฟล์ที่ต้องดาวน์โหลดมา
+และความจุในฮาร์ดดิสก์ที่ต้องการใช้) แล้วกดปุ่ม <strong>Install</strong></p>
+<p><img alt="" src="xilinx_inst-8.png" /></p>
+<p>รูป: ในระหว่างการติดตั้งซอฟต์แวร์ จะต้องมีการดาวน์โหลดไฟล์ต่าง ๆ จากอินเทอร์เน็ต</p>
+<p>เมื่อได้ติดตั้งโปรแกรมได้สำเร็จแล้ว ให้ทำขั้นตอน <strong>License Setup</strong>
+โดยการเรียกใช้งานโปรแกรม <strong>AMD License Manager</strong></p>
+<p>ขั้นตอนถัดไปคือ ผู้ใช้จะต้องไปยัง <a href="https://www.xilinx.com/support/licensing_solution_center.html"><strong>Xilinx Product Licensing Site</strong></a>
+เพื่อขอสร้างไฟล์ลิขสิทธิ์ (<strong>License File</strong>) ซึ่งเป็นแบบ <strong>Node-locked</strong> สำหรับการใช้งานซอฟต์แวร์ได้ฟรี  </p>
+<p>ผู้ใช้จะต้องกรอกข้อมูลเกี่ยวกับเครื่องคอมพิวเตอร์ที่จะใช้งาน โดยจะต้องระบุหมายเลข <strong>NIC</strong>
+หรือ <strong>MAC Address</strong> ของเครื่องคอมพิวเตอร์ที่จะใช้งาน
+เมื่อกรอกข้อมูลและส่งข้อมูลเข้าระบบแล้ว ผู้ใช้จะได้รับไฟล์ <code>xilinx.lic</code> ผ่านทางอีเมล์ตามที่ได้ลงทะเบียนเอาไว้
+แล้วให้นำไปใส่ไว้ในไดเรกทอรี <code>$HOME/.Xilinx/</code></p>
+<p><img alt="" src="xilinx_license-1.png" /></p>
+<p>รูป: เมื่อกดปุ่ม <strong>Connect</strong> จะเปิดเว็บเบราว์เซอร์ไปยังเว็บไซต์ของ <strong>AMD</strong>
+เพื่อขอไฟล์ลิขสิทธิ์ (<strong>License File</strong>) สำหรับเครื่องผู้ใช้</p>
+<p><img alt="" src="xilinx_license-2.png" /></p>
+<p>รูป: การตรวจสอบไฟล์ลิขสิทธิ์ เมื่อได้รับมาผ่านทางอีเมล์และติดตั้งในเครื่องของผู้ใช้แล้ว</p>
+<p><img alt="" src="vivado_ml_edition_main.png" /></p>
+<p>รูป:  หน้าต่างหลักของ <strong>Vivado ML Edition</strong> และพร้อมใช้งานแล้ว</p>
+<p>&nbsp;</p>
+<p>อีกขั้นตอนหนึ่งที่สำคัญคือ การติดตั้งไฟล์สำหรับใช้งาน <strong>Xilinx Platform Cable USB Programmer</strong>
+สำหรับ <strong>Linux</strong> โดยให้ทำคำสั่งดังนี้ (ข้อสังเกต: ไดเรกทอรีสำหรับการติดตั้ง <strong>Vivado</strong> ของผู้ใช้อื่น
+อาจแตกต่างไปจากตัวอย่าง)</p>
+<pre><code class="language-bash"># Change to the installation directory of the Vivado ML edition
+$ cd /opt/Xilinx/2023.1/Vivado/2023.1/
+
+# Change to the installation directory for Xilinx Cable drivers
+$ cd ./data/xicom/cable_drivers/lin64/install_script/install_drivers
+
+# Run the installation script
+$ sudo ./install_driver
+</code></pre>
+<p>เมื่อทำคำสั่งข้างต้นแล้ว พบว่ามีการเพิ่มไฟล์สำหรับ <strong>Linux udev rules</strong></p>
+<p><code>/etc/udev/rules.d/52-xilinx-pcusb.rules</code></p>
+<p>และมีตัวอย่างข้อความภายในไฟล์ดังนี้</p>
+<pre><code class="language-text">ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;0008&quot;, MODE=&quot;666&quot;
+ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;0007&quot;, MODE=&quot;666&quot;
+ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;0009&quot;, MODE=&quot;666&quot;
+ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;000d&quot;, MODE=&quot;666&quot;
+ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;000f&quot;, MODE=&quot;666&quot;
+ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;0013&quot;, MODE=&quot;666&quot;
+ATTR{idVendor}==&quot;03fd&quot;, ATTR{idProduct}==&quot;0015&quot;, MODE=&quot;666&quot;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการติดตั้งซอฟต์แวร์
+<strong>AMD Vivado ML Edition (v2023.1)</strong> สำหรับ <strong>Ubuntu 22.04 LTS</strong>
+เพื่อนำมาใช้ในการออกแบบวงจรดิจิทัลสำหรับชิป <strong>FPGA</strong> เช่น <strong>AMD / Xilinx
+Artix-7</strong> หรือ <strong>Spartan-7</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2023-07-20 | Last Updated: 2023-07-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
