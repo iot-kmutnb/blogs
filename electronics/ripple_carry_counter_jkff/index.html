@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/ripple_carry_counter_jkff/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างวงจรตัวนับไบนารีด้วยลอจิกเกต JK Flip-Flops - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#jk-flip-flops" class="nav-link">การสร้างวงจรตัวนับไบนารีด้วยลอจิกเกต JK Flip-Flops</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#jk-74hc73" class="nav-link">&#9655; ฟลิปฟลอปแบบ JK และ ไอซี 74HC73</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การสร้างวงจรตัวนับไบนารี</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl" class="nav-link">&#9655; การเขียนโค้ด VHDL เพื่อจำลองการทำงานสำหรับวงจรดิจิทัล</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#verilog" class="nav-link">&#9655; ตัวอย่างการสร้างวงจรด้วย Verilog</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="jk-flip-flops">การสร้างวงจรตัวนับไบนารีด้วยลอจิกเกต JK Flip-Flops<a class="headerlink" href="#jk-flip-flops" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการฝึกต่อวงจรบนเบรดบอร์ดด้วยไอซี <strong>74HC73</strong>
+(<strong>Dual JK Flip-Flops with Asynchronous Clear</strong>) โดยนำมาสร้างเป็นวงจรตัวนับ
+<strong>Ripple-Carry (Asynchrnous) Binary Counter</strong> ขนาด 4 บิต
+และสามารถจำลองการทำงานเสมือนจริงได้โดยใช้ซอฟต์แวร์อย่างเช่น <strong>AUTODESK Tinkercad Circuits</strong>
+นอกจากนั้นแล้วยังมีตัวอย่างการเขียนโค้ด <strong>VHDL</strong> และ <strong>Verilog</strong>
+สำหรับการสร้างโมเดลจำลองการทำงานของวงจรดังกล่าวและตรวจสอบการทำงานโดยใช้ซอฟต์แวร์ประเภท <strong>Open Source</strong></p>
+<p><strong>Keywords:</strong> <em>Circuit Simulation</em>, <em>AUTODESK Tinkercad</em>, 
+<em>Virtual Breadboard Circuit Prototyping</em>, <em>JK Flip-Flops</em>, <em>74HC73</em>, <em>Ripple-Carry Binary Counter</em></p>
+<hr />
+<h2 id="jk-74hc73">&#9655; <strong>ฟลิปฟลอปแบบ JK และ ไอซี 74HC73</strong><a class="headerlink" href="#jk-74hc73" title="Permanent link">#</a></h2>
+<p>"ฟลิปฟลอป" (<strong>Flip Flop</strong>) หนึ่งตัวสามารถใช้เก็บข้อมูลหนึ่งบิต และมีอยู่หลายประเภท เช่น
+<strong>D-FF</strong>, <strong>T-FF</strong>, <strong>SR-FF</strong> และ <strong>JK-FF</strong>
+ซึ่งมีฟังก์ชันการทำงานแตกต่างกัน
+<strong>JK-FF</strong> เป็น "ฟลิปฟลอป" ประเภทหนึ่ง
+มีขาเอาต์พุตสำหรับค่าของฟลิปฟลอปคือ <strong>Q</strong> (<em>Output</em>) และ <strong>/Q</strong> (<em>Inverted Output</em>)
+สามารถบันทึกข้อมูลหนึ่งบิต และทำงานตามจังหวะของสัญญาณ <strong>CLK (Clock)</strong> 
+ที่ขอบขาขึ้น (<strong>Positive Edge-Triggered</strong>) หรือขาลง (<strong>Negative Edge-Triggered</strong>)
+แบบใดแบบหนึ่ง มีขาสัญญาณควบคุมเป็นอินพุตคือ <strong>J</strong> และ <strong>K</strong> เพื่อกำหนดค่าลอจิกของฟลิปฟลอป
+นอกจากนั้นแล้วยังมีขาควบคุม <strong>RESET</strong> หรือ <strong>CLR</strong> เป็นอินพุตสำหรับการรีเซต หรือ การเคลียร์ค่าลอจิก
+โดยไม่ต้องรอจังหวะของสัญญาณ <strong>CLK</strong> (จึงถือว่าเป็น <strong>Asynchronous Clear</strong>) </p>
+<p>ไอซีประเภทลอจิกเกต (<strong>Logic IC</strong>) เบอร์ <strong>74HC73</strong> เป็นหนึ่งในซีรีย์ <strong>74HCxx Standard Logic ICs</strong>
+มีลอจิกเกตประเภท <strong>JK Flip Flop (JK-FF)</strong> อยู่ 2 ตัว ภายในตัวถังเดียวกัน
+ไอซี <strong>MC74HC73A</strong> ของบริษัท <strong>ON Semiconductor</strong> เป็นตัวอย่างของไอซีที่มีฟังก์ชันการทำงานได้เหมือน 
+<strong>74HC73</strong>  จากรูปจะเห็นได้ว่า มี <strong>JK-FF</strong> อยู่สองชุด และแม้ว่าจะอยู่ในตัวถังของไอซีเดียวกัน
+แต่ <strong>JK-FF</strong> ชุดที่ 1 และ 2 ก็มีขา <strong>I/O</strong> อิสระจากกัน แต่ใช้ขาแรงดันไฟเลี้ยง <strong>VCC</strong> กับ <strong>GND</strong>
+เหมือนกัน</p>
+<p><img alt="" src="mc74hc73a.png" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขาของไอซี <strong>MC74HC73A</strong> (Source: ON Semiconductor)</p>
+<p>ฟังก์ชันการทำงานของ <strong>JK-FF</strong> สามารถดูได้จากตาราง <strong>Function Table</strong> ของไอซี <strong>MC74HC73A</strong></p>
+<ul>
+<li>เมื่อขาอินพุต <strong>Reset</strong> มีค่าเป็นลอจิก <strong>Low</strong>
+จะทำให้ขาเอาต์พุต  <strong>Q</strong> เป็น <strong>Low</strong> และขาเอาต์พุต <strong>/Q</strong> เป็น  <strong>High</strong> 
+โดยไม่สนใจว่า ขาอินพุต <strong>J</strong> และ <strong>K</strong> และสัญญาณ <strong>CLK</strong> ของฟลิปฟลอปเป็นอย่างไรในขณะนั้น</li>
+<li><strong>JK-FF</strong> จะเปลี่ยนสถานะของเอาต์พุต ก็ต่อเมื่อเกิดขอบขาลง
+(<strong>Falling Edge</strong>) ของสัญญาณ <strong>CLK</strong> เท่านั้น</li>
+<li>เมื่อเกิดขอบขาลงของ <strong>CLK</strong> และ <strong>J</strong> มีค่าลอจิกที่แตกต่างจาก <strong>K</strong> จะทำให้ค่าของ  <strong>Q</strong> 
+เป็นไปตามค่าลอจิกของอินพุต <strong>J</strong> และ <strong>/Q</strong> จะเป็นไปตาม <strong>K</strong> ในขณะนั้น</li>
+<li>เมื่อเกิดขอบขาลงของ <strong>CLK</strong> ถ้า <strong>J</strong> และ <strong>K</strong> เป็น <strong>High</strong> เหมือนกัน
+จะทำให้ค่าของ  <strong>Q</strong> และ <strong>/Q</strong> แต่ละขา เกิดการสลับจากค่าเดิม (<strong>Toggle</strong>) ในขณะนั้น</li>
+<li>เมื่อเกิดขอบขาลงของ <strong>CLK</strong> ถ้า <strong>J</strong> และ <strong>K</strong> เป็น <strong>Low</strong> เหมือนกัน
+ค่าของ  <strong>Q</strong> และ <strong>/Q</strong> จะไม่เปลี่ยนแปลงจากเดิม</li>
+</ul>
+<p><strong>ข้อสังเกต</strong>:</p>
+<ul>
+<li>ไอซีลอจิกตามมาตรฐาน <strong>74HCxx</strong> สำหรับ <strong>JK-FF</strong> ยังมีเบอร์อื่นอีก เช่น
+<a href="https://www.ti.com/product/CD4027B"><strong>CD4027B</strong></a>
+(<strong>CMOS Dual J-K Master-Slave Flip-Flop</strong>)
+ของบริษัท <strong>Texas Instruments (TI)</strong> ซึ่งมีขาอินพุต "รีเซต" (<strong>RESET</strong>)
+และ "เซต" (<strong>SET</strong>) แบบ <strong>Active-High</strong>
+และทำงานตามจังหวะขอบขาขึ้นของสัญญาณ <strong>CLK</strong> (<strong>Positive Edge-Triggered</strong>)</li>
+</ul>
+<p><img alt="" src="mc74hc73a_logic_diagram.png" /></p>
+<p>รูป: ผังวงจรในระดับลอจิกเกต (<strong>Logic Diagram</strong>) ที่แสดงให้เห็นองค์ประกอบพื้นฐานของ <strong>JK-FF</strong> (หนึ่งตัว) ภายในไอซี <strong>MC74HC73A</strong>
+เช่น  ลอจิกเกต <strong>NOT</strong>, <strong>OR2</strong>, <strong>NAND2</strong> 
+และ <strong>TG (<a href="https://en.wikipedia.org/wiki/Transmission_gate">CMOS Transmission Gate</a>)</strong></p>
+<p><strong>TG</strong> ประกอบด้วยทรานซิสเตอร์แบบ <strong>NMOS</strong> และ <strong>PMOS</strong> หนึ่งคู่
+ทำหน้าที่เป็นสวิตช์เปิด/ปิด เพื่อให้เป็นทางผ่านของสัญญาณหรือเชื่อมต่อถึงกันระหว่างสองจุด
+ในรูปวงจรจะเห็นได้ว่า มี <strong>TG</strong> อยู่ 2 กลุ่ม ๆ ละ 3 ตัว แต่ละกลุ่มถูกควบคุมด้วยสัญญาณ <strong>CLK</strong> และ <strong>/CLK</strong> เหมือนกัน 
+ถ้าต่างกลุ่มกัน ก็จะ "เปิดหรือปิดประตู" ไม่เหมือนกันในแต่ละช่วงเวลา</p>
+<p>ลองมาดูว่า ถ้ามีการรีเซต <strong>JK-FF</strong> จะเกิดอะไรขึ้นในวงจรภายในฟลิปฟลอป (ภายในไอซี  <strong>MC74HC73A</strong>)
+และจะเห็นได้ว่า ที่ขาเอาต์พุต <strong>Q</strong> และ <strong>/Q</strong> จะมีค่าลอจิก <strong>0</strong> และ  <strong>1</strong> ตามลำดับ</p>
+<p><img alt="" src="jkff_internal_reset.png" /></p>
+<p>รูป: ตัวอย่างกรณีที่เกิดการรีเซตค่าลอจิกของ <strong>JK-FF</strong> เมื่อ <strong>RESET=0 (Low)</strong> 
+จำแนกตามกรณีของค่าลอจิกที่ขาอินพุต <strong>CLK</strong></p>
+<p>วงจร <strong>JK-FF</strong> ประกอบด้วยส่วนแรกที่เป็นวงจรกำหนดค่าของข้อมูลอินพุต และส่วนที่ใช้ในการเก็บข้อมูลหนึ่งบิต
+ซึ่งประกอบด้วย <strong>D-Latch</strong> หนึ่งคู่ ต่อเข้าด้วยกัน และทำงานในลักษณะที่เรียกว่า <strong>Master-Slave Flip-Flop</strong></p>
+<ul>
+<li>วงจรของ <strong>Master</strong> จะมีค่าลอจิกตามข้อมูล-อินพุต <strong>D</strong> เมื่อสัญญาณ <strong>CLK=1</strong>
+และในช่วงถัดไป เมื่อ <strong>CLK=0</strong> ก็จะเก็บค่าดังกล่าวไว้ไม่ให้เปลี่ยนแปลง และใช้เป็นเอาต์พุตด้วย</li>
+<li>วงจรของ <strong>Slave</strong> คงค่าเอาไว้เพื่อใช้เป็นเอาต์พุต เมื่อสัญญาณ <strong>CLK=1</strong>
+และในช่วงถัดไป เมื่อ <strong>CLK=0</strong> ก็จะรับค่าจากวงจร <strong>Master</strong> เพื่อนำมาเก็บไว้ในเฟสถัดไป
+(ค่า <strong>D</strong> จะนำไปใช้เป็น <strong>Q</strong>)</li>
+</ul>
+<p><img alt="" src="jkff_internal_falling_edge.png" /></p>
+<p>รูป: การเปลี่ยนแปลงภายใน <strong>JK-FF</strong> เมื่อเกิดขอบขาลงของสัญญาณ <strong>CLK</strong></p>
+<p>ลองดูวงจรภายในไอซีลจอจิก  <strong>CD4027B</strong> (และเปรียบเทียบความแตกต่างกับไอซี  <strong>MC74HC73A</strong>)</p>
+<p><img alt="" src="cd4027b_jkff_internal.png" /></p>
+<p>รูป: วงจรภายในของ <strong>JK-FF</strong> (หนึ่งตัว) และตารางฟังก์ชันเชิงลอจิกของไอซี <strong>CD4027B</strong> (Source: TI)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การสร้างวงจรตัวนับไบนารี</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถ้าต่อขาอินพุต <strong>J</strong> และ <strong>K</strong> กับแรงดันไฟเลี้ยง ให้มีค่าเป็นลอจิก <strong>High</strong> เหมือนกัน
+(หรือนำไปต่อกับขาอินพุตที่มีชื่อว่า <strong>TOGGLE</strong> เป็นสัญญาณควบคุม)
+ฟลิปฟลอป <strong>JK-FF</strong> จะทำหน้าที่ได้เหมือนฟลิปฟลอปประเภทที่เรียกว่า <strong>Toggle Flip Flop (T-FF)</strong>
+ในกรณีนี้ ทุกครั้งที่เกิดขอบขาลงของสัญญาณ <strong>CLK</strong> จะทำให้ <strong>T-FF</strong> เปลี่ยนสถานะลอจิกที่ขาเอาต์พุตทั้งสอง
+เกิดการสลับค่าลอจิก (<strong>Toggle</strong>)</p>
+<p>ฟลิปฟลอป <strong>T-FF</strong> สามารถนำมาใช้ในการสร้างวงจรตัวนับแบบไบนารี ในรูปแบบที่เรียกว่า
+<strong>Ripple-Carry (Asynchrnous) Binary Counter</strong> แบ่งเป็นสองกรณี</p>
+<ol>
+<li>สำหรับฟลิปที่ทำงานตามจังหวะของขอบขาลง (<strong>Falling Edge</strong>): ขาเอาต์พุต <strong>Q</strong> ของ <strong>T-FF</strong> ตัวหนึ่ง จะนำไปต่อเข้ากับขา <strong>CLK</strong> ของ <strong>T-FF</strong> ตัวถัดไปตามลำดับ </li>
+<li>สำหรับฟลิปที่ทำงานตามจังหวะของขอบขาขึ้น (<strong>Rising Edge</strong>): ขาเอาต์พุต <strong>/Q</strong> ของ <strong>T-FF</strong> ตัวหนึ่ง จะนำไปต่อเข้ากับขา <strong>CLK</strong> ของ <strong>T-FF</strong> ตัวถัดไปตามลำดับ </li>
+</ol>
+<p>ทุกครั้งที่เกิดขอบขาลง (ตามวงจรในตัวอย่างนี้) จะทำให้ <strong>T-FF</strong> นับขึ้นหนึ่งครั้ง และเป็นตัวนับแบบหนึ่งบิต
+โดยมีค่าตามลำดับดังนี้ <strong>0 -&gt; 1 -&gt; 0 -&gt; 1 -&gt; ...</strong> </p>
+<p>การเปลี่ยนแปลงค่าลอจิกหรือการสลับสถานะลอจิกที่ขาเอาต์พุตของฟลิปฟลอปตัวหนึ่ง
+จะถูกนำไปใช้เป็นพัลส์สำหรับสัญญาณ <strong>Clock</strong> ของฟลิปฟลอปอีกตัวหนึ่งในตำแหน่งถัดไป
+<strong>T-FF</strong></p>
+<p><img alt="" src="counter_jkff_schematic-1.png" /></p>
+<p>รูป: ผังวงจรของ <strong>4-bit Binary Counter</strong> ที่ประกอบด้วย <strong>JK-FF</strong> จำนวน 4 ตัว</p>
+<p>ให้สังเกตว่า <strong>JK-FF</strong> ทั้งสองตัวของไอซี <strong>74HC73</strong> ทำงานที่ขอบขาลง และสามารถสร้างวงจรตัวนับขนาด 4 บิต
+โดยใช้ <strong>JK-FF</strong> จำนวน 4 ตัว (ใช้ไอซี <strong>74HC73</strong> จำนวน 2 ตัว)</p>
+<p><img alt="" src="wiring_diagram.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรตัวนับ <strong>4-Bit Ripple-Carry Binary Counter</strong>
+โดยใช้ไอซี <strong>74HC73</strong> จำนวน 2 ตัว (ขาอินพุต <strong>RESET</strong> และ <strong>TOGGLE</strong>
+ต่อกับ <strong>VCC</strong> มีค่าลอจิก <strong>High</strong>)</p>
+<p><img alt="" src="4bit_counter_tinkercad.png" /></p>
+<p>รูป: ตัวอย่างการวางแผนต่อวงจรตัวนับ <strong>4-Bit Ripple-Carry Binary Counter</strong>
+บนเบรดบอร์ด โดยใช้ไอซี <strong>74HC73</strong> และใช้ปุ่มกดสร้างสัญญาณ <strong>Pulses</strong> สำหรับ <strong>CLK</strong>
+ส่วนขา <strong>RESET</strong> ต่อกับ <strong>VCC</strong> ให้เป็นลอจิก <strong>High</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="4bit_counter_tinkercad_sim.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของวงจรตัวนับด้วย <strong>TinkerCad</strong>
+และใช้อุปกรณ์ <strong>Function Generator</strong> สร้างสัญญาณ <strong>CLK</strong> ความถี่ต่ำ แทนการกดปุ่ม</p>
+<p>&nbsp;</p>
+<p>นอกเหนือจากซอฟต์แวร์ <strong>TinkerCad</strong> ก็ยังมีซอฟต์แวร์ที่เป็นตัวเลือกอื่นอีกที่สามารถนำมาใช้จำลองการทำงานของวงจรดิจิทัลได้
+ตัวอย่างถัดไปเป็นการจำลองการทำงานด้วยโปรแกรม <a href="https://easyeda.com/"><strong>EasyEDA Online PCB Design &amp; Circuit Simulator</strong></a> และ 
+<a href="https://www.falstad.com/circuit/e-index.html"><strong>Falstad's Online Electronic Circuit Simulator</strong></a></p>
+<p><img alt="" src="easyeda_couter_jkff_sim_waveforms.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของวงจรตัวนับด้วย <strong>EasyEDA Simulator</strong>
+และแสดงรูปคลื่นสัญญาณเอาต์พุตด้วย <strong>Virtual Logical Analyzer</strong></p>
+<p><img alt="" src="falstad_carry_ripple_counter_sim.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของวงจรตัวนับด้วย <a href="https://www.falstad.com/circuit/e-counter.html"><strong>Falstad's Online Circuit Simulator</strong></a></p>
+<p>&nbsp;</p>
+<p>อีกตัวอย่างหนึ่งเป็นการสาธิตการใช้ซอฟต์แวร์ 
+<a href="https://circuitverse.org/simulator/"><strong>CircuitVerse Online Simulator</strong></a>
+เพื่อวาดผังวงจรและจำลองการทำงาน และสามารถเขียนโค้ด <strong>Verilog</strong> เพื่อสร้างวงจรดิจิทัลและนำมาใช้ได้</p>
+<p>ในผังวงจร จะเห็นได้ว่า มี <strong>JK_FF</strong> อยู่ 4 ตัว มีขา  <strong>J</strong> และ <strong>K</strong> ของทุกตัว
+เชื่อมต่อกับปุ่มอินพุต <strong>TOGGLE</strong> และมีขา <strong>CLR</strong> สำหรับรีเซตค่าของฟลิปฟลอปทุกตัว
+เชื่อมต่อกับปุ่มอินพุต <strong>RESET</strong> </p>
+<p>ขา <strong>Q</strong> ของ <strong>JK-FF</strong> แต่จะตัวจะเชื่อมต่อกับ <strong>LED</strong> อย่างละหนึ่งตัว เพื่อแสดงสถานะลอจิก
+<strong>JK-FF</strong> ที่อยู่ทางขวามือ จะได้รับอินพุตที่ขา <strong>CLK</strong> มาจากตัวสร้างสัญญาณพัลส์ต่อเนื่องสำหรับ <strong>Clock</strong>
+ความถี่ต่ำ เมื่อมีการจำลองการทำงานของวงจร</p>
+<p><img alt="" src="circuitverse_sim.png" /></p>
+<p>รูป: ตัวอย่างผังวงจร <strong>4-bit Ripple Carry Counter</strong> ที่ประกอบด้วย <strong>JK_FF</strong>
+(<strong>Circuit Component</strong>) และการจำลองการทำงานแบบ <strong>Interactive Circuit Simulation</strong></p>
+<p><img alt="" src="circuitverse_jk_ff_verilog.png" /></p>
+<p>รูป: การสร้างแบบจำลองของ <strong>JK_FF</strong> ด้วยภาษา  <strong>Verilog</strong> แล้วนำไปใช้ในการสร้างวงจรตัวนับขนาด 4 บิต</p>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> </p>
+<ul>
+<li>ในตัวอย่างโค้ด <strong>Verilog</strong> วงจร  <strong>JK-FF</strong> ทำงานด้วยขอบขาลง  (<strong>Falling-Edge</strong>) และใช้ขา <strong>Q</strong> 
+เพื่อนำสัญญาณเอาต์พุตไปใช้กับขาอินพุต <strong>CLK</strong> ของ <strong>JK-FF</strong> ตัวถัดไป
+และนำขา <strong>Q</strong> ไปต่อกับวงจร <strong>LED</strong> ที่ทำงานแบบ <strong>Active-High</strong></li>
+<li>ถ้าจะแก้ไขให้ <strong>JK-FF</strong> ทำงานด้วยขอบขาขึ้น จะต้องเปลี่ยนไปใช้ขา <strong>/Q</strong> เพื่อนำไปใช้กับขา <strong>CLK</strong>
+ของ <strong>JK-FF</strong> ตัวถัดไป
+และนำขา <strong>/Q</strong> ไปต่อกับวงจร <strong>LED</strong> ที่ทำงานแบบ <strong>Active-Low</strong></li>
+<li>วงจรไบนารีในลักษณะนี้ ไม่เหมาะสำหรับการนำไปสร้างเป็นวงจรในชิป <strong>FPGA</strong>
+เนื่องจากไม่เป็น <strong>Fully Synchronous Logic Design</strong> เพราะฟลิปฟลอป <strong>JK-FF</strong> แต่ละตัว
+มีสัญญาณ <strong>CLK</strong> ที่แตกต่างกัน (หรือกล่าวได้ว่า ฟลิปฟลอปในวงจรไม่ได้ใช้สัญญาณ <strong>CLK</strong> เดียวกัน)</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl">&#9655; <strong>การเขียนโค้ด VHDL เพื่อจำลองการทำงานสำหรับวงจรดิจิทัล</strong><a class="headerlink" href="#vhdl" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>VHDL</strong> เพื่อจำลองการทำงานของฟลิปฟลอป <strong>JK-FF</strong>
+และการนำฟลิปฟลอป <strong>JK-FF</strong> จำนวน 4 ตัว นำมาต่อเข้าด้วยกันให้เป็นวงจรตัวนับไบนารีที่มีขนาด 4 บิต</p>
+<p>จากตัวอย่างโค้ดจะเห็นได้ว่า วงจร <code>ripple_carry_counter</code> จะประกอบด้วย
+วงจร <code>JK_FF</code> จำนวน 4 ตัว นำมาต่อเข้าด้วยกัน</p>
+<p><strong>File</strong>: <code>ripple_carry_counter.vhd</code></p>
+<pre><code class="language-vhdl">library ieee;
+use ieee.std_logic_1164.all;
+
+entity JK_FF is
+  port( CLK, CLR, J, K: in std_logic;
+        Q, QB : out std_logic
+  );
+end JK_FF;
+
+architecture synth of JK_FF is
+  signal ff : std_logic;
+begin
+  process (CLK, CLR) begin
+     if ( CLR = '0') then 
+       ff &lt;= '0';       -- clear the FF's value
+     elsif CLK'event and CLK='0' then -- falling edge
+       if J /= K then
+          ff &lt;= J;      -- load the input J
+       elsif J = '1' and K = '1' then
+          ff &lt;= not ff; -- toggle the FF's value
+       end if;
+     end if;
+  end process;
+  -- output and inverted output
+  Q  &lt;= ff;
+  QB &lt;= not ff;
+
+end synth;
+
+-------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity ripple_carry_counter is
+  port( CLK, RESET : in std_logic;
+        Q : out std_logic_vector(3 downto 0)
+  );
+end ripple_carry_counter;
+
+architecture structural of ripple_carry_counter is
+
+  component JK_FF is
+  port( CLK, CLR, J, K : in std_logic;
+       Q, QB : out std_logic );
+  end component;
+
+  signal t: std_logic_vector(4 downto 0);
+  signal VCC : std_logic;
+
+begin
+
+  VCC  &lt;= '1';
+  t(0) &lt;= CLK;
+
+  -- create four instance of JK_FF components
+  U_i: for i in 0 to 3 generate
+    Instance: JK_FF port map(
+        CLK =&gt; t(i), CLR =&gt; RESET,
+        J =&gt; VCC, K =&gt; VCC,
+        Q =&gt; t(i+1), QB =&gt; open
+    );
+  end generate;
+
+  -- 4-bit binary output
+  Q &lt;= t(4 downto 1);
+
+end structural;
+</code></pre>
+<p><img alt="" src="jk_ff.png" /></p>
+<p>รูป: ตัวอย่างวงจรดิจิทัลที่ได้จากการแปลงโค้ด <strong>VHDL</strong> หรือการสังเคราะห์วงจร สำหรับ <code>JK_FF</code></p>
+<p>&nbsp;</p>
+<p>อีกไฟล์หนึ่งเป็น <strong>VHDL Testbench</strong> เพื่อใช้ในการจำลองการทำงานของวงจร
+<code>ripple_carry_counter</code></p>
+<p><strong>File</strong>: <code>ripple_carry_counter_tb.vhd</code></p>
+<pre><code class="language-vhdl">library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity testbench is
+-- empty
+end testbench;
+
+architecture tb of testbench is
+  -- DUT component
+  component ripple_carry_counter is
+  port( CLK, RESET : in std_logic;
+        Q : out std_logic_vector(3 downto 0) );
+  end component;
+
+  signal t_clk, t_reset: std_logic := '0';
+  signal t_q: std_logic_vector(3 downto 0);
+
+begin
+
+  DUT: ripple_carry_counter
+       port map( t_clk, t_reset, t_q );
+
+  process begin
+    t_clk &lt;= not t_clk;
+    wait for 10 ns;
+  end process;
+
+  process begin
+    assert false report &quot;Simulation started.&quot; severity note;
+    t_reset &lt;= '0';
+    wait for 100 ns;
+    t_reset &lt;= '1';
+    wait for 1000 ns;
+    t_reset &lt;= '0';
+    wait for 100 ns;
+    t_reset &lt;= '1';
+    wait for 10 us;
+    assert false report &quot;Test done.&quot; severity note;
+    wait;
+  end process;
+end tb;
+</code></pre>
+<p>ถ้าใช้โปรแกรม <a href="https://github.com/ghdl/ghdl"><strong>GHDL</strong></a> ซึ่งเป็นซอฟต์แวร์ประเภท
+<strong>Open Source</strong> เพื่อการจำลองการทำงานของวงจร (ในบทความนี้ ได้นำ
+<strong>GHDL v4.0.0-dev</strong> มาใช้งานสำหรับ <strong>Ubuntu Linux</strong>) 
+ก็มีตัวอย่างการทำคำสั่งใน <strong>Bash Shell</strong> ดังนี้</p>
+<pre><code class="language-text"># Install GHDL and GTKWave packages
+$ sudo apt install ghdl gtkwave \
+  libcanberra-gtk-module libcanberra-gtk3-module
+</code></pre>
+<p>การทำคำสั่งเพื่อคอมไพล์โค้ด <strong>VHDL</strong> และจำลองการทำงานของวงจร <strong>VHDL Testbench</strong>
+ด้วย <strong>GHDL</strong></p>
+<pre><code class="language-text">$ ghdl -i ripple_carry_counter.vhd ripple_carry_counter_tb.vhd \
+  &amp;&amp; ghdl -m testbench \
+  &amp;&amp; ghdl -r testbench --vcd=dump.vcd --stop-time=15us
+</code></pre>
+<p>เมื่อได้ไฟล์ <code>dump.vcd</code> มาแล้ว ก็สามารถเปิดดูรูปคลื่นสัญญาณโดยใช้โปรแกรม
+<a href="https://gtkwave.sourceforge.net/"><strong>GTKWave</strong></a> ได้</p>
+<p><img alt="" src="ghdl_sim_vcd-1.png" /></p>
+<p><img alt="" src="ghdl_sim_vcd-2.png" /></p>
+<p>รูป: ตัวอย่างผลการจำลองการทำงานของวงจรซึ่งแสดงอยู่ในรูปคลื่นสัญญาณดิจิทัล</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="verilog">&#9655; <strong>ตัวอย่างการสร้างวงจรด้วย Verilog</strong><a class="headerlink" href="#verilog" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ดด้วยภาษา <strong>Verilog</strong> ซึ่งจะทำงานได้เหมือนวงจรที่เขียนโค้ดด้วยภาษา <strong>VHDL</strong>
+ในตัวอย่างที่แล้ว จากตัวอย่างโค้ดจะเห็นได้ว่า มีการสร้าง <code>JK_FF</code> แล้วนำมาใช้จำนวน 4 ตัว ต่อเข้าด้วยกัน
+ให้ได้วงจร <code>ripple_carry_counter</code></p>
+<p><strong>File:</strong> <code>ripple_carry_counter.v</code></p>
+<pre><code class="language-verilog">//---------------------------------------------------
+module JK_FF (
+    input  CLK, CLR, J, K,
+    output Q, QB
+);
+
+reg ff; // internal single-bit flip-flop (FF)
+
+always @(negedge CLK or negedge CLR) begin
+    if (CLR == 1'b0) begin
+        ff &lt;= 0; // clear the FF's value
+    end else begin
+        if (J !== K) begin
+            ff &lt;= J;   // load the FF's value
+        end else if (J &amp;&amp; K) begin
+            ff &lt;= ~ff; // toggle the FF's value.
+        end
+    end
+end
+// output and inverted output
+assign Q  = ff;
+assign QB = ~ff;
+
+endmodule
+
+//---------------------------------------------------
+
+module ripple_carry_counter (
+    input  CLK, RESET,
+    output [3:0] Q
+);
+
+wire [4:0] t; // internal wires
+wire VCC;
+
+assign VCC = 1'b1;
+assign t[0] = CLK;
+
+genvar i;
+generate for (i=0; i&lt;=3; i = i+1) 
+  begin : U_i
+    JK_FF Instance (
+        .CLK(t[i]), .CLR(RESET),
+        .J(VCC), .K(VCC),
+        .Q(t[i+1]), .QB()
+    );
+  end
+endgenerate
+// 4-bit output
+assign Q = t[4:1];
+
+endmodule
+//---------------------------------------------------
+</code></pre>
+<p><strong>คำถาม:</strong> ถ้าต้องการให้ <strong>JK_FF</strong> เปลี่ยนจากการทำงานตามจังหวะขอบขาลง ให้เป็นไปตามขอบขาขึ้น
+จะต้องแก้ไขโค้ดอย่างไรจึงจะทำให้วงจรโดยรวมทำงานได้ผลเหมือนเดิม?</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการเขียนโค้ด <strong>Verilog Testbench</strong> มีดังนี้</p>
+<p><strong>File:</strong> <code>ripple_carry_counter_tb.v</code></p>
+<pre><code class="language-verilog">`timescale 1ns / 1ps
+
+module testbench;
+
+// Signals
+reg t_clk = 1'b0;
+reg t_reset = 1'b0;
+wire [3:0] t_q;
+
+// DUT component definition
+ripple_carry_counter DUT (
+    .CLK(t_clk),
+    .RESET(t_reset),
+    .Q(t_q)
+);
+
+// Dumpfile and dumpvars
+initial begin
+    $dumpfile(&quot;waveform.vcd&quot;);
+    $dumpvars(0, testbench); // Dump all variables in the testbench
+end
+
+// Clock generation
+always begin
+    #5 t_clk = ~t_clk;
+end
+
+// Test procedure
+initial begin
+    $display(&quot;Simulation started.&quot;);
+    #100;
+    t_reset = 1'b1;
+    #1000;
+    t_reset = 1'b0;
+    #100;
+    t_reset = 1'b1;
+    #10;
+    $display(&quot;Test done.&quot;);
+    $finish;
+end
+
+endmodule
+</code></pre>
+<p>การจำลองการทำงานของโค้ด <strong>Verilog Testbench</strong> สามารถใช้โปรแกรม
+<strong>Icarus Verilog</strong> ซึ่งเป็นซอฟต์แวร์ประเภท <strong>Open Source</strong> (ในบทความนี้ได้ทดลองใช้
+<strong>Icarus Verilog v11.0</strong>) มีตัวอย่างการทำคำสั่งเพื่อใช้งานสำหรับ
+<strong>Ubuntu Linux</strong> ดังนี้</p>
+<pre><code class="language-text"># Install iverilog 
+$ sudo apt install iverilog 
+</code></pre>
+<pre><code class="language-text">$ iverilog -o simulation_tb \
+  ripple_carry_counter.v ripple_carry_counter_tb.v \
+  &amp;&amp; vvp simulation_tb 
+</code></pre>
+<p>เมื่อทำคำสั่งได้สำเร็จแล้ว จะได้ไฟล์ <strong>VCD</strong> ชื่อ <code>waveform.vcd</code>
+และสามารถเปิดดูรูปคลื่นสัญญาณโดยใช้โปรแกรม <strong>GTKWave</strong></p>
+<p>&nbsp;</p>
+<p>หากต้องการจะลองใช้ซอฟต์แวร์แบบออนไลน์ ก็สามารถใช้บริการฟรีของเว็บไซต์
+เช่น <a href="https://edaplayground.com/"><strong>EDAplayground</strong></a></p>
+<p><img alt="" src="edaplayground_sim-1.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ด <strong>Verilog Testbench</strong> โดยใช้ <strong>EDAplayground</strong>
+(เลือกใช้ <strong>Icarus Verilog</strong>)</p>
+<p><img alt="" src="edaplayground_sim-2.png" /></p>
+<p>รูป: ผลการจำลองการทำงานในรูปของคลื่นสัญญาณดิจิทัล (<strong>EDAplayground - EPWave</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการสร้างวงจรตัวนับไบนารี <strong>"Ripple-Carry Counter"</strong> ขนาด 4 บิต
+และมีการจำลองการทำงานของวงจรในรูปแบบที่แตกต่างกัน เช่น การใช้ไอซีลอจิก <strong>74HC73</strong> มาต่อวงจรเสมือนจริงบนเบรดบอร์ด
+การเขียนโค้ด <strong>VHDL</strong> และ <strong>Verilog</strong> เพื่อสร้างแบบจำลองของวงจร และใช้โปรแกรม เช่น
+<strong>GHDL</strong> และ <strong>Icarus Verilog</strong> ในการจำลองการทำงานและตรวจสอบฟังก์ชันการทำงานของวงจร</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-08-13 | Last Updated: 2023-08-15</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
