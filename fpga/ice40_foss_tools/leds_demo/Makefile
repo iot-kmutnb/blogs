@@ -1,4 +1,4 @@
-filename = leds
+filename =leds
 pcf_file = $(filename).pcf
 
 build:

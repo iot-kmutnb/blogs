@@ -1,19 +1,23 @@
-module top(
+module leds(
    input  wire clk,
-   output wire LED_R, 
-   output wire LED_G, 
-   output wire LED_B
+   output wire led_r, 
+   output wire led_g, 
+   output wire led_b
 );
 
-reg [24:0] counter = 0;
+localparam N = 24;
 
-assign LED_R = ~counter[21];
-assign LED_G = ~counter[22];
-assign LED_B = ~counter[23];
+reg [N-1:0] counter = 0; // N-bit register
+wire [1:0]  selected_bits;
+
+assign selected_bits = { counter[N-1], counter[N-2] };
+assign led_r = ~(selected_bits == 2'b01);
+assign led_g = ~(selected_bits == 2'b10);
+assign led_b = ~(selected_bits == 2'b11);
 
 always @(posedge clk) begin
-      counter <= counter + 1; // increment the counter value
+      counter <= counter + 1'b1; // increment the counter value
 end
 
-endmodule // top
+endmodule
 

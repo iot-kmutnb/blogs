@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/lattice_radiant_ice40/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานซอฟต์แวร์ Lattice Radiant สำหรับบอร์ด Lattice iCE40UP FPGA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#lattice-radiant-lattice-ice40up-fpga" class="nav-link">การใช้งานซอฟต์แวร์ Lattice Radiant สำหรับบอร์ด Lattice iCE40UP FPGA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#fpga-lattice-semiconductor" class="nav-link">&#9655; ชิป FPGA ของบริษัท Lattice Semiconductor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#lattice-radiant" class="nav-link">&#9655; ขั้นตอนการติดตั้งซอฟต์แวร์ Lattice Radiant</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#lattice-radiant_1" class="nav-link">&#9655; ตัวอย่างการใช้ซอฟต์แวร์ Lattice Radiant</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="lattice-radiant-lattice-ice40up-fpga">การใช้งานซอฟต์แวร์ Lattice Radiant สำหรับบอร์ด Lattice iCE40UP FPGA<a class="headerlink" href="#lattice-radiant-lattice-ice40up-fpga" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Lattice iCE40 UltraPlus FPGA</em>, 
+<em>Lattice Semiconductor FPGAs</em>, <em>Lattice Radiant Software</em></p>
+<hr />
+<h2 id="fpga-lattice-semiconductor">&#9655; <strong>ชิป FPGA ของบริษัท Lattice Semiconductor</strong><a class="headerlink" href="#fpga-lattice-semiconductor" title="Permanent link">#</a></h2>
+<p><a href="https://www.latticesemi.com/"><strong>Lattice Semiconductor</strong></a>
+เป็นผู้ผลิตชิป <strong>FPGA</strong> ซึ่งมีอยู่หลายตระกูล (<strong>FPGA Families</strong>) ยกตัวอย่างดังนี้</p>
+<ul>
+<li><strong>General-Purpose FPGAs</strong><ul>
+<li><strong>Lattice Avant FPGA Architecture</strong> (16nm FinFET)<ul>
+<li><strong>Avant-E</strong></li>
+</ul>
+</li>
+<li><strong>Lattice Nexus FPGA Platform</strong> (28nm FD-SOI: <em>"fully depleted silicon-on-insulator"</em>)<ul>
+<li><strong>Certus-NX</strong></li>
+<li><strong>CertusPro-NX</strong></li>
+</ul>
+</li>
+<li><strong>ECP5/ECP5-5G</strong> (40nm process)</li>
+<li><strong>LatticeECP3</strong> (65nm process)</li>
+<li><strong>LatticeECP2/M</strong></li>
+<li><strong>LatticeXP2</strong></li>
+</ul>
+</li>
+<li><strong>Video Bridging &amp; Processing FPGAs</strong><ul>
+<li><strong>CrossLink-NX</strong>, <strong>CrossLinkPlus</strong>, <strong>CrossLink</strong> </li>
+</ul>
+</li>
+<li><strong>Security FPGAs (with Crypto Hard IP Cores)</strong><ul>
+<li><strong>MachXO5-NX</strong></li>
+<li><strong>MachXO3</strong>, <strong>MachXO3D</strong></li>
+<li><strong>MachXO2</strong></li>
+<li><strong>MachXO</strong></li>
+</ul>
+</li>
+<li><strong>Ultra-Low Power &amp; Form Factor FPGAs</strong> (40nm process)<ul>
+<li><strong>iCE40 UltraPlus</strong> </li>
+<li><strong>iCE40 Ultra</strong></li>
+<li><strong>iCE40 LP/HX</strong></li>
+</ul>
+</li>
+</ul>
+<p>ซอฟต์แวร์ที่ใช้ในการออกแบบวงจรสำหรับชิป <strong>Lattice FPGA</strong>
+(มีเวอร์ชันสำหรับ <strong>Windows</strong> และ <strong>Linux</strong>) ได้แก่</p>
+<ul>
+<li><a href="https://www.latticesemi.com/Products/DesignSoftwareAndIP/FPGAandLDS/Radiant"><strong>Lattice Radiant Software</strong></a></li>
+<li><a href="https://www.latticesemi.com/Products/DesignSoftwareAndIP/FPGAandLDS/LatticePropel"><strong>Lattice Propel Design Environment</strong></a></li>
+<li><a href="https://www.latticesemi.com/Products/DesignSoftwareAndIP/FPGAandLDS/LatticeDiamond"><strong>Lattice Diamond Software</strong></a> </li>
+<li><a href="https://www.latticesemi.com/Products/DesignSoftwareAndIP/FPGAandLDS/iCEcube2"><strong>iCEcube2 Design Software</strong></a></li>
+</ul>
+<p>ซอฟต์แวร์ <strong>Lattice Radiant</strong> จะใช้กับชิป <strong>Lattice FPGA</strong> หลายรุ่นที่ออกมาใหม่
+เช่น <strong>Avant-E</strong>, <strong>Certus-NX / CertusPro-NX</strong> และ <strong>iCE40 Ultra Plus</strong>
+(แต่ถ้าชิปเป็นรุ่นอื่น ๆ  จะใช้ซอฟต์แวร์ <strong>Lattice Diamond</strong>)</p>
+<p>จากข้อมูลบนเว็บไซต์ของบริษัท: <a href="https://www.latticesemi.com/Support/Licensing">https://www.latticesemi.com/Support/Licensing</a>
+(ในขณะที่เขียนบทความนี้) จะเห็นได้ว่า ซอฟต์แวร์ <strong>Lattice Radiant</strong> รองรับชิป <strong>FPGA</strong> ในตระกูลต่อไปนี้</p>
+<ul>
+<li><strong>Subscription</strong>: Avant-E, MachXO5-NX, CertusPro-NX-RT</li>
+<li><strong>Free</strong>: CertusPro-NX, CrossLink, <strong><em>iCE40 UltraPlus</em></strong></li>
+</ul>
+<p>บทความนี้จะกล่าวถึง ขั้นตอนการติดตั้งและใช้งานซอฟต์แวร์ <strong>Lattice Radiant</strong>
+(ทดลองใช้เวอร์ชัน <strong>v2023.1</strong> สำหรับระบบปฏิบัติการ <strong>Windows</strong>)
+และทดลองใช้ในการแปลงโค้ด <strong>Verilog</strong>
+ให้เป็นวงจรสำหรับชิป <strong>iCE40UP5K</strong> และใช้บอร์ด <strong>iCE-Sugar</strong> เป็นบอร์ดทดลอง</p>
+<p><img alt="" src="../ice40_foss_tools/ice-sugar_board.jpg" /></p>
+<p>รูป: บอร์ด <strong>iCE-Sugar</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="lattice-radiant">&#9655; <strong>ขั้นตอนการติดตั้งซอฟต์แวร์ Lattice Radiant</strong><a class="headerlink" href="#lattice-radiant" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการติดตั้งซอฟต์แวร์ <strong>Lattice Radiant v2023.1</strong>
+และในบทความนี้ จะเลือกติดตั้งไฟล์เฉพาะสำหรับชิปในตระกูล <strong>iCE40 UltraPlus</strong> เท่านั้น
+และไม่เลือกติดตั้ง <strong>ModelSim - Lattice FPGA Edition</strong></p>
+<p><img alt="" src="lattice_radiant_installation.png" /></p>
+<p>รูป: ขั้นตอนการติดตั้งซอฟต์แวร์ <strong>Lattice Radiant</strong></p>
+<p>โปรแกรมที่เป็นเครื่องมือสำหรับการสังเคราะห์วงจร โดยการแปลงโค้ด <strong>HDL (Hardware Description Language)</strong>
+ให้เป็นวงจรระดับลอจิกเกต มีสองตัวเลือกที่ได้มีการติดตั้งมาพร้อมกับ <strong>Lattice Radiant</strong> คือ</p>
+<ul>
+<li><strong>Lattice Synthesis Engine (LSE)</strong></li>
+<li><strong>Synopsys Synplify Pro</strong> (Third-party Software)</li>
+</ul>
+<p><img alt="" src="lattice_lse_flow.png" /></p>
+<p>รูป:  <strong>Lattice LSE Design Flow</strong> (Source: Lattice Semiconductor)</p>
+<p>เมื่อติดตั้งได้แล้ว จะต้องไปยังเว็บไซต์ <a href="https://www.latticesemi.com/Products/DesignSoftwareAndIP/FPGAandLDS/Radiant"><strong>Radiant Software Licensing</strong></a>
+ของบริษัท <strong>Lattice Semiconductor</strong>
+เพื่อขอรับไฟล์ลิขสิทธิ์ (<strong>License File</strong>) ในการใช้งานซอฟต์แวร์ซึ่งมีอายุการใช้งานได้หนึ่งปี
+แนะนำให้เลือกแบบ <strong>Node-Locked License File</strong></p>
+<p>ผู้ใช้จะต้องระบุ <strong>NIC</strong> ของเครื่องคอมพิวเตอร์ของผู้ใช้ ซึ่งเป็น <strong>MAC Address</strong> ของ
+<strong>Ethernet / Wi-Fi Interface</strong> ในเลขฐานสิบหก (<strong>Hexadecimal</strong>) จำนวน 12 ตัว 
+และเมื่อกรอกข้อมูลได้สำเร็จแล้ว ก็จะได้รับไฟล์ (<strong>license.dat</strong>) ที่ถูกส่งมาทางอีเมล์ของผู้ใช้ที่ได้ลงทะเบียนไว้
+เมื่อเปิดใช้งานซอฟต์แวร์ครั้งแรก จะมีการตรวจสอบไฟล์ <strong>license.dat</strong> ก็ให้เลือกไฟล์ที่ได้ดาวน์โหลดมายังเครื่องของผู้ใช้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="lattice-radiant_1">&#9655; <strong>ตัวอย่างการใช้ซอฟต์แวร์ Lattice Radiant</strong><a class="headerlink" href="#lattice-radiant_1" title="Permanent link">#</a></h2>
+<p>เมื่อเปิดใช้งานซอฟต์แวร์ <strong>Lattice Radiant</strong>
+ก็ให้เริ่มต้นด้วยการสร้างโปรเจกต์ใหม่ (<strong>New Project</strong>)
+ระบุชื่อโปรเจกต์ และไดเรกทอรีใหม่สำหรับเก็บไฟล์ต่าง ๆ ของโปรเจกต์
+จากนั้นให้เลือกชิป <strong>FPGA</strong> ที่ต้องการใช้งาน </p>
+<p>ในตัวอย่างนี้ได้ตั้งชื่อโปรเจกต์เป็น <code>leds_demo</code> และเนื่องจากฮาร์ดแวร์ที่ได้นำมาทดลองคือ บอร์ด <strong>iCE-Sugar</strong>
+ดังนั้นจึงเลือกใช้ชิป <code>iCE40UP5K-SG48I</code></p>
+<p><img alt="" src="lattice_radiant_project-1.png" /></p>
+<p>รูป: หน้าต่างหลักเมื่อได้เปิดใช้งานซอฟต์แวร์ <strong>Lattice Radiant</strong></p>
+<p><img alt="" src="lattice_radiant_project-2.png" /></p>
+<p>รูป: เริ่มต้นด้วยการสร้างโปรเจกต์ใหม่ และยังไม่ต้องเพิ่มไฟล์ <strong>HDL</strong> ลงในโปรเจกต์</p>
+<p><img alt="" src="lattice_radiant_project-3.png" /></p>
+<p>รูป:  เลือกชิป <strong>iCE40UP5K-SG48I</strong> สำหรับโปรเจกต์</p>
+<p><img alt="" src="lattice_radiant_project-4.png" /></p>
+<p>รูป: กลับสู่หน้าต่างหลักเมื่อได้สร้างโปรเจกต์ใหม่แล้ว</p>
+<p><img alt="" src="lattice_radiant_project-5.png" /></p>
+<p>รูป: สร้างไฟล์ใหม่สำหรับโค้ด <strong>Verilog (.v)</strong> แล้วเพิ่มไฟล์ไว้ในโปรเจกต์</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ด <strong>Verilog</strong> มีดังนี้</p>
+<p><strong>File</strong>: <code>leds.v</code></p>
+<pre><code class="language-verilog">module leds(
+   input  wire clk,
+   output wire [2:0] leds
+);
+
+   localparam N = 24;
+   reg  [N-1:0] counter = 0; // N-bit register
+   wire [N-1:0] sum;
+
+   assign sum = counter + 1'b1;
+
+   always @(posedge clk) begin
+     counter &lt;= sum;
+   end
+
+   assign leds = ~{counter[N-1], counter[N-2], counter[N-3]};
+
+endmodule
+</code></pre>
+<p>ถ้าต้องการกำหนดเงื่อนไขเชิงเวลา (<strong>Timing Constraints</strong>) สำหรับการสังเคราะห์วงจร เช่น
+การกำหนดคาบความถี่ของสัญญาณ <strong>Clock</strong> (ความถี่ <strong>12MHz</strong>
+หรือ มีคาบประมาณ <strong>83.33ns</strong> สำหรับบอร์ด <strong>iCE-Sugar</strong>)
+ในวงจร ก็ให้เพิ่มบรรทัดต่อไปนี้ ลงในไฟล์ <strong>.sdc (Pre-Synthesis Constraint File)</strong> 
+ของโปรเจกต์</p>
+<p><strong>SDC Timing Constraints</strong></p>
+<pre><code class="language-text">create_clock -name clk -period 83.33 [get_ports clk]
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="lattice_radiant_project-6.png" /></p>
+<p>รูป: ทำขั้นตอน <strong>Synthesize Design</strong> เพื่อคอมไพล์โค้ดและสังเคราะห์วงจรลอจิก</p>
+<p>&nbsp;</p>
+<p>เมื่อได้ทำขั้นตอนการสังเคราะห์วงจรแล้ว ถัดไปจะต้องกำหนดตำแหน่งของขาที่ใช้กับ <strong>I/O</strong> ของวงจร
+โดยให้คำสั่งจากเมนู <strong>Tools &gt; Device Constraint Editor</strong></p>
+<p><img alt="" src="lattice_radiant_project-7.png" /></p>
+<p>รูป: การกำหนดตำแหน่งขา <strong>I/O</strong> ของวงจร</p>
+<p>หรือจะแก้ไขไฟล์ <strong>.pdc (Post-Synthesis Constraint File)</strong> ของโปรเจกต์ ดังนี้</p>
+<pre><code class="language-text">ldc_set_location -site {40} [get_ports {leds[0]}]
+ldc_set_location -site {41} [get_ports {leds[1]}]
+ldc_set_location -site {39} [get_ports {leds[2]}]
+ldc_set_location -site {35} [get_ports clk]
+</code></pre>
+<p>&nbsp;</p>
+<p>จากนั้นให้ทำขั้นตอนให้ครบทุกขั้นตอนตามลำดับใน <strong>Lattice FPGA Design Flow</strong>
+ซึ่งในขั้นตอนสุดท้าย ก็จะได้ไฟล์  "บิตสตรีม" (<strong>.bin</strong>) ที่นำไปทดลองกับบอร์ด<strong>FPGA</strong> ได้</p>
+<ul>
+<li><strong>Synthesize Design</strong></li>
+<li><strong>Map Design</strong></li>
+<li><strong>Place &amp; Route Design</strong></li>
+<li><strong>Export Files</strong></li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="lattice_radiant_project-8.png" /></p>
+<p>รูป: การทำขั้นตอนได้สำเร็จทุกขั้นตอน</p>
+<p>ซอฟต์แวร์ <strong>Lattice Radiant</strong> จะสร้างไฟล์รายงาน <strong>Report Files</strong>
+ในแต่ละขั้นตอน แนะนำให้ผู้ใช้ได้ลองศึกษาดูรายละเอียดในไฟล์เหล่านั้น</p>
+<p><img alt="" src="lattice_synth_report-1.png" /></p>
+<p><img alt="" src="lattice_synth_report-2.png" /></p>
+<p>รูป: ตัวอย่างผลการสังเคราะห์วงจร และข้อมูลเกี่ยวกับทรัพยากรของชิป <strong>FPGA</strong> ที่ถูกใช้ไปสำหรับวงจร</p>
+<p>นอกจากนั้นแล้ว ผู้ใช้ยังสามารถดูผลการสังเคราะห์วงจรในระดับต่าง ๆ เช่น 
+ในระดับ <strong>RTL (Register-Transfer Level)</strong> ก็ให้ดูจาก
+<strong>Tools &gt; Netlist Analyzer</strong></p>
+<p><img alt="" src="lattice_radiant_project-9.png" /></p>
+<p>รูป: ผังวงจรในระดับ <strong>RTL</strong> ที่ได้จากการคอมไพล์โค้ด <strong>Verilog</strong> และสังเคราะห์วงจร</p>
+<p>แต่ถ้าอยากจะทราบว่า วงจรประกอบด้วยองค์ประกอบพื้นฐานภายในชิป <strong>FPGA</strong> อย่างไรบ้าง
+มีการจัดวางตำแหน่งของลอจิกเซลล์ (<strong>Logic Cells</strong>) และเลือกเส้นทางสัญญาณเชื่อมต่อกันอย่างไร ก็ให้ดูจาก
+<strong>Tools &gt; Physical Designer</strong> </p>
+<p><img alt="" src="lattice_radiant_project-10.png" /></p>
+<p>รูป: การแสดงโครงสร้างที่มีลักษณะเป็นอาร์เรย์ภายในชิป <strong>FPGA</strong> (<strong>Placement Mode</strong>)
+และลอจิกเซลล์ (<strong>Logic Cells</strong>) ที่ถูกนำไปใช้ในการสร้างวงจร</p>
+<p><img alt="" src="lattice_radiant_project-11.png" /></p>
+<p>รูป: การแสดงโครงสร้างที่มีลักษณะเป็นอาร์เรย์ภายในชิป <strong>FPGA</strong> (<strong>Routing Mode</strong>)
+และการเชื่อมต่อสัญญาณ (<strong>Nets</strong>) ระหว่างลอจิกเซลล์ของวงจร</p>
+<p><img alt="" src="lattice_radiant_project-12.png" /></p>
+<p>รูป: การแสดงเส้นทางของสัญญาณ <strong>Clock</strong> ไปยังส่วนต่าง ๆ ของวงจรภายในชิป <strong>FPGA</strong></p>
+<p><img alt="" src="lattice_radiant_project-13.png" /></p>
+<p>รูป: องค์ประกอบพื้นฐานเชิงลอจิกที่เรียกว่า <strong>SLICE</strong> ของชิป <strong>FPGA</strong> ที่ถูกใช้เป็นส่วนหนึ่งของวงจร</p>
+<p><img alt="" src="lattice_radiant_project-14.png" /></p>
+<p>รูป: โครงสร้างภายใน <strong>SLICE</strong> ที่ประกอบด้วย <strong>4-Input LUTs + Carry Logic + Flip-Flops</strong> 
+(<strong>1 SLICE = 2 Logic Cells</strong>)
+&nbsp;</p>
+<p>ถ้าต้องการเปลี่ยนจาก <strong>LSE</strong> ไปลองใช้ <strong>Synplify Pro for Lattice</strong> ก็ทำได้ง่าย
+จากนั้นให้ทำขั้นตอนการสังเคราะห์วงจรใหม่อีกครั้ง แล้วเปิดดูผังวงจรด้วย  <strong>Netlist Analyzer</strong></p>
+<p><img alt="" src="lattice_synplify-1.png" /></p>
+<p>รูป: การเลือกเครื่องมือสำหรับการสังเคราะห์วงจร โดยใช้ <strong>Synplify Pro for Lattice</strong></p>
+<p><img alt="" src="lattice_synplify-2.png" /></p>
+<p>รูป: ตัวอย่างผังวงจรที่ได้จากการสังเคราะห์วงจรด้วย <strong>Synplify Pro for Lattice</strong></p>
+<p>ผู้ใช้สามารถเรียกใช้งาน <strong>Synplify Pro for Lattice</strong> จากโปรเจกต์ใน
+<strong>Lattice Radiant</strong> ได้เช่นกัน โดยเลือกจากเมนู <strong>Tools &gt; Synplify Pro for Lattice</strong></p>
+<p><img alt="" src="lattice_synplify-3.png" /></p>
+<p>รูป: การใช้งาน <strong>Synplify Pro for Lattice</strong></p>
+<p><img alt="" src="lattice_synplify-4.png" /></p>
+<p>รูป: ตัวอย่างผังวงจรในมุมมอง <strong>RTL View</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการติดตั้งและใช้งานซอฟต์แวร์ <strong>Lattice Radiant</strong> ในเบื้องต้น
+และมีตัวอย่างโค้ด <strong>Verilog</strong> เพื่อสาธิตการสร้างวงจรควบคุมการทำงานของ <strong>RGB LED</strong>
+สำหรับบอร์ด <strong>iCE-Sugar</strong> (ชิป <strong>Lattice iCE40UP5K FPGA</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2023-08-19 | Last Updated: 2023-08-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
