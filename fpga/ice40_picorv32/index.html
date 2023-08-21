@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/ice40_picorv32/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทดลองใช้งาน PicoRV32 Soft-Core CPU ในเบื้องต้น สำหรับบอร์ด Lattice iCE40 FPGA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#picorv32-soft-core-cpu-lattice-ice40-fpga" class="nav-link">การทดลองใช้งาน PicoRV32 Soft-Core CPU ในเบื้องต้น สำหรับบอร์ด Lattice iCE40 FPGA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#picorv32" class="nav-link">&#9655; PicoRV32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ซอฟต์แวร์ที่จำเป็นต้องใช้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ice-sugar" class="nav-link">&#9655; การใช้งานสำหรับบอร์ด iCE-Sugar</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#icesprog" class="nav-link">&#9655; ตัวอย่างการใช้คำสั่ง icesprog</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="picorv32-soft-core-cpu-lattice-ice40-fpga">การทดลองใช้งาน PicoRV32 Soft-Core CPU ในเบื้องต้น สำหรับบอร์ด Lattice iCE40 FPGA<a class="headerlink" href="#picorv32-soft-core-cpu-lattice-ice40-fpga" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Lattice iCE40 FPGA</em>, <em>Open Source Hardware</em>, 
+<em>OSHW FPGA Boards</em>, <em>FOSS FPGA Design Tools</em>, <em>PicoRV32</em></p>
+<hr />
+<h2 id="picorv32">&#9655; <strong>PicoRV32</strong><a class="headerlink" href="#picorv32" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการทดลองใช้งาน <a href="https://github.com/YosysHQ/picorv32"><strong>PicoRV32</strong></a>
+ซึ่งเป็น <strong>32-bit Soft-Core CPU</strong> ตามสถาปัตยกรรมของซีพียูที่มีชื่อว่า 
+<strong>RISC-V</strong> (ออกเสียงว่า <em>"RISC-FIVE"</em>) โดยนำมาใช้กับบอร์ด <strong>iCE-Sugar</strong>
+ที่มีชิป <strong>Lattice iCE40UP5K FPGA</strong> เป็นองค์ประกอบหลักของบอร์ด</p>
+<p><strong>RISC-V</strong> เป็นสถาปัตยกรรมของชุดคำสั่งแบบเปิดและฟรี  (<strong>Free and Open ISA</strong>)
+มีต้นกำเนิดมาจากทีมวิจัยที่มหาวิทยาลัย <strong>University of California at Berkeley (USA)</strong>
+จากนั้นจึงมีการรวมตัวเป็นองค์กรเพื่อดำเนินการพัฒนาต่อและเผยแพร่ภายใต้ชื่อ <a href="https://riscv.org/"><strong>RISC-V Foundation</strong></a></p>
+<p><strong>PicoRV32</strong> ถูกออกแบบโดย <a href="http://www.clifford.at/"><strong>Clifford (Claire) Wolf</strong></a> โดยใช้ภาษา <strong>Verilog</strong> เริ่มต้นในปีค.ศ. 2015 
+เผยแพร่โค้ดภายใต้ลิขสิทธิ์  <strong>ISC License</strong> (คล้ายกับ <strong>MIT License</strong>)
+มีการนำมาใช้กับบอร์ด เช่น <strong>Lattice iCE40-HX8K</strong> และ <a href="http://icoboard.org/"><strong>icoBoard</strong></a> ตั้งแต่ปีค.ศ. 2016
+และใช้กับซอฟต์แวร์ <a href="https://clifford.at/icestorm"><strong>"Project IceStorm"</strong></a> ซึ่งเป็น <strong>Open Source</strong>
+เวอร์ชันล่าสุดคือ <strong>PicoRV32 v1.0</strong> (<strong>Release Date</strong>: March 3, 2019)</p>
+<p><strong>PicoRV32</strong> ใช้สถาปัตยกรรมของชุดคำสั่งของ <strong>RISC-V</strong> ที่เป็น <strong>32-bit Integer ISA</strong>: <code>RV32[IMC]</code></p>
+<p><strong>RISC-V Extensions</strong></p>
+<ul>
+<li><code>I</code>: Load-store achitecture</li>
+<li><code>M</code>: Integer multiplication and division.</li>
+<li><code>C</code>: Compressed instructions (16-bit instructions)</li>
+</ul>
+<p>นอกจากนั้นแล้ว <strong>PicoRV32 Core</strong> ยังได้จำแนกออกเป็น 3 รูปแบบการใช้งาน คือ</p>
+<ul>
+<li><code>picorv32</code>: มีการใช้งานบัสขนาด 32 บิต อย่างง่าย เพื่อเชื่อมต่อระหว่างซีพียูกับวงจรอื่น</li>
+<li><code>picorv32_axi</code>: รองรับการใช้งาน <strong> AXI-4 Lite Bus Master</strong> </li>
+<li><code>picorv32_wb</code>: รองรับการใช้งาน <strong>WishBone Bus Master</strong></li>
+</ul>
+<p><img alt="" src="picorv32_soc_model.png" /></p>
+<p>รูป: บล็อกไดอะแกรมของตัวอย่างดีไซนที่มีการใช้งาน <strong>PicoSoC</strong></p>
+<p><img alt="" src="picorv32_hx8kdemo.png" /></p>
+<p>รูป: บล็อกไดอะแกรมสำหรับ <strong>PicoRV32 - Lattice iCE40HX-8K</strong> 
+(Source: 7th RISC-V Workshop, November 2017)</p>
+<p><strong>PicoSoC</strong></p>
+<ul>
+<li><strong>PicoSoC</strong> เป็นตัวอย่างการสร้างวงจรดิจิทัลที่มีการใช้งาน <strong>PicoRV32 Core</strong> สำหรับนำไปทดลองใช้งานกับบอร์ด <strong>iCE40 FPGA</strong></li>
+<li>ไฟล์ <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/picosoc.v"><code>picosoc.v</code></a> 
+เป็นโมดูล  <strong>Verilog</strong> ที่ภายในมีการใช้งาน <strong>PicoRV32 Core</strong> จากไฟล์ 
+<a href="https://github.com/YosysHQ/picorv32/blob/master/picorv32.v"><code>picorv32.v</code></a></li>
+<li>มีการใช้งานหน่วยความจำ <strong>On-chip SRAM</strong> สำหรับการทำงานของซีพียู ใช้  <strong>Block SRAM</strong>
+ของชิป <strong>FPGA</strong> โดยปรกติแล้ว ก็จะมีขนาดเล็กและจำกัด เช่น <strong>1024 words (4KB)</strong><ul>
+<li>ชิป <strong>iCE40 UltraPlus FPGA</strong> มีหน่วยความจำภายที่เรียกว่า <strong>Single-Port SRAM</strong>
+ขนาดความจุโดยรวม <strong>4x 256KBits (128KB)</strong> หรือ <strong>32,768 Words</strong> และจะถูกใช้ในการสร้าง *<em>SRAM</em>
+(<a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/ice40up5k_spram.v"><code>ice40up5k_spram</code></a>)</li>
+</ul>
+</li>
+<li>สามารถเข้าถึงหน่วยความจำภายนอก  <strong>(Q)SPI Flash</strong> เช่น การรันโค้ดจากหน่วยความจำแฟลชภายนอกได้</li>
+<li>ในชิปหน่วยความจำแฟลช ช่วงแรกที่มีขนาด <strong>1MB</strong> จะใช้สำหรับการเก็บข้อมูลของไฟล์ "บิตสตรีม" สำหรับชิป <strong>FPGA</strong></li>
+<li><strong>PicoSoC</strong> มีวงจรอื่นรวมอยู่ด้วย เช่น<ul>
+<li><strong>SPI Flash Memory Controller</strong> (<a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/spimemio.v"><code>spimemio</code></a>): สำหรับการอ่านข้อมูลและโปรแกรมจากหน่วยความจำแฟลชภายนอก</li>
+<li><strong>Simple UART</strong> (<a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/simpleuart.v"><code>simpleuart.v</code></a>): สำหรับการเชื่อมต่อแบบบิตอนุกรม (<strong>default baudrate: 115200</strong>)</li>
+</ul>
+</li>
+<li>ไฟล์ <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/icebreaker.v"><code>icebreaker.v</code></a>
+เป็นโมดูล <strong>Verilog</strong> ที่มีการใช้  <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/picosoc.v"><code>picosoc</code></a>
+เพื่อนำไปใช้กับชิป <strong>iCE40UP5K</strong> ของบอร์ด <strong>iCE-Breaker</strong> 
+และไฟล์ <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/icebreaker_tb.v"><code>icebreaker_tb.v</code></a>
+เป็นไฟล์ <strong>Verilog Testbench</strong> ซึ่งต้องใช้โปรแกรม  <strong>Icarus Verilog</strong> ในการจำลองการทำงาน </li>
+<li>ไฟล์  <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/icebreaker.pcf"><code>icebreaker.pcf</code></a>
+เป็นไฟล์ที่ใช้กำหนดหมายเลขขาของชิป <strong>FPGA</strong> สำหรับสัญญาณ <strong>I/O</strong> ของวงจร<ul>
+<li>วงจรทำงานด้วยสัญญาณ <strong>Clock</strong> ที่มีความถี่ <strong>12MHz</strong> โดยรับสัญญาณอินพุตที่ขา <strong>Pin 35</strong></li>
+</ul>
+</li>
+<li>ซอร์สโค้ดภาษาซีสำหรับการเขียนโปรแกรมอยู่ในไฟล์ <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/firmware.c"><code>firmware.c</code></a>
+และโค้ดสำหรับ <strong>Startup</strong> อยู่ในไฟล์ <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/start.s"><code>start.s</code></a></li>
+</ul>
+<p><strong>PicoRV32 / PicoSoC</strong> สามารถนำมาใช้กับชิป <strong>Lattice iCE40</strong> ได้หลายรุ่น
+เช่น <strong>iCE40HX8K</strong> และ <strong>iCE40UP5K</strong> และมีบอร์ด <strong>FPGA</strong> ที่สามารถนำมาทดลองใช้ได้ เช่น</p>
+<ul>
+<li><strong>Lattice iCE40HX-8K Evaluation Board</strong></li>
+<li><strong>iCEBreaker (iCE40UP5K) Board</strong></li>
+</ul>
+<hr />
+<h2 id="_1">&#9655; <strong>ซอฟต์แวร์ที่จำเป็นต้องใช้</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การแปลงโค้ด <strong>Verilog HDL</strong> ของวงจร <strong>PicoRV32 / PicoSoC</strong>
+ให้ใช้งานได้กับชิป <strong>Lattice iCE40 FPGA</strong> จะต้องใช้โปรแกรมที่เป็น <strong>Open Source</strong>
+ซึ่งจะไม่ขอกล่าวถึงในบทความนี้ ดังนั้นแนะนำให้ผู้อ่านได้ศึกษาขั้นตอนการติดตั้งซอฟต์แวร์ดังกล่าว
+ได้จากบทความ : <a href="./ice40_foss_tools/">"การใช้งานซอฟต์แวร์ <strong>Open Source FPGA Design Tools</strong> สำหรับบอร์ด 
+<strong>Lattice iCE40 FPGA</strong>"</a>
+และได้ทำการติดตั้งให้พร้อมใช้งานสำหรับ <strong>Ubuntu</strong></p>
+<p>ในส่วนที่เกี่ยวข้องกับการคอมไพล์โค้ดสำหรับ <strong>RISC-V CPU</strong>
+จะต้องใช้ <strong>Cross-Compilation GNU Toolchain for RISC-V</strong>
+ซึ่งเป็นซอฟต์แวร์ <strong>Open Source</strong> แต่ผู้ใช้จะต้องมาทำขั้นตอนคอมไพล์เอง (<strong>Build from Source Code</strong>)
+<a href="https://github.com/riscv/riscv-gnu-toolchain"><code>https://github.com/riscv/riscv-gnu-toolchain</code></a></p>
+<p>แต่เพื่อความสะดวก ผู้ใช้สามารถดาวน์โหลดไฟล์ <strong>Binary Executables</strong> ได้จาก 
+<a href="https://github.com/sifive/freedom-tools/releases"><strong>SiFive's Github Repo</strong></a></p>
+<p>เวอร์ชันที่ได้ดาวน์โหลดมาทดลองสำหรับ <strong>Ubuntu 22.04 LTS</strong> คือ 
+<strong> Release Version: December 2020 (2020.12.8)</strong> ประกอบด้วยโปรแกรมที่เกี่ยวข้องดังนี้</p>
+<ul>
+<li><strong>GCC 10.2</strong></li>
+<li><strong>Binutils 2.35</strong></li>
+<li><strong>Newlib 4.1</strong></li>
+<li><strong>GDB 10.1</strong></li>
+<li><strong>Spike-DASM 1.0.1</strong></li>
+<li><strong>OpenOCD 0.10.0</strong></li>
+</ul>
+<p>ขั้นตอนการดาวน์โหลดไฟล์และติดตั้งในระบบ <strong>Ubuntu 22.04 LTS</strong> มีการทำคำสั่งดังนี้</p>
+<pre><code class="language-text"># Download and extract the archive file for RISCV64 Toolchain.
+$ RISCV_TOOLS=riscv64-unknown-elf-toolchain-10.2.0-2020.12.8; \
+  TGZ_FILE=${RISCV_TOOLS}-x86_64-linux-ubuntu14.tar.gz; \
+  URL=https://static.dev.sifive.com/; \
+  URL+=dev-tools/freedom-tools/v2020.12/; \
+  URL+=$TGZ_FILE; echo &quot;Downloading $URL ...&quot;; \
+  wget $URL -c -O $TGZ_FILE &amp;&amp; \
+  tar xfz $TGZ_FILE &amp;&amp; rm -f $TGZ_FILE
+
+# Move the directory to /opt/
+$ sudo mv ${RISCV_TOOLS}-* /opt/${RISCV_TOOLS}-x86_64
+$ export PATH=&quot;$PATH&quot;:/opt/${RISCV_TOOLS}-x86_64/bin
+
+# Show the version of the 'riscv64-unknown-elf-gcc' program.
+$ riscv64-unknown-elf-gcc --version | head -n 1
+</code></pre>
+<p>ถ้าต้องการจำลองการทำงานของ <strong>PicoSoC</strong> จะต้องติดตั้งและใช้งานโปรแกรม
+<strong>Icarus Verilog</strong> ก่อน ซึ่งมีขั้นตอนสำหรับการติดตั้งและใช้งานใน <strong>Ubuntu</strong> ดังนี้</p>
+<pre><code class="language-text">## Build and install Icarus Verilog.
+$ cd ~/Tools/
+$ git clone https://github.com/steveicarus/iverilog
+$ cd iverilog &amp;&amp; sh autoconf.sh &amp;&amp; ./configure
+$ make -j $(nproc)
+$ sudo make install
+
+# Check the version of the 'iverilog' tool.
+$ iverilog -V | sed -n 1p
+Icarus Verilog version 13.0 (devel)
+</code></pre>
+<p>&nbsp;</p>
+<p>ขั้นตอนการดาวน์โหลดและคอมไพล์มีดังนี้</p>
+<pre><code class="language-text"># PicoRV32 - A Size-Optimized RISC-V CPU
+$ cd ~/
+$ git clone https://github.com/YosysHQ/picorv32
+$ cd ./picorv32/picosoc
+</code></pre>
+<p>แก้ไขไฟล์ <code>Makefile</code> ในบรรทัดแรก เพื่อตั้งชื่อของคอมไพล์ที่จะใช้งานให้ถูกต้อง</p>
+<pre><code class="language-text">CROSS=riscv64-unknown-elf-
+</code></pre>
+<p>จากนั้นให้ลองทำคำสั่ง <code>make</code> เพื่อการจำลองการทำงานของวงจร <strong>PicoSoC</strong> ดังนี้</p>
+<pre><code class="language-text"># Simulate the PicoSoC for iCE-Breaker Board.
+$ make icebsim
+</code></pre>
+<p><img alt="" src="picosoc_icebsim.png" /></p>
+<p>รูป: การจำลองการทำงานของวงจร <strong>PicoSoC</strong> โดยใช้ <strong>Icarus Verilog Simulator</strong></p>
+<p><img alt="" src="gtkwave_view.png" /></p>
+<p>รูป: การแสดงคลื่นสัญญาณของวงจร <strong>PicoSoC</strong> โดยใช้ข้อมูลจากไฟล์
+<code>testbench.vcd</code> และเปิดไฟล์ด้วยโปรแกรม <strong>GTKWave Viewer</strong></p>
+<p>&nbsp;</p>
+<p>ถัดไปหากต้องการสร้างไฟล์ "บิตสตรีม" สำหรับชิป <strong>FPGA</strong> ของบอร์ดทดลอง ให้ลองทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-text"># Build the .bin files (firwmare and bitstream) for iCE-Breaker Board.
+$ make icebreaker_fw.bin
+$ make icebreaker.bin
+</code></pre>
+<p>ผลจากการสังเคราะห์วงจรเพื่อนำไปใช้กับชิป <strong>iCE40UP5K</strong> ระบุว่า 
+มีการใช้ <strong>Logic Cells (LUT4)</strong> จำนวน <strong>4209/ 5280</strong>  หรือ <strong>79%</strong>
+ใช้ <strong>SPRAM</strong> ทั้งหมด
+วงจรสามารถทำงานด้วยความถี่ <strong>12MHz</strong> หรือสูงกว่าได้
+แต่ไม่เกินประมาณ <strong>15MHz</strong> ซึ่งถือว่าค่อนข้างต่ำ</p>
+<p><img alt="" src="icebreaker_make_bin_files.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง เพื่อสร้างไฟล์ <strong>.bin</strong> สำหรับบอร์ด <strong>iCE-Breaker</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ice-sugar">&#9655; <strong>การใช้งานสำหรับบอร์ด iCE-Sugar</strong><a class="headerlink" href="#ice-sugar" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>FPGA</strong> ที่ได้เลือกมาทดลองใช้งานตามที่ได้กล่าวไปคือ <strong>iCE-Sugar</strong> ของ <strong>Muse Lab</strong>
+บอร์ดนี้มีความเหมือนและความแตกต่างจากบอร์ด <strong>iCE-Breaker</strong> ของ <strong>Bit-Squared</strong> ดังนี้</p>
+<p><img alt="" src="../ice40_foss_tools/icesugar_illustrated.png" /></p>
+<p>รูป: แผนผังของบอร์ด <strong>iCE-Breaker</strong></p>
+<ul>
+<li>สิ่งที่มีเหมือนกันทั้งสองบอร์ด<ul>
+<li>ใช้ชิป <strong>iCE40UP5K-SG48I</strong> เหมือนกัน</li>
+<li>ใช้สัญญาณอินพุตสำหรับ <strong>Clock</strong> ความถี่ <strong>12MHz</strong> ป้อนเข้าที่ขา <strong>Pin 35</strong></li>
+<li>มีขา <strong>I/O</strong> สำหรับ <strong>3-pin RGB (active-low)</strong> เหมือนกันทั้งสองบอร์ด</li>
+<li>มีหน่วยความจำแฟลชภายนอก <strong>SPI Flash</strong> เชื่อมต่อขาสัญญาณเหมือนกัน (แต่มีขนาดที่แตกต่างกัน
+และ <strong>iCE-Breaker v1.0e</strong> ใช้หน่วยความจำแบบ <strong>16MB QSPI-DDR Flash</strong>)</li>
+</ul>
+</li>
+<li>ความแตกต่าง<ul>
+<li>บอร์ด <strong>iCE-Breaker</strong> มีไอซี <strong>FTDI FT2232H</strong> ทำหน้าที่เป็น
+ <strong>USB-to-SPI / USB-to-Serial Bridge</strong>
+  ทำหน้าที่เป็นตัวโปรแกรมข้อมูลลงหน่วยความจำแฟลช และเชื่อมต่อกับชิป <strong>FPGA</strong> สำหรับ <strong>Serial Interface</strong>
+และใช้คำสั่ง <code>iceprog</code> สำหรับการโปรแกรมชิป</li>
+<li>บอร์ด <strong>iCE-Sugar</strong> ใช้ชิปไมโครคอนโทรลเลอร์  (<strong>STM32F103</strong>)
+  ทำหน้าที่เป็นวงจรที่เรียกว่า <strong>iCE-Link</strong> สำหรับการโปรแกรมข้อมูลลงหน่วยความจำแฟลช และเชื่อมต่อกับชิป <strong>FPGA</strong> สำหรับ <strong>Serial Interface</strong>
+  รองรับการโปรแกรมด้วยวิธีของ <strong>DAPLink (Drag &amp; Drop Programming)</strong> 
+  หรือใช้คำสั่ง <code>icesprog</code> ของ <strong>Muse Lab</strong> สำหรับการโปรแกรมชิป</li>
+<li>ขา <strong>UART RX/TX</strong> ของบอร์ด<strong>iCE-Breaker</strong> คือ <strong>Pin 6 / 9</strong>
+  แต่สำหรับ <strong>iCE-Sugar</strong> คือ <strong>Pin 4 / 6</strong></li>
+<li>ดูการใช้งานขา <strong>I/O</strong> ของบอร์ด <strong>iCE-Sugar</strong> ได้จากไฟล์
+ <a href="https://github.com/wuxx/icesugar/blob/master/src/advanced/picorv32/picosoc/icesugar.pcf"><code>icesugar.pcf</code></a>
+และเปรียบเทียบกับไฟล์ <a href="https://github.com/YosysHQ/picorv32/blob/master/picosoc/icebreaker.pcf"><code>icebreaker.pcf</code></a> เพื่อดูความแตกต่าง</li>
+</ul>
+</li>
+</ul>
+<p>ดังนั้น ในขั้นตอนถัดไป ให้แก้ไขไฟล์ <code>icebreaker.pcf</code> ในส่วนที่เป็นขา <strong>UART RX/TX</strong>
+ในตรงกับการใช้งานสำหรับบอร์ด <strong>iCE-Sugar</strong> </p>
+<pre><code class="language-text"># UART for iCE-Sugar
+set_io ser_rx      4
+set_io ser_tx      6
+</code></pre>
+<p>จากนั้นให้ทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-text"># Create the bitstream and the firmware files.
+$ make clean icebreaker_fw.bin icebreaker.bin
+
+# Merge the two binary files into a single file (picorv32.bin).
+$ truncate -s 1048576 icebreaker.bin; \
+  cat icebreaker.bin icebreaker_fw.bin &gt; picorv32.bin
+</code></pre>
+<p>เมื่อได้ไฟล์ <code>picorv32.bin</code> ก็ให้เชื่อมต่อบอร์ด <strong>iCE-Sugar</strong>
+กับคอมพิวเตอร์ของผู้ใช้แล้วจะมองเห็นไดรฟ์ชื่อ <code>iCELink</code> จากนั้นจึงนำไฟล์
+<code>picorv32.bin</code> ไปใส่ลงในไดรฟ์ดังกล่าว
+และเปิดโปรแกรมที่ใช้รับข้อมูลจากพอร์ต <strong>Serial</strong> เพื่อดูข้อความที่ถูกส่งออกมาจากบอร์ด</p>
+<p><img alt="" src="serial_output-1.png" /></p>
+<p><img alt="" src="serial_output-2.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากบอร์ด <strong>iCE-Sugar</strong> ผ่านทาง <strong>USB-to-Serial Bridge</strong></p>
+<p>ถัดไปให้ลองใช้โค้ดตัวอย่างต่อไปนี้ ก่อนอื่นให้สำเนาไฟล์ <code>firmware.c</code> เก็บไว้ก่อน
+แล้วจึงแก้ไขไฟล์ตามตัวอย่างโค้ดต่อไปนี้ </p>
+<p>โค้ดตัวอย่างนี้จะทำให้ <strong>RGB LED</strong> สีแดงและสีเขียว ติดดับสลับกันไป และส่งข้อความแสดงสถานะของ <strong>LED</strong>
+มาทาง <strong>UART</strong></p>
+<pre><code class="language-text">#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+// UART
+#define reg_uart_clk_rate (*(volatile uint32_t*)0x02000004)
+#define reg_uart_data     (*(volatile uint32_t*)0x02000008)
+// LEDs
+#define reg_leds          (*(volatile uint32_t*)0x03000000)
+
+// macro for software-defined delay (approx. x*100ms)
+#define _delay(x) { for(volatile int j=0; j &lt; 2320*(x); j++); }
+
+void putchar(char c) {
+  if (c == '\n') {
+    putchar('\r');
+  }
+  reg_uart_data = c;
+}
+
+void print_str(const char *p) {
+  while (*p) {
+    putchar(*(p++));
+  }
+}
+
+void main(void) {
+  reg_uart_clk_rate = 104; // Set UART clock rate
+  print_str(&quot;PicoRV32 / PicoSoC using iCE-Sugar...\n&quot;);
+  while(1) {
+    print_str(&quot;LED: Red\n&quot;);
+    reg_leds = ~(1&lt;&lt;6);
+    _delay(5);
+    print_str(&quot;LED: Green\n&quot;);
+    reg_leds = ~(1&lt;&lt;7);
+    _delay(5);
+  }
+}
+</code></pre>
+<p>เมื่อแก้ไขโค้ดแล้ว ให้ทำคำสั่งต่อไปนี้ เพื่อสร้างไฟล์ <code>picorv32.bin</code> ใหม่อีกครั้งแล้วจึงนำไปทดลองใช้งาน</p>
+<pre><code class="language-text">$ make icebreaker_fw.bin icebreaker.bin 
+$ truncate -s 1048576 icebreaker.bin; \
+  cat icebreaker.bin icebreaker_fw.bin &gt; picorv32.bin
+</code></pre>
+<p><img alt="" src="serial_output-3.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="icesprog">&#9655; <strong>ตัวอย่างการใช้คำสั่ง icesprog</strong><a class="headerlink" href="#icesprog" title="Permanent link">#</a></h2>
+<p>ตัวอย่างการใช้คำสั่ง <a href="https://github.com/wuxx/icesugar/tree/master/tools/src"><code>icesprog</code></a>
+ของ <strong>Muse Lab</strong> สำหรับการเขียนข้อมูลลงในหน่วยความจำแฟลช มีดังนี้</p>
+<pre><code class="language-text"># Find / List the USB device by the VID/PID.
+$ lsusb | grep &quot;ID 1d50:602b&quot;
+Bus 001 Device 002: ID 1d50:602b OpenMoko, Inc. FPGALink
+
+# Detect the iCE-Sugar board.
+$ sudo icesprog -p
+probe chip
+board: [iCESugar]
+flash: [w25q64] (8MB)
+done
+
+# Erase the on-board Flash memory.
+$ sudo icesprog -e
+erase chip
+done
+
+# Write the bitstream file (file size: 1MB max).
+$ sudo icesprog &lt;bitsream.bin&gt;
+
+# Write the firmware file (with 1MB address offset).
+$ sudo icesprog -o 0x100000 &lt;firmware.bin&gt;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างและขั้นตอนการทดลองใช้งาน <strong>PicoRV32 SoftCore CPU</strong> สำหรับชิป <strong>FPGA</strong> ในเบื้องต้น
+โดยใช้บอร์ด <strong>iCE-Sugar iCE40UP5K</strong> และ ซอฟต์แวร์ประเภท <strong>Open Source</strong> ภายใต้ระบบปฏิบัติการ <strong>Ubuntu Linux</strong>
+เพื่อการคอมไพล์โค้ดต่าง ๆ ให้ได้ไฟล์บิตสตรีมและไฟล์เฟิร์มแวร์ แล้วทำไปทดลองใช้กับบอร์ด <strong>FPGA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2023-08-20 | Last Updated: 2023-08-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
