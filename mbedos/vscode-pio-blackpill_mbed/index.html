@@ -103,6 +103,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#cmsis-dap" class="nav-link">&#9655; การใช้งานโมดูล CMSIS-DAP</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -349,13 +353,55 @@ int main() {
 </code></pre>
 <p>&nbsp;</p>
 <hr />
+<h2 id="cmsis-dap">&#9655; <strong>การใช้งานโมดูล CMSIS-DAP</strong><a class="headerlink" href="#cmsis-dap" title="Permanent link">#</a></h2>
+<p>นอกจากโมดูล <strong>ST-Link</strong> แล้ว ยังมีตัวเลือกอื่นที่สามารถนำมาใช้ได้เพื่อการอัปโหลดและดีบักโปรแกรมสำหรับชิป <strong>STM32</strong>
+ถัดไปเป็นตัวอย่างการใช้โมดูล <strong>WeAct-Studio WCHLink</strong> และมีขาเชื่อมต่อ 2 ชุด ดังนี้</p>
+<ul>
+<li><strong>SWD</strong>: <code>+3.3V</code>, <code>DIO</code>, <code>CLK</code>, <code>GND</code>, <code>+5V</code> </li>
+<li><strong>Serial</strong>: <code>+3.3V</code>, <code>TXD</code>, <code>RXD</code>, <code>GND</code>, <code>+5V</code></li>
+</ul>
+<p>คอนเนกเตอร์ <strong>SWD (CMSIS-DAP)</strong> จะใช้แทน <strong>ST-Link</strong> สำหรับการอัปโหลดโปรแกรมและดีบักได้ 
+และคอนเนกเตอร์จะใช้สำหรับการเชื่อมต่อ <strong>Serial Tx/Rx</strong> ไปยังขา <code>PA_3</code> และ <code>PA_2</code> ของ <strong>STM32F411</strong></p>
+<p><img alt="" src="../images/stm32f4_wchlink.png" /></p>
+<p>รูป: การเชื่อมต่อโมดูล <strong>WeAct-Studio WCHLink</strong> กับบอร์ด <strong>BlackPill</strong></p>
+<p>ในกรณีนี้ ผู้ใช้สามารถใช้สาย <strong>USB</strong> เพียงหนึ่งเส้นเชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ได้
+และบอร์ด <strong>STM32F411</strong> จะได้รับแรงดันไฟเลี้ยง <strong>+3.3V</strong> จากโมดูล <strong>WCHLink</strong></p>
+<p>ผู้ใช้จะต้องแก้ไขไฟล์ <code>platformio.ini</code> เพื่อเปลี่ยนมาใช้ <code>cmsis-dap</code> สำหรับ <code>upload_protocol</code>
+และ <code>debug_tool</code></p>
+<p><strong>File</strong>: <code>platformio.ini</code></p>
+<pre><code class="language-text">[env:blackpill_f411ce]
+platform = ststm32
+framework = mbed
+board = blackpill_f411ce
+upload_protocol = cmsis-dap
+debug_tool = cmsis-dap
+monitor_speed = 115200
+build_flags = 
+    -D PIO_FRAMEWORK_MBED_RTOS_PRESENT
+    -I $PROJECT_SRC_DIR/TARGET_BLACKPILL_F411CE
+</code></pre>
+<p><img alt="" src="../images/vscode_mbed_pio_blackpill_cmsis-dap-1.png" /></p>
+<p>รูป: การแก้ไขไฟล์  <code>platformio.ini</code> และทำขั้นตอน <strong>Build</strong></p>
+<p><img alt="" src="../images/vscode_mbed_pio_blackpill_cmsis-dap-2.png" /></p>
+<p>รูป: ตัวอย่างการรับข้อมูลผ่าน <strong>Serial</strong> จากบอร์ด <strong>BlackPill</strong></p>
+<p><img alt="" src="../images/vscode_mbed_pio_blackpill_cmsis-dap-3.png" /></p>
+<p>รูป: ตัวอย่างการทำขั้นตอนดีบัก (<strong>PIO Debug</strong>)</p>
+<p>&nbsp;</p>
+<p>ถ้าหากอัปเดท <a href="https://github.com/platformio/platform-ststm32/releases"><code>platform-ststm32</code></a>
+เป็นเวอร์ชัน <strong>v16.1.0 (Released: Jul 28, 2023)</strong> ก็จะสามารถใช้   <strong>Mbed OS v6.17.0</strong></p>
+<p><img alt="" src="../images/vscode_pio_mbed_v6.17.0.png" /></p>
+<p>รูป: การทดลองใช้ <strong>Mbed Framework</strong> เวอร์ชัน <strong>v6.17.0</strong></p>
+<p><img alt="" src="../images/vscode_pio_mbed_v6.17.0_serial_monitor.png" /></p>
+<p>รูป: ข้อความเอาต์พุตแสดงให้เห็นว่า <strong>Mbed OS</strong> ที่ใช้งานเป็นเวอร์ชัน <strong>v6.17.0</strong></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>ในบทความนี้ เราได้เรียนรู้ขั้นตอนการเขียนโค้ดด้วย <strong>Mbed OS</strong> สำหรับบอร์ด <strong>Black Pill (STM32F411CEU6)</strong>
 โดยใช้ไฟล์จากโปรเจกต์ตัวอย่างสำหรับ <strong>Visual Studio Code + PlatformIO</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2021-12-30 | Last Updated: 2023-04-29</p></div>
+<p>Created: 2021-12-30 | Last Updated: 2023-09-03</p></div>
             </div>
         </div>
 
