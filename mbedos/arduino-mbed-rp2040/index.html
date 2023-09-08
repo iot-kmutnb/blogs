@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/mbedos/arduino-mbed-rp2040/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนวทางการเรียนรู้ ARM Mbed OS โดยใช้บอร์ด Raspberry Pi Pico - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arm-mbed-os-raspberry-pi-pico" class="nav-link">แนวทางการเรียนรู้ ARM Mbed OS โดยใช้บอร์ด Raspberry Pi Pico</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#arm-mbed-os" class="nav-link">&#9655; Arm Mbed OS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-arm-mbed-os" class="nav-link">&#9655; ความสัมพันธ์ระหว่าง Arduino และ Arm Mbed OS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arm-mbed-os_1" class="nav-link">&#9655; ตัวเลือกสำหรับการเรียนรู้ Arm Mbed OS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator-arduino-rp2040" class="nav-link">&#9655; Wokwi Simulator - Arduino RP2040</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator-arduino-mbed-rp2040" class="nav-link">&#9655; Wokwi Simulator - Arduino Mbed RP2040</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rp2040" class="nav-link">&#9655; การทดลองใช้บอร์ดไมโครคอนโทรลเลอร์ RP2040</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arm-mbed-os-raspberry-pi-pico">แนวทางการเรียนรู้ ARM Mbed OS โดยใช้บอร์ด Raspberry Pi Pico<a class="headerlink" href="#arm-mbed-os-raspberry-pi-pico" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอแนวทางการเรียนรู้ <strong>Arm Mbed OS 6.x</strong> โดยใช้บอร์ด <strong>Raspberry Pi Pico (RP2040)</strong> 
+และการจำลองการทำงานเสมือนจริงด้วย <strong>Wokwi Online Simulator</strong></p>
+<p><strong>Keywords:</strong> 
+<em>Arm Mbed OS</em>, <em>RTOS</em>, <em>Raspberry Pico</em>, <em>RP2040</em>, <em>Arduino</em>, <em>Wokwi Simulator</em></p>
+<hr />
+<h2 id="arm-mbed-os">&#9655; <strong>Arm Mbed OS</strong><a class="headerlink" href="#arm-mbed-os" title="Permanent link">#</a></h2>
+<p>บริษัท <strong>Arm Ltd.</strong> ได้พัฒนา <a href="https://os.mbed.com/"><strong>Arm Mbed OS</strong></a> 
+ซึ่งเป็นระบบปฏิบัติการเวลาจริง (<strong>Real-Time OS: RTOS</strong>) และเป็นซอฟต์แวร์ประเภทโอเพนซอร์ส
+เริ่มต้นตั้งแต่ประมาณปีค.ศ. 2009 และต่อเนื่องมาจนถึงปัจจุบัน แบ่งเป็นเวอร์ชันหลักคือ <strong>Mbed 2</strong>, <strong>Mbed 5</strong> และ <strong>Mbed 6</strong></p>
+<p>ในอดีตผู้ใช้สามารถทดลองเขียนโค้ดผ่านเว็บเบราว์เซอร์ได้ โดยใช้ <strong>Mbed Online Compiler</strong> แต่ปัจจุบันยกเลิกการบริการไปแล้ว และแต่ก็มีซอฟต์แวร์รุ่นใหม่คือ 
+<a href="https://www.keil.arm.com/mbed/"><strong>Keil Studio Cloud</strong></a> มาแทนที่</p>
+<p><strong>Mbed OS 6.x</strong> รองรับบอร์ดไมโครคอนโทรลเลอร์ (<strong>MCU Boards</strong>) หลายรุ่น และจากหลายบริษัทผู้ผลิตชิป
+ยกตัวอย่างที่สำคัญ เช่น <strong>STM</strong> และ <strong>NXP</strong> หรือดูรายการบอร์ดเพิ่มเติมได้จาก
+<a href="https://www.keil.arm.com/boards/">https://www.keil.arm.com/boards/</a></p>
+<p>ในอดีต <strong> Jan Jongboom</strong> ในช่วงเวลาที่เขายังทำงานให้กับบริษัท <strong>Arm Ltd.</strong> ได้พัฒนาและเปิดให้ลองใช้งาน 
+<a href="https://os.mbed.com/blog/entry/introducing-mbed-simulator/"><strong>Mbed 5 Simulator (Experimental)</strong></a>
+และเปิดเผยซอร์สโค้ด <a href="https://github.com/janjongboom/mbed-simulator"><code>github:mbed-simulator</code></a>
+ทำให้ผู้ใช้สามารถทดลองรันโค้ดที่เขียนด้วย <strong>C/C++</strong> และ <strong>Mbed 5 API</strong>
+และใช้เป็นเครื่องมือสำหรับการเรียนรู้ <strong>Mbed OS API</strong> ในเบื้องต้น แต่ในปัจจุบันไม่มีการพัฒนาต่อและได้ยกเลิกการให้บริการไปแล้ว</p>
+<p>&#10230;  แนะนำให้อ่านบทความที่เกี่ยวข้อง: <a href="../">"<strong>ARM Mbed OS</strong>"</a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-arm-mbed-os">&#9655; <strong>ความสัมพันธ์ระหว่าง Arduino และ Arm Mbed OS</strong><a class="headerlink" href="#arduino-arm-mbed-os" title="Permanent link">#</a></h2>
+<p>ในช่วงหลายปีที่ผ่านมา บริษัท <strong>Arduino</strong> ได้พัฒนาบอร์ดไมโครคอนโทรลเลอร์ ออกมาสู่ตลาด ยกตัวอย่างเช่น</p>
+<ul>
+<li><strong>Arduino Opta Series</strong></li>
+<li><strong>Portenta H7 / H7 Lite</strong></li>
+<li><strong>Arduino Edge Control</strong></li>
+<li><strong>Arduino Nicla / Nicla Vision</strong></li>
+<li><strong>Arduino GIGA R1 WiFi</strong></li>
+<li><strong>Arduino Nano 33 BLE / BLE Sense</strong></li>
+<li><strong>Arduino Nano 2040 Connect</strong></li>
+</ul>
+<p>และได้พัฒนาซอฟต์แวร์ <a href="https://github.com/arduino/ArduinoCore-mbed"><strong>Arduino Core for Mbed OS</strong></a>
+มารองรับการเขียนโปรแกรม <strong>Arduino Sketch</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์เหล่านี้ 
+โดยเลือกใช้ <strong>Arm Mbed OS</strong> เป็นพื้นฐานในการทำงาน และตั้งแต่ประมาณเดือนเมษายน ค.ศ. 2021 เป็นต้นมา ก็สามารถนำมาใช้ได้กับบอร์ด 
+<a href="https://docs.arduino.cc/hardware/nano-rp2040-connect"><strong>Arduino Nano 2040 Connect</strong></a> 
+รวมถึงบอร์ด <a href="https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html"><strong>Raspberry Pico / Pico-W</strong></a>
+และบอร์ดอื่น ๆ ที่ใช้ชิป <a href="https://www.raspberrypi.com/products/rp2040/"><strong>RP2040</strong></a></p>
+<p><strong>RP2040</strong> เป็นชิปประเภท <strong>SoC</strong> ที่มีซีพียูตามสถาปัตยกรรมตระกูล
+<strong>Arm Cortex-M</strong> (<strong>Dual-Core 32-bit Arm Cortex-M0+</strong>)
+บริษัท <strong>Raspberry Pi Trading</strong> ได้ออกแบบและพัฒนาชิป <strong>MCU</strong> เป็นรุ่นแรกของบริษัท
+และมีการสร้างบอร์ด <strong>Raspberry Pico</strong> เป็นบอร์ดไมโครคอนโทรลเลอร์รุ่นแรกที่ใช้ชิปดังกล่าว (เปิดตัวในเดือนมกราคม ค.ศ. 2021)</p>
+<p><strong>Arduino Nano 2040 Connect</strong> และ <strong>Raspberry Pico-W</strong> 
+รองรับการสื่อสารไร้สายด้วย <strong>WiFi / BLE</strong> แต่ก็มีความแตกต่างในการใช้งานและการเขียนโค้ด</p>
+<ul>
+<li>บอร์ด <strong>Arduino Nano 2040 Connect</strong> มีชิป <strong>RP2040</strong>
+เป็นตัวประมวลผลหลัก และใช้โมดูล <strong>U-blox Nina W102</strong> สำหรับการสื่อสารไร้สาย และใช้ไลบรารีชื่อ
+<a href="https://github.com/arduino-libraries/WiFiNINA"><code>NinaWiFi.h</code></a> สำหรับการเขียนโค้ด</li>
+<li>บอร์ด <strong>Raspberry Pico-W</strong> มีชิป <strong>RP2040</strong>
+เป็นตัวประมวลผลหลัก แต่ใช้โมดูลที่มีชิป <strong>Infineon CYW43439</strong> สำหรับการสื่อสารไร้สาย
+และใช้ไลบรารีชื่อ  <a href="https://arduino-pico.readthedocs.io/en/latest/wifi.html"><code>WiFi.h</code></a> สำหรับการเขียนโค้ด
+(<strong>Arduino WiFi for Pico-W</strong>) </li>
+<li>เมื่อเปรียบเทียบราคา บอร์ด <strong>Raspberry Pico-W</strong> มีราคาถูกกว่า <strong>Arduino Nano 2040 Connect</strong> </li>
+</ul>
+<p>ดังนั้นจึงอาจกล่าวได้ว่า <strong>Arm Mbed OS</strong> เป็นองค์ประกอบเชิงซอฟต์แวร์และมีความสำคัญในระบบนิเวศของ
+<strong>Arduino</strong> (<strong>Arduino Ecosystem</strong>) ในยุคปัจจุบันและอนาคต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arm-mbed-os_1">&#9655; <strong>ตัวเลือกสำหรับการเรียนรู้ Arm Mbed OS</strong><a class="headerlink" href="#arm-mbed-os_1" title="Permanent link">#</a></h2>
+<p><strong>คำถาม:</strong> ถ้าหากสนใจจะเรียนรู้และใช้งาน <strong>Arm Mbed OS</strong> ในมุมมองของนักพัฒนาซอฟต์แวร์ 
+เช่น การใช้คำสั่งต่าง ๆ ของ <strong>Mbed OS API</strong> ควรจะเลือกใช้ชิปหรือบอร์ดไมโครคอนโทรลเลอร์ใดได้บ้าง
+และมีซอฟต์แวร์สำหรับการจำลองการทำงานเสมือนจริงหรือไม่ ?</p>
+<p>โดยปรกติแล้ว บอร์ด <a href="https://www.st.com/en/evaluation-tools/stm32-nucleo-boards.html"><strong>STM32 Nucleo</strong></a>
+ซึ่งมีหลายรุ่นให้เลือกใช้งาน สามารถนำมาใช้งานร่วมกับ <strong>Arm Mbed OS 6</strong> ได้เป็นอย่างดี
+แต่อีกตัวเลือกหนึ่งที่น่าสนใจคือ การใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>RP2040</strong> เช่น
+<strong>Raspberry Pi Pico</strong> (หรือบอร์ดไมโครคอนโทรลเลอร์อื่นที่ใช้ชิปตัวนี้เหมือนกัน)</p>
+<ul>
+<li>บอร์ด <strong>Raspberry Pi Pico</strong> มีราคาไม่แพง และมีบอร์ด <strong>MCU</strong> ที่ใช้ชิป <strong>RP2040</strong>
+แทนที่ได้</li>
+<li>รองรับการเขียนโปรแกรมด้วย <a href="https://www.arduino.cc/en/software"><strong>Arduino IDE</strong></a> 
+และ <a href="https://platformio.org/install/ide?install=vscode"><strong>VS Code IDE + PlatformIO Extension</strong></a></li>
+<li>สามารถเขียนโค้ดและจำลองการทำงานเสมือนจริงได้โดยใช้ <a href="https://wokwi.com/"><strong>Wokwi Simulator</strong></a></li>
+<li>ตัวเลือกสำหรับภาษาคอมพิวเตอร์สำหรับการเขียนโค้ด <strong>C/C++</strong><ul>
+<li><a href="https://github.com/raspberrypi/pico-sdk"><strong>Pico C/C++ SDK</strong></a></li>
+<li><a href="https://github.com/arduino/ArduinoCore-mbed"><strong>Arduino Core for Mbed OS</strong></a></li>
+<li><a href="https://github.com/earlephilhower/arduino-pico"><strong>Arduino Core for RP2040 (Community Core)</strong></a></li>
+</ul>
+</li>
+<li>การใช้ภาษา <strong>Python</strong> สำหรับไมโครคอนโทรลเลอร์<ul>
+<li><a href="https://micropython.org/download/?mcu=rp2040"><strong>MicroPython for Pico</strong></a></li>
+<li><a href="https://circuitpython.org/board/raspberry_pi_pico/"><strong>CircuitPython for Pico</strong></a></li>
+</ul>
+</li>
+</ul>
+<p>ดังนั้น ถ้าจะใช้บอร์ด <strong>Raspberry Pi Pico</strong> ร่วมกับ <strong>Arduino Core for Mbed OS</strong>
+ก็สามารถนำมาใช้ในการเรียนรู้หลักการทำงานและการเขียนโค้ดโดยใช้ <strong>Arm Mbed OS API</strong> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator-arduino-rp2040">&#9655; <strong>Wokwi Simulator - Arduino RP2040</strong><a class="headerlink" href="#wokwi-simulator-arduino-rp2040" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการนำเสนอตัวอย่างการเขียนโค้ดและจำลองการทำงานของโปรแกรม
+โดยใช้ <strong>Wokwi Online Simulator</strong>
+สำหรับบอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>ให้เปิดเบราว์เซอร์ไปที่เว็บไซต์ต่อไปนี้ เพื่อสร้างโปรเจกต์ใหม่ โดยเลือกใช้บอร์ด <strong>Pico</strong>: 
+<a href="https://wokwi.com/projects/new/pi-pico">https://wokwi.com/projects/new/pi-pico</a></p>
+<p><strong>คำแนะนำ:</strong> ให้เริ่มต้นด้วยขั้นตอน <strong>Sign-In</strong> ในเว็บไซต์ของ <strong>Wokwi</strong> เพื่อให้มีบัญชีผู้ใช้ก่อน 
+จากนั้นจึงสามารถสร้างโปรเจกต์และใช้งานได้ฟรี และเก็บบันทึกไฟล์โปรเจกต์ต่าง ๆ 
+ไว้ใน <strong>Wokwi Cloud</strong> ได้ (แชร์ต่อสาธารณะ)</p>
+<p>เมื่อสร้างโปรเจกต์ใหม่แล้ว จะมีไฟล์ในโปรเจกต์ เช่น</p>
+<ul>
+<li><code>sketch.ino</code> เป็นไฟล์โค้ด (ตัวอย่าง) สำหรับ <strong>Arduino Sketch</strong> ผู้ใช้สามารถเปลี่ยนชื่อใหม่ได้</li>
+<li><code>diagram.json</code> เป็นไฟล์ประเภท <strong>JSON</strong> ที่ใช้สำหรับการวาดผังวงจรที่อยู่ทางขวามือ
+และจำลองการทำงานของโปรแกรมโดยใช้ฮาร์ดแวร์เสมือนจริง</li>
+<li><strong>Library Manager</strong> จะใช้สำหรับการเพิ่มรายการ <strong>Arduino Labraries</strong>
+ที่ต้องการใช้งานในแต่ละโปรเจกต์</li>
+</ul>
+<p><img alt="" src="wokwi-pico-1.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ โดยใช้บอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>ทดลองโค้ด <strong>Arduino Sketch</strong> ตามตัวอย่างต่อไปนี้ แล้วลองรันโค้ด
+โดยใช้ <strong>Simulator</strong> (กดปุ่มสีเขียวเพื่อเริ่มต้นการจำลองการทำงาน)
+เมื่อโปรแกรมทำงาน จะสังเกตเห็น <strong>LED</strong> (สีเขียว) ที่อยู่บนบอร์ด <strong>Pico</strong> และต่อกับขา <strong>GP25</strong>
+กระพริบด้วยอัตราคงที่ และมีการส่งข้อความเอาต์พุตออกมา</p>
+<pre><code class="language-c++">void setup() {
+  Serial1.begin(115200);
+  Serial1.println(&quot;Hello, Raspberry Pi Pico!&quot;);
+}
+
+void loop() {
+  // Use a static local variable to keep the LED state.
+  static int state = 0;
+  // Toggle and update the LED output.
+  digitalWrite( LED_BUILTIN, state ^= 1 );
+  // Show the current LED state by sending a message to Serial1.
+  Serial1.print( &quot;LED state: &quot; );
+  Serial1.print( state ? &quot;ON&quot; : &quot;OFF&quot; );
+  Serial1.println();
+  delay(500); // Wait for 500 msec.
+}
+</code></pre>
+<p>เมื่อโค้ดทำงาน จะมีข้อความเอาต์พุตมาปรากฎในส่วนที่รับข้อความจากบอร์ด
+<strong>Pico</strong> ทางพอร์ตอนุกรม <strong>Serial</strong></p>
+<p>ถ้าหากคลิกดูไฟล์ <code>diagram.json</code> จะเห็นว่า มีการเลือกใช้ขา
+<strong>GP0 / RX</strong> และ  <strong>GP1 / TX</strong> ของวงจร <strong>UART</strong> ในชิป <strong>RP2040</strong>
+สำหรับการรับส่งข้อมูลกับ <strong>Serial Monitor</strong>
+(ในโค้ดตัวอย่าง แสดงให้เห็นว่า มีการใช้ <strong>Serial</strong> หมายเลข 1 
+(หรือ <code>Serial1</code>) สำหรับการเขียนโค้ดด้วย <strong>Arduino Sketch</strong>
+เพื่อการส่งข้อความเอาต์พุต)</p>
+<p><img alt="" src="wokwi-pico-2.png" /></p>
+<p>รูป: ตัวอย่างไฟล์ <code>diagram.json</code></p>
+<p><img alt="" src="wokwi-pico-3.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของโปรแกรม และรับข้อความเอาต์พุตผ่านทาง <code>Serial1</code></p>
+<p>&nbsp;</p>
+<p>หากนำโค้ดนี้ไปทดลองกับบอร์ด <strong>Pico</strong> โดยใช้ฮาร์ดแวร์จริง และต้องการส่งข้อความเอาต์พุต
+ไปยังคอมพิวเตอร์ของผู้ใช้ จะต้องมีอุปกรณ์เสริมมาต่อเพิ่ม ซึ่งก็คือ โมดูล <strong>USB-to-Serial</strong>
+(<em>3.3V I/O Interfacing</em>)
+โดยนำมาต่อที่ขาสัญญาณ <strong>Rx</strong> และ <strong>Tx</strong> ของบอร์ด <strong>Pico</strong> จึงจะรับส่งข้อมูลได้</p>
+<p>แต่ถ้าต้องการเปลี่ยนมาใช้พอร์ต <strong>USB</strong> ของ <strong>RP2040</strong>
+ในโหมด <strong>USB CDC (USB-to-Serial)</strong> เพื่อความสะดวกในการใช้งาน
+ก็จะต้องแทนที่การใช้ <code>Serial1</code> ด้วย <code>SerialUSB</code> (หรือจะใช้
+<code>Serial</code> ก็ได้ ซึ่งให้ผลเหมือนกัน)  ก็มีตัวอย่างการเขียนโค้ดดังนี้
+และจะต้องมีการแก้ไขไฟล์ <code>diagram.json</code> ใหม่ให้ถูกต้องด้วย</p>
+<p><img alt="" src="wokwi-pico-4.png" /></p>
+<p>รูป: ตัวอย่างโค้ดที่เปลี่ยนมาใช้ <code>SerialUSB</code>(ไม่ได้ใช้ <code>Serial1</code>)
+และสามารถส่งข้อความเอาต์พุตออกมาได้เช่นกัน</p>
+<p><img alt="" src="wokwi-pico-5.png" /></p>
+<p>รูป: การแก้ไขไฟล์ <code>diagram.json</code> เพื่อเปลี่ยนมาใช้ <code>SerialUSB</code> 
+เพื่อการส่งข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator-arduino-mbed-rp2040">&#9655; <strong>Wokwi Simulator - Arduino Mbed RP2040</strong><a class="headerlink" href="#wokwi-simulator-arduino-mbed-rp2040" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการนำเสนอตัวอย่างการเขียนโค้ด <strong>C/C++</strong> โดยเปลี่ยนจากการใช้คำสั่งของ
+<strong>Arduino API</strong> มาใช้ <strong>Mbed OS API</strong> 
+และจำลองการทำงานของโปรแกรมโดยใช้ <strong>Wokwi Online Simulator</strong>
+สำหรับบอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>ขั้นตอนแรกให้ลบโค้ดในไฟล์ <strong>Arduino Sketch (.ino)</strong> ออกทั้งหมด ให้เหลือเป็นไฟล์ว่างเปล่า
+ถัดไปขั้นตอนที่สอง ให้สร้างไฟล์ใหม่ และเพิ่มไว้ในโปรเจกต์ ตั้งชื่อไฟล์ใหม่เป็น <code>main.cpp</code>
+แล้วลองใช้โค้ดตามตัวอย่างต่อไปนี้</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;USB/PluggableUSBSerial.h&quot; // Arduino USB-to-Serial
+
+#define LED_PIN (p25) // Use the on-board LED (GP25) pin.
+
+mbed::DigitalOut led( LED_PIN ); // Use a DigitalOut object.
+std::string sbuf; // Use a standard C++ string object.
+
+int main() {
+   // Intialize the Arduino USB-to-Serial.
+   PluggableUSBD().begin(); 
+   rtos::ThisThread::sleep_for( 100 /*ticks*/ );
+   SerialUSB.println(&quot;Mbed OS - RP2040 Demo...&quot;);
+   while(1) {
+     led  = !led; // Toggle and update the LED output.
+     sbuf = &quot;LED state: &quot;;
+     sbuf += std::to_string( led.read() );
+     // Show the current LED state.
+     SerialUSB.println( sbuf.c_str() );
+     // Sleep for 500 milliseconds.
+     rtos::ThisThread::sleep_for( 
+        std::chrono::milliseconds(500) 
+     );
+   }
+}
+</code></pre>
+<p>จากโค้ดตัวอย่างจะเห็นได้ว่า ไม่มีการสร้างฟังก์ชัน <code>void setup() {...}</code>
+และ <code>void loop() {...}</code> ในไฟล์ <strong>Arduino Sketch</strong> แล้ว 
+แต่เป็นการสร้างฟังก์ชัน <code>int main() {...}</code> ในไฟล์ <code>main.cpp</code>
+เหมือนกับซอร์สโค้ดสำหรับโปรแกรมภาษา <strong>C/C++</strong> โดยทั่วไป</p>
+<ul>
+<li>คำสั่งของ <strong>Arduino</strong> เช่น <code>delay(...)</code> เพื่อการหน่วงเวลา จะถูกแทนที่ด้วย
+<code>rtos::ThisThread::sleep_for(...)</code> เป็นต้น</li>
+<li>มีการใช้คลาส <code>std::string</code> และเมธอดที่เกี่ยวข้อง ซึ่งเป็นส่วนหนึ่งของ
+<strong>Standard C++ String Library</strong> สำหรับการสร้างข้อความ </li>
+<li>มีการใช้คำสั่ง <code>std::chrono::milliseconds(...)</code> 
+ซึ่งเป็นส่วนหนึ่งของ <strong>Standard C++ Chrono Library</strong>
+และใช้สำหรับการกำหนดระยะเวลา (<strong>Time Duration</strong>)</li>
+<li>มีการใช้คลาส <code>mbed::DigitalOut</code> ของ <a href="https://os.mbed.com/docs/mbed-os/latest/apis/drivers.html"><strong>Mbed Drivers</strong></a>
+เพื่อนำมาใช้กับขา <strong>GPIO</strong> ที่เป็นเอาต์พุต-ดิจิทัล</li>
+<li>มีการทำคำสั่ง <code>PluggableUSBD().begin()</code> และการใช้ <code>SerialUSB</code>
+จากไฟล์ <a href="https://github.com/arduino/ArduinoCore-mbed/blob/main/cores/arduino/USB/PluggableUSBSerial.h"><code>PluggableUSB.h</code></a>
+เป็นคำสั่งของ <strong>Arduino</strong> ไม่ใช่การเรียกใช้คำสั่งของ <strong>Mbed Drivers API</strong>
+แต่จะต้องใช้ <code>SerialUSB</code> ในลักษณะนี้ หากจะนำโค้ดตัวอย่างไปใช้กับ <strong>Arduino IDE</strong>
+และทดลองกับอุปกรณ์บอร์ทดลองจริง จึงจะรับข้อความเอาต์พุตได้ใน <strong>Serial Monitor</strong>
+ของโปรแกรม <strong>Arduino IDE</strong> </li>
+<li>แต่ถ้าไม่ใช้ <code>SerialUSB</code> ก็มีคลาส <code>USBSerial</code> ของ  <strong>Mbed OS API</strong> ให้ใช้งานได้เช่นกัน</li>
+</ul>
+<p><img alt="" src="wokwi-pico-6.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างที่ใช้คำสั่งของ <strong>Mbed OS API</strong></p>
+<p>&nbsp;</p>
+<p>ตัวอย่างถัดไปเป็นการสาธิตการใช้คลาส <a href="https://os.mbed.com/docs/mbed-os/latest/apis/usbserial.html"><code>USBSerial</code></a>
+ของ <a href="https://os.mbed.com/docs/mbed-os/latest/apis/drivers.html"><strong>Mbed Drivers API</strong></a>
+และ การใช้คลาส <a href="https://os.mbed.com/docs/mbed-os/latest/apis/thread.html"><code>Thread</code></a>
+เพื่อสร้าง <strong>Mbed OS Thread</strong> มาทำหน้าที่สลับสถานะลอจิกที่ขา <strong>GP25</strong> และทำให้ <strong>LED</strong> กระพริบได้ด้วยอัตราคงที่</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;rtos.h&quot;
+#include &quot;USBSerial.h&quot;
+
+#define LED_PIN (p25) // Use on-board LED (GP25 pin).
+
+// Note: This code doesn't work with Arduino Serial Monitor.
+// You can use other programs such as Putty or TeraTerm to
+// receive the messages from the serial port.
+
+// Use Mbed Drivers such as USBSerial and DigitalOut objects.
+USBSerial usbSerial(false); // Use USB in non-blocking mode.
+mbed::DigitalOut led( LED_PIN ); // Use the onboard LED pin.
+std::string sbuf; // Use a standard c++ string object.
+rtos::Thread ledBlinkthread(osPriorityNormal); // Create an Mbed thread.
+
+void ledBlink( void *arg ) {
+  auto sleep_ms = std::chrono::milliseconds( (uint32_t)arg );
+  while(1) {
+    led = !led; // Toggle and update the LED output.
+    sbuf = &quot;LED state: &quot;;
+    sbuf += std::to_string( led.read() );
+     // Send a string to the USB serial.
+    usbSerial.printf( &quot;%s\r\n&quot;, sbuf.c_str() );
+    rtos::ThisThread::sleep_for( sleep_ms );
+  }
+}
+
+int main() {
+  usbSerial.init();
+  usbSerial.connect();
+  while ( !usbSerial.connected() ) {
+    // Blink the LED while waiting for USB connection.
+    led = !led; // Fast-toggle the onboard LED.
+    rtos::ThisThread::sleep_for( 100 /*ticks*/ );
+  }
+
+  // Show Mbed OS Version
+  usbSerial.printf( &quot;Mbed OS - RP2040 Demo..\r\n&quot; );
+  usbSerial.printf( &quot;Mbed OS v%d.%d.%d\r\n&quot;,
+     MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION );
+
+  // Show the esystem clock speed in MHz.
+  usbSerial.printf( &quot;CPU Clock: %lu MHz\r\n&quot;, 
+     SystemCoreClock/1000000UL );
+
+  // Start the LED-Blink thread
+  ledBlinkthread.start( mbed::callback(ledBlink, (void *)500) );
+  while(1) {
+    osDelay(osWaitForever); // wait forever
+  }
+}
+</code></pre>
+<p><img alt="" src="wokwi-pico-7.png" /></p>
+<p>รูป: การจำลองการทำงานของโค้ดตัวอย่างที่มีการใช้ <code>USBSerial</code> และ <code>Thread</code>
+ของ <strong>Mbed OS API</strong></p>
+<p>&nbsp;</p>
+<p>อีกตัวอย่างหนึ่งเป็นการสาธิตการใช้คลาสของ <strong>Mbed Drivers API</strong> ได้แก่</p>
+<ul>
+<li><code>AnalogIn</code> เพื่ออ่านค่าจากแอนะล็อก-อินพุต  (เลือกใช้ขา <strong>GP26</strong> ของบอร์ด <strong>Pico</strong>)</li>
+<li><code>PwmOut</code> เพื่อสร้างสัญญาณ <strong>PWM</strong> (<em>Pulse Width Modulation</em>)
+และใช้เป็นสัญญาณเอาต์พุตควบคุมความสว่างของ <strong>LED</strong> (เลือกใช้ขา <strong>GP13</strong> ของบอร์ด <strong>Pico</strong>)</li>
+</ul>
+<p>และจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> มีการใช้โมดูลตัวต้านทานปรับค่าได้แบบเสมือนจริง
+สร้างสัญญาณแอนะล็อก และใช้วงจร <strong>LED</strong> สำหรับการปรับความสว่าง</p>
+<pre><code class="language-c++">#include &quot;mbed.h&quot;
+#include &quot;USB/PluggableUSBSerial.h&quot;
+
+#define ADC_VREF (3300ul) 
+#define LED_PIN  (p13)
+#define ADC_PIN  (p26)
+
+mbed::AnalogIn ain(ADC_PIN); 
+mbed::PwmOut   led_pwm(LED_PIN);
+std::string sbuf; // Use a standard C++ string object.
+
+int main() {
+   // Intialize the Arduino USB-to-Serial.
+   PluggableUSBD().begin(); 
+   rtos::ThisThread::sleep_for( 100 /*ticks*/ );
+   SerialUSB.println(&quot;Mbed OS - RP2040 Demo...&quot;);
+   // Set PWM period to 1024 usec
+   led_pwm.period_us( 1024 ); 
+   // Set the PWM pulse width to 0.
+   led_pwm.pulsewidth_us( 0 );
+   while(1) {
+     // Read the analog input as (unsigned) 16-bit value.
+     uint32_t value = ain.read_u16();
+     // Convert the analog value to millivolts.
+     uint32_t mV = ADC_VREF*value/65535;
+     // Update the PWM pulse width.
+     led_pwm.pulsewidth_us( value/64 );
+     sbuf = &quot;{ADC(mV):&quot;;
+     sbuf += std::to_string( mV );
+     sbuf += &quot;}&quot;;
+     // Show the current LED state.
+     SerialUSB.println( sbuf.c_str() );
+     // Sleep for 500 milliseconds.
+     rtos::ThisThread::sleep_for( 
+        std::chrono::milliseconds(200) 
+     );
+   }
+}
+</code></pre>
+<p>หลักการทำงานของโค้ดตัวอย่างมีดังนี้ ถ้าหมุนปรับค่าความต้านทานของ <strong>Potentiometer</strong>
+จะทำให้แรงดันไฟฟ้าเปลี่ยนแปลง (อยู่ในช่วง <strong>0V</strong> ถึง <strong>3.3V</strong>) และเมื่อใช้เป็นสัญญาณอินพุต-แอนะล็อกของวงจร
+ก็จะมีการอ่านค่าแอนะล็อก และนำไปใช้กำหนดค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong>
+ที่มีความกว้างของคาบเท่ากับ <strong>1024 usec</strong> การปรับเพิ่มหรือลดค่า <strong>Duty Cycle</strong> จะทำให้ <strong>LED</strong>
+มีการเปลี่ยนแปลงระดับของความสว่าง</p>
+<p><img alt="" src="rp2040-potentiometer-led-dimming.png" /></p>
+<p>รูป: ผังวงจรเสมือนจริงเพื่อนำไปต่อวงจรทดลอง</p>
+<p><img alt="" src="wokwi-pico-8.png" /></p>
+<p>รูป: การจำลองการทำงานแบบเสมือนจริงด้วย <strong>WokWi Simulator</strong></p>
+<p><img alt="" src="wokwi-pico-9.png" /></p>
+<p>รูป: การแสดงรูปกราฟสัญญาณจากข้อมูลเอาต์พุต ซึ่งเป็นค่าแรงดันไฟฟ้าที่อ่านได้จากขาอินพุต-แอนะล็อก</p>
+<p><strong>File:</strong> <code>diagram.json</code></p>
+<pre><code class="language-json">{
+  &quot;version&quot;: 1,
+  &quot;author&quot;: &quot;Anonymous maker&quot;,
+  &quot;editor&quot;: &quot;wokwi&quot;,
+  &quot;parts&quot;: [
+    { &quot;type&quot;: &quot;wokwi-pi-pico&quot;, &quot;id&quot;: &quot;pico&quot;, 
+              &quot;top&quot;: 0, &quot;left&quot;: 0, &quot;attrs&quot;: {} },
+    { &quot;type&quot;: &quot;wokwi-potentiometer&quot;, &quot;id&quot;: &quot;pot1&quot;,
+              &quot;top&quot;: -16, &quot;left&quot;: 102, &quot;attrs&quot;: {} },
+    {
+      &quot;type&quot;: &quot;wokwi-led&quot;,
+      &quot;id&quot;: &quot;led1&quot;,
+      &quot;top&quot;:   60,
+      &quot;left&quot;: -50,
+      &quot;attrs&quot;: { &quot;color&quot;: &quot;red&quot; }
+    },
+    {
+      &quot;type&quot;: &quot;wokwi-resistor&quot;,
+      &quot;id&quot;: &quot;r1&quot;,
+      &quot;top&quot;: 120,
+      &quot;left&quot;: -64,
+      &quot;rotate&quot;: 90,
+      &quot;attrs&quot;: { &quot;value&quot;: &quot;470&quot; }
+    }
+  ],
+  &quot;connections&quot;: [
+    [ &quot;pico:3V3&quot;, &quot;pot1:VCC&quot;, &quot;red&quot;, [ &quot;h28&quot;, &quot;v32&quot;, &quot;h40&quot; ] ],
+    [ &quot;pot1:GND&quot;, &quot;pico:GND.8&quot;, &quot;black&quot;, [ &quot;v40&quot;, &quot;h-40&quot;, &quot;v0&quot; ] ],
+    [ &quot;pico:GP26&quot;, &quot;pot1:SIG&quot;, &quot;green&quot;, [ &quot;h0&quot; ] ],
+    [ &quot;pico:GP13&quot;, &quot;led1:A&quot;, &quot;green&quot;, [ &quot;h0&quot; ] ],
+    [ &quot;led1:C&quot;, &quot;r1:1&quot;, &quot;green&quot;, [ &quot;v0&quot; ] ],
+    [ &quot;r1:2&quot;, &quot;pico:GND.4&quot;, &quot;black&quot;, [ &quot;h4&quot;, &quot;v24&quot; ] ]
+  ],
+  &quot;dependencies&quot;: {}
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rp2040">&#9655; <strong>การทดลองใช้บอร์ดไมโครคอนโทรลเลอร์ RP2040</strong><a class="headerlink" href="#rp2040" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการสาธิตการใช้งาน <strong>Arduino IDE v2.x</strong> 
+(ใช้ระบบปฏิบัติการ <strong>Ubuntu 22.04 LTS</strong>)
+เพื่อทดลองโค้ดตัวอย่างและอัปโหลดโปรแกรมไปยังบอร์ด <strong>Raspberry Pi Pico</strong></p>
+<p>ขั้นตอนการดำเนินการ</p>
+<ul>
+<li>ติดตั้ง <strong>Arduino Mbed OS RP2040</strong> สำหรับ <strong>Board Managers</strong> </li>
+<li>สร้างโปรเจกต์ <strong>Arduino Sketch</strong> ใหม่</li>
+<li>ลบโค้ดทั้งหมดในไฟล์  <strong>Arduino Sketch (.ino)</strong></li>
+<li>สร้างและเพิ่มไฟล์ใหม่ <code>main.cpp</code> และเขียนโค้ดตัวอย่าง
+(โค้ดตัวอย่างนี้ใช้คำสั่ง <code>SerialUSB</code> ของ <strong>Arduino API</strong>)</li>
+<li>คอมไพล์โค้ด และอัปโหลดไปยังบอร์ด <strong>Pico</strong>
+แต่จะต้องทำให้ชิป <strong>RP2040</strong> อยู่ในโหมด <strong>USB Bootloader</strong></li>
+</ul>
+<p><img alt="" src="arduino-pico-1.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino Mbed OS RP2040</strong> สำหรับ <strong>Board Managers</strong> </p>
+<p><img alt="" src="arduino-pico-2.png" /></p>
+<p>รูป: การเขียนโค้ดในไฟล์ <code>main.cpp</code> ของโปรเจกต์</p>
+<p><img alt="" src="arduino-pico-4.png" /></p>
+<p>รูป: การอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>Pico</strong></p>
+<p><img alt="" src="arduino-pico-3.png" /></p>
+<p>รูป: การเลือกพอร์ต <strong>Serial</strong> เพื่อรับข้อความเอาต์พุตจากบอร์ด <strong>Pico</strong></p>
+<p>&nbsp;</p>
+<p>การอัปโหลดไฟล์เฟิร์มแวร์ด้วย <strong>Arduino IDE</strong> ไปยังบอร์ด <strong>Pico</strong>
+จะต้องมีการทำให้ชิปอยู่ในโหมด <strong>USB Bootloader</strong> โดยการทำให้ขาอินพุต
+<strong>RUN</strong> (ขารีเซต) เป็น <strong>Low</strong> และกดปุ่ม <strong>BOOT</strong> บนบอร์ด 
+แต่เนื่องจากขา <strong>RUN</strong> ของบอร์ด <strong>Pico</strong> ไม่มีปุ่มกดรีเซต
+จึงแนะนำให้ต่อวงจรปุ่มกดเพิ่มบนเบรดบอร์ด เพื่อความสะดวก</p>
+<p><img alt="" src="vcc-gnd_rp2040_board.jpg" /></p>
+<p>รูป: ตัวอย่างบอร์ด <strong>RP2040</strong> (เช่น บอร์ด <strong>YD-RP2040</strong> ของ <strong>VCC-GND Studio</strong>) 
+ที่มีปุ่มกดสำหรับการรีเซต</p>
+<p><img alt="" src="pico_pinout.png" /></p>
+<p>รูป: <strong>Pico Pinout</strong></p>
+<p><img alt="" src="vcc_gnd_yd2040_pinout.png" /></p>
+<p>รูป: <strong>YD-RP2040 Pinout</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการเรียนรู้การเขียนโค้ดด้วย <strong>Arm Mbed OS</strong>
+โดยใช้ภาษา <strong>C/C++</strong> และใช้ซอฟต์แวร์ <strong>Arduino IDE v2.x</strong>
+ในการเขียนโค้ด และเลือกใช้บอร์ด <strong>Raspberry Pi Pico</strong>
+สำหรับการทดลองกับฮาร์ดแวร์จริง และยังสาธิตการจำลองการทำงานของโค้ดแบบเสมือนจริง
+โดยใช้ <strong>Wokwi Simulator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2023-09-07 | Last Updated: 2023-09-08</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
