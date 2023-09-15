@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32-spi-master-slave/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโค้ด Arduino สำหรับ ESP32 เพื่อการใช้เชื่อมต่อด้วยบัส SPI Master-Slave - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-esp32-spi-master-slave" class="nav-link">การเขียนโค้ด Arduino สำหรับ ESP32 เพื่อการใช้เชื่อมต่อด้วยบัส SPI Master-Slave</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#spi-esp32" class="nav-link">&#9655; การเชื่อมต่อด้วยบัส SPI สำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spi-esp32c3" class="nav-link">&#9655; การเชื่อมต่อด้วยบัส SPI สำหรับ ESP32C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-esp32-spi-master-slave">การเขียนโค้ด Arduino สำหรับ ESP32 เพื่อการใช้เชื่อมต่อด้วยบัส SPI Master-Slave<a class="headerlink" href="#arduino-esp32-spi-master-slave" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="spi-esp32">&#9655; <strong>การเชื่อมต่อด้วยบัส SPI สำหรับ ESP32</strong><a class="headerlink" href="#spi-esp32" title="Permanent link">#</a></h2>
+<p><strong>SPI</strong> (<em>Serial Peripheral Interface</em>) 
+เป็นรูปแบบหนึ่งของการสื่อสารข้อมูลระหว่างอุปกรณ์แบบดิจิทัลที่พบเห็นได้บ่อย
+โดยทั่วไปชิปไมโครคอนโทรลเลอร์ ก็มีวงจรภายในสำหรับการเชื่อมต่อและรับส่งข้อมูลด้วยบัส <strong>SPI</strong>
+โดยแบ่งเป็นสองโหมดคือ  <strong>SPI Master</strong> ("มาสเตอร์") และ <strong>SPI Slave</strong> ("สเลฟ")</p>
+<p>โดยทั่วไป บัส <strong>SPI</strong> ใช้สัญญาณ 4 เส้น (ใช้งานตามรูปแบบที่เรียกว่า <strong>4-Wire SPI</strong>) ได้แก่</p>
+<ul>
+<li><strong>SCK (Serial Clock)</strong></li>
+<li><strong>MOSI (Master-Out, Slave-In)</strong></li>
+<li><strong>MISO (Master-In, Slave-Out)</strong></li>
+<li><strong>SS (Slave Select)</strong></li>
+</ul>
+<p>การทำงานของบัส <strong>SPI</strong> แบ่งได้เป็น 4 โหมด (<strong>SPI Modes: 0,1,2,3</strong>) 
+จำแนกตามพารามิเตอร์สองตัวที่เรียกว่า <strong>CPOL (Clock Polarity)</strong> และ <strong>CPHA (Clock Phase)</strong>
+ซึ่งจะเป็นตัวกำหนดลักษณะการทำงานของบัส เช่น การเลือกที่จะส่ง-รับบิตที่ขอบขาขึ้น หรือ ขอบขาลงของสัญญาณ <strong>SCK</strong>
+และจะให้สัญญาณ <strong>SCK</strong> อยู่ที่ระดับลอจิก <strong>HIGH</strong> หรือ <strong>LOW</strong> เมื่อไม่อยู่ในช่วงของการส่งข้อมูลใด ๆ </p>
+<p>การเขียนโปรแกรมด้วยคำสั่งของ <strong>Arduino Core for ESP32</strong> สามารถทำได้ง่าย
+โดยการใช้ไลบรารีที่มีชื่อว่า <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI"><code>SPI</code></a>
+แต่ถ้าจะให้ทำงานในโหมด <strong>SPI Slave</strong> จะต้องใช้ไลบรารี อย่างเช่น <a href="https://github.com/hideakitai/ESP32SPISlave"><code>ESP32SPISlave</code></a></p>
+<p><code>SPIClass</code> ในไฟล์ <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/src/SPI.h"><code>SPI.h</code></a>
+เป็นคลาสในภาษา <strong>C++</strong> สำหรับการใช้งาน <strong>ESP32 SPI Master</strong>
+และมีตัวอย่างของคำสั่ง (<strong>Methods</strong>) ดังนี้</p>
+<ul>
+<li><code>SPIClass( uint8_t spi_bus )</code> เป็น <strong>Class Constructor</strong>
+โดยจะต้องระบุชื่อ <strong>SPI Bus Controller</strong> ที่ต้องการใช้งาน ได้แก่ <code>HSPI</code>
+และ <code>VSPI</code></li>
+<li><code>void begin( int8_t sck, int8_t miso, int8_t mosi, int8_t ss)</code>
+เป็นการเริ่มต้นการทำงานของ <strong>SPI Master</strong> และสามารถกำหนดหมายเลขของขา
+<strong>GPIO Pins</strong> ที่จะเลือกใช้งานได้ </li>
+<li><code>void setBitOrder(uint8_t bitOrder)</code>
+เป็นการเลือกลำดับการส่งข้อมูลบิตออก มี 2 กรณีคือ <code>SPI_MSBFIRST</code> และ <code>SPI_LSBFIRST</code></li>
+<li><code>void setDataMode( uint8_t dataMode )</code>
+เป็นการเลือกโหมดการทำงาน มี 4 โหมด ได้แก่
+<code>SPI_MODE0</code>, <code>SPI_MODE1</code>, <code>SPI_MODE2</code> หรือ <code>SPI_MODE3</code></li>
+<li><code>void setFrequency( uint32_t freq )</code>
+เป็นการตั้งค่าความถี่ของสัญญาณ <strong>SCLK</strong></li>
+<li><code>void beginTransaction( SPISettings settings )</code>
+เป็นการเริ่มต้นการรับส่งข้อมูลในรูปแบบที่เรียกว่า <strong>SPI Bus Transaction</strong> 
+ตามรูปแบบของข้อมูลสมาชิกในคลาส <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/src/SPI.h"><code>SPISettings</code></a>
+ซึ่งประกอบด้วย ความถี่ของ <strong>SCLK</strong> 
+ลำดับการส่งข้อมูลบิต และโหมดการทำงานของ <strong>SPI</strong></li>
+<li><code>void endTransaction( void )</code> เป็นการจบการรับส่งข้อมูลผ่านบัส <strong>SPI</strong></li>
+<li><code>void transferBytes( uint8_t *data, uint8_t *out, uint32_t size )</code> 
+ส่งและรับข้อมูลหลายไบต์ ตามจำนวนไบต์ที่กำหนด</li>
+</ul>
+<p>ชิป <strong>ESP32</strong> มีวงจร <strong>SPI Peripheral</strong> อยู่ 4 ชุด คือ</p>
+<ul>
+<li><strong>SPI0</strong> และ <strong>SPI1</strong> ใช้สำหรับการเชื่อมต่อกับชิปหน่วยความจำแฟลชโดยเฉพาะ</li>
+<li><strong>HSPI (SPI2)</strong></li>
+<li><strong>VSPI (SPI3)</strong></li>
+</ul>
+<p>ความถี่สูงสุดสำหรับ <strong>SCK</strong> ของ <strong>ESP32</strong> ได้สูงสุด <strong>80MHz</strong> ถ้าใช้ขาโดยเฉพาะผ่าน
+<strong>IO_MUX</strong> แต่ถ้ามีการใช้ขาผ่าน <strong>GPIO Matrix</strong> ไปยัง <strong>IO_MUX</strong>
+จะได้ความถี่สูงสุดไม่เกิน <strong>40MHz</strong></p>
+<p>ในกรณีที่เขียนโค้ดด้วย <strong>Arduino Core for ESP32</strong> ได้มีการกำหนดขาสำหรับ 
+<code>SPI.h</code> (ใช้ <strong>HSPI</strong>) ไว้ดังนี้ (อ้างอิงจากไฟล์ 
+<a href="https://github.com/espressif/arduino-esp32/blob/master/variants/esp32/pins_arduino.h"><code>pins_arduino.h</code></a></p>
+<ul>
+<li><code>SS</code>: <strong>GPIO-5</strong></li>
+<li><code>SCK</code>: <strong>GPIO-18</strong></li>
+<li><code>MISO</code>: <strong>GPIO-19</strong></li>
+<li><code>MOSI</code>: <strong>GPIO-23</strong></li>
+</ul>
+<p>หรือจะเปลี่ยนไปใช้ขาของ <strong>VSPI</strong> ก็ได้เช่นกัน</p>
+<ul>
+<li><code>SS</code>: <strong>GPIO-15</strong></li>
+<li><code>SCK</code>: <strong>GPIO-14</strong></li>
+<li><code>MISO</code>: <strong>GPIO-12</strong></li>
+<li><code>MOSI</code>: <strong>GPIO-13</strong></li>
+</ul>
+<p>ตัวอย่างโค้ด <strong>Arduino Sketch</strong> สำหรับ <strong>ESP32</strong> เพื่อสาธิตการรับส่งข้อมูลระหว่างบอร์ด
+<strong>ESP32</strong> จำนวน 2 บอร์ด โดยบอร์ดหนึ่งทำหน้าที่เป็น <strong>SPI Master</strong> และอีกบอร์ดหนึ่งทำหน้าที่เป็น
+<strong>SPI Slave</strong></p>
+<p>จำนวนข้อมูลที่จะถูกส่งออกไปโดย <strong>SPI Master</strong> ในตัวอย่างนี้ มีจำนวน  8 ไบต์
+ซึ่งมี 4 ไบต์แรกได้จากค่าตัวนับซึ่งเป็นเลขจำนวนเต็มขนาด 32 บิต 
+และอีก 4 ไบต์จากค่าคงที่ <code>0xAABB5588</code>
+และในขณะที่รับข้อมูลชุดใหม่ <strong>SPI Slave</strong> จะส่งชุดไบต์ที่ได้รับครั้งก่อนกลับไปยัง <strong>SPI Master</strong></p>
+<p>โค้ด <strong>Arduino Sketch</strong> ใช้ร่วมกันทั้ง <strong>SPI Master</strong> และ <strong>SPI Slave</strong>
+แต่จะใช้วิธีอ่านค่าจากขาอินพุต <strong>GPIO-33</strong> เพื่อดูว่า มีค่าลอจิกเป็นอย่างไร ถ้าเป็น <strong>LOW</strong> ก็ให้ทำหน้าที่เป็น
+<strong>SPI Slave</strong> แต่ถ้าเป็น <strong>HIGH</strong> ก็ให้ทำหน้าที่เป็น <strong>SPI Master</strong></p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &quot;ESP32SPISlave.h&quot;
+
+#define USE_SPI2      // Select either SPI2 or SPI3.
+
+#ifdef USE_SPI2       // HSPI
+#define SCLK_PIN 14   // Clock pin (SCK)
+#define MISO_PIN 13   // Master In Slave Out (MISO)
+#define MOSI_PIN 12   // Master Out Slave In (MOSI)
+#define SS_PIN   15   // Slave Select (SS) or Chip Select (CS) pin
+#endif
+
+#ifdef USE_SPI3       // VSPI
+#define SCLK_PIN 18   // Clock pin (SCK)
+#define MISO_PIN 19   // Master In Slave Out (MISO)
+#define MOSI_PIN 23   // Master Out Slave In (MOSI)
+#define SS_PIN   5    // Slave Select (SS) or Chip Select (CS) pin
+#endif
+
+#define LED_PIN (22)
+#define CHECK_SLAVE_PIN (33)
+#define SPI_CLK_HZ      (8000000UL) //  up to 10 MHz for SPI Slave
+
+// Create an object from the ESP32SPISlave class.
+ESP32SPISlave slave;
+
+boolean master_not_slave;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(CHECK_SLAVE_PIN, INPUT_PULLUP);
+  pinMode(SS_PIN, INPUT_PULLUP);
+  pinMode(MISO_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  delay(100);
+
+  master_not_slave = digitalRead(CHECK_SLAVE_PIN);
+  Serial.println(&quot;\n\n\n&quot;);
+  Serial.println(&quot;ESP32 SPI Master-Slave Demo...&quot;);
+  if (master_not_slave) {
+    digitalWrite( LED_PIN, HIGH );
+    Serial.println(&quot;ESP32 SPI Master... &quot;);
+    pinMode(SS_PIN, OUTPUT);
+    digitalWrite(SS_PIN, HIGH);
+    // Initialize SPI communication
+    SPI.begin(SCLK_PIN, MISO_PIN, MOSI_PIN, SS_PIN);
+    // Configure SPI settings
+    SPI.beginTransaction(SPISettings(SPI_CLK_HZ, MSBFIRST, SPI_MODE3)); 
+  } 
+  else {
+    Serial.println(&quot;ESP32 SPI Slave... &quot;);
+    digitalWrite( LED_PIN, LOW );
+    slave.setDataMode(SPI_MODE3);
+    slave.setQueueSize(1);  // transaction queue size
+    //slave.begin();
+    slave.begin(HSPI, SCLK_PIN, MISO_PIN, MOSI_PIN, SS_PIN); 
+  } 
+  Serial.println(&quot;Default SPI pins:&quot;);
+  Serial.printf(&quot;   /SS: %d\n&quot;, SS );
+  Serial.printf(&quot;   SCK: %d\n&quot;, SCK );
+  Serial.printf(&quot;  MISO: %d\n&quot;, MISO );
+  Serial.printf(&quot;  MOSI: %d\n\n&quot;, MOSI );
+
+  Serial.println(&quot;User-defined SPI pins:&quot;);
+  Serial.printf(&quot;   /SS: %d\n&quot;, SS_PIN );
+  Serial.printf(&quot;   SCK: %d\n&quot;, SCLK_PIN );
+  Serial.printf(&quot;  MISO: %d\n&quot;, MISO_PIN );
+  Serial.printf(&quot;  MOSI: %d\n\n&quot;, MOSI_PIN );
+
+  if (master_not_slave) {
+    delay(1000);
+  }
+}
+
+#define SPI_BUF_LEN (32)
+
+void spi_master_action() {
+  static uint32_t cnt = 0;
+  static uint32_t PADDING_WORD = 0xAABB5588;
+  static uint8_t sendData[SPI_BUF_LEN] = {0};
+  static uint8_t receivedData[SPI_BUF_LEN] = {0};
+
+  int num_bytes = sizeof(uint32_t) + 4;
+
+  memcpy( sendData, (uint8_t *)&amp;cnt, num_bytes );
+  memcpy( sendData+4, (uint8_t *)&amp;PADDING_WORD, 4 );
+  cnt++;
+
+  // Select the slave device (if multiple slaves are used)
+  digitalWrite(SS_PIN, LOW);
+  // Send data over SPI
+  SPI.transferBytes(sendData, receivedData, num_bytes);
+  // De-select the slave device
+  digitalWrite(SS_PIN, HIGH);
+
+  Serial.print(&quot;S: &quot;);
+  for (int i=0; i &lt; num_bytes; i++ ) {
+    Serial.printf( &quot;%02X &quot;, sendData[i] );
+  }
+  Serial.println();
+  Serial.print(&quot;R: &quot;);
+  for (int i=0; i &lt; num_bytes; i++ ) {
+    Serial.printf( &quot;%02X &quot;, receivedData[i] );
+  }
+  Serial.println(&quot;\n&quot;);
+
+  delay(500);
+}
+
+void spi_slave_action() {
+  static uint8_t sendData[SPI_BUF_LEN] = {0};
+  static uint8_t receivedData[SPI_BUF_LEN] = {0};
+
+  if (slave.remained() == 0) {
+    memcpy( sendData, receivedData, SPI_BUF_LEN );
+    slave.queue(receivedData, sendData, SPI_BUF_LEN);
+    int n = 0;
+    while (slave.available()) {
+      n = slave.size();
+      slave.pop(); // remove SPI slave transaction from the queue.
+      Serial.print(&quot;R: &quot;);
+      for (int i=0; i &lt; n; i++ ) {
+         Serial.printf(&quot;%02X &quot;, receivedData[i] );
+      }
+      Serial.println(&quot;&quot;); 
+    }
+  }  
+}
+
+void loop() {
+  if (master_not_slave) { // master
+    spi_master_action(); 
+  } 
+  else { // slave
+    spi_slave_action();
+  }
+}
+</code></pre>
+<p><img alt="" src="esp32_arduino-1.png" /></p>
+<p>รูป: การคอมไพล์และอัปโหลดโค้ด <strong>Arduino Sketch</strong> ด้วย <strong>Arduino IDE</strong></p>
+<p><img alt="" src="esp32-spi_wiring.jpg" /></p>
+<p>รูป: การทดลองเชื่อมต่อบอร์ด <strong>ESP32</strong> ระหว่างสองบอร์ด
+(โดยเลือกใช้บอร์ด <strong>WeMos Lolin32 Lite</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spi-esp32c3">&#9655; <strong>การเชื่อมต่อด้วยบัส SPI สำหรับ ESP32C3</strong><a class="headerlink" href="#spi-esp32c3" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการทดลองใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32-C3</strong> เพื่อสื่อสารข้อมูลกัน
+โดยใช้บัส <strong>SPI</strong> ในตัวอย่างนี้ได้เลือกใช้บอร์ด
+<a href="https://github.com/WeActStudio/WeActStudio.ESP32C3CoreBoard"><strong>WeActStudio ESP32-C3FH4 Mini-Core Board</strong></a></p>
+<p>ชิป <strong>ESP32-C3</strong> มีวงจร <strong>SPI Peripheral</strong> จำนวน 3 ชุด</p>
+<ul>
+<li><strong>SPI0</strong> และ <strong>SPI1</strong> ใช้สำหรับการเชื่อมต่อกับหน่วยความจำแฟลชทั้งภายในและภายนอกชิป
+ดังนั้นจึงไม่นำไปใช้กับวงจรอื่น</li>
+<li><strong>SPI2</strong> เป็น <strong>General-purpose SPI Controller</strong> </li>
+</ul>
+<p>การเลือกใช้ขา <strong>I/O</strong> ของบัส <strong>SPI2</strong> สำหรับ <strong>ESP32C3</strong> มีดังนี้
+(เลือกใช้ตาม <strong>Arduino Core for ESP32C3</strong>:
+<a href="https://github.com/espressif/arduino-esp32/blob/master/variants/esp32c3/pins_arduino.h"><code>pins_arduino.h</code></a> )
+และใช้เหมือนกันทั้ง <strong>SPI Master</strong> (ขา <strong>SS</strong> เป็นเอาต์พุต) และ <strong>SPI Slave</strong> (ขา <strong>SS</strong> เป็นอินพุต)</p>
+<ul>
+<li><code>SS</code>: <strong>GPIO-7</strong></li>
+<li><code>MOSI</code>: <strong>GPIO-6</strong></li>
+<li><code>MISO</code>: <strong>GPIO-5</strong></li>
+<li><code>SCK</code> : <strong>GPIO-4</strong></li>
+</ul>
+<p>โค้ด <strong>Arduino Sketch</strong> ใช้ร่วมกันทั้ง <strong>SPI Master</strong> และ <strong>SPI Slave</strong>
+แต่จะใช้วิธีอ่านค่าจากขาอินพุต <strong>GPIO-3</strong> ของ <strong>ESP32C3</strong> เพื่อดูว่า มีค่าลอจิกเป็นอย่างไร ถ้าเป็น <strong>LOW</strong> ก็ให้ทำหน้าที่เป็น
+<strong>SPI Slave</strong> แต่ถ้าเป็น <strong>HIGH</strong> ก็ให้ทำหน้าที่เป็น <strong>SPI Master</strong></p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &quot;ESP32SPISlave.h&quot;
+
+#define SCLK_PIN 4   // Clock pin (SCK)
+#define MISO_PIN 5   // Master In Slave Out (MISO)
+#define MOSI_PIN 6   // Master Out Slave In (MOSI)
+#define SS_PIN   7   // Slave Select (SS) or Chip Select (CS) pin
+
+#define LED_PIN (8) // Active-low
+#define CHECK_SLAVE_PIN (3)
+#define SPI_CLK_HZ      (8000000UL) //  up to 10 MHz
+
+ESP32SPISlave slave;
+
+boolean master_not_slave;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(CHECK_SLAVE_PIN, INPUT_PULLUP);
+  pinMode(SS_PIN, INPUT_PULLUP);
+  pinMode(MISO_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  delay(100);
+
+  master_not_slave = digitalRead(CHECK_SLAVE_PIN);
+  Serial.println(&quot;\n\n\n&quot;);
+  Serial.println(&quot;ESP32C3 SPI Master-Slave Demo...&quot;);
+  digitalWrite( LED_PIN, !master_not_slave );
+  if (master_not_slave) {
+    Serial.println(&quot;ESP32C3 SPI Master... &quot;);
+    pinMode(SS_PIN, OUTPUT);
+    digitalWrite(SS_PIN, HIGH);
+    // Initialize SPI communication
+    SPI.begin(SCLK_PIN, MISO_PIN, MOSI_PIN, SS_PIN);
+    // Configure SPI settings
+    SPI.beginTransaction(SPISettings(SPI_CLK_HZ, MSBFIRST, SPI_MODE3)); 
+  } 
+  else {
+    Serial.println(&quot;ESP32C SPI Slave... &quot;);
+    digitalWrite( LED_PIN, LOW );
+    slave.setDataMode(SPI_MODE3);
+    slave.setQueueSize(1);  // transaction queue size
+    //slave.begin();
+    slave.begin(HSPI, SCLK_PIN, MISO_PIN, MOSI_PIN, SS_PIN); 
+  } 
+  Serial.println(&quot;Default SPI pins:&quot;);
+  Serial.printf(&quot;   /SS: %d\n&quot;, SS );
+  Serial.printf(&quot;   SCK: %d\n&quot;, SCK );
+  Serial.printf(&quot;  MISO: %d\n&quot;, MISO );
+  Serial.printf(&quot;  MOSI: %d\n\n&quot;, MOSI );
+
+  Serial.println(&quot;User-defined SPI pins:&quot;);
+  Serial.printf(&quot;   /SS: %d\n&quot;, SS_PIN );
+  Serial.printf(&quot;   SCK: %d\n&quot;, SCLK_PIN );
+  Serial.printf(&quot;  MISO: %d\n&quot;, MISO_PIN );
+  Serial.printf(&quot;  MOSI: %d\n\n&quot;, MOSI_PIN );
+
+  if (master_not_slave) {
+    delay(1000);
+  }
+}
+
+#define SPI_BUF_LEN (32)
+
+void spi_master_action() {
+  static uint32_t cnt = 0;
+  static uint32_t PADDING_WORD = 0xAABB5588;
+  static uint8_t sendData[SPI_BUF_LEN] = {0};
+  static uint8_t receivedData[SPI_BUF_LEN] = {0};
+
+  int num_bytes = sizeof(uint32_t) + 4;
+
+  memcpy( sendData, (uint8_t *)&amp;cnt, num_bytes );
+  memcpy( sendData+4, (uint8_t *)&amp;PADDING_WORD, 4 );
+  cnt++;
+
+  // Select the slave device (if multiple slaves are used)
+  digitalWrite(SS_PIN, LOW);
+  // Send data over SPI
+  SPI.transferBytes(sendData, receivedData, num_bytes);
+  // De-select the slave device
+  digitalWrite(SS_PIN, HIGH);
+
+  Serial.print(&quot;S: &quot;);
+  for (int i=0; i &lt; num_bytes; i++ ) {
+    Serial.printf( &quot;%02X &quot;, sendData[i] );
+  }
+  Serial.println();
+  Serial.print(&quot;R: &quot;);
+  for (int i=0; i &lt; num_bytes; i++ ) {
+    Serial.printf( &quot;%02X &quot;, receivedData[i] );
+  }
+  Serial.println(&quot;\n&quot;);
+
+  if (cnt % 16 == 0) {
+     Serial.println(&quot;----------------------------&quot;);
+     delay(2000);
+  }
+}
+
+void spi_slave_action() {
+  static uint8_t sendData[SPI_BUF_LEN] = {0};
+  static uint8_t receivedData[SPI_BUF_LEN] = {0};
+
+  if (slave.remained() == 0) {
+    memcpy( sendData, receivedData, SPI_BUF_LEN );
+    slave.queue(receivedData, sendData, SPI_BUF_LEN);
+    int n = 0;
+    while (slave.available()) {
+      n = slave.size();
+      slave.pop(); // remove SPI slave transaction from the queue.
+      Serial.print(&quot;R: &quot;);
+      for (int i=0; i &lt; n; i++ ) {
+         Serial.printf(&quot;%02X &quot;, receivedData[i] );
+      }
+      Serial.println(&quot;&quot;); 
+      Serial.flush();
+      yield();
+    }
+  }  
+}
+
+void loop() {
+  if (master_not_slave) { // master
+    spi_master_action(); 
+  } 
+  else { // slave
+    spi_slave_action();
+  }
+}
+</code></pre>
+<p><img alt="" src="esp32c3_spi_wiring.png" /></p>
+<p>รูป: การเชื่อมต่อระหว่างบอร์ด <strong>ESP32C3</strong></p>
+<p><img alt="" src="esp32c3-spi_wiring.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองบนเบรดบอร์ดและวัดสัญญาณด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="spi_8mhz_wave-1.png" /></p>
+<p>รูป: การวัดสัญญาณ <strong>SCLK</strong> (ความถี่ประมาณ  <strong>8MHz</strong>), <strong>MISO</strong> และ <strong>MOSI</strong>
+และตั้งค่า <strong>Time/Div = 1us</strong> สำหรับการแสดงผล</p>
+<p><img alt="" src="spi_8mhz_wave-2.png" /></p>
+<p>รูป: การวัดสัญญาณของบัส <strong>SPI</strong> และตั้งค่า <strong>Time/Div = 100 ns</strong></p>
+<p><img alt="" src="spi_10mhz_wave-1.png" /></p>
+<p>รูป: การวัดสัญญาณ ในกรณีที่ได้ตั้งค่าความถี่ <strong>SCLK</strong> ให้เท่ากับ <strong>10MHz</strong>
+และตั้งค่า <strong>Time/Div = 200 ns</strong> สำหรับการแสดงผล</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการเชื่อมต่อบอร์ด <strong>ESP32 / ESP32C3</strong>
+โดยใช้บัส <strong>SPI</strong> และสาธิตการทำงานในโหมด <strong>SPI Master</strong>
+และ <strong>SPI Slave</strong> เพื่อทดลองส่งและรับข้อมูลระหว่างบอร์ด 2 สอง
+พร้อมตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-09-14| Last Updated: 2023-09-14</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
