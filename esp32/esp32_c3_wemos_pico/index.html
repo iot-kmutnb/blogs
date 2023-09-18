@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_c3_wemos_pico/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเริ่มต้นใช้งานบอร์ด WeMos ESP32-C3 Pico - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#wemos-esp32-c3-pico" class="nav-link">การเริ่มต้นใช้งานบอร์ด WeMos ESP32-C3 Pico</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#wemos-esp32-c3-pico_1" class="nav-link">&#9655; WeMos ESP32-C3 Pico</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch-demo" class="nav-link">&#9655; Arduino Sketch Demo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="wemos-esp32-c3-pico">การเริ่มต้นใช้งานบอร์ด WeMos ESP32-C3 Pico<a class="headerlink" href="#wemos-esp32-c3-pico" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="wemos-esp32-c3-pico_1">&#9655; <strong>WeMos ESP32-C3 Pico</strong><a class="headerlink" href="#wemos-esp32-c3-pico_1" title="Permanent link">#</a></h2>
+<p>บทความนี้กล่าวถึง การทดลองใช้งานบอร์ดไมโครคอนโทรลเลอร์
+<a href="https://www.wemos.cc/en/latest/c3/c3_pico.html"><strong>WeMos ESP32-C3 Pico</strong></a>
+ของบริษัท <strong>Wemos.cc</strong> ในเบื้องต้น</p>
+<p><img alt="" src="wemos_c3_pico.png" /></p>
+<p>รูป: บอร์ด  <strong>WeMos ESP32-C3 Pico v1.0.0</strong> (มุมมองจากด้านหน้าและด้านหลัง)</p>
+<p><img alt="" src="wemos_c3_pico_pinout.png" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขา (<strong>PinOut</strong>) ของบอร์ด <strong>WeMos ESP32-C3 Pico</strong></p>
+<p><strong>ข้อมูลเกี่ยวกับบอร์ด</strong></p>
+<ul>
+<li>ชิปตัวประมวลผล: <strong>Espressif ESP32-C3FH4 SoC</strong><ul>
+<li><strong>Single-Core RISC-V CPU, 160MHz</strong></li>
+<li><strong>IEEE 802.11 b/g/n 2.4GHz WiFi / BLE 5.0</strong></li>
+</ul>
+</li>
+<li>มีหน่วยความจำแบบแฟลชรวมไว้ในชิปเดียวกัน: <strong>Embedded SPI Flash (4MB)</strong></li>
+<li>เชื่อมต่อด้วยคอนเนกเตอร์ <strong>Type-C USB</strong> </li>
+<li>ใช้ตัวสร้างความถี่ <strong>Crystal Oscillator 40MHz</strong></li>
+<li>ไม่มีชิป <strong>USB-to-Serial Bridge</strong> ดังนั้นต้องใช้งานแบบ <strong>USB-CDC</strong>
+สำหรับการรับส่งข้อมูลกับคอมพิวเตอร์ของผู้ใช้</li>
+<li>ใช้ไอซีควบคุมแรงดันคงที่: <strong>MC6211C33 LDO Voltage Regulator (3.3V)</strong></li>
+<li>ใช้สายอากาศแบบ <strong>Ceramic Chip Antenna (SMD)</strong></li>
+<li>มีปุ่มกด <strong>BOOT</strong> (<strong>10k pullup, GPIO-9</strong>)</li>
+<li>มีปุ่มกด <strong>RESET</strong> (<strong>10k pullup, CHIP_EN</strong>)</li>
+<li>มีไอซีสำหรับชาร์จแบตเตอรี: <strong>On-board Battery Charging IC (TP4054)</strong><ul>
+<li><strong>500mA Charging Current (max.)</strong></li>
+<li><strong>Red LED (Charging Status)</strong></li>
+</ul>
+</li>
+<li><strong>12x I/O Pins</strong></li>
+<li><strong>6x ADC Input Pins (A0 .. A5)</strong></li>
+<li><strong>1x WS2812 RGB LED (GPIO-7, 3.3V)</strong></li>
+<li><strong>1x LOLIN I2C Port (4-pin)</strong></li>
+<li><strong>1x Battery Connector (PH2.0 Connector)</strong></li>
+<li>ใช้งานได้ร่วมกับโมดูล <strong>WeMos LOLIN D1-mini shields</strong></li>
+<li>ถ้ามีการบัดกรีด้วยขา <strong>Pin Headers</strong>
+ก็สามารถเสียบขาลงบนเบรดบอร์ดได้ (<strong>Breadboard-Friendly</strong>)</li>
+</ul>
+<p><img alt="" src="wemos_c3_pico_schematic.png" /></p>
+<p>รูป: ผังวงจรของบอร์ด <strong>Wemos C3 Pico</strong> (<a href="wemos_esp32_c3_pico_v1.0.0_schematic.pdf"><strong>Schematic</strong></a>)</p>
+<p>ขา <strong>VIN</strong> ซึ่งเป็นแรงดันไฟเลี้ยงและนำไปต่อกับไอซี <strong>3.3V LDO Regulator</strong> 
+จะได้ไฟเลี้ยงจากสองแหล่งจ่าย</p>
+<ul>
+<li><strong>VBUS (5V)</strong> จากพอร์ต  <strong>USB Type-C</strong> หรือ</li>
+<li><strong>VBAT</strong> ซึ่งเป็นแรงดันไฟเลี้ยงจากแบตเตอรี่ (ถ้ามีการต่อใช้งาน <strong>3.7V LiPo</strong>)</li>
+</ul>
+<p>ถ้าเชื่อมต่อกับแบตเตอรี่ <strong>LiPo</strong> และไม่เสียบสาย <strong>USB Type-C</strong> 
+วงจรบนบอร์ดจะได้รับแรงดันไฟเลี้ยงจาก <strong>VBAT</strong></p>
+<p><img alt="" src="wemos_c3_pico_supply.png" /></p>
+<p>รูป: บางส่วนของผังวงจรที่แสดงให้เห็นวงจรสำหรับแหล่งจ่ายไฟเลี้ยงบนบอร์ด</p>
+<p>ถ้าบัดกรีเชื่อมต่อที่ตำแหน่ง <strong>Solder Jumper JP1</strong> 
+ก็จะใช้ขา <strong>GPIO3</strong> เป็นขาแอนะล็อกอินพุต ซึ่งต่อผ่านวงจรแบ่งแรงดัน (ใช้ตัวต้านทาน 
+<strong>100k</strong> จำนวน 2 ตัว ต่ออนุกรมกัน) ได้ค่าเท่ากับ <strong>VBAT/2</strong>
+และสามารถใช้ <strong>ADC</strong> ภายในชิป เพื่อวัดระดับแรงดันแบตเตอรี่ได้ </p>
+<p><strong>ข้อสังเกต:</strong> บอร์ด <strong>ESP32-C3</strong> ของ <strong>Wemos.cc</strong> อีกบอร์ดหนึ่งคือ
+<a href="https://www.wemos.cc/en/latest/c3/c3_mini.html"><strong>WeMos C3 Mini (v2.1.0)</strong></a> 
+แต่มีขนาดใหญ่กว่า <strong>WeMos C3 Pico</strong> ใช้สายอากาศแบบ <strong>PCB Antenna</strong> และไม่มีวงจรชาร์จแบตเตอรี่</p>
+<p>บทความที่เกี่ยวข้อง: <a href="./../esp32-c3_lolin_mini/">"การเริ่มต้นใช้งานบอร์ด <strong>WeMos LOLIN C3 Mini</strong>"</a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch-demo">&#9655; <strong>Arduino Sketch Demo</strong><a class="headerlink" href="#arduino-sketch-demo" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Arduino Sketch</strong> สำหรับทดลองใช้งานกับ <strong>Arduino IDE</strong>
+โดยจะต้องมีการติดตั้ง <strong>Arduino Core for ESP32</strong> ไว้แล้ว
+(เพิ่มรายการสำหรับไฟล์ <code>package_esp32_index.json</code> ใน <strong>Arduino Board Manager</strong>
+แล้วติดตั้งแพคเกจสำหรับ <strong>ESP32</strong>)</p>
+<p><strong>URL</strong>: <code>https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code></p>
+<pre><code class="language-c++">void setup() {
+  Serial.begin(115200);
+  while(!Serial);
+  delay(1000);
+  Serial.println(&quot;\nWemos ESP32 C3 Mini / Pico Demo...\n&quot;);
+}
+#define SEP_LINE &quot;=====================================&quot;
+
+void loop() {
+  Serial.println( SEP_LINE  SEP_LINE );
+  Serial.printf(&quot;Espressif IDF: %s\n&quot;, ESP.getSdkVersion() );
+  Serial.printf(&quot;Chip Revision %lu\n&quot;, ESP.getChipRevision() );
+  Serial.printf(&quot;Cpu Freq. %lu MHz\n&quot;, ESP.getCpuFreqMHz() );
+  Serial.printf(&quot;Heap (total/free): %lu / %lu bytes\n&quot;, 
+         ESP.getHeapSize(), ESP.getFreeHeap());
+  Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  Serial.printf(&quot;Flash Size: %lu MB, Flash Speed: %lu MHz\n&quot;,
+         ESP.getFlashChipSize()/(1024*1024UL), 
+         ESP.getFlashChipSpeed()/(uint32_t) 1e6 );
+
+  // more info...
+  Serial.printf(&quot;Espressif chip model: %s\n&quot;,
+         ESP.getChipModel() );
+  Serial.printf(&quot;Number of CPU Cores: %d\n&quot;, 
+         ESP.getChipCores() );
+  String str;
+  switch(ESP.getFlashChipMode()) {
+     case FM_QIO:  str = &quot;QIO&quot;;  break;
+     case FM_QOUT: str = &quot;QOUT&quot;; break;
+     case FM_DIO:  str = &quot;DIO&quot;;  break;
+     case FM_DOUT: str = &quot;DOUT&quot;; break;
+     default:      str = &quot;Unknown&quot;; break;
+  }
+  Serial.printf(&quot;Flash model: %s\n&quot;, str.c_str() );
+  Serial.printf( &quot;Arduino ESP32 Core v%u.%u.%u\n&quot;,
+     ESP_ARDUINO_VERSION_MAJOR, 
+     ESP_ARDUINO_VERSION_MINOR, 
+     ESP_ARDUINO_VERSION_PATCH );
+  Serial.println( SEP_LINE SEP_LINE );
+  delay(4000);
+}
+</code></pre>
+<p><img alt="" src="arduino_esp32c3_settings.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าเพื่อเลือกบอร์ดใช้งานสำหรับ <strong>Arduino IDE</strong></p>
+<p><img alt="" src="arduino_esp32c3_output.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานบอร์ด <strong>Wemos C3 Pico</strong>
+และมีตัวอย่างโค้ดสำหรับการเขียนโปรแกรมด้วย <strong>Arduino IDE</strong>
+สำหรับการทดลองในเบื้องต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-09-17 | Last Updated: 2023-09-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
