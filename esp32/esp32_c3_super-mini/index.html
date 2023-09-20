@@ -8,7 +8,7 @@
         <meta name="author" content="RSP">
         <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_c3_super-mini/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>แนะนำการใช้งานบอร์ด **ESP32-C3 Super-Mini** - IoT Engineering Education</title>
+        <title>แนะนำการใช้งานบอร์ด ESP32-C3 Super-Mini - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -111,6 +111,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch-demo-5" class="nav-link">&#9655; Arduino Sketch Demo 5</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -122,7 +126,7 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="esp32-c3-super-mini">แนะนำการใช้งานบอร์ด <strong>ESP32-C3 Super-Mini</strong><a class="headerlink" href="#esp32-c3-super-mini" title="Permanent link">#</a></h1>
+<h1 id="esp32-c3-super-mini">แนะนำการใช้งานบอร์ด ESP32-C3 Super-Mini<a class="headerlink" href="#esp32-c3-super-mini" title="Permanent link">#</a></h1>
 <hr />
 <h2 id="esp32-c3-super-mini_1">&#9655; <strong>ESP32-C3 Super-Mini</strong><a class="headerlink" href="#esp32-c3-super-mini_1" title="Permanent link">#</a></h2>
 <p>บทความนี้กล่าวถึง การใช้งานบอร์ดไมโครคอนโทรลเลอร์
@@ -211,7 +215,7 @@ const int LED_PIN = 8;  // GPIO-8
 // FreeRTOS task handles
 TaskHandle_t tasks[2];
 
-// Queue handle for passing values betwen tasks.
+// Queue handle for passing values between tasks.
 QueueHandle_t queue = NULL;
 
 // Task function to read analog value
@@ -486,11 +490,130 @@ void loop() {
 <p>รูป: ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ด โดยใช้โมดูล <strong>WS2812 RGB LED (Single-Pixel)</strong></p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="arduino-sketch-demo-5">&#9655; <strong>Arduino Sketch Demo 5</strong><a class="headerlink" href="#arduino-sketch-demo-5" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการรับและส่งต่อข้อมูลระหว่าง <strong>USB-CDC</strong> กับ <strong>Hardware Serial</strong>
+(เลือกใช้ขา <strong>GPIP-20</strong> สำหรับ <strong>RX</strong> และขา <strong>GPIO-21</strong> สำหรับ <strong>TX</strong>)
+มีการทำงานออกเป็นสองส่วน คือ ฟังก์ชัน <code>task1</code> และ <code>task2</code></p>
+<ul>
+<li><code>task1</code>: เมื่อมีข้อมูลได้ถูกส่งจากคอมพิวเตอร์ของผู้ใช้ทางช่องทาง <strong>USB-CDC</strong> 
+ก็จะมีการอ่านข้อมูลดังกล่าว แล้วส่งต่อออกไปทางขา <strong>TX</strong> ของ <strong>Hardware Serial</strong> </li>
+<li><code>task2</code>: ถ้ามีข้อมูลถูกส่งเข้ามาทาง <strong>Hardware Serial</strong>
+ที่ขา <strong>RX</strong> ก็จะอ่านและส่งต่อไปยัง <strong>USB-CDC</strong></li>
+</ul>
+<pre><code class="language-c++">#include &lt;HardwareSerial.h&gt;
+
+#define RX_PIN   (20)
+#define TX_PIN   (21)
+#define BUF_SIZE (64)
+
+// Create a HardwareSerial object using UART0
+HardwareSerial MySerial(0);
+uint8_t tx_data[ BUF_SIZE+1 ];
+uint8_t rx_data[ BUF_SIZE+1 ];
+
+void task1() {
+  uint32_t len;
+  if ( (len = Serial.available()) &gt; 0 ) {
+    if ( len &gt; BUF_SIZE ) { len = BUF_SIZE; }
+    // Read incoming bytes from Serial.
+    len = Serial.readBytes( tx_data, len );
+    if ( len &gt; 0 ) {
+      // Send the received bytes to MySerial.
+      MySerial.write( tx_data, len );
+    }
+  }
+}
+
+void task2() {
+  uint32_t len;
+  if ( (len = MySerial.available()) &gt; 0 ) {
+    if ( len &gt; BUF_SIZE ) { len = BUF_SIZE; }
+    // Read incoming bytes from MySerial.
+    len = MySerial.readBytes( tx_data, len );
+    if ( len &gt; 0 ) {
+      // Send the received bytes to Serial.
+      Serial.write( tx_data, len );
+    }
+  }
+}
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.setTimeout(10);
+  MySerial.begin( 115200, SERIAL_8N1, RX_PIN, TX_PIN );
+  MySerial.setDebugOutput(false);
+  while( MySerial.available() ) { (void)MySerial.read(); }
+  MySerial.setTimeout(10);
+}
+
+void loop() {
+  task1();
+  task2();
+}
+</code></pre>
+<p>ถ้าจะลองเขียนให้อยู่ในรูปแบบของทาสก์สำหรับ <strong>FreeRTOS</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &lt;HardwareSerial.h&gt;
+
+#define RX_PIN   (20)
+#define TX_PIN   (21)
+#define BUF_SIZE (64)
+
+HardwareSerial MySerial(0);
+uint8_t tx_data[ BUF_SIZE+1 ];
+uint8_t rx_data[ BUF_SIZE+1 ];
+
+void task1(void *pvParameters) {
+  (void)pvParameters; // Task parameters not used.
+  uint32_t len;
+  while (1) {    
+    if ( (len = Serial.available()) &gt; 0 ) {
+      if ( len &gt; BUF_SIZE ) { len = BUF_SIZE; }
+      len = Serial.readBytes( tx_data, len );
+      if ( len &gt; 0 ) {
+        MySerial.write( tx_data, len );
+      }
+    }
+    vTaskDelay(pdMS_TO_TICKS(10));
+  }
+}
+
+void task2(void *pvParameters) {
+  (void)pvParameters; // Task parameters not used.
+  uint32_t len;
+  while (1) {
+    if ( (len = MySerial.available()) &gt; 0 ) {
+      if ( len &gt; BUF_SIZE ) { len = BUF_SIZE; }
+      len = MySerial.readBytes( tx_data, len );
+      if ( len &gt; 0 ) {
+        Serial.write( tx_data, len );
+      }
+    }
+    vTaskDelay(pdMS_TO_TICKS(10));
+  }
+}
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.setTimeout(10);
+  MySerial.begin( 115200, SERIAL_8N1, RX_PIN, TX_PIN );
+  MySerial.setDebugOutput(false);
+  while( MySerial.available() ) { (void)MySerial.read(); }
+  MySerial.setTimeout(10);
+
+  xTaskCreate( task1, &quot;Task1&quot;, 1024, NULL, 1, NULL );
+  xTaskCreate( task2, &quot;Task2&quot;, 1024, NULL, 1, NULL );
+}
+
+void loop() {
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอการใช้งานบอร์ด <strong>ESP32-C3 Super-Mini</strong>
 ซึ่งถือว่าเป็นบอร์ดไมโครคอนโทรลเลอร์อีกตัวอย่างหนึ่งที่ใช้ชิป <strong>ESP32-C3 SoC</strong>
 และบอร์ดมีขนาดเล็ก ขนาดใกล้เคียงกับบอร์ด <strong>Seeed Studio XIAO ESP32-C3</strong>
-นอกจากนั้นแล้วยังได้สาธิตการเขียนโค้ดโดยใช้ <strong>FreeRTOS</strong> เป็นตัวอย่าง</p>
+นอกจากนั้นแล้วยังได้สาธิตการเขียนโค้ดด้วย <strong>Arduino + FreeRTOS</strong> เป็นตัวอย่าง</p>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>

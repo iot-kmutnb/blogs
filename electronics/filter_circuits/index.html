@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/filter_circuits/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>วงจรกรองความถี่แบบพาสซีฟสำหรับสัญญาณทางไฟฟ้า - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">วงจรกรองความถี่แบบพาสซีฟสำหรับสัญญาณทางไฟฟ้า</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; วงจรกรองความถี่</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rc-transient" class="nav-link">&#9655; การวิเคราะห์วงจร RC ในโหมด Transient</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rl-transient" class="nav-link">&#9655; การวิเคราะห์วงจร RL ในโหมด Transient</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rc-ac" class="nav-link">&#9655; การวิเคราะห์วงจร RC ในโหมด AC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="_1">วงจรกรองความถี่แบบพาสซีฟสำหรับสัญญาณทางไฟฟ้า<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง วงจรกรองความถี่แบบฟาสซีฟด้วยวงจร <strong>RC</strong> และตัวอย่างการจำลองการทำงานด้วยซอฟต์แวร์</p>
+<p><strong>Keywords:</strong> <em>Filter Circuits</em>, <em>Circuit Analysis</em>, <em>EasyEDA</em>, <em>MATLAB</em></p>
+<hr />
+<h2 id="_2">&#9655; <strong>วงจรกรองความถี่</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>วงจรกรองความถี่ (<strong>Filter Circuit</strong>) เป็นวงจรที่ยอมให้สัญญาณที่มีความถี่ในย่านความถี่ที่กำหนดผ่านได้ดี
+แต่ช่วงความถี่อื่นจะถูกตัดออก หรือ ลดทอนแอมพลิจูดลงไป เมื่อพิจารณาย่านความถี่สำหรับการกรอง
+ก็จำแนกวงจรกรองความถี่ได้หลายประเภท เช่น</p>
+<ul>
+<li>วงจรกรองความถี่ต่่าผ่าน (<strong>Low-Pass Filter: LPF</strong>) ความถี่ต่ำจะผ่านได้ดี แต่ความถี่สูงจะถูกลดทอนหรือตัดออกไป</li>
+<li>วงจรกรองความถี่สูงผ่าน (<strong>High Pass Filter: HPF</strong>) ความถี่สูงจะผ่านได้ดี แต่ความถี่ต่ำจะถูกลดทอนหรือตัดออกไป</li>
+<li>วงจรกรองสัญญาณช่วงความถี่ (<strong>Band-Pass Filter: BPF</strong>) เฉพาะย่านความถี่ที่กำหนดไว้ผ่านได้ดี แต่นอกย่านความถี่จะถูกลดทอนหรือตัดออกไป</li>
+<li>วงจรกรองตัดหรือลดทอนความถี่เฉพาะย่าน (<strong>Band-Stop Filter: BSF</strong> หรือ <strong>Band-Reject Filter</strong>) ช่วงความที่กำหนดจะถูกตัดออก แต่ความถี่อื่น ๆ ผ่านไปได้ดี</li>
+</ul>
+<p>นอกจากนั้นแล้ว วงจรกรองความถี่ก็จำแนกได้เป็น 2 ประเภท</p>
+<ul>
+<li>วงจรกรองแบบพาสซีฟ  (<strong>Passive Filter</strong>) เป็นวงจรที่ประกอบด้วย
+<strong>R</strong> (ตัวต้านทาน) <strong>L</strong> (ตัวเหนี่ยวนำ) และ <strong>C</strong> (ตัวเก็บประจุ) นำมาต่อเป็นวงจรในรูปแบบต่าง ๆ </li>
+<li>วงจรกรองแบบแอกทีฟ   (<strong>Active Filter</strong>) เป็นวงจรที่ถูกสร้างขึ้นโดยใช้ทรานซิสเตอร์ หรือ ไอซีประเภทออปแอมป์ (<strong>OpAmp</strong>)
+เป็นองค์ประกอบที่สำคัญของวงจร และมีการใช้แหล่งพลังงานไฟเลี้ยง</li>
+</ul>
+<p>หากนำสัญญาณรูปคลื่นไซน์ไปใช้เป็นอินพุตของวงจรกรอง แล้ววัดสัญญาณเอาต์พุตของวงจร ขนาดของสัญญาณ (<strong>Magnitude</strong>) และเฟส (<strong>Phase</strong>)
+อาจแตกต่างจากสัญญาณอินพุต เมื่อเปรียบเทียบกันระหว่างสัญญาณเอาต์พุตกับอินพุต เช่น แอมพลิจูดลดลงและความต่างเฟส </p>
+<p>ตัวอย่างการวิเคราะห์วงจรไฟฟ้าที่เกี่ยวข้องกับสัญญาณรูปคลื่นไซน์ ได้แก่ การวิเคราะห์ผลตอบสนองเชิงความถี่ของวงจร (<strong>Frequency Response Analysis</strong>) 
+หรือถ้าใช้ซอฟต์แวร์จำลองการทำงานของวงจร จะเรียกว่า <strong>AC Sweep Simulation</strong> เพื่อดูว่า แต่ละค่าความถี่จากต่ำไปสูง ส่งผลต่อสัญญาณเอาต์พุตของวงจรอย่างไร</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rc-transient">&#9655; <strong>การวิเคราะห์วงจร RC ในโหมด Transient</strong><a class="headerlink" href="#rc-transient" title="Permanent link">#</a></h2>
+<p><img alt="" src="rc_circuit-1.png" /></p>
+<p>รูป: การวาดวงจร <strong>RC</strong> โดยใช้ซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p>จากผังวงจร สามารถเขียนสมการที่เกี่ยวข้องได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   i_C(t) &= C \frac{d}{dt} v_C(t) \\
+   v_R(t) &= R\, i_R(t) \\
+   i(t)   &= i_R(t) = i_C(t) \\
+\end{align} \\
+   v_R(t) + v_C(t) - v_S(t) = 0 \\
+   R\, i_R(t) + v_C(t) = v_S(t) \\
+   RC\,\frac{d}{dt} v_C(t) + v_C(t) = v_S(t) \\
+</script>
+</p>
+<p>ดังนั้นจะได้สมการเชิงอนุพันธ์ (อันดับหนึ่ง) พร้อมเงื่อนไขเริ่มต้น และผลเฉลยดังนี้สำหรับฟังก์ชัน <script type="math/tex">v_S(t)</script> แบบขั้นบันได
+(<strong>Step Function</strong>)</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   \text{First-order ODE: }   & \quad v'_C(t) + \frac{1}{RC} v_C(t) = \frac{1}{RC}v_S(t) \\
+   \text{Initial Condition: } &\quad v_C(0) = V_0  \\
+\end{align}
+</script>
+<script type="math/tex; mode=display">
+ v_S(t) = \begin{cases}
+   V_S  & t \geq 0 \\  
+   0  & t < 0 \\
+\end{cases} \\
+\begin{align}
+     v_C(t) &= V_S - (V_S - V_0)e^{-t/RC} \\
+     i(t)   &= \frac{(V_S - V_0)}{R}\,e^{-t/RC} \\
+     v_R(t) &= R\, i(t) =(V_S - V_0)\,e^{-t/RC} \\
+\end{align} 
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ด <strong>MATLAB</strong> (ใช้  <a href="https://www.mathworks.com/products/symbolic.html"><strong>Symbolic Math Toolbox</strong></a>) สำหรับการหาผลเฉลยของสมการเชิงอนุพันธ์สำหรับวงจร <strong>RC</strong></p>
+<pre><code class="language-matlab">% clear all symbols, variables, figures and command outputs
+clearvars; clc; clf;
+% define symbols
+syms t R C V_S V_0 v_C(t) i(t)
+% write the ODE
+eqn = diff(v_C(t),t) + v_C(t)/(R*C) == V_S/(R*C);
+% set the initial condition (IC)
+ic = v_C(0) == V_0;
+% solve the ODE to find v_C(t)
+sol = dsolve( eqn, ic )
+% determine the current i(t)
+i(t) = simplify( C*diff(sol,t) )
+</code></pre>
+<p>&nbsp;</p>
+<p>หากป้อนสัญญาณ <script type="math/tex">v_S(t)</script> เป็นแบบขั้นบันได เช่น เปลี่ยนจาก <strong>0V</strong> เป็น <strong>5V</strong> ที่เวลา <script type="math/tex">t=0</script> และ <strong>0V</strong>
+เมื่อเวลา <script type="math/tex">t=5ms</script> ตามลำดับ จะได้รูปคลื่นสัญญาณสำหรับแรงดันไฟฟ้าตกคร่อมดังนี้ (ตั้งค่า <script type="math/tex">R=1000\Omega, C=1uF</script>)</p>
+<p><img alt="" src="rc_circuit_sim-1.png" /></p>
+<p>รูป: ผลการจำลองการทำงานสำหรับวงจร <strong>RC</strong> เมื่ออินพุตเป็นสัญญาณแบบขั้นบันได</p>
+<p>ในการพิจารณารูปกราฟ ให้แบ่งเป็นสองช่วง</p>
+<ul>
+<li>ช่วงแรก <script type="math/tex">v_C(t)</script> จะเพิ่มจาก <script type="math/tex">V_0 = 0V</script> ไปจนถึงประมาณ <script type="math/tex">V_S = 5V</script> เนื่องจากมีการอัดประจุไฟฟ้า (<strong>Charging</strong>)</li>
+<li>ช่วงที่สอง <script type="math/tex">v_C(t)</script> จะลดลงจาก  <script type="math/tex">V_0 = 5V</script> ไปจนถึงประมาณ <script type="math/tex">V_S = 0V</script> เนื่องจากมีการคายประจุไฟฟ้า (<strong>Discharging</strong>)</li>
+</ul>
+<p>หากลองวาดรูปกราฟสำหรับ <script type="math/tex">v_C(t)</script> และใช้ค่าของตัวเก็บประจุที่แตกต่างกัน เช่น <script type="math/tex">0.1uF, 1uF, 10uF</script>
+โดยใช้ <strong>MATLAB</strong> ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-matlab">% (continued)
+% substitute parameters with specific values for v_C(t)
+params = [R, V_S, V_0];
+values = [1000, 5, 0];
+v_C(t) = subs( sol, params, values )
+% plot v_C(t) with different values of C for t=0..0.02 sec
+hold on
+ts = [0,0.02];
+Cs = [0.1e-6, 1e-6, 10e-6];
+for value=Cs
+   fplot( subs(v_C(t),C,value), ts, linewidth=1.5 );
+end
+xlabel('t'), ylabel('v_C(t)'),
+ylim([0,5.5]), grid on,
+legend( compose('%.1f uF', (Cs.*10^6)) )
+hold off
+</code></pre>
+<p><img alt="" src="rc_voltage_matlab_plot-1.png" /></p>
+<p>รูป: แสดงเส้นกราฟสำหรับ <script type="math/tex">v_C(t)</script> สำหรับค่าตัวเก็บประจุที่แตกต่างกัน ในช่วงที่มีการชาร์จประจุ</p>
+<p>&nbsp;</p>
+<p><strong>คำถาม:</strong> หากป้อนสัญญาณ <script type="math/tex">v_S(t)</script> เป็นแบบ <strong>PWM</strong> (<em>Pulse Width Modulation</em>) ที่มีค่า <strong>Duty Cycle=50%</strong> หรือ คลื่นสี่เหลี่ยม (<strong>Rectangular Wave</strong>) 
+ความถี่ของสัญญาณจะส่งผลต่อรูปคลื่นสัญญาณของ <script type="math/tex">v_C(t)</script> อย่างไร ?
+ลองดูตัวอย่างผลการจำลองการทำงานสำหรับความถึ่ <script type="math/tex">{1kHz, 2kHz, 10kHz}</script> ตามลำดับ</p>
+<p><img alt="" src="rc_sim_pwm_1khz.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต (ความถี่ <script type="math/tex">1kHz</script>)</p>
+<p><img alt="" src="rc_sim_pwm_2khz.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต (ความถี่ <script type="math/tex">2kHz</script>)</p>
+<p><img alt="" src="rc_sim_pwm_10khz.png" /></p>
+<p>รูป: สัญญาณเอาต์พุต (ความถี่ <script type="math/tex">10kHz</script>)</p>
+<p>จากรูปคลื่นสัญญาณจะพอสรุปได้ดังนี้</p>
+<ul>
+<li>ระดับแรงดันไฟฟ้า <script type="math/tex">v_C(t)</script> จะลู่เข้าสู่ <strong>2.5V</strong> (ครึ่งหนึ่งของ <strong>5V</strong>) เนื่องจากสัญญาณ <strong>PWM</strong> จะมีค่า <strong>Duty Cycle</strong> เท่ากับ <strong>50%</strong></li>
+<li>สัญญาณ <script type="math/tex">v_C(t)</script> จะไม่เรียบ มีการแกว่งอยู่ระหว่างสองระดับ (<script type="math/tex">V_{lower}</script> และ <script type="math/tex">V_{upper}</script>) ผลต่างเรียกว่า <strong>Ripple Voltage</strong> 
+และช่วงของแรงดันที่แกว่งจะแคบลงถ้าใช้ความถี่สูงขึ้น</li>
+</ul>
+<p>การวิเคราะห์แบ่งได้เป็นสองช่วง คือ ช่วงสัญญาณขาขึ้นเมื่อสัญญาณ <strong>PWM</strong> อยู่ที่ระดับ <script type="math/tex">V_S > 0V</script> และช่วงขาลงเมื่อสัญญาณ <strong>PWM</strong> อยู่ที่ระดับ <script type="math/tex">0V</script>
+โดยที่ <script type="math/tex">0 < \alpha < 1</script>
+<script type="math/tex; mode=display">
+\begin{align}
+ \text{Rising: } \quad & v_C(\alpha T) = V_S - (V_S - V_{lower})\, e^{−\alpha T/RC} = V_{upper} \\
+ \text{Falling: }\quad & v_C((1-\alpha) T) = 0 - (0 - V_{upper})\, e^{−(1-\alpha) T/RC} = V_{lower} \\
+\end{align}
+</script>
+หากหาผลเฉลยของระบบสมการนี้จะได้ </p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ V_{upper} &= \Big(\frac{ 1 - e^{-\alpha T/\tau}}{ 1 - e^{-T/\tau} }\Big) V_S, \; \tau := RC \\
+ V_{lower} &= e^{-(1-\alpha)T/\tau } \Big(\frac{ 1 - e^{-\alpha T/\tau} }{ 1 - e^{-T/\tau}} \Big) V_S
+ = e^{-(1-\alpha)T/\tau } \cdot  V_{upper} \\
+\end{align}</script>
+</p>
+<p>ถ้าใช้ความถี่ <script type="math/tex">1kHz</script> ซึ่งมีคาบ <script type="math/tex">T = 10^{-3} s</script>, <script type="math/tex"> \alpha = 0.5</script> สำหรับค่า <strong>Duty Cycle = 50%</strong>
+และ <script type="math/tex">V_S = 5 V</script>, <script type="math/tex">R = 10^{3} \Omega</script>, <script type="math/tex">C = 10^{-1} uF</script>, <script type="math/tex">\tau = 10^{-3} s</script> จะได้ระดับแรงดันอยู่ในช่วงต่อไปนี้
+<script type="math/tex; mode=display">\begin{align}
+ V_{upper} &= 3.112 V \\
+ V_{lower} &= 1.888 V \\
+ \frac{V_{upper} + V_{lower}}{2} &= 2.500V \\
+\end{align}</script>
+</p>
+<p>ตัวอย่างการใช้งานวงจร <strong>RC</strong> ในลักษณะนี้กับสัญญาณ <strong>PWM</strong> ได้แก่ การสร้างสัญญาณเอาต์พุต <strong>PWM</strong>
+ด้วยบอร์ด <strong>Arduino</strong> โดยใช้คำสั่ง <code>analogWrite()</code> ดังนั้นการปรับค่าความกว้างของพัลส์
+หรือ <strong>Duty Cycle</strong> จะส่งผลต่อระดับของสัญญาณเอาต์พุตที่ผ่านวงจร <strong>RC</strong> และใช้แทนสัญญาณเอาต์พุตแบบแอนะล็อก
+ในกรณีที่ชิปไมโครคอนโทรลเลอร์ไม่มีวงจร <strong>DAC</strong> (<em>Digital-Analog Converter</em>) อยู่ภายใน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rl-transient">&#9655; <strong>การวิเคราะห์วงจร RL ในโหมด Transient</strong><a class="headerlink" href="#rl-transient" title="Permanent link">#</a></h2>
+<p>การวิเคราะห์วงจร <strong>RL</strong> ก็วิธีการคล้ายกับวงจร <strong>RC</strong> ซึ่งจะนำไปสู่สมการเชิงอนุพันธ์อันดับหนึ่งเช่นกัน </p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   v_L(t) &= L \frac{d}{dt} i_L(t) \\
+   v_R(t) &= R\, i_R(t) \\
+   i(t)   &= i_R(t) = i_L(t) \\
+\end{align} \\
+   v_R(t) + v_L(t) - v_S(t) = 0 \\
+   R\,i_R(t) + L\frac{d}{dt} i_L(t) = v_S(t) \\
+</script>
+</p>
+<p><img alt="" src="rl_circuit-1.png" /></p>
+<p>รูป: การวาดวงจร <strong>RL</strong> โดยใช้ซอฟต์แวร์ <strong>EasyEDA</strong> (มีการต่อแอมมิเตอร์เพื่อวัดกระแสในวงจร)</p>
+<p>ดังนั้นจะได้สมการเชิงอนุพันธ์ (อันดับหนึ่ง) และเงื่อนไขเริ่มต้นดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+\begin{align}
+   \text{First-order ODE: }    &\quad i'_L(t) + \frac{R}{L} i_L(t) = \frac{1}{L}v_S(t) \\
+   \text{Initial Condition: }  &\quad i_L(0) = I_0 \\
+\end{align} \\
+</script>
+</p>
+<p>ในกรณีที่สัญญาณ <script type="math/tex">v_S(t)</script> เป็นแบบขั้นบันได จะได้ผลเฉลยดังนี้ 
+<script type="math/tex; mode=display">
+ i_L(t) = \frac{V_S}{R} - (\frac{V_S}{R} - I_0)\,e^{-\frac{R}{L}t} \\
+ v_L(t) = L \frac{d}{dt} i_L(t) = (V_S - I_0 R)\,e^{-\frac{R}{L}t} \\
+ v_R(t) = R\, i_L(t) = V_S - (V_S - I_0 R)\,e^{-\frac{R}{L}t}\\
+</script>
+</p>
+<p>หากป้อนสัญญาณ <script type="math/tex">v_S(t)</script> เป็นแบบขั้นบันได เช่น เปลี่ยนจาก <strong>0V</strong> เป็น <strong>5V</strong> ที่เวลา <script type="math/tex">t=0</script> 
+และ <strong>0V</strong> เมื่อเวลา <script type="math/tex">t=5ms</script> ตามลำดับ จะได้รูปคลื่นสัญญาณสำหรับแรงดันไฟฟ้าตกคร่อมดังนี้
+(ตั้งค่า <script type="math/tex">R=100 \Omega, L=100 mH</script>)</p>
+<p><img alt="" src="rl_circuit_sim-1.png" /></p>
+<p>รูป: ผลการจำลองการทำงานสำหรับวงจร <strong>RL</strong> เมื่ออินพุตเป็นสัญญาณแบบขั้นบันได</p>
+<p>ในการพิจารณารูปกราฟ ให้แบ่งเป็นสองช่วง</p>
+<ul>
+<li>ช่วงแรก เมื่อเวลา <script type="math/tex">t=0</script> กระแส <script type="math/tex">i(t)</script> เท่ากับ <script type="math/tex">I_0=0mA</script> แล้วเพิ่มขึ้นจนถึง <script type="math/tex">5V/100\Omega=50mA</script>
+ซึ่งมีแนวโน้มเหมือน <script type="math/tex">v_R(t)</script> ที่เพิ่มขึ้นจาก <strong>0V</strong> ไปสู่ <strong>5V</strong> ในขณะที่แรงดันตกคร่อมที่ตัวเหนี่ยวนำ 
+<script type="math/tex">v_L(t)</script> จะกระโดดไปเริ่มต้นที่ <strong>5V</strong> แล้วลดลงเข้าใกล้ <strong>0V</strong></li>
+<li>ช่วงที่สอง <script type="math/tex">v_L(t)</script> จะกระโดดไปที่ <strong>-5V</strong> แล้วเพิ่มขึ้นจนเข้าใกล้ <strong>0V</strong> ในขณะที่ <script type="math/tex">v_R(t)</script> ลดลง <strong>5V</strong> ไปสู่ <strong>0V</strong>
+เช่นเดียวกับกระแส <script type="math/tex">i(t)</script> ที่มีแนวโน้มลดลงจาก<script type="math/tex">I_0=50mA</script> ไปสู่ <script type="math/tex">0mA</script>
+</li>
+</ul>
+<p>ตัวอย่างโค้ด <strong>MATLAB</strong> สำหรับการคำนวณหากระแสและแรงดันตกคร่อมในวงจร <strong>RL</strong></p>
+<pre><code class="language-matlab">% clear all symbols, variables, figures and command outputs
+clearvars; clc; clf;
+% create symbols
+syms t R L V_S I_0 i_L(t) v_L(t) v_R(t)
+% write the ODE 
+eqn = diff(i_L(t),t) + (R/L)*i_L(t) == V_S/L;
+% set the initial condition (IC)
+ic = i_L(0) == I_0;
+% solve the ODE to find i_L(t)
+sol = dsolve( eqn, ic );
+i_L(t) = sol
+v_L(t) = L*diff(i_L(t),t)
+v_R(t) = R*i_L(t)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rc-ac">&#9655; <strong>การวิเคราะห์วงจร RC ในโหมด AC</strong><a class="headerlink" href="#rc-ac" title="Permanent link">#</a></h2>
+<p>สัญญาณอินพุตที่เป็นรูปคลื่นไซน์ ตามรูปแบบต่อไปนี้
+<script type="math/tex; mode=display">
+  v_S(t) = V_S\, sin(\omega t), \; \omega = 2\pi f = \frac{2\pi}{T}
+</script>
+หรือเขียนให้อยู่ในรูปแบบของเฟสเซอร์ <strong>Phasor</strong>
+<script type="math/tex; mode=display">
+  \mathbf{V}_S = |\mathbf{V}_S| \angle 0^{\circ}
+</script>
+</p>
+<p>หากป้อนสัญญาณรูปคลื่นไซน์สำหรับ <script type="math/tex">v_S(t)</script> ที่มีความถี่คงที่เท่ากับ <script type="math/tex">\omega</script> 
+และเงื่อนไขเริ่มต้นเป็นศูนย์ ซึ่งหมายถึง ตัวเก็บประจุไม่สะสมพลังงานเอาไว้
+และสนใจเฉพาะผลตอบสนองบังคับเมื่อเข้าสู่สภาวะคงตัว มีวิธีการวิเคราะห์ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \mathbf{I}   &= \frac{\mathbf{V}_S}{R + X_C} \\
+  \mathbf{V}_R &= \frac{R}{R + X_C} \mathbf{V}_S 
+     = \frac{R}{R + 1/(j\omega C)} \mathbf{V}_S 
+     = \frac{j\omega RC}{1 + j\omega RC} \mathbf{V}_S  \\
+  \mathbf{V}_C &= \frac{X_C}{R + X_C} \mathbf{V}_S 
+     = \frac{1/(j\omega C)}{R + 1/(j\omega C)} \mathbf{V}_S
+     = \frac{1}{1 + j\omega R C} \mathbf{V}_S \\
+\end{align}</script>
+</p>
+<p>ข้อสังเกต:</p>
+<ul>
+<li>รีแอคแตนซ์ของตัวเก็บประจุ  (<strong>Capacitive Reactance</strong>): <script type="math/tex">X_C = \frac{1}{j\omega C} = \frac{1}{j 2\pi f C}</script>
+</li>
+<li>รีแอคแตนซ์ของตัวเหนี่ยวนำ  (<strong>Inductive Reactance</strong>): <script type="math/tex">X_L = j\omega L = j 2\pi f L</script>
+</li>
+<li>สัญลักษณ์ <script type="math/tex">j</script> หมายถึง <script type="math/tex">\sqrt{-1}</script> ในระบบเลขจำนวนเชิงซ้อน</li>
+</ul>
+<p>หากพิจารณา แรงดันตกคร่อมที่ตัวเก็บประจุ ให้เป็นสัญญาณเอาต์พุตของวงจร ความสัมพันธ์ระหว่างเอาต์พุตต่ออินพุต เขียนได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \mathbf{H}(j\omega) &:= \frac{\mathbf{V}_C}{\mathbf{V}_S} 
+                       = \frac{1}{1 + j\omega R C} \\
+  |\mathbf{H}(j\omega)| &= \frac{1}{\sqrt{1 + (\omega R C)^2}} \\
+  \angle \mathbf{H}(j\omega) &= -tan^{-1}(\omega RC) \quad (radian)\\
+\end{align}</script>
+</p>
+<p>ดังนั้น <script type="math/tex">\mathbf{H}(j\omega)</script> ใช้ในการวิเคราะห์ผลต่อสนองเชิงความถี่ของวงจรได้
+และสามารถกล่าวได้ว่า ความถี่ <script type="math/tex">\omega</script> และค่า <script type="math/tex">RC</script> จะส่งผลต่อแอมพลิจูดและความต่างเฟสของสัญญาณเอาต์พุต
+เมื่อเปรียบเทียบกับสัญญาณอินพุต</p>
+<p>ศึกษาเพิ่มเติมได้จากบทความที่เกี่ยวข้อง:
+<a href="../ac_circuit_analysis/">"การวิเคราะห์และจำลองการทำงานของวงจรไฟฟ้ากระแสสลับ <strong>(AC Circuit Analysis)</strong>"</a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการวิเคราะห์วงจรกรองความถี่แบบพาสซีฟ เช่น วงจร <strong>Low-Pass RC Filter</strong>
+และมีตัวอย่างการจำลองการทำงานด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2022-04-10 | Last Updated: 2023-09-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
