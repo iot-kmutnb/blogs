@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/displays/max7219/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานไอซี MAX7219 กำหนดสถานะลอจิกให้ LEDs - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#max7219-leds" class="nav-link">การใช้งานไอซี MAX7219 กำหนดสถานะลอจิกให้ LEDs</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#max7219" class="nav-link">&#9655; MAX7219</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#max7219-arduino" class="nav-link">&#9655; ไลบรารีสำหรับ MAX7219 เพื่อใช้ในการเขียนโค้ดด้วย Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-wokwi-simulator-8x8-led-matrix-display" class="nav-link">&#9655; การเขียนโค้ดและจำลองการทำงานด้วย Arduino Wokwi Simulator: 8x8 LED Matrix Display</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="max7219-leds">การใช้งานไอซี MAX7219 กำหนดสถานะลอจิกให้ LEDs<a class="headerlink" href="#max7219-leds" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="max7219">&#9655; <strong>MAX7219</strong><a class="headerlink" href="#max7219" title="Permanent link">#</a></h2>
+<p>ไอซี <strong>MAX7219</strong> (<a href="https://www.analog.com/media/en/technical-documentation/data-sheets/MAX7219-MAX7221.pdf"><strong>Datasheet</strong></a>) ของบริษัท 
+<strong>Maxim Integrated / Analog Devices</strong>
+มักนิยมนำมาใช้สำหรับควบคุมการแสดงผลด้วย <strong>LED</strong> แบบหลายดวง 
+โดยแบ่งการทำงานเป็น 2 ลักษณะ ตามรูปแบบการใช้งาน ได้แก่ </p>
+<ul>
+<li>การใช้งานกับโมดูล <strong>7-Segment Display</strong>: สามารถควบคุมได้ทั้งหมด 8 ชุด (8 หลักของตัวเลข หรือ <strong>Digits</strong>)</li>
+<li>การใช้งานกับโมดูล <strong>8x8 LED Matrix Display</strong>: ใช้งานกับ <strong>8x8 LEDs</strong> ต่อไอซีหนึ่งตัว</li>
+</ul>
+<p>ตามเอกสารของผู้ผลิต ไอซี <strong>MAX7219</strong> ใช้แรงดันไฟเลี้ยง (<strong>VCC</strong>) 
+อยู่ในช่วง <strong>+4.0V</strong> ถึง <strong>+5.5V</strong> หรือ <strong>+5V</strong> (<em>typ.</em>)
+แต่ก็สามารถนำมาใช้กับ <strong>+3.3V</strong> ได้เช่นกัน</p>
+<p><img alt="" src="max7219_pins.png" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขาและคำอธิบาย (อ้างอิงจากเอกสารของผู้ผลิต)</p>
+<p><img alt="" src="max7219_block_diagram.png" /></p>
+<p>รูป: บล็อกไดอะแกรมแสดงองค์ประกอบภายในของไอซี <strong>MAX7219</strong></p>
+<p><img alt="" src="max7219_8x8_dot_matrix.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งานไอซี <strong>MAX7219</strong> สำหรับ <strong>8x8 Dot LED Matrix</strong></p>
+<p><img alt="" src="max7219_8x_7seg_display.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งานไอซี <strong>MAX7219</strong> สำหรับ <strong>7-Segment Display (Common-Cathode)</strong> แบบ 8 หลัก</p>
+<p><img alt="" src="max7219_8dig_7seg_display.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>8-Digit 7-Segment Display (Common-Cathode)</strong> ที่ใช้ไอซี <strong>MAX7219</strong>
+ควบคุมการทำงาน</p>
+<p><img alt="" src="max7219_32x8_dot_matrix.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>32x8 MAX7219 Dot Matrix Display</strong></p>
+<p>&nbsp;</p>
+<p>ไอซีมีขา <strong>ISET</strong> เอาไว้ต่อเข้ากับตัวต้านทานภายนอกไปยัง <strong>VCC</strong> เพื่อกำหนดปริมาณกระแสสูงสุด
+(<strong>Peak Segment Current</strong>) สำหรับจ่ายให้ <strong>LED Segments</strong> </p>
+<p>ไอซีมีขา <strong>I/O</strong> ที่ใช้ควบคุมการทำงานของ <strong>LEDs</strong> จำนวน 16 ขา (แพ็คเกจของไอซีมี 24 ขา)  แบ่งเป็น 2 กลุ่มคือ </p>
+<ul>
+<li><strong>8x DIGITS</strong> (<code>DIG0</code> .. <code>DIG7</code>) หรือ <strong>Digit Driver Pins</strong>: ขาควบคุม จะมีเพียงหนึ่งขาในแต่ละช่วงเวลาที่แอคทีฟ (<strong>Active</strong>)</li>
+<li><strong>8x SEGMENTS</strong> (<code>SEG_A</code> .. <code>SEG_G</code>, <code>SEG_DP</code>) หรือ <strong>Segment Driver Pins</strong>): ขาข้อมูลบิต จำนวน 8 บิต
+เช่น นำไปใช้กับ <strong>8x LEDs</strong> สำหรับ <strong>7-Segment + DP (Decimal Point)</strong> หรือ
+<strong>8x LEDs</strong> ในหนึ่งแถวของ <strong>LED Matrix</strong></li>
+</ul>
+<p>การส่งข้อมูลไปยังไอซี <strong>MAX7219</strong> เช่น จากไมโครคอนโทรลเลอร์ จะใช้สัญญาณเพียง 3 สัญญาณ ได้แก่</p>
+<ul>
+<li><code>CLK</code> (ความถี่สูงสุด <strong>10MHz</strong>) สำหรับสัญญาณ <strong>Clock</strong></li>
+<li><code>DIN</code> (<strong>Serial-Data Input</strong>) สำหรับสัญญาณข้อมูลที่ถูกเลื่อนไปทีละบิต เพื่อเก็บในรีจิสเตอร์ภายใน</li>
+<li><code>LOAD</code> หรือ <code>CS</code> (<strong>Load-Data Input</strong>) สำหรับสัญญาณควบคุม
+เมื่อเกิดขอบขาขึ้นที่สัญญาณ <strong>LOAD</strong> ข้อมูลในรีจิสเตอร์เลื่อนบิตในขณะนั้น จะถูกนำไปใช้</li>
+</ul>
+<p>การส่งคำสั่งและข้อมูลนั้น จะทำโดยใช้วิธีเลื่อนบิตเข้าไปทีละบิต (<strong>Bit Shifting</strong>) แบบ <strong>MSB First</strong>
+เข้าไปที่ขา <code>DIN</code> ไปยังรีจิสเตอร์สำหรับการเลื่อนบิตและรับข้อมูล (<strong>Shift Register</strong>) ขนาด 16 บิต 
+และส่งออกได้ที่ขา <code>DOUT</code> (<strong>Serial-Data Output</strong>) ตามจังหวะสัญญาณ <code>CLK</code> 
+ดังนั้นข้อมูลมีขนาด 2 ไบต์ หรือ 16 บิต (<code>D15</code> .. <code>D0</code>) สำหรับไอซี <strong>MAX7219</strong> หนึ่งตัว</p>
+<p>ถ้าต้องการควบคุมได้มากกว่าหนึ่งชุด โดยใช้ไอซี <strong>MAX7219</strong> มากกว่าหนึ่งตัว นำมาต่อกันแบบ 
+<strong>Daisy-Chain</strong> โดยให้ขา <code>DOUT</code> เชื่อมต่อกับขา <code>DIN</code> ของไอซีที่อยู่ในลำดับถัดไป</p>
+<p>ตัวอย่างการใช้งานในลักษณะนี้และพบเห็นได้บ่อย เช่น การทำป้ายไฟแสดงผล <strong>LED Matrix</strong> ที่มีความสูง 8 พิกเซล 
+แต่มีความยาวมากกว่า 8 พิกเซล ถ้าต้องการขนาด <strong>8x32</strong> ก็ต้องใช้อุปกรณ์ทั้งหมด 4 ชุด นำมาต่อกันตามลำดับ เป็นต้น</p>
+<p>การเขียนโปรแกรมไมโครคอนโทรลเลอร์ เพื่อเลื่อนบิตข้อมูลไปยัง <strong>MAX7219</strong> ทำได้ 2 วิธีคือ </p>
+<ul>
+<li>การใช้ขา <strong>GPIO</strong> และสร้างสัญญาณ เพื่อใช้สำหรับ  <code>CLK</code> แล้วเลื่อนข้อมูลทีละบิต ออกไปสำหรับขา <code>DIN</code></li>
+<li>การใช้วงจร <strong>Hardware SPI</strong> ภายในชิปไมโครคอนโทรลเลอร์ ซึ่งจะทำได้เร็วและใช้ความถี่ของ <strong>Clock</strong> ได้สูงกว่าวิธีแรก</li>
+</ul>
+<p>บิตที่ <code>D11</code> .. <code>D8</code> ของข้อมูล 16 บิต (ในรีจิสเตอร์สำหรับการเลื่อนบิตและรับข้อมูล)
+เป็นตัวระบุคำสั่ง (<strong>Operation</strong>) ขนาด 4 บิต และแอดเดรสของรีจิสเตอร์เป้าหมาย (<strong>Register Address</strong>) ขนาด 4 บิต เช่น</p>
+<ul>
+<li>บิต <code>D15</code> .. <code>D12</code>: ไม่มีการใช้งาน (<strong>Don't care</strong>)</li>
+<li>บิต <code>D11</code> .. <code>D8</code>: ใช้สำหรับการกำหนดแอดเดรสของรีจิสเตอร์</li>
+<li>บิต <code>D7</code> .. <code>D0</code>: ข้อมูลขนาด 8 บิต เพื่อเขียนลงในรีจิสเตอร์</li>
+</ul>
+<p><img alt="" src="max7219_table-1.png" /></p>
+<p>รูป: ตารางเกี่ยวกับรีจิสเตอร์ภายใน</p>
+<p>รีจิสเตอร์แต่ละตัวมีหน้าที่แตกต่างกัน เช่น </p>
+<ul>
+<li>รีจิสเตอร์ <strong>No-Op</strong>: การไม่ทำคำสั่งใด ๆ (<strong>No-Op = No Operation</strong>) </li>
+<li>รีจิสเตอร์ <strong>Digit 0 .. Digit 7</strong>: สำหรับการกำหนดค่าขนาดหนึ่งไบต์ตามแอดเดรสที่ระบุ เก็บข้อมูลลงในหน่วยความจำ <strong>8x8 SRAM</strong>
+จำนวน 8 บิต ต่อหนึ่งแอดเดรส และนำไปใช้ในการกำหนดสถานะติดหรือดับของ <strong>LEDs</strong></li>
+<li>รีจิสเตอร์ <strong>Decode Mode</strong>: การใช้งาน <strong>Code B Decode Mode</strong> ในโหมดนี้ถ้ามีการเปิดใช้งาน ข้อมูล 4 บิต จะถูกใช้เป็น <strong>BCD Code</strong>
+(มี 16 กรณี หรือ ตัวอักขระ คือ <code>0</code> - <code>9</code>, <code>E</code>, <code>H</code>, <code>L</code>, <code>P</code>, <code>-</code> และว่างเปล่า <code></code>) และมีการแปลงโดยอัตโนมัติให้เป็นข้อมูล 8 บิต เพื่อนำไปใช้กับ <strong>7-Segment Digit</strong></li>
+<li>รีจิสเตอร์ <strong>Intensity</strong>: การกำหนดระดับความสว่าง ซึ่งมีให้เลือกตั้งค่าได้ทั้งหมด 16 ระดับ</li>
+<li>รีจิสเตอร์ <strong>Scan Limit</strong>: การตั้งค่าจำนวนหลักสูงสุดที่มี ถ้าใช้ไม่ครบ 8 หลัก
+ในกรณีที่ใช้กับ <strong>7-Segment Display</strong></li>
+<li>รีจิสเตอร์ <strong>Shutdown</strong>: การเปิดหรือปิด <strong>LEDs</strong> คือ เลือกระหว่างโหมด <strong>Normal Mode</strong> กับ <strong>Shutdown Mode</strong></li>
+<li>รีจิสเตอร์  <strong>Display Test</strong>: การเปิดหรือปิดโหมดการทดสอบ คือ การเลือกระหว่าง <strong>Normal Mode</strong> กับ <strong>Display Test</strong> 
+ถ้าเป็นโหมดทดสอบ จะทำให้ <strong>LEDs</strong> ทุกดวงอยู่ในสถานะ <strong>ON</strong></li>
+</ul>
+<p><img alt="" src="max7219_table-2.png" /></p>
+<p>รูป: ตารางเกี่ยวกับรีจิสเตอร์ <strong>Intensity</strong> และ <strong>Scan Limit</strong></p>
+<p>การทำงานเพื่อควบคุม <strong>LEDs</strong> จำนวน 8 ชุด จะใช้วิธีที่เรียกว่า <strong>Time Multiplexing</strong> 
+โดยจะเรียงไปตามลำดับของสัญญาณควบคุม <code>SEG_A</code> .. <code>SEG_G</code>, <code>SEG_DP</code> 
+(แล้ววนซ้ำใหม่โดยอัตโนมัติด้วยอัตรา <strong>800Hz</strong>) และในขณะเดียวกัน
+ก็จะมีการอ่านค่าจากรีจิสเตอร์ขนาด 8 บิต แล้วส่งออกทีขา <code>DIG0</code> .. <code>DIG7</code> พร้อมกัน 
+แต่ละขาจ่ายกระแสได้สูงสุดประมาณ <strong>40mA</strong> (<strong>Segment Drive Source Current</strong>)</p>
+<hr />
+<h2 id="max7219-arduino">&#9655; <strong>ไลบรารีสำหรับ MAX7219 เพื่อใช้ในการเขียนโค้ดด้วย Arduino</strong><a class="headerlink" href="#max7219-arduino" title="Permanent link">#</a></h2>
+<p>เนื่องจากไอซีและโมดูล <strong>MAX7219</strong> มีการใช้งานมาหลายปี จึงมีการจัดทำเป็นไลบารี
+ที่เป็น <strong>Open Source</strong> เพื่อนำไปใช้ในการเขียนโค้ด <strong>Arduino Sketch</strong> 
+และจะเห็นได้ว่า มีไลบรารีให้เลือกใช้งาน อยู่จำนวนไม่น้อย (บางตัวเลือก ก็ไม่ได้มีการอัปเดตแล้วหลายปี) เช่น</p>
+<ul>
+<li><a href="https://github.com/olikraus/U8g2_Arduino"><code>github:olikraus/U8g2_Arduino</code></a></li>
+<li><a href="https://github.com/adafruit/Adafruit_LED_Backpack"><code>github:adafruit/Adafruit_LED_Backpack</code></a></li>
+<li><a href="https://github.com/MajicDesigns/MD_MAX72XX"><code>github:MajicDesigns/MD_MAX72XX</code></a></li>
+<li><a href="https://github.com/JemRF/max7219"><code>github:JemRF/max7219</code></a></li>
+<li><a href="https://github.com/nickgammon/MAX7219_Dot_Matrix"><code>github:nickgammon/MAX7219_Dot_Matrix</code></a></li>
+<li><a href="https://github.com/ozhantr/DigitLedDisplay"><code>github:ozhantr/DigitLedDisplay</code></a></li>
+<li><a href="https://github.com/markruys/arduino-Max72xxPanel"><code>github:markruys/arduino-Max72xxPanel</code></a></li>
+<li><a href="https://github.com/wayoda/LedControl"><code>github:wayoda/LedControl</code></a></li>
+</ul>
+<hr />
+<h2 id="arduino-wokwi-simulator-8x8-led-matrix-display">&#9655; <strong>การเขียนโค้ดและจำลองการทำงานด้วย Arduino Wokwi Simulator: 8x8 LED Matrix Display</strong><a class="headerlink" href="#arduino-wokwi-simulator-8x8-led-matrix-display" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการเขียนโค้ดด้วย <strong>Arduino Sketch</strong> เพื่อสาธิตการใช้งานโมดูล
+<strong>8x8 LED Matrix Display</strong> โดยเลือกใช้วงจร <strong>SPI Master</strong>
+ของชิปไมโครคอนโทรลเลอร์บนบอร์ด <strong>Arduino Uno/Nano</strong> ทำหน้าที่เลื่อนข้อมูลไปยังไอซี <strong>MAX7219</strong>
+เมื่อโปรแกรมทำงาน จะแสดงผลเป็นรูปสัญลักษณ์หัวใจ (<strong>Heart Symbol</strong>) ขนาด 8x8 พิกเซล
+ซึ่งมีสองขนาด (ใหญ่และเล็ก) และกระพริบได้</p>
+<p>การใช้งานขา <strong>GPIO</strong> ของบอร์ด <strong>Arduino Uno/Nano</strong> มี 3 ขา มีดังนี้</p>
+<ul>
+<li>ขา <strong>Arduino D13 (SPI SCK)</strong> จะใช้สำหรับสัญญาณ <strong>CLK</strong></li>
+<li>ขา  <strong>Arduino D11 (SPI MOSI)</strong> จะใช้สำหรับสัญญาณ <strong>DIN</strong></li>
+<li>ขา  <strong>Arduino D10</strong> จะใช้สำหรับสัญญาณ <strong>LOAD</strong> หรือ <strong>CS</strong></li>
+</ul>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+
+// SPI Pins for Arduino Uno/Nano
+//const int CLK_PIN = 13; // SPI SCK
+//const int DIN_PIN = 11; // SPI MOSI
+const int CS_PIN = 10;    // SPI #CS 
+
+#define REG_DIGIT(x)      (0x1+(x))
+#define REG_DECODE_MODE   (0x9)
+#define REG_INTENSITY     (0xA)
+#define REG_SCAN_LIMIT    (0xB)
+#define REG_SHUTDOWN      (0xC)
+#define REG_DISPLAY_TEST  (0xF)
+
+const uint8_t BIG_HEART_SYM[] = { // Big heart symbol
+  0b00000000,
+  0b01100110,
+  0b11111111,
+  0b11111111,
+  0b01111110,
+  0b00111100,
+  0b00011000,
+  0b00000000
+};
+
+const uint8_t SMALL_HEART_SYM[] = { // Small heart symbol
+  0b00000000,
+  0b00000000,
+  0b00100100,
+  0b01111110,
+  0b00111100,
+  0b00011000,
+  0b00000000,
+  0b00000000
+};
+
+void MAX7219_WriteReg( uint8_t addr, uint8_t data ) {
+  digitalWrite( CS_PIN, LOW );
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+  SPI.transfer( addr );
+  SPI.transfer( data );
+  SPI.endTransaction();
+  digitalWrite( CS_PIN, HIGH );
+}
+
+void MAX7219_Init( uint8_t init_value = 0x00 ) {
+  MAX7219_WriteReg( REG_DECODE_MODE,  0x00 ); // No decode
+  MAX7219_WriteReg( REG_INTENSITY,    0x07 ); // Set intensity: 0x07=15/32
+  MAX7219_WriteReg( REG_SCAN_LIMIT,   0x07 ); // Scan limit: display digits 0-7
+  MAX7219_WriteReg( REG_SHUTDOWN,     0x01 ); // Shutdown: normal operation
+  MAX7219_WriteReg( REG_DISPLAY_TEST, 0x00 ); // Display test: no display test
+  for ( uint8_t i=0; i &lt; 8; i++ ) {
+    MAX7219_WriteReg( REG_DIGIT(i), init_value ); // Clear display
+  }
+  MAX7219_WriteReg( REG_SHUTDOWN, 0x01 ); // Normal operation
+}
+
+void setup() {
+  SPI.begin(); // Use the default SPI pin settings.
+  pinMode( CS_PIN, OUTPUT );
+  digitalWrite( CS_PIN, HIGH );
+  MAX7219_Init(); // Initialize the MAX7219 display.
+}
+
+void update( uint8_t *data = NULL ) {
+  uint8_t value;
+  for ( int i=0; i &lt; 8; i++) {
+    value = (data != NULL) ? data[i] : 0x00;
+    MAX7219_WriteReg( REG_DIGIT(i), value ); 
+  }
+}
+
+#define DELAY_MS (200)
+
+void loop() {
+  static uint32_t ts_saved = 0;
+  uint32_t ts_now = millis();  
+  static uint8_t index = 0;
+  if ( ts_now - ts_saved &gt;= DELAY_MS ) {
+    ts_saved = ts_now;
+    if (index == 0 ) {
+      update( BIG_HEART_SYM );
+    } else if (index == 1 ) {
+      update( SMALL_HEART_SYM );
+    } else {
+      update( );
+    }
+    index = (index+1) % 4;
+  }
+}
+</code></pre>
+<p><img alt="" src="wokwi_nano_max7219_8x8_led_matrix.png" /></p>
+<p>รูป: การเขียนโค้ด <strong>Arduino Sketch</strong> และจำลองการทำงานด้วย <strong>Arduino Wokwi Simulator</strong>
+โดยใช้บอร์ด <strong>Arduino Nano</strong> และโมดูล
+<strong>MAX7219 8x8 LED Dot Matrix (FC-16 Model)</strong> แบบเสมือนจริง</p>
+<p><strong>Arduino WokWi Simulator</strong> มีโมดูล 
+<a href="https://docs.wokwi.com/parts/wokwi-max7219-matrix"><code>wokwi-max7219-matrix</code></a>
+ให้เลือกใช้งาน และสามารถตั้งค่าได้ว่า จะใช้สีอะไร และมีจำนวนโมดูลมากกว่าหนึ่งอันที่นำมาต่อกันได้</p>
+<p><img alt="" src="wokwi_nano_max7219_8x8_led_matrix_diagram.png" /></p>
+<p>รูป: การตั้งค่าโมดูล <strong>MAX7219 Display</strong> ในไฟล์ <code>diagram.json</code> สำหรับ <strong>Wokwi Simulator</strong></p>
+<p>ถ้าจะลองใช้กับ <strong>ESP32-C3</strong> ก็มีตัวอย่างโค้ดดังนี้ (เลือกใช้ขา <strong>GPIO</strong> สำหรับ <strong>SPI</strong>
+ซึ่งแตกต่างจากกรณีที่ใช้บอร์ด <strong>Arduino Uno/Nano</strong>)</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+
+// SPI Pins for ESP32-C3
+const int SCK_PIN  = 4;  // SPI SCK
+const int MOSI_PIN = 6;  // SPI MOSI
+const int MISO_PIN = 6;  // SPI MISO
+const int CS_PIN   = 7;  // SPI #CS 
+
+#define REG_DIGIT(x)      (0x1+(x))
+#define REG_DECODE_MODE   (0x9)
+#define REG_INTENSITY     (0xA)
+#define REG_SCAN_LIMIT    (0xB)
+#define REG_SHUTDOWN      (0xC)
+#define REG_DISPLAY_TEST  (0xF)
+
+const uint8_t BIG_HEART_SYM[] = {
+  0b00000000,
+  0b01100110,
+  0b11111111,
+  0b11111111,
+  0b01111110,
+  0b00111100,
+  0b00011000,
+  0b00000000
+};
+
+const uint8_t SMALL_HEART_SYM[] = {
+  0b00000000,
+  0b00000000,
+  0b00100100,
+  0b01111110,
+  0b00111100,
+  0b00011000,
+  0b00000000,
+  0b00000000
+};
+
+void MAX7219_WriteReg( uint8_t addr, uint8_t data ) {
+  digitalWrite( CS_PIN, LOW );
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+  SPI.transfer( addr );
+  SPI.transfer( data );
+  SPI.endTransaction();
+  digitalWrite( CS_PIN, HIGH );
+}
+
+void MAX7219_Init( uint8_t init_value = 0x00 ) {
+  MAX7219_WriteReg( REG_DECODE_MODE,  0x00 ); // No decode
+  MAX7219_WriteReg( REG_INTENSITY,    0x07 ); // Set intensity: 0x07=15/32
+  MAX7219_WriteReg( REG_SCAN_LIMIT,   0x07 ); // Scan limit: display digits 0-7
+  MAX7219_WriteReg( REG_SHUTDOWN,     0x01 ); // Shutdown: normal operation
+  MAX7219_WriteReg( REG_DISPLAY_TEST, 0x00 ); // Display test: no display test
+  for ( uint8_t i=0; i &lt; 8; i++ ) {
+    MAX7219_WriteReg( REG_DIGIT(i), init_value ); // Clear display
+  }
+  MAX7219_WriteReg( REG_SHUTDOWN, 0x01 ); // Normal operation
+}
+
+void setup() {
+  SPI.begin( SCK_PIN, MISO_PIN, MOSI_PIN, CS_PIN ); // ESP32-C3
+  pinMode( CS_PIN, OUTPUT );
+  digitalWrite( CS_PIN, HIGH );
+  MAX7219_Init(); // Initialize the MAX7219 display.
+}
+
+void update( uint8_t *data = NULL ) {
+  uint8_t value;
+  for ( int i=0; i &lt; 8; i++) {
+    value = (data != NULL) ? data[i] : 0x00;
+    MAX7219_WriteReg( REG_DIGIT(i), value ); 
+  }
+}
+
+#define DELAY_MS (200)
+
+void loop() {
+  static uint32_t ts_saved = 0;
+  uint32_t ts_now = millis();  
+  static uint8_t index = 0;
+  if ( ts_now - ts_saved &gt;= DELAY_MS ) {
+    ts_saved = ts_now;
+    if (index == 0 ) {
+      update( (uint8_t*) BIG_HEART_SYM );
+    } else if (index == 1 ) {
+      update( (uint8_t*) SMALL_HEART_SYM );
+    } else {
+      update( );
+    }
+    index = (index+1) % 4;
+  }
+}
+</code></pre>
+<p><img alt="" src="wokwi_esp32c3_max7219_8x8_led_matrix.png" /></p>
+<p>รูป: การจำลองการทำงานสำหรับบอร์ด <strong>ESP32-C3</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้กล่าวถึง หลักการทำงานของไอซี <strong>MAX7219</strong> ซึ่งมักพบว่า มีการนำมาใช้ควบคุมการแสดงผลของ
+<strong>7-Segment Display</strong> หรือ <strong>8x8 LED Dot Matrix</strong> และมีตัวอย่างการเขียนโค้ดด้วย
+<strong>Arduino</strong> เพื่อสาธิตการทำงานในเบื้องต้น </p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-09-30 | Last Updated: 2023-10-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

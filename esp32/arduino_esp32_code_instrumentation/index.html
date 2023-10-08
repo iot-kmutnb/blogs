@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/arduino_esp32_code_instrumentation/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทดสอบหาระยะเวลาในการทำคำสั่งสำหรับ Arduino ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-esp32" class="nav-link">การทดสอบหาระยะเวลาในการทำคำสั่งสำหรับ Arduino ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32_1" class="nav-link">&#9655; Arduino ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">&#9655; โค้ดตัวอย่างที่ 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4" class="nav-link">&#9655; โค้ดตัวอย่างที่ 4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#5" class="nav-link">&#9655; โค้ดตัวอย่างที่ 5</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#6" class="nav-link">&#9655; โค้ดตัวอย่างที่ 6</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-esp32">การทดสอบหาระยะเวลาในการทำคำสั่งสำหรับ Arduino ESP32<a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>:  <em>Arduino</em>, <em>ESP32</em>, <em>ESP32 Performance Measurement</em>, <em>Code Instrumentation</em></p>
+<hr />
+<h2 id="arduino-esp32_1">&#9655; <strong>Arduino ESP32</strong><a class="headerlink" href="#arduino-esp32_1" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์อย่างเช่น <strong>ESP32</strong> สามารถนำมาใช้และเขียนโปรแกรมได้โดยใช้คำสั่งของ <strong>Arduino API</strong>
+บทความนี้นำเสนอแนวทางการทดลองและตัวอย่างโค้ดเพื่อดูว่า การทำคำสั่งบางคำสั่งสำหรับไมโครคอนโทรลเลอร์ดังกล่าว จะใช้เวลาเท่าไหร่
+การทดลองในลักษณะนี้เรียกว่า <strong>Code Instrumentation</strong> ซึ่งจะต้องมีการแทรกคำสั่ง เพื่อใช้ในการจับเวลา
+เช่น ก่อนเริ่มทำคำสั่งและหลังจากการทำคำสั่งแล้ว แล้วนำมาคำนวณเป็นระยะเวลาในการทำคำสั่งดังกล่าว
+การทำคำสั่งควรจะต้องทำหลายครั้งแล้วนำมาหาค่าเฉลี่ย</p>
+<p>สำหรับการเขียนโค้ด ให้ติดตั้ง
+<a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core by Espressif Systems</strong></a>
+(<strong>v2.0.13 based on ESP-IDF v4.4.5</strong>) สำหรับ <strong>Arduino IDE v2.1.0</strong></p>
+<p><img alt="" src="arduino_esp32_core.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino-ESP32 Core</strong> สำหรับ <strong>Arduino IDE v2.1.0 (Windows)</strong></p>
+<p>การอ่านค่าเวลาของระบบสำหรับ <strong>Arduino ESP32</strong> ก็มีมากกว่าหนึ่งวิธี</p>
+<ol>
+<li>อ่านค่าเวลาที่เป็นตัวเลขจำนวนเต็ม มีหน่วยเป็นไมโครวินาที</li>
+<li>อ่านค่าตัวเลขจำนวนเต็มจากรีจิสเตอร์ตัวนับการทำงานของซีพียูตามจำนวนไซเคิล (<strong>CPU Cycle Count</strong>)</li>
+</ol>
+<p>การอ่านค่าเวลาของระบบ ก็สามารถใช้คำสั่ง <code>micros()</code> ของ <strong>Arduino API</strong>
+ซึ่งจะได้ค่าเป็นตัวเลขจำนวนเต็ม มีหน่วยเวลาเป็นไมโครวินาที (<strong>usec</strong>)
+หรือ คำสั่ง <code>esp_timer_get_time()</code> ที่ค่าเลขจำนวนเต็มและมีหน่วยเป็นไมโครวินาที</p>
+<p>ถ้าจะอ่านค่าตัวนับไซเคิลของซีพียู ก็สามารถใช้คำสั่ง
+<code>esp_cpu_get_ccount()</code> ของ <strong>ESP-IDF</strong>
+หรือคำสั่ง <code>ESP.getCycleCount()</code> ซึ่งเป็นส่วนหนึ่งของคลาส
+<a href="https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/Esp.h"><code>ESP</code></a>
+แล้วจะนำมาแปลงเป็นค่าเวลาก็ได้ ซึ่งขึ้นอยู่กับความถี่ของซีพียู (เช่น <strong>240MHz</strong>)</p>
+<p>ถ้าจะใช้คำสั่งแบบ <strong>Inline Assembly</strong> เพื่ออ่านค่าจากรีจิสเตอร์ตัวนับไซเคิลของซีพียู ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c">  uint32_t c0, c1;
+  // Read cycle count register.
+  asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
+  _NOP(); // 1 CPU cycle
+  _NOP(); // 1 CPU cycle
+  _NOP(); // 1 CPU cycle
+  _NOP(); // 1 CPU cycle
+  // Read cycle count register.
+  asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1) );
+  // Compute cycle count difference.
+  uint32_t cyc_diff = (c1-c0-1);
+  Serial.printf( &quot;Cycle difference: %u\n&quot;, cyc_diff );
+  // Convert cycle count difference to time duration in nanoseconds.
+  Serial.printf( &quot;Time difference: %.3lf nsec\n&quot;,
+                 ((double)1000*cyc_diff)/ESP.getCpuFreqMHz() );
+</code></pre>
+<p>หรือใช้คำสั่ง <code>esp_cpu_get_ccount()</code></p>
+<pre><code class="language-c">  uint32_t c0, c1;
+  // Read cycle count register.
+  c0 = esp_cpu_get_ccount();
+  _NOP(); // 1 CPU cycle
+  _NOP(); // 1 CPU cycle
+  _NOP(); // 1 CPU cycle
+  _NOP(); // 1 CPU cycle
+  // Read cycle count register.
+  c1 = esp_cpu_get_ccount();
+  // Compute cycle count difference.
+  uint32_t cyc_diff = (c1-c0-1);
+  Serial.printf( &quot;Cycle difference: %u\n&quot;, cyc_diff );
+  // Convert cycle count difference to time duration in nanoseconds.
+  Serial.printf( &quot;Time difference: %.3lf nsec\n&quot;,
+                 ((double)1000*cyc_diff)/ESP.getCpuFreqMHz() );
+</code></pre>
+<p>การทำงานของโค้ดตัวอย่างนี้ จะได้ค่าเท่ากับ 4 ไซเคิล ซึ่งเท่ากับจำนวนครั้งที่มีการทำคำสั่ง <strong>NOP (No Operation)</strong>
+หรือคิดเป็น <strong>4  Cycles @240MHz = 16.667</strong> นาโนวินาที</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1">&#9655; <strong>โค้ดตัวอย่างที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างแรกสาธิตการทดลองเพื่อหาระยะเวลาในการทำคำสั่งของฟังก์ชัน
+<code>digitalWrite()</code> ของ <strong>Arduino API</strong>
+ซึ่งมักจะใช้กำหนดค่าลอจิกให้ขา <strong>GPIO</strong> ที่เป็นเอาต์พุต</p>
+<pre><code class="language-c">const int LED_PIN = 5; // GPIO-5
+
+void setup() {
+  Serial.begin(115200);
+  pinMode( LED_PIN, OUTPUT );
+}
+
+void loop() {
+  uint32_t c0, c1;
+  asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
+  digitalWrite( LED_PIN, HIGH ); // Output high to GPIO-5
+  digitalWrite( LED_PIN, LOW  ); // Output low to GPIO-5
+  asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1) );
+  uint32_t cyc_diff = (c1-c0-1); // Compute the cycle count difference.
+  Serial.printf( &quot;Cycle difference    : %u\n&quot;, cyc_diff );
+  double t_usec = ((double)cyc_diff)/ESP.getCpuFreqMHz();
+  Serial.printf( &quot;Time difference     : %.3lf usec\n&quot;, t_usec );
+  Serial.printf( &quot;digitalWrite() call : %.3lf usec\n\n&quot;, t_usec/2 );
+  // Wait for 5 seconds before repeating the loop.
+  delay(5000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ในโค้ดตัวอย่างให้สังเกตว่า มีการเรียกใช้ฟังก์ชัน <code>digitalWrite()</code> สองครั้งถัดกัน (กำหนดค่าเอาต์พุตเป็น
+<code>HIGH</code> และ <code>LOW</code> ตามลำดับ)
+จากตัวอย่างข้อความเอาต์พุต จะเห็นได้ว่า การเรียกฟังก์ชัน <code>digitalWrite()</code> ต่อหนึ่งครั้ง จะใช้เวลาประมาณ
+<strong>0.327 usec</strong> หรือ <strong>327</strong> นาโนวินาที </p>
+<p><img alt="" src="test-0.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2">&#9655; <strong>โค้ดตัวอย่างที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการจับเวลาที่ใช้ในการทำคำสั่ง <strong>for loop</strong> 
+โดยกำหนดให้ภายในลูปไม่มีคำสั่งใด ๆ ดังนั้นจึงเป็นการคำสั่งเพื่อเพิ่มค่าของตัวแปรที่ใช้เป็นตัวนับ
+(ตั้งชื่อตัวแปรภายในเป็น <code>i</code> ที่มีชนิดข้อมูลเป็น  <code>counter_t</code>)
+ตัวนับจะเริ่มต้นจาก <code>0</code> และเพิ่มขึ้นครั้งละหนึ่งตามจำนวนรอบในการทำซ้ำ (<code>NUM_ITERS</code>)
+และมีการตรวจสอบการทำซ้ำตามเงื่อนไขดังกล่าวในแต่ละรอบ ไม่มีการคำสั่งอื่นใด ๆ</p>
+<p>ชนิดข้อมูล <code>counter_t</code> ได้ถูกกำหนดด้วยคำสั่ง <code>typedef</code>
+ให้เป็น <code>uint32_t</code> (หรือ <code>unsigned int</code>)
+ที่มีขนาด 32 บิต และสำหรับการเปรียบเทียบ ก็อาจเลือกใช้ <code>float</code> หรือ <code>double</code>
+แทน <code>uint32_t</code> สำหรับตัวแปรที่ใช้เป็นตัวนับสำหรับ <strong>for loop</strong></p>
+<pre><code class="language-c">  for (volatile counter_t i=0; i &lt; NUM_ITERS; i++) {
+     // empty
+  }
+</code></pre>
+<p>ก่อนเริ่มต้นการทำงานของประโยคคำสั่ง <code>for</code> จะมีการปิดไม่ให้เกิดอินเทอร์รัพท์ในระบบด้วยคำสั่ง
+<code>portDISABLE_INTERRUPTS()</code>
+เพื่อไม่ให้ถูกขัดจังหวะในการทำงาน และเมื่อจบการทำงานแล้ว
+จึงเปิดการทำงานของอินเทอร์รัพท์ในระบบตามปรกติด้วยคำสั่ง  <code>portENABLE_INTERRUPTS()</code></p>
+<pre><code class="language-c">typedef uint32_t counter_t;
+// typedef float counter_t;
+// typedef double counter_t;
+
+const int LED_PIN = 5;
+const uint32_t NUM_ITERS = 100000UL;
+
+#define SEP_LINE &quot;==============================&quot;
+
+void setup() {
+  Serial.begin( 115200 );
+  Serial.flush();
+  delay( 100 );
+  Serial.println( &quot;\n\n\n&quot; );
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+  Serial.printf( &quot;ESP-IDF %s\n&quot;, ESP.getSdkVersion() );
+}
+
+void loop() {
+  uint32_t t_start, t_exec, t_cycles;
+
+  // Save the start time (in usec).
+  t_start  = micros();
+  // Save the current CPU cycle count.
+  t_cycles = ESP.getCycleCount();
+  // Output high to the LED pin.
+  digitalWrite( LED_PIN, HIGH );
+  // Disable interrupts.
+  portDISABLE_INTERRUPTS();
+  for (volatile counter_t i=0; i &lt; NUM_ITERS; i++) {
+     // empty
+  }
+  // Enable interrupts.
+  portENABLE_INTERRUPTS();
+  // Output low to the LED pin.
+  digitalWrite( LED_PIN, LOW );
+
+  // Compute the CPU cycles executed.
+  t_cycles = ESP.getCycleCount() - t_cycles;
+  // Compute the execution time (in usec).
+  t_exec   = micros() - t_start;
+
+  // Get the CPU frequency (in MHz).
+  uint32_t freq = ESP.getCpuFreqMHz();
+  // Show measurement results.
+  Serial.println( &quot;\n\n&quot; SEP_LINE  SEP_LINE );
+  Serial.printf( &quot;CPU Freq. [MHz]  : %u\n&quot;, freq );
+  Serial.printf( &quot;Number of loops  : %u\n&quot;, NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %u\n&quot;, t_exec );
+  Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
+                 ((double)t_exec)/NUM_ITERS );
+  Serial.printf( &quot;Exec time [cyc.] : %u\n&quot;, t_cycles );
+  Serial.printf( &quot;Exec time [cyc.] : %u per loop\n&quot;, 
+                 t_cycles/NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
+                 ((double)(t_cycles/freq))/NUM_ITERS );
+
+  // Wait for 5 seconds before repeating the loop.
+  delay(5000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>จากการทดลอง ซึ่งดูได้จากตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+จะเห็นได้ว่า </p>
+<ul>
+<li>การทำซ้ำด้วยประโยคคำสั่ง <code>for</code> จำนวน <strong>100,000</strong> ครั้ง
+ใช้เวลาทั้งหมด <strong>7933 usec</strong> (หรือ <strong>7.933 msec</strong>)</li>
+<li>หากดูจำนวนไซเคิลของซีพียูสำหรับการวนซ้ำ จะได้ <strong>1,903,745</strong> ไซเคิล (ซีพียูใช้ความถี่ <strong>240MHz</strong>)</li>
+<li>หากหารเฉลี่ย จะได้ <strong>0.0793 usec</strong> (<strong>79.3 nsec</strong>) ต่อหนึ่งรอบการทำซ้ำ
+ค่านี้จึงถือว่าเป็นส่วนที่เรียกว่า <strong>Loop Overhead</strong> (โดยประมาณ)</li>
+<li>ตัวแปรที่ใช้เป็นตัวนับ ถ้าเปลี่ยนจาก <code>uint32_t</code> มาเป็น <code>double</code> 
+การทำซ้ำแต่ละรอบ จะใช้เวลามากขึ้น ใช้เวลา <strong>0.4506 usec</strong> ต่อหนึ่งรอบการทำซ้ำ
+เพราะว่า การประมวลผลของซีพียูด้วย <strong>32-bit Floating-Point Unit (FPU)</strong>
+จะใช้เวลามากกว่า <strong>32-bit Integer Arithmetic</strong></li>
+</ul>
+<p><img alt="" src="test-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากการทดลองด้วยบอร์ด <strong>ESP32</strong> และเลือกใช้
+<code>uint32_t</code> สำหรับชนิดข้อมูล <code>customer_t</code></p>
+<p><img alt="" src="test-2.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต ในกรณีที่ได้เลือกใช้ <code>double</code> สำหรับชนิดข้อมูล <code>customer_t</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3">&#9655; <strong>โค้ดตัวอย่างที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไป มีการทำคำสั่งด้วยประโยคคำสั่ง <code>for</code> จำนวน
+<strong>1,000,000</strong> ครั้ง ซึ่งภายในประโยคคำสั่งดังกล่าว
+จะมีการเรียกใช้คำสั่ง <code>digitalWrite()</code> สองครั้ง เพื่อกำหนดสถานะลอจิกของขา
+<strong>GPIO</strong> ให้เป็น <strong>High</strong> และ <strong>Low</strong> ตามลำดับ
+(เลือกใช้ขา <strong>GPIO-5</strong> สำหรับเอาต์พุต อ้างอิงด้วยชื่อตัวแปร <code>LED_PIN</code>)</p>
+<p>เนื่องจากมีการทำซ้ำที่ต้องใช้เวลานานและมีการปิดอินเทอร์รัพท์ของระบบในช่วงเวลาดังกล่าว
+ในกรณีนี้ อาจทำให้ <strong>ESP32 Watchdog Timer (WDT)</strong> ทำงานและรีเซตการทำงานของระบบ
+ดังนั้นจึงต้องมีการปิดการทำงานของ <strong>WDT</strong> ก่อนการทำซ้ำ ดังนั้นจึงมีการสร้างและเรียกใช้ฟังก์ชัน
+<code>disableWDT()</code> ในโค้ดตัวอย่างนี้</p>
+<pre><code class="language-c">#include &quot;soc/timer_group_struct.h&quot;
+#include &quot;soc/timer_group_reg.h&quot;
+
+typedef uint32_t counter_t;
+
+const int LED_PIN = 5;
+const uint32_t NUM_ITERS = 1000000UL;
+
+#define SEP_LINE &quot;==============================&quot;
+
+void disableWDT() {
+  // Disable the interrupt watchdog timer
+  TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdt_feed = 1; // Reset feed count.
+  TIMERG1.wdt_config0.en = 0; // Disable timer.
+  TIMERG1.wdt_wprotect = 0; // Lock timer config.
+
+  TIMERG0.wdt_wprotect = TIMG_WDT_WKEY_VALUE;
+  TIMERG0.wdt_feed = 1;
+  TIMERG0.wdt_config0.en = 0;
+  TIMERG0.wdt_wprotect = 0;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.flush();
+  delay(100);
+  Serial.println(&quot;\n\n\n&quot;);
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+  // Disable the Watchdog Timer.
+  disableWDT();
+}
+
+void loop() {
+  uint32_t t_start, t_exec, t_cycles;
+
+  t_start  = micros();
+  t_cycles = ESP.getCycleCount();
+  portDISABLE_INTERRUPTS(); // Disable interrupts.
+  for (counter_t i=0; i &lt; NUM_ITERS; i++){
+    digitalWrite( LED_PIN, HIGH ); // ~0.324usec
+    digitalWrite( LED_PIN, LOW );
+  }
+  portENABLE_INTERRUPTS(); // Re-enable interrupts.
+  t_exec   = micros() - t_start;
+  t_cycles = ESP.getCycleCount() - t_cycles;
+
+  uint32_t freq = ESP.getCpuFreqMHz();
+  Serial.println( &quot;\n\n&quot; SEP_LINE  SEP_LINE );
+  Serial.printf( &quot;CPU Freq. [MHz]  : %u\n&quot;, freq );
+  Serial.printf( &quot;Number of loops  : %u\n&quot;, NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %u\n&quot;, t_exec );
+  Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
+                 ((double)t_exec)/NUM_ITERS );
+  Serial.printf( &quot;Exec time [cyc.] : %u\n&quot;, t_cycles );
+  Serial.printf( &quot;Exec time [cyc.] : %u per loop\n&quot;, 
+                 t_cycles/NUM_ITERS );
+  Serial.printf(&quot;Exec time [usec] : %.4lf per loop\n&quot;, 
+                 ((double)(t_cycles/freq))/NUM_ITERS );
+  // Wait for 5 seconds before repeating the loop.
+  delay(5000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ตัวอย่างข้อความเอาต์พุตจากการทดลอง มีดังนี้</p>
+<p><img alt="" src="test-3.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p><img alt="" src="esp32_toggle_waveform.png" /></p>
+<p>รูป: การวัดสัญญาณที่ขาเอาต์พุตด้วยออสซิลโลสโคปดิจิทัล</p>
+<p>จากการทดลองและวัดสัญญาณที่ขาเอาต์พุต โดยวัดความกว้างของพัลส์ จะเห็นได้ว่า
+การทำคำสั่งของฟังก์ชัน <code>digitalWrite()</code> จะได้ประมาณ <strong>324</strong> นาโนวินาที</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4">&#9655; <strong>โค้ดตัวอย่างที่ 4</strong><a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปเป็นการหาระยะเวลาในการทำคำสั่ง <code>analogRead()</code> ของ <strong>Arduino API</strong>
+ซึ่งเป็นฟังก์ชันที่ใช้สำหรับการอ่านค่าแอนะล็อกอินพุต</p>
+<pre><code class="language-c++">#include &quot;soc/timer_group_struct.h&quot;
+#include &quot;soc/timer_group_reg.h&quot;
+
+typedef uint32_t counter_t;
+// Note: value range for 32-bit unsigned int: 0 .. 4,294,967,295
+
+const int LED_PIN = 5;
+const uint32_t NUM_ITERS = 100000UL;
+
+#define SEP_LINE &quot;==============================&quot;
+
+void disableWDT() {
+  // Disable the interrupt watchdog timer
+  TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdt_feed = 1; // Reset feed count.
+  TIMERG1.wdt_config0.en = 0; // Disable timer.
+  TIMERG1.wdt_wprotect = 0; // Lock timer config.
+
+  TIMERG0.wdt_wprotect = TIMG_WDT_WKEY_VALUE;
+  TIMERG0.wdt_feed = 1;
+  TIMERG0.wdt_config0.en = 0;
+  TIMERG0.wdt_wprotect = 0;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.flush();
+  delay(100);
+  Serial.println(&quot;\n\n\n&quot;);
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+  disableWDT(); // Disable the Watchdog Timer.
+}
+
+void loop() {
+  uint32_t t_start, t_exec, t_cycles;
+  t_start  = micros();
+  t_cycles = ESP.getCycleCount();
+  digitalWrite( LED_PIN, HIGH );
+  portDISABLE_INTERRUPTS(); // Disable interrupts.
+  for (counter_t i=0; i &lt; NUM_ITERS; i++) {
+    (void)analogRead(A0); // Read analog input at A0 pin.
+  }
+  portENABLE_INTERRUPTS(); // Re-enable interrupts.
+  digitalWrite( LED_PIN, LOW );
+  t_exec   = micros() - t_start;
+  t_cycles = ESP.getCycleCount() - t_cycles;
+
+  uint32_t freq = ESP.getCpuFreqMHz();
+  Serial.println( &quot;\n\n&quot; SEP_LINE  SEP_LINE );
+  Serial.printf( &quot;CPU Freq. [MHz]  : %u\n&quot;, freq );
+  Serial.printf( &quot;Number of loops  : %u\n&quot;, NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %u\n&quot;, t_exec );
+  Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
+                ((double)t_exec)/NUM_ITERS );
+  Serial.printf( &quot;Exec time [cyc.] : %u\n&quot;, t_cycles );
+  Serial.printf( &quot;Exec time [cyc.] : %u per loop\n&quot;, 
+                t_cycles/NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
+                ((double)clockCyclesToMicroseconds(t_cycles))/NUM_ITERS );
+  // Wait for 5 seconds before repeating the loop.
+  delay(5000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>จากตัวอย่างข้อความเอาต์พุต จะใช้เวลาในการคำสั่ง <code>analogRead()</code> ต่อหนึ่งครั้ง
+ประมาณ  <strong>81.08 usec</strong> (รวม <strong>Loop Overhead</strong> ด้วย)</p>
+<p><img alt="" src="test-4.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<p>ลองเปรียบเทียบกับรูปแบบการเขียนโค้ดอีกแนวทางหนึ่ง เพื่อหาระยะเวลาในการทำคำสั่ง
+<code>analogRead()</code> ได้เช่นกัน</p>
+<pre><code class="language-c">const uint32_t NUM_ITERS = 100000UL;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.flush();
+  delay(100);
+  Serial.println(&quot;\n\n\n&quot;);
+  // Set analog read resolution to 12 bits
+  analogReadResolution(12); 
+}
+
+void loop() {
+  uint32_t c0, c1, cyc_diff;
+
+  cyc_diff = 0;
+  for (uint32_t i=0; i &lt; NUM_ITERS; i++) {
+    portDISABLE_INTERRUPTS(); // Disable interrupts.
+    asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
+    (void)analogRead(A0);     // Read analog input at A0 pin.
+    asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1) );
+    portENABLE_INTERRUPTS();  // Re-enable interrupts.
+    cyc_diff += (c1-c0-1);    // Accumulate the cycle count difference.
+  } 
+  double t_usec;
+  cyc_diff /= NUM_ITERS; // Compute the average cycle count.
+  Serial.printf( &quot;#Cycles per call  : %u\n&quot;, cyc_diff );
+  t_usec = ((double)cyc_diff)/ESP.getCpuFreqMHz();
+  Serial.printf( &quot;analogRead() call : %.3lf usec\n\n&quot;, t_usec );
+
+  // Wait for 5 seconds before repeating the loop.
+  delay(5000);
+}
+</code></pre>
+<p>จากข้อความเอาต์พุต แสดงให้เห็นว่า การเรียกฟังก์ชัน <code>analogRead(...)</code> ในแต่ละครั้ง
+จะใช้เวลาประมาณ <strong>80.88 usec</strong> (ค่าตัวเลขนี้ไม่ได้รวม <strong>Loop Overhead</strong>)</p>
+<p><img alt="" src="test-5.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5">&#9655; <strong>โค้ดตัวอย่างที่ 5</strong><a class="headerlink" href="#5" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้จะคล้ายกับโค้ดตัวอย่างที่ 4 แต่เปลี่ยนจากการหาระยะเวลาในการทำคำสั่ง <code>analogRead(...)</code>
+มาเป็นคำสั่ง <code>dacWrite(...)</code> ซึ่งใช้สำหรับการสร้างสัญญาณแอนะล็อกเป็นเอาต์พุต
+ชิป <strong>ESP32 SoC</strong> มีวงจร <strong>DAC</strong> จำนวน 2 ช่อง (<strong>DAC1</strong> และ <strong>DAC2</strong>)</p>
+<pre><code class="language-c">const uint32_t NUM_ITERS = 100000UL;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.flush();
+  delay(100);
+  Serial.println(&quot;\n\n\n&quot;);
+  // Set analog write resolution to 8 bits
+  analogWriteResolution(8); 
+}
+
+void loop() {
+  uint32_t c0, c1, cyc_diff;
+
+  cyc_diff = 0;
+  for (uint32_t i=0; i &lt; NUM_ITERS; i++) {
+    portDISABLE_INTERRUPTS(); // Disable interrupts.
+    asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
+    dacWrite( DAC1, 127 );  // Write DAC value to DAC1 channel.
+    asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1) );
+    portENABLE_INTERRUPTS();  // Re-enable interrupts.
+    cyc_diff += (c1-c0-1);    // Accumulate the cycle count difference.
+  } 
+  double t_usec;
+  cyc_diff /= NUM_ITERS; // Compute the average cycle count.
+  Serial.printf( &quot;#Cycles per call : %u\n&quot;, cyc_diff );
+  t_usec = ((double)cyc_diff)/ESP.getCpuFreqMHz();
+  Serial.printf( &quot;dacWrite() call  : %.3lf usec\n\n&quot;, t_usec );
+
+  // Wait for 5 seconds before repeating the loop.
+  delay(5000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>จากข้อความเอาต์พุต แสดงให้เห็นว่า การเรียกฟังก์ชัน <code>dacWrite(...)</code> ในแต่ละครั้ง
+จะใช้เวลาประมาณ <strong>17.883 usec</strong> (ค่าตัวเลขนี้ไม่ได้รวม <strong>Loop Overhead</strong>)</p>
+<p><img alt="" src="test-6.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6">&#9655; <strong>โค้ดตัวอย่างที่ 6</strong><a class="headerlink" href="#6" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการหาระยะเวลาในการสื่อสารกันระหว่างทาสก์ (<strong>Task</strong>) ของ <strong>FreeRTOS</strong>
+โดยมีทากส์หนึ่งที่ถูกสร้างขึ้นมา (เรียกว่า <strong>User Task</strong>) และรอการสื่อสารด้วยวิธี
+<strong>Task Notification</strong> จากทาสก์หลัก (<strong>Main Task</strong>)
+ในตัวอย่างนี้ ทั้งสองทาสก์ทำงานโดยใช้ซีพียูตัวเดียวกัน
+(<strong>ESP32</strong> มีซีพียู 2 ชุด คือ <strong>CPU 0</strong> และ <strong>CPU 1</strong>)</p>
+<pre><code class="language-c">TaskHandle_t userTask;
+
+volatile uint32_t c0, c1;
+
+void userTaskFunc(void *parameter) {
+  (void)parameter;
+  uint32_t count = 0;
+  for (;;) {
+    // Wait for notification from the main task
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1));
+    uint32_t cyc_diff = c1-c0-1;
+    Serial.printf( &quot;User task running on core %d!\n&quot;, xPortGetCoreID() );
+    Serial.printf( &quot;User task's priority: %u\n&quot;, uxTaskPriorityGet(NULL) );
+    Serial.printf( &quot;Notification received: #%u\n&quot;, ++count );
+    Serial.printf( &quot;Cycle difference: %u\n&quot;, cyc_diff );
+    // Convert cycle count difference to time duration in nanoseconds.
+    Serial.printf( &quot;Time difference: %.3lf usec\n\n&quot;,
+                 ((double)cyc_diff)/ESP.getCpuFreqMHz() );
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  // Create a new FreeRTOS task
+  xTaskCreate(
+    userTaskFunc,    // Task entry function
+    &quot;UserTask&quot;,      // Task name
+    4096,            // Stack size (in words)
+    NULL,            // Task parameter
+    2,               // Task priority (higher than the main task)
+    &amp;userTask        // Task handle
+  );
+  delay(1000);
+  Serial.println( &quot;\n\nESP32-FreeRTOS Demo...&quot; );
+  Serial.printf( &quot;Main task's priority: %u\n&quot;, uxTaskPriorityGet(NULL)  );
+  Serial.printf( &quot;Main task running on core %d!\n&quot;, xPortGetCoreID() );
+}
+
+void loop() {
+  // Save the CPU cycle count.
+  asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
+  // Send notification to a user task.
+  xTaskNotifyGive(userTask);  
+  // Delay for 5 seconds
+  vTaskDelay( pdMS_TO_TICKS(5000) ); 
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>จากตัวอย่างข้อความเอาต์พุต จะเห็นได้ว่า เมื่อทาสก์หลักได้สื่อสารไปยังอีกทาสก์หนึ่งที่มีความคำสัญสูงกว่า
+และทำงานโดยใช้ <strong>CPU Core</strong> เดียวกัน จะใช้เวลาประมาณ  <strong>12 usec</strong> ในแต่ละครั้ง
+โดยเริ่มนับจากการทำคำสั่ง <code>xTaskNotifyGive(...)</code> ในฟังก์ชันการทำงานของทาสก์หลัก
+ไปจนถึงเวลาที่อีกทาสก์หนึ่งที่รออยู่เนื่องจากทำคำสั่ง <code>ulTaskNotifyTake(...)</code> ได้ทำงานอีกครั้ง</p>
+<p><img alt="" src="test-7.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<p>ถ้าให้ทาสก์ทั้งสองทำงานด้วยซีพียูเดียวกันหรือต่างกัน ก็แนะนำให้ใช้คำสั่ง <code>esp_timer_get_time()</code> 
+เพื่อจับเวลาด้วยวงจร <strong>Hardware Timer</strong> ของ <strong>ESP32</strong>
+และมีตัวอย่างการเขียนโค้ดดังนี้</p>
+<pre><code class="language-c">TaskHandle_t userTask;
+
+volatile uint32_t ts0, ts1;
+
+void userTaskFunc(void *parameter) {
+  (void)parameter;
+  uint32_t count = 0;
+  for (;;) {
+    // Wait for notification from the main task
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    ts1 = esp_timer_get_time();
+    uint32_t t_diff = ts1 - ts0;
+    Serial.printf( &quot;User task running on core %d!\n&quot;, xPortGetCoreID() );
+    Serial.printf( &quot;User task's priority: %u\n&quot;, uxTaskPriorityGet(NULL) );
+    Serial.printf( &quot;Notification received: #%u\n&quot;, ++count );
+    Serial.printf( &quot;Time difference: %u usec\n\n&quot;, t_diff );
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  // Create a new FreeRTOS task
+  xTaskCreatePinnedToCore(
+    userTaskFunc,   // Taskentry function
+    &quot;UserTAsk&quot;,     // Task name
+    4096,           // Stack size (in words)
+    NULL,           // Task parameter
+    2,              // Task priority (higher than the main task)
+    &amp;userTask,      // Task handle
+    1               // Core ID (either 0 or 1)
+  );
+
+  delay(1000);
+  Serial.println( &quot;\n\nESP32-FreeRTOS Demo...&quot; );
+  Serial.printf( &quot;Main task's priority: %u\n&quot;, uxTaskPriorityGet(NULL)  );
+  Serial.printf( &quot;Main task running on core %d!\n&quot;, xPortGetCoreID() );
+}
+
+void loop() {
+  // Save the CPU cycle count.
+  ts0 = esp_timer_get_time();
+  // Send notification to a user task.
+  xTaskNotifyGive(userTask);  
+  // Delay for 5 seconds
+  vTaskDelay( pdMS_TO_TICKS(5000) ); 
+}
+</code></pre>
+<p><img alt="" src="test-8.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>หากทดลองเลือกใช้ <strong>CPU Core</strong> ให้ <strong>User Task</strong> 
+ทำงานต่างซีพียูจาก <strong>Main Task</strong> ก็จะเห็นได้ว่า ระยะเวลาที่ต้องใช้ จะมากขึ้น
+(เช่น เพิ่มขึ้นจาก <strong>12 ~ 15 usec</strong> เป็น <strong> 17 ~ 20 usec</strong> โดยประมาณ)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอวิธีการและตัวอย่างการเขียนโค้ด <strong>Arduino</strong>
+เพื่อหาระยะเวลาในการทำคำสั่งสำหรับชิป <strong>ESP32</strong> ยกตัวอย่างเช่น การเรียกใช้ฟังก์ชัน 
+<code>digitalWrite()</code> <code>analogRead()</code> และ <code>dacWrite()</code> เป็นต้น
+ซึ่งวิธีนี้จะช่วยให้นักพัฒนาสามารถนำไปใช้ เพื่อทำความเข้าใจและตรวจสอบการทำงานของโค้ด
+การวิเคราะห์พฤติกรรมการทำงานในเชิงเวลาของฮาร์ดแวร์ได้ง่ายขึ้น</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-10-06 | Last Updated: 2023-10-07</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
