@@ -147,11 +147,11 @@
 <p>การอ่านค่าเวลาของระบบสำหรับ <strong>Arduino ESP32</strong> ก็มีมากกว่าหนึ่งวิธี</p>
 <ol>
 <li>อ่านค่าเวลาที่เป็นตัวเลขจำนวนเต็ม มีหน่วยเป็นไมโครวินาที</li>
-<li>อ่านค่าตัวเลขจำนวนเต็มจากรีจิสเตอร์ตัวนับการทำงานของซีพียูตามจำนวนไซเคิล (<strong>CPU Cycle Count</strong>)</li>
+<li>อ่านค่าตัวเลขจำนวนเต็มจากรีจิสเตอร์ตัวนับของซีพียูตามจำนวนไซเคิล (<strong>CPU Cycle Count</strong>)</li>
 </ol>
 <p>การอ่านค่าเวลาของระบบ ก็สามารถใช้คำสั่ง <code>micros()</code> ของ <strong>Arduino API</strong>
 ซึ่งจะได้ค่าเป็นตัวเลขจำนวนเต็ม มีหน่วยเวลาเป็นไมโครวินาที (<strong>usec</strong>)
-หรือ คำสั่ง <code>esp_timer_get_time()</code> ที่ค่าเลขจำนวนเต็มและมีหน่วยเป็นไมโครวินาที</p>
+หรือ คำสั่ง <code>esp_timer_get_time()</code> ที่ให้ค่าเป็นเลขจำนวนเต็มและมีหน่วยเป็นไมโครวินาที</p>
 <p>ถ้าจะอ่านค่าตัวนับไซเคิลของซีพียู ก็สามารถใช้คำสั่ง
 <code>esp_cpu_get_ccount()</code> ของ <strong>ESP-IDF</strong>
 หรือคำสั่ง <code>ESP.getCycleCount()</code> ซึ่งเป็นส่วนหนึ่งของคลาส
@@ -159,6 +159,7 @@
 แล้วจะนำมาแปลงเป็นค่าเวลาก็ได้ ซึ่งขึ้นอยู่กับความถี่ของซีพียู (เช่น <strong>240MHz</strong>)</p>
 <p>ถ้าจะใช้คำสั่งแบบ <strong>Inline Assembly</strong> เพื่ออ่านค่าจากรีจิสเตอร์ตัวนับไซเคิลของซีพียู ก็มีตัวอย่างดังนี้</p>
 <pre><code class="language-c">  uint32_t c0, c1;
+
   // Read cycle count register.
   asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
   _NOP(); // 1 CPU cycle
@@ -167,6 +168,7 @@
   _NOP(); // 1 CPU cycle
   // Read cycle count register.
   asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1) );
+
   // Compute cycle count difference.
   uint32_t cyc_diff = (c1-c0-1);
   Serial.printf( &quot;Cycle difference: %u\n&quot;, cyc_diff );
@@ -176,6 +178,7 @@
 </code></pre>
 <p>หรือใช้คำสั่ง <code>esp_cpu_get_ccount()</code></p>
 <pre><code class="language-c">  uint32_t c0, c1;
+
   // Read cycle count register.
   c0 = esp_cpu_get_ccount();
   _NOP(); // 1 CPU cycle
@@ -184,6 +187,7 @@
   _NOP(); // 1 CPU cycle
   // Read cycle count register.
   c1 = esp_cpu_get_ccount();
+
   // Compute cycle count difference.
   uint32_t cyc_diff = (c1-c0-1);
   Serial.printf( &quot;Cycle difference: %u\n&quot;, cyc_diff );
@@ -196,27 +200,31 @@
 <p>&nbsp;</p>
 <hr />
 <h2 id="1">&#9655; <strong>โค้ดตัวอย่างที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
-<p>โค้ดตัวอย่างแรกสาธิตการทดลองเพื่อหาระยะเวลาในการทำคำสั่งของฟังก์ชัน
+<p>โค้ดตัวอย่างแรกสาธิตการทดลอง เพื่อหาระยะเวลาในการทำคำสั่งของฟังก์ชัน
 <code>digitalWrite()</code> ของ <strong>Arduino API</strong>
-ซึ่งมักจะใช้กำหนดค่าลอจิกให้ขา <strong>GPIO</strong> ที่เป็นเอาต์พุต</p>
+ที่ใช้เพื่อกำหนดค่าลอจิกให้ขา <strong>GPIO</strong> ที่เป็นเอาต์พุต</p>
 <pre><code class="language-c">const int LED_PIN = 5; // GPIO-5
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin( 115200 );
   pinMode( LED_PIN, OUTPUT );
 }
 
 void loop() {
   uint32_t c0, c1;
-  asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
+
+  asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0) );
   digitalWrite( LED_PIN, HIGH ); // Output high to GPIO-5
   digitalWrite( LED_PIN, LOW  ); // Output low to GPIO-5
   asm volatile( &quot;rsr %0, ccount&quot; : &quot;=a&quot;(c1) );
-  uint32_t cyc_diff = (c1-c0-1); // Compute the cycle count difference.
-  Serial.printf( &quot;Cycle difference    : %u\n&quot;, cyc_diff );
+
+  // Compute the cycle count difference.
+  uint32_t cyc_diff = (c1-c0-1);
+  Serial.printf( &quot;Cycle difference    : %lu\n&quot;, cyc_diff );
   double t_usec = ((double)cyc_diff)/ESP.getCpuFreqMHz();
-  Serial.printf( &quot;Time difference     : %.3lf usec\n&quot;, t_usec );
+  Serial.printf( &quot;Time difference     : %.3lf usec\n&quot;,   t_usec );
   Serial.printf( &quot;digitalWrite() call : %.3lf usec\n\n&quot;, t_usec/2 );
+
   // Wait for 5 seconds before repeating the loop.
   delay(5000);
 }
@@ -295,13 +303,13 @@ void loop() {
   uint32_t freq = ESP.getCpuFreqMHz();
   // Show measurement results.
   Serial.println( &quot;\n\n&quot; SEP_LINE  SEP_LINE );
-  Serial.printf( &quot;CPU Freq. [MHz]  : %u\n&quot;, freq );
-  Serial.printf( &quot;Number of loops  : %u\n&quot;, NUM_ITERS );
-  Serial.printf( &quot;Exec time [usec] : %u\n&quot;, t_exec );
+  Serial.printf( &quot;CPU Freq. [MHz]  : %lu\n&quot;, freq );
+  Serial.printf( &quot;Number of loops  : %lu\n&quot;, NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %lu\n&quot;, t_exec );
   Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
                  ((double)t_exec)/NUM_ITERS );
-  Serial.printf( &quot;Exec time [cyc.] : %u\n&quot;, t_cycles );
-  Serial.printf( &quot;Exec time [cyc.] : %u per loop\n&quot;, 
+  Serial.printf( &quot;Exec time [cyc.] : %lu\n&quot;, t_cycles );
+  Serial.printf( &quot;Exec time [cyc.] : %lu per loop\n&quot;, 
                  t_cycles/NUM_ITERS );
   Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
                  ((double)(t_cycles/freq))/NUM_ITERS );
@@ -352,7 +360,18 @@ const uint32_t NUM_ITERS = 1000000UL;
 #define SEP_LINE &quot;==============================&quot;
 
 void disableWDT() {
-  // Disable the interrupt watchdog timer
+  // Disable the interrupt watchdog timer for timer groups: 1 and 0
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  TIMERG1.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdtfeed.val = 1; // Reset feed count.
+  TIMERG1.wdtconfig0.wdt_en = 0; // Disable timer.
+  TIMERG1.wdtwprotect.wdt_wkey = 0; // Lock timer config.
+
+  TIMERG0.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE;
+  TIMERG0.wdtfeed.val = 1;
+  TIMERG0.wdtconfig0.wdt_en = 0;
+  TIMERG0.wdtwprotect.wdt_wkey = 0;
+#else
   TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
   TIMERG1.wdt_feed = 1; // Reset feed count.
   TIMERG1.wdt_config0.en = 0; // Disable timer.
@@ -362,6 +381,7 @@ void disableWDT() {
   TIMERG0.wdt_feed = 1;
   TIMERG0.wdt_config0.en = 0;
   TIMERG0.wdt_wprotect = 0;
+#endif
 }
 
 void setup() {
@@ -391,13 +411,13 @@ void loop() {
 
   uint32_t freq = ESP.getCpuFreqMHz();
   Serial.println( &quot;\n\n&quot; SEP_LINE  SEP_LINE );
-  Serial.printf( &quot;CPU Freq. [MHz]  : %u\n&quot;, freq );
-  Serial.printf( &quot;Number of loops  : %u\n&quot;, NUM_ITERS );
-  Serial.printf( &quot;Exec time [usec] : %u\n&quot;, t_exec );
+  Serial.printf( &quot;CPU Freq. [MHz]  : %lu\n&quot;, freq );
+  Serial.printf( &quot;Number of loops  : %lu\n&quot;, NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %lu\n&quot;, t_exec );
   Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
                  ((double)t_exec)/NUM_ITERS );
-  Serial.printf( &quot;Exec time [cyc.] : %u\n&quot;, t_cycles );
-  Serial.printf( &quot;Exec time [cyc.] : %u per loop\n&quot;, 
+  Serial.printf( &quot;Exec time [cyc.] : %lu\n&quot;, t_cycles );
+  Serial.printf( &quot;Exec time [cyc.] : %lu per loop\n&quot;, 
                  t_cycles/NUM_ITERS );
   Serial.printf(&quot;Exec time [usec] : %.4lf per loop\n&quot;, 
                  ((double)(t_cycles/freq))/NUM_ITERS );
@@ -430,7 +450,18 @@ const uint32_t NUM_ITERS = 100000UL;
 #define SEP_LINE &quot;==============================&quot;
 
 void disableWDT() {
-  // Disable the interrupt watchdog timer
+  // Disable the interrupt watchdog timer for timer groups: 1 and 0
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  TIMERG1.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdtfeed.val = 1; // Reset feed count.
+  TIMERG1.wdtconfig0.wdt_en = 0; // Disable timer.
+  TIMERG1.wdtwprotect.wdt_wkey = 0; // Lock timer config.
+
+  TIMERG0.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE;
+  TIMERG0.wdtfeed.val = 1;
+  TIMERG0.wdtconfig0.wdt_en = 0;
+  TIMERG0.wdtwprotect.wdt_wkey = 0;
+#else
   TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
   TIMERG1.wdt_feed = 1; // Reset feed count.
   TIMERG1.wdt_config0.en = 0; // Disable timer.
@@ -440,6 +471,7 @@ void disableWDT() {
   TIMERG0.wdt_feed = 1;
   TIMERG0.wdt_config0.en = 0;
   TIMERG0.wdt_wprotect = 0;
+#endif
 }
 
 void setup() {
@@ -468,13 +500,13 @@ void loop() {
 
   uint32_t freq = ESP.getCpuFreqMHz();
   Serial.println( &quot;\n\n&quot; SEP_LINE  SEP_LINE );
-  Serial.printf( &quot;CPU Freq. [MHz]  : %u\n&quot;, freq );
-  Serial.printf( &quot;Number of loops  : %u\n&quot;, NUM_ITERS );
-  Serial.printf( &quot;Exec time [usec] : %u\n&quot;, t_exec );
+  Serial.printf( &quot;CPU Freq. [MHz]  : %lu\n&quot;, freq );
+  Serial.printf( &quot;Number of loops  : %lu\n&quot;, NUM_ITERS );
+  Serial.printf( &quot;Exec time [usec] : %lu\n&quot;, t_exec );
   Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
                 ((double)t_exec)/NUM_ITERS );
-  Serial.printf( &quot;Exec time [cyc.] : %u\n&quot;, t_cycles );
-  Serial.printf( &quot;Exec time [cyc.] : %u per loop\n&quot;, 
+  Serial.printf( &quot;Exec time [cyc.] : %lu\n&quot;, t_cycles );
+  Serial.printf( &quot;Exec time [cyc.] : %lu per loop\n&quot;, 
                 t_cycles/NUM_ITERS );
   Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
                 ((double)clockCyclesToMicroseconds(t_cycles))/NUM_ITERS );
@@ -515,7 +547,7 @@ void loop() {
   } 
   double t_usec;
   cyc_diff /= NUM_ITERS; // Compute the average cycle count.
-  Serial.printf( &quot;#Cycles per call  : %u\n&quot;, cyc_diff );
+  Serial.printf( &quot;#Cycles per call  : %lu\n&quot;, cyc_diff );
   t_usec = ((double)cyc_diff)/ESP.getCpuFreqMHz();
   Serial.printf( &quot;analogRead() call : %.3lf usec\n\n&quot;, t_usec );
 
@@ -541,7 +573,7 @@ void setup() {
   delay(100);
   Serial.println(&quot;\n\n\n&quot;);
   // Set analog write resolution to 8 bits
-  analogWriteResolution(8); 
+  //analogWriteResolution(DAC1, 8); 
 }
 
 void loop() {
@@ -558,7 +590,7 @@ void loop() {
   } 
   double t_usec;
   cyc_diff /= NUM_ITERS; // Compute the average cycle count.
-  Serial.printf( &quot;#Cycles per call : %u\n&quot;, cyc_diff );
+  Serial.printf( &quot;#Cycles per call : %lu\n&quot;, cyc_diff );
   t_usec = ((double)cyc_diff)/ESP.getCpuFreqMHz();
   Serial.printf( &quot;dacWrite() call  : %.3lf usec\n\n&quot;, t_usec );
 
@@ -575,10 +607,10 @@ void loop() {
 <hr />
 <h2 id="6">&#9655; <strong>โค้ดตัวอย่างที่ 6</strong><a class="headerlink" href="#6" title="Permanent link">#</a></h2>
 <p>โค้ดตัวอย่างถัดไปสาธิตการหาระยะเวลาในการสื่อสารกันระหว่างทาสก์ (<strong>Task</strong>) ของ <strong>FreeRTOS</strong>
-โดยมีทากส์หนึ่งที่ถูกสร้างขึ้นมา (เรียกว่า <strong>User Task</strong>) และรอการสื่อสารด้วยวิธี
+โดยมีทาสก์หนึ่งที่ถูกสร้างขึ้นมา (เรียกว่า <strong>User Task</strong>) และรอการสื่อสารด้วยวิธี
 <strong>Task Notification</strong> จากทาสก์หลัก (<strong>Main Task</strong>)
-ในตัวอย่างนี้ ทั้งสองทาสก์ทำงานโดยใช้ซีพียูตัวเดียวกัน
-(<strong>ESP32</strong> มีซีพียู 2 ชุด คือ <strong>CPU 0</strong> และ <strong>CPU 1</strong>)</p>
+<strong>ESP32</strong> มีซีพียู 2 ชุด คือ <strong>CPU 0</strong> และ <strong>CPU 1</strong>
+ในตัวอย่างนี้ ทั้งสองทาสก์ทำงานโดยใช้ซีพียูตัวเดียวกัน คือ <strong>CPU 1</strong></p>
 <pre><code class="language-c">TaskHandle_t userTask;
 
 volatile uint32_t c0, c1;
@@ -593,8 +625,8 @@ void userTaskFunc(void *parameter) {
     uint32_t cyc_diff = c1-c0-1;
     Serial.printf( &quot;User task running on core %d!\n&quot;, xPortGetCoreID() );
     Serial.printf( &quot;User task's priority: %u\n&quot;, uxTaskPriorityGet(NULL) );
-    Serial.printf( &quot;Notification received: #%u\n&quot;, ++count );
-    Serial.printf( &quot;Cycle difference: %u\n&quot;, cyc_diff );
+    Serial.printf( &quot;Notification received: #%lu\n&quot;, ++count );
+    Serial.printf( &quot;Cycle difference: %lu\n&quot;, cyc_diff );
     // Convert cycle count difference to time duration in nanoseconds.
     Serial.printf( &quot;Time difference: %.3lf usec\n\n&quot;,
                  ((double)cyc_diff)/ESP.getCpuFreqMHz() );
@@ -622,7 +654,7 @@ void setup() {
 void loop() {
   // Save the CPU cycle count.
   asm volatile(&quot;rsr %0, ccount&quot; : &quot;=a&quot;(c0));
-  // Send notification to a user task.
+  // Send notification to the user task.
   xTaskNotifyGive(userTask);  
   // Delay for 5 seconds
   vTaskDelay( pdMS_TO_TICKS(5000) ); 
@@ -632,12 +664,13 @@ void loop() {
 <p>จากตัวอย่างข้อความเอาต์พุต จะเห็นได้ว่า เมื่อทาสก์หลักได้สื่อสารไปยังอีกทาสก์หนึ่งที่มีความคำสัญสูงกว่า
 และทำงานโดยใช้ <strong>CPU Core</strong> เดียวกัน จะใช้เวลาประมาณ  <strong>12 usec</strong> ในแต่ละครั้ง
 โดยเริ่มนับจากการทำคำสั่ง <code>xTaskNotifyGive(...)</code> ในฟังก์ชันการทำงานของทาสก์หลัก
-ไปจนถึงเวลาที่อีกทาสก์หนึ่งที่รออยู่เนื่องจากทำคำสั่ง <code>ulTaskNotifyTake(...)</code> ได้ทำงานอีกครั้ง</p>
+ไปจนถึงเวลาที่อีกทาสก์หนึ่งได้ทำงานอีกครั้ง หลังจากที่รออยู่เนื่องจากได้ทำคำสั่ง <code>ulTaskNotifyTake(...)</code> เอาไว้</p>
 <p><img alt="" src="test-7.png" /></p>
 <p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
 <p>&nbsp;</p>
-<p>ถ้าให้ทาสก์ทั้งสองทำงานด้วยซีพียูเดียวกันหรือต่างกัน ก็แนะนำให้ใช้คำสั่ง <code>esp_timer_get_time()</code> 
-เพื่อจับเวลาด้วยวงจร <strong>Hardware Timer</strong> ของ <strong>ESP32</strong>
+<p>การอ่านค่าจากรีจิสเตอร์ของตัวนับไซเคิล ซึ่งมี 2 ชุด แยกกันระหว่างซีพียู <strong>CPU 0</strong> และ <strong>CPU 1</strong>
+ดังนั้นถ้าให้ทาสก์ทั้งสองทำงานด้วยซีพียูต่างกัน (หรือซีพียูเดียวกันก็ได้) ก็แนะนำให้ใช้คำสั่ง <code>esp_timer_get_time()</code> 
+เพื่อใช้ในการจับเวลาด้วยวงจร <strong>Hardware Timer</strong> ของ <strong>ESP32</strong>
 และมีตัวอย่างการเขียนโค้ดดังนี้</p>
 <pre><code class="language-c">TaskHandle_t userTask;
 
@@ -653,8 +686,8 @@ void userTaskFunc(void *parameter) {
     uint32_t t_diff = ts1 - ts0;
     Serial.printf( &quot;User task running on core %d!\n&quot;, xPortGetCoreID() );
     Serial.printf( &quot;User task's priority: %u\n&quot;, uxTaskPriorityGet(NULL) );
-    Serial.printf( &quot;Notification received: #%u\n&quot;, ++count );
-    Serial.printf( &quot;Time difference: %u usec\n\n&quot;, t_diff );
+    Serial.printf( &quot;Notification received: #%lu\n&quot;, ++count );
+    Serial.printf( &quot;Time difference: %lu usec\n\n&quot;, t_diff );
   }
 }
 
@@ -681,7 +714,7 @@ void setup() {
 void loop() {
   // Save the CPU cycle count.
   ts0 = esp_timer_get_time();
-  // Send notification to a user task.
+  // Send notification to the user task.
   xTaskNotifyGive(userTask);  
   // Delay for 5 seconds
   vTaskDelay( pdMS_TO_TICKS(5000) ); 
@@ -703,7 +736,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2023-10-06 | Last Updated: 2023-10-07</p></div>
+<p>Created: 2023-10-06 | Last Updated: 2023-10-10</p></div>
             </div>
         </div>
 

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/arduino_esp32_dac/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างสัญญาณแอนะล็อกด้วยวงจร DAC ของชิป ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#dac-esp32" class="nav-link">การสร้างสัญญาณแอนะล็อกด้วยวงจร DAC ของชิป ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#esp32-dac" class="nav-link">&#9655; ESP32 DAC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-dac-one-shot" class="nav-link">&#9655; โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด One-Shot</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-dac-one-shot-hardware-timer" class="nav-link">&#9655; โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด One-Shot ร่วมกับ Hardware Timer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-dac-continuous" class="nav-link">&#9655; โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด Continuous</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-dac-cosine-waveform" class="nav-link">&#9655; โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด Cosine-Waveform</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dacwrite" class="nav-link">&#9655; โค้ดตัวอย่าง: การหาระยะเวลาในการทำคำสั่ง dacWrite()</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dacwrite-analogread" class="nav-link">&#9655; โค้ดตัวอย่าง: การทำคำสั่ง dacWrite() และ analogRead()</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="dac-esp32">การสร้างสัญญาณแอนะล็อกด้วยวงจร DAC ของชิป ESP32<a class="headerlink" href="#dac-esp32" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino</em>, <em>ESP32</em>, <em>ESP32 DAC</em></p>
+<hr />
+<h2 id="esp32-dac">&#9655; <strong>ESP32 DAC</strong><a class="headerlink" href="#esp32-dac" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ESP32</strong> สามารถสร้างสัญญาณเอาต์พุตแบบแอนะล็อกได้ (<strong>Analog Output</strong>) โดยใช้วงจรภายในคือ 
+<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/dac.html"><strong>DAC (Digital-to-Analog Converter)</strong></a>
+ซึ่งมีจำนวน 2 ช่องสัญญาณเอาต์พุต (<strong>DAC0 / GPIO25</strong> และ <strong>DAC1 / GPIO26</strong>)
+การเขียนค่าเพื่อใช้กับ <strong>DAC</strong> มีความละเอียดของข้อมูลเท่ากับ 8 บิต</p>
+<p>บทความนี้นำเสนอตัวอย่างการใช้งานวงจร <strong>DAC</strong> ภายในชิป <strong>ESP32</strong> ในเบื้องต้น 
+และโค้ดตัวอย่าง <strong>Arduino Sketch</strong> สำหรับสาธิตการทำงานของวงจรดังกล่าว</p>
+<p>การทำงานของ <strong>DAC</strong> ของแต่ละช่องสัญญาณ แบ่งออกได้เป็น 3 กรณี</p>
+<ul>
+<li><strong>One-Shot Mode</strong> ในโหมดนี้ จะต้องมีการเขียนข้อมูล 8 บิต เพื่อใช้เป็นสัญญาณเอาต์พุตในแต่ละครั้ง</li>
+<li><strong>Cosine Waveform (CW) Mode</strong> ในโหมดนี้ วงจร <strong>DAC</strong>
+สามารถสร้างสัญญาณแอนะล็อกรูปคลื่นไซน์ (<strong>Sinusoidal Waveform</strong>) ตามความถี่ที่กำหนดไว้
+โดยใช้วงจรที่เรียกว่า  <strong>Cosine Waveform Generator</strong></li>
+<li><strong>DMA-based Continuous Mode</strong> ในโหมดนี้ จะใช้ชุดข้อมูลในหน่วยความจำที่กำหนดไว้ แล้วนำข้อมูลไปใช้ตามลำดับ
+โดยใช้วงจร <strong>I2S Controller</strong> ทำหน้าที่ดังกล่าว</li>
+</ul>
+<p>ข้อสังเกต: <strong>Espressif ESP-IDF</strong> มีการปรับปรุงจากเวอร์ชัน <strong>4.x</strong> ไปเป็น <strong>5.x</strong>
+และมีการเปลี่ยนรูปแบบการเขียนโค้ดสำหรับ <strong>DAC Driver</strong> ใหม่
+(เช่น หากใช้  <strong>ESP-IDF v5.1</strong> จะแตกต่างจาก <strong>ESP-IDF v4.4</strong>)</p>
+<p>ดังนั้นการเขียนโค้ดที่ใช้ <strong>ESP-IDF API</strong> จึงแบ่งออกเป็น 2 กรณี คือ แบบเก่าและแบบใหม่</p>
+<ul>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/v4.4.6/esp32/api-reference/peripherals/dac.html"><strong>Old (legacy) DAC Driver</strong></a>:<ul>
+<li><code>#include &lt;driver/dac.h&gt;</code></li>
+<li><code>#include &lt;driver/dac_common.h&gt;</code></li>
+<li><code>#include &lt;soc/dac_channel.h&gt;</code></li>
+</ul>
+</li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/dac.html"><strong>New DAC Driver</strong></a>:<ul>
+<li><code>#include &lt;driver/dac_oneshot.h&gt;</code></li>
+<li><code>#include &lt;driver/dac_cosine.h&gt;</code></li>
+<li><code>#include &lt;driver/dac_continuous.h&gt;</code></li>
+</ul>
+</li>
+</ul>
+<p>ในขณะที่เขียนบทความนี้ <strong>Arduino ESP32 Core</strong> มีสองตัวเลือก</p>
+<ul>
+<li><strong>Stable Release</strong>: <strong>v2.0.14 (ESP-IDF v4.4.6)</strong>:
+<a href="https://espressif.github.io/arduino-esp32/package_esp32_index.json"><code>arduino-esp32/package_esp32_index.json</code></a></li>
+<li><strong>Development Release</strong>: <strong>v3.0.0 (ESP-IDF v5.1)</strong>
+<a href="https://espressif.github.io/arduino-esp32/package_esp32_dev_index.json"><code>arduino-esp32/package_esp32_dev_index.json</code></a></li>
+</ul>
+<p><img alt="" src="arduino_esp32_v3.0.0-1.png" /></p>
+<p>รูป: <strong>Arduino ESP32 v3.0.0</strong></p>
+<p><img alt="" src="arduino_esp32_v3.0.0-2.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino ESP32 v3.0.0</strong></p>
+<p>&nbsp;</p>
+<p>การเขียนโค้ดสำหรับ <strong>Arduino</strong> เพื่อใช้งานวงจร <strong>DAC</strong> 
+ทำได้สะดวก เนื่องจากมีฟังก์ชัน <code>dacWrite(...)</code> ซึ่งจะใช้งาน <strong>DAC</strong>
+ในโหมด <strong>One-Shot</strong></p>
+<p>นอกจากนั้นแล้ว การจัดทำไลบรารีเอาไว้ให้ใช้งาน เช่น
+<a href="https://github.com/yellobyte/DacESP32"><code>yellobyte/DacESP32</code></a>:
+สามารถใช้ในการสร้างสัญญาณแอนะล็อกด้วย <strong>DAC</strong> ในโหมด <strong>One-Shot</strong> และ
+<strong>Cosine Waveform</strong> แต่จะใช้ได้กับ <strong>Arduino ESP32 Core v2.0.x (Legacy DAC Driver)</strong>
+ยังไม่รองรับ <strong>v3.0.0</strong></p>
+<p>ในบทความนี้ จะกล่าวถึง การทดลองการใช้งานเฉพาะ <strong>Arduino ESP32 Core v3.0.0</strong> เท่านั้น
+เพื่อใช้งานวงจร <strong>DAC</strong> ในโหมดต่าง ๆ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-dac-one-shot">&#9655; <strong>โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด One-Shot</strong><a class="headerlink" href="#esp32-dac-one-shot" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไปสาธิตการสร้างสัญญาณแอนะล็อกเอาต์พุต 2 ช่องพร้อมกัน
+โดยใช้วงจร <strong>DAC</strong> ในโหมด <strong>One-Shot</strong> และมีการเรียกใช้ฟังก์ชันของ 
+<strong>ESP-IDF DAC Driver</strong> ดังนี้</p>
+<ul>
+<li><code>dac_oneshot_new_channel(...)</code> ตั้งค่าการใช้งานสำหรับ <strong>DAC Channel</strong></li>
+<li><code>dac_oneshot_output_voltage(...)</code> กำหนดค่าขนาด 8 บิต (<strong>0..255</strong>) สำหรับเอาต์พุตให้ <strong>DAC Channel</strong></li>
+</ul>
+<pre><code class="language-c">#include &lt;hal/dac_types.h&gt;
+#include &lt;driver/dac_oneshot.h&gt;
+
+dac_oneshot_handle_t dac0_handle = NULL;
+dac_oneshot_handle_t dac1_handle = NULL;
+
+void initDAC() {
+  // DAC configuration for DAC channel 0
+  dac_oneshot_config_t chan0_cfg = {
+    .chan_id = DAC_CHAN_0
+  };
+  // DAC configuration for DAC channel 1
+  dac_oneshot_config_t chan1_cfg = {
+    .chan_id = DAC_CHAN_1
+  };
+  // Create two DAC channels in one-shot mode.
+  dac_oneshot_new_channel( &amp;chan0_cfg, &amp;dac0_handle );
+  dac_oneshot_new_channel( &amp;chan1_cfg, &amp;dac1_handle );
+}
+
+void outputDAC( uint32_t value ) {
+  // Write DAC outputs.
+  dac_oneshot_output_voltage( dac0_handle, value );
+  value = (value &gt; 127) ? 255-value : value;
+  dac_oneshot_output_voltage( dac1_handle, value&lt;&lt;1 );
+}
+
+void setup() {
+  Serial.begin(115200);
+  initDAC();
+  delay(1000);
+}
+
+void loop() {
+  static uint32_t level = 0;
+  outputDAC( level ); // execution time: 7~8 usec
+  level = (level+1) % 256;
+}
+</code></pre>
+<p>ในตัวอย่างนี้ สัญญาณเอาต์พุตทั้งสองช่อง มีการอัปเดตค่าพร้อมกันเมื่อทำคำสั่งของฟังก์ชัน
+<code>outputDAC(...)</code> แต่ใช้ค่าที่แตกต่างกัน และจะได้รูปคลื่นสัญญาณแตกต่างกัน</p>
+<p><img alt="" src="dac_one-shot-1.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณเอาต์พุตทั้งสองช่อง เมื่อวัดด้วยออสซิลโลสโคป (<strong>CH1=DAC0</strong> และ <strong>CH2=DAC1</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-dac-one-shot-hardware-timer">&#9655; <strong>โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด One-Shot ร่วมกับ Hardware Timer</strong><a class="headerlink" href="#esp32-dac-one-shot-hardware-timer" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการสร้างสัญญาณเอาต์พุตด้วย <strong>DAC</strong> ทั้งสองช่องพร้อมกัน ในโหมด <strong>One-Shot</strong>
+และมีการใช้งานร่วมกับวงจร <strong>General-Purpose Timer (GPTimer)</strong> ที่ได้ตั้งค่าความละเอียดในการนับไว้
+<strong>1 usec</strong> (ไมโครวินาที) และใช้วงจรเวลานี้ เพื่อสร้างอินเทอร์รัพท์ และให้ฟังก์ชันที่ทำหน้าที่เป็น 
+<strong>Callback Function</strong> อัปเดตค่าเอาต์พุตสำหรับช่องสัญญาณของ <strong>DAC</strong> ด้วยอัตราคงที่ </p>
+<p>การสร้างสัญญาณเอาต์พุต จะใช้วิธีอ่านค่าจากตารางข้อมูลรูปคลื่นไซน์
+(ในโค้ดตัวอย่างนี้ ได้กำหนดขนาดของตารางไว้เท่ากับ 256 ที่มีค่าตัวเลขขนาด 8 บิต
+อ้างอิงโดยตัวแปรแบบอาร์เรย์ชื่อ <code>WAVE_TABLE</code>) ไปตามลำดับแล้ววนซ้ำใหม่ 
+เพื่อนำไปใช้กับ <strong>DAC</strong> ความถี่ของสัญญาณเอาต์พุตที่ได้คือ <strong>100Hz</strong>
+และสัญญาณทั้งสองช่องเป็นรูปคลื่นไซน์ และมีความถี่เท่ากัน แต่มีแอมพลิจูดตรงข้ามกัน</p>
+<pre><code class="language-c">#include &lt;hal/dac_types.h&gt;
+#include &lt;driver/dac_oneshot.h&gt;
+#include &lt;driver/gptimer.h&gt;
+
+gptimer_handle_t gptimer = NULL;
+dac_oneshot_handle_t dac0_handle = NULL;
+dac_oneshot_handle_t dac1_handle = NULL;
+
+#define FREQ_HZ          (100)
+#define RESOLUTION_1MHZ  (1000000UL)
+
+const uint32_t TABLE_SIZE = 256;
+uint8_t WAVE_TABLE[ TABLE_SIZE ];
+volatile uint32_t sin_index = 0;
+
+// GPTimer Callback Function
+bool IRAM_ATTR on_timer_alarm_cb( gptimer_handle_t timer, 
+  const gptimer_alarm_event_data_t *edata, void *user_data ) 
+{
+  outputDAC( WAVE_TABLE[sin_index] );
+  sin_index = (sin_index+1) % TABLE_SIZE;
+  return false;
+}
+
+void initTimer() { // Initialize the timer
+  gptimer_config_t timer_config = {
+      .clk_src       = GPTIMER_CLK_SRC_DEFAULT,
+      .direction     = GPTIMER_COUNT_UP,
+      .resolution_hz = RESOLUTION_1MHZ // 1MHz, 1 tick = 1us
+  };
+  gptimer_new_timer( &amp;timer_config, &amp;gptimer );
+  gptimer_alarm_config_t alarm_config = {
+      .alarm_count   = RESOLUTION_1MHZ/(TABLE_SIZE*FREQ_HZ),
+      .reload_count  = 0,
+      .flags = { .auto_reload_on_alarm = true }
+  };
+  gptimer_event_callbacks_t cbs = {
+      .on_alarm = on_timer_alarm_cb
+  };
+  gptimer_register_event_callbacks( gptimer, &amp;cbs, NULL );
+  gptimer_set_alarm_action( gptimer, &amp;alarm_config );
+  gptimer_enable( gptimer );
+  gptimer_start( gptimer );
+}
+
+void initDAC() {
+  dac_oneshot_config_t chan0_cfg = {
+    .chan_id = DAC_CHAN_0
+  };
+  dac_oneshot_config_t chan1_cfg = {
+    .chan_id = DAC_CHAN_1
+  };
+  dac_oneshot_new_channel( &amp;chan0_cfg, &amp;dac0_handle );
+  dac_oneshot_new_channel( &amp;chan1_cfg, &amp;dac1_handle );
+  outputDAC( 127 );
+}
+
+inline void outputDAC( uint32_t value ) {
+  dac_oneshot_output_voltage( dac0_handle, value );
+  dac_oneshot_output_voltage( dac1_handle, 255-value );
+}
+
+void setup() {
+  Serial.begin(115200);
+  // Create a table (array) for sine-waveform data.
+  for (int i=0; i &lt; TABLE_SIZE; i++) {
+    WAVE_TABLE[i] = (127)*(sin(2*PI*i/TABLE_SIZE)+1);
+  }
+  initDAC();   // Initialize DAC in one-shot mode.
+  initTimer(); // Initialize general-purpose timer.
+  delay(1000);
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="dac_one_shot_timer-1.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณเอาต์พุตทั้งสองช่อง เมื่อวัดด้วยออสซิลโลสโคป (<strong>CH1=DAC0</strong> และ <strong>CH2=DAC1</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-dac-continuous">&#9655; <strong>โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด Continuous</strong><a class="headerlink" href="#esp32-dac-continuous" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้งาน <strong>DAC</strong> ในโหมด <strong>Continuous</strong>
+โดยใช้ <strong>DMA Controller</strong> ทำหน้าที่อ่านค่าจากอาร์เรย์ (<code>WAVE_TABLE</code>)
+ซึ่งเป็นตารางข้อมูลสำหรับรูปคลื่นไซน์ แล้วนำไปใช้เป็นค่าเอาต์พุตสำหรับ <strong>DAC</strong> ตามลำดับ</p>
+<p>การทำงานของ <strong>DAC</strong> ในโหมด <strong>Continuous</strong> มีสองรูปแบบ</p>
+<ul>
+<li><code>DAC_CHANNEL_MODE_SIMUL</code>  ใช้ข้อมูลร่วมกันทั้งสองช่องเหมือนกันพร้อมกัน</li>
+<li><code>DAC_CHANNEL_MODE_ALTER</code>  ใช้ข้อมูลร่วมกันแต่แบ่งกันโดยสลับกันไประหว่างสองช่อง</li>
+</ul>
+<p>ในตัวอย่างนี้ ข้อมูลในอาร์เรย์ <code>WAVE_TABLE</code> ถ้าเป็นแอดเดรสที่เป็นเลขคู่ (0,2,4,...)
+จะเป็นข้อมูลสำหรับช่อง <strong>DAC0</strong> แต่ถ้าเป็นแอดเดรสที่เป็นเลขคี่ (1,3,5,...) จะใช้สำหรับช่อง <strong>DAC1</strong></p>
+<pre><code class="language-c">#include &lt;hal/dac_types.h&gt;
+#include &lt;driver/dac_continuous.h&gt;
+
+const uint32_t freq = 200;
+const uint32_t TABLE_SIZE = 256;
+uint8_t WAVE_TABLE[ TABLE_SIZE ];
+
+dac_continuous_handle_t dac_cont_handle = NULL;
+
+void initDAC() {
+  dac_continuous_config_t dac_cont_cfg = {
+     .chan_mask = DAC_CHANNEL_MASK_ALL,
+     .desc_num  = 8,
+     .buf_size  = 2048,
+     .freq_hz   = (TABLE_SIZE*freq)/2,
+     .offset    = 0,
+     .clk_src   = DAC_DIGI_CLK_SRC_DEFAULT, 
+     .chan_mode = DAC_CHANNEL_MODE_ALTER // alternate output
+  };
+  dac_continuous_new_channels( &amp;dac_cont_cfg, &amp;dac_cont_handle );
+  dac_continuous_enable( dac_cont_handle );
+}
+
+void setup() {
+  Serial.begin(115200);
+  for (int i=0; i &lt; TABLE_SIZE; i+=2) {
+    float arg = 2*PI*i/TABLE_SIZE;
+    WAVE_TABLE[i]   = (127)*(1+sin(arg));
+    WAVE_TABLE[i+1] = (127)*(1+cos(arg));
+  }  
+  // Initialize DAC in DMA continuous mode.
+  initDAC();
+  delay(1000);
+  // Apply the waveform data to DMA-based DAC output.
+  dac_continuous_write_cyclically( dac_cont_handle,
+     WAVE_TABLE, TABLE_SIZE, NULL );
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="dac_dma-1.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณทั้งสองช่อง (ความถี่ <strong>200Hz</strong>)</p>
+<p><img alt="" src="dac_dma-2.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณทั้งสองช่อง (เมื่อตั้งค่าความถี่เป็น <strong>10kHz</strong>)</p>
+<p>&nbsp;</p>
+<p>แต่ถ้าจะใช้วงจร <strong>DAC</strong> ในโหมด <strong>DMA-based Continuous</strong>
+สำหรับช่องเอาต์พุตเพียงช่องเดียว เช่น <strong>DAC0</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c">#include &lt;hal/dac_types.h&gt;
+#include &lt;driver/dac_oneshot.h&gt;
+#include &lt;driver/dac_continuous.h&gt;
+
+const uint32_t freq = 100;
+const uint32_t TABLE_SIZE = 256;
+uint8_t WAVE_TABLE[ TABLE_SIZE ];
+
+dac_continuous_handle_t dac_cont_handle = NULL;
+
+void initDAC() {
+  dac_continuous_config_t dac_cont_cfg = {
+     .chan_mask = DAC_CHANNEL_MASK_CH0, // only DAC0 channel
+     .desc_num  = 8,
+     .buf_size  = 2048,
+     .freq_hz   = (TABLE_SIZE*freq),
+     .offset    = 0,
+     .clk_src   = DAC_DIGI_CLK_SRC_DEFAULT, 
+     .chan_mode = DAC_CHANNEL_MODE_SIMUL
+  };
+  dac_continuous_new_channels( &amp;dac_cont_cfg, &amp;dac_cont_handle );
+  dac_continuous_enable( dac_cont_handle );
+}
+
+void setup() {
+  Serial.begin(115200);
+  for (int i=0; i &lt; TABLE_SIZE; i++) {
+    float arg = 2*PI*i/TABLE_SIZE;
+    WAVE_TABLE[i] = 127*(1+sin(arg));
+  }
+  // Initialize DAC in DMA continuous mode.
+  initDAC();
+  delay(1000);
+  // Apply the waveform data to DMA-based DAC output.
+  dac_continuous_write_cyclically( dac_cont_handle, 
+       WAVE_TABLE, TABLE_SIZE, NULL );
+}
+
+void loop() {
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-dac-cosine-waveform">&#9655; <strong>โค้ดตัวอย่าง: การใช้งาน ESP32-DAC ในโหมด Cosine-Waveform</strong><a class="headerlink" href="#esp32-dac-cosine-waveform" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการสร้างสัญญาณเอาต์พุต โดยใช้ <strong>DAC</strong> ในโหมด <strong>Cosine-Waveform (CW)
+Generator</strong> ทั้งสองช่องเอาต์พุต ซึ่งมีความถี่เหมือนกัน ตั้งค่า <strong>Offset</strong> ให้เป็น 0
+แต่กำหนดให้ <strong>DAC0</strong> มีแอมพลิจูดตามปรกติ มีมุมเริ่มต้นเป็น 0 องศา และให้ <strong>DAC1</strong> มีแอมพลิจูด 1/2 
+(เป็นครึ่งหนึ่งของขนาดปรกติ) มีมุมเริ่มต้นเป็น 180 องศา (เลือกได้แค่ 0 หรือ 180 องศา เท่านั้น)</p>
+<pre><code class="language-c">#include &lt;hal/adc_types.h&gt;
+#include &lt;hal/dac_types.h&gt;
+#include &lt;hal/clk_tree_ll.h&gt;
+#include &lt;driver/dac_cosine.h&gt;
+
+/*
+ DAC Cosine Waveform Generation: Amplitude Scaling
+  - 1/1 amplitude: DAC_COSINE_ATTEN_DB_0 (DAC_COSINE_ATTEN_DEFAULT)
+  - 1/2 amplitude: DAC_COSINE_ATTEN_DB_6
+  - 1/4 amplitude: DAC_COSINE_ATTEN_DB_12
+  - 1/8 amplitude: DAC_COSINE_ATTEN_DB_18
+ Phase:
+  - DAC_COSINE_PHASE_0
+  - DAC_COSINE_PHASE_180
+*/
+
+dac_cosine_handle_t chan0_handle;
+dac_cosine_handle_t chan1_handle;
+
+void outputCW( uint32_t freq = 130 ) {
+
+  dac_cosine_config_t cos0_cfg = {
+     .chan_id = DAC_CHAN_0, // GPIO25 pin on ESP32
+     .freq_hz = freq,       // DAC frequency in Hz
+     .clk_src = DAC_COSINE_CLK_SRC_DEFAULT, // RC_FAST
+     .atten = DAC_COSINE_ATTEN_DEFAULT, // normal amplitude
+     .phase = DAC_COSINE_PHASE_0, // phase value (0 or 180)
+     .offset = 0,           // offset value -128 ~ +127
+     .flags = { .force_set_freq = true }
+  };
+
+  dac_cosine_config_t cos1_cfg = {
+     .chan_id = DAC_CHAN_1, // GPIO26 pin on ESP32
+     .freq_hz = freq,       // DAC frequency in Hz
+     .clk_src = DAC_COSINE_CLK_SRC_DEFAULT, // RC_FAST
+     .atten   = DAC_COSINE_ATTEN_DB_6, // 1/2 amplitude
+     .phase   = DAC_COSINE_PHASE_180, // phase value (0 or 180)
+     .offset  = 0,          // offset value -128 ~ +127
+     .flags   = { .force_set_freq = true } // overwrite current freq.
+  };
+
+  if ( chan0_handle != NULL ) {
+    dac_cosine_stop( chan0_handle );
+    dac_cosine_del_channel( chan0_handle );
+  }
+  if ( chan1_handle != NULL ) {
+    dac_cosine_stop( chan1_handle );
+    dac_cosine_del_channel( chan1_handle );
+  }
+  // Configure the DAC-CW channel 0 and channel 1.
+  dac_cosine_new_channel( &amp;cos0_cfg, &amp;chan0_handle );
+  dac_cosine_new_channel( &amp;cos1_cfg, &amp;chan1_handle );
+
+  // Start te DAC-CW Generator on DAC channel 0 and 1.
+  dac_cosine_start( chan0_handle );
+  dac_cosine_start( chan1_handle );
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  uint32_t clk_div = clk_ll_rc_fast_get_divider();
+  Serial.printf( &quot;Clock divider: %lu\n&quot;, clk_div );
+  Serial.printf( &quot;The lowest frequency: %lu Hz\n&quot;, 130/clk_div );
+}
+
+const uint32_t Fmin = 130, Fmax = 300, Fstep = 10;
+
+void loop() {
+  for (uint32_t freq=Fmin; freq &lt;= Fmax; freq+=Fstep ) {
+    Serial.printf( &quot;Freq. %4lu Hz\n&quot;, freq );
+    outputCW( freq );
+    delay(2000);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ข้อจำกัดในการใช้งาน <strong>DAC</strong> ในโหมด <strong>CW</strong> คือ</p>
+<ul>
+<li>การเลือกค่าความถี่ จะต้องมีค่าอย่างน้อย <strong>130Hz</strong> (ถ้าตั้งค่าตัวหารความถี่ไว้ 1)
+และค่าที่วัดได้จริง อาจจะมีความคลาดเคลื่อนได้ เนื่องจากวงจร <strong>DAC CW Generator</strong>
+ใช้วงจร <strong>Internal Fast RC Oscillator</strong> สร้างสัญญาณ <strong>Clock</strong> ภายใน
+และอาจจะมีความคลาดเคลื่อนได้</li>
+<li>ทั้งสองช่องเอาต์พุต ใช้ความถี่เหมือนกัน แต่ต่างเฟสได้ 0 หรือ 180 องศา</li>
+<li>ค่าความถี่ที่ใช้ได้ จะไม่ต่อเนื่อง เช่น ถ้าลองตั้งค่าความถี่เริ่มต้นจาก <strong>130Hz</strong>
+เพิ่มทีละ <strong>10Hz</strong> ไปจนถึง <strong>300Hz</strong> ค่าความถี่ที่วัดได้จริงคือ  <strong>126Hz</strong>
+และสัญญาณเอาต์พุตจะเริ่มเปลี่ยนความถี่เป็น <strong>252Hz</strong> เมื่อตั้งค่าเป็น <strong>260Hz</strong> หรือมากกว่า</li>
+</ul>
+<p>จากการทดลองตั้งค่าและการวัดความถี่ที่ได้จริง มีตัวอย่างดังนี้</p>
+<table>
+<thead>
+<tr>
+<th align="left">Output Value</th>
+<th align="left">Measured Frequency (Hz)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">130</td>
+<td align="left">~126</td>
+</tr>
+<tr>
+<td align="left">260</td>
+<td align="left">~252</td>
+</tr>
+<tr>
+<td align="left">390</td>
+<td align="left">~380</td>
+</tr>
+<tr>
+<td align="left">520</td>
+<td align="left">~510</td>
+</tr>
+<tr>
+<td align="left">650</td>
+<td align="left">~641</td>
+</tr>
+<tr>
+<td align="left">780</td>
+<td align="left">~757</td>
+</tr>
+<tr>
+<td align="left">910</td>
+<td align="left">~893</td>
+</tr>
+<tr>
+<td align="left">1040</td>
+<td align="left">~1.04k</td>
+</tr>
+<tr>
+<td align="left">1170</td>
+<td align="left">~1.14k</td>
+</tr>
+<tr>
+<td align="left">1300</td>
+<td align="left">~1.26k</td>
+</tr>
+<tr>
+<td align="left">2600</td>
+<td align="left">~2.5k</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p><img alt="" src="dac_cw_sine.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณช่อง <strong>DAC0</strong> (วัดความถี่ได้ <strong>126Hz</strong> เมื่อตั้งค่าเป็น <strong>130</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dacwrite">&#9655; <strong>โค้ดตัวอย่าง: การหาระยะเวลาในการทำคำสั่ง dacWrite()</strong><a class="headerlink" href="#dacwrite" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการใช้คำสั่ง <a href="https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-dac.h"><code>dacWrite(...)</code></a>
+ของ <strong>Arduino API</strong> และจับเวลาในการทำคำสั่งแต่ละครั้ง </p>
+<pre><code class="language-c">void setup() {
+  Serial.begin(115200);
+}
+
+const int DAC_PIN = DAC1; // Use either DAC1 or DAC2.
+
+void loop() {
+  const uint32_t N = 256;
+  uint32_t t0 = esp_timer_get_time();
+  for (uint32_t level = 0; level &lt; N; level++) {
+    dacWrite( DAC_PIN, (uint8_t)level ); // DAC output
+  }
+  uint32_t t1 = esp_timer_get_time();
+  uint32_t t_diff = (t1-t0); // Time difference in usec.
+  Serial.printf( &quot;Time difference: %lu usec\n&quot;, t_diff );
+  Serial.printf( &quot;Time difference: %.1f usec per loop\n&quot;, 
+                ((float)t_diff)/N );
+  delay(1000);
+}
+</code></pre>
+<p>จากข้อความเอาต์พุตที่ได้นำมาเป็นตัวอย่าง แสดงค่าตัวเลขต่อหนึ่งรอบ
+ดังนั้นการทำคำสั่ง <code>dacWrite()</code> ต่อหนึ่งครั้ง จะใช้เวลาไม่เกิน 3.7 ไมโครวินาที</p>
+<pre><code class="language-text">Time difference: 945 usec
+Time difference: 3.7 usec per loop
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dacwrite-analogread">&#9655; <strong>โค้ดตัวอย่าง: การทำคำสั่ง dacWrite() และ analogRead()</strong><a class="headerlink" href="#dacwrite-analogread" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการใช้คำสั่ง <code>dacWrite()</code> เพื่อสร้างสัญญาณแอนะล็อก
+และใช้คำสั่ง <code>analogRead()</code> เพื่ออ่านค่าแอนะล็อกจากแรงดันอินพุต โดยเลือกใช้ขา
+<strong>DAC1 / GPIO25</strong> สำหรับเอาต์พุต และขา <strong>ADC1_CH6 / GPIO34</strong> สำหรับอินพุต
+ดังนั้นในการทดลองจริง จะต้องมีการเชื่อมต่อขาทั้งสองด้วยลวดสายไฟหรือตัวต้านทาน</p>
+<p>การอ่านค่า <strong>ADC</strong> จะเกิดขึ้นด้วยอัตราคงที่ โดยอาศัยการทำงานของ <strong>General-Purpose Timer</strong>
+และเปิดใช้งานอินเทอร์รัพท์ เพื่อทำให้ฟังก์ชัน <strong>Callback</strong> ได้อ่านค่าจาก <strong>ADC Input</strong>
+ตามอัตราที่กำหนดไว้ ค่าที่อ่านได้ในแต่ละครั้งซึ่งถูกแปลงเป็นค่าแรงดันไฟฟ้า (หน่วยเป็นมิลลิโวลต์)
+จะถูกส่งผ่าน <strong>FreeRTOS Queue</strong> ไปยังทาสก์หลักของโปรแกรม
+และจะมีการปรับค่าเอาต์พุตสำหรับ <strong>DAC</strong></p>
+<pre><code class="language-c">const int ADC_PIN = 34; // ADC1_CH6 / GPIO34
+const int DAC_PIN = DAC1;
+
+// A Mutex object
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+
+// A FreeRTOS queue used to store ADC values
+QueueHandle_t adc_queue;
+
+uint8_t level = 0;
+
+// Callback function of the hardware timer.
+void IRAM_ATTR timer_callback() { 
+  portENTER_CRITICAL_ISR(&amp;mux); // Acquire the mutex.
+  uint32_t value = analogReadMilliVolts( ADC_PIN );
+  dacWrite( DAC_PIN, level += 8 );
+  // Send the ADC value to the FreeRTOS queue
+  xQueueSendFromISR(adc_queue, &amp;value, NULL);
+  portEXIT_CRITICAL_ISR(&amp;mux); // Release the mutex.
+}
+
+// Initialize the ADC input channel.
+void initADC() { 
+  // Set ADC resolution to 12 bits
+  analogSetWidth( 12 );
+  // Set attenuation level to 11 dB.
+  analogSetPinAttenuation( ADC_PIN, ADC_11db ); 
+}
+
+// Initialize the hardware timer.
+void initTimer( uint32_t hw_timer_unit=0 ) {
+  static hw_timer_t *timer = NULL;
+  timer = timerBegin( 1000000UL ); // 1MHz (1us tick)
+  timerWrite(timer, 0);
+  // Attach the callback function (ISR) to the timer
+  timerAttachInterrupt( timer, &amp;timer_callback );
+  timerAlarm(timer, 1000, true /*reload*/, 0 /*reload value*/);
+  timerRestart(timer);
+}
+
+void setup() {
+  // Initialize the Serial (use baudrate of 921600)
+  Serial.begin(921600);
+  Serial.print(&quot;\n\n\n&quot;);  
+  Serial.flush();
+  // Create a FreeRTOS queue object.
+  adc_queue = xQueueCreate(16, sizeof(uint32_t));
+  initADC(); // Initialize the ADC.
+  dacWrite( DAC_PIN, 0 );
+  // Initialize the hardware timer.
+  initTimer();
+}
+
+void loop() {
+  uint32_t adc_reading;
+  if (xQueueReceive(adc_queue, &amp;adc_reading, portMAX_DELAY)) {
+    Serial.printf( &quot;A:%lu\n&quot;, adc_reading );
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_plot-1.png" /></p>
+<p>รูป: ตัวอย่างการแสดงผลข้อมูลที่ได้รับใน <strong>Arduino Serial Plotter</strong></p>
+<p>&nbsp;</p>
+<p>หากจะลองเปลี่ยนไปใช้ <strong>DAC CW Waveform Generator</strong> เพื่อสร้างสัญญาณเอาต์พุตรูปคลื่นไซน์
+โดยเลือกใช้ช่อง <strong>DAC0 / GPIO25</strong> เพียงช่องเดียว และอ่านค่าอินพุตด้วยคำสั่ง <code>analogReadMilliVolts()</code>
+โดยตั้งอัตราการอ่านค่าจาก <strong>ADC</strong> ให้สูงขึ้น (เพิ่มค่า <strong>Sampling Rate</strong> เช่น <strong>1/250usec = 4k Samples/sec</strong>)
+และกำหนดค่า <strong>Baudrate</strong> ให้สูงขึ้นเป็น <strong>921600</strong> ก็มีตัวอย่างการเขียนโค้ดดังนี้</p>
+<pre><code class="language-c">#include &lt;hal/adc_types.h&gt;
+#include &lt;hal/dac_types.h&gt;
+#include &lt;driver/dac_cosine.h&gt;
+
+const int ADC_PIN = 34; // ADC1_CH6 / GPIO34
+
+// A Mutex object
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+
+// A FreeRTOS queue used to store ADC values
+QueueHandle_t adc_queue;
+
+uint8_t level = 0;
+
+// Callback function of the hardware timer.
+void IRAM_ATTR timer_callback() { 
+  portENTER_CRITICAL_ISR(&amp;mux); // Acquire the mutex.
+  uint32_t value = analogReadMilliVolts( ADC_PIN );
+  // Send the ADC value to the FreeRTOS queue
+  xQueueSendFromISR(adc_queue, &amp;value, NULL);
+  portEXIT_CRITICAL_ISR(&amp;mux); // Release the mutex.
+}
+
+// Initialize the ADC input channel.
+void initADC() { 
+  // Set ADC resolution to 12 bits
+  analogSetWidth( 12 );
+  // Set attenuation level to 11 dB.
+  analogSetPinAttenuation( ADC_PIN, ADC_11db ); 
+}
+
+// Initialize the hardware timer.
+void initTimer( uint32_t hw_timer_unit=0 ) {
+  static hw_timer_t *timer = NULL;
+  timer = timerBegin( 1000000UL ); // 1MHz (1us tick)
+  timerWrite(timer, 0);
+  // Attach the callback function (ISR) to the timer
+  timerAttachInterrupt( timer, &amp;timer_callback );
+  timerAlarm(timer, 250, true /*reload*/, 0 /*reload value*/);
+  timerRestart(timer);
+}
+
+dac_cosine_handle_t dac_chan_handle;
+
+void outputCW( uint32_t freq ) {
+  dac_cosine_config_t dac_cos_cfg = {
+     .chan_id = DAC_CHAN_0, // GPIO25 pin on ESP32
+     .freq_hz = freq,       // DAC frequency in Hz
+     .clk_src = DAC_COSINE_CLK_SRC_DEFAULT, // RC_FAST
+     .atten = DAC_COSINE_ATTEN_DEFAULT, // normal amplitude
+     .phase = DAC_COSINE_PHASE_0, // phase value (0 or 180)
+     .offset = 0,           // offset value -128 ~ +127
+     .flags = { .force_set_freq = true }
+  };
+
+  if ( dac_chan_handle != NULL ) {
+    dac_cosine_stop( dac_chan_handle );
+    dac_cosine_del_channel( dac_chan_handle );
+  }
+  // Configure the DAC-CW channel
+  dac_cosine_new_channel( &amp;dac_cos_cfg, &amp;dac_chan_handle );
+  // Start te DAC-CW Generator on DAC channel
+  dac_cosine_start( dac_chan_handle );
+}
+
+void setup() {
+  // Initialize the Serial (use baudrate of 921600)
+  Serial.begin(921600);
+  Serial.print(&quot;\n\n\n&quot;);  
+  Serial.flush();
+  // Create a FreeRTOS queue object.
+  adc_queue = xQueueCreate(32, sizeof(uint32_t));
+  initADC(); // Initialize the ADC.
+  outputCW(150); // Set the DAC CW frequency (&gt; 130) 
+  // Initialize the hardware timer.
+  initTimer();
+}
+
+void loop() {
+  uint32_t adc_reading;
+  if (xQueueReceive(adc_queue, &amp;adc_reading, portMAX_DELAY)) {
+    Serial.printf( &quot;A:%lu\n&quot;, adc_reading );
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_plot-2.png" /></p>
+<p>รูป: ตัวอย่างการแสดงผลข้อมูลที่ได้รับใน <strong>Arduino Serial Plotter</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอวิธีการและตัวอย่างการเขียนโค้ด <strong>Arduino</strong>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> เพื่อสร้างสัญญาณแอนะล็อก
+โดยใช้วงจร <strong>DAC</strong> ในโหมดการทำงานที่แตกต่างกัน และได้ทดลองใช้
+<strong>Arduino ESP32 Core v3.0.0</strong> สำหรับการเขียนโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-10-10 | Last Updated: 2023-10-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
