@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/dsp/fourier_series/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การหาอนุกรมฟูเรียร์ (Fourier Series) ของสัญญาณคาบเวลา และตัวอย่างการเขียนโค้ดด้วย MATLAB และ Python - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fourier-series-matlab-python" class="nav-link">การหาอนุกรมฟูเรียร์ (Fourier Series) ของสัญญาณคาบเวลา และตัวอย่างการเขียนโค้ดด้วย MATLAB และ Python</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#fourier-series" class="nav-link">&#9655; Fourier Series</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sine-cosine" class="nav-link">&#9655; สัญญาณคาบ: Sine &amp; Cosine</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; สัญญาณคาบ: สัญญาณรูปสามเหลี่ยม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#matlab" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด MATLAB และสัญญาณรูปสามเหลี่ยม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด Python และสัญญาณรูปสามเหลี่ยม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#unit-impulse-train" class="nav-link">&#9655; สัญญาณคาบ: Unit Impulse Train</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fourier-series-matlab-python">การหาอนุกรมฟูเรียร์ (Fourier Series) ของสัญญาณคาบเวลา และตัวอย่างการเขียนโค้ดด้วย MATLAB และ Python<a class="headerlink" href="#fourier-series-matlab-python" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="fourier-series">&#9655; <strong>Fourier Series</strong><a class="headerlink" href="#fourier-series" title="Permanent link">#</a></h2>
+<p>สัญญาณต่อเนื่องเชิงเวลาและเป็นสัญญาณคาบ มีคุณสมบัติดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) = x(t+T), \;\; T > 0, \forall t \in\mathbb{R}
+</script>
+โดยที่ <script type="math/tex">T</script> คือ คาบของสัญญาณ (<strong>Period</strong>)</p>
+<p>สัญญาณคาบสามารถเขียนให้อยู่ในรูปแบบของอนุกรมฟูเรียร์ (<strong>Fourier Series</strong>)
+ถ้าเป็นไปตามเงื่อนไขของ <strong>Dirichlet</strong> เช่น ฟังก์ชัน <script type="math/tex">|x(t)|</script> 
+สามารถหาค่าอินทิเกรตได้ในช่วงหนึ่งคาบได้</p>
+<p>
+<script type="math/tex; mode=display">
+  0 < \int_{T} |x(t)| dt < \infty
+</script>
+</p>
+<p>อนุกรมฟูเรียร์ของสัญญาณคาบ <script type="math/tex">x(t)</script> ที่มีความถี่มูลฐาน <script type="math/tex">f_0</script> หรือคาบ <script type="math/tex">T</script> มีรูปแบบดังนี้
+(<strong>Exponential Complex Form of Fourier Series</strong>)</p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) = \sum_{k=-\infty}^{\infty} c_k \, e^{j k\omega_0 t},
+\; \omega_0 = 2\pi f_0 = \frac{2\pi}{T}, \; k = 0, \pm 1, \pm 2, ...
+</script>
+</p>
+<p>และสัมประสิทธิ์เชิงซ้อน (<strong>Complex Coefficients</strong>) 
+ของอนุกรมฟูเรียร์สำหรับสัญญาณ <script type="math/tex">x(t)</script> มีสูตรการคำนวณดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ c_0 &= \frac{1}{T} \int_{T} x(t) dt \\
+ c_k &= \frac{1}{T} \int_{T} x(t)\, e^{-j k\omega_0 t} dt, \; k \neq 0 
+\end{align}</script>
+</p>
+<p>ถ้าใช้สูตรของ <strong>Euler</strong></p>
+<p>
+<script type="math/tex; mode=display">
+   e^{\pm j\theta} = cos(\theta) \pm j sin(\theta) 
+</script>
+</p>
+<p>สัมประสิทธิ์เชิงซ้อนสามารถเขียนได้ใหม่ ดังนี้
+<script type="math/tex; mode=display">
+ c_k = \frac{1}{T} \int_{T} x(t)\, \big[cos(k\omega_0 t) - j sin(k\omega_0 t) \big]\,dt
+</script>
+</p>
+<p>โดยที่</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+\qquad
+ a_k   &= \frac{2}{T} \int_{T} x(t)\, cos(k\omega_0 t) dt = a_{-k}  \\
+ b_k   &= \frac{2}{T} \int_{T} x(t)\, sin(k\omega_0 t) dt = -b_{-k} \\
+ c_k   &= \frac{1}{2}(a_k - j\, b_k) \\
+ c^*_k &= \frac{1}{2}(a_k + j\, b_k) = c_{-k} \qquad \mbox{ (Conjugate complex) } \\
+ a_0   &= c_0 \\
+\end{align}</script>
+</p>
+<p>ถ้าจะเปลี่ยนจากสัมประสิทธิ์ <script type="math/tex">c_k</script> มาเป็นสัมประสิทธิ์ <script type="math/tex">a_k</script> และ <script type="math/tex">b_k</script> ที่เป็นเลขจำนวนจริง ก็สามารถเขียนฟังก์ชัน
+<script type="math/tex">x(t)</script> ในรูปแบบของอนุกรมฟูเรียร์ได้ใหม่ดังนี้ (เรียกรูปแบบนี้ว่า <strong>Trigonometric Form of Fourier Series</strong>)</p>
+<p>
+<script type="math/tex; mode=display">\begin{align} 
+\quad
+  x(t) &= \sum_{k=-\infty}^{\infty} c_k \, e^{j k\omega_0 t} 
+   = c_0 + \sum_{k=1}^{\infty}
+     \big( c_{-k}\, e^{-j k\omega_0 t} + c_{k}\, e^{j k\omega_0 t} \big)\\
+  &= c_0 
+   + \sum_{k=1}^{\infty} \frac{1}{2}(a_k + j b_k)\, e^{-j k\omega_0 t} 
+   + \sum_{k=1}^{\infty} \frac{1}{2}(a_k - j b_k)\, e^{j k\omega_0 t} \\
+  &= a_0 
+   + \sum_{k=1}^{\infty} a_k \frac{(e^{j k\omega_0 t} + e^{-j k\omega_0 t})}{2} 
+   - \sum_{k=1}^{\infty} j b_k \frac{(e^{j k\omega_0 t} - e^{-j k\omega_0 t})}{2} \\
+  &= a_0
+   + \sum_{k=1}^{\infty} a_k \frac{(e^{j k\omega_0 t} + e^{-j k\omega_0 t})}{2} 
+   + \sum_{k=1}^{\infty} b_k \frac{(e^{j k\omega_0 t} - e^{-j k\omega_0 t})}{2j} \\
+  &= a_0  
+   + \sum_{k=1}^{\infty} a_k\, cos(k\omega_0 t)
+   + \sum_{k=1}^{\infty} b_k\, sin(k\omega_0 t) \\
+\end{align}</script>
+</p>
+<p>ถ้ากำหนดให้
+<script type="math/tex; mode=display">\begin{align}
+  A_0 &= a_0 \\
+  A_k &= \sqrt{a_k^2 + b_k^2} \\
+  a_k &= A_k\, cos(\theta_k)  \\
+  b_k &= -A_k\, sin(\theta_k) \\
+   \theta_k &= -tan^{-1}(\frac{b_k}{a_k})
+\end{align}</script>
+</p>
+<p>และใช้สูตรตรีโกณมิติต่อไปนี้
+<script type="math/tex; mode=display">
+   cos(A+B) = cos(A)cos(B) - sin(A)sin(B)
+</script>
+</p>
+<p>ดังนั้น <script type="math/tex">x(t)</script> จึงเขียนอยู่ในรูปใหม่ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ x(t) &= a_0 + \sum_{k=1}^{\infty}
+       a_k\, cos(k\omega_0 t) + b_k\, sin(k\omega_0 t) \\
+      &= A_0 + \sum_{k=1}^{\infty}
+       A_k\, cos(\theta_k) cos(k\omega_0 t)
+     - A_k\, sin(\theta_k) sin(k\omega_0 t) \\
+ x(t) &= A_0 + \sum_{k=1}^{\infty}
+       A_k\, cos(k\omega_0 t + \theta_k)
+\end{align}</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sine-cosine">&#9655; <strong>สัญญาณคาบ: Sine &amp; Cosine</strong><a class="headerlink" href="#sine-cosine" title="Permanent link">#</a></h2>
+<p>ถ้าเป็นรูปคลื่นไซน์ที่มีคาบเท่ากับ <script type="math/tex">T</script> และ <script type="math/tex">\omega_0 = 2\pi/T</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+  A\, sin(\omega_0 t) 
+   = A \Big(\frac{e^{j\omega_0 t} - e^{-j\omega_0 t} }{2j}\Big)
+</script>
+</p>
+<p>จะได้ค่าสัมประสิทธิ์ <script type="math/tex">c_k</script> (ในกรณีนี้ ไม่จำเป็นต้องใช้การอินทิเกรต)</p>
+<p>
+<script type="math/tex; mode=display">
+ c_k = \begin{cases} 
+   +\frac{A}{2j},\; & k = +1  \\
+   -\frac{A}{2j},\; & k = -1  \\
+  \;\; 0, \; & |k| \neq 1
+   \end{cases}
+</script>
+</p>
+<p>ถ้าเป็นฟังก์ชันโคไซน์</p>
+<p>
+<script type="math/tex; mode=display">
+  A\, cos(\omega_0 t)
+  = A \Big( \frac{e^{j\omega_0 t} + e^{-j\omega_0 t} }{2} \Big)
+</script>
+</p>
+<p>จะได้ค่าสัมประสิทธิ์ <script type="math/tex">c_k</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+ c_k = \begin{cases} 
+   \frac{A}{2}, & |k| = 1  \\
+   0, & |k| \neq 1
+   \end{cases}
+</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>สัญญาณคาบ: สัญญาณรูปสามเหลี่ยม</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>สัญญาณคาบเวลาที่มีลักษณะเป็นรูปสามเหลี่ยม  (<strong>Triangular Waveform</strong>)
+สามารถเขียนให้อยู่ในรูปแบบของฟังก์ชันทางคณิตศาสตร์ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) = \begin{cases} 
+   \frac{2A}{T}t     &, \; 0 \leq t < T/2 \\
+   2A(1-\frac{t}{T}) &, \; T/2 \leq t < T \\
+   x(t \, mod \, T) &, \; \mbox{ otherwise}
+  \end{cases}
+</script>
+</p>
+<p><img alt="" src="triangular_wave.png" /></p>
+<p>รูป: สัญญาณรูปสามเหลี่ยม <script type="math/tex">x(t)</script> ในช่วง <script type="math/tex">t \in [-2T,2T]</script>
+</p>
+<p>ลองมาดูวิธีการคำนวณหาค่าสัมประสิทธิ์ของอนุกรมฟูเรียร์สำหรับฟังก์ชันนี้</p>
+<p>เริ่มต้นด้วยสูตรการอินทิเกรตต่อไปนี้ก่อน</p>
+<p>
+<script type="math/tex; mode=display">
+\int t\,cos(a\,t)\,dt = \frac{(a\,t)\, sin(a\,t) + cos(a\,t)}{a^2} \\
+</script>
+จากนั้นจึงเริ่มคำนวณ <script type="math/tex">a_k</script> โดยพิจารณาเลือกคาบเวลาอยู่ในช่วง <script type="math/tex">[-T/2,T/2]</script>
+ซึ่งจะทำได้ง่ายกว่าการคำนวณ <script type="math/tex">c_k</script> สำหรับฟังก์ชันรูปสามเหลี่ยมในกรณีนี้ เนื่องจากเป็นฟังก์ชันคู่ </p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+a_k 
+ &= \frac{2}{T} \int_{-T/2}^{T/2} \frac{2A}{T}|t|\, cos(k\omega_0 t)\, dt \qquad \mbox{ (even function) } \\
+ &= \frac{4}{T} \int_{0}^{T/2} \frac{2A}{T} t\, cos(k\omega_0 t)\, dt 
+   = \frac{8A}{T^2} \int_{0}^{T/2} t\, cos(k\omega_0 t)\, dt \\
+ &= \frac{8A}{T^2}\Big[ \frac{(k\omega_0\,t)\, sin(k\omega_0\,t) + cos(k\omega_0\,t)}{(k\omega_0)^2} \Big]_{0}^{T/2}\\
+ &= \frac{8A}{T^2}\Big[ \frac{k\omega_0\,(T/2)\, sin(k\omega_0\,(T/2)) + cos(k\omega_0\,(T/2))}{(k\omega_0)^2} \\
+ & \qquad \qquad - \frac{k\omega_0\,(0)\, sin(k\omega_0\,(0)) + cos(k\omega_0\,(0))}{(k\omega_0)^2} 
+\Big] \\
+ &= \frac{8A}{T^2}\Big[ \frac{k\pi\, sin(k\pi) + cos(k\pi)}{(k\omega_0)^2} - \frac{1}{(k\omega_0)^2} \Big] \\
+ &= \frac{8A}{T^2} \frac{(cos(k\pi)-1)}{(k\omega_0)^2}
+    = \frac{8A}{T^2} \frac{((-1)^k-1)}{(k\omega_0)^2} \\
+ &= \frac{8A}{T^2} \frac{((-1)^k-1)}{k^2 (4\pi^2)/T^2}
+    = 2A\frac{((-1)^k-1)}{k^2 \pi^2} \\
+ c_k &= \frac{1}{2}{a_k - j b_k} = A\frac{((-1)^k-1)}{k^2 \pi^2} \\
+ c_0 &= \frac{1}{T} \int_{-T/2}^{T/2} \frac{2A}{T}|t|\,dt 
+     = \frac{4A}{T^2} \int_{0}^{T/2} t\,dt = \frac{A}{2} \\
+\end{align}</script>
+</p>
+<p>และได้ 
+<script type="math/tex; mode=display">
+  x(t) = \frac{A}{2} + \sum_{k=1}^{\infty}
+       A\frac{((-1)^k-1)}{k^2 \pi^2} cos(k\omega_0 t)
+</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="matlab">&#9655; <strong>ตัวอย่างการเขียนโค้ด MATLAB และสัญญาณรูปสามเหลี่ยม</strong><a class="headerlink" href="#matlab" title="Permanent link">#</a></h2>
+<p>ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> มีดังนี้ 
+เริ่มต้นด้วยการประกาศใช้ตัวแปรเชิงสัญลักษณ์ (<strong>Symbolic Variables</strong>)
+เช่น สัญลักษณ์ <script type="math/tex">t</script> (ตัวแปรอิสระซึ่งเป็นเวลา)  <script type="math/tex">T</script> (คาบ)  และ <script type="math/tex">A</script> (แอมพลิจูด)
+จากนั้นสร้างฟังก์ชัน <script type="math/tex">x_T(t)</script> สำหรับหนึ่งคาบของสัญญาณ ซึ่งเป็นฟังก์ชันแบบ
+<strong>piecewise</strong> และในตัวอย่างนี้มีลักษณะเป็นรูปสามเหลี่ยม
+และนำไปใช้ในการสร้างฟังก์ชันที่มีคาบ <script type="math/tex">x(t)</script>
+</p>
+<p>เมื่อสร้างฟังก์ชัน <script type="math/tex">x(t)</script> แล้ว จึงนำไปแสดงรูปกราฟของฟังก์ชันโดยใช้คำสั่ง
+<code>fplot()</code> และแสดงค่าในช่วง <script type="math/tex">t \in [-2,2]</script>
+และกำหนดค่าตัวเลขให้พารามิเตอร์ <script type="math/tex">A</script> ให้เท่ากับ 1 และ <script type="math/tex">T</script> เท่ากับ 1 </p>
+<pre><code class="language-matlab">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% clear variables, clear the command window, clear figures
+clearvars; clc; clf; close all;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Section 1
+syms t real;
+syms T A positive;
+% Define a triangular-shape function x_T(t) for t in [0,T).
+x_T(t) = piecewise( 0 &lt;= t &amp; t &lt; T/2, 2*A*t/T,...
+                    T/2 &lt;= t &amp; t &lt; T, 2*A*(1-t/T) );
+% Define x(t) as a periodic function.
+x(t) = x_T( mod(t,T) );
+% Set the specific values for the parameters A and T.
+params =  [A,T];
+values  = [1,1];
+% Set the range for t.
+t_range = [-2,2];
+
+% Plot the x(t) function for A=1, T=1 and t in [-2,2]  
+figure;
+fplot( subs(x(t), params, values), t_range, 'linewidth', 1.5),
+axis equal, xlabel('t'), ylabel('x(t)'), grid on;
+% Use custom labels.
+custom_x_labels = {'-2T', '-T', '0', 'T', '2T'}; 
+xticks(linspace( t_range(1), t_range(2), numel(custom_x_labels)));
+xticklabels(custom_x_labels);
+custom_y_labels = {'0','A'}; 
+y_range = [0, eval(subs(A, params, values))];
+yticks(linspace( y_range(1), y_range(2), numel(custom_y_labels)))
+yticklabels(custom_y_labels);
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นการคำนวณค่าสัมประสิทธิ์ของอนุกรมฟูเรียร์ <script type="math/tex">c_k</script> รวมถึง <script type="math/tex">a_k</script> และ <script type="math/tex">b_k</script> ด้วย</p>
+<pre><code class="language-matlab">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Section 2
+syms k integer;
+syms m integer;
+omega_0 = 2*pi/T;
+% Compute the complex coefficients of the Fourier Series.
+c_k = (1/T)*int( x_T(t) * exp(-1j*k*omega_0*t),t,[0,T]);
+c_k = simplify( c_k, 'Steps', 100 );
+c_k_odd  = simplify( subs(c_k, k, 2*m+1) );
+c_k_even = simplify( subs(c_k, k, 2*m ) );
+% Compute the a_k coefficients of the Fourier Series.
+a_k = simplify( (2/T)*int( x_T(t) * cos(k*omega_0*t),t,[0,T]) );
+% Compute the a_0 coefficient of the Fourier Series.
+a_0 = (1/T) * int( x_T(t), t, [0,T] );
+% Compute the b_k coefficients of the Fourier Series.
+b_k = simplify( (2/T)*int( x_T(t) * sin(k*omega_0*t),t,[0,T]) );
+
+% Show the coefficients
+c_k, c_k_odd, c_k_even, a_k, b_k, a_0
+</code></pre>
+<p><img alt="" src="triangular_wave_matlab.png" /></p>
+<p>รูป:  ตัวอย่างเอาต์พุตจากการรันโค้ด <strong>MATLAB</strong></p>
+<p>จากข้อความเอาต์พุต จะได้สัมประสิทธิ์ของอนุกรมฟูเรียร์สำหรับ <script type="math/tex">x(t)</script>
+</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  a_k &= 2A\frac{((-1)^k-1)}{(\pi k)^2}, k > 0 \\
+  a_k &= -\frac{4A}{(\pi k)^2},\; k=1,3,5,... \\ 
+  a_k &= 0,\; k=2,4,6,... \\
+  a_0 &= c_0 = \frac{A}{2} \\
+  b_k &= 0 \\
+  c_k &= \frac{1}{2}(a_k - j b_k) = \frac{a_k}{2} \\
+  c_k &= -\frac{2A}{(\pi k)^2},\; k=1,3,5,... \\
+  c_k &= 0,\; k=2,4,6,... \\
+\end{align}</script>
+</p>
+<p>&nbsp;</p>
+<p>เมื่อได้คำนวณค่าสัมประสิทธิ์ <script type="math/tex">a_k</script> ก็สามารถเขียนฟังก์ชัน <script type="math/tex">x(t)</script>
+ให้อยู่ในรูปแบบของอนุกรมฟูเรียร์  ถ้าจะลองสร้างฟังก์ชัน <script type="math/tex">y(t)</script>
+จากอนุกรมฟูเรียร์ของ <script type="math/tex">x(t)</script> สำหรับ <script type="math/tex">k=0,1,...,K</script> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-matlab">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Section 3
+% Plot a Fourier Series with k=0,1..,K.
+K = 5;
+y(t) = A/2;
+for k=1:1:K
+   y(t) = y(t) + 2*A*((-1)^k-1)/(pi*k)^2 * cos(k*omega_0*t);
+end
+figure;
+fplot( subs(y(t),params,values), t_range, 'linewidth', 1.5 ),
+axis equal, xlabel('t'), 
+ylabel('y(t)'), ylim(y_range), grid on;
+</code></pre>
+<p><img alt="" src="triangular_wave_approx.png" /></p>
+<p>รูป: กราฟของฟังก์ชัน <script type="math/tex">y(t)</script>
+</p>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับวาดรูปกราฟสำหรับค่าสัมประสิทธิ์ <script type="math/tex">|c_k|</script>
+</p>
+<pre><code class="language-matlab">syms k integer;
+c_k = A*((-1)^k-1)/(k*pi)^2; 
+K = 10;
+ks = 1:1:K;
+c_k = [subs(c_k,k,flip(-ks)),A/2,subs(c_k,k,ks)];
+figure( 'Position', [100,100,1000,480])
+stem( [flip(-ks),0,ks], abs( subs(c_k,A,1) ) ); 
+xlabel('k');
+ylabel('| c_k |');
+title('Magnitude of c_k');
+grid on;
+</code></pre>
+<p><img alt="" src="ck_magnitude.png" /></p>
+<p>รูป: กราฟของฟังก์ชัน <script type="math/tex">|c_k|</script> (<strong>Magnitude Plot</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; <strong>ตัวอย่างการเขียนโค้ด Python และสัญญาณรูปสามเหลี่ยม</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Python</strong> ใช้ <strong>NumPy</strong> และ <strong>SciPy</strong> ซึ่งจะให้ผลการทำงานคล้ายกับโค้ดที่เขียนด้วย
+<strong>MATLAB</strong> เวอร์ชันของ <strong>SciPy</strong> ที่ได้ทดลองใช้คือ <strong>v1.11.1</strong></p>
+<p>โค้ดในส่วนแรกเป็นการสร้างฟังก์ชัน <script type="math/tex">x_T(T)</script> และ <script type="math/tex">x(t)</script> ตามลำดับ จากนั้นก็แสดงรูปกราฟของฟังก์ชันดังกล่าว</p>
+<pre><code class="language-python">
+import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
+
+# SciPy version: 1.11.1
+scipy_version = sp.__version__
+print(f&quot;SciPy version: {scipy_version}&quot;)
+
+# Define symbolic variables
+t, T, A = sp.symbols('t T A', real=True, positive=True)
+
+# Define a triangular-shape function for t in [0, T)
+x_T = sp.Piecewise((2*A*t/T, (0&lt;=t) &amp; (t&lt;T/2)), 
+                   (2*A*(1-t/T), (T/2&lt;=t) &amp; (t&lt;T)))
+
+# Define a periodic function
+x = x_T.subs(t, t % T)
+
+# Define the t_range
+t_range = np.linspace(-2, 2, 400)
+
+fig = plt.figure(figsize=(8, 4))
+# Plot the x(t) function for A=1, T=1, and t in [-2,2]
+params = {A:1, T:1} 
+x_values = [x.subs({t:val}) for val in t_range]
+x_values = [x.subs(params) for x in x_values]
+plt.plot(t_range, x_values, linewidth=1.5)
+plt.axis('equal')
+plt.xlabel('t')
+plt.ylabel('y(t)')
+plt.grid(True)
+
+# Use custom labels
+custom_x_labels = ['-2T', '-T', '0', 'T', '2T']
+xticks = np.linspace(t_range[0], t_range[-1], len(custom_x_labels))
+plt.xticks(xticks, custom_x_labels)
+custom_y_labels = ['0', 'A']
+y_min = 0
+y_max = int(A.subs(params))
+yticks = np.linspace(y_min, y_max, len(custom_y_labels))
+plt.yticks(yticks, custom_y_labels)
+plt.show()
+</code></pre>
+<p><img alt="" src="python_plot.png" /></p>
+<p>รูป: การวาดรูปกราฟของฟังก์ชัน <script type="math/tex">x(t)</script> ด้วย <strong>Python Matplotlib</strong></p>
+<p>&nbsp;</p>
+<p>โค้ดส่วนที่สองต่อจากส่วนแรก จะคำนวณสัมประสิทธิ์ของอนุกรมฟูเรียร์สำหรับฟังก์ชัน <script type="math/tex">x(t)</script>
+</p>
+<pre><code class="language-python"># Define symbolic variables
+k, t, T = sp.symbols('k t T', integer=True, real=True, positive=True)
+omega_0 = 2 * sp.pi / T
+
+x_T = (2*A*t/T*sp.Piecewise((1, t &lt; T/2), (0, True)) 
+       + 2*A*(1-t/T)*sp.Piecewise((1, t&gt;= T/2), (0, True)))
+
+# Compute the complex coefficients c_k of the Fourier Series
+c_k = sp.simplify( (1/T) * 
+      sp.integrate( x_T * sp.exp(-1j*k*omega_0*t), (t,0,T)) )
+c_k = sp.simplify( c_k )
+
+# Compute the a_k coefficients of the Fourier Series
+a_k = sp.simplify( 
+      (2/T) * sp.integrate(x_T*sp.cos(k*omega_0*t), (t,0,T)))
+
+# Compute the a_0 coefficient of the Fourier Series
+a_0 = (1/T) * sp.integrate(x_T, (t,0,T))
+
+# Compute the b_k coefficients of the Fourier Series
+b_k = sp.simplify( (2/T)*sp.integrate(x_T*sp.sin(k*omega_0*t), (t,0,T)))
+
+# Print the results
+print(f&quot;c_k: {c_k}&quot;)
+print(f&quot;a_k: {a_k}&quot;)
+print(f&quot;a_0: {a_0}&quot;)
+print(f&quot;b_k: {b_k}&quot;)
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">c_k: 1.0*A*((-1)**k - 1)/(pi**2*k**2)
+a_k: 2*A*((-1)**k - 1)/(pi**2*k**2)
+a_0: A/2
+b_k: 0
+</code></pre>
+<p>โค้ดส่วนที่สาม สร้างฟังก์ชัน <script type="math/tex">y(t)</script>
+จากอนุกรมฟูเรียร์ของ <script type="math/tex">x(t)</script> สำหรับ <script type="math/tex">k=0,1,...,K=11</script> แล้วแสดงรูปกราฟที่ได้</p>
+<pre><code class="language-python"># Define parameters
+K = 11
+A = 1
+T = 1
+t_range = np.linspace(-2, 2, 400)
+omega_0 = 2*np.pi/T
+
+# Initialize y(t) with A/2
+y = A/2
+
+# Calculate y(t) for k=1 to K
+for k in range(1, K + 1):
+    y += 2*A*((-1)**k - 1)/(np.pi*k)**2 * np.cos(k*omega_0*t_range)
+
+# Plot the Fourier Series
+plt.plot(t_range, y, linewidth=1.5)
+plt.axis('equal')
+plt.xlabel('t')
+plt.ylabel('y(t)')
+plt.grid(True)
+
+# Show the plot
+plt.show()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="unit-impulse-train">&#9655; <strong>สัญญาณคาบ: Unit Impulse Train</strong><a class="headerlink" href="#unit-impulse-train" title="Permanent link">#</a></h2>
+<p>ถ้ากำหนดให้สัญญาณ <script type="math/tex">p(t)</script>
+ได้จากผลรวมอนันต์ของฟังก์ชัน <script type="math/tex">\delta(t - nT)</script>
+ซึ่งเป็นฟังก์ชัน <script type="math/tex">\delta(t)</script> (มีชื่อว่า <strong>Dirac delta impulse</strong>)
+ที่มีการเลื่อนเวลาไปที่ตำแหน่ง <script type="math/tex">t = nT</script> ดังนั้น <script type="math/tex">p(t)</script> จึงเป็นสัญญาณคาบเวลา และมีคาบเท่ากับ <script type="math/tex">T</script>
+</p>
+<p>
+<script type="math/tex; mode=display"> p(t) = \sum_{n=-\infty}^{\infty} \delta(t - n T),\;
+n=0,\pm 1, \pm 2, ... </script>
+</p>
+<p>สามารถหาค่าสัมประสิทธิ์ <script type="math/tex">c_k</script> ของอนุกรมฟูเรียร์ ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+c_k &= \frac{1}{T} \int_{T}
+       p(t)\, e^{-j k\omega_0 t} dt \\
+    &= \frac{1}{T} \int_{-T/2}^{+T/2} 
+       \delta(t)\, e^{-j k\omega_0 t} dt = \frac{1}{T}
+\end{align}</script>
+</p>
+<p>ซึ่งจะเห็นได้ว่า <script type="math/tex">c_k</script> ของ <script type="math/tex">p(t)</script> เป็นค่าคงที่และเป็นเลขจำนวนจริง 
+ดังนั้น <script type="math/tex">p(t)</script> จึงเขียนให้อยู่ในรูปแบบของอนุกรมฟูเรียร์ได้ต่อไปนี้
+<script type="math/tex; mode=display">\begin{align}
+  p(t) &= \sum_{k=-\infty}^{\infty} c_k \, e^{j k\omega_0 t} 
+       = \sum_{k=-\infty}^{\infty} \frac{1}{T} \, e^{j k\omega_0 t},
+\;\; \omega_0 = \frac{2\pi}{T} \\
+      &= \frac{1}{T}\Big[ 1 + \sum_{k=1}^{\infty} 
+           e^{-j k \omega_0 t} + e^{j k \omega_0 t} \Big] \\
+      &= \frac{1}{T}\Big[ 1 +  2 \sum_{k=1}^{\infty} 
+          cos(k\omega_0 t) \Big] \\
+\end{align}</script>
+</p>
+<p>และสรุปได้ว่า </p>
+<p>
+<script type="math/tex; mode=display">
+  p(t) = \sum_{n=-\infty}^{\infty} \delta(t - n T)
+       = \frac{1}{T} \sum_{k=-\infty}^{\infty} e^{j k\omega_0 t}
+       = \frac{1}{T}\Big[ 1 + 2 \sum_{k=1}^{\infty} 
+          cos(k\omega_0 t) \Big]
+</script>
+</p>
+<p>คุณสมบัติข้อหนึ่งของ <script type="math/tex">p(t)</script> คือ ผลการอินทิเกรตสำหรับหนึ่งคาบเวลา จะมีค่าเป็น 1 </p>
+<p>
+<script type="math/tex; mode=display">
+  \int_{-T/2}^{T/2} p(t)\, dt = 
+  \underbrace{\int_{-T/2}^{T/2} \frac{1}{T}\, dt}_{1}
++ \underbrace{\int_{-T/2}^{T/2} \frac{2}{T} \sum_{k=1}^{\infty} 
+          cos(k\omega_0 t)\, dt}_{0} = 1
+</script>
+</p>
+<p>ซึ่งให้ผลเหมือน</p>
+<p>
+<script type="math/tex; mode=display">
+ \int_{-T/2}^{T/2} p(t)\, dt 
+  = \int_{-T/2}^{T/2} \delta(t)\, dt = 1
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ถ้าลองเขียนโค้ด <strong>MATLAB</strong> เพื่อสร้างฟังก์ชัน <script type="math/tex">x(t)</script> ที่มีลักษณะใกล้เคียงกับฟังก์ชัน
+<script type="math/tex">p(t)</script> โดยใช้ <script type="math/tex">K</script> เป็นพารามิเตอร์ และลองเพิ่มค่าจาก <script type="math/tex">K=20</script> เป็น <script type="math/tex">K=100</script>
+เพื่อดูแล้วโน้มการเปลี่ยนของรูปกราฟ </p>
+<p>
+<script type="math/tex; mode=display">
+ x(t) = \frac{1}{T}\Big[ 1 + 2 \sum_{k=1}^{K} cos(k\omega_0 t) \Big]
+</script>
+<script type="math/tex; mode=display">
+  p(t) = \lim_{K\rightarrow\infty} x(t)
+</script>
+ข้อสังเกต เมื่อสร้างฟังก์ชัน <script type="math/tex">x(t)</script> แล้วนำมาแสดงรูปกราฟจะถูกหารด้วยค่า <script type="math/tex">K</script> 
+ถ้าไม่หารด้วย <script type="math/tex">K</script> เพื่อค่า <script type="math/tex">K</script> เพิ่มขึ้น แอมพลิจูดก็จะมีค่ามากขึ้น</p>
+<pre><code class="language-matlab">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% clear variables, clear the command window, clear figures
+clearvars; clc; clf; close all;
+syms k integer;
+syms t real;
+syms T positive;
+% Set T to 1.
+T = subs(T,T,1); 
+% Define x(t) as a sum of cosine functions.
+x(t) = 1/T;
+K=20;
+for k=1:1:K
+     x(t) = x(t) + (1/T)*cos(k*2*pi/T*t);
+end
+t_range = [-2,2];
+% Plot x(t) by scaling amplitude by 1/K.
+figure;
+fplot( x(t)/K, t_range), ylim([-0.5,1]), grid on
+title(['x(t)/K with K=', num2str(K)])
+hold on;
+ts = t_range(1):1:t_range(2);
+ys = ones(size(ts));
+% Create a stem plot
+stem(ts, ys, 'r', 'filled'), hold off;
+</code></pre>
+<p><img alt="" src="impulse_train_plot.png" /></p>
+<p>รูป: การวาดกราฟด้วย <strong>MATLAB</strong> สำหรับฟังก์ชัน <script type="math/tex">x(t), T=1</script> สำหรับ <script type="math/tex">K=20</script> และ <script type="math/tex">K=100</script>
+</p>
+<p>&nbsp;</p>
+<p>ถ้าจะเขียนโค้ดด้วย <strong>Python + NumPy / SciPy</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+import sympy as sp
+
+# Define symbols and parameters.
+t = sp.symbols('t', real=True)
+
+# Set T to 1
+T = 1
+# Define x(t) as a sum of cosine functions.
+x_t = 1/T
+# Set the K parameter.
+K = 100
+omega = 2*sp.pi/T
+for k in range(1,K+1):
+    x_t += (1/T) * sp.cos(k*omega*t)
+
+# Create a lambda function for x(t) for numerical evaluation.
+x = sp.lambdify(t, x_t, 'numpy')
+# Define the range for t.
+t_range = np.linspace(-2, 2, 1000+1)
+plt.figure( figsize=(9,6) )
+# Plot x(t) by scaling amplitude by 1/K.
+plt.plot(t_range, (1/K)*x(t_range) )
+plt.ylim([-0.2, 1.1])
+plt.grid(True)
+plt.title(f'x(t)/K with K={K}')
+# Create a stem plot
+ts = np.arange(-2, 3)
+ys = np.ones(len(ts))
+#plt.stem(ts, ys, linefmt='r', markerfmt='r.', basefmt=' ')
+plt.show()
+</code></pre>
+<p>และตัวอย่างรูปกราฟที่ได้</p>
+<p><img alt="" src="impulse_train_plot2.png" /></p>
+<p>รูป: การวาดกราฟด้วย <strong>Python</strong> สำหรับฟังก์ชัน <script type="math/tex">x(t), T=1</script> สำหรับ <script type="math/tex">K=100</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอเนื้อหาเกี่ยวกับอนุกรมฟูเรียร์ของสัญญาณคาบเวลา
+และตัวอย่างการคำนวณหาค่าสัมประสิทธิ์ของอนุกรมฟูเรียร์
+โดยการเขียนโค้ดด้วย <strong>MATLAB</strong> และ <strong>Python</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-10-15 | Last Updated: 2023-10-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

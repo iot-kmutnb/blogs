@@ -111,7 +111,11 @@
             </li>
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การตรวจสอบข้อมูลเกี่ยวกับฮาร์ดแวร์และซอฟต์แวร์ที่ใช้งาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -168,7 +172,7 @@
 ได้พัฒนาซอฟต์แวร์และไลบรารีต่าง ๆ รวมเรียกว่า <a href="https://github.com/espressif/esp-idf"><strong>ESP-IDF</strong></a>
 (<em>Espressif IoT Developmment Framework</em>) หรืออาจจะมองว่าเป็น <strong>SDK</strong> (<em>Software Development Kit</em>) สำหรับ <strong>ESP32</strong> และในขณะที่เขียนบทความนี้ 
 เวอร์ชันในปัจจุบันของ <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/versions.html"><strong>ESP-IDF</strong></a> คือ <strong>v4.4</strong>
-และตามมาด้วย <strong>v5.0</strong> </p>
+และตามมาด้วย <strong>v5.0</strong> และ <strong>v5.1</strong></p>
 <p>แต่สำหรับผู้เริ่มต้น การใช้ <strong>ESP-IDF</strong> สำหรับการเขียนโปรแกรมชิปหรือบอร์ด <strong>ESP32</strong> 
 ก็อาจยากกว่าการใช้ <strong>Arduino</strong> ดังนั้นถ้าต้องการเขียนโปรแกรมโดยใช้ <strong>Arduino IDE</strong>
 ก็ให้ติดตั้งเพิ่มซอฟต์แวร์ที่เรียกว่า <a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core</strong></a> </p>
@@ -349,7 +353,54 @@ void loop() {
 <p>รูป: การจำลองการทำงานของโค้ดตัวอย่างสำหรับบอร์ด <strong>Espressif ESP32-S2 DevKit</strong></p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<h2 id="_1">&#9655; <strong>การตรวจสอบข้อมูลเกี่ยวกับฮาร์ดแวร์และซอฟต์แวร์ที่ใช้งาน</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>ESP32</strong> และชิปรุ่นอื่นของบริษัท <strong>Espressif</strong> เช่น <strong>ESP32-S2 / ESP32-S3 /
+ESP32-C3</strong> มีการใช้งานอย่างแพร่หลายในปัจจุบัน
+อีกทั้งมีการอัปเดตซอฟต์แวร์สำหรับการพัฒนาโปรแกรมอยู่ต่อเนื่อง โค้ดต่อไปนี้สาธิตการแสดงข้อความเกี่ยวกับฮาร์ดแวร์และซอฟต์แวร์ที่ใช้ในการเขียนโค้ด
+<strong>Arduino Sketch</strong> เช่น ชิปที่ใช้งาน ขนาดของหน่วยความจำแฟลช ความเร็วของชิปแฟลช เวอร์ชันของ
+<strong>Arduino ESP32 Core</strong> ที่ใช้งาน เป็นต้น</p>
+<pre><code class="language-c">// see: https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/Esp.cpp
+void showESPInfo() {  
+  Serial.println( &quot;Hardware Info...&quot; );
+  Serial.printf( &quot;- ESP chip model      : %s\n&quot;, ESP.getChipModel() );
+  Serial.printf( &quot;- Chip revision       : %u\n&quot;, ESP.getChipRevision() );
+  Serial.printf( &quot;- Number of CPU cores : %u\n&quot;, ESP.getChipCores() );
+  Serial.printf( &quot;- Chip MAC address    : %llx\n&quot;, ESP.getEfuseMac() );
+
+  Serial.printf( &quot;- Total heap size     : %lu bytes\n&quot;, ESP.getHeapSize() );
+  Serial.printf( &quot;- Free heap size      : %lu bytes\n&quot;, ESP.getFreeHeap() );
+  Serial.printf( &quot;- Total PSRAM size    : %lu bytes\n&quot;, ESP.getPsramSize() );
+  Serial.printf( &quot;- Free PSRAM size     : %lu bytes\n&quot;, ESP.getFreePsram() );
+
+  Serial.printf( &quot;- SPI flash size      : %lu MB\n&quot;,    ESP.getFlashChipSize()/(1024*1024) );
+  Serial.printf( &quot;- SPI flash speed     : %lu MHz\n\n&quot;, ESP.getFlashChipSpeed()/(uint32_t)1e6 );
+
+  Serial.println( &quot;Software Info...&quot; );
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  Serial.printf( &quot;- Arduino ESP32 Core  : v%s\n&quot;, ESP.getCoreVersion() );
+#else
+  Serial.printf( &quot;- Arduino ESP32 Core  : v%i.%i.%i\n&quot;,
+      ESP_ARDUINO_VERSION_MAJOR,  ESP_ARDUINO_VERSION_MINOR, ESP_ARDUINO_VERSION_PATCH );
+#endif
+  Serial.printf( &quot;- Espressif ESP-IDF   : %s\n\n&quot;, ESP.getSdkVersion() );
+}
+
+void setup() {
+  Serial.begin( 115200 );
+  delay(1000);
+  Serial.println(&quot;\n\n\n&quot;);
+}
+
+void loop() {
+  showESPInfo();
+  delay(5000);
+}
+</code></pre>
+<p><img alt="" src="wokwi_arduino_esp32_v2.0.14.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอการใช้งาน <strong>Wokwi Online Arduino Simulator</strong> 
 เพื่อการทดลองเขียนโค้ด <strong>Arduino Sketch</strong> ในเบื้องต้น และจำลองการทำงานของโค้ดสำหรับบอร์ดไมโครคอนโทรลเลอร์
 <strong>ESP32</strong> </p>
@@ -358,7 +409,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-11-12 | Last Updated: 2023-01-07</p></div>
+<p>Created: 2022-11-12 | Last Updated: 2023-10-13</p></div>
             </div>
         </div>
 

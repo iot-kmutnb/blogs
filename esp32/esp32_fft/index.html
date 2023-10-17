@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_fft/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งาน ESP32 เพื่อประมวลผลข้อมูลด้วย FFT (Fast-Fourier Transform) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#esp32-fft-fast-fourier-transform" class="nav-link">การใช้งาน ESP32 เพื่อประมวลผลข้อมูลด้วย FFT (Fast-Fourier Transform)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#espressif-dsp-library" class="nav-link">&#9655; Espressif DSP Library</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-fft-fast-fourier-transform">การใช้งาน ESP32 เพื่อประมวลผลข้อมูลด้วย FFT (Fast-Fourier Transform)<a class="headerlink" href="#esp32-fft-fast-fourier-transform" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="espressif-dsp-library">&#9655; <strong>Espressif DSP Library</strong><a class="headerlink" href="#espressif-dsp-library" title="Permanent link">#</a></h2>
+<p>บริษัท <strong>Espressif Systems</strong> ผู้พัฒนาชิป <strong>ESP32 SoC</strong> ได้จัดทำไลบรารีที่มีชื่อว่า
+<a href="https://docs.espressif.com/projects/esp-dsp/en/latest/esp32/esp-dsp-library.html"><strong>ESP-DSP</strong></a>
+(<a href="https://github.com/espressif/esp-dsp"><strong>Github Repo</strong></a>)
+ซึ่งเป็นส่วนหนึ่งของ <a href="https://github.com/espressif/esp-idf"><strong>ESP-IDF: Espressif IoT Development Framework</strong></a> และใช้สำหรับการประมวลผลสัญญาณเชิงเลข (<strong>Digital Signal Processing</strong>)</p>
+<p>ไลบรารีดังกล่าวประกอบด้วยฟังก์ชันในภาษาซี และชนิดข้อมูลที่สามารถเลือกใช้ได้  ซึ่งมีขนาด 16 บิต หรือ 32 บิต</p>
+<ul>
+<li><code>s</code> = signed integer</li>
+<li><code>u</code> = unsigned integer</li>
+<li><code>f</code> = float</li>
+<li><code>c</code> = complex</li>
+</ul>
+<p>นอกจากนั้นแล้วยังมีการจำแนกฟังก์ชันตามประเภทของสัญญาณหรือข้อมูลที่นำมาใช้</p>
+<ul>
+<li><code>s</code> ใช้กับข้อมูลสำหรับสัญญาณมิติเดียว</li>
+<li><code>i</code> ใช้กับข้อมูลสำหรับสัญญาณสองมิติ เช่น ข้อมูลภาพ</li>
+<li><code>m</code> ใช้กับข้อมูลสำหรับเมตริกซ์</li>
+<li><code>q</code> ใช้กับลำดับข้อมูลที่มีความยาวจำกัด</li>
+</ul>
+<p>ฟังก์ชันที่มีชื่อลงท้ายด้วย <code>ansi</code> (หรือไม่เขียนกำกับไว้) จะหมายถึง การเขียนโค้ดด้วย <strong>ANSI C</strong> ไม่เจาะจงใช้งานกับชิปใด ๆ
+แต่ถ้าเป็น <code>ae32</code> หรือ <code>aes3</code> จะใช้กับชิป <strong>ESP32</strong> และ <strong>ESP32-S3</strong> ตามลำดับ
+เนื่องจากมีการใช้คำสั่งในภาษา <strong>Assembly (Optimized Code)</strong> เจาะจงใช้กับชิปดังกล่าว</p>
+<p>ตัวอย่างฟังก์ชันในไลบรารีที่ใช้กับสัญญาณข้อมูลมิติเดียว ได้แก่</p>
+<ul>
+<li><strong>Dot-Product of Vectors</strong></li>
+<li><strong>Basic Vector &amp; Matrix Operations</strong></li>
+<li><strong>FFT (Fast Fourier Transform: Radix-2 &amp; Radix-4)</strong></li>
+<li><strong>DCT (Discrete Cosine Transform)</strong></li>
+<li><strong>IIR Filter</strong></li>
+<li><strong>FIR Filter</strong></li>
+<li><strong>Convolution and Correlation</strong></li>
+<li><strong>Complex Tone Generator</strong></li>
+<li><strong>Development support Functions</strong></li>
+<li><strong>Window Generation Functions</strong></li>
+<li><strong>Kalman Filter</strong></li>
+</ul>
+<p>บทความนี้จะกล่าวถึงเฉพาะการใช้งานฟังก์ชันสำหรับการคำนวณ <strong>FFT (Fast Fourier Transform)</strong></p>
+<p>ตัวอย่างฟังก์ชันที่เกี่ยวข้องกับการคำนวณ <strong>FFT (Radix-2)</strong>
+(<a href="https://github.com/espressif/esp-dsp/blob/master/modules/fft/include/dsps_fft2r.h"><code>./fft/include/dsps_fft2r.h</code></a>) </p>
+<ul>
+<li>
+<p>ฟังก์ชันสำหรับการเริ่มต้นและสร้างตารางค่าสัมประสิทธิ์ก่อนนำไปใช้ในการคำนวณ <strong>FFT (Radix-2)</strong> เขียนโค้ดด้วย  <strong>ANSI C</strong></p>
+<ul>
+<li><code>dsps_fft2r_init_fc32( float *fft_table_buff, int table_size )</code>
+ใช้กับชนิดข้อมูลแบบ <strong>float</strong> ขนาด 32 บิต ประมวลผลข้อมูลเป็นแบบเชิงซ้อน (<strong>Complex</strong>)</li>
+<li><code>dsps_fft2r_init_sc16( int16_t *fft_table_buff, int table_size )</code>
+ใช้กับชนิดข้อมูลแบบ <strong>signed integer</strong> ขนาด 16 บิต  ประมวลผลข้อมูลเป็นแบบเชิงซ้อน (<strong>Complex</strong>)</li>
+</ul>
+</li>
+<li>
+<p>ฟังก์ชันคำนวณ <strong>FFT</strong> (<strong>ANSI C</strong>)</p>
+<ul>
+<li><code>dsps_fft2r_fc32_ansi( float *data, int N )</code></li>
+<li><code>dsps_fft2r_sc16_ansi( int16_t *data, int N )</code></li>
+</ul>
+</li>
+<li>ฟังก์ชันคำนวณ <strong>FFT</strong> (เจาะจงใช้กับ <strong>ESP32</strong>)<ul>
+<li><code>dsps_fft2r_fc32_ae32( float *data, int N )</code></li>
+<li><code>dsps_fft2r_sc16_ae32( int16_t *data, int N )</code></li>
+</ul>
+</li>
+<li>ฟังก์ชันคำนวณ <strong>FFT</strong> (เจาะจงใช้กับ <strong>ESP32-S3</strong>)<ul>
+<li><code>dsps_fft2r_fc32_aes3( float *data, int N, )</code></li>
+<li><code>dsps_fft2r_sc16_aes3( int16_t *data, int N )</code></li>
+</ul>
+</li>
+<li>ฟังก์ชันสำหรับการกลับค่าบิต (<strong>Bit Reverse Operation</strong>) เพื่อจัดเรียงลำดับข้อมูลที่ได้จากการคำนวณ <strong>FFT</strong> และง่ายต่อการนำไปใช้งาน<ul>
+<li><code>dsps_bit_rev_fc32_ansi( float *data, int N )</code></li>
+<li><code>dsps_bit_rev_sc16_ansi( int16_t *data, int N )</code></li>
+</ul>
+</li>
+<li>ฟังก์ชันสำหรับแปลงข้อมูลเชิงซ้อนที่ได้จากการคำนวณ <strong>FFT</strong>ให้เป็นข้อมูลจำนวนจริงสองชุด <ul>
+<li><code>dsps_cplx2reC_fc32_ansi( float *data, int N )</code></li>
+<li><code>dsps_cplx2real_sc16_ansi( int16_t *data, int N )</code></li>
+</ul>
+</li>
+</ul>
+<p><code>N</code> หมายถึง <strong>FFT Size</strong> และค่าสูงสุดที่สามารถใช้ได้ ถูกกำหนดไว้โดย <code>CONFIG_DSP_MAX_FFT_SIZE</code>
+ซึ่งมีคงที่เท่ากับ <code>4096</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการใช้งานไลบรารี <strong>ESP-DSP</strong> ที่ได้มีการจัดทำขึ้นโดยบริษัท <strong>Espressif Systems</strong>
+ซึ่งเป็นส่วนหนึ่งของ <strong>Espressif ESP-IDF</strong>
+และเหมาะสำหรับการนำมาใช้กับชิป <strong>ESP32</strong> และ <strong>ESP32-S3</strong> สามารถนำมาใช้กับ
+<strong>Arduino ESP32 Core</strong> เพื่อใช้ในการเขียนโปรแกรมด้วย <strong>Arduino</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../dsp/fft/">ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> และ <strong>Python</strong> สำหรับการคำนวณ <strong>FFT (Fast-Fourier Transform)</strong></a></li>
+<li><a href="../../dsp/fourier_series/">การหาอนุกรมฟูเรียร์ (<strong>Fourier Series</strong>) ของสัญญาณคาบเวลา และตัวอย่างการเขียนโค้ดด้วย <strong>MATLAB</strong> และ <strong>Python</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-10-15 | Last Updated: 2023-10-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
