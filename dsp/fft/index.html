@@ -119,8 +119,9 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="matlab-python-fft-fast-fourier-transform">ตัวอย่างการเขียนโค้ด MATLAB และ Python สำหรับการคำนวณ FFT (Fast-Fourier Transform)<a class="headerlink" href="#matlab-python-fft-fast-fourier-transform" title="Permanent link">#</a></h1>
-<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ดในภาษา <strong>MATLAB</strong>
-เพื่อคำนวณค่าสัมประสิทธิ์ของ <strong>FFT</strong> ที่ได้เป็นผลลัพธ์จากการคำนวณ และใช้ในการิวเคราะห์สัญญาณในเชิงความถี่</p>
+<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ดในภาษา <strong>MATLAB</strong> และ <strong>Python</strong>
+เพื่อแปลงสัญญาณดิจิทัลด้วยวิธี <strong>FFT</strong> และใช้ในการวิเคราะห์สัญญาณในเชิงความถี่</p>
+<p><strong>Keywords</strong>: <em>FFT</em>, <em>MATLAB</em>, <em>Python</em>, <em>Fourier Analysis</em>, <em>Frequency Spectrum</em></p>
 <hr />
 <h2 id="fft-fast-fourier-transform">&#9655; <strong>FFT (Fast-Fourier Transform)</strong><a class="headerlink" href="#fft-fast-fourier-transform" title="Permanent link">#</a></h2>
 <p><a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform"><strong>FFT</strong></a> เป็น "อัลกอริทึม" (<strong>Algorithm</strong>) หรือขั้นตอนวิธีทางคอมพิวเตอร์
@@ -136,17 +137,19 @@
 <p>รูป: โครงสร้างสำหรับการคำนวณ <strong>N-point FFT</strong> มีจำนวนข้อมูลเท่ากับ <script type="math/tex">N=8</script> (Source: Wikipedia)</p>
 <p>จากรูปจะเห็นได้ว่า ไดอะแกรมนี้แสดงโครงสร้างการประมวลผลข้อมูลตามวิธีของ <strong>FFT</strong>
 ที่มีลักษณะแบบ <strong>Recursive</strong> กล่าวคือ ในการคำนวณ <strong>N-point DFT</strong>
-จากอินพุต  <script type="math/tex">x[n]</script> ไปเป็น <script type="math/tex">X[k]</script> จะต้องมีการคำนวณ <strong>N/2-point DFT</strong> เป็นองค์ประกอบย่อยภายใน</p>
+จากอินพุต  <script type="math/tex">x[n]</script> (จำนวนจริง) ไปเป็นเอาต์พุต <script type="math/tex">X[k]</script> (จำนวนเชิงซ้อน)
+จะต้องมีการคำนวณ <strong>N/2-point DFT</strong> เป็นองค์ประกอบย่อยภายใน
+แต่ในบทความนี้ จะไม่ขอกล่าวถึง วิธีการคำนวณของ <strong>FFT</strong> ในรายละเอียด</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>สัญญาณต่อเนื่องเชิงเวลาและการสุ่มสัญญาณ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>สัญญาณอินพุต <script type="math/tex">x(t)</script> เป็นสัญญาณต่อเนื่องเชิงเวลา (<strong>Continuous-Time Signal</strong>) เป็นตัวอย่างของสัญญาณแบบแอนะล็อกในทางกายภาพ
-และถ้าจะนำมาประมวลผลด้วยคอมพิวเตอร์ จึงต้องมีการการแปลงสัญญาณให้เป็นลำดับข้อมูล ในส่วนนี้เรียกว่า
-<strong>ADC (Analog-to-Digital Conversion)</strong> ซึ่งมีขั้นตอนการชักตัวอย่าง
+และถ้าจะนำมาประมวลผลด้วยคอมพิวเตอร์ จึงต้องมีการแปลงสัญญาณให้เป็นลำดับข้อมูล (<strong>Sampled Input Signal</strong>) 
+ในส่วนนี้เรียกว่า <strong>ADC (Analog-to-Digital Conversion)</strong> ซึ่งมีขั้นตอนการชักตัวอย่าง
 หรือสุ่มตัวอย่างด้วยอัตราคงที่ (<strong>Sampling</strong>)</p>
 <p>ข้อมูลที่ได้จะเรียกว่า ลำดับข้อมูลที่ไม่ต่อเนื่องเชิงเวลา <script type="math/tex">x[n]</script> (<strong>Discrete-Time Sequence</strong>)
-จำนวนข้อมูล (<strong>Number of Samples</strong>) จะขึ้นอยู่กับช่วงเวลา (<strong>Timer Interval</strong>)
-ที่ต้องการและความถี่ <script type="math/tex">F_s</script> ที่ได้เลือกใช้</p>
+จำนวนข้อมูล (<strong>Number of Samples</strong>) จะขึ้นอยู่กับช่วงเวลาที่ต้องการ (<strong>Timer Interval</strong>)
+และความถี่หรืออัตราการชักตัวอย่าง <script type="math/tex">F_s</script> ที่ได้เลือกใช้</p>
 <p>ความถี่ <script type="math/tex">F_s</script> จะต้องมีค่าอย่างน้อยสองเท่าของความถี่สูงสุดของสัญญาณอินพุต 
 (ตามทฤษฎีของ <strong>Nyquist Sampling Theorem</strong>) เพื่อไม่ให้เกิดปัญหาที่เรียกว่า
 <strong>Aliasing</strong> หรือ ความผิดเพี้ยนของสัญญาณข้อมูลจากการชักตัวอย่าง 
@@ -157,9 +160,7 @@
 x(t) = A sin(\omega_0 t), \; \omega_0 = 2\pi f_0,\; f_0 = 1/T_0
 </script>
 </p>
-<p>และมีการนำมาแปลงเป็นลำดับข้อมูลที่ไม่ต่อเนื่องเชิงเวลา จะได้ลำดับข้อมูลเป็น <script type="math/tex">x[n]</script>
-</p>
-<p>
+<p>และมีการนำมาแปลงเป็นลำดับข้อมูลที่ไม่ต่อเนื่องเชิงเวลา จะได้ลำดับข้อมูลเป็น <script type="math/tex">x[n]</script> โดยที่ <script type="math/tex">n</script> เป็นเลขจำนวนเต็ม
 <script type="math/tex; mode=display">
   x[n] = x(n T_s) 
        = A sin( \omega_o n T_s) = A sin(\omega_o n/F_s)
@@ -181,8 +182,8 @@ x(t) = A sin(\omega_0 t), \; \omega_0 = 2\pi f_0,\; f_0 = 1/T_0
 <p>เมื่อสร้างอาร์เรย์สำหรับ <strong>Windowing Function</strong> ที่มีความยาวเท่ากับจำนวนข้อมูลอินพุต
 แล้วนำมาคูณกัน ผลลัพธ์ที่ได้ (<code>x_input_windowed</code>)
 จึงนำไปใช้เป็นอินพุตให้ฟังก์ชัน <code>fft()</code> ของ <strong>MATLAB</strong>
-แล้วนำผลลัพธ์ที่ได้มาแปลงให้เป็นขนาดซึ่งเป็นเลขจำนวนจริง แล้วแสดงรูปกราฟ
-<strong>Magnitude Plot</strong> มีแกนแนวนอนเป็นความถี่ ในช่วง <script type="math/tex">0</script> ถึง <script type="math/tex">Fs/2</script>
+แล้วนำผลลัพธ์ที่ได้มาแปลงให้เป็นขนาดด้วยฟังก์ชัน <code>abs()</code> ซึ่งข้อมูลแต่ละตัวจะได้ค่าเป็นเลขจำนวนจริง
+แล้วแสดงรูปกราฟ <strong>Magnitude Plot</strong> ที่มีแกนแนวนอนเป็นความถี่ ในช่วง <script type="math/tex">0</script> ถึง <script type="math/tex">Fs/2</script>
 </p>
 <pre><code class="language-matlab">% clear variables, clear the command window, clear figures
 clearvars; clc; clf; close all;
@@ -259,7 +260,7 @@ xlabel('Frequency (Hz)'), ylabel('Magnitude');
 title('Frequency Domain Representation (FFT)');
 xlim([0, Fs/2]), grid on;
 </code></pre>
-<p>จากรูปจะเห็นได้ว่า มีความถี่เดียวที่มีขนาดไม่เป็น 0 ซึ่งก็คือ ความถี่ของสัญญาณอินพุต</p>
+<p>จากรูปจะเห็นได้ว่า มีความถี่เดียวที่มีขนาดไม่เป็น 0 ซึ่งก็คือ ตำแหน่งที่ตรงกับความถี่ของสัญญาณอินพุต</p>
 <p><img alt="" src="sin_samples_fft_plot.png" /></p>
 <p>รูป: การแสดงสเปกตรัม (<strong>Magnitude Spectrum</strong>)
 ของสัญญาณตามความถี่ เมื่อนำข้อมูลอินพุตไปคำนวณด้วย <strong>FFT</strong></p>
@@ -276,24 +277,33 @@ N_samples = 256; % Number of samples
 <p>รูป: การเปรียบเทียบผลการแปลง <strong>FFT</strong> ที่มีการใช้ <strong>Windowing Function</strong> (กราฟบน)
 และไม่ใช้ (กราฟล่าง)</p>
 <p>จากรูปกราฟจะเห็นความแตกต่าง ถ้ามีการใช้ <strong>Windowing Function</strong> ก่อนการแปลง <strong>FFT</strong>
-ผลลัพธ์ที่ได้ เฉพาะตรงความถี่ของสัญญาณไซน์ที่เป็นอินพุต จะมีค่าไม่เป็นศูนย์ และในความถี่รอบข้าง จะใกล้เคียงศูนย์</p>
-<p>แต่ถ้าไม่มีการใช้  <strong>Windowing Function</strong> จะเห็นได้ว่า บริเวณความถี่รอบข้างความถี่ของสัญญาณไซน์
-จะไม่เป็นศูนย์ </p>
+ผลลัพธ์ที่ได้ ตรงเฉพาะความถี่ของสัญญาณไซน์ที่เป็นอินพุต จะมีค่าไม่เป็นศูนย์และมีขนาดมากที่สุด
+ในขณะที่ในตำแหน่งความถี่รอบข้าง จะมีขนาดใกล้เคียงศูนย์ แต่ก็สามารถสังเกตได้ว่า เอาต์พุตจะมีขนาดลดลงกว่ากรณีที่ไม่มีการ
+<strong>Windowing Function</strong> </p>
+<p>แต่ถ้าไม่มีการใช้  <strong>Windowing Function</strong> ก็จะเห็นได้ว่า บริเวณรอบข้างความถี่ของสัญญาณไซน์
+จะมีขนาดไม่เป็นศูนย์</p>
 <p>ปรากฏการณ์ที่เรียกว่า <strong>Spectral Leakage</strong> จะเห็นได้ชัดเจนขึ้น
-เมื่อความถี่ของสัญญาณใกล้เคียงขอบซ้ายหรือขวาของสเปกตรัมขนาดของสัญญาณที่ได้จากการแปลงข้อมูลด้วย <strong>FFT</strong>
+เมื่อความถี่ของสัญญาณใกล้เคียงขอบซ้ายหรือขวาในกราฟสเปกตรัมที่ได้จากการแปลงข้อมูลด้วย <strong>FFT</strong>
 ลองดูตัวอย่างถัดไป โดยกำหนดค่าพารามิเตอร์ดังนี้</p>
 <pre><code class="language-matlab">freq = 10;  % The fundamental frequency of the sine wave (in Hz)
 Fs   = 1000; % The sampling rate (in Hz)
 N_samples = 256; % Number of samples
 </code></pre>
+<p>จากตัวอย่างพารามิเตอร์ สัญญาณอินพุตมีคาบเวลาเท่ากับ <script type="math/tex">1/10\,Hz</script> หรือ <script type="math/tex">100\, msec</script>
+ใช้ความถี่ในการชักตัวอย่างเท่ากับ <script type="math/tex">1000\,Hz</script> ถ้าชักตัวอย่างให้ได้จำนวนข้อมูลเท่ากับ <script type="math/tex">256</script> จะได้ระยะเวลา
+<script type="math/tex">256 \cdot 1\,msec</script> และหากนำไปหารด้วยคาบเวลาของสัญญาณ จะได้ <script type="math/tex">256 / 100</script> ซึ่งเป็นตัวเลขที่ไม่ลงตัว
+(ได้เศษเท่ากับ <script type="math/tex">56</script> และไม่ครบหนึ่งคาบหนึ่งคาบของสัญญาณ ซึ่งจะส่งผลทำให้เกิด <strong>Spectral Leakage</strong>
+เมื่อทำการแปลงข้อมูลด้วย <strong>FFT</strong>) </p>
 <p><img alt="" src="sin_fft_spectral_leakage.png" /></p>
 <p>รูป: การเปรียบเทียบผลการแปลง <strong>FFT</strong> ที่มีการใช้ <strong>Windowing Function</strong> (กราฟบน)
 และไม่ใช้ (กราฟล่าง) ในกรณีที่ความถี่ของสัญญาณอินพุตค่อนข้างต่ำ (อยู่ใกล้ขอบด้านซ้าย)</p>
-<p>จากรูปจะเห็นปัญหาของ <strong>Spectral Leakage</strong> ในช่วงความถี่ใกล้เคียง 0 Hz
-ขนาดควรจะเป็นศูนย์ ยกเว้นตรงความถี่ของสัญญาณอินพุต</p>
+<p>จากรูปกราฟ จะสามารถสังเกตเห็นปัญหาของ <strong>Spectral Leakage</strong> ในช่วงความถี่บริเวณใกล้เคียง <strong>0 Hz</strong>
+ขนาดควรจะเป็นศูนย์ ยกเว้นตำแหน่งที่ตรงความถี่ของสัญญาณอินพุต</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="python">&#9655; <strong>ตัวอย่างการเขียนโค้ด Python</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อเปรียบเทียบกับโค้ด <strong>MATLAB</strong>
+ซึ่งเหมาะสำหรับกรณีที่ผู้ใช้ไม่มีลิขสิทธิ์การใช้งานซอฟต์แวร์ หรือไม่สะดวกใช้ <strong>MATLAB</strong></p>
 <p>ตัวอย่างการเขียนโค้ด <strong>Python</strong> โดยใช้ <strong>NumPy</strong> &amp; <strong>Matplotlib</strong>
 และ <strong>SciPy</strong> ที่ทำงานได้เหมือนโค้ด <strong>MATLAB</strong> ตามที่ได้นำเสนอไปแล้ว มีดังนี้</p>
 <pre><code class="language-python">import numpy as np
@@ -372,7 +382,7 @@ plt.show()
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-10-15 | Last Updated: 2023-10-17</p></div>
+<p>Created: 2023-10-15 | Last Updated: 2023-10-18</p></div>
             </div>
         </div>
 

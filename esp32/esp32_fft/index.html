@@ -95,6 +95,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-fft-demo" class="nav-link">&#9655; ESP32 FFT Demo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -127,7 +131,7 @@
 <li><code>m</code> ใช้กับข้อมูลสำหรับเมตริกซ์</li>
 <li><code>q</code> ใช้กับลำดับข้อมูลที่มีความยาวจำกัด</li>
 </ul>
-<p>ฟังก์ชันที่มีชื่อลงท้ายด้วย <code>ansi</code> (หรือไม่เขียนกำกับไว้) จะหมายถึง การเขียนโค้ดด้วย <strong>ANSI C</strong> ไม่เจาะจงใช้งานกับชิปใด ๆ
+<p>ฟังก์ชันที่มีชื่อลงท้ายด้วย <code>ansi</code> จะหมายถึง การเขียนโค้ดด้วย <strong>ANSI C</strong> ไม่เจาะจงใช้งานกับชิปใด ๆ
 แต่ถ้าเป็น <code>ae32</code> หรือ <code>aes3</code> จะใช้กับชิป <strong>ESP32</strong> และ <strong>ESP32-S3</strong> ตามลำดับ
 เนื่องจากมีการใช้คำสั่งในภาษา <strong>Assembly (Optimized Code)</strong> เจาะจงใช้กับชิปดังกล่าว</p>
 <p>ตัวอย่างฟังก์ชันในไลบรารีที่ใช้กับสัญญาณข้อมูลมิติเดียว ได้แก่</p>
@@ -179,7 +183,7 @@
 <li><code>dsps_bit_rev_sc16_ansi( int16_t *data, int N )</code></li>
 </ul>
 </li>
-<li>ฟังก์ชันสำหรับแปลงข้อมูลเชิงซ้อนที่ได้จากการคำนวณ <strong>FFT</strong>ให้เป็นข้อมูลจำนวนจริงสองชุด <ul>
+<li>ฟังก์ชันสำหรับแปลงข้อมูลเชิงซ้อนที่ได้จากการคำนวณ <strong>FFT</strong> ให้เป็นข้อมูลจำนวนจริงสองชุด <ul>
 <li><code>dsps_cplx2reC_fc32_ansi( float *data, int N )</code></li>
 <li><code>dsps_cplx2real_sc16_ansi( int16_t *data, int N )</code></li>
 </ul>
@@ -187,6 +191,142 @@
 </ul>
 <p><code>N</code> หมายถึง <strong>FFT Size</strong> และค่าสูงสุดที่สามารถใช้ได้ ถูกกำหนดไว้โดย <code>CONFIG_DSP_MAX_FFT_SIZE</code>
 ซึ่งมีคงที่เท่ากับ <code>4096</code></p>
+<hr />
+<h2 id="esp32-fft-demo">&#9655; <strong>ESP32 FFT Demo</strong><a class="headerlink" href="#esp32-fft-demo" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการแปลงข้อมูลของสัญญาณด้วย <strong>FFT (Fast-Fourier Transform)</strong>
+และโค้ดตัวอย่าง <strong>Arduino Sketch</strong> มีขั้นตอนการดำเนินการ ดังนี้ </p>
+<ul>
+<li>สร้างสัญญาณอินพุตรูปคลื่นไซน์ที่มีความถี่ <code>freq</code> เช่น <strong>1000Hz</strong> และชักตัวอย่างข้อมูลด้วยความถี่ <code>Fs</code>
+เช่น <strong>8000Hz</strong> แล้วเก็บข้อมูลลงในอาร์เรย์ <code>samples[]</code> ซึ่งมีชนิดข้อมูลแต่ละตัวเป็น <code>float</code>
+และมีจำนวนข้อมูล <code>N</code> เท่ากับ <strong>1024</strong></li>
+<li>สร้างอาร์เรย์ <code>wind_cf[]</code> เพื่อใช้เก็บค่าคงที่ตามจำนวน <code>N</code> 
+และได้จากการฟังก์ชัน <strong>Hann Windowing Function</strong></li>
+<li>สร้างอาร์เรย์ <code>y_cf[]</code> เพื่อใช้ในการเก็บข้อมูลสำหรับนำไปใช้ในการคำนวณ <strong>FFT</strong>
+ชนิดข้อมูลแต่ละตัวเป็น <code>float</code> แต่เนื่องจากการคำนวณด้วย <strong>FFT</strong> 
+จะต้องใช้กับข้อมูลเชิงซ้อน จึงมีการจัดเก็บและมีลำดับข้อมูลเป็น <strong>Re[0]</strong>, <strong>Im[0]</strong>,
+<strong>Re[1]</strong>, <strong>Im[1]</strong>, ... ไปตามลำดับ</li>
+<li>ก่อนเริ่มต้นการคำนวณ <strong>FFT</strong> จะต้องนำข้อมูลอินพุตจากอาร์เรย์ <code>samples[]</code> ไปใส่ลงใน
+อาร์เรย์ <code>y_cf[]</code> ในตำแหน่งที่เป็น <strong>Re[..]</strong> ส่วนที่เป็น <strong>Im[..]</strong> ให้มีค่าเป็น 0</li>
+<li>สร้างอาร์เรย์ <code>fft_result[]</code> ใช้เก็บค่าสำหรับขนาดของค่าสัมประสิทธิ์ที่ได้จากการคำนวณ <strong>FFT</strong>
+และนำไปใช้แสดงรูปกราฟ เพื่อง่ายต่อการตรวจสอบความถูกต้อง</li>
+</ul>
+<p>ฟังก์ชันที่เรียกใช้สำหรับการคำนวณ <strong>FFT</strong> ได้แก่</p>
+<ul>
+<li><code>dsps_fft2r_init_fc32( ... )</code></li>
+<li><code>dsps_fft2r_fc32( ... )</code> </li>
+<li><code>dsps_bit_rev_fc32( ... )</code></li>
+<li><code>dsps_cplx2reC_fc32( ... )</code></li>
+</ul>
+<pre><code class="language-c">#include &quot;esp_dsp.h&quot; // Include the  Espressif's ESP-DSP library.
+
+uint32_t Fs   = 8000;  // Sampling frequency (Hz)
+uint32_t freq = 1000;  // Signal frequency (Hz)
+
+const uint32_t N = 1024;
+float samples[N];    // Array of samples
+float wind_cf[N];    // Array of window coefficients
+float y_cf[2*N];     // Array of working complex values
+float y_result[N/2]; // FFT  result
+
+void setup() {
+  Serial.begin(115200);
+  Serial.print(&quot;\n\n\n&quot;); 
+  Serial.println(&quot;ESP32 - FFT Demo with ESP-DSP lib...&quot;);
+  initFFT();
+}
+
+void loop() {
+  createSamples(); // Create input samples.
+  fft();           // Perform FFT.
+  delay(5000);
+}
+
+void createSamples() {
+  for (uint32_t i=0; i &lt; N; i++) {
+    float noise = 0.0f;
+    //noise = (float)random(0, 100) / 1000.0;
+    samples[i] = sin(2*PI*freq*i/Fs)/2 + noise;
+  }
+}
+
+void initFFT() {
+    esp_err_t ret;
+    // Initializez the ESP32-DSP radix-2 FFT routine.
+    // Initialize the coefficients table for complex FFT calculation.
+    ret = dsps_fft2r_init_fc32( NULL/*use internal buffer*/,
+                                CONFIG_DSP_MAX_FFT_SIZE );
+    if (ret != ESP_OK) {
+      Serial.printf( &quot;Not possible to initialize FFT. Error = %i&quot;, ret );
+      return;
+    }
+    // Generate the coefficients of the Hann window.
+    dsps_wind_hann_f32( wind_cf, N );
+}
+
+void fft() {
+    // Convert two input vectors to one complex vector.
+    for (int i=0 ; i &lt; N ; i++) {
+      y_cf[i*2 + 0] = samples[i] * wind_cf[i]; // Re[..]
+      y_cf[i*2 + 1] = 0; // Im[..]
+    }
+
+    uint32_t start_cyc = dsp_get_cpu_cycle_count();
+    // FFT
+    // y_cf = Re[0], Im[0], … Re[N-1], Im[N-1] as input data.
+    // The result of FFT will be stored to this array.
+    dsps_fft2r_fc32( y_cf, N );
+    // Bit reverse 
+    dsps_bit_rev_fc32( y_cf, N );
+    // Convert one complex vector to two complex vectors
+    dsps_cplx2reC_fc32( y_cf, N );
+
+    uint32_t stop_cyc = dsp_get_cpu_cycle_count();
+    uint32_t cyc_diff = stop_cyc - start_cyc;
+    uint32_t time_diff_us = cyc_diff/ESP.getCpuFreqMHz();
+
+    float re, im;
+    for ( uint32_t i=0 ; i &lt; N/2; i++) {
+      re = y_cf[i*2];
+      im = y_cf[i*2 + 1];
+      y_result[i] = 10 * log10f( (re*re + im*im)/N );
+    }
+    // Show spectrum in w x h window from 0..N/2 samples.
+    Serial.println(&quot;FFT-based Magnitude Spectrum of Signal&quot;);
+    dsps_view( y_result, N/2, 40/*width*/, 10/*height*/,
+               -40/*min*/, 60/*max*/, '|');
+    Serial.printf( &quot;%lu-point FFT exec time: %lu cycles\n&quot;, N, cyc_diff );
+    Serial.printf( &quot;Time diff: %lu usec\n\n&quot;, time_diff_us );
+    delay(2000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ฟังก์ชัน <code>dsps_view(...)</code> ใช้สำหรับการแสดงรูปสเปกตรัมของผลลัพธ์ที่ได้ในรูปแบบของข้อความ
+โดยจะต้องกำหนดขนาดความกว้างและความสูง
+เช่น กำหนดความกว้างให้เท่ากับ 40 คือ แบ่งช่วงความถี่จาก <strong>0..Fs/2</strong>
+ถ้าให้ <strong>Fs=8000 Hz</strong> ดังนั้นเมื่อแบ่งออกเป็น 40 ช่อง
+ดังนั้นหนึ่งช่องหมายถึง  <strong>4000 Hz/40 = 100 Hz</strong></p>
+<p>ลองมาดูตัวอย่างการจำลองการทำงานของโค้ด <strong>Arduino</strong> โดยใช้ <strong>Wokwi Simulator</strong></p>
+<p><img alt="" src="fft_1khz.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตแสดงสเปกตรัมสำหรับสัญญาณรูปไซน์ความถี่ <strong>1000Hz</strong></p>
+<p><img alt="" src="fft_2khz.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตแสดงสเปกตรัมสำหรับสัญญาณรูปไซน์ความถี่ <strong>2000Hz</strong></p>
+<p>ลองแก้ไขฟังก์ชัน <code>createSamples()</code> ที่ใช้ในการสร้างข้อมูลสำหรับสัญญาณอินพุตดังนี้
+ซึ่งได้จากผลรวมของสัญญาณไซน์ 2 สัญญาณที่มีความถี่และแอมพลิจูดแตกต่างกัน
+และมีการเพิ่มสัญญาณรบกวนด้วย (<strong>Noise Addition</strong>) </p>
+<pre><code class="language-c">void createSamples() {
+  for (uint32_t i=0; i &lt; N; i++) {
+    float noise = 0.0f;
+    noise = (float)random(0, 100) / 1000.0; // 0..0.1
+    samples[i] = 1.0*sin(2*PI*(1*freq)*i/Fs)/2
+               + 0.5*sin(2*PI*(3*freq)*i/Fs)/2
+               + noise;
+  }
+}
+</code></pre>
+<p><img alt="" src="fft_1khz_3khz_noise.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตแสดงสเปกตรัมสำหรับสัญญาณ
+เกิดจากผลรวมของสัญญาณไซน์ที่ความถี่  <strong>1kHz</strong> และ <strong>3kHz</strong>
+(และมีการเพิ่มสัญญาณรบกวน)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -197,12 +337,13 @@
 <p><strong>บทความที่เกี่ยวข้อง</strong></p>
 <ul>
 <li><a href="../../dsp/fft/">ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> และ <strong>Python</strong> สำหรับการคำนวณ <strong>FFT (Fast-Fourier Transform)</strong></a></li>
+<li><a href="../../dsp/fir_filtering/">ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> และ <strong>Python</strong> สำหรับตัวกรองความถี่แบบ <strong>FIR Filtering</strong></a></li>
 <li><a href="../../dsp/fourier_series/">การหาอนุกรมฟูเรียร์ (<strong>Fourier Series</strong>) ของสัญญาณคาบเวลา และตัวอย่างการเขียนโค้ดด้วย <strong>MATLAB</strong> และ <strong>Python</strong></a></li>
 </ul>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2023-10-15 | Last Updated: 2023-10-17</p></div>
+<p>Created: 2023-10-15 | Last Updated: 2023-10-18</p></div>
             </div>
         </div>
 

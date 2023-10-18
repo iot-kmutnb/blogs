@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/dsp/fir_filtering/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการเขียนโค้ด MATLAB และ Python สำหรับตัวกรองความถี่แบบ FIR Filtering - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#matlab-python-fir-filtering" class="nav-link">ตัวอย่างการเขียนโค้ด MATLAB และ Python สำหรับตัวกรองความถี่แบบ FIR Filtering</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#digital-filtering" class="nav-link">&#9655; Digital Filtering</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#convolution-sum" class="nav-link">&#9655; Convolution Sum</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#matlab" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด MATLAB</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด Python</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="matlab-python-fir-filtering">ตัวอย่างการเขียนโค้ด MATLAB และ Python สำหรับตัวกรองความถี่แบบ FIR Filtering<a class="headerlink" href="#matlab-python-fir-filtering" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการเขียนโค้ดในภาษา <strong>MATLAB</strong> และ <strong>Python</strong>
+ที่ใช้ในการประมวลผลสัญญาณแบบดิจิทัลและกรองความถี่ โดยใช้ตัวกรองแบบ
+<strong>Low-Pass FIR Filter</strong> </p>
+<p><strong>Keywords</strong>: <em>Window-based FIR Filtering</em>, <em>Convolution Sum</em>, <em>MATLAB</em>, <em>Python</em></p>
+<hr />
+<h2 id="digital-filtering">&#9655; <strong>Digital Filtering</strong><a class="headerlink" href="#digital-filtering" title="Permanent link">#</a></h2>
+<p>การกรองสัญญาณแบบดิจิทัล  (<strong>Digital Filtering</strong>)
+เป็นเทคนิคการประมวลผลสัญญาณดิจิทัล (<strong>Digital Signal Processing: DSP</strong>)
+เพื่อใช้ตัดหรือแยกองค์ประกอบของสัญญาณตามช่วงความถี่ ซึ่งแบ่งเป็นสองประเภทตามหลักการทำงานของตัวกรอง คือ</p>
+<ul>
+<li><strong>FIR (Finite Impulse Response) Filter</strong></li>
+<li><strong>IIR (Infinite Impulse Response) Filter</strong></li>
+</ul>
+<p>ถ้าให้ <script type="math/tex">x[n]</script> เป็นอินพุต และ <script type="math/tex">y[n]</script> เป็นเอาต์พุตของระบบประมวลผลสัญญาณดิจิทัล 
+ความสัมพันธ์ระหว่างอินพุตและเอาต์พุตของตัวกรองสัญญาณ สามารถเขียนให้อยู่ในรูปแบบสมการที่เรียกว่า
+"สมการผลต่าง" (<strong>Difference Equation</strong>) ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ \mbox{ FIR (Non-recursive): } & \quad
+   y[n] = \sum_{m=0}^{M-1} b_m \cdot x[n-m], \; n \geq 0 \\
+ \mbox{ IIR (Recursive): } & \quad
+   y[n] = -\sum_{k=1}^{N-1} a_k \cdot y[n-k] 
+   + \sum_{m=0}^{M-1} b_m \cdot x[n-m], \; n \geq 0 \\
+\mbox{ Initial conditions: } & \quad y[-k], k=1,2,...,N-1 \\
+\end{align}</script>
+</p>
+<p>ในบทความนี้จะกล่าวถึง ตัวกรองในประเภท <strong>FIR</strong> เท่านั้น
+ตัวกรองสัญญาณดิจิทัลแบบ <strong>FIR</strong> มีผลตอบสนองอิมพัลส์  (<strong>Impulse Response</strong>)
+ที่มีความยาวหรือจำนวนสัมประสิทธิ์จำกัด และสามารถคำนวณได้ง่าย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="convolution-sum">&#9655; <strong>Convolution Sum</strong><a class="headerlink" href="#convolution-sum" title="Permanent link">#</a></h2>
+<p>กำหนดให้ <script type="math/tex">\delta[n]</script> คือ "อิมพัลส์หนึ่งหน่วย"  ซึ่งมีคุณสมบัติดังนี้
+<script type="math/tex; mode=display">
+  \delta[n] = \begin{cases}
+    1 &, \; n=0 \\
+    0 &, \; n\neq 0
+  \end{cases}
+</script>
+โดยที่ <script type="math/tex">n</script> เป็นเลขจำนวนเต็ม</p>
+<p>ถ้าให้ <script type="math/tex">T\{...\}</script> เป็นตัวดำเนินการทางคณิตศาสตร์ของระบบที่มีคุณสมบัติแบบ 
+<strong>LTI (Linear Time-Invariance)</strong> หรือ มีความเป็นเชิงเส้นและไม่แปรเปลี่ยนตามการเลื่อนเวลา
+เช่น ระบบดิจิทัลที่เป็นตัวกรองความถี่ และใช้สำหรับการแสดงความสัมพันธ์ระหว่างสัญญาณอินพุต <script type="math/tex">x[n]</script>
+กับสัญญาณเอาต์พุต <script type="math/tex">y[n]</script> ของระบบ ดังนี้
+<script type="math/tex; mode=display">
+  y[n] = T\{\, x[n] \,\} 
+</script>
+เมื่อป้อนอินพุต <script type="math/tex">x[n] = \delta[n]</script> ก็จะได้เอาต์พุต
+<script type="math/tex; mode=display">
+  y[n] = T\{\, \delta[n] \,\} = h[n]
+</script>
+ซึ่งโดยนิยาม <script type="math/tex">h[n]</script> เรียกว่า ผลตอบสนองอิมพัลส์หนึ่งหน่วย</p>
+<p>สัญญาณ <script type="math/tex">x[n]</script> สามารถเขียนให้อยู่ในรูปของผลรวมอนันต์ดังนี้
+<script type="math/tex; mode=display">
+   x[n] = \sum_{k=-\infty}^{\infty} x[k]\cdot \delta[n-k]
+</script>
+</p>
+<p>ถ้ากำหนดให้ <script type="math/tex">h[n]</script> คือ ผลตอบสนองอิมพัลส์หนึ่งหน่วย 
+ดังนั้นจึงได้ผลลัพธ์หรือเอาต์พุตของระบบ คือ <script type="math/tex">y[n]</script> ซึ่งเป็นไปตามความสัมพันธ์ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+   y[n] &= T\{\, x[n] \,\} \\
+   &= T\{\, \sum_{k=-\infty}^{\infty} x[k]\cdot \delta[n-k] \,\} \\
+   &= \sum_{k=-\infty}^{\infty} T\{\, x[k]\cdot \delta[n-k] \,\} \\
+   &= \sum_{k=-\infty}^{\infty} x[k]\cdot T\{\, \delta[n-k] \,\} \\
+   &= \sum_{k=-\infty}^{\infty} x[k]\cdot h[n-k] = x[n] * h[n]\\
+\end{align}</script>
+และการคำนวณในลักษณะนี้ว่า ผลรวมคอนโวลูชันระหว่าง <strong>x[n]</strong> กับ <strong>h[n]</strong> โดยที่สัญลักษณ์
+<code>*</code> หมายถึง ผลรวมคอนโวลูชัน (<strong>Convolution Sum</strong>)</p>
+<p>ผลรวมคอนโวลูชัน มีคุณสมบัติการสลับที่ (<strong>Commutative Property</strong>) ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  y[n] &= x[n]*h[n] \\
+       &= \sum_{k=-\infty}^{\infty} x[k]\cdot h[n-k] \\
+       &= \sum_{m=-\infty}^{\infty} x[n-m]\cdot h[n-(n-m)] \quad \mbox{ (replace $k$ with $n-m$)} \\
+       &= \sum_{m=-\infty}^{\infty} h[m]\cdot x[n-m] \\
+       &= \sum_{k=-\infty}^{\infty} h[k]\cdot x[n-k] \quad \mbox{ (replace $m$ with $k$)} \\
+       &= h[n]*x[n]
+\end{align}</script>
+</p>
+<p>ถ้ากำหนดให้ <script type="math/tex">h[n]</script> มีความยาวจำกัดเท่ากับ <script type="math/tex">M > 0</script> และให้ <script type="math/tex">h[n] = 0</script> ถ้า <script type="math/tex">M < 0</script>
+หรือ <script type="math/tex">n \geq M</script> ดังนั้น</p>
+<p>
+<script type="math/tex; mode=display">
+  y[n] = h[n]*x[n] = \sum_{m=0}^{M-1} h[m]\cdot x[n-m] 
+</script>
+</p>
+<p>รูปแบบการคำนวณในลักษณะนี้ ตรงกับการทำงานของตัวกรองดิจิทัลแบบ <strong>FIR</strong>
+และคุณสมบัติของตัวกรอง จะขึ้นอยู่กับการกำหนดค่าสัมประสิทธิ์ของตัวกรอง (<strong>Filter Coefficients</strong>): 
+<script type="math/tex">h[0], h[1], ..., h[M-1]</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="matlab">&#9655; <strong>ตัวอย่างการเขียนโค้ด MATLAB</strong><a class="headerlink" href="#matlab" title="Permanent link">#</a></h2>
+<p>ถัดเป็นตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> โดยแบ่งเป็นขั้นตอนดังนี้</p>
+<ol>
+<li>กำหนดพารามิเตอร์สำหรับการวิเคราะห์สัญญาณอินพุตที่มีคาบเวลา
+โดยยกตัวอย่าง สัญญาณอินพุตที่ได้จากผลรวมของสัญญาณรูปคลื่นไซน์ที่มีความถี่เป็นจำนวนเท่าของ <code>freq</code>
+เช่น <strong>100Hz</strong> (ความถี่มูลฐาน)</li>
+<li>ทำขั้นตอนการชักตัวอย่างสัญญาณอินพุตด้วยความถี่ <code>Fs</code> เช่น <strong>4000Hz</strong>
+และจำนวนของข้อมูลที่ได้จากการชักตัวอย่างคือ <code>N_samples</code> เช่น <strong>256</strong></li>
+<li>สร้างอาร์เรย์ค่าคงที่ตามรูปแบบของฟังก์ชัน <strong>Windowing Function</strong>
+(เช่น เลือกตามรูปแบบของ <strong>Hamming</strong> หรือ <strong>Hann</strong>)</li>
+<li>ทำขั้นตอน <strong>Signal Windowing</strong> สำหรับข้อมูลอินพุต</li>
+<li>แสดงรูปกราฟของข้อมูลอินพุตและผลลัพธ์จากการทำขั้นตอน <strong>Signal Windowing</strong> จากขั้นตอนที่ 4</li>
+<li>ทำการแปลง <strong>FFT (Fast-Fourier Transform)</strong> สำหรับข้อมูลอินพุตที่ได้จากขั้นตอนที่ 5
+แล้วแสดงกราฟสเปกตรัมขนาดของสัญญาณ (<strong>Magnitude Spectrum</strong>)</li>
+</ol>
+<pre><code class="language-matlab">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% clear variables, clear the command window, clear figures
+clearvars; clc; clf;
+% Step 1) Define some parameters.
+freq = 100;  % The fundamental frequency of the sine wave (in Hz)
+Fs   = 4000; % The sampling rate (in Hz)
+N_samples = 256; % Number of samples
+ts   = 0:1/Fs:(N_samples-1)/Fs; % Define an array of time steps
+% Step 2) Generate the input signal.
+% of different harmonic frequencies.
+x_input = zeros(1,N_samples);
+omega = 2*pi*freq;
+K=11;
+for k=1:2:K
+    x_input = x_input + 4/(pi*k) * sin((k*omega)*ts);
+end
+
+% Step 3) Define a windowing function.
+% window = ones(N_samples,1);  % Rectangular window
+% window = hamming(N_samples); % Hamming window
+window = hann(N_samples);      % Hann window
+
+% Step 4) Apply the windowing function to the input signal.
+x_input_windowed = x_input .* window';
+
+% Step 5) Plot the sampled data.
+figure('Position',[100,100,1000,400]);
+hold on;
+plot( ts, x_input );
+title( 'Input signal');
+hold off;
+xlabel('Time (s)'), ylabel('Amplitude');
+title('Sampled Input Signal'), grid on;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 6) Create FFT-based Frequency Spectrum.
+% Create frequency steps for the frequency axis.
+frequencies = (0:N_samples-1) * (Fs/N_samples);
+% Compute the FFT.
+fft_result = fft(x_input_windowed);
+% Normalize by number of samples.
+magnitude_spectrum = abs(fft_result)/N_samples; 
+% Plot the FFT result.
+figure('Position',[100,100,1000,400]);
+plot(frequencies, magnitude_spectrum);
+title('Frequency Domain Representation (FFT)');
+xlabel('Frequency (Hz)'), ylabel('Magnitude');
+xlim([0, Fs/2]), grid on;
+</code></pre>
+<p><img alt="" src="input_signal-1.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณอินพุตเพื่อนำไปใช้ในการแปลงสัญญาณด้วย <strong>FFT</strong></p>
+<p><img alt="" src="input_signal_fft-1.png" /></p>
+<p>รูป: สเปกตรัมความถี่ซึ่งได้จากการแปลงสัญญาณด้วย <strong>FFT</strong>
+ที่แยกให้เห็นองค์ประกอบของสัญญาณอินพุตตามความถี่</p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นการสร้างสัญญาณอินพุตอีกตัวอย่างหนึ่ง และมีการชักตัวอย่าง
+โดยให้สัญญาณอินพุตได้จากผลรวมของสัญญาณไซน์ที่มีความถี่ เช่น 
+{<strong>100Hz</strong>, <strong>300Hz</strong> และ <strong>500Hz</strong>}
+และมีแอมพลิจูดแตกต่างกัน (ลดลงตามลำดับความถี่)</p>
+<p>เมื่อสร้างสัญญาณอินพุตแล้ว ถัดไปจึงสร้างตัวกรองแบบ <strong>Low-Pass FIR Filter</strong>
+โดยใช้คำสั่ง <a href="https://www.mathworks.com/help/signal/ref/fir1.html"><code>fir1()</code></a> ของ <strong>MATLAB</strong>
+โดยจะต้องมีการกำหนดจำนวนสัมประสิทธิ์ของตัวกรอง
+และความถี่ <strong>Cutoff Frequency</strong> (กำหนดค่าเป็น
+<strong>Normalized Cutoff Frequency</strong> เทียบกับความถี่ของการชักตัวอย่าง)</p>
+<p>ข้อสังเกต: <strong>MATLAB</strong> มีเครื่องมือในการช่วยออกแบบตัวกรองความถี่
+(<a href="https://www.mathworks.com/help/signal/ref/filterdesigner-app.html"><strong>MATLAB Filter Design</strong></a>)
+ผู้ใช้สามารถกำหนดคุณสมบัติต่าง ๆ ของตัวกรองที่ต้องการ
+เช่น ประเภทของตัวกรอง ผลตอบสนองทางความถี่ ความกว้างของช่วงเปลี่ยนผ่านความถี่
+และจำนวนของสัมประสิทธิ์ที่ต้องการใช้ เป็นต้น</p>
+<p>สำหรับตัวอย่างนี้ ได้ตั้งค่าให้เป็นสองเท่าของความถี่ <strong>100Hz</strong> ของสัญญาณอินพุต
+ดังนั้นถ้าใช้ตัวกรองนี้กับสัญญาณอินพุต องค์ประกอบเชิงความถี่ในสัญญาณอินพุตที่สูงกว่า
+<strong>200Hz</strong> จะถูกกรองทิ้งไป</p>
+<p>การหาเอาต์พุตที่ได้จากการนำอินพุตที่ผ่านตัวกรอง มีตัวอย่าง 2 วิธีการ วิธีแรกคือ
+ใช้คำสั่ง <a href="https://www.mathworks.com/help/matlab/ref/filter.html"><code>filter()</code></a> ของ <strong>MATLAB</strong> และอีกวิธีหนึ่งคือ
+การคำนวณผลรวมคอนโวลูชันระหว่างสัญญาณอินพุตกับผลตอบสนองอิมพัลส์ของตัวกรอง</p>
+<p>สัญญาณเอาต์พุตที่ได้จากการกรองให้ความถี่ต่ำผ่าน จะถูกนำไปแสดงเป็นรูปกราฟคลื่นสัญญาณ
+รวมถึงการแสดงสเปกตรัมขนาดของสัญญาณเอาต์พุตด้วย เพื่อง่ายต่อการตรวจสอบ
+นอกจากนั้นแล้ว ยังมีการคำนวณเพื่อหาค่าความถี่ในสเปกตรัม ในตำแหน่งที่มีขนาดของสัญญาณเอาต์พุตมากที่สุด</p>
+<pre><code class="language-matlab">% clear variables, clear the command window, clear figures
+clearvars; clc; clf; close all;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 1) 
+% Define the parameter and generate the input signal.
+freq = 100;      % The fundamental frequency of the input (in Hz)
+Fs   = 4000;     % The Sampling rate (in Hz)
+N_samples = 512; % Number of samples
+% Define an array of time steps
+ts = 0:1/Fs:(N_samples-1)/Fs; 
+% Generate the input waveform consisting of 3 sine-wave signals.
+% of different frequencies.
+omega = 2*pi*freq;
+x_input = sin( omega * ts ) ... 
+             + (1/3)*sin( 3*omega*ts ) ...
+             + (1/5)*sin( 5*omega*ts );
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 2)
+% Use MATLAB Filter Designer to create a low-pass FIR filter.
+% with a cutoff frequency (normalized frequency).
+N_ORDERS = 64;    % Set the FIR Filter order.
+Wn = (2*freq/Fs); % Set the normalized cutoff frequency.
+% Generate filter coefficients for a low-pass FIR filter.
+b = fir1( N_ORDERS, Wn, 'low' );
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 3)
+% Apply the FIR filter to the windowded input signal.
+y_output1 = filter(b, 1, x_input);
+% The b array represents the numerator coefficients and 
+% 1 represents the denominator coefficients of the filter's
+% transfer function.
+% For FIR filters, the denominator coefficients are always 1.
+
+M = length(b);
+x_input_padded = [zeros(1,M),x_input];
+N = length(x_input_padded);
+y_output2 = zeros(1,N);
+% Apply the filter using convolution sum.
+for i=M:N
+    y_output2(i) = sum(b .* x_input_padded(i:-1:i-M+1));
+end
+y_output2 = y_output2(M:N-1);
+y_output  = y_output1; 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 4) Plot the input and filtered signals.
+figure('Position',[100,100,1000,600]);
+subplot(3, 1, 1);
+plot(ts, x_input);
+title('Input Signal');
+xlabel('Time (s)'), ylabel('Amplitude'), grid on;
+subplot(3, 1, 2);
+plot(ts, y_output1);
+title('Filtered Output Signal (1)');
+xlabel('Time (s)'), ylabel('Amplitude'), grid on;
+subplot(3, 1, 3);
+plot(ts, y_output2);
+title('Filtered Output Signal (2)');
+xlabel('Time (s)'), ylabel('Amplitude'), grid on;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 5) Plot the FFT result.
+% Create frequency steps for the frequency axis
+frequencies = (0:N_samples-1) * (Fs/N_samples);
+% Compute the FFT
+fft_result = fft( y_output .* hamming(N_samples)' );  
+% Normalize by number of samples
+magnitude_spectrum = abs(fft_result)/N_samples; 
+figure('Position',[100,100,1000,400]);
+plot(frequencies, magnitude_spectrum);
+title('Frequency Domain Representation (FFT)');
+xlabel('Frequency (Hz)'),ylabel('Magnitude');
+xlim([0, Fs/2]), grid on;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Step 6) Find the dominant frequency.
+[~, index] = max(abs(fft_result));
+dominant_freq = frequencies(index);
+fprintf('Dominant Frequency: %.2f Hz\n', dominant_freq);
+% output: 101.56Hz
+
+% Count the number of zero-crossings.
+zero_crossings = length(find(diff(sign(y_output))));
+freq = (zero_crossings/2)/(N_samples/Fs);
+fprintf('Estimated Frequency: %.2f Hz\n', freq);
+% output: 99.61 Hz
+</code></pre>
+<p><img alt="" src="input_output_signal-2.png" /></p>
+<p>รูป: สัญญาณอินพุตและเอาต์พุตที่ได้จากการผ่านตัวกรอง </p>
+<p><img alt="" src="filtered_signal_fft.png" /></p>
+<p>รูป: สเปกตรัมที่ได้จากการแปลง <strong>FFT</strong> ของสัญญาณเอาต์พุต </p>
+<p>จากรูปกราฟ จะเห็นว่า องค์ประกอบของสัญญาณที่มีความถี่สูงกว่า <strong>200Hz</strong> ถูกกรองทิ้งไป 
+เหลือแต่องค์ประกอบของสัญญาณที่มีความถี่ <strong>100Hz</strong> เท่านั้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; <strong>ตัวอย่างการเขียนโค้ด Python</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อเปรียบเทียบกับโค้ด <strong>MATLAB</strong>
+ซึ่งเหมาะสำหรับกรณีที่ผู้ใช้ไม่มีลิขสิทธิ์การใช้งานซอฟต์แวร์หรือไม่สะดวกใช้ <strong>MATLAB</strong></p>
+<pre><code class="language-python">import numpy as np
+from scipy.signal import firwin, lfilter
+import matplotlib.pyplot as plt
+
+# Step 1: Generate the input signal
+freq = 100   # The fundamental frequency of the input (in Hz)
+Fs = 4000    # The Sampling rate (in Hz)
+N_samples = 512  # Number of samples
+ts = np.arange(0, N_samples) / Fs
+
+omega = 2 * np.pi * freq
+x_input = (np.sin(omega*ts) 
+           + (1/3)*np.sin(3*omega*ts) 
+           + (1/5)*np.sin(5*omega*ts))
+
+# Step 2: Create a low-pass FIR filter
+N_ORDERS = 64   # Set the FIR Filter order.
+Wn = 2*freq/Fs  # Set the normalized cutoff frequency.
+b = firwin(N_ORDERS, Wn, window='hamming')
+
+# Step 3: Apply the FIR filter to the input signal.
+# Method 1) Use the scipy.signal.lfilter() function for filtering.
+y_output1 = lfilter(b, 1, x_input)
+# b: The numerator coefficients a
+# a: The denominator coefficients of the filter's transfer function. 
+# For FIR filters, a=1 (no feedback).
+M = len(b)
+x_input_padded = np.concatenate((np.zeros(M), x_input))
+N = len(x_input_padded)
+# Method 2) Compute the output using convolution sum.
+y_output2 = np.zeros(N)
+for i in range(M,N):
+    y_output2[i] = np.sum(b * x_input_padded[i:i-M:-1])
+# Remove the first M values from the output.
+y_output2 = y_output2[M:N] 
+y_output = y_output1 # Select the output
+
+# Step 4: Plot the input and filtered signals
+plt.figure(figsize=(10, 6))
+plt.subplot(3, 1, 1)
+plt.plot(ts, x_input)
+plt.title('Input Signal')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.grid(True)
+plt.subplot(3, 1, 2)
+plt.plot(ts, y_output1)
+plt.title('Filtered Output Signal (1)')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.grid(True)
+plt.subplot(3, 1, 3)
+plt.plot(ts, y_output2)
+plt.title('Filtered Output Signal (2)')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.grid(True)
+plt.subplots_adjust(left=0.1, right=0.9, top=0.9, 
+                    bottom=0.1, wspace=0.2, hspace=0.75)
+plt.show()
+
+# Step 5: Plot the FFT result
+frequencies = np.arange(N_samples)*(Fs/N_samples)
+fft_result = np.fft.fft(y_output * np.hamming(N_samples))
+magnitude_spectrum = np.abs(fft_result)/N_samples
+plt.figure(figsize=(10, 4))
+plt.plot(frequencies, magnitude_spectrum)
+plt.title('Frequency Domain Representation (FFT)')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude')
+plt.xlim(0, Fs / 2)
+plt.grid(True)
+plt.show()
+
+# Step 6: Find the dominant frequency
+index = np.argmax(np.abs(fft_result))
+dominant_freq = frequencies[index]
+print(f'Dominant Frequency: {dominant_freq:.2f} Hz')
+
+zero_crossings = len(np.where(np.diff(np.sign(y_output)))[0])
+freq = (zero_crossings/2)/(N_samples/Fs)
+print(f'Estimated Frequency: {freq:.2f} Hz')
+</code></pre>
+<p><img alt="" src="python_plots.png" /></p>
+<p>รูป: ตัวอย่างการแสดงรูปกราฟด้วย <strong>Python</strong></p>
+<p>&nbsp;</p>
+<p>อีกตัวอย่างหนึ่งเป็นโค้ด <strong>Python</strong> เพื่อใช้ในการแสดงผลตอบสนองเชิงความถี่ของตัวกรอง 
+(<strong>Filter's Frequency Response</strong>)</p>
+<pre><code class="language-python">from scipy.signal import lfilter, freqz
+
+# Note: use the filter coefficients (a,b) from the previous code.
+
+# Compute the frequency response of the filter using freqz
+w, h = freqz(b, a=1)
+# w: An array of angular frequencies ranging from 0 to pi (radians/sample).
+# h: An array of complex values representing the freq. response of the filter.
+
+# Extract the magnitude of the frequency response.
+magnitude = np.abs(h)
+# Plot the magnitude response.
+real_frequencies = (w/(2*np.pi))*Fs
+plt.figure(figsize=(9,4))
+plt.plot(real_frequencies, magnitude)
+plt.title('Magnitude Response of the Filter')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude')
+plt.grid(True)
+plt.show()
+
+# Calculate custom x-axis values as integer multiples of pi/N_STEPS.
+N_STEPS = 5
+x_steps = np.arange(0,N_STEPS+1)
+custom_ticks = np.pi*x_steps/N_STEPS
+custom_labels = [f'({x}/{N_STEPS})$\pi$' for x in x_steps[:-1]]
+custom_labels[0] = '0'
+custom_labels.append( '$\pi$' )
+# Plot the magnitude response with custom x-axis labels.
+plt.figure(figsize=(9,4))
+plt.plot(w, magnitude)
+plt.title('Magnitude Response of the Filter')
+plt.xlabel('Frequency (radians/sample)')
+plt.ylabel('Magnitude')
+plt.grid(True)
+# Set the custom x-axis labels
+plt.xticks(custom_ticks, custom_labels)
+plt.show()
+</code></pre>
+<p><img alt="" src="python_filter_freq_response.png" /></p>
+<p>รูป: ตอบสนองเชิงความถี่ของตัวกรอง </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอ หลักการทำงานของตัวกรองความถี่ ซึ่งใช้วิธีการประมวลผลข้อมูลแบบดิจิทัล (<strong>Digital Filters</strong>)
+และมีตัวอย่างโค้ดสำหรับ <strong>MATLAB</strong> และ <strong>Python</strong> เพื่อสาธิตการทำขั้นตอนการกรองสัญญาณดิจิทัล
+และเป็นตัวกรองแบบความถี่ต่ำผ่านได้ </p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-10-17 | Last Updated: 2023-10-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
