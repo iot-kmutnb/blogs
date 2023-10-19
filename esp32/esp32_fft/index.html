@@ -99,6 +99,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-fft-with-tft-lcd-demo" class="nav-link">&#9655; ESP32 FFT with TFT LCD Demo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -327,6 +331,148 @@ void fft() {
 <p>รูป: ตัวอย่างข้อความเอาต์พุตแสดงสเปกตรัมสำหรับสัญญาณ
 เกิดจากผลรวมของสัญญาณไซน์ที่ความถี่  <strong>1kHz</strong> และ <strong>3kHz</strong>
 (และมีการเพิ่มสัญญาณรบกวน)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-fft-with-tft-lcd-demo">&#9655; <strong>ESP32 FFT with TFT LCD Demo</strong><a class="headerlink" href="#esp32-fft-with-tft-lcd-demo" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นอีกหนึ่งตัวอย่างสาธิตการแสดงสเปกตรัมของสัญญาณอินพุตที่ได้จากการแปลง <strong>FFT</strong>
+และจำลองการทำงานโดยใช้ <strong>WokWi Simulator</strong></p>
+<pre><code class="language-c">#include &quot;esp_dsp.h&quot; // Include the  Espressif's ESP-DSP library.
+
+#include &quot;SPI.h&quot;
+#include &quot;Adafruit_GFX.h&quot;
+#include &quot;Adafruit_ILI9341.h&quot;
+// https://github.com/adafruit/Adafruit_ILI9341
+
+//----------------------------------------------------------------
+#define TFT_DC   (2)
+#define TFT_RES  (4)
+#define TFT_CS   (15)
+// SCK / SCK  -&gt; GPIO 18
+// SDA / MOSI -&gt; GPIO 23
+
+#define SPI_SPEED     (10000000)
+#define BLACK_COLOR    (ILI9341_BLACK)
+#define RED_COLOR      (ILI9341_RED)
+#define GREEN_COLOR    (ILI9341_GREEN)
+#define SCREEN_WIDTH   (ILI9341_TFTWIDTH)
+#define SCREEN_HEIGHT  (ILI9341_TFTHEIGHT)
+
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RES);
+
+//----------------------------------------------------------------
+
+uint32_t Fs   = 8000;  // Sampling frequency (Hz)
+uint32_t freq = 1000;  // Signal frequency (Hz)
+
+const uint32_t N = 512;
+float samples[N];    // Array of samples
+float wind_cf[N];    // Array of window coefficients
+float y_cf[2*N];     // Array of working complex values
+float y_result[N/2]; // FFT  result
+
+void setup() {
+  Serial.begin(115200);
+  tft.begin();
+  tft.setRotation(1);
+  tft.fillScreen(BLACK_COLOR);
+  tft.setTextColor(RED_COLOR);
+  tft.setTextSize(2);
+  drawCentreString( &quot;Spectrum&quot;, 0, 4 );
+  initFFT();
+}
+
+void loop() {
+  createSamples(); // Create input samples.
+  fft();           // Perform FFT.
+  delay(2000);
+}
+
+void createSamples() {
+  for (uint32_t i=0; i &lt; N; i++) {
+    float noise = 0.0f;
+    //noise = (float)random(0, 100) / 1000.0;
+    samples[i] = 0.5*sin(2*PI*freq*i/Fs)
+               + 0.02*sin(2*PI*3*freq*i/Fs)
+               + noise;
+  }
+}
+
+void initFFT() {
+    esp_err_t ret;
+    // Initializez the ESP32-DSP radix-2 FFT routine.
+    // Initialize the coefficients table for complex FFT calculation.
+    ret = dsps_fft2r_init_fc32( NULL/*use internal buffer*/,
+                                CONFIG_DSP_MAX_FFT_SIZE );
+    if (ret != ESP_OK) {
+      Serial.printf( &quot;Not possible to initialize FFT. Error = %i&quot;, ret );
+      return;
+    }
+    // Generate the coefficients of the Hann window.
+    dsps_wind_hann_f32( wind_cf, N );
+}
+
+void showSpectrum(const float *data, int len, int step, float scale ) {
+  int w= 2;
+  int y_offset = 40;
+  int x_offset = (tft.width()-len/step*w)/2;
+  tft.fillRect( x_offset, y_offset,
+                tft.width()-2*x_offset, tft.height()-5, GREEN_COLOR );
+  for (int i=0; i &lt; len; i+=step) {
+       int value = (int)(scale*(data[i] - 30));
+       int h= value;
+       int x= x_offset + (i/step)*w;
+       int y= y_offset - h;
+       tft.fillRect(x, y, w, h, BLACK_COLOR );
+  }
+}
+
+void fft() {
+    // Convert two input vectors to one complex vector.
+    for (int i=0 ; i &lt; N ; i++) {
+      y_cf[i*2 + 0] = samples[i] * wind_cf[i]; // Re[..]
+      y_cf[i*2 + 1] = 0; // Im[..]
+    }
+
+    uint32_t start_cyc = dsp_get_cpu_cycle_count();
+    // FFT
+    // y_cf = Re[0], Im[0], … Re[N-1], Im[N-1] as input data.
+    // The result of FFT will be stored to this array.
+    dsps_fft2r_fc32( y_cf, N );
+    // Bit reverse 
+    dsps_bit_rev_fc32( y_cf, N );
+    // Convert one complex vector to two complex vectors
+    dsps_cplx2reC_fc32( y_cf, N );
+
+    uint32_t stop_cyc = dsp_get_cpu_cycle_count();
+    uint32_t cyc_diff = stop_cyc - start_cyc;
+    uint32_t time_diff_us = cyc_diff/ESP.getCpuFreqMHz();
+
+    float re, im;
+    for ( uint32_t i=0 ; i &lt; N/2; i++) {
+      re = y_cf[i*2];
+      im = y_cf[i*2 + 1];
+      y_result[i] = 10 * log10f( (re*re + im*im)/N );
+    }
+    // Show spectrum in w x h window from 0..N/2 samples.
+    Serial.println(&quot;FFT-based Magnitude Spectrum of Signal&quot;);
+   // dsps_view( y_result, N/2, 40/*width*/, 10/*height*/,
+   //            -40/*min*/, 60/*max*/, '|');
+    showSpectrum( y_result, N/2, 2, 1.0 );
+    Serial.printf( &quot;%lu-point FFT exec time: %lu cycles\n&quot;, N, cyc_diff );
+    Serial.printf( &quot;Time diff: %lu usec\n\n&quot;, time_diff_us );
+    delay(2000);
+}
+
+void drawCentreString(const char *buf, int xpos, int ypos) {
+    int16_t _x, _y;
+    uint16_t _w, _h;
+    tft.getTextBounds(buf, xpos, ypos, &amp;_x, &amp;_y, &amp;_w, &amp;_h);
+    tft.setCursor( xpos + (tft.width() - _w)/2, ypos + _h/2 );
+    tft.print(buf);
+}
+</code></pre>
+<p><img alt="" src="wokwi_esp32_fft_tft.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงาน</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
