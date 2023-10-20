@@ -440,6 +440,9 @@ void loop() {
 เมื่อครบหนึ่งแถวแล้วจึงขึ้นแถวใหม่ไปตามลำดับ และเมื่อพิกเซลในทุกตำแหน่งเป็น <strong>ON</strong> แล้ว
 จึงทำขั้นตอนซ้ำโดยเปลี่ยนเป็น <strong>OFF</strong> ไปตามลำดับ</p>
 <pre><code class="language-c">#include &lt;SPI.h&gt;
+
+#define USE_FC16
+
 // SPI Pins for ESP32
 const int SCK_PIN  = 18;  // SPI SCK
 const int MOSI_PIN = 23;  // SPI MOSI
@@ -501,18 +504,27 @@ void max7219_update( uint8_t *data ) {
 void max7219_init() {
   max7219_write(0xf, 0); // Disable test mode
   max7219_write(0xb, 7); // Set scanlines to 8
+  max7219_write(0xa, 7); // Set intensity to 7
   max7219_clear();
   max7219_write(0xc, 1); // Enable display
 }
 
 void max7219_set_pixel( int r, int c, uint8_t b ) {
-// 4  bytes x 8 rows
   uint8_t *p = &amp;pixels[(c/8) + r*NUM_DEVICES];
+
+#ifdef USE_FC16
+  if (b) {
+    *p |= 1&lt;&lt;(7-c%8);
+  } else {
+   *p &amp;= ~(1&lt;&lt;(7-c%8));
+  }
+#else
   if (b) {
     *p |= 1&lt;&lt;(c%8);
   } else {
    *p &amp;= ~(1&lt;&lt;(c%8));
   }
+#endif
 }
 </code></pre>
 <p><img alt="" src="max7219_4x_esp32.png" /></p>
@@ -530,7 +542,7 @@ void max7219_set_pixel( int r, int c, uint8_t b ) {
       &quot;id&quot;: &quot;matrix1&quot;,
       &quot;top&quot;: -20,
       &quot;left&quot;: -155,
-      &quot;attrs&quot;: { &quot;chain&quot;: &quot;4&quot; }
+      &quot;attrs&quot;: { &quot;chain&quot;: &quot;4&quot;, &quot;layout&quot;: &quot;fc16&quot; }
     }
   ],
   &quot;connections&quot;: [
@@ -545,6 +557,8 @@ void max7219_set_pixel( int r, int c, uint8_t b ) {
   &quot;dependencies&quot;: {}
 }
 </code></pre>
+<p><img alt="" src="esp32_max7219_red_4x.jpg" /></p>
+<p>รูป: ตัวอย่างการทดลองกับอุปกรณ์จริง</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -553,7 +567,7 @@ void max7219_set_pixel( int r, int c, uint8_t b ) {
 <strong>Arduino</strong> เพื่อสาธิตการทำงานในเบื้องต้น </p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-09-30 | Last Updated: 2023-10-18</p></div>
+<p>Created: 2023-09-30 | Last Updated: 2023-10-19</p></div>
             </div>
         </div>
 
