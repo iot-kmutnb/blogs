@@ -146,6 +146,10 @@
 </ul>
 <p>สำหรับการทดสอบโค้ดโดยใช้ฮาร์ดแวร์จริง ได้เลือกใช้บอร์ด <strong>WeMos LOLIN32 Lite</strong>
 ซึ่งเป็นบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> ที่มีราคาไม่แพง </p>
+<p><strong>ข้อสังเกต</strong>: เนื่องจาก <strong>Arduino-ESP32 Core</strong> มีหลายเวอร์ชัน เช่น <strong>v2.0.x</strong>
+และในขณะที่อัปเดตบทความนี้ ได้มีการพัฒนาเวอร์ชัน <strong>v3.0.x</strong> ซึ่งใหม่กว่า และมีเปลี่ยนแปลงในส่วนของ <strong>API</strong>
+และฟังก์ชันต่าง ๆ ที่เกี่ยวข้องกับการใช้งานวงจรภายใน โดยอ้างอิงฟังก์ชันการทำงานของ <strong>ESP-IDF v5.1</strong> (หรือสูงกว่า)
+รูปแบบการเขียนโค้ดจึงแตกต่างจากแบบเดิม ดังนั้นโค้ดตัวอย่างจึงแบ่งสองกรณี และแนะนำให้ปรับเปลี่ยนไปใช้เวอร์ชันใหม่กว่าในอนาคต</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="ticker-based-pulse-generation">&#9655; <strong>Ticker-based Pulse Generation</strong><a class="headerlink" href="#ticker-based-pulse-generation" title="Permanent link">#</a></h2>
@@ -160,7 +164,8 @@
 เชื่อมต่อจากขา <strong>GPIO22</strong> (เอาต์พุต) ไปยังขา <strong>GPIO5</strong> (อินพุต)
 และใช้คำสั่ง <code>pulseIn(...)</code> ของ <strong>Arduino API</strong> เพื่อวัดค่าความกว้างของพัลส์ที่ขาอินพุตดังกล่าว
 และจะได้ค่าตัวเลขในหน่วยเป็นไมโครวินาที </p>
-<pre><code class="language-c++">#include &lt;Ticker.h&gt;  // Import the Ticker library
+<pre><code class="language-c++">// This Arduino sketch works with both Arduino-ESP32 v2.0.x and v3.0.0.
+#include &lt;Ticker.h&gt;  // Import the Ticker library
 
 // Note: Connect GPIO22 (output) to GPIO5 (input)
 #define LED_PIN        (22)
@@ -174,22 +179,22 @@ void setup() {
   pinMode( INPUT_PIN, INPUT_PULLUP );
   pinMode( LED_PIN, OUTPUT ); 
 
-  // Attach a callback function (ISR) to the Ticker
+  // Attach a callback function (ISR) to the Ticker.
   ticker.attach_ms( INTERVAL_MSEC /*msec*/, ticker_callback );
 }
 
 void loop() {
-  // Measure the high pulse width of the input signal
+  // Measure the high pulse width of the input signal.
   uint32_t pw = pulseIn( INPUT_PIN /*GPIO pin*/, 
                          1 /*logic level*/,
                          1000000 /*timeout in usec*/ );
-  // Show the measured pulse width
-  Serial.printf( &quot;Pulse width: %ld usec\n&quot;, pw );
+  // Show the measured pulse width.
+  Serial.printf( &quot;Pulse width: %lu usec\n&quot;, (unsigned long) pw );
   delay(1000);
 }
 
 void ticker_callback() { // The callback function for Ticker
-  // Toggle the LED output
+  // Toggle the LED output.
   digitalWrite( LED_PIN, !digitalRead( LED_PIN ) );   
 }
 </code></pre>
@@ -216,10 +221,15 @@ void ticker_callback() { // The callback function for Ticker
 และใช้คำสั่ง  <code>timerAttachInterrupt(...)</code> เพื่อกำหนดให้ฟังก์ชันชื่อ <code>timer_isr()</code> 
 เป็นฟังก์ชัน <strong>ISR</strong> หรือ <strong>Callback Function</strong> คอยเพิ่มค่าของตัวแปรภายนอก
 <code>tick_counter</code> ครั้งละหนึ่ง เมื่อเกิดอินเทอร์รัพท์ </p>
-<pre><code class="language-c++">#define ESP_TIMER_NUMBER  (0)
+<pre><code class="language-c++">// This Arduino sketch works with both Arduino-ESP32 v2.0.x and v3.0.0.
+// https://github.com/espressif/arduino-esp32/blob/master/
+// -&gt; cores/esp32/esp32-hal-timer.h
+// -&gt; cores/esp32/esp32-hal-timer.c
+
+#define ESP_TIMER_NUMBER  (0)
 
 // Declare a global variable
-volatile uint32_t tick_counter = 0;
+static uint32_t tick_counter = 0;
 
 // Declare a variable to keep the timer struct
 hw_timer_t *timer = NULL;
@@ -236,6 +246,17 @@ void IRAM_ATTR timer_isr() {
 void setup() {
   Serial.begin(115200);
   Serial.println(&quot;\n\nESP32 Hardware Timer Demo...&quot;);
+
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  timer = timerBegin( 1000000 );
+  if (timer == NULL){
+    Serial.println(&quot;Timer init failed!!&quot;);
+  }
+  timerAlarm( timer, 1000 /*period (ticks)*/, 
+              true /*autoreload*/, 0 /*autoreload count*/ );
+  timerAttachInterrupt( timer, &amp;timer_isr );
+  timerStart( timer );
+#else
   // Use the first hardware timer (0)
   // Set prescaler to 80 -&gt; Timer frequency = 80MHz/80 (1usec per tick)
   // Note: The start will start automatically.
@@ -252,17 +273,18 @@ void setup() {
   // Reset counter value of the timer to 0
   timerWrite( timer, 0 /*value*/ );
 
-  // timerStop( timer );
-  // timerStart( timer );
-  // timerDetachInterrupt( timer );
-  // timerEnd( timer ); 
+#endif
+  //timerStop( timer );
+  //timerRestart( timer );
+  //timerDetachInterrupt( timer );
+  //timerEnd( timer );
 }
 
 void loop() {
   portENTER_CRITICAL( &amp;timer_mux );
   uint32_t value = tick_counter; // Read the current tick counter 
   portEXIT_CRITICAL( &amp;timer_mux );
-  Serial.printf( &quot;Ticks: %lu\n&quot;, value );
+  Serial.printf( &quot;Ticks: %lu\n&quot;, (unsigned long) value );
   delay(1000);
 }
 </code></pre>
@@ -273,14 +295,15 @@ void loop() {
 เพื่อใช้เป็นขาอินพุตและวัดความกว้างของพัลส์</p>
 <p>การทำงานของโค้ดตัวอย่าง จะทำให้เกิดการสลับสถานะลอจิกขา <strong>GPIO22</strong> ทุก ๆ 100 มิลลิวินาที 
 และค่าความกว้างของพัลส์สามารถวัดได้ โดยใช้คำสั่ง <code>pulseIn(...)</code></p>
-<pre><code class="language-c++">// Note: Connect GPIO22 (output) to GPIO5 (input)
+<pre><code class="language-c++">// This Arduino sketch works with both Arduino-ESP32 v2.0.x and v3.0.0.
+// Note: Connect GPIO22 (output) to GPIO5 (input)
 #define LED_PIN           (22)
 #define INPUT_PIN         (5)
 #define ESP_TIMER_NUMBER  (0)
 #define INTERVAL_MSEC     (100)
 
 // Declare a global variable
-volatile uint32_t tick_counter = 0;
+static uint32_t tick_counter = 0;
 
 // Declare a variable to keep the timer struct
 hw_timer_t *timer = NULL;
@@ -295,13 +318,19 @@ void IRAM_ATTR timer_isr() {
   }
 }
 
-void setup() {
-  Serial.begin(115200);
-  Serial.println(&quot;\n\nESP32 Hardware Timer Demo...&quot;);
-  pinMode( LED_PIN, OUTPUT );
-  pinMode( INPUT_PIN, INPUT_PULLUP );
+void initTimer() {
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  timer = timerBegin( 1000000 );
+  if (timer == NULL){
+    Serial.println(&quot;Timer init failed!!&quot;);
+  }
+  timerAlarm( timer, 1000 /*period (ticks)*/, 
+              true /*autoreload*/, 0 /*autoreload count*/ );
+  timerAttachInterrupt( timer, &amp;timer_isr );
+  timerStart( timer );
+#else
   // Use the first hardware timer (0)
-  // Set prescaler to 80 -&gt; Timer frequency = 80MHz/80 (or 1usec per tick)
+  // Set prescaler to 80 -&gt; Timer frequency = 80MHz/80 (or 1usec/tick)
   // Note: The start will start automatically.
   timer = timerBegin( ESP_TIMER_NUMBER /*timer number*/, 
                       80 /*prescaler*/, true /*count up*/ );
@@ -311,12 +340,21 @@ void setup() {
   timerAlarmWrite( timer, 1000 /*period (ticks)*/, true /*autoreload*/ );
   // Start the alarm
   timerAlarmEnable( timer );
+#endif
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;\n\nESP32 Hardware Timer Demo...&quot;);
+  pinMode( LED_PIN, OUTPUT );
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  initTimer();
 }
 
 void loop() {
   // Measure the pulse width (in usec)
   uint32_t pw = pulseIn( INPUT_PIN, 1, 1000000 );
-  Serial.printf( &quot;Pulse width: %lu usec\n&quot;, pw );
+  Serial.printf( &quot;Pulse width: %lu usec\n&quot;, (unsigned long) pw );
   delay(1000);
 }
 </code></pre>
@@ -346,12 +384,73 @@ void loop() {
 <p>วงจร <strong>RMT</strong> รองรับการมอดูเลตสัญญาณ (<strong>Signal Modulation</strong>)
 ด้วยสัญญาณพาหะ (<strong>Carrier Signal</strong>) ที่มีความถี่สูงกว่า เช่น 
 ในกรณีที่ต้องการสร้างสัญญาณสำหรับอุปกรณ์รีโมตอินฟราเรด แต่ในตัวอย่างนี้ ไม่มีการมอดูเลตสัญญาณเอาต์พุต </p>
-<pre><code class="language-c++">#include &lt;driver/rmt.h&gt; // Required for RMT
+<pre><code class="language-c++">// This Arduino sketch works with both Arduino-ESP32 v2.0.x and v3.0.0.
+// https://github.com/espressif/arduino-esp32/blob/master/
+// -&gt; cores/esp32/esp32-hal-rmt.h
+// -&gt; cores/esp32/esp32-hal-rmt.c
+
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#include &lt;driver/rmt_common.h&gt;
+#include &lt;driver/rmt_tx.h&gt;
+#include &lt;hal/rmt_types.h&gt;
+#else
+#include &lt;driver/rmt.h&gt; // Required for RMT
+#endif
 
 // Note: Connect GPIO22 (output) to GPIO5 (input)
 #define INPUT_PIN       (GPIO_NUM_5)
 #define RMT_GPIO_PIN    (GPIO_NUM_22)
 #define RMT_CHANNEL     (RMT_CHANNEL_0)
+
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+
+rmt_channel_handle_t tx_chan = NULL;
+
+const rmt_tx_channel_config_t tx_chan_config = {
+    .gpio_num = RMT_GPIO_PIN,         // GPIO number
+    .clk_src = RMT_CLK_SRC_DEFAULT,   // select source clock
+    .resolution_hz = 1 * 1000 * 1000, // 1 MHz tick resolution, i.e., 1 tick = 1 µs
+    .mem_block_symbols = 64,          // memory block size, 64 * 4 = 256 Bytes
+    .trans_queue_depth = 4,           // set the number of transactions
+    .flags = { 
+      .invert_out = false,            // do not invert output signal
+      .with_dma = false,
+      .io_loop_back = false,
+      .io_od_mode = false,
+    },
+    .intr_priority = 0,
+};
+
+const rmt_transmit_config_t tx_config = {
+  .loop_count = -1, // transmit in an infinite loop.
+  .flags = {
+     .eot_level = 0,
+  },
+};
+
+// Define the RMT item for a 1kHz square wave
+const rmt_symbol_word_t pulse_rmt_symbol = {
+  {
+    .duration0 = 500, // High pulse width in cycles 
+    .level0 = 1,      // High level 
+    .duration1 = 500, // Low pulse width in cycles
+    .level1 = 0       // Low level 
+  }
+};
+
+void initRMT( ) {
+  ESP_ERROR_CHECK( rmt_new_tx_channel(&amp;tx_chan_config, &amp;tx_chan));
+  // The functionality of a copy encoder is to copy the RMT symbols 
+  // from user space into the driver layer. 
+  rmt_encoder_handle_t copy_encoder = NULL;
+  rmt_copy_encoder_config_t copy_encoder_config = {};
+  ESP_ERROR_CHECK( rmt_new_copy_encoder(&amp;copy_encoder_config, &amp;copy_encoder) );
+  ESP_ERROR_CHECK( rmt_enable(tx_chan) );
+  ESP_ERROR_CHECK( rmt_transmit(tx_chan, copy_encoder, 
+     &amp;pulse_rmt_symbol, sizeof(pulse_rmt_symbol), &amp;tx_config) );
+}
+
+#else
 
 // Define the RMT configuration parameters
 // - The RMT clock is set to 80MHz/80 = 1MHz (1usec per cycle).
@@ -382,9 +481,7 @@ const rmt_item32_t pulse_item = {
   }}
 };
 
-void setup() {
-  Serial.begin( 115200 );
-  pinMode( INPUT_PIN, INPUT_PULLUP );
+void initRMT( ) {
   // Initialize RMT for TX mode
   ESP_ERROR_CHECK( rmt_config( &amp;rmt_tx_cfg ) );
   ESP_ERROR_CHECK( rmt_driver_install(RMT_CHANNEL, 0, 0) );
@@ -392,12 +489,21 @@ void setup() {
   rmt_write_items( RMT_CHANNEL, &amp;pulse_item, 1, true );
 }
 
+#endif
+
+
+void setup() {
+  Serial.begin( 115200 );
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  initRMT();
+}
+
 void loop() {
-  // Pulse width measurment
+  // Pulse width measurement
   uint32_t pw = pulseIn( INPUT_PIN /*GPIO pin*/, 
                          1 /*logic level: high pulse*/,
                          1000000 /* timeout in usec*/ );
-  Serial.printf( &quot;Pulse width: %ld usec\n&quot;, pw );
+  Serial.printf( &quot;Pulse width: %lu usec\n&quot;, (unsigned long) pw );
   Serial.printf( &quot;Frequency: %.3lf kHz\n&quot;, 1000.0/(2*pw) );
   delay(1000);
 }
@@ -437,40 +543,71 @@ void loop() {
 <p>ในตัวอย่างนี้ สัญญาณเอาต์พุตที่ขา <strong>GPIO22</strong> จะถูกป้อนกลับเข้าที่ขา <strong>GPIO5</strong>
 หากให้เวลานับจำนวนพัลส์ที่เกิดขึ้นในช่วงเวลา 1000 มิลลิวินาที (หรือต่อหนึ่งวินาที)
 ก็สามารถนำค่าที่ได้มาคำนวณเป็นค่าความถี่ของสัญญาณ</p>
-<pre><code class="language-c++">// Note: Connect GPIO22 (output) to GPIO5 (input)
+<pre><code class="language-c++">// This Arduino sketch works with both Arduino-ESP32 v2.0.x and v3.0.0.
+// https://github.com/espressif/arduino-esp32/blob/master/
+// -&gt; cores/esp32/esp32-hal-ledc.h
+// -&gt; cores/esp32/esp32-hal-ledc.c
+
+// Note: Connect GPIO22 (output) to GPIO5 (input)
 #define INPUT_PIN     (5)
+
 #define LEDC_GPIO_PIN (22)
 #define LEDC_CHANNEL  (0)
 #define NUM_BITS      (8)
 #define FREQ_HZ       (1000UL)
 
-volatile uint32_t count = 0; 
-uint32_t last_time_msec = 0;
+// Use a FreeRTOS mutex to protect the shared variable (tick_counter)
+portMUX_TYPE timer_mux = portMUX_INITIALIZER_UNLOCKED;
+
+static uint32_t count = 0; 
+static uint32_t last_time_msec = 0;
 
 void IRAM_ATTR pulse_isr() { // ISR to handle pulse counter events
+  portENTER_CRITICAL_ISR( &amp;timer_mux );
   count++; // Increment the pulse counter
+  portEXIT_CRITICAL_ISR( &amp;timer_mux );
 }
 
-void setup() {
-  // Initialize serial communication
-  Serial.begin( 115200 ); 
-  // Set the LED pin as an output
-  pinMode( LEDC_GPIO_PIN, OUTPUT ); 
-  // Set the input pin for the pulse counter
-  pinMode( INPUT_PIN, INPUT_PULLUP );
-  // Attach the ISR to the input pin
-  attachInterrupt( INPUT_PIN, pulse_isr, RISING ); 
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
 
+void initLEDC() {  
+  // Setup LEDC pin with given frequency and resolution.
+  ledcAttach( LEDC_GPIO_PIN, FREQ_HZ, NUM_BITS ); 
+  // Set the duty cycle for the PWM output (50%).
+  ledcWrite( LEDC_GPIO_PIN, (1&lt;&lt;(NUM_BITS-1))-1 );
+  delay(10);
+  // Read the PWM frequency.
+  Serial.printf( &quot;LEDC Freq.: %lu Hz\n&quot;, 
+                 (unsigned long) ledcReadFreq(LEDC_GPIO_PIN) );
+}
+
+#else
+
+void initLEDC() {  
   // see: cores/esp32/esp32-hal-ledc.c
   // Initialize the LEDC channel 0, use 8-bit resolution.
   ledcSetup( LEDC_CHANNEL, FREQ_HZ, NUM_BITS );  
-  // Attach the GPIO22 pin to the LEDC Channel 0
+  // Attach the GPIO22 pin to the LEDC Channel 0.
   ledcAttachPin( LEDC_GPIO_PIN, LEDC_CHANNEL ); 
-  // Set the duty cycle for the PWM output (50%)
+  // Set the duty cycle for the PWM output (50%).
   ledcWrite( LEDC_CHANNEL, (1&lt;&lt;(NUM_BITS-1))-1 );
   delay(10);
   // Read the PWM frequency.
-  Serial.printf( &quot;LEDC Freq.: %ld Hz\n&quot;, ledcReadFreq(LEDC_CHANNEL) );
+  Serial.printf( &quot;LEDC Freq.: %lu Hz\n&quot;, 
+                 (unsigned long) ledcReadFreq(LEDC_GPIO_PIN) );
+}
+#endif
+
+void setup() {
+  // Initialize serial communication.
+  Serial.begin( 115200 ); 
+  // Set the LED pin as an output.
+  pinMode( LEDC_GPIO_PIN, OUTPUT ); 
+  // Set the input pin for the pulse counter.
+  pinMode( INPUT_PIN, INPUT_PULLUP );
+  // Attach the ISR to the input pin.
+  attachInterrupt( INPUT_PIN, pulse_isr, RISING ); 
+  initLEDC();
   count = 0;
   last_time_msec = millis();
 }
@@ -478,18 +615,20 @@ void setup() {
 void loop() {
   static uint32_t saved_count;
   uint32_t now = millis();
-  if ( now - last_time_msec &gt;= 1000 ) { // print count every 1 second
+  if ( now - last_time_msec &gt;= 1000 ) { // Print count every 1 sec.
+    portENTER_CRITICAL( &amp;timer_mux );
     saved_count = count;
-    // Reset the pulse count
+    // Reset the pulse count.
     count = 0;
+    portEXIT_CRITICAL( &amp;timer_mux );
     if (saved_count &gt;= 1000 ) {
-      // Calculate the frequency in kHz
+      // Calculate the frequency in kHz.
       float frequency = saved_count/1000.0; 
-      Serial.printf(&quot;Frequency: %.3f kHz\n&quot;, frequency);
+      Serial.printf( &quot;Frequency: %.3f kHz\n&quot;, frequency );
     } else {
-      // Calculate the frequency in Hz
+      // Calculate the frequency in Hz.
       int frequency = saved_count; 
-      Serial.printf(&quot;Frequency: %d Hz\n&quot;, frequency);      
+      Serial.printf( &quot;Frequency: %d Hz\n&quot;, frequency );      
     }
     // Save the timestamp
     last_time_msec = now;
@@ -498,7 +637,7 @@ void loop() {
 </code></pre>
 <p><img alt="" src="wokwi_ledc_demo-1.png" /></p>
 <p>รูป: การจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> (สัญญาณเอาต์พุตที่มีความถี่ <strong>1kHz</strong>)</p>
-<p>การสร้างสัญญาณ <strong>PWM</strong> สำหรับ <strong>ESP32</strong> ก็อาจจะใช้คำสั่งของ <strong>Arduino API</strong> ได้ดังนี้</p>
+<p>การสร้างสัญญาณ <strong>PWM</strong> สำหรับ <strong>ESP32</strong> ก็อาจจะใช้คำสั่งของ <strong>Arduino-ESP32 API (v2.0.x)</strong> ได้ดังนี้</p>
 <pre><code class="language-c++">  // PWM frequency 1kHz
   analogWriteFrequency( 1000 );      // Frequency:  1kHz 
   analogWriteResolution( 8 );        // Resolution: 8-bit
@@ -522,7 +661,7 @@ void loop() {
 <h2 id="esp32-pulse-counter">&#9655; <strong>ESP32 Pulse Counter</strong><a class="headerlink" href="#esp32-pulse-counter" title="Permanent link">#</a></h2>
 <p>ตัวอย่างถัดไปเป็นการสาธิตการใช้งานวงจร <strong>Pulse Counter (PCNT)</strong> ของชิป <strong>ESP32</strong>
 เหมาะสำหรับการนับจำนวนพัลส์ของสัญญาณอินพุต หรือนำไปคำนวณค่าความถี่หากเป็นสัญญาณที่มีคาบ</p>
-<p>ในตัวอย่างนี้มีการสร้างและใช้ฟังก์ชันชื่อ <code>init_pcnt()</code> เพื่อตั้งค่าให้ <strong>PCNT</strong> ช่องอินพุตหมายเลข 0 
+<p>ในตัวอย่างนี้มีการสร้างและใช้ฟังก์ชันชื่อ <code>initPCNT()</code> เพื่อตั้งค่าให้ <strong>PCNT</strong> ช่องอินพุตหมายเลข 0 
 รับอินพุตจากขา <strong>GPIO22</strong> และให้ตัวนับขนาด 16 บิต ของ <strong>PCNT</strong> นับขึ้นครั้งละหนึ่ง เมื่อเกิดขอบขาขึ้น
 นอกจากนั้นแล้วยังตั้งค่าสูงสุดไว้ที่ 32767 เมื่อนับถึงค่าดังกล่าว จะทำให้เกิดอินเทอร์รัพท์
 (<strong>Overflow Interrupt</strong>) และฟังก์ชันชื่อ <code>overflow_isr()</code>
@@ -532,15 +671,8 @@ void loop() {
 และถูกนำมาใช้ในการคำนวณจำนวนพัลส์ที่เกิดขึ้น โดยจะต้องใช้ค่า <code>pcnt_overflows</code> ร่วมด้วย</p>
 <p>คำสั่งต่าง ๆ ที่เกี่ยวข้องกับการใช้งาน <strong>PCNT</strong> สามาารถดูได้จาก
 <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/pcnt.html"><strong>ESP-IDF Programming Guide - PCNT API</strong></a></p>
-<pre><code class="language-c++">#include &quot;driver/periph_ctrl.h&quot;
-#include &quot;driver/gpio.h&quot;
-#include &quot;driver/pcnt.h&quot;
-#include &quot;soc/pcnt_struct.h&quot;
-
-// Settings for PWM generation
-#define PWM_PIN             (22)
-#define PWM_FREQ            (1000000UL)
-#define NUM_BITS            (2)
+<pre><code class="language-c++">// This Arduino sketch works with both Arduino-ESP32 v2.0.x and v3.0.0.
+// https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/pcnt.html
 
 // Settings for PCNT
 #define PCNT_INPUT_PIN      (5)
@@ -548,33 +680,115 @@ void loop() {
 #define PCNT_H_LIM_VAL      (32767)
 #define PCNT_L_LIM_VAL      (0)
 
+// Settings for PWM generation
+#define PWM_PIN             (22)
+#define PWM_FREQ            (100000UL)
+#define NUM_BITS            (2)
+
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#include &quot;driver/pulse_cnt.h&quot;
+#include &quot;driver/gpio.h&quot;
+#else
+#include &quot;driver/periph_ctrl.h&quot;
+#include &quot;driver/pcnt.h&quot;
+#include &quot;soc/pcnt_struct.h&quot;
+#include &quot;driver/gpio.h&quot;
+#include &quot;driver/ledc.h&quot;
+#endif
+
 // Declare global variables
-volatile uint32_t pcnt_overflows = 0;
-pcnt_isr_handle_t pcnt_isr_handle = NULL;
-uint32_t last_time_msec = 0;
+static uint32_t pcnt_overflows = 0;
+
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+
+static pcnt_unit_handle_t    pcnt_unit = NULL;
+static pcnt_channel_handle_t pcnt_chan = NULL;
+
+// The internal hardware counter will be cleared to zero automatically 
+// when it reaches high or low limit. 
+
+static bool IRAM_ATTR pcnt_on_reach( pcnt_unit_handle_t unit, 
+  const pcnt_watch_event_data_t *edata, void *user_ctx )
+{
+  pcnt_overflows++;
+  return false;
+}
+
+void initPCNT() {
+  // Create and configure a PCNT unit.
+  pcnt_unit_config_t unit_config = {
+      .low_limit  = PCNT_L_LIM_VAL-1,
+      .high_limit = PCNT_H_LIM_VAL,
+      .flags = { .accum_count = 0 },
+  };
+  ESP_ERROR_CHECK( pcnt_new_unit(&amp;unit_config, &amp;pcnt_unit) );
+  // Set glitch filter.
+  pcnt_glitch_filter_config_t filter_config = {
+      .max_glitch_ns = 100, // Set the maximum glitch width to 100 ns.
+  };
+  ESP_ERROR_CHECK( pcnt_unit_set_glitch_filter(pcnt_unit, &amp;filter_config) );
+
+  pcnt_chan_config_t chan_config = {
+      .edge_gpio_num  = PCNT_INPUT_PIN,
+      .level_gpio_num = -1,
+  };
+  ESP_ERROR_CHECK( pcnt_new_channel(pcnt_unit, &amp;chan_config, &amp;pcnt_chan) );
+  // Set specific actions for rising and falling edge of the signal channel.
+  ESP_ERROR_CHECK( pcnt_channel_set_edge_action( pcnt_chan, 
+                    PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD) );
+  // Set specific actions for high and low level of the signal channel.
+  ESP_ERROR_CHECK( 
+    pcnt_channel_set_level_action( pcnt_chan, 
+                    PCNT_CHANNEL_LEVEL_ACTION_KEEP, PCNT_CHANNEL_LEVEL_ACTION_KEEP) );
+  // Add high limit watch point for the PCNT unit.
+  ESP_ERROR_CHECK( pcnt_unit_add_watch_point(pcnt_unit, PCNT_H_LIM_VAL));
+  // Register the callback function for the watchpoint event.
+  pcnt_event_callbacks_t cbs = {
+      .on_reach = pcnt_on_reach,
+  };
+  ESP_ERROR_CHECK( pcnt_unit_register_event_callbacks(pcnt_unit, &amp;cbs, (void *)NULL) );
+  ESP_ERROR_CHECK( pcnt_unit_clear_count(pcnt_unit) );
+  // Enable the PCNT unit.
+  ESP_ERROR_CHECK( pcnt_unit_enable(pcnt_unit) );
+  // Start the PCNT unit.
+  ESP_ERROR_CHECK( pcnt_unit_start(pcnt_unit) );
+}
+
+uint32_t readPCNT()  { 
+  int pulse_count = 0;
+  pcnt_unit_get_count( pcnt_unit, &amp;pulse_count );
+  pcnt_unit_clear_count( pcnt_unit );
+  uint32_t count = pulse_count + pcnt_overflows*(PCNT_H_LIM_VAL);
+  Serial.printf(&quot;overflows : %lu\n&quot;, pcnt_overflows );
+  pcnt_overflows = 0; 
+  return count;
+}
+
+#else
 
 //------------------------------------------------------------------------------------
 void IRAM_ATTR overflow_isr(void *arg) {
-  PCNT.int_clr.val = BIT( PCNT_UNIT ); 
-  //pcnt_counter_clear( PCNT_UNIT );
-  pcnt_overflows++;
-}  
+  PCNT.int_clr.val =  BIT( PCNT_UNIT ); // Clear PCNT interrupt first.
+  pcnt_counter_clear( PCNT_UNIT ); // Clear the PCNT counter.
+  pcnt_overflows++; // Increment the overflow count.
+} 
 
 //------------------------------------------------------------
-void init_pcnt() {
-  // Configure the PCNT Channel 0 to operate in count-up mode
+void initPCNT() {
+  static pcnt_isr_handle_t pcnt_isr_handle = NULL;
+  // Configure the PCNT Channel 0 to operate in count-up mode.
   pcnt_config_t pcnt_config; 
   pcnt_config.pulse_gpio_num = PCNT_INPUT_PIN;
-  pcnt_config.ctrl_gpio_num = -1;
+  pcnt_config.ctrl_gpio_num  = -1;
   pcnt_config.hctrl_mode = PCNT_MODE_KEEP;
   pcnt_config.lctrl_mode = PCNT_MODE_KEEP;
   pcnt_config.counter_h_lim = PCNT_H_LIM_VAL; 
-  pcnt_config.counter_l_lim = PCNT_L_LIM_VAL; 
+  pcnt_config.counter_l_lim = PCNT_L_LIM_VAL-1; 
   pcnt_config.pos_mode = PCNT_COUNT_INC;
   pcnt_config.neg_mode = PCNT_COUNT_DIS;
-  pcnt_config.unit = PCNT_UNIT; 
-  pcnt_config.channel = PCNT_CHANNEL_0; 
-  pcnt_unit_config( &amp;pcnt_config ); 
+  pcnt_config.unit     = PCNT_UNIT; 
+  pcnt_config.channel  = PCNT_CHANNEL_0; 
+  ESP_ERROR_CHECK( pcnt_unit_config( &amp;pcnt_config ) ); 
 
   // Configure the PCNT filter
   pcnt_set_filter_value( PCNT_UNIT, 2 );
@@ -583,47 +797,64 @@ void init_pcnt() {
   // Attach an ISR function to the PCNT interrupt
   pcnt_counter_pause( PCNT_UNIT );
   pcnt_counter_clear( PCNT_UNIT );
-  pcnt_event_enable( PCNT_UNIT, PCNT_EVT_H_LIM );
   pcnt_isr_register( overflow_isr, NULL, 0, &amp;pcnt_isr_handle ); 
+  pcnt_event_enable( PCNT_UNIT, PCNT_EVT_H_LIM );
   pcnt_intr_enable( PCNT_UNIT );
   pcnt_counter_resume( PCNT_UNIT );
 }
 
 //------------------------------------------------------------
-uint32_t read_pcnt()  { 
+uint32_t readPCNT()  { 
   int16_t pcnt_count = 0;
   pcnt_get_counter_value( PCNT_UNIT, &amp;pcnt_count );
   pcnt_counter_clear( PCNT_UNIT );
-  uint32_t count = pcnt_count + pcnt_overflows*PCNT_H_LIM_VAL;
+  uint32_t count = ((uint32_t)pcnt_count) + pcnt_overflows*PCNT_H_LIM_VAL;
   pcnt_overflows = 0; 
   return count;
 }
+
+#endif
 
 void setup() {
   Serial.begin( 115200 );
   Serial.println( &quot;\nESP32 PCNT Demo....&quot; );
   pinMode( PCNT_INPUT_PIN, INPUT_PULLUP );
 
-  // Initialize the PCNT
-  init_pcnt();
+  // Initialize the PCNT.
+  initPCNT();
 
-  // Create a PWM signal for test purpose 
-  analogWriteResolution( NUM_BITS );       // Set PWM resolution(bits)
-  analogWriteFrequency( PWM_FREQ );        // Set PWM frequency 
-  analogWrite( PWM_PIN, (1&lt;&lt;NUM_BITS)/2 ); // Set PWM duty cycle to 50%
+  // Create a PWM signal for test purpose. 
+#if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  // Set PWM duty cycle to 50%.
+  ledcAttach( PWM_PIN, PWM_FREQ, NUM_BITS );
+  ledcChangeFrequency( PWM_PIN, PWM_FREQ, NUM_BITS );
+  ledcWrite( PWM_PIN, (1&lt;&lt;NUM_BITS)/2 );
+#else
+  ledc_channel_t ledc_channel = LEDC_CHANNEL_0;
+  ledcSetup( ledc_channel, PWM_FREQ /*Hz*/, NUM_BITS /*bits*/ ); 
+  // Attach the GPIO pin to LEDC Channel.
+  ledcAttachPin( PWM_PIN, ledc_channel ); 
+  // Set the PWM duty cycle (~50%).
+  ledcWrite( ledc_channel, (1&lt;&lt;NUM_BITS)/2 ); 
+
+  //analogWriteResolution( NUM_BITS );  // Set PWM resolution(bits).
+  //analogWriteFrequency( PWM_FREQ );   // Set PWM frequency.
+  //analogWrite( PWM_PIN, (1&lt;&lt;NUM_BITS)/2 ); // Set PWM duty cycle to 50%.
+#endif
   delay(1000);
 }
 
 void loop( ) {
+  static uint32_t last_time_msec = 0;
   uint32_t now = millis(); // Read current time in msec
-  if ( now - last_time_msec &gt;= 1000 ) { // Update every 1 second
-    uint32_t count = read_pcnt(); // Read the current value of PCNT
+  if ( now - last_time_msec &gt;= 1000 ) { // Update every 1 sec.
+    uint32_t count = readPCNT(); // Read the current value of PCNT.
     if ( count &gt;= 1000 ) {
       Serial.printf(&quot; Freq. %.3f kHz\n&quot;, count / 1000.0 );
     } else {
-      Serial.printf(&quot; Freq. %lu Hz\n&quot;, count );
+      Serial.printf(&quot; Freq. %lu Hz\n&quot;, (unsigned long) count );
     }
-    last_time_msec = millis(); // Save the last update time
+    last_time_msec = millis(); // Save the last update time.
   }
 }
 </code></pre>
@@ -644,7 +875,7 @@ void loop( ) {
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2023-04-28 | Last Updated: 2023-04-29</p></div>
+<p>Created: 2023-04-28 | Last Updated: 2023-10-27</p></div>
             </div>
         </div>
 
