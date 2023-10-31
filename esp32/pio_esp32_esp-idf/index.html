@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/pio_esp32_esp-idf/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งาน VS Code IDE + PlatformIO + ESP-IDF (สำหรับ Linux) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#vs-code-ide-platformio-esp-idf-linux" class="nav-link">การใช้งาน VS Code IDE + PlatformIO + ESP-IDF (สำหรับ Linux)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#vs-code-ide-platformio-extension" class="nav-link">&#9655; VS Code IDE + PlatformIO Extension</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#platformio-for-esp32" class="nav-link">&#9655; PlatformIO for ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ขั้นตอนการดำเนินการ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp-idf-programming-led-blink-demo" class="nav-link">&#9655; ESP-IDF Programming: LED Blink Demo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#demo-code-esp32-system-info" class="nav-link">&#9655; Demo Code: ESP32 System Info</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pio-command-line" class="nav-link">&#9655; การใช้งาน PIO แบบ Command Line</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="vs-code-ide-platformio-esp-idf-linux">การใช้งาน VS Code IDE + PlatformIO + ESP-IDF (สำหรับ Linux)<a class="headerlink" href="#vs-code-ide-platformio-esp-idf-linux" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="vs-code-ide-platformio-extension">&#9655; <strong>VS Code IDE + PlatformIO Extension</strong><a class="headerlink" href="#vs-code-ide-platformio-extension" title="Permanent link">#</a></h2>
+<p>ซอฟต์แวร์ที่ใช้ในการเขียนโปรแกรมภาษา <strong>C/C++</strong>
+สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32 SoC</strong> ของบริษัท <a href="https://www.espressif.com/en/company/about-espressif"><strong>Espressif Systems</strong></a>
+มีให้เลือกใช้หลายตัวเลือก เช่น</p>
+<ul>
+<li><a href="https://www.arduino.cc/en/software"><strong>Arduino IDE</strong></a> + <a href="https://github.com/espressif/arduino-esp32"><strong>Arduino ESP32 Core</strong></a></li>
+<li><a href="https://code.visualstudio.com/"><strong>VS Code IDE</strong></a> + <a href="https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/install.md"><strong>Espressif ESP-IDF Extension</strong></a></li>
+<li><a href="https://code.visualstudio.com/"><strong>VS Code IDE</strong></a> + <a href="https://platformio.org/install/ide?install=vscode"><strong>PlatformIO Extension</strong></a></li>
+</ul>
+<p><strong>PlatformIO</strong> เป็นซอฟต์แวร์ที่รองรับการเขียนโปรแกรมไมโครคอนโทรลเลอร์ได้หลายตระกูล
+เช่น  <strong>Arm Cortex-M Series</strong> และ <strong>RISC-V</strong> เป็นต้น
+จากหลายผู้ผลิต รวมถึง <strong>Espressif ESP32 SoC Series</strong></p>
+<p>บทความนี้นำเสนอตัวอย่างการใช้งานซอฟต์แวร์ <strong>VS Code IDE + PlatformIO</strong>
+โดยได้ลองใช้เวอร์ชัน <strong>v6.1.1 (2023-08-31)</strong>
+สำหรับระบบปฏิบัติการ <strong>Linux / Ubuntu 22.04</strong>
+และนำมาใช้ในการเขียนโค้ดในภาษา <strong>C/C++</strong> ด้วย <strong>API</strong> ของ
+<a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/"><strong>ESP-IDF - Espressif IoT Development Framework</strong></a>
+เพื่อใช้งานกับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong></p>
+<p>ขั้นตอนการติดตั้ง <strong>PlatformIO Extension</strong> สำหรับ 
+<strong>VS Code IDE</strong> ดูรายละเอียดได้จาก <a href="https://docs.platformio.org/en/stable/integration/ide/vscode.html"><strong>"PlatformIO IDE for VS Code - Installation"</strong></a></p>
+<p>ข้อสังเกต: การใช้งาน <strong>VS Code IDE + PlatformIO</strong> สำหรับ <strong>Linux</strong> มีตัวเลือกหลายกรณี</p>
+<ul>
+<li>การใช้งาน <strong>Linux Ubuntu</strong> ในรูปแบบของ <strong>Virtual Machine</strong> สำหรับระบบปฏิบัติการ <strong>Windows</strong>
+(เช่น ใช้งานร่วมกับ <strong>Oracle VirtualBox</strong>)</li>
+<li>การใช้งาน <strong>WSL2 + Ubuntu</strong> สำหรับระบบปฏิบัติการ <strong>Windows</strong></li>
+<li>การใช้งาน <strong>Linux Ubuntu</strong> แบบ <strong>Native</strong></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="platformio-for-esp32">&#9655; <strong>PlatformIO for ESP32</strong><a class="headerlink" href="#platformio-for-esp32" title="Permanent link">#</a></h2>
+<p>ซอฟต์แวร์ <strong>PlatformIO</strong>
+รองรับการเขียนโปรแกรมสำหรับ <strong>ESP32</strong> ในส่วนนี้เรียกว่า
+<a href="https://github.com/platformio/platform-espressif32/">"<strong>Platformio-esp32</strong>"</a>
+หรือ <code>platform-espressif32</code> (ลองใช้เวอร์ชัน <strong>v6.4.0, released August 31, 2023</strong>)
+และมีสองรูปแบบในการเขียนโค้ด คือ</p>
+<ol>
+<li>การเขียนโค้ด <strong>C/C++</strong> ด้วย <strong>Arduino Framework</strong> ซึ่งสามารถใช้แทนที่ตัวเลือก
+<strong>Arduino IDE</strong> + <strong>Arduino ESP32 Core</strong> ได้</li>
+<li>การเขียนโค้ด <strong>C/C++</strong> ด้วย <strong>Espressif ESP-IDF Framework</strong></li>
+</ol>
+<p>ในขณะที่เขียนบทความนี้ เวอร์ชันล่าสุดของ <strong>Arduino ESP32 Core</strong> ที่รองรับการใช้งานโดย <strong>Platformio-esp32</strong> คือ <a href="https://github.com/espressif/arduino-esp32/releases/tag/2.0.11"><strong>v2.0.11 (based on ESP-IDF 4.4.5)</strong></a>
+และเวอร์ชันล่าสุดของ <strong>ESP-IDF</strong> คือ <a href="https://github.com/espressif/esp-idf/releases/tag/v5.1.1"><strong>ESP-IDF v5.1.1</strong></a></p>
+<p><strong>Platformio-esp32</strong> รองรับบอร์ด <strong>ESP32</strong> หลายรุ่น และสามารถดูรายการบอร์ด
+<strong>ESP32</strong> ที่เกี่ยวข้องได้จากหน้าเว็บ <a href="https://docs.platformio.org/en/latest/boards/index.html#espressif-32"><strong>"ESP32 Hardware Support by Platformio-esp32"</strong></a>
+และนำเสนอเป็นตัวอย่าง เช่น</p>
+<ul>
+<li><strong>ESP32</strong><ul>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/esp32dev.html"><code>esp32dev</code></a></li>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/esp32doit-devkit-v1.html"><code>esp32doit-devkit-v1</code></a></li>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/lolin32_lite.html"><code>lolin32_lite</code></a></li>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/esp-wrover-kit.html"><code>esp-wrover-kit</code></a></li>
+</ul>
+</li>
+<li><strong>ESP32-C3</strong><ul>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/seeed_xiao_esp32c3.html"><code>seeed_xiao_esp32c3</code></a></li>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/lolin_c3_mini.html"><code>lolin_c3_mini</code></a></li>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/airm2m_core_esp32c3.html"><code>airm2m_core_esp32c3</code></a></li>
+</ul>
+</li>
+<li><strong>ESP32-S3</strong><ul>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/arduino_nano_esp32.html"><code>arduino_nano_esp32</code></a></li>
+<li><a href="https://docs.platformio.org/en/latest/boards/espressif32/seeed_xiao_esp32s3.html"><code>seeed_xiao_esp32s3</code></a></li>
+</ul>
+</li>
+</ul>
+<p>ตัวอย่างโปรเจกต์สำหรับ <strong>Platformio-esp32</strong> สามารถดูได้จาก</p>
+<ul>
+<li><a href="https://github.com/platformio/platform-espressif32/tree/develop/examples"><code>platform-espressif32/tree/develop/examples</code></a></li>
+</ul>
+<hr />
+<h2 id="_1">&#9655; <strong>ขั้นตอนการดำเนินการ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การเริ่มต้นใช้งาน <strong>VS Code IDE + PlatformIO IDE</strong> มีขั้นตอนดังนี้</p>
+<ol>
+<li>เปิดใช้งาน <strong>VS Code IDE</strong></li>
+<li>เปิดใช้งาน <strong>PlatformIO (PIO)</strong></li>
+<li>อัปเดต <strong>PlatformIO Core</strong> 
+(โดยเลือกจากเมนู <strong>Upgrade PlatformIO Core</strong>)</li>
+<li>เปิดหน้า <strong>PIO Home &gt; Open</strong> </li>
+<li>สร้างโปรเจกต์ใหม่ในส่วนที่เรียกว่า <strong>Project Wizard</strong><ul>
+<li>ระบุชื่อโปรเจกต์ใหม่ (<strong>Project Name</strong>)</li>
+<li>เลือกบอร์ด <strong>ESP32</strong> ที่ต้องการใช้งาน</li>
+<li>เลือกรูปแบบการเขียนโค้ดสำหรับ <strong>ESP32</strong> โดยเลือก <strong>ESP-IDF Framework</strong></li>
+<li>เลือกไดเรกทอรีสำหรับโปรเจกต์ (<strong>Project Location</strong>)</li>
+</ul>
+</li>
+<li>เปิดไดเรกทอรีของโปรเจกต์ใหม่<ul>
+<li>เปิดไฟล์ <code>src/main.c</code> เพื่อแก้ไขโค้ดตามตัวอย่าง</li>
+<li>เปิดไฟล์ <code>platformio.ini</code> เพื่อตั้งค่าการใช้งานสำหรับโปรเจกต์</li>
+</ul>
+</li>
+</ol>
+<p>&nbsp;</p>
+<p><img alt="" src="vscode_pio_esp32-1.png" /></p>
+<p>รูป: เปิดใช้งาน <strong>VS Code IDE</strong></p>
+<p><img alt="" src="vscode_pio_esp32-2.png" /></p>
+<p>รูป: <strong>Upgrade PlatformIO Core</strong></p>
+<p><img alt="" src="vscode_pio_esp32-3.png" /></p>
+<p>รูป: <strong>เปิดหน้า </strong>PIO Home**</p>
+<p><img alt="" src="vscode_pio_esp32-4.png" /></p>
+<p>รูป: ตั้งชื่อโปรเจกต์ที่ต้องการสร้างใหม่ และเลือกบอร์ด <strong>ESP32</strong> จากรายการ
+(เช่น <strong>Wemos Lolin32 Lite</strong>)</p>
+<p><img alt="" src="vscode_pio_esp32-5.png" /></p>
+<p>รูป: เลือกรูปแบบการเขียนโค้ดเป็น <strong>ESP-IDF</strong></p>
+<p><img alt="" src="vscode_pio_esp32-6.png" /></p>
+<p>รูป: กดปุ่ม <strong>Finish</strong> เพื่อทำขั้นตอนสร้างไฟล์สำหรับโปรเจกต์ใหม่</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp-idf-programming-led-blink-demo">&#9655; <strong>ESP-IDF Programming: LED Blink Demo</strong><a class="headerlink" href="#esp-idf-programming-led-blink-demo" title="Permanent link">#</a></h2>
+<p>เมื่อได้สร้างโปรเจกต์ใหม่แล้ว ให้เปิดไฟล์ <code>src/main.c</code> ในไดเรกทอรีของโปรเจกต์
+แล้วแก้ไขโค้ดตามตัวอย่างต่อไปนี้ </p>
+<p>ตัวอย่างนี้สาธิตการใช้คำสั่ง เช่น <code>gpio_config(...)</code> และ <code>gpio_set_level(...)</code>
+เพื่อทำให้วงจร <strong>LED</strong> ซึ่งต่อกับขา <strong>GPIO-22</strong> (ใช้เป็นเอาต์พุต)
+บนบอร์ด <strong>WeMos Lolin32 Lite</strong> สลับสถานะลอจิกตามระยะเวลาที่กำหนดไว้</p>
+<p>ฟังก์ชัน <code>app_main()</code> เปรียบเสมือนฟังก์ชัน <code>main()</code> ของโปรแกรมที่เขียนโค้ดด้วยภาษา <strong>C/C++</strong>
+แต่เนื่องจากมีการใช้ <strong>FreeRTOS</strong> ฟังก์ชันดังกล่าวจึงทำหน้าที่เป็นฟังก์ชันของทาสก์หลัก
+(<strong>Main Task</strong>) ของโปรแกรม</p>
+<p>การหน่วงเวลาในการทำงานของทาสก์หลัก
+จะใช้คำสั่ง <code>vTaskDelay(...)</code> ของ <strong>FreeRTOS API</strong> 
+โดยจะต้องระบุระยะเวลาเป็นตัวเลขจำนวนเต็ม และนับเวลาตามจำนวน <strong>RTOS Ticks</strong>
+(เช่น ตั้งค่า <strong>1 Tick</strong> เท่ากับ 1 มิลลิวินาที เป็นต้น)</p>
+<pre><code class="language-c">#include &lt;stddef.h&gt;
+#include &quot;driver/gpio.h&quot;
+#include &quot;freertos/FreeRTOS.h&quot;
+#include &quot;freertos/task.h&quot;
+
+#define GPIO_LED         (22)
+#define GPIO_LED_PIN_SEL (1ULL &lt;&lt; GPIO_LED)
+
+static void init_led(void) {
+  gpio_config_t io_conf;
+  io_conf.mode         = GPIO_MODE_OUTPUT;
+  io_conf.pin_bit_mask = GPIO_LED_PIN_SEL;
+  io_conf.intr_type    = GPIO_INTR_DISABLE;
+  io_conf.pull_down_en = 0;
+  io_conf.pull_up_en   = 0;
+  gpio_config( &amp;io_conf );
+}
+
+void app_main() {
+    // Used to keep the state of LED.
+    int led_state = 0;
+    // Initialize GPIO pin for LED output.
+    init_led();
+    while (1) {
+        // Toggle the LED state.
+        led_state = !led_state;
+        // Set the GPIO output according to the LED state.
+        gpio_set_level( GPIO_LED, led_state );
+        // Delay the main task for 100 ticks.
+        vTaskDelay( 100 );
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>การตั้งค่าการใช้งานสำหรับ <strong>ESP-IDF Configuration</strong> สำหรับโปรเจกต์
+สามารถดูหรือแก้ไขได้จากไฟล์ <code>sdkconfig.*</code> 
+เช่น <code>sdkconfig.lolin32_lite</code> สำหรับบอร์ด 
+<a href="https://docs.platformio.org/en/latest/boards/espressif32/lolin32_lite.html"><strong>Wemos Lolin32 Lite</strong></a>
+หรือ <code>sdkconfig.esp32dev</code> สำหรับบอร์ด 
+<a href="https://docs.platformio.org/en/latest/boards/espressif32/esp32dev.html"><strong>Espressif ESP32 Dev Module</strong></a></p>
+<p><img alt="" src="vscode_pio_esp32-7.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าเพื่อกำหนดอัตรา <strong>FreeRTOS Tick Rate</strong> (เปลี่ยนค่าจาก <code>100</code> เป็น <code>1000</code> Hz)</p>
+<p>&nbsp;</p>
+<p>ถัดไปให้เปิดและแก้ไขไฟล์ <a href="https://docs.platformio.org/en/stable/projectconf/index.html"><code>platformio.ini</code></a> ของโปรเจกต์ ตามตัวอย่างดังนี้</p>
+<pre><code>; PlatformIO Project Configuration File
+;
+; Please visit documentation for the other options and examples
+; https://docs.platformio.org/page/projectconf.html
+
+[env:lolin32_lite]
+platform = espressif32
+; platform = espressif32 @ ^6.4.0
+board = lolin32_lite
+framework = espidf
+
+upload_protocol = esptool
+upload_speed = 921600
+upload_port  = /dev/ttyUSB0
+
+monitor_speed = 115200
+monitor_port = /dev/ttyUSB0
+
+lib_extra_dirs =
+    ../../common/components
+    ../../common/esp-idf-lib/components
+</code></pre>
+<p>คำอธิบาย</p>
+<ul>
+<li>ถ้าเริ่มต้นบรรทัดด้วย <code>;</code> หมายถึง <strong>Comment Line</strong></li>
+<li><code>platform = espressif32</code> เลือกใช้ <code>platformio-esp32</code> (<strong>development release</strong>)</li>
+<li><code>platform = espressif32 @ ^6.4.0</code> เลือกใช้ <code>platformio-esp32</code> แบบเจาะจงเวอร์ชัน</li>
+<li><code>board = lolin32_lite</code> เลือกใช้บอร์ด <strong>Wemos Lolin32 Lite</strong></li>
+<li><code>framework = espidf</code> เลือกใช้รูปแบบการเขียนโค้ด <strong>ESP-IDF Framework</strong></li>
+<li><code>upload_protocol = esptool</code> เลือกใช้วิธีการอัปโหลดเฟิร์มแวร์ไปยังบอร์ด โดยใช้โปรแกรม <code>esptool.py</code></li>
+<li><code>upload_speed = 921600</code> กำหนดความเร็วในการอัปโหลดผ่านพอร์ต <strong>Serial</strong></li>
+<li><code>upload_port  = /dev/ttyUSB0</code> เจาะจงเลือกใช้พอร์ต <strong>Serial</strong> เช่น <code>/dev/ttyUSB0</code> (สำหรับ <strong>Linux</strong>)</li>
+<li><code>monitor_speed = 115200</code> กำหนดความเร็วของ <strong>Baudrate</strong> สำหรับ <strong>Serial Monitor</strong></li>
+<li><code>monitor_port = /dev/ttyUSB0</code> เจาะจงเลือกใช้พอร์ต <strong>Serial</strong> สำหรับ <strong>Serial Monitor</strong></li>
+<li><code>lib_extra_dirs =</code> เพิ่มรายการของไดเรกทอรีสำหรับ <strong>ESP-IDF Reusable Software Components</strong>
+หรือไลบรารีต่าง ๆ ที่ต้องการนำมาใช้ในโปรเจกต์</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="esp32_espidf_led_blink-1.png" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ดและทำขั้นตอน <strong>Build Project</strong> เพื่อคอมไพล์โค้ด</p>
+<p><img alt="" src="esp32_espidf_led_blink-2.png" /></p>
+<p>รูป: การอัปโหลดไฟล์เฟิร์มแวร์ด้วย <code>esptool.py</code> ไปยังบอร์ด <strong>ESP32</strong>
+ที่เชื่อมต่อกับพอร์ต <code>/dev/ttyUSB0</code></p>
+<p><img alt="" src="esp32_espidf_led_blink-3.png" /></p>
+<p>รูป: การเปิดใช้งาน <strong>Serial Monitor (Baudrate: 115200)</strong> เพื่อรับข้อความจากบอร์ด
+<strong>ESP32</strong> ผ่านทาง <strong>USB-Serial</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="demo-code-esp32-system-info">&#9655; <strong>Demo Code: ESP32 System Info</strong><a class="headerlink" href="#demo-code-esp32-system-info" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไป ซึ่งดัดแปลงแก้ไขจากโค้ดตัวอย่าง
+<a href="https://github.com/espressif/esp-idf/blob/master/examples/get-started/hello_world/"><code>get-started/hello_world/</code></a>
+สาธิตการใช้คำสั่งของ <strong>ESP-IDF</strong> เช่น
+<code>esp_chip_info(...)</code> เพื่ออ่านข้อมูลเกี่ยวกับชิป <strong>ESP32</strong>
+เช่น ขนาดของหน่วยความจำแฟลช (<strong>Flash Size</strong>) เวอร์ชันของชิป <strong>ESP32</strong> 
+(<strong>Silicon chip revision</strong>) เวอร์ชันของซอฟต์แวร์ <strong>ESP-IDF</strong> ที่ใช้ในการคอมไพล์โค้ด
+เป็นต้น ข้อมูลเหล่านี้จะถูกแสดงเป็นข้อความส่งออกทาง <strong>Serial</strong> โดยใช้คำสั่ง <code>printf(...)</code></p>
+<pre><code class="language-c">#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;inttypes.h&gt;
+#include &quot;freertos/FreeRTOS.h&quot;
+#include &quot;freertos/task.h&quot;
+#include &quot;esp_system.h&quot;
+#include &quot;esp_chip_info.h&quot;
+#include &quot;esp_flash.h&quot;
+
+static void sys_info(void) {
+    esp_chip_info_t chip_info;
+    uint32_t flash_size;
+    esp_chip_info( &amp;chip_info );
+
+    printf(&quot;%s chip with %d CPU core(s)\n&quot;,
+           CONFIG_IDF_TARGET, chip_info.cores );
+
+    printf(&quot;Hardware features: \n&quot; );
+    printf( &quot;- WiFi: %s\n&quot;, (
+        chip_info.features &amp; CHIP_FEATURE_WIFI_BGN) ? &quot;y&quot;:&quot;n&quot; );
+    printf( &quot;-  BLE: %s\n&quot;, 
+        (chip_info.features &amp; CHIP_FEATURE_BLE) ? &quot;y&quot;:&quot;n&quot; );
+    printf( &quot;- IEEE802.14.5/ZigBee/Thread: %s\n&quot;, 
+        (chip_info.features &amp; CHIP_FEATURE_IEEE802154) ? &quot;y&quot;:&quot;n&quot; );
+
+    unsigned major_rev = chip_info.revision / 100;
+    unsigned minor_rev = chip_info.revision % 100;
+    printf( &quot;silicon revision v%d.%d, &quot;, major_rev, minor_rev );
+
+    if (esp_flash_get_size(NULL, &amp;flash_size) != ESP_OK) {
+        printf(&quot;Get flash size failed&quot;);
+        return;
+    }
+    printf( &quot;%&quot; PRIu32 &quot;MB %s flash\n&quot;, 
+           flash_size / (uint32_t)(1024 * 1024),
+           (chip_info.features &amp; CHIP_FEATURE_EMB_FLASH) ? 
+           &quot;embedded&quot; : &quot;external&quot; );
+    printf( &quot;Minimum free heap size: %&quot; PRIu32 &quot; bytes\n&quot;, 
+            esp_get_minimum_free_heap_size() );
+    printf( &quot;\n\n\n&quot; );
+    fflush( stdout );
+}
+
+void app_main() {
+    printf( &quot;ESP32 - ESP-IDF Demo...\n&quot; );
+    while (1) {
+        sys_info();
+        vTaskDelay(4000 /*ticks*/);
+    }
+}
+</code></pre>
+<p><img alt="" src="esp32_espidf_sys_info-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับจากบอร์ด <strong>ESP32</strong> ผ่านทาง <strong>USB-Serial</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pio-command-line">&#9655; <strong>การใช้งาน PIO แบบ Command Line</strong><a class="headerlink" href="#pio-command-line" title="Permanent link">#</a></h2>
+<p>การคอมไพล์โค้ดตัวอย่าง หรือการทำขั้นตอน <strong>Build Project</strong>
+ด้วยวิธีการทำคำสั่งแบบ <strong>Command Line</strong>
+โดยใช้คำสั่ง <code>pio</code> ซึ่งจะต้องมีการติดตั้ง <a href="https://docs.platformio.org/en/stable/core/installation/index.html"><strong>PlatformIO Core / CLI</strong></a>
+หรือ  <strong>PlatformIO IDE</strong> ไว้แล้วในระบบ <strong>Linux</strong> มีแนวทางดังนี้ </p>
+<p>การติดตั้ง <strong>Platform Core / CLI</strong> ทำได้หลายวิธี เช่น การดาวน์โหลดไฟล์ 
+<a href="https://docs.platformio.org/en/stable/core/installation/methods/installer-script.html"><strong>Python Installer Script for PIO</strong></a>
+แล้วรันสคริปต์ เพื่อติดตั้งโปรแกรม โดยจะมีการติดตั้งไว้ใน <strong>Python Virtual Environment</strong> สำหรับ <strong>PlatformIO</strong>
+ภายใต้ไดเรกทอรี <code>~/.platformio/penv/</code> </p>
+<pre><code class="language-text"># Download the Python installer script
+$ PIO_SCRIPT=https://raw.githubusercontent.com/platformio/
+$ PIO_SCRIPT=$PIO_SCRIPT/platformio-core-installer/master/get-platformio.py
+$ wget -O get-platformio.py $PIO_SCRIPT
+
+# Run the installer script
+$ python3 get-platformio.py
+</code></pre>
+<p>การทำคำสั่งตรวจสอบเวอร์ชันและอัปเกรด <strong>PIO</strong></p>
+<pre><code class="language-text"># Check the version of the PIO Core
+$ pio --version
+PlatformIO Core, version 6.1.6
+
+# Upgrade the PIO core
+$ pio upgrade
+</code></pre>
+<p>การดาวน์โหลดโปรเจกต์ตัวอย่างจาก <strong>Github</strong> และทดลองทำขั้นตอน <strong>Build Project</strong>
+สำหรับโปรเจกต์ที่มีชื่อว่า <code>arduino-blink</code> (ข้อสังเกต: โค้ดตัวอย่างใช้ <strong>Arduino Framework</strong>)</p>
+<pre><code class="language-text"># Change to the user's home directory.
+$ cd ~/
+
+# Clone the platformio/platform-espressif32 repository
+$ git clone https://github.com/platformio/platform-espressif32
+
+# Change directory to example
+$ cd platform-espressif32/examples/arduino-blink
+</code></pre>
+<p>ถ้าลองดูในไฟล์  <code>platformio.ini</code> ภายใต้ไดเรกทอรีของโปรเจกต์
+จะมีพบว่า มีรายการบอร์ดที่มีการตั้งค่าไว้ (ระบุชื่อ <strong>Environment Names</strong>) และเลือกใช้งานได้ ดังนี้</p>
+<ul>
+<li><code>esp32-s3-devkitc-1</code></li>
+<li><code>esp32doit-devkit-v1</code></li>
+<li><code>arduino_nano_esp32</code></li>
+<li><code>esp-wrover-kit</code></li>
+<li><code>lolin_c3_mini</code> </li>
+<li><code>lolin32</code></li>
+</ul>
+<pre><code class="language-text"># Build project for a specific environment (e.g. lolin32)
+$ pio run -e lolin32
+
+# Upload firmware for the specific environment (e.g. lolin32)
+$ pio run -e lolin32 --target upload
+
+# Clean build files
+$ pio run --target clean
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="pio_core_build.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>pio</code> แบบ <strong>Command Line</strong> เพื่อคอมไพล์โค้ดตัวอย่าง
+<code>arduino-blink</code></p>
+<p><img alt="" src="pio_core_build_upload.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>pio</code> เพื่ออัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>ESP32</strong> โดยใช้ <strong>esptool</strong></p>
+<p>&nbsp;</p>
+<p>ผู้ใช้สามารถเปิดใช้งาน <strong>VS Code IDE</strong> สำหรับโปรเจกต์ของ <strong>PIO</strong> ได้เช่นกัน
+โดยทำคำสั่ง <code>code .</code> ภายใต้ไดเรกทอรีของโปรเจกต์ เพื่อเรียกใช้ <strong>VS Code IDE</strong></p>
+<p><img alt="" src="wsl2_ubuntu_vscode_build.png" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>VS Code IDE</strong> สำหรับโปรเจกต์ของ <strong>PIO</strong> และทำขั้นตอน
+<strong>Build Project</strong></p>
+<p><img alt="" src="wsl2_ubuntu_vscode_upload.png" /></p>
+<p>รูป: ตัวอย่างการทำขั้นตอน <strong>Upload firmware</strong></p>
+<p>สำหรับผู้ใช้ <strong>Linux</strong>: แนะนำให้ทำขั้นตอนติดตั้งไฟล์ <a href="https://github.com/platformio/platformio-docs/blob/develop/core/installation/udev-rules.rst"><code>99-platformio-udev.rules</code></a>
+(<strong>Installation of udev rules for PlatformIO supported boards/devices</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานซอฟต์แวร์ <strong>VS Code IDE</strong> ร่วมกับ
+<strong>PlatformIO</strong> เพื่อเขียนโปรแกรมภาษา <strong>C/C++</strong> โดยใช้
+<strong>Espressif ESP-IDF Framework</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> </p>
+<p>แนะนำบทความภาษาไทยที่เกี่ยวข้องให้ศึกษาเพิ่มเติม</p>
+<ul>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/">"แนะนำชิป <strong>ESP32</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/training/mcu_programming_with_esp32/">"การเขียนโปรแกรมไมโครคอนโทรลเลอร์ <strong>ESP32</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/arduino/vscode_pio_arduino/">"การใช้งาน <strong>VS Code IDE</strong> + <strong>PlatformIO Extension</strong> สำหรับการเขียนโค้ด <strong>Arduino</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp32_vscode_pio/">"การใช้งาน <strong>PlatformIO</strong> ร่วมกับ <strong>VS Code IDE</strong> สำหรับบอร์ด <strong>ESP32</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/linux_pio_esp32/">"การใช้งาน <strong>PlatformIO (PIO) Core</strong> สำหรับ <strong>WSL2 Ubuntu</strong> ในเบื้องต้น"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp-idf_linux_wsl/">"การติดตั้งและใช้งาน <strong>ESP-IDF</strong> สำหรับ <strong>WSL / Ubuntu</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp-idf_vscode/">"การใช้งาน <strong>VS Code IDE + Espresssif IDF Extension</strong> สำหรับ <strong>Windows</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp32-c6_esp-idf/">"การใช้งาน <strong>ESP-IDF (WSL2 / Ubuntu)</strong> สำหรับ <strong>ESP32-C6</strong>"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-10-30 | Last Updated: 2023-10-31</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
