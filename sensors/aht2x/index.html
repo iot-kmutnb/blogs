@@ -99,6 +99,14 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32" class="nav-link">&#9655; ตัวอย่างโค้ดสำหรับ Arduino ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32-sh1106-oled" class="nav-link">&#9655; ตัวอย่างโค้ดสำหรับ Arduino ESP32 + SH1106 OLED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -249,11 +257,11 @@
 \end{align}
 </script>
 </p>
-<p>แต่ถ้าเป็น <strong>AHT2x</strong> จะมีอีกหนึ่งไบต์ (<strong>CRC8 Checksum Byte</strong>) ซึ่งจะใช้สำหรับตรวจสอบความถูกต้องด้วยวิธีการคำนวณค่า <strong>CRC8</strong> ตามรูปแบบของ <strong>Dallas/Maxim</strong></p>
+<p>แต่ถ้าเป็น <strong>AHT2x</strong> จะมีอีกหนึ่งไบต์ (<strong>CRC8 Checksum Byte</strong>) ซึ่งจะใช้สำหรับตรวจสอบความถูกต้องด้วยวิธีการคำนวณค่า <strong>CRC8 Checksum</strong> ตามรูปแบบของ <strong>Dallas/Maxim</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="arduino">&#9655; <strong>ตัวอย่างโค้ดสำหรับ Arduino</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
-<p>โค้ดตัวอย่างแรกสาธิตการตรวจสอบดูว่า มีอุปกรณ์ <strong>I2C slave devices</strong> ที่เชื่อมต่อกับ
+<p>โค้ดตัวอย่างแรกสาธิตการตรวจสอบดูว่า มีอุปกรณ์ <strong>I2C Slave Devices</strong> ที่เชื่อมต่อกับ
 บัส <strong>I2C</strong> อยู่หรือไม่ โดยจะแสดงเลขแอดเดรส (ฐานสิบหก) ของอุปกรณ์</p>
 <pre><code class="language-cpp">// Author: RSP @ KMUTNB
 // Date: 2022-08-21
@@ -332,7 +340,7 @@ void loop() {
 <ul>
 <li><code>aht2x_init()</code> เริ่มต้นใช้งานอุปกรณ์ (<strong>Device Initialization</strong>) 
 โดยส่งคำสั่งไปยังอุปกรณ์และเปิดการตั้งค่าชดเชย (<strong>Calibration Enabled</strong>) </li>
-<li><code>aht2x_crc8()</code> ตรวจสอบความถูกต้องของข้อมูลไบต์ในอาร์เรย์ที่ได้รับมา โดยเปรียบเทียบกับข้อมูลไบต์สำหรับ <strong>CRC8</strong></li>
+<li><code>aht2x_crc8()</code> ตรวจสอบความถูกต้องของข้อมูลไบต์ในอาร์เรย์ที่ได้รับมา โดยเปรียบเทียบกับข้อมูลไบต์สำหรับ <strong>CRC8 Checksum</strong></li>
 <li><code>aht2x_read_sensor()</code> สั่งให้อุปกรณ์ทำการวัดแล้วอ่านค่าความชื้นสัมพัทธ์และอุณหภูมิ</li>
 </ul>
 <pre><code class="language-cpp">#include &lt;Wire.h&gt;
@@ -353,9 +361,9 @@ void aht2x_init() {
 }
 
 uint8_t aht2x_crc8( uint8_t *data, int len ) {
-  // calculate CRC8 (Dallas/Maxim)
+  // Calculate CRC8 checksum (Dallas/Maxim).
   // The initial value of CRC is 0xFF.
-  // The CRC check polynomial: X^8 + X^5 + X^4 + 1 =&gt; 0b00110001 (0x31)
+  // The CRC polynomial: X^8 + X^5 + X^4 + 1 =&gt; 0b00110001 (0x31)
   uint8_t crc = 0xff;
   for ( uint8_t j=0; j &lt; len; j++ ) {
      crc ^= data[j];
@@ -363,7 +371,7 @@ uint8_t aht2x_crc8( uint8_t *data, int len ) {
        if (crc &amp; 0x80) {
           crc = (crc &lt;&lt; 1) ^ 0x31;
        } else {
-          crc = crc &lt;&lt; 1;
+          crc = (crc &lt;&lt; 1);
        }
      }
   }
@@ -389,7 +397,7 @@ bool aht2x_read_sensor( float *humidity, float *temperature ) {
         return false; // failed
      }
      if ( aht2x_crc8( buf, 6 ) != crc8 ) {
-        Serial.println( &quot;CRC8 failed!&quot; );
+        Serial.println( &quot;CRC8 check failed!&quot; );
         *humidity = 0.0;
         *temperature = 0.0;
         return false; // failed
@@ -422,8 +430,8 @@ void setup() {
 #else
   Wire.begin();
 #endif
-  Wire.setClock( 400000 ); // set I2C speed to 400kHz
-  aht2x_init(); // initialize the AHT2x
+  Wire.setClock( 400000 ); // Set I2C speed to 400kHz.
+  aht2x_init(); // Initialize the AHT2x.
   delay(500);
 }
 
@@ -452,6 +460,341 @@ void loop() {
 <p>รูป: ตัวอย่างข้อความเอาต์พุตที่แสดงผลใน <strong>Arduino Serial Monitor</strong></p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="arduino-esp32">&#9655; <strong>ตัวอย่างโค้ดสำหรับ Arduino ESP32</strong><a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการสร้างคลาสชื่อ <code>AHT2x</code> ในภาษา <strong>C++</strong> 
+และเก็บไว้ในไฟล์ <code>aht2x.h</code> เพื่อให้ง่ายต่อการนำมาใช้งานโมดูล <strong>AHT2x</strong></p>
+<pre><code class="language-c++">// File: aht2x.h
+#pragma once
+#include &lt;Arduino.h&gt;
+#include &lt;Wire.h&gt;
+
+class AHT2x {
+
+private:
+   uint8_t addr;
+   static const uint8_t AHT2X_CALIB_CMD[3];
+   static const uint8_t AHT2X_MEASURE_CMD[3];
+
+public:
+   static const uint8_t AHT2X_DEF_ADDR = 0x38; // 0x38 or 0x39
+
+  AHT2x(uint8_t _addr = AHT2x::AHT2X_DEF_ADDR) 
+   : addr(_addr) {
+     // empty
+  }
+
+  void init() {
+    Wire.beginTransmission( addr );
+    Wire.write( AHT2x::AHT2X_CALIB_CMD, 3 );
+    Wire.endTransmission();
+  }
+
+  static uint8_t crc8( uint8_t *data, int len ) {
+    // calculate CRC8 (Dallas/Maxim)
+    // The initial value of CRC is 0xFF.
+    // The CRC polynomial: X^8 + X^5 + X^4 + 1 =&gt; 0b00110001 (0x31)
+    uint8_t crc = 0xff;
+    for ( uint8_t j=0; j &lt; len; j++ ) {
+       crc ^= data[j];
+       for ( uint8_t i=0; i &lt; 8; i++ ) {
+         if (crc &amp; 0x80) {
+           crc = (crc &lt;&lt; 1) ^ 0x31;
+         } else {
+           crc = crc &lt;&lt; 1;
+        }
+      }
+    }
+    return crc;
+  }
+
+  bool read( float *humidity, float *temperature ) {
+    Wire.beginTransmission( addr );
+    Wire.write( AHT2x::AHT2X_MEASURE_CMD, 3 );
+    Wire.endTransmission();
+    // After the host sends a trigger-measurement command (0xAC),
+    // a delay of 80+ msec is necessary before reading the data.
+    delay(100);
+    Wire.requestFrom( (int)addr, 7 );
+    if ( Wire.available() &gt;= 7 ) { // expect 7 bytes from the sensor
+       uint8_t buf[7] = {0};
+       for( int i=0; i &lt; 7; i++ ) {
+         buf[i] = Wire.read();
+       } 
+       uint8_t crc8 = buf[6];
+       if ( buf[0] &amp; 0x80 ) { // AHT2x busy
+          return false; // failed
+       }
+       if ( AHT2x::crc8( buf, 6 ) != crc8 ) { // CRC8 failed
+          *humidity = 0.0;
+          *temperature = 0.0;
+          return false; // failed
+       } else {
+          uint32_t value;
+          // 20-bit raw value for humidity
+          value = buf[1];
+          value = (value &lt;&lt; 8) | buf[2];
+          value = (value &lt;&lt; 8) | buf[3];
+          value &gt;&gt;= 4;
+          *humidity = (100.0*value)/(1UL&lt;&lt;20);
+          // 20-bit raw value for temperature
+          value = (buf[3] &amp; 0x0F);
+          value = (value &lt;&lt; 8) | buf[4];
+          value = (value &lt;&lt; 8) | buf[5];
+          *temperature = ((200.0*value)/(1UL&lt;&lt;20)) - 50;
+          return true; // ok
+       }
+    }
+    return false;
+  }
+
+};
+
+const uint8_t AHT2x::AHT2X_CALIB_CMD[3]   = {0xBE, 0x08, 0x00};
+const uint8_t AHT2x::AHT2X_MEASURE_CMD[3] = {0xAC, 0x33, 0x00};
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับ <strong>ESP32</strong>
+และมีการสร้างอ็อบเจกต์จากคลาส <code>AHT2x</code> เพื่อใช้ในการอ่านข้อมูลจากโมดูลเซนเซอร์ <strong>AHT20</strong>
+และนำไปใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> (<strong>WeMos Lolin32 Lite Board</strong>)</p>
+<pre><code>// File: esp32_aht2x_demo.ino
+// Date: 2023-11-13
+#include &quot;aht2x.h&quot;
+
+// Select I2C Pins for ESP32.
+#define I2C_SDA_PIN   (16)
+#define I2C_SCL_PIN   (17)
+
+// Set time interval (in msec) for sensor readings
+#define INTERVAL_MSEC (4000)
+
+AHT2x aht2x; // Create an object from the AHT2x class.
+
+void setup() {
+  // Initialize the serial port.
+  Serial.begin(115200);
+  // Show the compile date and time of the sketch.
+  Serial.println( &quot;\n\nCompiled on &quot; __DATE__ &quot;, at &quot; __TIME__ );
+  Serial.println( &quot;Set I2C pins for ESP32...&quot; );
+  // Set the I2C speed and initialize the I2C bus.
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN, 400000 );
+  Serial.printf( &quot;I2C clock frequency: %lu\n&quot;, Wire.getClock() );
+  Serial.printf( &quot;I2C timeout: %u msec\n&quot;, Wire.getTimeOut() );
+
+  // Initialize the AHT2x sensor.
+  aht2x.init();
+  delay(500);
+}
+
+void loop() {
+  static uint32_t ts;
+  uint32_t now = millis();
+  if ( now - ts &gt;= INTERVAL_MSEC ) {    
+    float t, rh;
+    ts = now;
+    // Read sensor values from the AHT2x.
+    if ( aht2x.read( &amp;rh, &amp;t ) ) { // ok
+      Serial.printf( &quot;T: %.1f deg.C, H: %.1f %%RH\n&quot;, t, rh );
+    } else { // error
+      Serial.printf( &quot;AHT2x reading error!\n&quot; );
+    }
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32-sh1106-oled">&#9655; <strong>ตัวอย่างโค้ดสำหรับ Arduino ESP32 + SH1106 OLED</strong><a class="headerlink" href="#arduino-esp32-sh1106-oled" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการใช้งานโมดูลเซนเซอร์ <strong>AHT2x</strong> 
+และโมดูล <strong>SH1106 OLED (Organic LED)</strong> ขนาด <strong>1.3" (128x64 pixels)</strong>
+โดยเลือกใช้งานไลบรารีที่มีชื่อว่า 
+<a href="https://github.com/ThingPulse/esp8266-oled-ssd1306/"><code>esp8266-oled-ssd1306</code></a>
+ทั้งสองอุปกรณ์ใช้วิธีเชื่อมต่อแบบ <strong>I2C</strong> และมีแอดเดรสสำหรับ <strong>I2C Slave Devices</strong>
+ที่แตกต่างกัน</p>
+<pre><code class="language-c++">// File: esp32_aht2x_sh1106_oled_demo.ino
+// Date: 2023-11-13
+#include &lt;Wire.h&gt;
+#include &quot;aht2x.h&quot;
+
+#include &quot;SH1106Wire.h&quot; // The library must be already installed.
+// see: https://github.com/ThingPulse/esp8266-oled-ssd1306/
+
+// Select I2C Pins for ESP32.
+#define I2C_SDA_PIN  (16)
+#define I2C_SCL_PIN  (17)
+
+// Set the update interval (in msec) for AHT2x sensor.
+#define INTERVAL_MSEC (4000) 
+
+#define AHT2x_I2C_ADDR  (0x38)
+#define OLED_I2C_ADDR   (0x3C)
+
+// Create an object from the AHT2x class.
+AHT2x aht2x( AHT2x_I2C_ADDR );
+
+// Create an object from the SH1106Wire class.
+SH1106Wire display( OLED_I2C_ADDR, -1 /*sda*/, -1 /*scl*/, 
+                    GEOMETRY_128_64, I2C_ONE /*Wire*/, -1 );
+
+void initOLED() {
+  display.init();
+  display.flipScreenVertically();
+  display.clear();
+  display.setFont( ArialMT_Plain_16 );
+  display.setTextAlignment( TEXT_ALIGN_CENTER );
+  display.drawString( 64,  8, String(&quot;ESP32 Demo&quot;)  );
+  display.drawString( 64, 32, String(&quot;SH1106 OLED&quot;) );
+  display.display();
+}
+
+void setup() {
+  // Initialize the serial port.
+  Serial.begin(115200);
+  // Show the compile date and time of the sketch.
+  Serial.println( &quot;\n\nCompiled on &quot; __DATE__ &quot;, at &quot; __TIME__ );
+  Serial.println( &quot;Set I2C pins for ESP32...&quot; );
+  // Set the I2C speed and initialize the I2C bus.
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+
+  // Initialize the OLED display.
+  initOLED();
+  // Initialize the AHT2x sensor.
+  aht2x.init();
+  delay(500);
+}
+
+void loop() {
+  static uint32_t ts;
+  uint32_t now = millis();
+  if ( now - ts &gt;= INTERVAL_MSEC ) {    
+    float t, rh;
+    ts = now;
+    String line1 = &quot;T: &quot;, line2 = &quot;H: &quot;;
+    // Read sensor values from the AHT2x.
+    if ( aht2x.read( &amp;rh, &amp;t ) ) { // ok
+      Serial.printf( &quot;T: %.1f deg.C, H: %.1f %%RH\n&quot;, t, rh );
+      line1 += t;
+      line1 += &quot; deg.C&quot;;
+      line2 += rh;
+      line2 += &quot; %RH&quot;;
+    } else { // error
+      Serial.printf( &quot;AHT2x reading error!\n&quot; );
+      line1 += &quot;--.- deg.C&quot;;
+      line2 += &quot;--.- %RH&quot;;
+    }
+    display.clear();
+    display.drawString( 64,  8, line1 );
+    display.drawString( 64, 32, line2 );
+    display.display();
+  }
+}
+</code></pre>
+<p><img alt="" src="oled_sh1106_1.3inch_black.png" /></p>
+<p>รูป: โมดูล <strong>OLED + SH1106 Driver</strong> ขนาด 1.3 นิ้ว (128 x 64 พิกเซล)
+สามารถใช้แรงดันไฟเลี้ยง <strong>3.3V</strong> หรือ <strong>5V</strong> ได้ (มีไอซี <strong>XC6206 3.3V LDO</strong>
+และมีตัวต้านทาน <strong>4.7k</strong> แบบ <strong>Pull-up</strong> ที่ขา <strong>SCL</strong> และ <strong>SDA</strong> ไปยังไฟเลี้ยง <strong>3.3V</strong>)</p>
+<p><img alt="" src="esp32_aht2x_oled-1.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองสำหรับโมดูล <strong>AHT21</strong></p>
+<p><img alt="" src="esp32_aht2x_oled-2.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองสำหรับโมดูล <strong>AHT20</strong></p>
+<p>แต่ถ้าจะลองใช้ไลบรารี <a href="https://github.com/adafruit/Adafruit_SH110x"><code>Adafruit_SH110X</code></a>
+ของบริษัท <strong>Adafruit</strong> ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+
+#define SH110X_NO_SPLASH
+#include &lt;Adafruit_GFX.h&gt;
+#include &lt;Adafruit_SH110X.h&gt;
+// see: https://github.com/adafruit/Adafruit_SH110x
+
+#include &quot;aht2x.h&quot;
+
+// Select I2C Pins for ESP32
+#define I2C_SDA_PIN  (16)
+#define I2C_SCL_PIN  (17)
+
+#define INTERVAL_MSEC (4000) 
+
+#define AHT2x_I2C_ADDR (0x38)
+#define OLED_I2C_ADDR  (0x3C)
+
+#define SCREEN_WIDTH  (128)
+#define SCREEN_HEIGHT  (64)
+
+// Create an object from the Adafruit_SH1106G class.
+Adafruit_SH1106G display( SCREEN_WIDTH, SCREEN_HEIGHT, 
+                          &amp;Wire, -1, 100000, 100000 );
+
+// Create an object from the AHT2x class.
+AHT2x aht2x( AHT2x_I2C_ADDR );
+
+void showCenteredText( int ypos, const String &amp;text ) {
+  int16_t x, y;
+  uint16_t text_h, text_w;
+  display.getTextBounds(text, 0, 0, &amp;x, &amp;y, &amp;text_w, &amp;text_h);
+  int xpos = (SCREEN_WIDTH  - text_w) / 2;
+  display.setCursor(xpos, ypos);
+  display.println(text);
+}
+
+void initOLED() {
+ if( !display.begin(OLED_I2C_ADDR, false) ) {
+    Serial.println( &quot;OLED init failed!&quot; );
+    for(;;) delay(10);
+  }
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor( SH110X_WHITE );
+  showCenteredText( 16, String(&quot;ESP32 Demo&quot;) );
+  showCenteredText( 32, String(&quot;SH1106 OLED&quot;) );
+  display.display();
+  delay(2000);
+}
+
+void setup() {
+  // Initialize the serial port.
+  Serial.begin(115200);
+  // Show the compile date and time of the sketch.
+  Serial.println( &quot;\n\nCompiled on &quot; __DATE__ &quot;, at &quot; __TIME__ );
+  Serial.println( &quot;Set I2C pins for ESP32...&quot; );
+  // Set the I2C speed and initialize the I2C bus.
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+  //Wire.setClock( 400000 );
+
+  // Initialize the OLED display.
+  initOLED();
+  // Initialize the AHT2x sensor.
+  aht2x.init();
+  delay(500);
+}
+
+void loop() {
+  static uint32_t ts;
+  uint32_t now = millis();
+  if ( now - ts &gt;= INTERVAL_MSEC ) {    
+    float t, rh;
+    ts = now;
+    String line1 = &quot;T: &quot;, line2 = &quot;H: &quot;;
+    // Read sensor values from the AHT2x.
+    if ( aht2x.read( &amp;rh, &amp;t ) ) { // ok 
+      Serial.printf( &quot;T: %.1f deg.C, H: %.1f %%RH\n&quot;, t, rh );
+      line1 += t;
+      line1 += &quot; deg.C&quot;;
+      line2 += rh;
+      line2 += &quot; %RH&quot;;
+    } else { // error
+      Serial.printf( &quot;AHT2x reading error!\n&quot; );
+      line1 += &quot;--.- deg.C&quot;;
+      line2 += &quot;--.- %RH&quot;;
+    }
+    display.clearDisplay();
+    showCenteredText( 16, line1 );
+    showCenteredText( 32, line2 );
+    display.display();
+  }
+}
+</code></pre>
+<p><img alt="" src="esp32_oled_sh1106_adafruit_lib.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองโดยเลือกใช้ไลบรารี <code>Adafruit_SH110X</code></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอการใช้งานโมดูลที่มีไอซี <strong>AHT2x</strong> ซึ่งเป็นเซนเซอร์สำหรับการวัดค่าความชื้นสัมพัทธ์
 และอุณหภูมิ โดยนำมาทดลองใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> 
@@ -459,7 +802,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-08-21 | Last Updated: 2023-01-07</p></div>
+<p>Created: 2022-08-21 | Last Updated: 2023-11-13</p></div>
             </div>
         </div>
 
