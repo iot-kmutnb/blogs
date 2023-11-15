@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/sensors/max4466/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูล MAX4466 Sound Sensor - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#max4466-sound-sensor" class="nav-link">การใช้งานโมดูล MAX4466 Sound Sensor</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#max4466-electret-microphone-amplifier" class="nav-link">&#9655; MAX4466 Electret Microphone Amplifier</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#max4466-arduino-esp32" class="nav-link">&#9655; การอ่านค่าสัญญาณจากโมดูล MAX4466 ด้วย Arduino-ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การทดสอบด้วยสัญญาณเสียง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="max4466-sound-sensor">การใช้งานโมดูล MAX4466 Sound Sensor<a class="headerlink" href="#max4466-sound-sensor" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="max4466-electret-microphone-amplifier">&#9655; <strong>MAX4466 Electret Microphone Amplifier</strong><a class="headerlink" href="#max4466-electret-microphone-amplifier" title="Permanent link">#</a></h2>
+<p>ในบทความนี้กล่าวถึง การทดลองใช้งานโมดูล <strong>GY-MAX4466</strong> ที่มีราคาไม่แพง และใช้ไอซี 
+<a href="https://www.analog.com/media/en/technical-documentation/data-sheets/max4465-max4469.pdf"><strong>MAX4466</strong></a>
+ของบริษัท <strong>Maxim Integrated / Analog Devices</strong> สำหรับการขยายสัญญาณแอนะล็อก
+จากไมโครโฟนเสียงประเภท <strong> Electret Condenser Microphone</strong>
+และสามารถปรับอัตราการขยายสัญญาณได้ (<strong>Adjustable Gain</strong>)</p>
+<p><img alt="" src="max4466_circuit.png" /></p>
+<p>รูป: ตัวอย่างวงจรสำหรับการใช้งานไอซี <strong>MAX4466</strong> (ปรับค่า <strong>Gain</strong> ไม่ได้)</p>
+<p><img alt="" src="adafruit_max4466_schematic.png" /></p>
+<p>รูป: ผังวงจรของโมดูล <a href="https://www.adafruit.com/product/1063"><strong>MAX4466 Electret Microphone Amplifier</strong></a>
+ของบริษัท <strong>Adafruit</strong> (ปรับค่า <strong>Gain</strong> ได้)</p>
+<p>&nbsp;</p>
+<p>คุณลักษณะของโมดูล <strong>GY-MAX4466</strong></p>
+<ul>
+<li>โมดูลมีขาสำหรับการเชื่อมต่อ 3 ขา<ul>
+<li>ขา <strong>VCC</strong> (<strong>Supply Voltage</strong>: <strong>2.4V ~ 5V</strong>)</li>
+<li>ขา <strong>GND</strong> (<strong>Ground</strong>)</li>
+<li>ขา <strong>OUT</strong> (<strong>Analog Output</strong>) </li>
+</ul>
+</li>
+<li>สัญญาณเอาต์พุตที่ขา <strong>OUT</strong> เป็นแบบ <strong>DC-biased</strong>
+และระดับแรงดันไฟฟ้าจะอยู่ที่ประมาณ <strong>VCC/2</strong> (ถ้าไม่มีเสียง)
+และมีค่าแอมพลิจูดประมาณ <strong>1Vpp</strong> (<em>peak-to-peak</em>)</li>
+<li>มีตัวต้านทานปรับค่าได้ (<strong>Trimpot / Potentiometer</strong>) ขนาด <strong>100k</strong>
+เพื่อปรับเลือกค่าอัตราการขยายสัญญาณ (ปรับค่าได้ในช่วงประมาณ  <strong>25 ~ 125</strong> เท่า)</li>
+</ul>
+<p><img alt="" src="max4466_modules.png" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>MAX4466</strong> (มุมมองด้านหน้าและด้านหลัง)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="max4466-arduino-esp32">&#9655; <strong>การอ่านค่าสัญญาณจากโมดูล MAX4466 ด้วย Arduino-ESP32</strong><a class="headerlink" href="#max4466-arduino-esp32" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับ <strong>Arduino-ESP32 v3.0.0</strong>
+เพื่ออ่านค่าสัญญาณแอนะล็อกจากโมดูล <strong>MAX4466</strong> (ใช้แรงดันไฟเลี้ยง <strong>VCC=+3.3V</strong>)
+โดยใช้วงจร <strong>ADC</strong> ของไมโครคอนโทรลเลอร์ <strong>ESP32</strong> และรับสัญญาณอินพุตเข้าที่ขา <strong>GPIO34</strong></p>
+<p>การอ่านค่าสัญญาณอินพุตจะเกิดขึ้นด้วยอัตราคงที่ โดยมีการเปิดใช้งานวงจรตัวนับ หรือ <strong>Hardware Timer</strong>
+ของ <strong>ESP32</strong> ให้นับขึ้นด้วยความเร็ว <strong>1MHz</strong> (หรือความละเอียดในการนับ <strong>1usec</strong>) 
+และเปิดใช้งานอินเทอร์รัพท์เมื่อนับตามช่วงเวลา (<strong>Time Interval</strong>) ที่ได้กำหนดไว้ 
+ซึ่งเป็นตัวกำหนดความถี่ในการอ่านค่า (<strong>Sampling Rate</strong>) เช่น <strong>10kHz</strong></p>
+<p>เมื่อมีการนับตามจังหวะได้หนึ่งรอบตามช่วงเวลาที่ได้กำหนดไว้ จะเกิดอินเทอร์รัพท์และมีการเริ่มต้นนับใหม่ที่ 0 
+และมีการเรียกฟังก์ชันที่ทำหน้าที่เป็น <strong>Callback Function</strong> หรือ <strong>ISR
+(Interrupt Service Routine)</strong>
+(ฟังก์ชันชื่อ <code>timer_callback</code> ในโค้ดตัวอย่าง) ถ้าตัวแปรสำหรับเงื่อนไข <code>sampling</code> มีค่าเป็น <code>true</code>
+ก็จะมีการอ่านค่าสัญญาณแอนะล็อกและบันทึกค่าที่ได้ลงในอาร์เรย์ที่ได้เตรียมไว้ (<code>samples[]</code>)</p>
+<p>เมื่อฟังก์ชัน <code>timer_callback()</code> ทำงานในแต่ละครั้ง ขา <strong>GPIO</strong> สำหรับ <strong>LED</strong>
+จะมีลอจิกเป็น <strong>High</strong> และเมื่อจบการทำงานของฟังก์ชันจะมีลอจิกเป็น <strong>Low</strong>
+ดังนั้นถ้าวัดสัญญาณเอาต์พุตนี้ด้วยออสซิลโลสโคป จะทำให้เห็นช่วงเวลาในการทำงานของฟังก์ชันนี้</p>
+<p>ตัวแปร <code>sampling</code> เริ่มต้นมีค่าเป็น <code>false</code> ดังนั้นจึงจะไม่มีการอ่านค่าอินพุต
+จนกว่าจะมีการส่งข้อความใด ๆ ก็ได้มาหนึ่งบรรทัด จึงจะเริ่มต้นการอ่านและบันทึกข้อมูล
+การอ่านค่าสัญญาณแอนะล็อกด้วย <strong>ADC</strong> จะได้เป็นเลขจำนวนเต็ม (ขนาด 12 บิต) โดยใช้ฟังก์ชัน
+<code>analogReadMilliVolts(...)</code> ได้ค่าเป็นตัวเลขที่มีหน่วยเป็นมิลลิโวลต์</p>
+<p>เมื่อเก็บค่าลงในอาร์เรย์จนครบตามจำนวน (ตั้งค่า <code>N</code> ไว้เท่ากับ 1024)
+ก็จะหยุดการอ่านสัญญาณอินพุตและบันทึกข้อมูลในอาร์เรย์ชั่วคราว
+และถัดไปจะมีการส่งข้อมูลทั้งหมด แปลงให้เป็นข้อความ หนึ่งค่าตัวเลขต่อหนึ่งบรรทัด
+ส่งออกไปตามลำดับทาง <strong>Serial Port</strong> โดยใช้ค่า <strong>Baudrate</strong> เท่ากับ <strong>921600</strong>
+เมื่อส่งข้อมูลได้ครบตามจำนวนที่ต้องการแล้ว จึงเริ่มการอ่านสัญญาณอินพุตและบันทึกค่าในรอบถัดไป</p>
+<pre><code class="language-c++">const int ADC_PIN = 34;   // ADC1_CH6 / GPIO34 pin
+const int LED_PIN = 22;   // LED pin
+
+uint32_t sample_index = 0;
+bool sampling = false;
+QueueHandle_t adc_queue;
+
+const uint32_t Fs = 10000; // Sampling frequency (Hz)
+const uint32_t N  = 1024;  // Number of samples
+
+uint32_t sample_count = 0;
+uint16_t samples[N];
+
+//----------------------------------------------------------------
+// Callback function of the hardware timer.
+void IRAM_ATTR timer_callback() {
+  if (!sampling)
+      return;
+  digitalWrite( LED_PIN, HIGH );
+  uint16_t value = (uint16_t)analogReadMilliVolts( ADC_PIN );
+  samples[sample_count++] = value;
+  if ( sample_count == N ) {
+    sampling = false;
+    sample_count = 0;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;  
+    xQueueSendFromISR(adc_queue, &amp;sampling, &amp;xHigherPriorityTaskWoken);
+    if (xHigherPriorityTaskWoken == pdTRUE) {
+      portYIELD_FROM_ISR();
+    }
+  }
+  digitalWrite( LED_PIN, LOW );
+}
+
+// Initialize the ADC input channel.
+void initADC() { 
+  // Set ADC resolution to 12 bits
+  analogSetWidth( 12 );
+  // Set attenuation level to 11 dB.
+  analogSetPinAttenuation( ADC_PIN, ADC_11db ); 
+}
+
+// Initialize the hardware timer.
+void initTimer( uint32_t hw_timer_unit=0 ) {
+  static hw_timer_t *timer = NULL;
+  timer = timerBegin( 1000000UL ); // 1MHz (1us tick)
+  timerWrite(timer, 0);
+  // Attach the callback function (ISR) to the timer
+  timerAttachInterrupt( timer, &amp;timer_callback );
+  timerAlarm(timer, 1000000UL/Fs /*interval*/,
+             true /*reload*/, 0 /*reload value*/); 
+  timerRestart(timer);
+}
+
+void setup() {
+  Serial.begin(921600);
+  Serial.setTxBufferSize(1024);
+  Serial.flush();
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+  adc_queue = xQueueCreate(1, sizeof(uint32_t));
+  initADC();   // Initialize the ADC.
+  initTimer(); // Initialize the hardware timer.
+}
+
+void loop() {
+  uint32_t flag;
+  while (Serial.available()) {
+    if (Serial.read() == '\n') {
+       sampling = true; // Start the ADC sampling process.
+    }
+  }
+  // Wait for an event from the ISR (with 5 msec timeout).
+  if (xQueueReceive(adc_queue, &amp;flag, 5)) {
+    // Send out the samples.
+    for ( uint32_t i=0; i &lt; N; i++ ) {
+      Serial.printf(&quot;%lu\n&quot;, samples[i] );
+    }
+    Serial.flush();
+    sampling = true;  // Restart the ADC sampling process.
+  }
+}
+</code></pre>
+<p>การวัดสัญญาณที่ขา <strong>LED</strong> เมื่อทดสอบการทำงานของโค้ดตัวอย่าง
+จะทำให้เห็นช่วงเวลาในการทำงานของ <strong>ISR</strong> </p>
+<p><img alt="" src="esp32_adc_timer-1.png" /></p>
+<p>รูป: ช่วงเวลาที่มีการทำงานของ <strong>ISR</strong> ตามจังหวะของ <strong>Hardware Timer</strong>
+เพื่ออ่านค่าจากสัญญาณแอนะล็อก</p>
+<p>จากรูปจะเห็นได้ว่า มีการเกิดอินเทอร์รัพท์และการทำงานของ <strong>ISR</strong> หรือ <strong>Callback Function</strong>
+ทุก ๆ <strong>100 usec</strong> (หรือ <strong>10kHz Sampling Rate</strong>) และใช้เวลาในการทำงานประมาณ <strong>50 usec</strong>
+(ช่วงที่ <strong>LED</strong> มีสถานะเป็น <strong>High</strong>)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="esp32_adc_timer-2.png" /></p>
+<p>รูป: ช่วงเวลาที่มีการทำงานของ <strong>ISR</strong> และช่วงเวลาที่ส่งข้อมูลออกทาง <strong>Serial Port</strong></p>
+<p>จากรูปจะเห็นได้ว่า ช่วงที่ไม่มีการทำงานของ <strong>ISR</strong> สถานะลอจิกของ <strong>LED</strong> จะเป็น <strong>Low</strong>
+และเป็นช่วงที่มีการส่งข้อมูลออกทาง <strong>Serial Port</strong> โดยใช้เวลาประมาณ <strong>52 msec</strong></p>
+<p>การทดสอบการทำงานของระบบ แนะนำให้เริ่มต้นด้วยการสร้างสัญญาณภายนอกจากเครื่องกำเนิดสัญญาณ
+(<strong>Function Generator</strong>) เช่น สัญญาณรูปคลื่นไซน์
+<strong>Vpp=2V, DC Offset=1.5V, Frequency=440Hz</strong>
+แล้วป้อนเข้าที่ขา <strong>ADC Input (GPIO34)</strong> แล้วแสดงกราฟข้อมูลด้วย
+<strong>Arduino Serial Plotter</strong> (ตั้งค่า <strong>Baudrate</strong> เท่ากับ <strong>921600</strong>)</p>
+<p><img alt="" src="sinewave_test.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณทดสอบจาก <strong>Function Generator</strong> และวัดสัญญาณด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="440hz_test-1.png" /></p>
+<p>รูป: การแสดงลำดับข้อมูลที่ได้รับในรูปของกราฟสัญญาณด้วย <strong>Arduino Serial Plotter</strong></p>
+<p><img alt="" src="esp32_adc_function_generator.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองเพื่อวัดสัญญาณแอนะล็อกจากเครื่อง <strong>Function Generator</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การทดสอบด้วยสัญญาณเสียง</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการทดสอบด้วยสัญญาณเสียง และใชโมดูล <strong>MAX4466</strong> เป็นเซนเซอร์สำหรับสัญญาณเสียง
+โดยนำสัญญาณเอาต์พุตที่ได้ ไปต่อเข้ากับขา <strong>ADC Input (GPIO34)</strong> ของบอร์ด <strong>ESP32</strong></p>
+<p>จากนั้นลองเปิดเสียงความถี่คงที่โดยใช้คอมพิวเตอร์ เช่น การเปิดคลิปจาก <strong>YouTube</strong>
+ที่สร้างสัญญาณเสียงความถี่ <strong>440Hz</strong> 
+<a href="https://www.youtube.com/watch?v=xGXYFJmvIvk">https://www.youtube.com/watch?v=xGXYFJmvIvk</a>
+และเปิด <strong>Arduino Serial Plotter</strong> เพื่อแสดงลำดับข้อมูลที่ได้รับในรูปของกราฟสัญญาณ</p>
+<p><img alt="" src="esp32_sound_module.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองโดยใช้โมดูล <strong>MAX4466</strong> </p>
+<p><img alt="" src="440hz_test-2.png" /></p>
+<p>รูป: การวัดสัญญาณจากโมดูล <strong>MAX4466</strong> ด้วยออสซิลโลสโคป 
+แสดงผลในโหมด <strong>DC Coupling Mode</strong>
+วัดค่าแอมพลิจูดได้ประมาณ <strong>1.12Vpp (peak-to-peak)</strong></p>
+<p><img alt="" src="440hz_test-4.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณที่มีแอมพลิจูดมีค่าประมาณ <strong>0.76Vpp (peak-to-peak)</strong>
+เนื่องจากเพิ่มระยะห่างระหว่างโมดูล <strong>MAX4466</strong> กับลำโพงเสียงของคอมพิวเตอร์</p>
+<p><img alt="" src="440hz_test-3.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณจากโมดูล <strong>MAX4466</strong> 
+แสดงผลในโหมด <strong>AC Coupling Mode</strong> (แอมพลิจูดได้ประมาณ <strong>1Vpp</strong>)</p>
+<p><img alt="" src="440hz_test-5.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณจากโมดูล <strong>MAX4466</strong> 
+แสดงผลในโหมด <strong>AC Coupling Mode</strong> (แอมพลิจูดได้ประมาณ <strong>0.68Vpp</strong>)</p>
+<p>&nbsp;</p>
+<p>หากลองเปลี่ยนเป็นสัญญาณเสียงของ <strong>Piano</strong> เช่น เล่นโน้ตดนตรี <strong>A4 (440Hz)</strong> 
+โดยมีการเว้นระยะเวลาและวนซ้ำไปเรื่อย ๆ 
+(<a href="https://www.youtube.com/watch?v=1af5Ms62RDQ">https://www.youtube.com/watch?v=1af5Ms62RDQ</a>)
+แล้ววัดสัญญาณเสียงด้วยโมดูล <strong>MAX4466</strong> ก็มีตัวอย่างดังนี้</p>
+<p><img alt="" src="piano_440hz-1.png" /></p>
+<p>รูป: การวัดสัญญาณด้วยออสซิลโลสโคป ในโหมด <strong>FFT (Fast-Fourier Transform)</strong>
+เพื่อดูสเปกตรัมของสัญญาณตามความถี่</p>
+<p><img alt="" src="piano_440hz-2.png" /></p>
+<p>รูป: สัญญาณเสียงเมื่อวัดด้วยออสซิลโลสโคป  (<strong>Time/Div = 100msec</strong>)</p>
+<p><img alt="" src="piano_440hz-3.png" /></p>
+<p>รูป: สัญญาณเสียงเมื่อวัดด้วยออสซิลโลสโคป (<strong>Time/Div = 500usec</strong>)</p>
+<p><img alt="" src="piano_440hz-4.png" /></p>
+<p>รูป: การแสดงลำดับข้อมูลที่ได้รับจาก <strong>ESP32</strong> โดยใช้ <strong>Arduino Serial Plotter</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการใช้งานโมดูลที่มีไอซี <strong>MAX4466</strong> ของบริษัท 
+<strong>Maxim Integrated / Analog Devices</strong> สำหรับการขยายสัญญาณแอนะล็อก
+จากไมโครโฟนเสียงประเภท <strong> Electret Condenser Microphone</strong>
+และตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับ <strong>ESP32</strong>
+เพื่ออ่านค่าสัญญาณแอนะล็อกจากโมดูลเสียงด้วยวงจร <strong>ADC</strong> และส่งค่าออกทางพอร์ต <strong>Serial</strong>
+และสามารถนำข้อมูลไปใช้ในการประมวผลด้วยคอมพิวเตอร์ในขั้นตอนต่อไปได้</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-11-14 | Last Updated: 2022-11-15</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
