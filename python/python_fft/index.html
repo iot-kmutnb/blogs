@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/python/python_fft/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การอ่านค่าสัญญาณเสียงด้วย Python และการแสดงรูปสเปกตรัมเชิงความถี่ - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#python" class="nav-link">การอ่านค่าสัญญาณเสียงด้วย Python และการแสดงรูปสเปกตรัมเชิงความถี่</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#fft-fast-fourier-transform" class="nav-link">&#9655; FFT (Fast-Fourier Transform)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pyaudio" class="nav-link">&#9655; PyAudio</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="python">การอ่านค่าสัญญาณเสียงด้วย Python และการแสดงรูปสเปกตรัมเชิงความถี่<a class="headerlink" href="#python" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การเขียนโค้ด <strong>Python</strong> เพื่ออ่านค่าสัญญาณเสียงจากไมโครโฟน และวิเคราะห์ข้อมูลด้วย
+<strong>FFT (Fast-Fourier Transform)</strong> สำหรับการแสดงผลในรูปของสเปกตรัมเชิงความถี่ </p>
+<p><strong>Keywords:</strong> <em>Python</em>, <em>PyAudio</em>, <em>NumPy / Matplotlib</em></p>
+<hr />
+<h2 id="fft-fast-fourier-transform">&#9655; <strong>FFT (Fast-Fourier Transform)</strong><a class="headerlink" href="#fft-fast-fourier-transform" title="Permanent link">#</a></h2>
+<p><strong>FFT</strong> เป็นอัลกอริทึมที่มีประสิทธิสูงสำหรับการคำนวณทางคณิตศาสตร์ตามรูปแบบที่เรียกว่า
+<strong>Discrete Fourier Transform (DFT)</strong> ซึ่งเป็นหนึ่งในวิธีการวิเคราะห์สัญญาณของฟูเรียร์
+(<strong>Fourier Analysis</strong>) </p>
+<p>อินพุตเป็นชุดข้อมูลจำนวนจำกัดที่ได้จาก "การชักตัวอย่าง" หรือ "การสุ่มตัวอย่าง" 
+(<strong>Sampling</strong>) ของสัญญาณที่มีการเปลี่ยนแปลงค่าในเชิงเวลา 
+และได้เอาต์พุตเป็นชุดของค่าสัมประสิทธิ์ที่เป็นเลขเชิงซ้อน (<strong>DFT Coefficients</strong>)
+ที่มีจำนวนเท่ากันกับข้อมูลอินพุต และนำไปวิเคราะห์คุณสมบัติของสัญญาณในเชิงความถี่
+เช่น การแสดงผลในรูปแบบที่เรียกว่า "สเปกตรัมเชิงความถี่" (<strong>Frequency Spectrum</strong>)
+ซึ่งแสดงองค์ประกอบของสัญญาณในโดเมนความถี่</p>
+<p><strong>FFT</strong> ถูกจัดอยู่ในกลุ่มที่เรียกว่า "การประมวลผลสัญญาณดิจิทัล" (<strong>DSP: Digital Signal Processing</strong>) 
+และใช้สำหรับการวิเคราะห์ชุดข้อมูลหรือสัญญาณดิจิทัลในเชิงความถี่</p>
+<p>ถ้าจะประมวลผลข้อมูลด้วยการเขียนโปรแกรมในภาษา <strong>Python</strong>
+ก็สามารถทำได้ง่าย เนื่องจากมีไลบรารี หรือ แพ็กเกจ (<strong>Python Packages</strong>) เช่น <a href="https://numpy.org/"><strong>NumPy</strong></a> ไว้ให้ใช้งาน</p>
+<p>ลองมาดูตัวอย่างโค้ด <strong>Python</strong> ที่มีการใช้งาน <strong>NumPy</strong> และ <strong>Matplotlib</strong>
+เพื่อการวิเคราะห์ข้อมูลสังเคราะห์ที่ได้จากการชักตัวอย่าง
+ด้วยอัตราคงที่ จากสัญญาณรูปคลื่นไซน์ (<strong>Sinusoidal Wave</strong>) ที่มีความถี่เท่ากับ <strong>500Hz</strong>
+และมีสัญญาณรบกวน (<strong>Noise</strong>) รวมอยู่ด้วย</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+N  = 1024  # Number of samples
+Fs = 8000  # Sampling frequency in Hz
+f  = 500   # The frequency of the sine wave as a test signal.
+A  = 10000 # The amplitude of the sine wave (=&gt; 16-bit signed).
+ts = np.arange(N)/Fs  # time values
+noise = (10*np.random.uniform(-1, 1, size=N)).astype(np.int16)
+data  = (A*np.sin(2*np.pi*f*ts)).astype(np.float32)
+data += noise # data plus noise
+
+# Apply a window function (Hanning window in this case)
+window_coeffs = np.hanning(N).astype( np.float32 )
+windowed_data = data * window_coeffs
+
+# Compute the FFT using NumPy
+fft_result = np.fft.fft( windowed_data )
+
+# Compute the magnitude spectrum, 
+# normalized by dividing the magnitude by N
+magnitude_fft = np.abs(fft_result) / N 
+
+# Convert magnitude to decibels (dB)
+magnitude_spectrum_db = 20 * np.log10(magnitude_fft + 1e-9)
+
+# Create a frequency axis for the plot
+freq_axis = np.fft.fftfreq(len(data), d=1.0/Fs)
+
+# Plot the magnitude spectrum in dB
+plt.figure(figsize=(10, 6))
+plt.plot(freq_axis[:N//2], magnitude_spectrum_db[:N//2])
+plt.title('Magnitude Spectrum (dB)')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Magnitude (dB)')
+plt.ylim(-100,100)
+plt.grid(True)
+plt.show()
+</code></pre>
+<p>การชักตัวอย่างจะเก็บข้อมูลตัวอย่าง (<strong>Samples</strong>) ที่มีจำนวนทั้งหมด <strong>N = 1023</strong>
+ความถี่ของการชักตัวอย่างคือ <strong>Fs = 8000 Hz</strong> 
+ดังนั้นจึงเป็นไปตามเงื่อนไขของ <strong>Nyquist</strong> กล่าวคือ
+อัตราการสุ่มตัวอย่าง (ในหน่วยของตัวอย่างต่อวินาที) จะต้องไม่น้อยกว่าสองเท่าของความถี่สูงสุดของสัญญาณ
+(กำหนดค่าความถี่ของสัญญาณไซน์คือ <strong>500Hz</strong>)</p>
+<p>ข้อมูลตัวอย่างจะถูกอ้างอิงโดยตัวแปรชื่อ <code>data</code> และเป็นอาร์เรย์ตามรูปแบบของ
+<strong>NumPy Array</strong> (<a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html"><code>numpy.array</code></a>)
+ที่มีชนิดข้อมูลเป็น <code>numpy.float32</code> ก่อนจะนำไปคำนวนตามรูปแบบของ
+<strong>FFT</strong> จะต้องนำอาร์เรย์ของข้อมูลตัวอย่างไปคูณ (การคูณแบบทีละตัวเลข) กับอาร์เรย์ที่ได้จากฟังก์ชันหน้าต่าง
+(<a href="https://numpy.org/doc/stable/reference/routines.window.html"><strong>Window Functions</strong></a>)
+เช่น <strong>Hanning Function</strong> (<a href="https://numpy.org/doc/stable/reference/generated/numpy.hanning.html"><code>numpy.hanning</code></a>)
+หรือ <strong>Hamming Function</strong> (<a href="https://numpy.org/doc/stable/reference/generated/numpy.hamming.html"><code>numpy.hamming</code></a>)
+และผลลัพธ์ที่ได้จะถูกอ้างอิงโดยตัวแปร <code>windowed_data</code> แล้วจึงนำไปใช้กับฟังก์ชัน
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.fft.fft.html"><code>numpy.fft.fft()</code></a></p>
+<p>ผลการแปลงสัญญาณข้อมูลด้วย <strong>FFT</strong> จะได้อาร์เรย์ของตัวเลขเชิงซ้อนที่มีจำนวนเท่ากับจำนวนข้อมูลตัวอย่าง
+ถ้าต้องการแสดงรูปกราฟของสเปกตรัมความถี่สำหรับขนาด (หรือ <strong>Magnitude</strong>)
+จะต้องนำไปคำนวณหาขนาดของตัวเลขเชิงซ้อนเหล่านั้น และแสดงรูปกราฟโดยมีแกนตั้งเป็นขนาด
+(คำนวณค่าให้มีหน่วยเป็น <strong>dB</strong>) และแกนนอนเป็นความถี่ (หน่วยเป็น <strong>Hz</strong>) เริ่มต้นที่ <strong>0</strong> จนถึง <strong>Fs/2</strong></p>
+<p><img alt="" src="python_fft_sin_no_noise.png" /></p>
+<p>รูป: ตัวอย่างของสัญญาณไซน์ <strong>500Hz</strong> (ไม่มีสัญญาณรบกวน) 
+และสเปกตรัมเชิงความถี่สำหรับขนาด (<strong>Magnitude Spectrum</strong>)</p>
+<p><img alt="" src="python_fft_sin_with_noise.png" /></p>
+<p>รูป: ตัวอย่างของสัญญาณไซน์ <strong>500Hz</strong> (มีสัญญาณรบกวน) และสเปกตรัมเชิงความถี่ (แมกนิจูด)</p>
+<p>จากรูปกราฟ จะเห็นได้ว่า ขนาดของสเปกตรัมที่มีค่าสูงสุดจะตรงกับความถี่ของสัญญาณไซน์ที่เป็นสัญญาณทดสอบ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pyaudio">&#9655; <strong>PyAudio</strong><a class="headerlink" href="#pyaudio" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการอ่านค่าของสัญญาณเสียง โดยใช้ไมโครโฟนของเครื่องคอมพิวเตอร์ผู้ใช้เป็นอุปกรณ์อินพุต หรือ เซนเซอร์เสียง ก็ทำได้สะดวกเช่นกัน
+เนื่องจากมี <a href="https://pypi.org/project/PyAudio/"><strong>PyAudio</strong></a> สำหรับวัตถุประสงค์ดังกล่าว</p>
+<p><strong>PyAudio</strong> ทำหน้าที่เป็น <strong>Python Binding</strong> สำหรับไลบรารีที่มีชื่อว่า
+<a href="https://www.portaudio.com/docs/v19-doxydocs/"><strong>PortAudio v19</strong></a> (<em>a cross-platform, open-source audio I/O library</em>) ซึ่งใช้ภาษาซีในการพัฒนา
+ใช้ได้กับหลายแฟลตฟอร์ เช่น <strong>Windows</strong> และ <strong>Linux</strong></p>
+<p>ก่อนเริ่มต้นใช้งาน <strong>PyAudio</strong> จะต้องมีการติดตั้งซอฟต์แวร์ที่เกี่ยวข้องก่อน ถ้าใช้ <strong>Ubuntu (22.04 LTS)</strong>
+ให้ทำคำสั่งใน <strong>Bash Shell</strong> ดังนี้</p>
+<pre><code class="language-text">## For Ubuntu 22.04 LTS.
+
+# Show the Python 3 version
+$ python3 -V
+Python 3.10.12
+
+# Install the `portaudio19-dev` library.
+$ sudo apt install portaudio19-dev
+
+# Install the PyAudio package
+$ pip3 install pyaudio -U
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Python</strong> โดยใช้ <strong>PyAudio</strong>
+เพื่อแสดงข้อมูลเกี่ยวกับฮาร์ดแวร์ของระบบที่ทำหน้าที่เป็นอินพุตหรือเอาต์พุตสำหรับสัญญาณเสียง</p>
+<pre><code class="language-python">import pyaudio
+
+# Tested with PyAudio v0.2.14
+
+# Create a Pyaudio class instance
+p = pyaudio.PyAudio()
+
+# Get the version of PyAudio
+pyaudio_version = pyaudio.__version__
+print(f&quot;\n\nPyAudio version: {pyaudio_version}&quot;)
+
+# Get the number of audio I/O devices
+devices = p.get_device_count()
+
+# Iterate through all audio devices
+for i in range(devices):
+    # Get the device info
+    device_info = p.get_device_info_by_index(i)
+    # Check if this device is a microphone (an input device)
+    if device_info.get('maxInputChannels') &gt; 0:
+        print( f&quot;Input device: {device_info.get('name')}, &quot; +
+               f&quot;Device index: {device_info.get('index')}&quot; )
+
+p.terminate()
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต (ทดสอบกับ <strong>Ubuntu 22.04 LTS</strong>)</p>
+<pre><code class="language-text">PyAudio version: 0.2.14
+Input device: HDA Intel PCH: ALC256 Analog (hw:0,0), Device index: 0
+Input device: sysdefault, Device index: 5
+Input device: samplerate, Device index: 11
+Input device: speexrate, Device index: 12
+Input device: pulse, Device index: 13
+Input device: upmix, Device index: 14
+Input device: vdownmix, Device index: 15
+Input device: default, Device index: 17
+</code></pre>
+<p>&nbsp;</p>
+<p>เมื่อได้ลองใช้ <strong>PyAudio</strong> ในเบื้องต้นแล้ว ถัดไปเป็นโค้ดตัวอย่าง <strong>Python</strong>
+ที่สาธิตการอ่านสัญญาณเสียง โดยใช้อุปกรณ์อินพุตเสียงของคอมพิวเตอร์ผู้ใช้ (<strong>Use default input device</strong>)</p>
+<p>การอ่านให้ได้ข้อมูลเสียง หนึ่งช่องสัญญาณ (<strong>Mono</strong>) จากไมโครโฟนด้วย <strong>PyAudio</strong>
+จะทำให้ได้ชุดข้อมูลที่มีจำนวนข้อมูล <code>N</code> เช่น <strong>1024</strong>
+ข้อมูลที่ได้จาก <strong>PyAudio</strong> เป็นแบบ <strong>16-bit Signed Integer</strong>
+และจะถูกแปลงให้เป็นชนิดข้อมูล <code>numpy.float32</code></p>
+<p>อัตราการชักตัวอย่าง <code>SAMPLE_RATE</code> มีค่าเท่ากับ <strong>8000</strong>  (สามารถลองใช้ค่าอื่นที่สูงกว่านี้ได้
+เช่น <strong>16000</strong> หรือ <strong>44100</strong> เป็นต้น)</p>
+<p>เมื่อได้ข้อมูลครบตามจำนวน ก็จะแสดงรูปกราฟแบบ <strong>Time Series</strong> และรูปกราฟแบบสเปกตรัมความถี่
+หลังจากได้คำนวณค่าด้วย <strong>FFT</strong> ในรอบถัดไป จะมีการอ่านข้อมูลชุดใหม่และอัปเดตรูปกราฟ ทุก ๆ 50 มิลลิวินาที</p>
+<pre><code class="language-python">import pyaudio
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import signal
+
+# Tested with PyAudio v0.2.14
+pyaudio_version = pyaudio.__version__
+print(f&quot;PyAudio version: {pyaudio_version}&quot;)
+
+# Create a PyAudio class instance
+p = pyaudio.PyAudio()
+
+FRAME_SIZE = 1024         # Number of samples
+FORMAT = pyaudio.paInt16  # Audio format (16-bit PCM)
+CHANNELS = 1              # Mono (single channel)
+SAMPLE_RATE = 8000        # Set sampling rate in Hz
+INPUT_DEVICE_ID = None    # Use the default input audio device
+
+# stream object to get data from the microphone
+stream = p.open(
+    format=FORMAT,
+    channels=CHANNELS,
+    rate=SAMPLE_RATE,
+    input=True,
+    output=True, 
+    input_device_index=INPUT_DEVICE_ID,
+    frames_per_buffer=FRAME_SIZE
+)
+
+# Initialize plots
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
+
+# Plot for audio samples
+ts = np.arange(0, FRAME_SIZE/SAMPLE_RATE, 1/SAMPLE_RATE)
+line1, = ax1.plot(ts, np.zeros(FRAME_SIZE))
+ax1.set_title('Samples')
+ax1.set_xlabel('Time [s]')
+ax1.set_ylabel('Amplitude (16-bit Signed)')
+ax1.set_xlim(ts[0], ts[-1])
+amplitude_limits = [-8000, 8000]
+ax1.set_ylim(amplitude_limits)
+ax1.grid(False)
+
+# Plot for FFT-based frequency spectrum
+N = FRAME_SIZE
+freq_steps = np.fft.fftfreq(FRAME_SIZE, d=1.0/SAMPLE_RATE)
+line2, = ax2.plot(freq_steps[:N//2], np.zeros(N//2) )
+ax2.set_title(&quot;FFT-based Frequency Spectrum&quot;)
+ax2.set_xlabel(f'Frequency (Hz): Fs={SAMPLE_RATE/1e3} kHz')
+ax2.set_ylabel('Magnitude (dB)')
+ax2.set_xlim(0, SAMPLE_RATE//2)
+magnitude_limits = [-80, 40]  # in dB
+ax2.set_ylim(magnitude_limits)
+ax2.grid(True)
+
+# Adjust vertical spacing between subplots
+plt.subplots_adjust(hspace=0.4)
+
+def read_test_data(n):
+    f = 500
+    data = (4000*np.sin( 2*np.pi*f*np.arange(n)/SAMPLE_RATE)
+            + 10*np.random.uniform(-1, 1, size=n))
+    return data.astype(np.float32)
+
+def read_audio_data(n):
+    audio_data = stream.read(n)
+    data = np.frombuffer(audio_data, dtype=np.int16)
+    return data.astype(np.float32)
+
+# Function to update the plot
+def update_plot(frame):
+    # Read the data
+    #data = read_test_data(N)
+    data = read_audio_data(N)
+    # Apply a window function (e.g. Hanning window)
+    window_coeffs = np.hanning(N)
+    windowed_data = data * window_coeffs
+    # Compute FFT 
+    spectrum = np.fft.fft(windowed_data) / N
+    # Update time-domain plot
+    line1.set_ydata(data)
+    # Update frequency spectrum plot in logarithmic scale (dB)
+    spectrum_mag = 20*np.log10( np.abs(spectrum[:N//2])+1e-6 )
+    line2.set_ydata( spectrum_mag[:N//2] )
+    return line1, line2
+
+# Function to handle Ctrl+C (KeyboardInterrupt)
+def signal_handler(signal, frame):
+    print(&quot;Ctrl+C detected. Terminating the program.&quot;)
+    plt.close('all')  # Close all matplotlib windows
+    if 'stream' in locals() and stream.is_active():
+        stream.stop_stream()
+        stream.close()
+    p.terminate()
+    exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+
+# Create animation (50 msec update interval)
+ani = FuncAnimation(fig, update_plot, 
+        blit=True, interval=50, save_count=1)
+
+# Show the plot in non-blocking mode
+plt.show()
+</code></pre>
+<p>ในการทดสอบการทำงาน ให้ลองเปิดคลิปเสียงรูปคลื่นไซน์ความถี่คงที่ เช่น
+ค้นหาและเลือกใช้คลิปตัวอย่างที่มีอยู่ใน <strong>Youtube</strong>
+เพื่อนำมาใช้เป็นสัญญาณอินพุตและทดสอบการทำงานของโค้ด <strong>Python</strong></p>
+<p><img alt="" src="sound_test_440hz.png" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมของเสียงที่มีความถี่คงที่ <strong>440Hz</strong></p>
+<p><img alt="" src="sound_test_1khz.png" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมของเสียงที่มีความถี่คงที่ <strong>1kHz</strong></p>
+<p>ถ้าลองจะลองใช้เสียงจากกีตาร์ สำหรับการตั้งค่าความถี่สำหรับเส้นสายกีตาร์ 6 เส้น ก็มีตัวอย่างคลิป
+เช่น <a href="https://www.youtube.com/watch?v=jJxRjWtwmEE"><strong>Youtube: Tuning a Guitar - Standard tuning for 6 string guitar</strong></a></p>
+<ul>
+<li><strong>E: 82 Hz (E2 Musical Note)</strong></li>
+<li><strong>A: 110 Hz (A2 Musical Note)</strong></li>
+<li><strong>D: 147 Hz (D3 Musical Note)</strong></li>
+<li><strong>G: 196 Hz (G3 Musical Note)</strong></li>
+<li><strong>B: 247 Hz (B3 Musical Note)</strong></li>
+<li><strong>E: 330 Hz (E4 Musical Note)</strong></li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="guitar_string_2_B.png" /></p>
+<p>รูป: <strong>String 2 (B) 247 Hz</strong></p>
+<p><img alt="" src="guitar_string_1_E.png" /></p>
+<p>รูป: <strong>String 1 (E) 330 Hz</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด <strong>Python</strong> โดยใช้ <strong>NumPy / Matplotlib</strong>
+เพื่อแสดงรูปกราฟที่แสดงให้เห็นการเปลี่ยนแปลงค่าในเชิงเวลาของสัญญาณ (<strong>Time-domain Plot</strong>)
+และรูปกราฟซึ่งเป็นสเปกตรัมความถี่ (<strong>Magnitude Spectrum</strong>) ของสัญญาณดังกล่าวที่ได้จากการชักตัวอย่าง
+และการใช้ <strong>PyAudio</strong> เพื่ออ่านค่าสัญญาณเสียงจากไมโครโฟนของคอมพิวเตอร์ผู้ใช้ และใช้เป็นสัญญาณอินพุต</p>
+<p>&nbsp;</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../dsp/fft/">ตัวอย่างการเขียนโค้ด <strong>MATLAB</strong> และ <strong>Python</strong> สำหรับการคำนวณ <strong>FFT</strong></a></li>
+<li><a href="../../esp32/esp32_fft/">การใช้งาน <strong>ESP32</strong> เพื่อประมวลผลข้อมูลด้วย <strong>FFT</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-11-16 | Last Updated: 2023-11-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
