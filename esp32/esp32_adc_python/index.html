@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_adc_python/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การอ่านค่าสัญญาณเสียงแอนะล็อกด้วย ESP32 และแสดงผลด้วย Python - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#esp32-python" class="nav-link">การอ่านค่าสัญญาณเสียงแอนะล็อกด้วย ESP32 และแสดงผลด้วย Python</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การอ่านค่าสัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch-esp32" class="nav-link">&#9655; โค้ด Arduino Sketch สำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; โค้ด Python</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-python">การอ่านค่าสัญญาณเสียงแอนะล็อกด้วย ESP32 และแสดงผลด้วย Python<a class="headerlink" href="#esp32-python" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="_1">&#9655; <strong>การอ่านค่าสัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>โมดูลเซนเซอร์เสียงมีหลายชนิด สามารถจำแนกได้ตามชนิดของสัญญาณเอาต์พุต
+เช่น มีเอาต์พุตเป็นสัญญาณแอนะล็อก หรือ เชื่อมต่อแบบดิจิทัลจากไมโครโฟนแบบ <strong>MEMS</strong>
+เพื่อรับข้อมูลตามรูปแบบของ <strong>I2S</strong></p>
+<p>บทความที่เกี่ยวข้องคือ <a href="../../sensors/max4466/">"การใช้งานโมดูล <strong>MAX4466 Sound Sensor</strong>"</a>
+ซึ่งกล่าวถึง โมดูลไมโครโฟนเสียงแบบ <strong>Electret Microphone</strong>
+และมีวงจรขยายเสียงที่ใช้ไอซี <strong>MAX4466</strong> ซึ่งให้เอาต์พุตเป็นสัญญาณแอนะล็อก 
+สัญญาณเสียงที่ถูกแปลงเป็นสัญญาณไฟฟ้าแบบแอนะล็อก จะถูกแปลงเป็นข้อมูลแบบดิจิทัลได้
+โดยการใช้วงจร <strong>ADC (Analog-to-Digital Converter</strong>) 
+อาจเป็นไอซีภายนอก หรือ วงจรภายในชิปไมโครคอนโทรลเลอร์ เช่น <strong>ESP32</strong></p>
+<p>ในบทความนี้ สาธิตการเขียนโค้ด <strong>Arduino-ESP32 (v3.0.0)</strong> เพื่อใช้งานวงจรภายใน <strong>ADC</strong>
+จำนวน 1 ช่องสัญญาณ และส่งข้อมูลที่ได้ไปยังคอมพิวเตอร์ผู้ใช้ ผ่านทาง <strong>Serial Port</strong>
+และมีการเขียนโค้ด <strong>Python</strong> เพื่อรับค่าและนำไปประมวลผลเชิงตัวเลข เช่น การวิเคราะห์สัญญาณแบบฟูเรียร์
+ด้วย <strong>FFT (Fast-Fourier Transform)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch-esp32">&#9655; <strong>โค้ด Arduino Sketch สำหรับ ESP32</strong><a class="headerlink" href="#arduino-sketch-esp32" title="Permanent link">#</a></h2>
+<p>โค้ดต่อไปนี้ สาธิตการอ่านค่าจาก <strong>ADC</strong> ที่ขา <strong>GPIO34</strong> โดยใช้วงจร
+<strong>Hardware Timer</strong> ทำหน้าที่กำหนดอัตราการอ่านค่าจาก <strong>ADC</strong>
+โดยเรียกใช้ฟังก์ชัน <code>timer_callback()</code></p>
+<p>ในโค้ดตัวอย่าง ได้กำหนดอัตราการชักตัวอย่างจากสัญญาณแอนะล็อกไว้ที่ความเร็ว <strong>Fs = 10000</strong> ตัวอย่างต่อวินาที
+การอ่านข้อมูลจากอินพุตและเก็บข้อมูลลงในอาร์เรย์ <code>samples[]</code> จะเริ่มต้นหลังจากได้รับข้อความหนึ่งบรรทัด (จบท้ายด้วย <code>\n</code>)
+จากพอร์ต <strong>Serial</strong> และทำต่อเนื่องจนได้ข้อมูลครบ <strong>N = 1024</strong> (เลือกจำนวนค่าตัวเลขให้เหมาะกับการนำไปคำนวณด้วย <strong>FFT</strong>)</p>
+<p>เมื่อได้ข้อมูลครบแล้ว ในขั้นตอนถัดไป ข้อมูลแต่ละตัวในอาร์เรย์ จะถูกส่งเป็นข้อความทีละบรรทัดผ่าน <strong>Serial</strong>
+ด้วยความเร็ว <strong>Baudrate = 921600</strong> จนครบ แล้วจึงเริ่มการอ่านค่า <strong>ADC</strong>
+และเก็บข้อมูลลงในอาร์เรย์ในรอบถัดไป</p>
+<pre><code class="language-c">//----------------------------------------------------------------
+const int ADC_PIN = 34;   // ADC1_CH6 / GPIO34 pin
+const int LED_PIN = 22;   // LED pin
+
+uint32_t sample_index = 0;
+bool sampling = false;
+QueueHandle_t adc_queue;
+
+const uint32_t Fs = 10000; // Sampling frequency (Hz)
+const uint32_t N  = 1024;  // Number of samples
+uint32_t sample_count = 0;
+uint16_t samples[N];
+
+//----------------------------------------------------------------
+// Callback function of the hardware timer.
+void IRAM_ATTR timer_callback() {
+  if (!sampling)
+      return;
+  digitalWrite( LED_PIN, HIGH );
+  // Read the ADC input channel.
+  uint16_t value = (uint16_t)analogReadMilliVolts( ADC_PIN );
+  samples[sample_count++] = value;
+  if ( sample_count == N ) {
+    sampling = false;  // Pause the ADC reading.
+    sample_count = 0;  // Reset the sample count.
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;  
+    xQueueSendFromISR( adc_queue, &amp;sampling,
+                       &amp;xHigherPriorityTaskWoken );
+    if (xHigherPriorityTaskWoken == pdTRUE) {
+      portYIELD_FROM_ISR();
+    }
+  }
+  digitalWrite( LED_PIN, LOW );
+}
+
+// Initialize the ADC input channel.
+void initADC() { 
+  // Set ADC resolution to 12 bits
+  analogSetWidth( 12 );
+  // Set attenuation level to 11 dB.
+  analogSetPinAttenuation( ADC_PIN, ADC_11db ); 
+}
+
+// Initialize the hardware timer.
+void initTimer( uint32_t hw_timer_unit=0 ) {
+  static hw_timer_t *timer = NULL;
+  timer = timerBegin( 1000000UL ); // 1MHz (1us tick)
+  timerWrite(timer, 0);
+  // Attach the callback function (ISR) to the timer
+  timerAttachInterrupt( timer, &amp;timer_callback );
+  timerAlarm(timer, (1000000UL/Fs) /*interval*/,
+             true /*reload*/, 0 /*reload value*/);
+  timerRestart(timer);
+}
+
+void setup() {
+  Serial.begin(921600);
+  Serial.setTxBufferSize(1024);
+  Serial.flush();
+  Serial.println(&quot;\nSend a newline to start ADC reading...&quot;);
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LOW );
+  adc_queue = xQueueCreate(1, sizeof(uint32_t));
+  initADC();   // Initialize the ADC.
+  initTimer(); // Initialize the hardware timer.
+ }
+
+void loop() {
+  uint32_t flag;
+  while (Serial.available()) {
+    if (Serial.read() == '\n') {
+       sampling = true; // Start the input sampling.
+    }
+  }
+  if (xQueueReceive(adc_queue, &amp;flag, 5)) {
+    for ( uint32_t i=0; i &lt; N; i++ ) {
+      // Send the sample as a string to serial.
+      Serial.printf(&quot;%lu\n&quot;, samples[i] );
+    }
+    Serial.flush();
+    sampling = true;
+  }
+}
+</code></pre>
+<p><img alt="" src="esp32_max4466.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองโดยใช้บอร์ด <strong>ESP32</strong> และโมดูล <strong>MAX4466</strong> (ใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; <strong>โค้ด Python</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นโค้ด <strong>Python</strong> สาธิตการรับข้อความจากพอร์ต <strong>Serial</strong>
+โดยใช้แพ็คเกจ <a href="https://pypi.org/project/pyserial/"><strong>pyserial</strong></a>
+แล้วนำมาแสดงผลในรูปของกราฟแบบ <strong>Time Series</strong> 
+และแสดงสเปกตรัมความถี่สำหรับขนาด (<strong>Magnitude Spectrum</strong>)
+เมื่อนำไปผ่านการแปลงข้อมูลด้วยวิธี <strong>FFT</strong> โดยใช้แพ็คเกจ <strong>NumPy / Matplotlib</strong></p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import signal
+import serial
+
+FRAME_SIZE  = 1024  # Number of samples
+SAMPLE_RATE = 10000 # Set sampling rate
+
+# Initialize plots
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
+
+# Plot for audio samples
+ts = np.arange(0, FRAME_SIZE/SAMPLE_RATE, 1/SAMPLE_RATE)
+line1, = ax1.plot(ts, np.zeros(FRAME_SIZE))
+ax1.set_title('Samples')
+ax1.set_xlabel('Time [s]')
+ax1.set_ylabel('Amplitude (16-bit Signed)')
+ax1.set_xlim(ts[0], ts[-1])
+amplitude_limits = [0, 3300]
+ax1.set_ylim(amplitude_limits)
+ax1.grid(False)
+
+# Plot for FFT-based frequency spectrum
+N = FRAME_SIZE
+freq_steps = np.fft.fftfreq(FRAME_SIZE, d=1.0/SAMPLE_RATE)
+line2, = ax2.plot(freq_steps[:N//2], np.zeros(N//2) )
+ax2.set_title(&quot;FFT-based Frequency Spectrum&quot;)
+ax2.set_xlabel(f'Frequency (Hz): Fs={SAMPLE_RATE/1e3} kHz')
+ax2.set_ylabel('Magnitude (dB)')
+ax2.set_xlim( 0, SAMPLE_RATE//2)
+magnitude_limits = [-80, 60]  # in dB
+ax2.set_ylim(magnitude_limits)
+ax2.grid(True)
+
+# Adjust vertical spacing between subplots
+plt.subplots_adjust(hspace=0.4)
+
+# Initialize serial port 
+#ser = serial.Serial('/dev/ttyUSB0', baudrate=921600, timeout=0.01)
+ser = serial.Serial('COM54', baudrate=921600, timeout=0.01)
+ser.write(b'\n') # Send a newline char to start the sampling
+
+def read_data_from_serial(n):
+    samples = []
+    err_count = 0
+    while len(samples) &lt; n:
+        try:
+            line = ser.readline()
+        except ValueError:
+            print( &quot;No data received from serial..&quot;)
+            return None
+
+        try:
+            # Read a line from the serial port and convert to float
+            line = line.decode().strip()
+            value = float(line)
+            if value &gt; 3300:
+                value = 3300
+            elif value &lt; 0:
+                value = 0
+            samples.append(value)
+        except ValueError as ex:
+            err_count += 1
+            #print(ex, err_count)
+            if err_count &gt;= 3:
+                return None
+    return samples
+
+def read_test_data(n):
+    f = 500
+    data = 500 + 1000*(1.0+np.sin( 2*np.pi*f*np.arange(n)/SAMPLE_RATE)
+           + 0.01*np.random.uniform(-1,1,size=n) ).astype(np.float32)
+    return data
+
+saved_data = np.zeros(N)
+
+# Function to update the plot
+def update_plot(frame):
+    # Read the data from the serial port
+    #data = read_test_data(N)
+    data = read_data_from_serial(N)
+    if data is None:
+        data = saved_data
+    # Apply a window function (Hanning window)
+    window_coeffs = np.hanning(N)
+    windowed_data = data * window_coeffs
+    # Compute FFT
+    spectrum = np.fft.fft(windowed_data) / N
+    # Update time-domain plot
+    line1.set_ydata(data)
+    # Update frequency spectrum plot in logarithmic scale (dB)
+    spectrum_mag = 20*np.log10( np.abs(spectrum[:N//2])+1e-9 )
+    line2.set_ydata( spectrum_mag[:N//2] )
+    return line1, line2
+
+# Function to handle Ctrl+C (KeyboardInterrupt)
+def signal_handler(signal, frame):
+    print(&quot;Ctrl+C detected. Terminating the program.&quot;)
+    plt.close('all')  # Close all matplotlib windows
+    exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+
+# Create animation (50 msec update interval)
+ani = FuncAnimation( fig, update_plot, blit=True, 
+                     interval=50, save_count=1 )
+
+# Show the plot in non-blocking mode
+plt.show()
+</code></pre>
+<p>หากทดสอบการทำงานของระบบ โดยใช้สัญญาณเสียงความถี่คงที่ เช่น <strong>Sine Wave 1kHz</strong>
+จะได้ผลในลักษณะต่อไปนี้</p>
+<p><img alt="" src="sound_test_1khz.png" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>1kHz</strong></p>
+<p><img alt="" src="sound_test_440hz.png" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>440Hz</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอ ตัวอย่างการเขียนโค้ด <strong>Arduino-ESP32</strong> เพื่ออ่านค่าจากโมดูลเซนเซอร์เสียงแบบแอนะล็อก
+และส่งข้อมูลเข้าคอมพิวเตอร์ผู้ใช้ผ่านทางพอร์ต <strong>Serial</strong> และเขียนโค้ด <strong>Python</strong> เพื่อรับข้อมูลจากบอร์ด
+<strong>ESP32</strong> นำมาแสดงรูปกราฟ</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../sensors/max4466/">การใช้งานโมดูลไมโครโฟนเสียง <strong>MAX4466 Sound Sensor</strong></a></li>
+<li><a href="../../python/python_fft/">การอ่านค่าสัญญาณเสียงด้วย <strong>Python</strong> และการแสดงรูปสเปกตรัมเชิงความถี่</a></li>
+<li><a href="../../esp32/esp32_fft/">การใช้งาน <strong>ESP32</strong> เพื่อประมวลผลข้อมูลด้วย <strong>FFT (Fast-Fourier Transform)</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-11-17 | Last Updated: 2023-11-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
