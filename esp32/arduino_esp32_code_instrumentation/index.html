@@ -91,7 +91,7 @@
             
             <li class="nav-item" data-level="1"><a href="#arduino-esp32" class="nav-link">การทดสอบหาระยะเวลาในการทำคำสั่งสำหรับ Arduino ESP32</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#arduino-esp32_1" class="nav-link">&#9655; Arduino ESP32</a>
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32-core" class="nav-link">&#9655; การเขียนโปรแกรมด้วย Arduino ESP32 Core</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -132,8 +132,17 @@
 
 <h1 id="arduino-esp32">การทดสอบหาระยะเวลาในการทำคำสั่งสำหรับ Arduino ESP32<a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h1>
 <p><strong>Keywords</strong>:  <em>Arduino</em>, <em>ESP32</em>, <em>ESP32 Performance Measurement</em>, <em>Code Instrumentation</em></p>
+<ul>
+<li><a href="#arduino-esp32-core">การเขียนโปรแกรมด้วย <strong>Arduino ESP32 Core</strong></a></li>
+<li><a href="#1">โค้ดตัวอย่างที่ 1</a></li>
+<li><a href="#2">โค้ดตัวอย่างที่ 2</a></li>
+<li><a href="#3">โค้ดตัวอย่างที่ 3</a></li>
+<li><a href="#4">โค้ดตัวอย่างที่ 4</a></li>
+<li><a href="#5">โค้ดตัวอย่างที่ 5</a></li>
+<li><a href="#6">โค้ดตัวอย่างที่ 6</a></li>
+</ul>
 <hr />
-<h2 id="arduino-esp32_1">&#9655; <strong>Arduino ESP32</strong><a class="headerlink" href="#arduino-esp32_1" title="Permanent link">#</a></h2>
+<h2 id="arduino-esp32-core">&#9655; <strong>การเขียนโปรแกรมด้วย Arduino ESP32 Core</strong><a class="headerlink" href="#arduino-esp32-core" title="Permanent link">#</a></h2>
 <p>บอร์ดไมโครคอนโทรลเลอร์อย่างเช่น <strong>ESP32</strong> สามารถนำมาใช้และเขียนโปรแกรมได้โดยใช้คำสั่งของ <strong>Arduino API</strong>
 บทความนี้นำเสนอแนวทางการทดลองและตัวอย่างโค้ดเพื่อดูว่า การทำคำสั่งบางคำสั่งสำหรับไมโครคอนโทรลเลอร์ดังกล่าว จะใช้เวลาเท่าไหร่
 การทดลองในลักษณะนี้เรียกว่า <strong>Code Instrumentation</strong> ซึ่งจะต้องมีการแทรกคำสั่ง เพื่อใช้ในการจับเวลา
@@ -141,7 +150,8 @@
 การทำคำสั่งควรจะต้องทำหลายครั้งแล้วนำมาหาค่าเฉลี่ย</p>
 <p>สำหรับการเขียนโค้ด ให้ติดตั้ง
 <a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core by Espressif Systems</strong></a>
-(<strong>v2.0.13 based on ESP-IDF v4.4.5</strong>) สำหรับ <strong>Arduino IDE v2.1.0</strong></p>
+(<strong>v2.0.14 based on ESP-IDF v4.4.6</strong>) สำหรับ <strong>Arduino IDE v2.1.0</strong> (หรือใหม่กว่า)
+แต่ถ้าเป็นเวอร์ชันใหม่ (ในขณะที่เขียนบทความนี้) ก็เป็นเวอร์ชัน <strong>Arduino ESP32 Core v3.0.0</strong>)</p>
 <p><img alt="" src="arduino_esp32_core.png" /></p>
 <p>รูป: การติดตั้ง <strong>Arduino-ESP32 Core</strong> สำหรับ <strong>Arduino IDE v2.1.0 (Windows)</strong></p>
 <p>การอ่านค่าเวลาของระบบสำหรับ <strong>Arduino ESP32</strong> ก็มีมากกว่าหนึ่งวิธี</p>
@@ -367,7 +377,7 @@ const uint32_t NUM_ITERS = 1000000UL;
 void disableWDT() {
   // Disable the interrupt watchdog timer for timer groups: 1 and 0
 #if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-  TIMERG1.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE; // Unlock timer config
   TIMERG1.wdtfeed.val = 1; // Reset feed count.
   TIMERG1.wdtconfig0.wdt_en = 0; // Disable timer.
   TIMERG1.wdtwprotect.wdt_wkey = 0; // Lock timer config.
@@ -377,7 +387,7 @@ void disableWDT() {
   TIMERG0.wdtconfig0.wdt_en = 0;
   TIMERG0.wdtwprotect.wdt_wkey = 0;
 #else
-  TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config
   TIMERG1.wdt_feed = 1; // Reset feed count.
   TIMERG1.wdt_config0.en = 0; // Disable timer.
   TIMERG1.wdt_wprotect = 0; // Lock timer config.
@@ -457,7 +467,7 @@ const uint32_t NUM_ITERS = 100000UL;
 void disableWDT() {
   // Disable the interrupt watchdog timer for timer groups: 1 and 0
 #if ESP_ARDUINO_VERSION &gt;= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-  TIMERG1.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE; // Unlock timer config
   TIMERG1.wdtfeed.val = 1; // Reset feed count.
   TIMERG1.wdtconfig0.wdt_en = 0; // Disable timer.
   TIMERG1.wdtwprotect.wdt_wkey = 0; // Lock timer config.
@@ -467,7 +477,7 @@ void disableWDT() {
   TIMERG0.wdtconfig0.wdt_en = 0;
   TIMERG0.wdtwprotect.wdt_wkey = 0;
 #else
-  TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config.
+  TIMERG1.wdt_wprotect = TIMG_WDT_WKEY_VALUE; // Unlock timer config
   TIMERG1.wdt_feed = 1; // Reset feed count.
   TIMERG1.wdt_config0.en = 0; // Disable timer.
   TIMERG1.wdt_wprotect = 0; // Lock timer config.
@@ -514,7 +524,7 @@ void loop() {
   Serial.printf( &quot;Exec time [cyc.] : %lu per loop\n&quot;, 
                 t_cycles/NUM_ITERS );
   Serial.printf( &quot;Exec time [usec] : %.4lf per loop\n&quot;, 
-                ((double)clockCyclesToMicroseconds(t_cycles))/NUM_ITERS );
+                ((double)clockCyclesToMicroseconds(t_cycles))/NUM_ITERS);
   // Wait for 5 seconds before repeating the loop.
   delay(5000);
 }

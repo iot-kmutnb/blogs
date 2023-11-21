@@ -99,7 +99,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; โค้ด Python สำหรับรับข้อมูลและวาดกราฟ</a>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; โค้ด Python สำหรับรับข้อมูลและวาดกราฟด้วยคอมพิวเตอร์</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -118,7 +118,7 @@
 <ul>
 <li><a href="#_1">การวัดสัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง</a></li>
 <li><a href="#arduino-sketch-esp32">โค้ด <strong>Arduino Sketch</strong> สำหรับ <strong>ESP32</strong></a></li>
-<li><a href="#python">โค้ด <strong>Python สำหรับรับข้อมูลและวาดกราฟ</strong></a></li>
+<li><a href="#python">โค้ด <strong>Python</strong> สำหรับรับข้อมูลและวาดกราฟด้วยคอมพิวเตอร์</a></li>
 </ul>
 <hr />
 <h2 id="_1">&#9655; <strong>การวัดสัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -204,11 +204,10 @@ void setup() {
   Serial.begin(921600);
   Serial.setTxBufferSize(1024);
   Serial.flush();
-  Serial.println(&quot;\nSend a newline to start ADC reading...&quot;);
   pinMode( LED_PIN, OUTPUT );
   digitalWrite( LED_PIN, LOW );
   adc_queue = xQueueCreate(1, sizeof(uint32_t));
-  initADC();   // Initialize the ADC.
+  initADC();   // Initialize the ADC in one-shot mode.
   initTimer(); // Initialize the hardware timer.
  }
 
@@ -220,9 +219,11 @@ void loop() {
     }
   }
   if (xQueueReceive(adc_queue, &amp;flag, pdMS_TO_TICKS(5))) {
+    Serial.println(&quot;+++&quot;); // Used as the frame-start symbol
+    Serial.flush();
     for ( uint32_t i=0; i &lt; N; i++ ) {
       // Send the sample as a string to serial.
-      Serial.printf(&quot;%lu\n&quot;, (uint32_t)samples[i] );
+      Serial.printf(&quot;%u\n&quot;, samples[i] );
     }
     Serial.flush();
     sampling = true;
@@ -233,7 +234,7 @@ void loop() {
 <p>รูป: การต่อวงจรทดลองโดยใช้บอร์ด <strong>ESP32</strong> และโมดูล <strong>MAX4466</strong> (ใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong>)</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="python">&#9655; <strong>โค้ด Python สำหรับรับข้อมูลและวาดกราฟ</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<h2 id="python">&#9655; <strong>โค้ด Python สำหรับรับข้อมูลและวาดกราฟด้วยคอมพิวเตอร์</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
 <p>ตัวอย่างถัดไปเป็นโค้ด <strong>Python</strong> สาธิตการรับข้อความจากพอร์ต <strong>Serial</strong>
 โดยใช้แพ็คเกจ <a href="https://pypi.org/project/pyserial/"><strong>PySerial</strong></a>
 แล้วนำมาแสดงผลในรูปของกราฟแบบ <strong>Time Series</strong> 
@@ -249,8 +250,9 @@ import serial
 
 # Initialize serial port 
 serial_port = 'COM13' # 'COMx' (Windows) or '/dev/ttyUSBx' (Linux)
-ser = serial.Serial(serial_port, baudrate=921600, timeout=0.01)
-ser.write(b'\n') # Send a newline char to start the sampling
+ser = serial.Serial(serial_port, baudrate=921600, timeout=0.04)
+ser.write(b'\r\n') # Send a newline char to start the sampling
+ser.flush()
 
 N_SAMPLES   = 1024  # Number of samples
 SAMPLE_RATE = 10000 # Set sampling rate.
@@ -298,6 +300,9 @@ def read_data_from_serial(n):
         try:
             # Read a line from serial and convert to float
             line = line.decode().strip()
+            if line[0:3] == &quot;+++&quot;:
+                samples.clear()
+                continue
             value = float(line)
             if value &gt; 3300:
                 value = 3300
@@ -338,7 +343,7 @@ def update_plot(frame):
     # Update time-domain plot
     data1.set_ydata(data)
     # Update frequency spectrum in logarithmic scale (dB)
-    spectrum_mag = 20*np.log10( np.abs(spectrum[:N//2])+1e-9 )
+    spectrum_mag = 20*np.log10( np.abs(spectrum[:N//2])+1e-6 )
     data2.set_ydata( spectrum_mag[:N//2] )
     return data1, data2
 
@@ -346,14 +351,15 @@ def update_plot(frame):
 def signal_handler(signal, frame):
     print(&quot;Ctrl+C detected. Terminating the program.&quot;)
     plt.close('all')  # Close all matplotlib windows
+    ser.close()       # Close serial port
     exit(0)
 
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
-# Create animation (50 msec update interval)
+# Create animation (set the update interval in msec)
 ani = FuncAnimation( fig, update_plot, blit=True, 
-                     interval=50, save_count=1 )
+                     interval=25, save_count=1 )
 
 # Show the plot in non-blocking mode
 plt.show()
@@ -379,7 +385,7 @@ plt.show()
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2023-11-17 | Last Updated: 2023-11-20</p></div>
+<p>Created: 2023-11-17 | Last Updated: 2023-11-21</p></div>
             </div>
         </div>
 
