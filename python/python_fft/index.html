@@ -259,101 +259,33 @@ Input device: default, Device index: 17
 </code></pre>
 <p>&nbsp;</p>
 <p>เมื่อได้ลองใช้ <strong>PyAudio</strong> ในเบื้องต้นแล้ว ถัดไปเป็นโค้ดตัวอย่าง <strong>Python</strong>
-ที่สาธิตการอ่านสัญญาณเสียง โดยใช้อุปกรณ์อินพุตเสียงของคอมพิวเตอร์ผู้ใช้ (<strong>Use default input device</strong>)</p>
-<p>การอ่านให้ได้ข้อมูลเสียง หนึ่งช่องสัญญาณ (<strong>Mono</strong>) จากไมโครโฟนด้วย <strong>PyAudio</strong>
-จะทำให้ได้ชุดข้อมูลที่มีจำนวนข้อมูล <code>N</code> เช่น <strong>1024</strong>
+ที่สาธิตการอ่านสัญญาณเสียง โดยใช้อุปกรณ์อินพุตเสียงของคอมพิวเตอร์ผู้ใช้ (เลือกอุปกรณ์อินพุตเป็น <strong>Default input device</strong>)</p>
+<p>การอ่านให้ได้ข้อมูลเสียงในหนึ่งช่องสัญญาณ (<strong>Mono</strong>) จากไมโครโฟนด้วย <strong>PyAudio</strong>
+จะทำให้ได้ชุดข้อมูลที่มีจำนวนข้อมูล <code>N</code> เช่น เลือกจำนวนข้อมูลให้เท่ากับ <strong>256</strong>, <strong>512</strong> หรือ <strong>1024</strong> เป็นต้น
 ข้อมูลที่ได้จาก <strong>PyAudio</strong> เป็นแบบ <strong>16-bit Signed Integer</strong>
-และจะถูกแปลงให้เป็นชนิดข้อมูล <code>numpy.float32</code></p>
+และจะถูกแปลงให้เป็นชนิดข้อมูล <code>numpy.float32</code> จำนวนของข้อมูลนั้น จะพอดีกับขนาดของ <strong>FFT</strong>
+(และไม่จำเป็นต้องทำ <strong>Zero Padding</strong>)</p>
 <p>อัตราการชักตัวอย่าง <code>SAMPLE_RATE</code> มีค่าเท่ากับ <strong>8000</strong>  (สามารถลองใช้ค่าอื่นที่สูงกว่านี้ได้
 เช่น <strong>16000</strong> หรือ <strong>44100</strong> เป็นต้น)</p>
 <p>เมื่อได้ข้อมูลครบตามจำนวน ก็จะแสดงรูปกราฟแบบ <strong>Time Series</strong> และรูปกราฟแบบสเปกตรัมความถี่
-หลังจากได้คำนวณค่าด้วย <strong>FFT</strong> ในรอบถัดไป จะมีการอ่านข้อมูลชุดใหม่และอัปเดตรูปกราฟ ทุก ๆ 50 มิลลิวินาที</p>
-<pre><code class="language-python">import pyaudio
-import numpy as np
+หลังจากได้คำนวณค่าด้วย <strong>FFT</strong> ในรอบถัดไป จะมีการอ่านข้อมูลชุดใหม่และอัปเดตรูปกราฟ ทุก ๆ 30 มิลลิวินาที
+(หรือเลือกค่าอื่นสำหรับการเว้นระยะเวลาในช่วง 20 .. 50 มิลลิวินาที)</p>
+<pre><code class="language-python">import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from matplotlib.gridspec  import GridSpec
+import scipy
 import signal
+import pyaudio
+
+# Print NumPy version
+print(f&quot;NumPy version: {np.__version__}&quot;)
 
 # Tested with PyAudio v0.2.14
 pyaudio_version = pyaudio.__version__
 print(f&quot;PyAudio version: {pyaudio_version}&quot;)
 
-# Create a PyAudio class instance
-p = pyaudio.PyAudio()
-
-FRAME_SIZE = 1024         # Number of samples
-FORMAT = pyaudio.paInt16  # Audio format (16-bit PCM)
-CHANNELS = 1              # Mono (single channel)
-SAMPLE_RATE = 8000        # Set sampling rate in Hz
-INPUT_DEVICE_ID = None    # Use the default input audio device
-
-# stream object to get data from the microphone
-stream = p.open(
-    format=FORMAT,
-    channels=CHANNELS,
-    rate=SAMPLE_RATE,
-    input=True,
-    output=True, 
-    input_device_index=INPUT_DEVICE_ID,
-    frames_per_buffer=FRAME_SIZE
-)
-
-# Initialize plots
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
-
-# Plot for audio samples
-ts = np.arange(0, FRAME_SIZE/SAMPLE_RATE, 1/SAMPLE_RATE)
-line1, = ax1.plot(ts, np.zeros(FRAME_SIZE))
-ax1.set_title('Samples')
-ax1.set_xlabel('Time [s]')
-ax1.set_ylabel('Amplitude (16-bit Signed)')
-ax1.set_xlim(ts[0], ts[-1])
-amplitude_limits = [-8000, 8000]
-ax1.set_ylim(amplitude_limits)
-ax1.grid(False)
-
-# Plot for FFT-based frequency spectrum
-N = FRAME_SIZE
-freq_steps = np.fft.fftfreq(FRAME_SIZE, d=1.0/SAMPLE_RATE)
-line2, = ax2.plot(freq_steps[:N//2], np.zeros(N//2) )
-ax2.set_title(&quot;FFT-based Frequency Spectrum&quot;)
-ax2.set_xlabel(f'Frequency (Hz): Fs={SAMPLE_RATE/1e3} kHz')
-ax2.set_ylabel('Magnitude (dB)')
-ax2.set_xlim(0, SAMPLE_RATE//2)
-magnitude_limits = [-80, 40]  # in dB
-ax2.set_ylim(magnitude_limits)
-ax2.grid(True)
-
-# Adjust vertical spacing between subplots
-plt.subplots_adjust(hspace=0.4)
-
-def read_test_data(n):
-    f = 500
-    data = (4000*np.sin( 2*np.pi*f*np.arange(n)/SAMPLE_RATE)
-            + 10*np.random.uniform(-1, 1, size=n))
-    return data.astype(np.float32)
-
-def read_audio_data(n):
-    audio_data = stream.read(n)
-    data = np.frombuffer(audio_data, dtype=np.int16)
-    return data.astype(np.float32)
-
-# Function to update the plot
-def update_plot(frame):
-    # Read the data
-    #data = read_test_data(N)
-    data = read_audio_data(N)
-    # Apply a window function (e.g. Hanning window)
-    window_coeffs = np.hanning(N)
-    windowed_data = data * window_coeffs
-    # Compute FFT 
-    spectrum = np.fft.fft(windowed_data) / N
-    # Update time-domain plot
-    line1.set_ydata(data)
-    # Update frequency spectrum plot in logarithmic scale (dB)
-    spectrum_mag = 20*np.log10( np.abs(spectrum[:N//2])+1e-6 )
-    line2.set_ydata( spectrum_mag[:N//2] )
-    return line1, line2
+#-----------------------------------------------------------
 
 # Function to handle Ctrl+C (KeyboardInterrupt)
 def signal_handler(signal, frame):
@@ -365,12 +297,113 @@ def signal_handler(signal, frame):
     p.terminate()
     exit(0)
 
+def read_test_data(num_samples,fs):
+    f = 500
+    test_data = (4000*np.sin(2*np.pi*f*np.arange(num_samples)/fs)
+            + 10*np.random.uniform(-1, 1, size=num_samples))
+    return test_data.astype(np.float32)
+
+def read_audio_data(audio_stream, num_samples):
+    audio_data = audio_stream.read( num_samples )
+    frame_data = np.frombuffer(audio_data, dtype=np.int16)
+    return frame_data.astype(np.float32)
+
+#-----------------------------------------------------------
+
+FRAME_SIZE   = 1024             # Number of samples
+SAMPLE_RATE  = 8000             # Set sampling rate in Hz
+AUDIO_FORMAT = pyaudio.paInt16  # Audio format (16-bit PCM)
+AUDIO_CHANNELS = 1              # Mono (single channel)
+AUDIO_INPUT_DEVICE_ID = None    # Use the default input audio device
+
+Fs = SAMPLE_RATE  # Sample rate
+N  = FRAME_SIZE   # Number of audio samples per frame
+
+# Create a PyAudio class instance
+p = pyaudio.PyAudio()
+
+# Create an audio stream object to get data from the microphone.
+stream = p.open(
+    format=AUDIO_FORMAT,
+    channels=AUDIO_CHANNELS,
+    rate=SAMPLE_RATE,
+    input=True,
+    output=False, 
+    input_device_index=AUDIO_INPUT_DEVICE_ID,
+    frames_per_buffer=FRAME_SIZE
+)
+
+#-----------------------------------------------------------
+
+def initial_plot():
+    global fig, gs 
+    global plot_data1, plot_data2, plot_data3 
+    global N, Fs
+
+    # Initialize plots with subplots
+    fig = plt.figure(figsize=(10, 6))
+    fig_title = 'PyAudio Demo: Time Series Plot &amp; FFT Spectrum'
+    fig.canvas.manager.set_window_title(fig_title)
+    gs  = GridSpec(2, 1, height_ratios=[1,1])
+    # Adjust vertical spacing between subplots
+    plt.subplots_adjust(hspace=0.5)
+
+    # Create a time-domain plot for audio samples
+    ax1 = plt.subplot(gs[0])
+    ts  = np.arange(0, N/Fs, 1/Fs)
+    plot_data1, = ax1.plot(ts, np.zeros(N) )
+    ax1.set_title('Samples')
+    ax1.set_xlabel('Time [s]')
+    ax1.set_ylabel('Amplitude')
+    ax1.set_xlim(ts[0], ts[-1])   # Set the time limits
+    ax1.set_ylim( -35000, 35000 ) # Set the amplitude limits
+    ax1.grid(False)
+
+    # Create an FFT-based frequency spectrum plot
+    ax2 = plt.subplot(gs[1])
+    freq_steps = np.fft.fftfreq(N, d=1.0/Fs)
+    plot_data2, = ax2.plot( freq_steps[:N//2], np.zeros(N//2) )
+    ax2.set_title(&quot;FFT-based Frequency Spectrum&quot;)
+    ax2.set_xlabel(f'Frequency (Hz): Fs={round(Fs/1e3)}kHz')
+    ax2.set_ylabel('Magnitude (dB)')
+    ax2.set_xlim(0, Fs//2) # Set frequency limits (in Hz)
+    ax2.set_ylim(-40, 80)  # Set the magnitude limits (in dB)
+    ax2.grid(True)
+
+# Function to update the plot
+def update_plot(frame):
+    global N, Fs
+    global plot_data1, plot_data2, plot_data3
+    # Read the data
+    #data = read_test_data(stream,N)
+    audio_data = read_audio_data(stream,N)
+
+    # Apply a window function (e.g. Hanning window)
+    window_coeffs = np.hanning(N)
+    windowed_data = audio_data * window_coeffs
+
+    # Update the time-domain plot
+    plot_data1.set_ydata(audio_data)
+
+    # Compute FFT 
+    spectrum = np.fft.fft(windowed_data) / N
+
+    # Update the frequency spectrum plot in logarithmic scale (dB)
+    spectrum_mag = 20 * np.log10( np.abs(spectrum[:N//2]) + 1e-6 )
+    plot_data2.set_ydata( spectrum_mag[:N//2] )
+
+    return plot_data1, plot_data2
+
+#-----------------------------------------------------------
+
+initial_plot()
+
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
 # Create animation (50 msec update interval)
 ani = FuncAnimation(fig, update_plot, 
-        blit=True, interval=50, save_count=1)
+        blit=True, interval=30, save_count=1)
 
 # Show the plot in non-blocking mode
 plt.show()
@@ -378,12 +411,13 @@ plt.show()
 <p>ในการทดสอบการทำงาน ให้ลองเปิดคลิปเสียงรูปคลื่นไซน์ความถี่คงที่ เช่น
 ค้นหาและเลือกใช้คลิปตัวอย่างที่มีอยู่ใน <strong>Youtube</strong>
 เพื่อนำมาใช้เป็นสัญญาณอินพุตและทดสอบการทำงานของโค้ด <strong>Python</strong></p>
-<p><img alt="" src="sound_test_440hz.png" /></p>
-<p>รูป: ตัวอย่างสเปกตรัมของเสียงที่มีความถี่คงที่ <strong>440Hz</strong></p>
+<p><img alt="" src="sound_test_1khz_no_harmonics.png" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมของเสียงที่มีความถี่คงที่ <strong>1kHz</strong> (ไม่มีความถี่ฮาร์โมนิกแทรกเข้ามา)</p>
 <p><img alt="" src="sound_test_1khz.png" /></p>
-<p>รูป: ตัวอย่างสเปกตรัมของเสียงที่มีความถี่คงที่ <strong>1kHz</strong></p>
+<p>รูป: ตัวอย่างสเปกตรัมของเสียงที่มีความถี่คงที่ <strong>1kHz</strong> (มีความถี่ฮาร์โมนิกแทรกเข้ามาในอินพุตของระบบเสียง)</p>
 <p>ถ้าลองจะลองใช้เสียงจากกีตาร์ สำหรับการตั้งค่าความถี่สำหรับเส้นสายกีตาร์ 6 เส้น ก็มีตัวอย่างคลิป
-เช่น <a href="https://www.youtube.com/watch?v=jJxRjWtwmEE"><strong>Youtube: Tuning a Guitar - Standard tuning for 6 string guitar</strong></a></p>
+เช่น <a href="https://www.youtube.com/watch?v=jJxRjWtwmEE"><strong>Youtube: Tuning a Guitar - Standard tuning for 6 string guitar</strong></a>
+และมีการเปลี่ยนอัตราการสุ่มสัญญาณเป็น <strong>4kHz</strong></p>
 <ul>
 <li><strong>E: 82 Hz (E2 Musical Note)</strong></li>
 <li><strong>A: 110 Hz (A2 Musical Note)</strong></li>
@@ -413,7 +447,7 @@ plt.show()
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-11-16 | Last Updated: 2023-11-17</p></div>
+<p>Created: 2023-11-16 | Last Updated: 2023-11-26</p></div>
             </div>
         </div>
 
