@@ -103,6 +103,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; การเขียนโค้ด Python เพื่อวาดรูปวงจรที่ประกอบด้วยตัวต้านทาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -198,6 +202,78 @@
 <script type="math/tex">R_x = 1.618k \Omega</script>
 </p>
 <p>&nbsp;</p>
+<p>ตัวอย่างโค้ด <strong>Python</strong> สำหรับการคำนวณค่าความต้านทานรวม ตามระดับชั้นหรือจำนวนคู่ของตัวต้านทาน มีดังนี้</p>
+<pre><code class="language-python">def total_resistance(n,R):
+    if n==1:
+        return 2*R
+    else:
+        return R + 1/( 1/R + 1/total_resistance(n-1,R) )
+
+R = 1000 # Resistance in Ohm
+level= 8 # Levels or number of resistor pairs
+for i in range(1,level+1):
+    print( f&quot;Level={i:d}) R_total={total_resistance(i, R):.1f}&quot; ) 
+print( f&quot;R_total: ~{1.618*R:.1f} &quot;)
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต สำหรับค่า <strong>R=1000</strong> โอห์ม และจำนวนคู่ของตัวต้านทานเท่ากับ 8
+ซึ่งจะเห็นได้ว่า ค่าความต้านทานรวมจะเริ่มคงที่เมื่อเพิ่มจำนวนคู่ของตัวต้านทานตั้งแต่ 6 เป็นต้นไป</p>
+<pre><code class="language-text">Level=1) R_total=2000.0
+Level=2) R_total=1666.7
+Level=3) R_total=1625.0
+Level=4) R_total=1619.0
+Level=5) R_total=1618.2
+Level=6) R_total=1618.1
+Level=7) R_total=1618.0
+Level=8) R_total=1618.0
+R_total: ~1618.0
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; <strong>การเขียนโค้ด Python เพื่อวาดรูปวงจรที่ประกอบด้วยตัวต้านทาน</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>อีกหนึ่งตัวอย่างกิจกรรมซึ่งเกี่ยวข้องกับการเขียนโค้ด <strong>Python</strong> คือ การวาดผังวงจรโดยใช้
+คำสั่งของไลบรารี่ที่มีชื่อว่า  <a href="https://schemdraw.readthedocs.io/en/latest/usage/start.html"><code>SchemDraw</code></a>
+ซึ่งได้มีการพัฒนามาตั้งแต่ปีค.ศ. 2014 โดย <strong>Collin Delker</strong> (Sandia National Laboratories)
+และได้ทดลองใช้เวอร์ชัน  <strong>v0.17, released on 2023-06-03</strong></p>
+<pre><code class="language-python"># Install the SchemDraw package.
+# $ pip install schemdraw[matplotlib]
+# $ pip install schemdraw[svgmath]
+# see: https://schemdraw.readthedocs.io/en/latest/usage/start.html
+
+import schemdraw
+from schemdraw import elements as elm
+
+def draw_resistor_network( d, levels ):
+    resistors = []
+    for i in range(levels):
+        r1 = elm.Resistor(label='R%d' % (2*i+1))
+        r2 = elm.Resistor(label='R%d' % (2*i+2))
+        resistors.append( r1 )
+        resistors.append( r2 )
+        if i==0:
+            d += r1.right().dot().idot(open=True).label('A', 'left')
+            d += r2.down().at(r1.end).dot()
+            d += elm.Line().left().dot(open=True).label('B', 'left')
+        elif i &lt; (levels-1):
+            d += r1.right().at(resistors[2*i-1].start).dot()
+            d += r2.down().at(resistors[2*i].end).dot()
+            d += elm.Line().left()
+        else:
+            d += r1.right().at(resistors[2*i-1].start)
+            d += r2.down().at(resistors[2*i].end)
+            d += elm.Line().left()
+
+with schemdraw.Drawing() as d:
+    d.config(fontsize=12)
+    levels = 5
+    draw_resistor_network ( d, levels )
+    # Save the schematic as an image file
+    d.save('resistor_network.png')
+    # Display the schematic
+    d.draw()
+</code></pre>
+<p><img alt="" src="resistor_network_drawing.png" /></p>
+<p>รูป: ตัวอย่างผังวงจรที่ได้จากการทำงานของโค้ด <strong>Python</strong> (กำหนดค่า <code>levels</code> ให้เท่ากับ 5)</p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอตัวอย่างโจทย์ฝึกปฏิบัติโดยนำตัวต้านทานมาต่อวงจร โดยใช้ซอฟต์แวร์ เช่น
@@ -206,7 +282,7 @@
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-12-20 | Last Updated: 2022-12-20</p></div>
+<p>Created: 2022-12-20 | Last Updated: 2023-12-01</p></div>
             </div>
         </div>
 
