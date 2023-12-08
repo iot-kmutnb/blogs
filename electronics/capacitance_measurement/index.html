@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/capacitance_measurement/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทดลองหาค่าความจุของตัวเก็บประจุไฟฟ้า - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">การทดลองหาค่าความจุของตัวเก็บประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; หลักการทำงานของตัวเก็บประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; วงจรสาธิตการอัดและคายประจุของตัวเก็บประจุด้วยปุ่มกด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#spdt" class="nav-link">&#9655; การจำลองการอัดและคายประจุของตัวเก็บประจุโดยใช้สวิตช์แบบ SPDT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; วงจรสาธิตการอัดและคายประจุของตัวเก็บประจุด้วยสัญญาณพัลส์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino" class="nav-link">&#9655; การใช้บอร์ด Arduino สำหรับการทดลองตัวเก็บประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino_1" class="nav-link">&#9655; การเขียนโค้ด Arduino วัดค่าความจุของตัวเก็บประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#io-arduino" class="nav-link">&#9655; การใช้ขา I/O ของบอร์ด Arduino สำหรับการอัดและคายประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="_1">การทดลองหาค่าความจุของตัวเก็บประจุไฟฟ้า<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอวิธีการวัดค่าความจุของตัวเก็บประจุไฟฟ้า โดยใช้บอร์ดไมโครคอนโทรลเลอร์ 
+<strong>Arduino</strong> (เช่น <strong>Uno</strong> หรือ <strong>Nano</strong>)
+และสาธิตการเขียนโปรแกรมควบคุมการอัดและคายประจุไฟฟ้า 
+และจับเวลาในการช่วงเวลาที่มีการคายประจุเพื่อนำไปคำนวณค่าความจุไฟฟ้า</p>
+<p><strong>Keywords:</strong> <em>Capacitance Measurement</em>, <em>Arduino</em>,
+<em>AUTODESK Tinkercad Circuits</em></p>
+<hr />
+<h2 id="_2">&#9655; <strong>หลักการทำงานของตัวเก็บประจุไฟฟ้า</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ตัวเก็บประจุไฟฟ้า หรือ คาปาซิเตอร์  (<strong>Capacitor</strong>) จะมีการเปลี่ยนแปลงระดับแรงดันไฟฟ้าที่ขั้วของตัวเก็บประจุ
+เมื่อมีกระแสไฟฟ้าไหลเข้า (อัดประจุ) และไหลออก (คายประจุ) 
+โมเดลของวงจรไฟฟ้าสำหรับการอัดและคายประจุไฟฟ้า ประกอบด้วยแหล่งจ่ายแรงดันไฟฟ้า <strong>DC</strong> ตัวต้านทาน <strong>R</strong> 
+และตัวเก็บประจุ <strong>C</strong> อย่างละหนึ่งตัว ต่อกันเป็นวงจรอนุกรมกัน วงจรนี้เรียกว่า วงจร <strong>RC Series</strong></p>
+<p>อัตราการเปลี่ยนแปลงแรงดันไฟฟ้าที่ขั้วของตัวเก็บประจุขึ้นอยู่กับค่าที่เรียกว่า <strong>Time Constant</strong> (<script type="math/tex">\tau</script>) 
+หรือ ผลคูณของ <strong>R</strong> กับ <strong>C</strong> หรือ <script type="math/tex">\tau = RC</script> 
+แรงดันไฟฟ้าตกคร่อมที่ตัวเก็บประจุไฟฟ้า เมื่อเกิดการคายประจุ เป็นไปตามสมการต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  v_C(t) = v_C(0) \cdot e^{-\frac{t}{RC}}, \quad t \geq 0 
+</script>
+<script type="math/tex">v_C(0)</script> คือ แรงดันเริ่มต้นของตัวเก็บประจุ เมื่อเวลา <script type="math/tex">t=0</script> จากนั้นก็เขียนสมการใหม่ได้เป็น
+<script type="math/tex; mode=display">
+  \frac{v_C(t)}{v_C(0)} = e^{-\frac{t}{RC}}
+</script>
+ถ้ากำหนดเงื่อนไขว่า ให้เวลาเวลาผ่านไป <script type="math/tex"> t = t_d </script> ในการคายประจุไฟฟ้า
+จนกว่าแรงดันไฟฟ้าจะลดลงเป็นครึ่งของแรงดันไฟฟ้าเริ่มต้น จงหาระยะเวลา <script type="math/tex">t_d</script>
+</p>
+<p>จากสมการดังกล่าว จะได้เป็น</p>
+<p>
+<script type="math/tex; mode=display">\begin{align*}
+       1/2 &= e^{-\frac{t_d}{RC}} \\
+   ln(1/2) &= -t_d/RC \\
+-0.6931472 &= -t_d/RC \\
+         t_d &= 0.6931472 \cdot RC 
+\end{align*}</script>
+</p>
+<p>ถ้าวัดระยะเวลาตั้งแต่เริ่มคายประจุไฟฟ้า จนแรงดันไฟฟ้าลดลงเป็นครึ่งหนึ่ง และทราบค่าความต้านทาน <strong>R</strong>
+ก็จะสามารถหาความจุของตัวเก็บประจุไฟฟ้า <strong>C</strong> ได้
+<script type="math/tex; mode=display">
+     C = \frac{t_d}{0.6931472\cdot R}
+</script>
+</p>
+<p>ถ้าให้ตัวแปร <strong>t</strong> มีหน่วยเวลาเป็นไมโครวินาที (<strong>usec</strong>) ค่าความจุ <strong>C</strong> จะมีหน่วยเป็นไมโครฟารัด (<strong>uF</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>วงจรสาธิตการอัดและคายประจุของตัวเก็บประจุด้วยปุ่มกด</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>ผังวงจรไฟฟ้าต่อไปนี้ ประกอบด้วยแหล่งจ่าย <strong>DC</strong> ตั้งค่าไว้คงที่ <strong>+5V</strong> 
+มีตัวเก็บประจุขนาด <strong>100uF</strong> และมีตัวต้านทานคงที่ <strong>R1=1k</strong> และ <strong>R2=1k</strong> 
+มีตัวต้านทานปรับค่าได้ในช่วง <strong>RP1=0..100K</strong> โอห์ม และมีปุ่มกด <strong>S1</strong> 
+(<strong>Tactile Switch</strong> หรือ <strong>Push Button</strong>)</p>
+<p><img alt="" src="circuit_capacitor_button-1.png" /></p>
+<p>รูป: ผังวงจร (วาดด้วยซอฟต์แวร์ <strong>EasyEDA</strong>) เพื่อสาธิตการอัดและคายประจุของตัวเก็บประจุ โดยการกดหรือปล่อยปุ่ม</p>
+<p>เริ่มต้นให้ตัวเก็บประจุไฟฟ้า ไม่มีประจุไฟฟ้า ดังนั้นจึงมีแรงดันไฟฟ้าตกคร่อมที่ตัวเก็บประจุเป็น <strong>0V</strong>
+ถ้าสวิตช์ <strong>S1</strong> ถูกกดค้างไว้ จะเปลี่ยนจากตำแหน่งเปิด (<strong>Open</strong>) มาเป็นตำแหน่งปิด (<strong>Close</strong>) 
+ทำให้มีการชาร์จประจุเข้าไปในตัวเก็บประจุ แรงดันไฟฟ้าจะเพิ่มขึ้นจนมีระดับเท่ากับ <strong>5V</strong></p>
+<p>ในขณะที่มีการชาร์จประจุ กระแสไฟฟ้าจะไหลจากแหล่งจ่าย <strong>5V</strong> ผ่าน <strong>R1</strong> ไปยังตัวเก็บประจุไฟฟ้า <strong>C1</strong> 
+ในขณะเดียวกันก็จะมีกระแสไหลผ่าน <strong>R2</strong> และ <strong>RP1</strong> เช่นกัน
+ขณะที่สวิตช์ <strong>S1</strong> ถูกกดค้างไว้ ตัวต้านทาน <strong>R2</strong> ในวงจรนี้ทำหน้าที่เป็นตัวจำกัดกระแส 
+หาก <strong>RP1</strong> ถูกปรับให้เป็น 0 โอห์ม กระแสที่ไหลจากแหล่งจ่ายไปยัง <strong>GND</strong> จะถูกจำกัดไว้ไม่ให้สูงเกินไปด้วย <strong>R2</strong></p>
+<p>ในอีกกรณีหนึ่ง ถ้าปล่อยปุ่ม <strong>S1</strong> เปลี่ยนจากตำแหน่งปิด (<strong>Close</strong>) มาเป็นตำแหน่งเปิด (<strong>Open</strong>)
+แหล่งจ่าย <strong>5V</strong> จะไม่มีผลต่อตัวเก็บประจุ และจะทำให้เกิดการคายประจุไฟฟ้าออกจากตัวเก็บประจุ
+โดยมีกระแสไฟฟ้าไหลจากตัวเก็บประจุ <strong>C1</strong> ผ่าน <strong>R1</strong> ไปยัง <strong>R2</strong> และ <strong>RP1</strong> ไปยัง <strong>GND</strong> ของวงจร 
+แรงดันไฟฟ้าของตัวเก็บประจุ <strong>C1</strong> จะค่อย ๆ ลดลงจนเป็น <strong>0V</strong>
+อัตราการคายประจุของ <strong>C1</strong> สามารถปรับได้ โดยการหมุนปรับตัวต้านทาน <strong>RP1</strong></p>
+<p>&nbsp;</p>
+<p>หากจะลองใช้ซอฟต์แวร์ <strong>AUTODESK Tinkercard Circuits</strong> ก็มีตัวอย่างดังนี้
+ซึ่งมีข้อดี คือ สามารถปรับเปลี่ยนค่าของตัวต้านทาน <strong>RP1</strong> และทำให้ผู้ใช้สามารถสังเกตเห็น
+อัตราการคายประจุได้ง่ายขึ้น หรือจะใช้ออสซิลโลสโคปเสมือนจริงวัดสัญญาณร่วมด้วยเพื่อสังเกตดูลักษณะของคลื่นสัญญาณ</p>
+<p><img alt="" src="circuit_capacitor_button_tinkercad-1.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริงบนเบรดบอร์ด</p>
+<p><img alt="" src="circuit_capacitor_button_tinkercad-2.png" /></p>
+<p>รูป: การจำลองการทำงานและวัดแรงดันไฟฟ้าช่วงที่มีการอัดประจุและคายประจุตามลำดับ</p>
+<p><img alt="" src="circuit_capacitor_button_tinkercad-3.png" /></p>
+<p>รูป: การจำลองการทำงานและวัดสัญญาณด้วยออสซิลโลสโคปเสมือนจริง</p>
+<p>ถ้าได้ต่อวงจรทดลองบนเบรดบอร์ดและวัดสัญญาณด้วยออสซิลโสโคป ก็สามารถหาระยะเวลา
+ในช่วงที่แรงดันไฟฟ้าของตัวเก็บประจุ ได้ลดลงเป็นครึ่งหนึ่ง และทราบค่าความต้านทาน ก็สามารถคำนวณความจุของตัวเก็บประจุได้</p>
+<p><img alt="" src="oscilloscope_measurement.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ด และวัดสัญญาณด้วยออซิลโลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="spdt">&#9655; <strong>การจำลองการอัดและคายประจุของตัวเก็บประจุโดยใช้สวิตช์แบบ SPDT</strong><a class="headerlink" href="#spdt" title="Permanent link">#</a></h2>
+<p>ผังวงจรต่อไปนี้สาธิตการใช้สวิตช์ <strong>S1</strong> แบบ <strong>SPDT</strong> (<em>Single-Pole Double-Throw</em>)
+หรือ <strong>Slide Switch</strong> แทนปุ่มกดแล้วปล่อย โดยตำแหน่งของสวิตช์จะเป็นการเลือกว่า 
+จะทำให้เกิดการอัดหรือคายประจุของตัวเก็บประจุ ตามผังวงจรต่อไปนี้</p>
+<p><img alt="" src="circuit_capacitor_slide_switch.png" /></p>
+<p>รูป: ผังวงจร (วาดด้วยซอฟต์แวร์ <strong>EasyEDA</strong>) เพื่อสาธิตการอัดและคายประจุของตัวเก็บประจุ โดยใช้สวิตช์เลื่อนตำแหน่ง</p>
+<p><img alt="" src="circuit_capacitor_switch_tinkercad-1.png" /></p>
+<p>รูป: การต่อวงจรเสมือนจริงและจำลองการทำงานด้วย <strong>AUTODESK Tinkercad Circuits</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>วงจรสาธิตการอัดและคายประจุของตัวเก็บประจุด้วยสัญญาณพัลส์</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>การทำให้แรงดันไฟเลี้ยงเปลี่ยนระดับ เช่น ระหว่าง <strong>0V</strong> กับ <strong>5V</strong> โดยเว้นระยะเวลาคงที่ 
+จะทำให้เกิดการอัดประจุและคายประจุสลับกันไป ดังนั้นในกรณีนี้
+แรงดันไฟเลี้ยงจากแหล่งจ่าย มีลักษณะเป็นสัญญาณพัลส์ (<strong>Pulse</strong>)</p>
+<p><img alt="" src="circuit_capacitor_pulse.png" /></p>
+<p>รูป: ผังวงจร (วาดด้วยซอฟต์แวร์ <strong>EasyEDA</strong>) เพื่อสาธิตการอัดและคายประจุของตัวเก็บประจุด้วยสัญญาณพัลส์</p>
+<p>หากจำลองการทำงานของวงจรนี้ด้วยซอฟต์แวร์ <strong>EasyEDA</strong> จะได้รูปคลื่นสัญญาณต่อไปนี้</p>
+<p><img alt="" src="circuit_capacitor_pulse_sim.png" /></p>
+<p>รูป: คลื่นสัญญาณไฟฟ้าซึ่งได้การวัดแรงดันไฟฟ้าของตัวเก็บประจุ ซึ่งจะเห็นช่วงการอัดและคายประจุสลับกัน</p>
+<p>หากจะลองใช้ซอฟต์แวร์ <strong>AUTODESK Tinkercad Circuits</strong> ก็สามารถเลือกใช้
+เครื่องกำเนิดสัญญาณเสมือนจริง (<strong>Function Generator</strong>) สร้างสัญญาณพัลส์
+หรือสัญญาณคาบรูปสี่เหลี่ยม (<strong>Rectangular Waveform</strong>)
+ตั้งคาบเวลาให้กว้างพอสำหรับการอัดหรือคายประจุไฟฟ้า
+และใช้ออสซิลโลสโคปวัดสัญญาณการเปลี่ยนแปลงของแรงดันไฟฟ้า</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino">&#9655; <strong>การใช้บอร์ด Arduino สำหรับการทดลองตัวเก็บประจุไฟฟ้า</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นแนวทางการใช้บอร์ดไมโครคอนโทรลเลอร์ และการเขียนโปรแกรมด้วย 
+<a href="https://www.arduino.cc/reference/en/"><strong>Arduino API</strong></a>
+เพื่อควบคุมการทำงานของขา <strong>Digital I/O</strong> เช่น กำหนดสถานะลอจิกของขาเอาต์พุต
+ให้เป็นลอจิก <strong>HIGH</strong> และ <strong>LOW</strong> สลับกันไป สำหรับการอัดหรือคายประจุไฟฟ้าของตัวเก็บประจุ
+และการวัดแรงดันไฟฟ้า</p>
+<p>จากรูปต่อไปนี้ จะเห็นได้ว่า มีการนำบอร์ด <strong>Arduino Uno</strong> มาต่อเพิ่ม โดยเชื่อมต่อ <strong>GND</strong> ของวงจรร่วมกัน
+และใช้ขา <strong>A0</strong> สำหรับวัดแรงดันไฟฟ้าที่ตัวเก็บประจุ แต่การอัดหรือคายประจุ ยังเป็นการกดและปล่อยปุ่ม
+(ไม่ได้ใช้ขาเอาต์พุตของบอร์ด <strong>Arduino</strong> เป็นสัญญาณควบคุม)</p>
+<p><img alt="" src="uno_voltage_measurement.png" /></p>
+<p>รูป: การต่อวงจรบนเบรดบอร์ดและใช้งานร่วมกับบอร์ด <strong>Arduino Uno</strong></p>
+<p>บอร์ด <strong>Arduino Uno / Nano</strong> ทำงานด้วยแรงดันไฟเลี้ยง <strong>VCC=+5V</strong>
+ดังนั้นสัญญาณไฟฟ้าจากภายนอก ทั้งสัญญาณดิจิทัล และ แอนะล็อก จะต้องมีแรงดันไฟเลี้ยงอยู่ในช่วง
+<strong>0V</strong> และ <strong>5V</strong> เพื่อหลีกเลี่ยงการทำให้อุปกรณ์อิเล็กทรอนิกส์ชำรุดเสียหาย</p>
+<p>ถ้าใช้บอร์ด <strong>Arduino Uno / Nano</strong> แรงดันไฟฟ้าจะอยู่ที่ <strong>+5V (HIGH)</strong> และ 
+<strong>0V (LOW)</strong> สำหรับการทำงานของขา <strong>Digital I/O</strong>
+และเชื่อมต่อกับวงจร <strong>RC Series</strong> เพื่อการอัดหรือคายประจุไฟฟ้าตามลำดับ</p>
+<ul>
+<li>เอาต์พุต <strong>HIGH</strong>: ขา <strong>I/O</strong> ของชิปไมโครคอนโทรลเลอร์ ทำหน้าที่สำหรับการจ่ายกระแสไหลออก (<strong>Current Source</strong>) </li>
+<li>เอาต์พุต <strong>LOW</strong>: ขา <strong>I/O</strong> ของชิปไมโครคอนโทรลเลอร์ ทำหน้าที่รับกระแสไฟฟ้าไหลเข้า (<strong>Current Sink</strong>) </li>
+</ul>
+<p>ขา <strong>Digital I/O</strong> ของชิป <strong>AVR</strong> สามารถรับหรือจ่ายกระแสได้ไม่เกิน <strong>20mA</strong> (max.)</p>
+<p>การกำหนดสถานะลอจิกและใช้งานขา <strong>I/O</strong> เป็นเอาต์พุต ก็มีคำสั่งของ<strong> Arduino API</strong> ให้ใช้งานดังนี้</p>
+<ul>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/digital-io/pinmode/"><code>pinMode( pin, mode )</code></a> 
+เป็นการใช้งานขา <strong>Digital I/O</strong> ตามหมายเลขของขาที่ได้เลือกใช้งาน
+และกำหนดทิศทางของสัญญาณหรือโหมดการใช้งาน เช่น <code>OUTPUT</code> หมายถึง เอาต์พุต และ <code>INPUT</code> หมายถึง อินพุต เป็นต้น</li>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/digital-io/digitalwrite/"><code>digitalWrite( pin, value )</code></a> 
+เป็นการกำหนดค่าลอจิกของขา <strong>Digital I/O</strong> ตามหมายเลขของขาที่ได้เลือกใช้งาน 
+เช่น <strong>HIGH</strong> จะได้เอาต์พุตมีระดับแรงดันประมาณ <strong>5V</strong> และ <strong>LOW</strong> มีระดับแรงดัน <strong>0V</strong></li>
+</ul>
+<p>การวัดแรงดันไฟฟ้าจากภายนอก โดยใช้ขา <strong>Analog Input</strong>
+ก็สามารถทำได้โดยใช้คำสั่งต่อไปนี้ แต่จะต้องเลือกใช้ขาของบอร์ด <strong>Arduino</strong> 
+ที่สามารถใช้งานเป็นขาแอนะล็อกอินพุตได้ เช่น ขา <strong>A0</strong>, <strong>A1</strong>, <strong>A2</strong>, …</p>
+<ul>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/"><code>digitalRead( pin )</code></a>
+จะได้ค่าเป็นเลขจำนวนเต็มในช่วง 0 ถึง 1023 (ความละเอียด 10 บิต) </li>
+</ul>
+<p>ถ้าจะแปลงค่าที่อ่านได้ด้วยคำสั่ง <code>digitalRead(...)</code> ให้เป็นระดับแรงดันไฟฟ้า
+ก็ใช้การคำนวณด้วยสเกลเชิงเส้นในช่วง <strong>0V</strong> ถึง <strong>5V</strong> 
+(ในกรณีนี้ แรงดันอ้างอิงสำหรับการอ่านค่าสัญญาณแอนะล็อกคือ <strong>AREF = 5V</strong>)
+และตัวอย่างประโยคคำสั่งในภาษา <strong>C/C++</strong> ดังนี้</p>
+<pre><code>  float mV = analogRead(A0) * 5000.0f / 1024;
+</code></pre>
+<p>ประโยคคำสั่งนี้ มีการประกาศใช้ตัวแปรชื่อ <code>mV</code> (มิลลิโวลต์) ซึ่งมีชนิดข้อมูลเป็น <code>float</code> สำหรับเก็บค่าตัวเลขทศนิยม
+และได้ค่าจากการทำคำสั่ง <code>analogRead(A0)</code> ที่ขาแอนะล็อกอินพุต <strong>A0</strong>
+แล้วนำมาคูณกับ <strong>5000</strong> (มิลลิโวลต์) แล้วหารด้วย <strong>1024</strong></p>
+<p>อีกกลุ่มคำสั่งของ <strong>Arduino API</strong> ที่สำคัญและมีการใช้งานบ่อยในการเขียนโค้ด คือ
+คำสั่งเกี่ยวกับการทำงานในเชิงเวลา เช่น </p>
+<ul>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/time/millis/"><code>millis( )</code></a>
+ได้ค่าตัวเลขจำนวนเต็ม ขนาด 32 บิต หน่วยเป็นมิลลิวินาที เริ่มนับตั้งแต่มีการรีเซตการทำงานของไมโครคอนโทรลเลอร์</li>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/time/micros/"><code>micros( )</code></a>
+ได้ค่าตัวเลขจำนวนเต็ม ขนาด 32 บิต หน่วยเป็นไมโคริวินาที เริ่มนับตั้งแต่มีการรีเซตการทำงานของไมโครคอนโทรลเลอร์</li>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/time/delay/"><code>delay( msec )</code></a>
+เป็นการหน่วงเวลาไวก่อนทำคำสั่งถัดไป ตามค่าตัวเลขจำนวนเต็มที่ต้องการหน่วยเป็นมิลลิวินาที</li>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/time/delaymicroseconds/"><code>delayMicroseconds( usec )</code></a>
+เป็นการหน่วงเวลาไวก่อนทำคำสั่งถัดไป ตามค่าตัวเลขจำนวนเต็มที่ต้องการุ หน่วยเป็นไมโครวินาที</li>
+</ul>
+<hr />
+<h2 id="arduino_1">&#9655; <strong>การเขียนโค้ด Arduino วัดค่าความจุของตัวเก็บประจุไฟฟ้า</strong><a class="headerlink" href="#arduino_1" title="Permanent link">#</a></h2>
+<p>แนวทางการเขียนโค้ด <strong>Arduino</strong> สำหรับการทดลองมีดังนี้</p>
+<ul>
+<li>ขั้นตอนที่ 1) อ่านค่าแรงดันอินพุตที่ขา <strong>A0</strong> และตรวจสอบดูว่า แรงดันเพิ่มขึ้นจนใกล้ค่าสูงสุดแล้วหรือไม่
+ถ้าใช่ ก็แสดงว่า มีการกดปุ่มให้เกิดการชาร์จประจุ ให้ไปทำขั้นตอนที่ 2 แต่ถ้าไม่ใช่ ให้ทำขั้นตอนซ้ำ</li>
+<li>ขั้นตอนที่ 2) อ่านค่าแรงดันอินพุตที่ขา <strong>A0</strong> และตรวจสอบดูว่า แรงดันเริ่มลดลงแล้วหรือไม่ ถ้าใช่
+ก็แสดงว่า มีการปล่อยปุ่มและเกิดการคายประจุ ให้ไปทำขั้นตอนที่ 3 และบันทึกเวลาเริ่มต้นไว้  แต่ถ้าไม่ใช่ ให้ทำขั้นตอนซ้ำ</li>
+<li>ขั้นตอนที่ 3)  อ่านค่าแรงดันอินพุตที่ขา <strong>A0</strong> และตรวจสอบดูว่า แรงดันเริ่มลดลงมาครึ่งหนึ่งแล้วหรือไม่
+ถ้าใช่ ให้บันทึกเวลาหยุด หาผลต่างเพื่อให้ได้ระยะเวลา แล้วนำไปคำนวณค่าความจุของตัวเก็บประจุ
+แล้วย้อนไปเริ่มที่ขั้นตอนที่ 1)  ซ้ำใหม่  แต่ถ้าไม่ใช่ ให้ทำขั้นตอนซ้ำ</li>
+</ul>
+<p>ตัวอย่างโค้ด <strong>Arduino Sketch</strong> สำหรับการสาธิต มีดังนี้</p>
+<pre><code class="language-c++">// Analog input pin for measuring the voltage across the capacitor
+const int AIN_PIN = A0;
+
+// The value for the discharge capacitor
+const uint32_t R_DISCHARGE = (10000+1000); // 10k + 1k
+
+void setup() {
+  Serial.begin(115200);
+}
+
+// The current value, the value value 
+// and the half value of the input voltage
+uint16_t value, last_value = 0, half_value;
+uint8_t state = 0; // the current state of the FSM
+uint32_t t_start;  // the start time (in usec)
+uint8_t cnt = 0;   // the counter
+
+void loop() {
+  // Read the analog input
+  value = analogRead(AIN_PIN);
+  // This is a finite-state machine (FSM).
+  switch( state ) {
+    case 0: 
+      if (last_value &lt; value &amp;&amp; value &gt; 1020 &amp;&amp; ++cnt &gt; 2) {
+         Serial.println(&quot;Charging...&quot;);
+         cnt = 0;   // Reset the counter
+         state = 1; // Go to state 1
+      }
+      break;
+    case 1: 
+      if (last_value &gt; value &amp;&amp; value &lt; 1000 &amp;&amp; ++cnt &gt; 2) {
+        t_start = micros(); // Save the start time 
+         Serial.println(&quot;Discharging...&quot;);
+        half_value = value/2; // Compute the half value
+        cnt = 0;   // Reset the counter
+        state = 2; // Go to state 2
+      }
+      break;
+    case 2: 
+      // The current value has reduced and reached to the half value.
+      if ( value &lt;= half_value ) {
+        // Compute the time duration
+        uint32_t t_delta = micros() - t_start;
+        // Compute the measured capacitance
+        String s = &quot;Measured Capacitance: &quot;;
+        float capacitance = t_delta/(0.6931472f*R_DISCHARGE);
+        s += capacitance;
+        s += &quot; uF&quot;;
+        // Send the result as a string to the serial port
+        Serial.println( s.c_str() );
+        state = 0; // Go to state 0
+      }
+      break;
+    default:
+      state = 0;
+  }
+  last_value = value; // Update the saved value
+  delay(1);
+}
+</code></pre>
+<p>การเขียนโค้ด <strong>Arduino Sketch</strong> และจำลองการทำงานเสมือนจริง
+สามารถทำได้ด้วย <strong>AUTODESK Tinkercad Circuits</strong></p>
+<p><img alt="" src="uno_voltage_measurement_sim.png" /></p>
+<p>รูป: การจำลองการทำงานเสมือนจริง (<strong>C=100uF</strong>, <strong>R1=1k</strong> และ <strong>R2=10k</strong>)</p>
+<p>&nbsp;</p>
+<p>ในการทดลองจริง ได้เลือกใช้ค่าความต้านทาน <strong>R1=10k</strong> และ <strong>R2=2.2k</strong>
+และเลือกใช้ตัวเก็บประจุ ชนิดอิเล็กทรอไลต์ (<strong>Electrolytic Capacitor</strong>)
+ที่มีค่าความจุ <strong>10uF</strong> และ <strong>100uF</strong> ตามลำดับ
+เมื่อวัดค่าด้วยมัลติมิเตอร์ <strong>Fluke 115</strong> จะได้ค่าเท่ากับ
+<strong>9.95uF</strong> และ <strong>108.1uF</strong> ตามลำดับ</p>
+<p><img alt="" src="uno_capacitor_button_measurement-3.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองจริง โดยใช้บอร์ด <strong>Arduino Nano</strong></p>
+<p><img alt="" src="uno_capacitor_button_measurement-1.png" /></p>
+<p>รูป: การทดลองกับตัวเก็บประจุ <strong>10uF</strong> และค่าได้ <strong>9.94uF</strong></p>
+<p><img alt="" src="uno_capacitor_button_measurement-2.png" /></p>
+<p>รูป: การทดลองกับตัวเก็บประจุ <strong>100uF</strong> และค่าได้ประมาณ <strong>107.8uF</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="io-arduino">&#9655; <strong>การใช้ขา I/O ของบอร์ด Arduino สำหรับการอัดและคายประจุไฟฟ้า</strong><a class="headerlink" href="#io-arduino" title="Permanent link">#</a></h2>
+<p>ถ้าใช้ขา <strong>I/O</strong> ของไมโครคอนโทรลเลอร์ จำนวน 2 ขา แยกกัน ขาหนึ่งสำหรับการอัดประจุไฟฟ้า
+และอีกขาหนึ่งสำหรับการคายประจุไฟฟ้า และเลือกใช้ตัวต้านทานต่างกัน (<strong>R1</strong> และ <strong>R2</strong>)
+สำหรับการอัดและคายประจุไฟฟ้าตามลำดับ ก็มีแนวทางดังนี้</p>
+<ul>
+<li>ถ้าใช้ค่าความต้านทาน <strong>R1</strong> ต่ำกว่าสำหรับการอัดประจุ ก็จะทำให้ค่า <strong>RC</strong> และระยะเวลาการอัดประจุก็จะลดลง</li>
+<li>ถ้าใช้ค่าความต้านทาน <strong>R2</strong> สูงกว่าสำหรับการคายประจุ ก็จะทำให้ค่า <strong>RC</strong> และระยะเวลาการอัดประจุก็จะเพิ่มมากขึ้น </li>
+</ul>
+<p>ขา <strong>Digital I/O</strong> ของชิป <strong>AVR</strong> บนบอร์ด <strong>Arduino</strong> มีค่าความต้านทานภายใน
+ประมาณ <strong>25Ω</strong> ถ้าใช้งานเป็นเอาต์พุต และมากกว่า <strong>1MΩ</strong> ถ้าใช้งานเป็นอินพุต (<strong>High-impedance Input</strong>)</p>
+<p>การจับเวลาและวัดแรงดันไฟฟ้าทำได้ทั้งในช่วงการอัดประจุและคายประจุไฟฟ้า แต่ถ้า <strong>R2</strong> มีค่ามากกว่า <strong>R1</strong>
+หลายเท่า ก็แนะนำให้ทำในช่วงการคายประจุ ซึ่งมีแรงดันไฟฟ้าลดลง และมีแนวทางดังนี้</p>
+<p>กำหนดให้ <code>CHARGE_PIN</code> และ <code>DISCHARGE_PIN</code> ของบอร์ด <strong>Arduino</strong>
+เป็นขาเอาต์พุตที่เลือกใช้งาน เช่น เลือกใช้ขา <strong>2</strong> และ <strong>3</strong>
+และใช้ขาแอนะล็อก-อินพุต <code>AIN_PIN</code> โดยเลือกใช้ขา <strong>A0</strong></p>
+<p><strong>ลำดับขั้นตอนของการทำซ้ำ</strong></p>
+<p>ขั้นตอนที่ 1) การชาร์จประจุ</p>
+<ul>
+<li>กำหนดให้ขา   <code>DISCHARGE_PIN</code> เป็นอินพุต</li>
+<li>กำหนดให้ขา   <code>CHARGE_PIN</code> เป็นเอาต์พุตและมีค่าเป็น <code>HIGH</code>
+เพื่อเริ่มต้นการชาร์จประจุ ด้วยแรงดันไฟฟ้าที่ระดับ <strong>5V</strong> โดยประมาณ ผ่านตัวต้านทาน <strong>R1</strong> ไปยังตัวเก็บประจุ</li>
+<li>หน่วงเวลา เช่น 500 มิลลิวินาที เพื่อให้เกิดการชาร์จประจุไฟฟ้าจนเต็ม</li>
+<li>กำหนดให้ขา   <code>CHARGE_PIN</code> เป็นอินพุต เพื่อหยุดการชาร์จประจุ แล้วไปทำขั้นตอนที่ 2</li>
+</ul>
+<p>ขั้นตอนที่ 2) การคายประจุ</p>
+<ul>
+<li>กำหนดให้ขา  <code>DISCHARGE_PIN</code> เป็นขาเอาต์พุตและมีค่าเป็น <code>LOW</code>
+เพื่อทำให้เกิดการคายประจุจากตัวเก็บประจุ และมีกระแสไหลจากตัวเก็บประจุผ่านตัวต้านทาน <strong>R2</strong> ไปยัง <strong>GND</strong></li>
+<li>อ่านค่าแรงดันเริ่มต้น กำหนดค่าแรงดันครึ่งของแรงดันเริ่มต้น บันทึกเวลาเริ่มต้น แล้วไปทำขั้นตอนที่ 3</li>
+</ul>
+<p>ขั้นตอนที่ 3) การตรวจสอบเงื่อนไขและวัดระยะเวลา</p>
+<ul>
+<li>ทำซ้ำเพื่ออ่านค่าจากขา <code>AIN_PIN</code> ด้วยคำสั่ง <code>analogRead()</code>
+จนกว่า ค่าที่ได้ลดลงจนถึงค่าแรงดันครึ่งหนึ่งจากจากเริ่มต้น เมื่อตรวจสอบเงื่อนไขแล้วเป็นจริง
+ให้บันทึกเวลาจบ แล้วนำไปคำนวณระยะเวลา และค่าความจุของตัวเก็บประจุตามลำดับ</li>
+<li>แสดงค่าความจุที่คำนวณได้เป็นข้อความผ่านทางพอร์ตอนุกรม <code>Serial</code></li>
+<li>หน่วงเวลาไว้เพื่อให้มีการคายประจุ ให้ได้แรงดันไฟฟ้าลดลงเป็น <strong>0V</strong> แล้วไปทำขั้นตอนที่ 1  ซ้ำ</li>
+</ul>
+<p><img alt="" src="uno_pins_charge_discharge_tinkercad.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรเสมือนจริง</p>
+<p><img alt="" src="uno_pins_charge_discharge.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองจริงบนบนเบรดบอร์ด</p>
+<p><img alt="" src="uno_capacitor_charge_discharge_demo.png" /></p>
+<p>รูป: การทดลองการทำงานโค้ด <strong>Arduino</strong> เมื่อทดลองวัดความจุของตัวเก็บประจุ <strong>10uF</strong></p>
+<p><img alt="" src="uno_oled.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อโมดูลแสดงผลกราฟิกแบบ <strong>OLED I2C</strong> เพื่อแสดงค่าความจุที่วัดได้ของตัวเก็บประจุ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_5">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอแนวทางการทดลองเกี่ยวกับการวัดค่าความจุของตัวเก็บประจุไฟฟ้าหรือคาปาซิเตอร์
+โดยใช้ซอฟต์แวร์จำลองการทำงานของวงจร และใช้บอร์ด <strong>Arduino</strong> เพื่อวัดแรงดันไฟฟ้า
+ในขณะที่เกิดการคายประจุไฟฟ้า และคำนวณค่าความจุของตัวเก็บประจุ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-12-06 | Last Updated: 2023-12-07</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
