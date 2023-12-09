@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32-s3_intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเริ่มต้นใช้งานชิป Espressif ESP32-S3 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#espressif-esp32-s3" class="nav-link">การเริ่มต้นใช้งานชิป Espressif ESP32-S3</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#esp32-s3-series" class="nav-link">&#9655; แนะนำ ESP32-S3 Series</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-s3" class="nav-link">&#9655; การจำแนกประเภทของบอร์ด ESP32-S3 และตัวอย่างบอร์ดทดลอง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32-s3_1" class="nav-link">&#9655;  ตัวเลือกในการเขียนโปรแกรมสำหรับ ESP32-S3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino" class="nav-link">&#9655;  การเขียนโปรแกรมด้วย Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#micropython" class="nav-link">&#9655;  การเขียนโปรแกรมด้วย MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#circuitpython" class="nav-link">&#9655;  การเขียนโปรแกรมด้วย CircuitPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wokwi-simulator" class="nav-link">&#9655;  การใช้งาน WokWi Simulator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="espressif-esp32-s3">การเริ่มต้นใช้งานชิป Espressif ESP32-S3<a class="headerlink" href="#espressif-esp32-s3" title="Permanent link">#</a></h1>
+<ul>
+<li><a href="#esp32-s3-series">แนะนำ <strong>ESP32-S3 Series</strong></a></li>
+<li><a href="#esp32-s3">การจำแนกประเภทของบอร์ด <strong>ESP32-S3</strong></a></li>
+<li><a href="#esp32-s3_1">ตัวเลือกในการเขียนโปรแกรมสำหรับ <strong>ESP32-S3</strong></a></li>
+<li><a href="#arduino">การเขียนโปรแกรมด้วย <strong>Arduino</strong></a></li>
+<li><a href="#micropython">การเขียนโปรแกรมด้วย <strong>MicroPython</strong></a></li>
+<li><a href="#circuitpython">การเขียนโปรแกรมด้วย <strong>CircuitPython</strong></a></li>
+<li><a href="#wokwi-simulator">การใช้งาน <strong>WokWi Simulator</strong></a></li>
+</ul>
+<hr />
+<h2 id="esp32-s3-series">&#9655; <strong>แนะนำ ESP32-S3 Series</strong><a class="headerlink" href="#esp32-s3-series" title="Permanent link">#</a></h2>
+<p>บริษัท <strong>Espressif Systems</strong> ได้เปิดตัวชิป <strong>ESP32-S3 SoC</strong> ในช่วงปลายปีค.ศ. 2020
+ชิป <strong>ESP32-S3</strong> มีตัวประมวลผล <strong>Tensilca Xtensa LX7 (32-bit dual-core)</strong>
+ความเร็วในการประมวลผลสูงสุด <strong>240MHz</strong></p>
+<p>ในเชิงเปรียบเทียบ <strong>ESP32</strong> (เริ่มจำหน่ายในปีค.ศ. 2016) ใช้ตัวประมวลผล <strong>Xtensa LX6 (32-bit dual-core)</strong>
+แต่ <strong>ESP32-S3</strong> มีชุดคำสั่งส่วนขยายที่เรียกว่า <strong>Processor Instruction Extensions (PIE)</strong>
+สามารถคำนวณด้วยข้อมูลขนาด 128 บิต (แบ่งเป็นข้อมูลหน่วยย่อยขนาด 8-bit, 16-bit หรือ 32-bit ได้)
+นอกจากนั้นยังรองรับการใช้งาน <strong>USB-OTG (Host &amp; Device)</strong> ได้ด้วย ซึ่งแตกต่างจากชิป
+<strong>ESP32</strong> รุ่นอื่น ๆ </p>
+<p><strong>ESP32-S3</strong></p>
+<ul>
+<li>Released: December 2020 </li>
+<li>TSMC ultra-low-power 40nm technology</li>
+<li>CPUs: Dual-core Xtensa LX7, 5-stage pipeline, up to 240 MHz</li>
+<li>384 KB ROM: for booting and core functions</li>
+<li>512 KB On-chip SRAM (for data and instructions)</li>
+<li>Processor Instruction Extensions (PIE)<ul>
+<li>Extended instruction set (based on 128-bit SIMD operations)</li>
+</ul>
+</li>
+<li>IEEE 802.11b/g/n (2.4 GHz Wi-Fi) and Bluetooth 5 (LE)</li>
+<li>USB-OTG: USB host and device support </li>
+<li>Chip models:<ul>
+<li>External Flash: ESP32-S3</li>
+<li>External Flash, built-in PSRAM: ESP32-S3R2, ESP32-S3R8, ESP32-S3R8V</li>
+<li>Built-in Flash: ESP32-S3FN8 (8MB Flash)</li>
+<li>Built-in Flash, PSRAM: ESP32-S3FH4R2 (4MB Flash, 2MB PSRAM)</li>
+</ul>
+</li>
+</ul>
+<p>ชิป <strong>ESP32-S2</strong> เป็นอีกรุ่นหนึ่งที่ใช้ตัวประมวลผล <strong>Xtensa LX7</strong> เหมือน <strong>ESP32-S3</strong>
+แต่ว่าไม่ใช่ <strong>Dual-Core</strong> แต่เป็น <strong>Single-Core</strong> มีเพียงซีพียูเดียว 
+และมีความเหมือนและความแตกต่าง โดยยกมาเป็นตัวอย่างดังนี้</p>
+<table>
+<thead>
+<tr>
+<th align="left">Feature</th>
+<th align="left">ESP32-S2</th>
+<th align="left">ESP32-S3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Announcement Date</td>
+<td align="left">September 2019</td>
+<td align="left">December 2020</td>
+</tr>
+<tr>
+<td align="left">CPU Core</td>
+<td align="left">Xtensa LX7 single-core</td>
+<td align="left">Xtensa LX7 dual-core</td>
+</tr>
+<tr>
+<td align="left">Max.Frequency</td>
+<td align="left">240 MHz</td>
+<td align="left">240 MHz</td>
+</tr>
+<tr>
+<td align="left">Wi-Fi</td>
+<td align="left">802.11 b/g/n, 2.4 GHz</td>
+<td align="left">802.11 b/g/n, 2.4 GHz</td>
+</tr>
+<tr>
+<td align="left">Bluetooth</td>
+<td align="left">✖️</td>
+<td align="left">Bluetooth LE v5.0</td>
+</tr>
+<tr>
+<td align="left">SRAM</td>
+<td align="left">320 KB</td>
+<td align="left">520 KB</td>
+</tr>
+<tr>
+<td align="left">ROM</td>
+<td align="left">128 KB</td>
+<td align="left">384 KB</td>
+</tr>
+<tr>
+<td align="left">ADC</td>
+<td align="left">2x 13-bit, 20 channels</td>
+<td align="left">2x 12-bit, 20 channels</td>
+</tr>
+<tr>
+<td align="left">DAC</td>
+<td align="left">2x 8-bit channels</td>
+<td align="left">✖️</td>
+</tr>
+<tr>
+<td align="left">USB OTG</td>
+<td align="left">1</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">RMT</td>
+<td align="left">4 channels</td>
+<td align="left">8 channels</td>
+</tr>
+<tr>
+<td align="left">MCPWM</td>
+<td align="left">✖️</td>
+<td align="left">2x6 PWM outputs</td>
+</tr>
+<tr>
+<td align="left">SD/SDIO/MMC host controller</td>
+<td align="left">✖️</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">ULP coprocessor</td>
+<td align="left">PicoRV32 core + ULP FSM</td>
+<td align="left">PicoRV32 core + ULP FSM</td>
+</tr>
+<tr>
+<td align="left">Ethernet MAC</td>
+<td align="left">✖️</td>
+<td align="left">✖️</td>
+</tr>
+</tbody>
+</table>
+<p>ดูรายละเอียดเพิ่มเติมได้จากเว็บ
+<a href="https://products.espressif.com/#/product-comparison"><strong>Espressif Product Comparison</strong></a></p>
+<p><img alt="" src="esp32s2_vs_s3.png" /></p>
+<p>รูป:การเปรียบเทียบระหว่าง <strong>ESP32-S2</strong> และ <strong>ESP32-S3</strong> บนหน้าเว็บไซต์ของบริษัท <strong>Espressif Systems</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-s3">&#9655; <strong>การจำแนกประเภทของบอร์ด ESP32-S3 และตัวอย่างบอร์ดทดลอง</strong><a class="headerlink" href="#esp32-s3" title="Permanent link">#</a></h2>
+<p>บริษัท <strong>Espressif Systems</strong> ได้จำแนกฮาร์ดแวร์ออกเป็น 3 กลุ่ม หรือ  3 ระดับ คือ</p>
+<ul>
+<li><strong>SoC</strong> หมายถึง ตัวชิปของบริษัท และมีตัวถังของไอซีเป็นแบบ <strong>QFN</strong></li>
+<li><strong>Module</strong> หมายถึง โมดูล <strong>PCB</strong> ที่มีชิป <strong>ESP32 Chip</strong> รวมถึงไอซีหน่วยความจำ วงจรสร้างความถี่
+ฝาครอบที่เป็นโลหะป้องกันการรบกวนสัญญาณ (<strong>RF Shield Metal Cover</strong>)
+และสายอากาศ (<strong>PCB Trace Antenna</strong>) หรือ คอนเนกเตอร์สำหรับต่อสายอากาศภายนอก </li>
+<li><strong>Board</strong> หมายถึง บอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิปของ <strong>Espressif</strong></li>
+</ul>
+<p>แนวทางการจำแนกบอร์ด <strong>ESP32-S3</strong> มีดังนี้</p>
+<ul>
+<li>จำแนกตามการใช้งานโมดูล เช่น <strong>ESP32-S3-WROOM-1</strong> หรือ <strong>ESP32-S3-MINI-1</strong></li>
+<li>จำแนกตามขนาดความจุของหน่วยจำ (ภายในหรือภายนอก) ทั้งประเภท  <strong>SPI Flash</strong> และ <strong>SPI PSRAM</strong></li>
+<li>จำแนกตามจำนวนพอร์ต <strong>USB</strong> เช่น ใช้คอนเนกเตอร์ <strong>USB-Type C</strong> หรือ <strong>MicroUSB</strong></li>
+<li>จำแนกตามการใช้งานชิปหรือวงจร <strong>USB-to-Serial Bridge Chip</strong> หรือ ไม่มี</li>
+<li>จำแนกตามขนาดของบอร์ด และการใช้งานร่วมกับเบรดบอร์ด </li>
+<li>จำแนกตามลักษณะการใช้งาน เช่น การเพิ่มโมดูลจอแสดงผล <strong>TFT IPS Touch Screen</strong>
+หรือ <strong>Camera Module</strong> เป็นต้น</li>
+</ul>
+<p>ตัวอย่างบอร์ด <strong>ESP32-S3</strong></p>
+<ul>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html"><strong>Espressif ESP32-S3-DevKitC-1 (ESP32-S2-WROOM-1)</strong></a></li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html"><strong>Espressif ESP32-S3-DevKitM-1 (ESP32-S3-MINI-1)</strong></a></li>
+<li><a href="https://github.com/vcc-gnd/YD-ESP32-S3"><strong>YD-ESP32-S3 Core Board (N16R8)</strong></a></li>
+<li><a href="https://wiki.banana-pi.org/BPI-PicoW-S3"><strong>Banana Pi BPI-PicoW ESP32-S3</strong></a></li>
+<li><a href="https://th.cytron.io/p-maker-feather-aiot-s3"><strong>Cytron.io Maker Feather AIoT S3</strong></a></li>
+<li><a href="https://unexpectedmaker.com/"><strong>Unexpected Maker Boards (ProS3 | FeatherS3 | TinyS3 | NanoS3)</strong></a></li>
+<li><a href="https://github.com/Makerfabs/ESP32-S3-Parallel-TFT-with-Touch-1.9inch"><strong>MakerFabs ESP32-S3 Parallel 1.9" TFT with Touch</strong></a></li>
+<li><a href="https://github.com/OLIMEX/ESP32-S3-DevKit-LiPo"><strong>Olimex ESP32-S3-DevKit-LiPo</strong></a></li>
+<li><a href="https://www.wemos.cc/en/latest/s3/s3_pro.html"><strong>Wemos.cc Lolin S3 Pro</strong></a></li>
+<li><a href="https://www.wemos.cc/en/latest/s3/s3_mini.html"><strong>Wemos.cc Lolin S3 Mini</strong></a></li>
+<li><a href="https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/"><strong>SeeedStudio Xiao ESP32S3 (Sense)</strong></a></li>
+<li><a href="https://www.waveshare.com/wiki/ESP32-S3-Zero"><strong>WaveShare ESP32-S3-Zero (ESP32-S3FH4R2)</strong></a></li>
+<li><a href="https://www.waveshare.com/wiki/ESP32-S3-Pico"><strong>WaveShare ESP32-S3-Pico</strong></a></li>
+<li><a href="https://www.waveshare.com/wiki/ESP32-S3-DEV-KIT-N8R8"><strong>WaveShare ESP32-S3-DevKit</strong></a></li>
+<li><a href="https://www.waveshare.com/wiki/NodeMCU-ESP-S3-12K-Kit"><strong>Ai-Thinker NodeMCU-ESP-S3-12K-Kit</strong></a></li>
+<li><a href="https://wiki.luatos.com/chips/esp32s3/board.html"><strong>ESP32S3-Luatos-Core</strong></a></li>
+<li><a href="https://github.com/WeActStudio/WeActStudio.ESP32S3-AorB/tree/main/ESP32S3-A"><strong>WeAct Studio ESP32-S3-A</strong></a></li>
+<li><a href="https://github.com/WeActStudio/WeActStudio.ESP32S3-AorB/tree/main/ESP32S3-B"><strong>WeAct Studio ESP32-S3-B</strong></a></li>
+<li><a href="https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-4.3"><strong>ESP32-S3 4.3inch Capacitive Touch Display</strong></a></li>
+<li><a href="https://learn.adafruit.com/adafruit-qt-py-esp32-s3"><strong>Adafruit Adafruit QT Py ESP32-S3</strong></a></li>
+<li><a href="https://github.com/Freenove/Freenove_ESP32_S3_WROOM_Board"><strong>FreeNove ESP32-S3 WROOM-1 + Camera</strong></a></li>
+<li><a href="https://docs.m5stack.com/en/core/AtomS3%20Lite"><strong>M5Stack AtomS3 Lite</strong></a></li>
+<li><a href="https://store.arduino.cc/products/nano-esp32"><strong>Arduino Nano ESP32 (u-blox NORA-W106 Module with ESP32-S3)</strong></a></li>
+</ul>
+<p><img alt="" src="esp32-s3-devkits.png" /></p>
+<p>รูป:  <strong>Espressif ESP32-S3-DevKitC-1</strong> และ <strong>ESP32-S3-DevKitM-1</strong></p>
+<p><img alt="" src="espressif_esp32s3_devkitc-1_pinout.png" /></p>
+<p>รูป: <strong>Espressif ESP32-S3-DevKitC-1 Pinout</strong></p>
+<p><img alt="" src="waveshare_esp32-s3_devkit_vs_pico.png" /></p>
+<p>รูป: บอร์ดของบริษัท <strong>WaveShare</strong>: <strong>ESP32-S3 DevKit vs. ESP32-S3 Pico</strong> </p>
+<p><img alt="" src="waveshare_esp32-s3_devkit_pinout.png" /></p>
+<p>รูป: <strong>Waveshare ESP32-S3 DevKit WROOM-1 Pinout</strong></p>
+<p><img alt="" src="waveshare_esp32-s3_zero_pinout.png" /></p>
+<p>รูป: <strong>Waveshare ESP32-S3 Zero Pinout</strong></p>
+<p><img alt="" src="wemos_lolin_s3_pinout.png" /></p>
+<p>รูป: <strong>Wemos Lolin S3 Pro Pinout</strong></p>
+<p><img alt="" src="wemos_lolin_s3_mini_pinout.png" /></p>
+<p>รูป: <strong>Wemos Lolin S3 Mini Pinout</strong></p>
+<p><img alt="" src="freenove_esp32s3_camera.png" /></p>
+<p>รูป: <strong>Freenove ESP32-S3 WROOM-1 Pinout</strong></p>
+<p><img alt="" src="yd_esp32-s3_core.png" /></p>
+<p>รูป: <strong>VCC-GND Studio YD-ESP32-S3 Core</strong></p>
+<p><img alt="" src="weact_studio_esp32s3_a_or_b.png" /></p>
+<p>รูป: <strong>WeAct Studio ESP32-S3 Core A and B</strong></p>
+<p><img alt="" src="weact_studio_esp32s3_b_pinout.png" /></p>
+<p>รูป:  <strong>WeAct Studio ESP32-S3 Core B Pinout</strong></p>
+<p><img alt="" src="yd_esp32-s3_core_pinout.png" /></p>
+<p>รูป: <strong>VCC-GND Studio YD-ESP32-S3 Core Pinout</strong></p>
+<p>บอร์ด <strong>Waveshare ESP32-S3-Pico</strong>
+(<a href="https://files.waveshare.com/upload/a/a7/ESP32-S3-Pico-SCH.pdf"><strong>Schematic</strong></a>)
+มีคุณสมบัติดังนี้</p>
+<ul>
+<li>ชิป: <strong> ESP32-S3R2</strong> (External Flash, built-in PSRAM)</li>
+<li>หน่วยความจำ  <strong>External Flash: 16MB (W25Q128)</strong></li>
+<li>หน่วยความจำ  <strong>On-chip PSRAM: 2MB</strong></li>
+<li>มีพอร์ต <strong>USB Type-C</strong> เพียงหนึ่งพอร์ต รองรับการใช้งาน <strong>Full-speed USB OTG</strong></li>
+<li>มีไอซี <strong>CH343 USB-to-Serial Bridge</strong> </li>
+<li>มีไอซี <strong>CH334 USB Hub IC</strong></li>
+<li>มีไอซี <strong>MP28164 (DC-DC Buck-Boost Switching  Converter)</strong> จ่ายกระแสได้สูงถึง <strong>2A @ 3.3V</strong></li>
+<li>มีสายอากาศแบบ <strong>Ceramic Antenna</strong></li>
+<li>มีไอซี <strong>WS2812B</strong> (GPIO21)</li>
+</ul>
+<hr />
+<h2 id="esp32-s3_1">&#9655;  <strong>ตัวเลือกในการเขียนโปรแกรมสำหรับ ESP32-S3</strong><a class="headerlink" href="#esp32-s3_1" title="Permanent link">#</a></h2>
+<p>ตัวเลือกในการเขียนโปรแกรมสำหรับ <strong>ESP32-S3</strong> ก็เหมือน <strong>ESP32 Series</strong> ในรุ่นอื่น ๆ ได้แก่</p>
+<ul>
+<li><strong>Espressif IDE + Espressif IDF</strong></li>
+<li><strong>Arduino IDE + Arduino ESP32 Core</strong></li>
+<li><strong>VS Code IDE + PlatformIO + Arduino-ESP32 Framework</strong></li>
+<li><strong>Python</strong>: <strong>MicroPython</strong>, <strong>CircuitPython</strong></li>
+<li><strong>Rust</strong></li>
+<li>...</li>
+</ul>
+<p>ตัวอย่าง <strong>Tutorials</strong> โดยผู้พัฒนาบอร์ด</p>
+<ul>
+<li><a href="https://www.wemos.cc/en/latest/tutorials/s3/get_started_with_arduino_s3.html"><strong>Get started with Arduino (ESP32-S3) by Wemos.cc</strong></a></li>
+<li><a href="https://www.wemos.cc/en/latest/tutorials/s3/get_started_with_micropython_s3.html"><strong>Get started with MicroPython (ESP32-S3) by Wemos.cc</strong></a></li>
+<li><a href="https://wiki.seeedstudio.com/XIAO_ESP32S3_CircuitPython/"><strong>Getting started with CircuitPython (XIAO ESP32-S3) by SeeedStudio</strong></a></li>
+<li><a href="https://www.waveshare.com/wiki/ESP32-S3-DEV-KIT-N8R8"><strong>Wiki for ESP32-S3-DEV-KIT-N8R8 by WaveShare</strong></a></li>
+<li><a href="https://cytron.io/tutorial/get-started-with-maker-feather-aIot-s3-using-circuitpyhton"><strong>Getting Started with Maker Feather AIoT S3 using CircuitPython by Cytron.io</strong></a></li>
+</ul>
+<hr />
+<h2 id="arduino">&#9655;  <strong>การเขียนโปรแกรมด้วย Arduino</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
+<p>การเขียนโค้ด <strong>Arduino Sketch</strong> แนะนำให้ติดตั้งและใช้งาน <strong>Arduino IDE</strong>
+จากนั้นจึงติดตั้ง <strong>Arduino ESP32 Board Manager</strong></p>
+<ul>
+<li><strong>Stable release:</strong> 
+<code>https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code></li>
+<li><strong>Development release:</strong> 
+<code>https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json</code></li>
+</ul>
+<p><img alt="" src="arduino_esp32s3-1.png" /></p>
+<p>รูป: การติดตั้ง <strong>Arduino ESP32 Core v3.0.0</strong></p>
+<p><img alt="" src="arduino_esp32s3-2.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าอุปกรณ์ก่อนการคอมไพล์และอัปโหลดเฟิร์มแวร์</p>
+<p>โค้ดตัวอย่าง <strong>Arduino Sketch</strong> สาธิตการตรวจสอบข้อมูลเกี่ยวกับฮาร์ดแวร์และซอฟต์แวร์ที่ใช้งาน
+มีดังนี้</p>
+<pre><code class="language-c++">void setup() {
+  Serial.begin(115200);
+  while(!Serial &amp;&amp; millis() &lt; 3000 );
+  Serial.println(&quot;\nESP32-S3 Demo...\n&quot;);
+}
+
+void loop() {
+  Serial.println(&quot;=========================================&quot;);
+  Serial.printf( &quot;Arduino ESP32 Core v%u.%u.%u\n&quot;,
+     ESP_ARDUINO_VERSION_MAJOR, 
+     ESP_ARDUINO_VERSION_MINOR, 
+     ESP_ARDUINO_VERSION_PATCH );
+
+  Serial.printf(&quot;Espressif IDF: %s\n&quot;, ESP.getSdkVersion() );
+  Serial.printf(&quot;Chip Revision %d\n&quot;,  ESP.getChipRevision() );
+  Serial.printf(&quot;Cpu Freq. %lu MHz\n&quot;, ESP.getCpuFreqMHz() );
+  Serial.printf(&quot;Heap (total/free): %lu / %lu bytes\n&quot;, 
+         ESP.getHeapSize(), ESP.getFreeHeap());
+  Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  Serial.printf(&quot;Flash Size: %lu MB, Flash Speed: %lu MHz\n&quot;,
+         ESP.getFlashChipSize()/(1024*1024UL), 
+         ESP.getFlashChipSpeed()/(uint32_t) 1e6 );
+
+  // more info...
+  Serial.printf(&quot;Espressif chip model: %s\n&quot;,
+         ESP.getChipModel() );
+  Serial.printf(&quot;Number of CPU Cores: %d\n&quot;, 
+         ESP.getChipCores() );
+  String str;
+  switch(ESP.getFlashChipMode()) {
+     case FM_QIO:  str = &quot;QIO&quot;;  break;
+     case FM_QOUT: str = &quot;QOUT&quot;; break;
+     case FM_DIO:  str = &quot;DIO&quot;;  break;
+     case FM_DOUT: str = &quot;DOUT&quot;; break;
+     default:      str = &quot;Unknown&quot;; break;
+  }
+  Serial.printf(&quot;Flash model: %s\n&quot;, str.c_str() );
+  Serial.println(&quot;=========================================\n&quot;);
+
+  const uint32_t N = 10000;
+  uint32_t *buf = (uint32_t*)ps_malloc(N*sizeof(uint32_t) ); 
+  if (buf != NULL) {
+    Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+    free( buf );
+    Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  }
+
+  struct PsramAllocator {
+    void* allocate(size_t size) {
+      return ps_malloc(size);
+    }
+    void deallocate(void* pointer) {
+      free(pointer);
+    }
+  };
+
+  PsramAllocator psramAllocator;
+  uint32_t n_bytes = N*sizeof(uint32_t);
+  // Try to allocate memory in PSRAM.
+  uint32_t *psram = (uint32_t *)psramAllocator.allocate( n_bytes );
+  Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  // Release the allocated PSRAM memory.
+  psramAllocator.deallocate(psram); // Deallocate the PSRAM memory
+  Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  delay(4000);
+}
+</code></pre>
+<p><img alt="" src="arduino_esp32s3-3.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython">&#9655;  <strong>การเขียนโปรแกรมด้วย MicroPython</strong><a class="headerlink" href="#micropython" title="Permanent link">#</a></h2>
+<p><strong>ESP32-S3</strong> มีเฟิร์มแวร์ที่เรียกว่า <strong>ROM Bootloader</strong> อยู่ภายในหน่วยความที่อ่านได้เท่านั้น
+และสามารถทำให้เข้าสู่โหมด <strong>Bootloader</strong> ได้โดยการกดปุ่ม <strong>BOOT</strong> ค้างไว้ และกดปุ่ม <strong>RESET</strong>
+แล้วปล่อย จะทำให้มองเห็น <strong>USB JTAG / Serial Port</strong> สำหรับคอมพิวเตอร์ของผู้ใช้</p>
+<p>เมื่อชิปอยู่ในโหมด <strong>Bootloader</strong> แล้ว ก็สามารถใช้โปรแกรม เช่น 
+<a href="https://github.com/espressif/esptool"><strong>esptool.py (Python-based)</strong></a>
+หรือ <a href="https://www.espressif.com/en/support/download/other-tools"><strong>Espressif Flash Download Tools</strong></a>
+หรือ <a href="https://espressif.github.io/esptool-js/"><strong>Espressif Web-based Esptool.js</strong></a> อัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ดได้</p>
+<p>การติดตั้ง <strong>esptool.py</strong> สำหรับ <strong>Ubuntu</strong> (สำหรับ <strong>Windows</strong> ก็ทำคำสั่งในลักษณะเดียวกัน)</p>
+<pre><code class="language-bash">$ pip install esptool
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>คำแนะนำ:</strong> แต่ถ้าใช้ซอฟต์แวร์  <a href="https://thonny.org/"><strong>Thonny IDE</strong></a>
+สำหรับการเขียนโค้ด การติดตั้งไฟล์เฟิร์มแวร์สำหรับ
+<strong>MicroPython</strong> จะทำได้ง่ายกว่าการใช้คำสั่ง <code>esptool.py</code></p>
+<p><img alt="" src="thonny_micropython_install-1.png" /></p>
+<p>รูป: การติดตั้ง <strong>MicroPython Firmware</strong> โดยใช้ <strong>Thonny IDE</strong></p>
+<p><img alt="" src="thonny_micropython_install-2.png" /></p>
+<p>รูป: การเลือกไฟล์ <strong>MicroPython Firmware</strong> สำหรับบอร์ด <strong>ESP32S3</strong> ที่จะใช้งาน</p>
+<p><img alt="" src="thonny_esp32s3_ws2812b_demo.png" /></p>
+<p>รูป: ตัวอย่างการเขียนและรันโค้ด <strong>MicroPython</strong> เพื่อเปลี่ยนสีของ 
+<strong>WS2812B RGB LED (GPIO-21)</strong> บนบอร์ด <strong>ESP32-S3</strong></p>
+<p>คำสั่งของ <strong>MicroPython API</strong> สำหรับ <strong>ESP32</strong> สามารถดูตัวอย่างการใช้งานได้จาก
+<a href="https://docs.micropython.org/en/latest/esp32/quickref.html"><strong>Quick reference for the ESP32</strong></a></p>
+<pre><code class="language-python">import neopixel
+import machine
+import time
+
+# Define the GPIO pin and the number of pixels
+led_pin    = 21
+num_pixels = 1
+
+# Create a NeoPixel object
+np = neopixel.NeoPixel(machine.Pin(led_pin), num_pixels)
+
+def set_color(rgb):
+    np[0] = rgb
+    np.write()
+
+colors = [(255,0,0), (0,255,0), (0,0,255)]
+while True:
+    for color in colors:
+        set_color( color )
+        time.sleep( 1 )
+</code></pre>
+<p>ตัวอย่างโค้ดสาธิตการแสดงข้อมูลเกี่ยวกับ <strong>MicroPython</strong> และฮาร์ดแวร์ที่ใช้งาน</p>
+<pre><code class="language-python">import esp
+import sys
+import machine
+import uos 
+import network
+
+# Print MicroPython version
+print(&quot;\n\nMicroPython version:&quot;, sys.version)
+
+names = ['sysname','nodename',
+         'release','version','machine']
+
+sys_info = dict(zip(names,uos.uname()))
+for n,v in sys_info.items():
+    print( &quot;{:&gt;10s}: '{}'&quot;.format(n,v) )
+
+# Print system information
+print(&quot;System info:&quot;)
+print(&quot;- Flash size:&quot;, esp.flash_size(), &quot;bytes&quot;)
+print(&quot;- Free heap:&quot;, gc.mem_free(), &quot;bytes&quot;)
+print(&quot;- Frequency:&quot;, int(machine.freq()/(1e6)), &quot;MHz&quot;)
+id = machine.unique_id()
+mac_address = ':'.join([hex(b)[2:].upper() for b in id])
+print(&quot;- MAC address:&quot;, mac_address)
+
+wlan_sta = network.WLAN(network.STA_IF)
+wlan_sta.active(True)
+wlan_mac = wlan_sta.config('mac')
+mac_address = ':'.join([hex(b)[2:].upper() for b in wlan_mac])
+print(&quot;- MAC address:&quot;, mac_address)
+</code></pre>
+<p><img alt="" src="thonny_esp32s3_demo-3.png" /></p>
+<p>รูป: ตัวอย่างการรันโค้ด <strong>MicroPython</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="circuitpython">&#9655;  <strong>การเขียนโปรแกรมด้วย CircuitPython</strong><a class="headerlink" href="#circuitpython" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการติดตั้งเฟิร์มแวร์สำหรับ <strong>CircuitPython</strong> มี 2 ทางเลือก</p>
+<ol>
+<li>ดาวน์โหลดไฟล์ <strong>.bin</strong> ให้ตรงกับบอร์ดที่ต้องการใช้งาน และใช้คำสั่ง <strong>esptool.py</strong> อัปโหลดไฟล์ไปยังบอร์ด
+เช่น บอร์ด <a href="https://circuitpython.org/board/adafruit_feather_esp32s3_nopsram/"><strong>Feather ESP32-S3 No PSRAM</strong></a></li>
+<li>ใช้ไฟล์ประเภทที่เรียกว่า <strong>UF2  firmware (.uf2)</strong> แต่จะต้องมีการติดตั้ง 
+<a href="https://github.com/adafruit/tinyuf2/releases"><strong>Tiny UF2 Bootloader firmware</strong></a>
+(ชื่อไฟล์ <code>tinyuf2.bin</code>) จัดทำโดยบริษัท <strong>Adafruit</strong> แล้วจึงติดตั้งไฟล์ <strong>.uf2</strong> ในขั้นถัดไป</li>
+</ol>
+<p>ตัวอย่างการติดตั้งไฟล์ <strong>.bin</strong> เช่น สำหรับบอร์ด <strong>ESP32-S3</strong> ที่ไม่มี <strong>PSRAM</strong></p>
+<p>File: <code>adafruit-circuitpython-adafruit_feather_esp32s3_nopsram-en_US-8.2.9.bin</code></p>
+<p>ตัวอย่างการทำคำสั่ง <code>esptool.py</code> 
+โดยไม่จำเป็นต้องระบุชื่อ <strong>Serial Port</strong> ถ้ามีบอร์ด <strong>ESP32</strong> เชื่อมต่ออยู่เพียงบอร์ดเดียว
+และทำให้บอร์ดเข้าสู่โหมด <strong>USB Bootloader</strong> ก่อนเริ่มทำคำสั่ง</p>
+<p>คำสั่งสำหรับ <strong>Ubuntu</strong></p>
+<pre><code class="language-text">## For Ubuntu Bash Shell
+# Erase flash
+$ esptool.py --chip esp32s3 erase_flash
+
+# Write the Flash with a single .bin file
+$ esptool.py --chip esp32s3 \ 
+  --before=default_reset --after=no_reset write_flash \
+  --flash_mode dio --flash_size detect --flash_freq 80m 0x0 \
+  adafruit-circuitpython-adafruit_feather_esp32s3_nopsram-en_US-8.2.9.bin
+</code></pre>
+<p>คำสั่งสำหรับ <strong>Windows</strong></p>
+<pre><code class="language-text">## For Windows Commands Shell
+# Erase flash
+&gt; esptool.py --chip esp32s3 erase_flash
+
+# Write the Flash with a single .bin file
+&gt; esptool.py --chip esp32s3 ^
+  --before=default_reset --after=no_reset write_flash ^
+  --flash_mode dio --flash_size detect --flash_freq 80m 0x0 ^
+  adafruit-circuitpython-adafruit_feather_esp32s3_nopsram-en_US-8.2.9.bin
+</code></pre>
+<p><img alt="" src="esptool_circuitpython_flashing.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>esptool.py</code></p>
+<p><img alt="" src="thonny_circuitpython_esp32s3.png" /></p>
+<p>รูป: การเชื่อมต่อจาก <strong>Thonny IDE</strong> ไปยังบอร์ด <strong>ESP32-S3</strong> ได้สำเร็จ</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างการติดตั้งไฟล์เฟิร์มแวร์แบบหลายไฟล์ (ไฟล์ .bin มีอยู่หลายไฟล์ รวมไว้ในไฟล์ .zip
+ดังนั้นให้แตกไฟล์ในไดเรกทอรีใหม่ก่อน) เช่น สำหรับบอร์ด <strong>ESP32-S3</strong> ที่ไม่มี <strong>PSRAM</strong></p>
+<p>File: <code>tinyuf2-adafruit_feather_esp32s3_nopsram-0.18.1.zip</code></p>
+<p>การทำคำสั่งด้วย <code>esptool.py</code> (สำหรับ <strong>Ubuntu</strong>)</p>
+<pre><code class="language-text"># Erase flash
+$ esptool.py --chip esp32s3 erase_flash
+
+# Write the Flash with multiple files
+$ esptool.py --chip esp32s3 \
+   --before=default_reset --after=no_reset write_flash \
+   --flash_mode dio --flash_size detect --flash_freq 80m \
+   0x0 bootloader.bin \
+   0x8000 partition-table.bin \
+   0xe000 ota_data_initial.bin \
+   0x410000 tinyuf2.bin
+</code></pre>
+<p>เมื่อได้ติดตั้ง <strong>TinyUF2 Bootloader</strong> สำหรับบอร์ด <strong>ESP32-S3</strong> ได้สำเร็จแล้ว
+จะมองเห็น <strong>TinyUF2 CDC</strong> ของบอร์ด ได้จากการใช้งาน <strong>Thonny IDE</strong>
+แต่ถึงขั้นตอนนี้ ยังไม่ได้มีการติดตั้ง <strong>CircuitPython</strong> 
+ดังนั้นขั้นตอนถัดไป ก็เป็นการติดตั้งหรืออัปเดตเฟิร์มแวร์สำหรับ <strong>CircuitPython</strong></p>
+<p><img alt="" src="thonny_circuitpython_uf2_install.png" /></p>
+<p>รูป: การติดตั้งหรืออัปเดตเฟิร์มแวร์สำหรับ <strong>CircuitPython</strong></p>
+<p><img alt="" src="thonny_circuitpython_ready.png" /></p>
+<p>รูป: การเชื่อมต่อจาก <strong>Thonny IDE</strong> ไปยังบอร์ด <strong>ESP32-S3</strong> ได้สำเร็จ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator">&#9655;  <strong>การใช้งาน WokWi Simulator</strong><a class="headerlink" href="#wokwi-simulator" title="Permanent link">#</a></h2>
+<p><a href="https://wokwi.com/dashboard/projects"><strong>Wokwi Simulator</strong></a> รองรับการใช้งาน <strong>ESP32-S3</strong>
+สำหรับการเขียนโปรแกรมด้วยภาษา <strong>C/C++</strong> โดย <strong>Arduino-ESP32 Core</strong> 
+และภาษา <strong>Rust</strong></p>
+<p><img alt="" src="wokwi_esp32-s3-1.png" /></p>
+<p>รูป: การเลือกบอร์ด <strong>Espressif ESP32-S3-DevKitC-1</strong> ใน <strong>Wokwi Simulator</strong> สำหรับการเขียนโปรแกรมด้วย <strong>Arduino ESP32</strong></p>
+<p><img alt="" src="wokwi_esp32-s3-2.png" /></p>
+<p>รูป: การเขียนโค้ด <strong>Arduino Sketch</strong> และจำลองการทำงานโดยใช้บอร์ด
+<strong>Espressif ESP32-S3-DevKitC-1</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการใช้งานบอร์ด <strong>ESP32-S3</strong> ในเบื้องต้น ตัวเลือกสำหรับซอฟต์แวร์และการเขียนโปรแกรม
+เช่น <strong>Arduino ESP32</strong> และภาษา <strong>MicroPython / CircuitPython</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-12-09 | Last Updated: 2023-12-09</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
