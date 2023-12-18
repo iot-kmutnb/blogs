@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/voltage_divider_lab/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การฝึกต่อวงจรแบ่งแรงดันบนเบรดบอร์ดร่วมกับบอร์ด **Arduino Uno** - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-uno" class="nav-link">การฝึกต่อวงจรแบ่งแรงดันบนเบรดบอร์ดร่วมกับบอร์ด Arduino Uno</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#voltage-divider" class="nav-link">&#9655; การทดลองวงจรแบ่งแรงดันไฟฟ้า (Voltage Divider)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#variable-resistors" class="nav-link">&#9655; ตัวอย่างอุปกรณ์  Variable Resistors ที่มีค่าความต้านทานเปลี่ยนแปลงได้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-uno-led" class="nav-link">&#9655; การอ่านค่าจากวงจรแบ่งแรงดันด้วย Arduino Uno เพื่อปรับอัตราการกระพริบของ LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#serial" class="nav-link">&#9655; การส่งข้อความออกทางพอร์ต Serial</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ldr" class="nav-link">&#9655; การอ่านค่าจากวงจรเซนเซอร์แสง LDR</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#wheatstone-bridge" class="nav-link">&#9655; การต่อวงจร "วิทสโตนบริดจ์"  (Wheatstone Bridge)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-uno">การฝึกต่อวงจรแบ่งแรงดันบนเบรดบอร์ดร่วมกับบอร์ด <strong>Arduino Uno</strong><a class="headerlink" href="#arduino-uno" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การฝึกต่อวงจรบนเบรดบอร์ดและใช้งานร่วมกับบอร์ด <strong>Arduino</strong>
+แบบเสมือนจริง รวมถึงแนะนำการเขียนโค้ด <strong>Arduino Sketch</strong> ในเบื้องต้น</p>
+<p><strong>Keywords:</strong> <em>Circuit Simulation</em>, 
+<em>Arduino Uno</em>, <em>Tinkercad Circuits</em>, <em>Voltage Dividers</em>, <em>Variable Resistors</em></p>
+<ul>
+<li><a href="#voltage-divider">การทดลองวงจรแบ่งแรงดันไฟฟ้า (<strong>Voltage Divider</strong>)</a></li>
+<li><a href="#variable-resistors">ตัวอย่างอุปกรณ์ <strong>Variable Resistors</strong> ที่มีค่าความต้านทานเปลี่ยนแปลงได้</a></li>
+<li><a href="#arduino-uno-led">การอ่านค่าจากวงจรแบ่งแรงดันด้วย <strong>Arduino Uno</strong> เพื่อปรับอัตราการกระพริบของ <strong>LED</strong></a></li>
+<li><a href="#serial">การส่งข้อความออกทางพอร์ต <strong>Serial</strong></a></li>
+<li><a href="#ldr">การอ่านค่าจากวงจรเซนเซอร์แสง <strong>LDR</strong></a></li>
+<li><a href="#wheatstone-bridge">การต่อวงจร "วิทสโตนบริดจ์"  (<strong>Wheatstone Bridge</strong>)</a></li>
+</ul>
+<hr />
+<h2 id="voltage-divider">&#9655; การทดลองวงจรแบ่งแรงดันไฟฟ้า (<strong>Voltage Divider</strong>)<a class="headerlink" href="#voltage-divider" title="Permanent link">#</a></h2>
+<p>วงจรแบ่งแรงดันไฟฟ้าประกอบด้วยตัวต้านทานอย่างน้อย 2 ตัว นำมาต่ออนุกรมกัน และมีการป้อนแรงดันไฟฟ้า
+เช่น จากแหล่งจ่ายแรงดันคงที่ให้กับวงจร (<strong>DC Voltage Supply</strong>) ถ้าตัวต้านทานตัวใดตัวหนึ่งมีค่าความต้านทานเปลี่ยนแปลงได้
+(เช่น ค่าความต้านทานเปลี่ยนแปลงตามสภาพแวดล้อม) ก็จะทำให้แรงดันตกคร่อมที่ตัวต้านทานแต่ละตัวเปลี่ยนแปลงตาม</p>
+<p><img alt="" src="voltage_dividers.png" /></p>
+<p>รูป: ตัวอย่างวงจรแบ่งแรงดันไฟฟ้า</p>
+<p>ตัวอย่างแรกเริ่มต้นด้วยการนำตัวต้านทานคงที่ 2 ตัว นำมาต่ออนุกรมกัน ดังนั้นเมื่อป้อนแรงดันไฟเลี้ยงให้กับตัวต้านทานที่ต่ออนุกรมกัน
+จะได้กระแส <strong>I</strong> ไหลผ่านตัวต้านทานแต่ละตัวในปริมาณที่เท่ากัน ยกตัวอย่างเช่น ป้อนแรงดันคงที่ <strong>VS=+5V</strong> ให้กับตัวต้านทาน
+<strong>R1</strong> และ <strong>R2</strong> ที่ต่ออนุกรมกัน และให้ปลายด้านหนึ่งของ <strong>R1</strong> ต่อกับ <strong>GND</strong> ของวงจร
+และให้ปลายด้านหนึ่งของ <strong>R2</strong> ต่อกับแรงดันไฟเลี้ยง <strong>VS</strong> ดังนั้นจึงสามารถคำนวณแรงดันตกคร่อมที่ตัวต้านทานแต่ละตัวได้ไม่ยาก</p>
+<p>
+<script type="math/tex; mode=display">
+   I = \frac{V_S}{(R_1 + R_2)} \\
+   V(R_1) = I \cdot R_1 = \frac{V_S}{(R_1 + R_2)} \cdot R_1 \\
+   V(R_2) = I \cdot R_2 = \frac{V_S}{(R_1 + R_2)} \cdot R_2 \\
+   V(R_1) + V(R_2) = V_S
+</script>
+</p>
+<p>ตัวอย่างการต่อวงจรทดลองสำหรับ <strong>Tinkercad Circuits</strong> มีดังนี้ </p>
+<p><img alt="" src="uno_breadboard-1.png" /></p>
+<p>รูป: การวัดแรงดันตกคร่อมของวงจรแบ่งแรงดันที่ประกอบด้วย <script type="math/tex">R_1=10k</script> และ <script type="math/tex">R_2=20k</script> โอห์ม</p>
+<p>วงจรประกอบด้วยตัวต้านทาน <script type="math/tex">R_1=10k</script> และ <script type="math/tex">R_2=20k</script> โอห์ม มีแหล่งจ่าย <script type="math/tex">V_S=+5V</script>
+ดังนั้นแรงดันตกคร่อมที่ตัวต้านทานแต่ละตัว จะได้เท่ากับ</p>
+<p>
+<script type="math/tex; mode=display">
+   V(R_1) = \frac{5V}{(10+20)k\Omega} \cdot 10k\Omega = 1.667V \\
+   V(R_2) = \frac{5V}{(10+20)k\Omega} \cdot 20k\Omega = 3.333V
+</script>
+</p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการทดลองใช้ตัวต้านทานปรับค่าได้แบบ 3 ขา หรือ <strong>Potentiometer</strong>
+และนำมาสร้างเป็นวงจรแบ่งแรงดันไฟฟ้า ดังต่อไปนี้</p>
+<p><img alt="" src="uno_breadboard-2.png" /></p>
+<p>รูป: การวัดค่าความต้านทานของตัวต้านทานปรับค่าได้ <strong>10k</strong> โอห์ม และการวัดแรงดันตกคร่อมของวงจรแบ่งแรงดัน</p>
+<p>เมื่อจำลองการทำงานและลองปรับตำแหน่งของตัวต้านทานปรับค่าได้
+จะทำให้แรงดันตกคร่อมที่ตัวต้านทาน <strong>R1</strong> และ <strong>R2</strong> เปลี่ยนแปลงได้
+แต่ผลรวมจะเท่ากับแรงดันของแหล่งจ่าย</p>
+<p>จากตำแหน่งของตัวต้านทานแบบหมุนปรับค่าได้ในรูปตัวอย่าง หากวัดด้วยโอห์มมิเตอร์จะได้ค่าความต้านทาน
+<strong>6.8k</strong> และ <strong>3.2k</strong> โอห์ม และได้ผลรวมเท่ากับ <strong>10k</strong> โอห์ม
+ดังนั้นกรณีนี้ <script type="math/tex">R_1=6.8k</script> และ <script type="math/tex">R_2=3.2k</script> โอห์ม และวัดได้แรงดันตกคร่อมได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   V(R_1) = \frac{5V}{10k\Omega} \cdot 6.8k\Omega = 3.4V \\
+   V(R_2) = \frac{5V}{10k\Omega} \cdot 3.2k\Omega = 1.6V
+</script>
+</p>
+<p>หากลองปรับหมุนปุ่มของตัวต้านทานปรับค่าได้จากตำแหน่งมุมซ้ายสุดไปขวาสุด และวัดแรงดันไฟฟ้าที่ได้
+จะเห็นได้ว่า ค่าที่วัดได้จะเป็นค่าต่อเนื่องในช่วง <strong>0V .. +5V</strong> ดังนั้นจึงมองว่า 
+เอาต์พุตของวงจรแบ่งแรงดันไฟฟ้าในลักษณะนี้ เป็นสัญญาณแบบแอนะล็อก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="variable-resistors">&#9655; ตัวอย่างอุปกรณ์  <strong>Variable Resistors</strong> ที่มีค่าความต้านทานเปลี่ยนแปลงได้<a class="headerlink" href="#variable-resistors" title="Permanent link">#</a></h2>
+<p>ในการใช้งานซอฟต์แวร์ <strong>AUTODESK Tinkercad Circuits</strong>
+นอกจากตัวต้านทานคงที่ และ ตัวต้านทานปรับค่าได้
+ยังมีตัวต้านทานประเภทอื่นที่มีค่าความต้านทานเปลี่ยนแปลงตามสภาพแวดล้อมให้เลือกใช้งานได้ เช่น</p>
+<ul>
+<li>ตัวต้านทานไวแสง (<strong>LDR: Light-Dependent Resistor</strong>) หรือเรียกว่า
+<strong>Photocell</strong> ที่มีค่าความต้านทานเปลี่ยนแปลงตามความเข้มแสง (<strong>Illuminance: Lux</strong>) 
+เช่น ทำจากวัสดุ <strong>CdS</strong> (<strong>Cadmium Sulfide</strong>) หรือ <strong>CdSe</strong> (<strong>Cadmium Selenide</strong>)
+ซึ่งตอบสนองได้ดีในช่วงความยาวคลื่นของแสงที่มองเห็นได้ด้วยตาเปล่า</li>
+<li>เทอร์มิสเตอร์ (<strong>Thermistor</strong>) เป็นวัสดุที่มีค่าความต้านเปลี่ยนแปลงตามอุณหภูมิ 
+โดยจำแนกออกเป็นสองประเภทหลักคือ เทอร์มิสเตอร์ที่มีค่าสัมประสิทธิ์อุณหภูมิเป็นบวก
+(<strong>Positive Temperature Coefficient: PTC</strong>) ซึ่งให้ค่าความต้านทานเพิ่มขึ้นเมื่ออุณหภูมิเพิ่มขึ้น
+และเทอร์มิสเตอร์ที่มีค่าสัมประสิทธิ์อุณหภูมิเป็นลบ ซึ่งให้ค่าความต้านทานลดลงเมื่ออุณหภูมิเพิ่มขึ้น
+(<strong>Negative Temperature Coefficient: NTC</strong>)</li>
+<li>ตัวต้านทานที่เปลี่ยนค่าเมื่อได้รับแรงกด ซึ่งเป็นใช้เซนเซอร์ตรวจจับแรงกด (<strong>Resistive Force Sensor</strong>) เมื่อได้รับแรงกระทำ จะทำให้ค่าความต้านทานเปลี่ยนแปลงได้</li>
+<li>ตัวต้านทานที่เปลี่ยนค่าเมื่อเกิดการโค้งงอ (<strong>Flexible Potentiometer</strong>) ซึ่งใช้เป็นเซนเซอร์ตรวจจับการโค้งงอ (<strong>Resistive Flex Sensor</strong>) เมื่อทำเกิดความโค้งงอ จะทำให้ค่าความต้านทานเปลี่ยนแปลงได้</li>
+</ul>
+<p><img alt="" src="tinkercad_ldr-1.png" /></p>
+<p>รูป: ตัวต้านทานไวแสง หรือ <strong>LDR</strong> (แอลดีอาร์)</p>
+<p><img alt="" src="tinkercad_flex_sensor-1.png" /></p>
+<p>รูป: ตัวต้านทานที่เปลี่ยนค่าเมื่อเกิดการโค้งงอ </p>
+<p><img alt="" src="tinkercad_force_sensor-1.png" /></p>
+<p>รูป: ตัวต้านทานที่เปลี่ยนค่าเมื่อได้รับแรงกด </p>
+<p>โดยทั่วไปแล้ว ตัวต้านทานปรับค่าได้จะถูกนำไปใช้ร่วมกับตัวต้านทานคงที่และใช้งานเป็นวงจรแบ่งแรงดันไฟฟ้า</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-uno-led">&#9655; การอ่านค่าจากวงจรแบ่งแรงดันด้วย <strong>Arduino Uno</strong> เพื่อปรับอัตราการกระพริบของ <strong>LED</strong><a class="headerlink" href="#arduino-uno-led" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> และจำลองการทำงานด้วย <strong>Tinkercad Circuits</strong>
+วงจรนี้ประกอบด้วยตัวต้านทานปรับค่าได้ซึ่งมี 3 ขา ป้อนแรงดันไฟเลี้ยงที่ขา 1 และ 2 (ขาคู่ที่อยู่ด้านข้าง)
+ส่วนขาตรงกลาง (ตรงกับ <strong>Wiper</strong> หรือ <strong>Sliding Contact</strong> ที่อยู่ภายใน) ใช้เป็นขาเอาต์พุตของวงจร
+แรงดันไฟฟ้าที่ขากลางเทียบกับ <strong>GND</strong> ของวงจรนี้ จะถูกนำไปใช้เป็นสัญญาณอินพุต-แอนะล็อก
+ซึ่งมีค่าอยู่ในช่วง <strong>0V .. +5V</strong> สำหรับบอร์ด <strong>Arduino Uno</strong></p>
+<p><img alt="" src="uno_breadboard-3.png" /></p>
+<p>รูป: การใช้งานวงจรแบ่งแรงดันไฟฟ้าร่วมกับบอร์ด <strong>Arduino Uno</strong> และตัวอย่างการเขียนโค้ด</p>
+<p>สัญญาณอินพุตแบบแอนะล็อกถูกนำไปต่อเข้าที่ขา <strong>A0</strong> ของบอร์ด <strong>Arduino Uno</strong>
+และสามารถอ่านค่าให้เป็นข้อมูลดิจิทัล (เป็นค่าตัวเลขจำนวนเต็ม) โดยใช้วงจร <strong>ADC (Analog-to-Digital
+Converter</strong>) ภายในชิปไมโครคอนโทรลเลอร์ของบอร์ด <strong>Uno</strong></p>
+<p>วงจรประเภทนี้ทำหน้าที่คอยแปลงระดับแรงดันที่ขาอินพุต
+ให้เป็นค่าตัวเลข ซึ่งในกรณีของบอร์ด <strong>Uno</strong> จะได้ค่าอยู่ในช่วง 0..1023 (ความละเอียดเท่ากับ 10 บิต)
+สำหรับแรงดันอินพุตในช่วง <strong>0V .. +5V</strong> (ใช้สเกลแบบเชิงเส้นในการแปลงค่าตัวเลข)</p>
+<p>คำสั่งของ <strong>Arduino API</strong> ที่จะต้องใช้กับสัญญาณอินพุต-แอนะล็อกคือ 
+<a href="https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/"><code>analogRead(...)</code></a>
+โดยจะต้องระบุหมายเลขขาที่ใช้เป็นขาอินพุต-แอนะล็อก เช่น <code>A0</code> ในตัวอย่างนี้</p>
+<pre><code class="language-c++">// Constant declaration
+const int analogInputPin = A0; // The analog input pin to be used.
+
+void setup() {
+  // Set LED pin direction to output
+  pinMode( LED_BUILTIN, OUTPUT );
+}
+
+void loop() {
+  // Read the value from the sensor
+  int value = analogRead( analogInputPin );
+  // Map the value from 0..1023 to 100...1000 
+  int delayMsec = map( value, 0, 1023, 100, 1000 );
+  // Turn the LED on
+  digitalWrite( LED_BUILTIN, HIGH );
+  // Delay for some milliseconds
+  delay( delayMsec );
+  // turn the LED off
+  digitalWrite( LED_BUILTIN, LOW );
+  // Delay for some milliseconds
+  delay( delayMsec );
+}
+</code></pre>
+<p>ในโค้ดตัวอย่างมีการใช้คำสั่ง <a href="https://www.arduino.cc/reference/en/language/functions/math/map/"><code>map(...)</code></a>
+ของ <strong>Arduino API</strong> เพื่อแปลงค่าตัวเลขในช่วง 0..1023 โดยการสเกลค่าแบบเชิงเส้น ให้อยู่ในช่วง 100 ถึง 1000 
+แล้วนำไปใช้เป็นค่าในการหน่วงเวลาด้วยคำสั่ง <code>delay(...)</code> ดังนั้นการหมุนปรับค่าของตัวต้านทาน
+จะทำให้อัตราการกระพริบของ <strong>LED</strong> บนบอร์ด <strong>Uno</strong> เพิ่มขึ้นหรือลดลงได้</p>
+<p>การเรียกใช้ฟังก์ชัน <code>map(...)</code> </p>
+<pre><code class="language-c++">map(value, fromLow, fromHigh, toLow, toHigh)
+</code></pre>
+<p>ให้ผลเหมือนกับการเขียนโค้ดต่อไปนี้</p>
+<pre><code class="language-c++">(value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="serial">&#9655; การส่งข้อความออกทางพอร์ต <strong>Serial</strong><a class="headerlink" href="#serial" title="Permanent link">#</a></h2>
+<p>จากวงจรและโค้ดตัวอย่างที่แล้ว หากต้องการจะส่งค่าของตัวแปรในขณะที่โปรแกรมทำงาน 
+โดยส่งเป็นข้อความออกทางพอร์ตอนุกรม <strong>Serial</strong> ไปยังคอมพิวเตอร์ของผู้ใช้
+ก็สามารถใช้คำสั่งของ <strong>Arduino API</strong> เช่น</p>
+<ul>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/">Serial.begin(...)</a>
+ทำคำสั่งนี้เป็นการเริ่มต้นการทำงานของพอร์ต <strong>Serial</strong> และจะต้องระบุอัตราการรับส่งข้อมูล ซึ่งเรียกว่า
+<strong>Baudrate</strong> โดยทั่วไปก็ใช้ค่าคงที่ เช่น <strong>9600</strong> (ช้า) หรือ <strong>115200</strong> (เร็ว) เป็นต้น</li>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/communication/serial/print/"><code>Serial.print(...)</code></a>
+ส่งค่าของตัวแปร หรือค่าคงที่ โดยแปลงเป็นข้อความไปยัง <strong>Serial</strong> ส่งข้อความแล้วไม่ต้องขึ้นบรรทัดใหม่</li>
+<li><a href="https://www.arduino.cc/reference/en/language/functions/communication/serial/println/"><code>Serial.println(...)</code></a> 
+ส่งข้อความแล้วขึ้นบรรทัดใหม่</li>
+</ul>
+<pre><code class="language-c++">// Constant declaration
+const int analogInputPin = A0; // Use Arduino A0 pin (analog input)
+
+void setup() {
+  // Initialize Serial and set the baudrate to 115200
+  Serial.begin( 115200 );
+  // Set LED pin direction to output
+  pinMode( LED_BUILTIN, OUTPUT );
+}
+
+void loop() {
+  // Read the value from the sensor
+  int value = analogRead( analogInputPin );
+  int delayMsec = map( value, 0, 1023, 100, 1000 );
+  Serial.print( &quot;A0:&quot; );
+  Serial.print( value );
+  Serial.print( &quot;, delay(msec):&quot; );
+  Serial.println( delayMsec );
+  // Turn the LED on
+  digitalWrite( LED_BUILTIN, HIGH );
+  // Delay for some milliseconds
+  delay( delayMsec );
+  // turn the LED off
+  digitalWrite( LED_BUILTIN, LOW );
+  // Delay for some milliseconds
+  delay( delayMsec );
+}
+</code></pre>
+<p><img alt="" src="uno_breadboard-4.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ด <strong>Uno</strong> แบบเสมือนจริง
+และมีการส่งข้อความออกทางพอร์ต <strong>Serial</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ldr">&#9655; การอ่านค่าจากวงจรเซนเซอร์แสง <strong>LDR</strong><a class="headerlink" href="#ldr" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการต่อวงจรแบ่งแรงดันไฟฟ้าโดยใช้ตัวต้านทานไวแสง <strong>LDR</strong> และตัวต้านทานคงที่ เช่น <strong>2.2k</strong>
+แรงดันไฟฟ้าจากวงจรดังกล่าวจะถูกนำไปใช้เป็นสัญญาณอินพุต-แอนะล็อกให้กับบอร์ด <strong>Uno</strong>
+โดยต่อเข้าที่ขา <strong>A0</strong> </p>
+<p><img alt="" src="ldr_resistor_schematic-1.png" /></p>
+<p>รูป: ตัวอย่างผังวงจรแบ่งแรงดันไฟฟ้าที่ประกอบด้วย <strong>LDR</strong> และตัวต้านทานคงที่ และการวัดแรงดันตกคร่อมที่ตัวต้านทาน</p>
+<p>ค่าของสัญญาณอินพุต-แอนะล็อกที่ได้จากการอ่านด้วยคำสั่ง <code>analogRead(...)</code> จะถูกเก็บไว้ในตัวแปร
+<code>sensorValue</code> แล้วนำไปเปรียบเทียบกับค่าคงที่ <code>triggerValue</code> ผลลัพธ์จากการเปรียบเทียบค่า
+จะถูกใช้เป็นเงื่อนไขของประโยคคำสั่ง <code>if</code> และกำหนดสถานะลอจิกของ <strong>LED</strong> ที่ขาดิจิทัลหมายเลข <strong>5</strong></p>
+<p>ในตัวอย่างนี้ได้กำหนดเงื่อนไขไว้ว่า ถ้าความสว่างหรือความเข้มแสงเพิ่มขึ้น และทำให้แรงดันอินพุตเพิ่มขึ้นตาม จนมีค่ามากกว่า <code>triggerValue</code>
+จะทำให้ <strong>LED</strong> เปลี่ยนสถานะลอจิกจาก <strong>HIGH</strong> เป็น <strong>LOW</strong>
+ดังนั้นถ้าความเข้มแสงมากพอ จะทำให้ <strong>LED</strong> ดับลง แต่ถ้าน้อยกว่าค่าที่กำหนดไว้ จะทำให้ <strong>LED</strong> สว่าง</p>
+<pre><code class="language-c++">// Constant declarations
+const int sensorInputPin = A0; // Analog input pin 
+const int ledPin = 9;          // External LED pin
+const int triggerValue = 700;  // Trigger value for comparison
+
+void setup() {
+  // Initialize Serial and set the baudrate to 115200
+  Serial.begin( 115200 ); 
+  // Set LED pin direction to output
+  pinMode( ledPin, OUTPUT );
+}
+
+void loop() {
+  // Read the analog input
+  int sensorValue = analogRead( sensorInputPin );
+  // Compare the current analog input value with
+  // the trigger value and update the LED output
+  if (sensorValue &gt; triggerValue) {
+    digitalWrite( ledPin, LOW );  // Turn off the LED
+  } else {
+    digitalWrite( ledPin, HIGH ); // Turn on the LED
+  }
+  // Send the analog sensor value as a string to Serial
+  Serial.println( sensorValue );
+  delay(50);
+}
+</code></pre>
+<p><img alt="" src="uno_breadboard-5.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ด <strong>Uno</strong> แบบเสมือนจริง สำหรับวงจรเซนเซอร์ <strong>LDR</strong>(มีการปรับความเข้มแสง)</p>
+<p>ค่าของ <code>triggerValue</code> เป็นค่าคงที่ แต่ถ้าต้องการให้ปรับระดับได้จากภายนอก ก็สามารถใช้วงจรแบ่งแรงดันไฟฟ้า
+และสร้างจากตัวต้านทานปรับค่าได้ และอ่านค่าด้วยขาแอนะล็อก-อินพุตอีกขาหนึ่ง เช่น <code>A0</code> แล้วนำค่าไปใช้ในการเปรียบเทียบ
+ตัวอย่างการเขียนโค้ด มีดังนี้</p>
+<pre><code class="language-c++">// Constant declaration
+const int sensorInputPin  = A0;
+const int triggerInputPin = A1;
+const int ledPin = 9; 
+
+void setup() {
+  Serial.begin( 115200 );
+  pinMode( ledPin, OUTPUT );
+}
+
+void loop() {
+  int sensorValue  = analogRead( sensorInputPin );
+  int triggerValue = analogRead( triggerInputPin );
+  // Check the condition for turning off/on the LED
+  if (sensorValue &gt; triggerValue) {
+    digitalWrite( ledPin, LOW );  // Turn off the LED
+  } else {
+    digitalWrite( ledPin, HIGH ); // Turn on the LED
+  }
+  // Send the analog value as a string to Serial
+  Serial.println( sensorValue );
+  delay(50);
+}
+</code></pre>
+<p><img alt="" src="uno_breadboard-6.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ด <strong>Uno</strong> แบบเสมือนจริง สำหรับวงจรเซนเซอร์ <strong>LDR</strong> (มีการปรับความเข้มแสง)</p>
+<p>&nbsp;</p>
+<p>หากนำโค้ดตัวอย่างไปทดลองใช้จริง ระดับแรงดันของสัญญาณอินพุต อาจมีการแกว่งหรือเปลี่ยนแปลงในช่วงแคบ ๆ 
+และถ้าหากใกล้เคียงกับค่า <code>triggerValue</code> ที่ได้กำหนดไว้ จะทำให้ <strong>LED</strong> ติด-ดับ สลับไปมา
+ในช่วงเวลาสั้น ๆ  การแก้ไขปัญหาในลักษณะนี้ทำได้หลายวิธี</p>
+<p>แนะนำให้มีการใช้ค่าคงที่สำหรับการเปรียบเทียบสอง 2 ระดับ 
+คือ ค่าระดับบน (<code>upperValue</code>) และค่าระดับล่าง (<code>lowerValue</code>) 
+และมีการเปรียบเทียบกับค่าล่าสุด (<code>currentValue</code>) กับค่าที่อ่านได้ในครั้งที่แล้ว (<code>previousValue</code>)
+เพื่อให้ทราบทิศทางการเปลี่ยนแปลง (เพิ่มขึ้นหรือลดลง)</p>
+<ul>
+<li>ถ้าแรงดันอินพุตที่วัดได้เพิ่มขึ้นและสูงกว่าค่าระดับบน ให้ผลลัพธ์เป็น "ความเข้มแสงมาก" แล้วปิด <strong>LED</strong></li>
+<li>ถ้าแรงดันอินพุตเริ่มลดลงจนต่ำกว่าค่าระดับล่าง ให้ผลลัพธ์เป็น "ความเข้มแสงน้อย" แล้วเปิด <strong>LED</strong></li>
+</ul>
+<p>การตรวจสอบเงื่อนไขสำหรับการปิด <strong>LED</strong>:</p>
+<pre><code class="language-c++">  if ( (currentValue &gt; previousValue) 
+    &amp;&amp; (currentValue &gt; upperValue) ) {
+    digitalWrite(ledPin, LOW); // Turn off LED
+  } 
+</code></pre>
+<p>คำอธิบายโค้ด</p>
+<ul>
+<li>มีการใช้ประโยคคำสั่ง <code>if</code> ตรวจสอบเงื่อนไขเพื่อทำให้ <strong>LED</strong> ดับลง (<strong>OFF</strong>)</li>
+<li>มีการเปรียบเทียบค่า  <code>(currentValue &gt; previousValue)</code>
+ถ้าให้ผลเป็นจริง ค่าใหม่มีค่ามากกว่าค่าครั้งก่อน หมายถึง มีการเปลี่ยนแปลงค่าเพิ่มขึ้น</li>
+<li>มีการเปรียบเทียบค่า <code>(currentValue &gt; upperValue)</code>
+ถ้าให้ผลเป็นจริง ค่าใหม่มีค่ามากกว่าค่าระดับบนแล้ว</li>
+<li><code>&amp;&amp;</code> หมายถึง โอเปอร์เรเตอร์ <strong>Logical AND</strong> ดังนั้นถ้าทั้งสองเงื่อนไขเป็นจริง
+จะทำให้ <strong>LED</strong> ดับลง</li>
+</ul>
+<p>การตรวจสอบเงื่อนไขสำหรับการเปิด <strong>LED</strong>:</p>
+<pre><code class="language-c++">  if ( (currentValue &lt; previousValue) 
+    &amp;&amp; (currentValue &lt; lowerValue) ) {
+    digitalWrite(ledPin, HIGH);
+  }
+</code></pre>
+<p>คำอธิบายโค้ด</p>
+<ul>
+<li>มีการใช้ประโยคคำสั่ง <code>if</code> ตรวจสอบเงื่อนไขเพื่อทำให้ <strong>LED</strong> สว่าง (<strong>ON</strong>)</li>
+<li>มีการเปรียบเทียบค่า <code>(currentValue &lt; previousValue)</code>
+ถ้าให้ผลเป็นจริง ค่าใหม่มีค่าน้อยกว่าค่าครั้งก่อน หมายถึง มีการเปลี่ยนแปลงค่าลดลง</li>
+<li>มีการเปรียบเทียบค่า  <code>(currentValue &lt; lowerValue)</code>
+ถ้าให้ผลเป็นจริง ค่าใหม่มีค่าน้อยกว่าค่าระดับล่างแล้ว</li>
+<li><code>&amp;&amp;</code> หมายถึง โอเปอร์เรเตอร์ <strong>Logical AND</strong> ดังนั้นถ้าทั้งสองเงื่อนไขเป็นจริง
+จะทำให้ <strong>LED</strong> สว่าง </li>
+</ul>
+<p>ตัวอย่างโค้ดโดยสมบรูณ์: </p>
+<pre><code class="language-c++">// Constant declaration
+const int analogInputPin = A0; 
+const int ledPin = 9; 
+const int lowerValue = 500;
+const int upperValue = 700;
+
+// Global variable declaration
+int previousValue;
+
+void setup() {
+  Serial.begin( 115200 );
+  pinMode( ledPin, OUTPUT );
+  previousValue = analogRead( analogInputPin );
+  delay(100);
+}
+
+void loop() {
+  // Read the analog input
+  int currentValue = analogRead( analogInputPin );
+  // Check the condition for turning off the LED
+  if ( (currentValue &gt; previousValue) 
+    &amp;&amp; (currentValue &gt; upperValue) ) {
+    digitalWrite(ledPin, LOW); // Turn off the LED
+  } 
+  // Check the condition for turning on the LED
+  if ( (currentValue &lt; previousValue) 
+    &amp;&amp; (currentValue &lt; lowerValue) ) {
+    digitalWrite(ledPin, HIGH); // Turn on the LED
+  }
+  // Save the current value as previous value
+  previousValue = currentValue;
+  // Send the analog value as a string to Serial
+  Serial.println( currentValue );
+  delay(50);
+}
+</code></pre>
+<p><img alt="" src="uno_breadboard-7.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ด <strong>Uno</strong> แบบเสมือนจริง สำหรับวงจรเซนเซอร์ <strong>LDR</strong> (มีการปรับความเข้มแสง)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wheatstone-bridge">&#9655; การต่อวงจร "วิทสโตนบริดจ์"  (<strong>Wheatstone Bridge</strong>)<a class="headerlink" href="#wheatstone-bridge" title="Permanent link">#</a></h2>
+<p>วงจร "วิทสโตนบริดจ์" เป็นวงจรไฟฟ้าที่ประกอบด้วยแหล่งจ่ายกระแสตรง <script type="math/tex">V_s</script> และตัวต้านทาน 4 ตัว 
+(<script type="math/tex">R_1</script>, .., <script type="math/tex">R_4</script>) ตามรูปวงจรต่อไปนี้ วงจรแบ่งได้เป็น 2 ส่วน คือ วงจรแบ่งแรงดันไฟฟ้าจำนวน 2 ชุด
+(ตัวต้านทาน <script type="math/tex">R_1</script> อนุกรมกับ <script type="math/tex">R_2</script> และ ตัวต้านทาน <script type="math/tex">R_2</script> อนุกรมกับ <script type="math/tex">R_4</script>ตามลำดับ)</p>
+<ul>
+<li>ตัวต้านทาน <script type="math/tex">R_1</script> และ <script type="math/tex">R_3</script> มีค่าคงที่ (<strong>Fixed Resistors</strong>) </li>
+<li>ตัวต้านทานหนึ่งตัวปรับค่าได้คือ <script type="math/tex">R_2</script> (<strong>Variable Resistor</strong>) </li>
+<li>ตัวต้านทาน <script type="math/tex">R_4</script> หรือ ใช้ชื่อเป็น <script type="math/tex">R_x</script> เป็นตัวต้านทานที่ไม่ทราบค่า (<strong>Unknown Resistor</strong>)
+เช่น ตัวต้านทานไวแสง (<strong>LDR</strong>) ตัวต้านทานเปลี่ยนแปลงค่าตามอุณหภูมิ หรือ เทอร์มิสเตอร์ เป็นต้น</li>
+</ul>
+<p>ข้อสังเกต: บางกรณี ก็ให้ <script type="math/tex">R_3</script> เป็นตัวต้านทานปรับค่าได้ และตัวต้านทาน <script type="math/tex">R_2</script> มีค่าคงที่</p>
+<p><img alt="" src="wheatstone_bridge.png" /></p>
+<p>
+<script type="math/tex">V_a</script> ของวงจรแบ่งแรงดันไฟฟ้าทางซ้ายมือ คำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  V_a = \frac{R_2}{R_1 + R_2} V_s
+</script>
+</p>
+<p>
+<script type="math/tex">V_b</script> ของวงจรแบ่งแรงดันไฟฟ้าทางขวา คำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  V_b = \frac{R_x}{R_3 + R_x} V_s
+</script>
+</p>
+<p>ดังนั้นผลต่างของแรงดันไฟฟ้าที่จุด <strong>A</strong> และ <strong>B</strong> หรือ <script type="math/tex">V_{ab}</script> ในวงจร จะเท่ากับ</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ V_{ab} &= V_a - V_b = \Big[ \frac{R_2}{R_1 + R_2} - \frac{R_x}{R_3 + R_x} \Big] V_s \\
+\frac{V_{ab}}{V_s} &= \frac{R_2}{R_1 + R_2} - \frac{R_x}{R_3 + R_x} \\
+\end{align}</script>
+</p>
+<p>และหาค่าของ <script type="math/tex">R_x</script> ได้ดังนี้ 
+<script type="math/tex; mode=display">
+ R_x = \Big(\frac{R_2 \cdot V_s - (R_1+R_2) \cdot V_{ab}}{
+             R_1 \cdot V_s + (R_1+R_2) \cdot V_{ab} }\Big) R_3
+</script>
+</p>
+<p>
+<script type="math/tex">V_{ab}</script> จะเป็นศูนย์หรือไม่ ขึ้นอยู่กับว่า วงจรอยู่ในสภาวะสมดุล (<strong>Balanced</strong>) หรือไม่
+การปรับค่า <script type="math/tex">R_3</script> สามารถทำให้วงจรเข้าสู่สภาวะสมดุลได้ </p>
+<p>ในสภาวะสมดุล ถ้าวัดปริมาณกระแสไหลระหว่างจุด <strong>A</strong> และ <strong>B</strong> จะได้เป็นศูนย์ (ไม่มีกระแสไหล)
+นอกจากนั้นแล้ว ยังสามารถเขียนความสัมพันธ์ระหว่างตัวต้านทานดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   V_{ab} = V_a - V_b = 0 \\
+  \frac{R_2}{R_1 + R_2} = \frac{R_x}{R_3 + R_x} \\
+  R_2 \cdot R_3 + R_2 \cdot R_x = R_1 \cdot R_x + R_2 \cdot Rx \\
+    R_x = \frac{R_2 \cdot R_3}{R_1}
+</script>
+</p>
+<p>ดังนั้นเมื่อทราบค่าความต้านทานของ <script type="math/tex">R_1</script>, <script type="math/tex">R_2</script> และ <script type="math/tex">R_3</script> ก็สามารถคำนวณค่าของ <script type="math/tex">R_x</script> หรือ <script type="math/tex">R_4</script> ได้
+&nbsp;</p>
+<p>ในแนวทางการทดลองวงจร "วิทสโตนบริดจ์" ร่วมกับบอร์ด <strong>Arduino Uno</strong> มีดังนี้</p>
+<ul>
+<li>ต่อวงจร "วิทสโตนบริดจ์" และใช้ <strong>LDR</strong> เป็นตัวต้านทาน <script type="math/tex">R_x</script>
+</li>
+<li>เลือกค่า <script type="math/tex">R_1</script>, <script type="math/tex">R_2</script> และ <script type="math/tex">R_3</script> ให้เท่ากัน เช่น เลือกค่า <script type="math/tex">10k</script> โอห์ม</li>
+<li>ใช้แรงดันไฟเลี้ยง <script type="math/tex">V_s</script> เท่ากับ <strong>VCC=+5V</strong> จากบอร์ด <strong>Uno</strong> และต่อ <strong>GND</strong> ร่วมกัน</li>
+<li>เชื่อมต่อจุด <script type="math/tex">V_a</script> และ <script type="math/tex">V_b</script> ในวงจร "วิทสโตนบริดจ์" ไปยังขาอินพุต-แอนะล็อก
+<strong>A0</strong> และ <strong>A1</strong> ของบอร์ด <strong>Uno</strong> ตามลำดับ</li>
+<li>เขียนโค้ด <strong>Arduino Sketch</strong> เพื่อวัดค่าแรงดันอินพุต <strong>A0</strong> และ <strong>A1</strong> 
+แล้วหาผลต่างแรงดันไฟฟ้าที่ได้สำหรับ <script type="math/tex">V_{ab}</script>
+</li>
+<li>คำนวณค่าความต้านทาน <script type="math/tex">R_x</script> ของ <strong>LDR</strong> จากค่า  <script type="math/tex">V_{ab}</script> และแสดงผลเป็นข้อความ</li>
+<li>ทดลองเปลี่ยนความเข้มแสงที่ <strong>LDR</strong> ได้รับ แล้วบันทึกผลการวัดค่าตัวต้านทาน <script type="math/tex">R_x</script>
+</li>
+</ul>
+<p>ดังนั้นโดยทางทฤษฎี ถ้าให้ <script type="math/tex">R_1 = R_2 = R_3 =: R</script> จะได้ความต้านทาน <script type="math/tex">R_x</script> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ R_x &= \Big(\frac{R_2 \cdot V_s - (R_1+R_2) \cdot V_{ab}}{
+             R_1 \cdot V_s + (R_1+R_2) \cdot V_{ab} }\Big) R_3 \\
+ R_x &= \Big(\frac{ V_s - 2\cdot V_{ab}}{
+               V_s + 2\cdot V_{ab} }\Big) R \\
+\end{align}</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอการทดลองวงจรที่มีการใช้งานตัวต้านทานปรับค่าได้ โดยสร้างเป็นวงจรแบ่งแรงดันไฟฟ้า
+และใช้งานร่วมกับบอร์ด <strong>Arduino Uno</strong> วงจรและโค้ดสามารถจำลองการทำงานได้เสมือนจริงโดยใช้ซอฟต์แวร์
+<strong>AUTODESK Tinkercad Circuits</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2023-12-16 | Last Updated: 2023-12-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
