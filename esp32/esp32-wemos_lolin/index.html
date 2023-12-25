@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32-wemos_lolin/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทำความเข้าใจผังวงจรสำหรับบอร์ดไมโครคอนโทรลเลอร์ WeMos ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#wemos-esp32" class="nav-link">การทำความเข้าใจผังวงจรสำหรับบอร์ดไมโครคอนโทรลเลอร์ WeMos ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#wemos-lolin-esp32" class="nav-link">&#9655; WeMos Lolin ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#esp32" class="nav-link">&#9655; วงจรบนบอร์ดไมโครคอนโทรลเลอร์ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#auto-reset-download" class="nav-link">&#9655; วงจร Auto-Reset &amp; Download</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; วงจรแรงดันไฟเลี้ยง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="wemos-esp32">การทำความเข้าใจผังวงจรสำหรับบอร์ดไมโครคอนโทรลเลอร์ WeMos ESP32<a class="headerlink" href="#wemos-esp32" title="Permanent link">#</a></h1>
+<p>บทความนี้นำเสนอตัวอย่างผังวงจรของบอร์ดไมโครคอนโทรลเลอร์ที่มีการใช้ชิป <strong>Espressif ESP32 SoC</strong>
+เป็นตัวประมวลผลหลัก และการศึกษาฟังก์ชันการทำงานของวงจรในส่วนต่าง ๆ ของบอร์ด</p>
+<hr />
+<h2 id="wemos-lolin-esp32">&#9655; <strong>WeMos Lolin ESP32</strong><a class="headerlink" href="#wemos-lolin-esp32" title="Permanent link">#</a></h2>
+<p>บริษัท <a href="https://www.wemos.cc/en/latest/"><strong>WeMos.cc</strong></a>
+ซึ่งเป็นบริษัทในประเทศจีน ได้ผลิตบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> ออกมาจำหน่าย 
+โดยใช้ชื่อว่า <strong>LOLIN32</strong> และมีหลายเวอร์ชัน ยกตัวอย่างเช่น บอร์ด 
+"<strong>ESP32 LOLIN D32</strong>"
+และ "<strong>ESP32 LOLIN32 Lite</strong>" (ปัจจุบันทางบริษัทไม่ได้จำหน่ายแล้ว) ซึ่งมีความแตกต่างกันในรายละเอียด เช่น</p>
+<ul>
+<li><strong>ESP32 LOLIN D32</strong><ul>
+<li>ใช้โมดูล <strong>ESP32 WROOM-32</strong> ที่มีฝาครอบโลหะป้องกัน</li>
+<li>มี <strong>Onboard LED (active-low)</strong> อยู่ที่ขา <strong>GPIO-5</strong></li>
+</ul>
+</li>
+<li><strong>ESP32 LOLIN32 Lite (v1.0.0)</strong><ul>
+<li>ไม่ได้ใช้โมดูล <strong>ESP32 WROOM-32</strong> </li>
+<li>มีชิป <strong>ESP32 SoC</strong> ชิปหน่วยความจำ <strong>SPI Flash</strong>
+  และวงจรสร้างความถี่ <strong>40MHz</strong> บนบอร์ด และไม่มีฝาครอบโลหะปิดไว้</li>
+<li>มี <strong>Onboard LED (active-low)</strong> อยู่ที่ขา <strong>GPIO-22</strong> </li>
+<li>ไม่มีขา <strong>USB (+5V)</strong> </li>
+</ul>
+</li>
+</ul>
+<p>สิ่งที่มีเหมือนกันทั้งสองบอร์ด</p>
+<ul>
+<li>มีขา <strong>Pin Header</strong> สามารถเสียบขาลงบนเบรดบอร์ดได้</li>
+<li>มีคอนเนกเตอร์ <strong>MicroUSB</strong> เป็นแหล่งจ่ายไฟเลี้ยง และเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้</li>
+<li>มีไอซี <strong>ME6211</strong> แปลงและควบคุมระดับแรงดันไฟฟ้า <strong>+3.3V</strong></li>
+<li>ใช้ชิป <strong>CH340C USB-to-Serial Bridge</strong></li>
+<li>มีวงจรชาร์จประจุ <strong>TP4054</strong> สำหรับแบตเตอรี่ <strong>LiPo (3.7V)</strong> 
+และคอนเนกเตอร์ <strong>PH2.0</strong> สำหรับแบตเตอรี่</li>
+</ul>
+<p><img alt="" src="wemos_lolin_d32_vs_lite.png" /></p>
+<p>รูป: บอร์ด <strong>WeMos Lolin D32</strong> (ซ้าย) เปรียบเทียบกับ <strong>Lolin32 Lite</strong> (ขวา)</p>
+<p><img alt="" src="wemos_lolin_d32.png" /></p>
+<p>รูป:  บอร์ด <strong>WeMos Lolin D32</strong></p>
+<p>จากรูปผังวงจรของบอร์ด <strong>WeMos Lolin D32</strong> จะทำให้เห็นองค์ประกอบและวงจรส่วนต่าง ๆ
+และเป็นผังวงจรที่ค่อนข้างง่ายต่อการทำความเข้าใจ</p>
+<p><img alt="" src="wemos_lolin_d32_schematic.png" /></p>
+<p>รูป: ผังวงจรของบอร์ด <strong>WeMos Lolin D32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32">&#9655; วงจรบนบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong><a class="headerlink" href="#esp32" title="Permanent link">#</a></h2>
+<p>วงจรที่พบเห็นได้ทั่วไปสำหรับบอร์ด <strong>ESP32</strong> นอกเหนือจากวงจรของ <strong>ESP32 Module</strong> ได้แก่</p>
+<ol>
+<li>วงจร <strong>USB-to-Serial Bridge</strong>: มีการใช้ไอซี เช่น 
+<strong>CP210x</strong> หรือ <strong>CH340x</strong> บอร์ดในรุ่นแรกมีคอนเนกเตอร์ <strong>MicroUSB</strong> 
+สำหรับการเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ แต่เริ่มมีการเปลี่ยนมาใช้ <strong>USB Type-C</strong> มากขึ้น
+ซึ่งมีความทนทานมากกว่า</li>
+<li>วงจร <strong>Auto-Reset &amp; Upload</strong>: นิยมใช้ไอซีทรานซิสเตอร์แบบ <strong>NPN</strong> จำนวน 2 ตัว
+นำมาต่อไขว้กัน (<strong>Cross-coupled</strong>) เพื่อรับสัญญาณ <strong>RTS</strong> กับ <strong>DTR</strong> 
+มาจากชิปดังกล่าวเป็นสัญญาณอินพุตให้วงจร แล้วสร้างสัญญาณเอาต์พุตสำหรับขา <strong>EN (Reset)</strong> และ 
+<strong>GPIO0 (Boot Mode Selection)</strong> ของชิปหรือโมดูล <strong>ESP32</strong>
+วงจรประเภทนี้ จะช่วยให้ผู้ใช้ไม่ต้องมาคอยกดปุ่ม <strong>Boot</strong> และปุ่ม  <strong>Reset</strong>
+ก่อนการอัปโหลดไฟล์เฟิร์มแวร์ทุกครั้ง</li>
+<li>วงจรใช้ไอซีประเภท <strong>LDO (Low-Drop-Out) Voltage Regulator</strong>: 
+ทำหน้าที่แปลงแรงดัน เช่น <strong>5V</strong> จากพอร์ต <strong>USB</strong> ให้เป็น <strong>3.3V</strong> เพื่อใช้สำหรับการทำงานของวงจร
+และชิป <strong>ESP32</strong></li>
+</ol>
+<p>&nbsp;</p>
+<hr />
+<h2 id="auto-reset-download">&#9655; วงจร <strong>Auto-Reset &amp; Download</strong><a class="headerlink" href="#auto-reset-download" title="Permanent link">#</a></h2>
+<p>สัญญาณ <strong>EN (Reset)</strong> และ  <strong>GPIO0 (Boot)</strong> มีความสำคัญสำหรับชิป <strong>ESP32</strong>
+กล่าวคือ จะใช้สำหรับการอัปโหลดไฟล์เฟิร์มแวร์ (.bin) จากคอมพิวเตอร์ของผู้ใช้ไปยังชิป 
+<strong>SPI Flash</strong> บนบอร์ด <strong>ESP32</strong> </p>
+<p>สัญญาณ <strong>EN (Reset)</strong> มีการต่อตัวต้านทานแบบ <strong>Pullup</strong> ขนาด <strong>10k</strong> ไว้แล้วบนบอร์ด
+วงจรภายในสำหรับขา <strong>GPIO0</strong> มีตัวต้านทานแบบ <strong>Pull-up</strong> ขนาด <strong>45k</strong> โอห์ม
+เมื่อมีการรีเซตการทำงานเพื่อทำให้ชิป <strong>ESP32</strong> เข้าสู่โหมด <strong>Bootloader</strong> 
+ก่อนการอัปโหลดเฟิร์มแวร์ ขา <strong>GPIO0</strong> จะต้องมีค่าลอจิกเป็น <strong>LOW</strong>
+และขา <strong>GPIO2</strong> จะต้องอยู่ในสถานะ <strong>Floating</strong> (ไม่ได้ต่อใช้งาน) หรือเป็น <strong>LOW</strong> </p>
+<p>ในโหมด  <strong>Bootloader</strong> โปรแกรม <strong>ROM Serial Bootloader</strong> ซึ่งอยู่ในหน่วยความจำภายใน <strong>On-chip ROM</strong>
+ของ <strong>ESP32</strong> จะเริ่มทำงาน และรอการเชื่อมต่อกับโปรแกรม <a href="https://github.com/espressif/esptool"><code>esptool.py</code></a>
+ในเครื่องคอมพิวเตอร์ของผู้ใช้ ผ่านทาง <strong>USB-to-Serial</strong>
+แต่ถ้าขา <strong>GPIO0</strong> เป็น <strong>HIGH</strong> หมายถึง <strong>Normal Boot Mode</strong> กล่าวคือ ชิป <strong>ESP32</strong>
+จะเริ่มต้นทำคำสั่งตามโปรแกรมที่เก็บไว้ใน <strong>SPI Flash</strong>
+รายละเอียดเกี่ยวกับการทำงานของ <strong>Auto Bootloader</strong>
+สามารถศึกษาเพิ่มเติมได้จากเอกสาร 
+"<a href="https://docs.espressif.com/projects/esptool/en/latest/esp32/advanced-topics/boot-mode-selection.html"><strong>Espressif ESP32: Boot Mode Selection</strong></a>"</p>
+<p><img alt="" src="auto_download_circuit.png" /></p>
+<p>รูป: ตัวอย่างวงจร <strong>Auto-Reset &amp; Download</strong></p>
+<p><img alt="" src="esp32_auto_reset_upload1.png" /></p>
+<p>รูป: ไอซี  <strong>Dual NPN Transistor (UMH3N)</strong> และการใช้งาน</p>
+<p><img alt="" src="esp32_auto_reset_upload2.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณ <strong>RTS</strong>, <strong>DTR</strong>, <strong>EN (Reset)</strong> แและ <strong>GPIO0 (Boot)</strong> ด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="esptool_device_reset.png" /></p>
+<p>รูป: ตัวอย่างโค้ดบางส่วนของ <code>esptool.py</code> ที่เกี่ยวข้องกับการสร้างสัญญาณควบคุม
+<strong>RTS</strong> และ <strong>DTR</strong></p>
+<p>การทำงานของสัญญาณ <strong>RTS</strong> และ <strong>DTR</strong> แบ่งออกเป็น 4 ช่วง ได้ดังนี้</p>
+<p><img alt="" src="esp32_auto_reset_upload-step1.png" /></p>
+<p>รูป: สัญญาณ <strong>RTS</strong> และ <strong>DTR</strong> เมื่อเปลี่ยนจากสถานะ <strong>IDLE</strong>
+ไปสู่สถานะ <strong>Reset Device</strong></p>
+<p><img alt="" src="esp32_auto_reset_upload-step2.png" /></p>
+<p>รูป: สัญญาณ <strong>RTS</strong> และ <strong>DTR</strong> เมื่อเปลี่ยนจากสถานะ <strong>Reset Device</strong> 
+ไปสู่ <strong>Enter Bootloader Mode</strong></p>
+<p><img alt="" src="esp32_auto_reset_upload-step3.png" /></p>
+<p>รูป: สัญญาณ <strong>RTS</strong> และ <strong>DTR</strong> เมื่อเปลี่ยนสู่สถานะ <strong>IDLE</strong> อีกครั้ง</p>
+<p>ในการจำลองการทำงานของวงจร <strong>Auto Reset &amp; Download</strong> มีลำดับขั้นตอนดังนี้</p>
+<ol>
+<li>เริ่มต้นด้วยสัญญาณ <strong>RTS</strong> และ <strong>DTR</strong> เป็น <strong>HIGH</strong> ซึ่งอยู่ในสถานะ <strong>IDLE</strong>
+ดังนั้นสัญญาณ <strong>EN (Reset)</strong> และ <strong>GPIO0 (Boot)</strong> จึงเป็น <strong>HIGH</strong></li>
+<li>สัญญาณ <strong>RTS</strong> เปลี่ยนเป็น <strong>LOW</strong> ซึ่งจะทำให้สัญญาณ  <strong>EN (Reset)</strong> เปลี่ยนเป็น <strong>LOW</strong></li>
+<li>สัญญาณ <strong>DTR</strong> เปลี่ยนเป็น <strong>LOW</strong> จะทำให้   <strong>EN (Reset)</strong> เปลี่ยนเป็น <strong>HIGH</strong>
+แต่ระดับแรงดันไฟฟ้าของสัญญาณนี้จะค่อย ๆ เพิ่มขึ้น (ไม่ทันที) เนื่องจากมีตัวเก็บประจุไฟฟ้าต่ออยู่ </li>
+<li>เมื่อสัญญาณ <strong>DTR</strong> เปลี่ยนเป็น <strong>LOW</strong> จะต้องรีบทำให้ <strong>RTS</strong> เปลี่ยนเป็น <strong>HIGH</strong>
+เพื่อทำให้สัญญาณ <strong>GPIO0 (Boot)</strong> เปลี่ยนเป็น <strong>LOW</strong> ซึ่งเป็นการทำให้ชิปเข้าสู่โหมด <strong>Bootloader</strong></li>
+<li>เมื่อสัญญาณ  <strong>EN (Reset)</strong> เปลี่ยนเป็น <strong>HIGH</strong> หลังจากเว้นช่วงเวลาระยะหนึ่งแล้ว (จบการรีเซต)
+จึงให้สัญญาณ <strong>DTR</strong> เปลี่ยนเป็น <strong>HIGH</strong> เพื่อทำให้สัญญาณ <strong>GPIO0 (Boot)</strong> เป็น <strong>HIGH</strong> อีกครั้ง</li>
+</ol>
+<p><img alt="" src="auto_download_circuit_sim.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของวงจรด้วยซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p><img alt="" src="auto_download_circuit_waveform.png" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่ได้จากการจำลองการทำงาน</p>
+<p>บางกรณีอาจพบว่า โปรแกรม <strong>Arduino IDE</strong> หรือ <a href="https://github.com/espressif/esptool"><code>esptool.py</code></a>
+(โปรแกรม <strong>ESP32 Bootloader Utility</strong> ที่เขียนด้วยภาษา
+<strong>Python</strong> และใช้สำหรับการอัปโหลดเฟิร์มแวร์ผ่านพอร์ต <strong>USB-to-Serial</strong>)
+ไม่สามารถอัปโหลดไฟล์ได้สำเร็จ ทั้งนี้ก็เป็นเพราะว่า ไม่สามารถทำให้ <strong>ESP32</strong> เข้าสู่โหมด 
+<strong>Serial Bootloader</strong> ได้สำเร็จ และอาจมาจากสาเหตุหนึ่งคือ <strong>Timing</strong> 
+ของสัญญาณทั้งสองไม่ถูกต้องตามข้อกำหนดของชิป </p>
+<p>วิธีการหนึ่งสำหรับแก้ไขปัญหาดังกล่าวคือ การต่อตัวเก็บประจุเพิ่ม เช่น ขนาดความุ <strong>1uF</strong> 
+ระหว่างขา <strong>EN</strong> กับ <strong>GND</strong> ของบอร์ด จึงจะใช้งานได้และเป็นการแก้ปัญหาในเชิงฮาร์ดแวร์ 
+การต่อตัวเก็บประจุเพิ่ม ก็เป็นการเพิ่มค่า <strong>Time Constant</strong> ของวงจร <strong>RC</strong> 
+ดังนั้นสัญญาณ <strong>RESET/EN</strong> จะถูกหน่วงเวลาในการเปลี่ยนจาก <strong>LOW</strong> เป็น <strong>HIGH</strong>
+หลังสัญญาณรีเซตแอคทีฟ</p>
+<p>ปัญหาเหล่านี้ ไม่ได้เกิดจากฮาร์ดแวร์เพียงอย่างเดียว แต่อาจเกิดจากการทำงานของชิป 
+<strong>USB-to-Serial</strong> และการสร้างสัญญาณ <strong>DTR/RTS</strong> ด้วย
+การใช้เครื่องออสซิลโลสโคปวัดสัญญาณเพื่อดูการเปลี่ยนแปลงและพารามิเตอร์ที่เกี่ยวข้อง
+ก็เป็นวิธีหนึ่งที่ช่วยเห็นสาเหตุของปัญหาได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; วงจรแรงดันไฟเลี้ยง<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ในส่วนของวงจรหรือไอซีควบคุมแรงดัน <strong>LDO 3.3V</strong> ซึ่งเป็นแรงดันไฟเลี้ยงสำหรับ <strong>ESP32</strong>
+นักออกแบบก็อาจเลือกใช้ไอซีที่แตกต่างกันไป เช่น ความสามารถในการจ่ายกระแสสูงให้เอาต์พุต
+โดยยังคงรักษาระดับแรงดันให้คงที่ไว้ได้  ตัวถังของไอซีที่เลือกใช้  (<strong>IC package</strong>) เป็นต้น</p>
+<p>หากมีการเขียนโค้ดและใช้ <strong>ESP32</strong> โดยตั้งค่ากำลังส่งสัญญาณ <strong>WiFi</strong> ให้มีกำลังไฟฟ้าสูงสุด
+และส่งต่อเนื่อง ปริมาณกระแสในระดับ <strong>Peak Current</strong> ก็อาจมากกว่า <strong>300mA</strong>
+และถ้าหากต่อขา <strong>3.3V</strong> จากบอร์ด <strong>ESP32</strong> ไปใช้กับอุปกรณ์อื่นสำหรับการต่อวงจรเพิ่ม 
+ก็จะเพิ่มภาระโหลดให้แก่ไอซีควบคุมแรงดันซึ่งเป็นอีกหนึ่งประเด็นหรือข้อควรระวังที่สำคัญในการใช้งาน</p>
+<p>อีกประเด็นหนึ่งคือ การป้องกันกระแสเกินหรือแรงดันเกินในส่วนที่เชื่อมต่อกับ <strong>USB</strong>
+หรือ การต่อแรงดันไฟเลี้ยง <strong>+5V</strong> จากภายนอกแทนการจ่ายไฟผ่านพอร์ต <strong>USB</strong>
+วงจรเลือกแรงดันไฟเลี้ยงหากมีตัวเลือกมากกว่าหนึ่งที่ไม่ใช่แค่ <strong>VUSB +5V</strong> ที่มาจากพอร์ต <strong>USB</strong>
+และบางบอร์ดก็มีวงจรชาร์จแบตเตอรี่สำหรับ <strong>Rechargeable LiPo (3.7V single-cell)</strong> เป็นต้น
+ไอซี <strong>ME6211C33</strong> เป็น <strong>LDO Voltage Regulator</strong> สามารถใช้แรงดันอินพุตในช่วง
+<strong>2V～6.0V</strong> ได้</p>
+<p><img alt="" src="me6211c33.png" /></p>
+<p>ตาราง: ข้อมูลเกี่ยวกับไอซี <strong>MicroOne ME6211C33</strong> </p>
+<p>ลองมาดูผังวงจรที่ตัดมาบางส่วนสำหรับ บอร์ด <strong>WeMos Lolin D32</strong> 
+จะเห็นได้ว่า แรงดันไฟเลี้ยงสำหรับบอร์ด มีทางเลือกจากพอร์ตยูเอสบีและจากแบตเตอรี่</p>
+<p><img alt="" src="wemos_esp32_voltage_supply.png" /></p>
+<p>รูป: ผังวงจรของบอร์ด <strong>WeMos Lolin D32</strong> ในส่วนที่เกี่ยวข้องกับแรงดันไฟเลี้ยง</p>
+<p>ในผังวงจร <code>VUSB</code> เป็นแรงดันไฟเลี้ยงจากพอร์ตยูเอสบี
+เชื่อมต่อผ่านไอซีทรานซิสเตอร์แบบ <strong>P-Channel Power MOSFET (CJ2301)</strong>
+ซึ่งทำหน้าที่เป็นสวิตช์ไฟฟ้า ทำให้เปิดแรงดันไฟเลี้ยง <code>+5V</code> ของบอร์ด
+ทรานซิสเตอร์มีการควบคุมที่ขาเกต (<strong>Gate: G</strong>) ด้วยไอซีทรานซิสเตอร์ (<strong>BCM8578C</strong>) 
+แบบ <strong>BJT (PNP)</strong> หนึ่งคู่</p>
+<p>แรงดันไฟเลี้ยง <code>+5V</code> เชื่อมต่อผ่านตัวไดโอด <strong>B5819</strong> หนึ่งตัว
+(ป้องกันกระแสย้อนกลับทิศทาง) และได้เป็น  <code>VIN</code> (<strong>Voltage Input</strong>)
+ซึ่งแรงดันจะลดลงเล็กน้อยประมาณ <strong>0.1V</strong> แล้วนำไปป้อนให้กับไอซี <strong>ME6211</strong>
+และได้แรงดันไฟฟ้าเอาต์พุต <strong>+3.3V</strong></p>
+<p>ถ้าไม่เสียบสาย <strong>USB</strong> แต่มีการใช้แบตเตอรี่ต่อใช้งานอยู่ ก็จะได้แรงดันไฟเลี้ยงจากแบตเตอรี่แทน
+(<code>VBATT</code>) โดยต่อผ่าน  <strong>P-Channel Power MOSFET (CJ2301)</strong>
+นำไปใช้งานเป็น <code>VIN</code>
+ในกรณีนี้ จะไม่มีแรงดัน <strong>+5V</strong> และตัวต้านทาน <strong>10k</strong>
+ทำหน้าที่เป็น <strong>Pulldown</strong> ดึงลงไปยัง <strong>GND</strong> ทำให้แรงดันที่ขาเกตของมอสเฟต (ชนิดพี) เป็น <strong>0V</strong>
+และเนื่องจากแรงดัน <script type="math/tex">V_{GS} < V_{GS(th)} < 0</script> จึงทำให้มอสเฟต (ชนิดพี) นำไฟฟ้าได้ดี
+เป็นสวิตช์ที่ยอมให้กระแสไฟฟ้าจาก <code>VBATT</code> ไหลผ่านไปยังไอซี <strong>ME6211</strong></p>
+<p>การศึกษาการทำงานของวงจรที่ใช้ทรานซิสเตอร์เป็นสวิตช์ไฟฟ้าสำหรับการจ่ายแรงดันไฟเลี้ยงให้วงจร
+สามารถทำได้โดยการจำลองการทำงานของวงจรโดยใช้ซอฟต์แวร์ เช่น <strong>EasyEDA</strong></p>
+<p><img alt="" src="vusb_mosfet_switch.png" /></p>
+<p>รูป: วงจร <strong>Current Mirror Controlled P-MOSFET Switch</strong> 
+เป็นสวิตช์สำหรับแรงดันไฟเลี้ยง <strong>VIN</strong> </p>
+<p><img alt="" src="vusb_mosfet_switch_sim.png" /></p>
+<p>รูป: การจำลองการทำงานของวงจรด้วย <strong>EasyEDA</strong>
+ซึ่งแสดงระดับแรงดันไฟฟ้าสำหรับ <strong>VB</strong>, <strong>VG</strong> และ <strong>VOUT</strong>
+เมื่อ <strong>VIN</strong> มีการเปลี่ยนแปลงระดับระหว่าง <strong>0V</strong> และ <strong>5V</strong></p>
+<p><img alt="" src="vusb_vbatt_selection_circuit.png" /></p>
+<p>รูป: วงจรเลือกแหล่งจ่ายสำหรับแรงดันไฟเลี้ยง ระหว่าง <strong>+5V (USB)</strong> และ <strong>VBATT</strong> </p>
+<p><img alt="" src="vusb_vbatt_selection_circuit_sim.png" /></p>
+<p>รูป: การจำลองการทำงานของวงจรด้วย <strong>EasyEDA</strong> เมื่อ <strong>VIN</strong> มีการเปลี่ยนแปลงระดับระหว่าง <strong>0V</strong> และ <strong>5V</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างผังวงจรของบอร์ด <strong>Wemos Lolin D32</strong> 
+โดยแบ่งวงจรออกเป็นวงจรย่อย เช่น วงจรสำหรับการรีเซตและเข้าสู่โหมด <strong>Bootloader</strong>
+วงจรจ่ายแรงดันไฟเลี้ยงและควบคุมแรงดันไฟฟ้า <strong>3.3V</strong> บนบอร์ด โดยเลือกใช้แหล่งจ่ายจากพอร์ต
+<strong>USB</strong> และแบตเตอรี่ที่ชาร์จประจุได้</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2023-12-24 | Last Updated: 2023-12-25</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
