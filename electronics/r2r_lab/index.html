@@ -115,7 +115,11 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ตัวอย่างวงจรสำหรับการทดลองเพิ่มเติม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -138,6 +142,7 @@
 <li><a href="#python">การเขียนโค้ด <strong>Python</strong> เพื่อช่วยในการหาคำตอบ</a></li>
 <li><a href="#tinkercad-circuits">การจำลองการทำงานด้วยซอฟต์แวร์ <strong>Tinkercad Circuits</strong></a></li>
 <li><a href="#arduino">การต่อวงจรควบคุมด้วยบอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino</strong></a></li>
+<li><a href="#_1">ตัวอย่างวงจรสำหรับการทดลองเพิ่มเติม</a></li>
 </ul>
 <hr />
 <h2 id="r-2r-easyeda">&#9655; วงจร <strong>R-2R</strong> และการจำลองการทำงานด้วย <strong>EasyEDA</strong><a class="headerlink" href="#r-2r-easyeda" title="Permanent link">#</a></h2>
@@ -441,7 +446,84 @@ void loop() {
 <p>รูป: การจำลองการทำงาน</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<h2 id="_1">&#9655; <strong>ตัวอย่างวงจรสำหรับการทดลองเพิ่มเติม</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>อีกวงจรหนึ่งที่สามารถนำมาศึกษาทดลองเพิ่มเติม เป็นวงจรแบ่งแรงดันโดยใช้ตัวต้านทาน 
+มีการนำไปใช้งานเป็นส่วนหนึ่งของวงจร <strong>Resistor DAC (Digital-to-Analog Converter)</strong>
+เพื่อสร้างสัญญาณเชื่อมต่อกับ <strong>VGA (Video Graphics Array)</strong> และกำหนดค่าสี <strong>R=Red, G=Green, B=Blue</strong>
+สำหรับจอมอนิเตอร์ของคอมพิวเตอร์ในอดีต จำนวนบิตที่ใช้อาจแตกต่างกันและจำนวนสีที่แตกต่าง เช่น</p>
+<ul>
+<li><strong>R=3,G=3,B=2</strong>: 8 บิต สำหรับ 256 สี</li>
+<li><strong>R=6,G=6,B=6</strong>: 18 บิต สำหรับ 262,144 สี</li>
+<li><strong>R=8,G=8,B=8</strong>: 24 บิต สำหรับ 16,777,216 สี</li>
+</ul>
+<p>วงจรตามผังตัวอย่างต่อไปนี้ ใช้สวิตช์เลื่อน <strong>S0,S1,S2</strong> เพื่อเลือกระดับแรงดันอินพุตระหว่าง <strong>0V</strong> หรือ <strong>VCC=5V</strong>
+ดังนั้นจะมีระดับแรงดันเอาต์พุตเมื่อวัดด้วยมัลติมิเตอร์ (โวลต์มิเตอร์) ได้แตกต่างกัน 8 ระดับ และมีความละเอียด 3 บิต</p>
+<p><img alt="" src="vga_resistor_dac-1.png" /></p>
+<p>รูป: ผังวงจรสำหรับการทดลอง (วาดผังวงจรด้วย <strong>EasyEDA</strong>)
+และใช้มัลติมิเตอร์วัดแรงดันเอาต์พุต</p>
+<p>เริ่มต้นให้สวิตซ์ทั้งสามตัวอยู่ในตำแหน่ง <strong>S0=S1=S2=Open</strong> ดังนั้นจะได้แรงดันไฟฟ้า <strong>0V</strong></p>
+<p><img alt="" src="vga_resistor_dac-2.png" /></p>
+<p>รูป: การจำลองการทำงาน <strong>S0=Close, S1=Open, S2=Open</strong></p>
+<p>เมื่อสวิตช์อยู่ในตำแหน่ง <strong>S0=Close, S1=Open, S2=Open</strong>
+จะได้ <strong>V0=5V, V1=0V, V2=0V</strong> และสามารถคำนวณแรงดันไฟฟ้าเอาต์พุตได้ดังนี้</p>
+<p><img alt="" src="vga_vout_calc-1.png" /></p>
+<p>รูป: ตัวอย่างการคำนวณหาแรงดันเอาต์พุตสำหรับกรณี <strong>S0=Close, S1=Open, S2=Open</strong></p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \frac{1}{R_x} &= \frac{1}{R_2} + \frac{1}{R_1} + \frac{1}{R_3} 
+                = \frac{1}{510} + \frac{1}{1000} + \frac{1}{75} \\
+  R_x &= 61.3718 \Omega \\
+  R_y &= R_0 = 2000 \Omega \\
+  V_{out} &= VCC \times \frac{R_x}{(R_x + R_y)} \\
+       &= 5 V \times \frac{61.3718\Omega}{(61.3718\Omega + 2000\Omega)} \\
+       &= 0.14886 V = 148.86 mV
+\end{align}</script>
+</p>
+<p>เมื่อสวิตช์อยู่ในตำแหน่ง <strong>S0=Open, S1=Close, S2=Close</strong>
+จะได้ <strong>V0=0V, V1=5V, V2=5V</strong> และสามารถคำนวณแรงดันไฟฟ้าเอาต์พุตได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \frac{1}{R_x} &= \frac{1}{R_0} + \frac{1}{R_3} \\
+  \frac{1}{R_y} &= \frac{1}{R_1} + \frac{1}{R_2} \\
+   R_x &= 72.2892\Omega \\
+   R_y &= 337.7483\Omega \\
+  V_{out} &= VCC \times \frac{R_x}{R_x + R_y} = 881.495mV
+\end{align}</script>
+</p>
+<p><img alt="" src="vga_resistor_dac-3.png" /></p>
+<p>รูป: การจำลองการทำงาน <strong>S0=Open, S1=Close, S2=Close</strong></p>
+<p>&nbsp;</p>
+<p>สวิตช์ทั้งสามตัวในวงจรดังกล่าว สามารถถูกแทนที่ได้ด้วยขาเอาต์พุต-ดิจิทัล 3 ขา ของบอร์ดไมโครคอนโทรลเลอร์
+<strong>Arduino</strong> และเขียนโปรแกรม <strong>Arduino Sketch</strong> กำหนดสถานะของลอจิกดังกล่าว
+เพื่อให้ได้ระดับแรงดันเอาต์พุตที่แตกต่างกันได้ 8 กรณี</p>
+<p><img alt="" src="vga_resistor_sim-1.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรเสมือนจริงด้วย <strong>AUTODESK Tinkercad</strong></p>
+<p><img alt="" src="vga_resistor_sim-2.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงาน</p>
+<p><strong>โจทย์การทดลอง</strong></p>
+<ul>
+<li>สร้างวงจรเสมือนจริงตามผังวงจร แต่ให้ใช้ค่า <strong>R2=560, R1=1.2k, R0=2.2k</strong>
+และ <strong>R3=75</strong> โอห์ม</li>
+<li>จงเขียนโค้ด <strong>Arduino Sketch</strong> เพื่อกำหนดค่าลอจิกให้ขาเอาต์พุต
+<strong>D3</strong>, <strong>D4</strong> และ <strong>D5</strong> ของ <strong>Arduino Uno</strong>
+โดยใช้คำสั่ง <code>digitalWrite()</code>
+ให้ได้ 8 กรณี เว้นระยะเวลาประมาณ 1 วินาที ก่อนเปลี่ยนค่าในแต่ละกรณี</li>
+<li>ในแต่ละกรณีให้วัดค่าแรงดันเอาต์พุต (<strong>Vout</strong>) ที่ได้
+โดยใช้ขาอินพุต-แอนะล็อก <strong>A0</strong> และใช้คำสั่ง <code>analogRead()</code>
+อ่านค่าตัวเลขแล้วแปลงค่าแรงดันไฟฟ้าหน่วยเป็นมิลลิโวลต์ ส่งเป็นข้อความจากบอร์ด
+<strong>Uno</strong> โดยใช้คำสั่ง <code>Serial.println()</code> 
+หนึ่งบรรทัดต่อหนึ่งค่าจากการวัดค่าในแต่ละกรณี และทำขั้นตอนซ้ำไปเรื่อย ๆ</li>
+</ul>
+<p><strong>คำถามจากการทดลอง:</strong> </p>
+<ul>
+<li>แรงดันเอาต์พุตที่วัดได้จากการใช้บอร์ด <strong>Arduino Uno</strong> ในแต่ละกรณี
+มีค่าใกล้เคียงกับค่าที่ได้จากการวัดด้วยมัลติมิเตอร์เสมือนจริงหรือไม่ ?</li>
+<li>แรงดันเอาต์พุตสูงสุดที่วัดได้จากการใช้บอร์ด <strong>Arduino Uno</strong> มีค่ากี่โวลต์
+และเป็นไปตามค่าที่คำนวณได้ตามทฤษฎีหรือไม่ ?</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอตัวอย่างโจทย์ฝึกปฏิบัติโดยนำตัวต้านทานและสวิตช์ไฟฟ้ามาต่อวงจรบนเบรดบอร์ด
 มีการใช้ซอฟต์แวร์ <strong>EasyEDA</strong> และ <strong>AUTODESK Tinkercad Circuits</strong>
 สำหรับการจำลองการทำงานของวงจร และมีตัวอย่างโค้ด <strong>Python</strong> ที่ช่วยในการหาคำตอบ
@@ -449,7 +531,7 @@ void loop() {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-01-14 | Last Updated: 2023-12-17</p></div>
+<p>Created: 2023-01-14 | Last Updated: 2023-12-27</p></div>
             </div>
         </div>
 
