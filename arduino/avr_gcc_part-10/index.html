@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/arduino/avr_gcc_part-10/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 10 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#c-avr-atmega328p-10" class="nav-link">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 10</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#c-bare-metal-avr-libc" class="nav-link">&#9655; การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#analog-comparator" class="nav-link">&#9655; วงจร Analog Comparator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">&#9655; โค้ดตัวอย่างที่ 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">&#9655; โค้ดตัวอย่างที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">&#9655; โค้ดตัวอย่างที่ 3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4" class="nav-link">&#9655; โค้ดตัวอย่างที่ 4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="c-avr-atmega328p-10">การเขียนโปรแกรมภาษา C สำหรับ AVR (ATmega328P): ตอนที่ 10<a class="headerlink" href="#c-avr-atmega328p-10" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Atmel AVR MCU</em>, <em>ATmega328P</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR-GCC</em>, <em>avr-libc</em></p>
+<hr />
+<h2 id="c-bare-metal-avr-libc">&#9655; <strong>การเขียนโปรแกรมภาษา C แบบ Bare-Metal และการใช้ไลบรารี avr-libc</strong><a class="headerlink" href="#c-bare-metal-avr-libc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 10 สาธิตตัวอย่างการเขียนโค้ดภาษา <strong>C</strong> เพื่อใช้งานวงจรที่เรียกว่า 
+<strong>Analog Comparator</strong> หรือ วงจรเปรียบเทียบแรงดันภายในชิป <strong>ATmega328P</strong> </p>
+<p>รายละเอียดเกี่ยวกับรีจิสเตอร์ที่เกี่ยวข้องกับการทำงานของ  <strong>Analog Comparator</strong>
+สามารถดูได้เอกสารของผู้ผลิต 
+<a href="../avr/atmega328p_datasheet.pdf"><strong>ATmega328P Datasheet</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="analog-comparator">&#9655; <strong>วงจร Analog Comparator</strong><a class="headerlink" href="#analog-comparator" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ATmega328P</strong> มีวงจรเปรียบเทียบแรงดันไฟฟ้า (<strong>Voltage Comparator</strong>
+หรือ <strong>Analog Comparator</strong>) ซึ่งใช้กับสัญญาณแอนะล็อก 
+โดยจะเปรียบเทียบระดับแรงดันของสัญญาณอินพุต <strong>IN+ (Positive Input)</strong>
+กับ <strong>IN- (Negative Unput)</strong> และให้ค่าเอาต์พุตเป็นลอจิก 1 เมื่อ <strong>IN+</strong> มากกว่า <strong>IN-</strong> 
+หรือได้ค่าเป็นลอจิก 0 ถ้าไม่เป็นไปตามเงื่อนไขดังกล่าว</p>
+<p><img alt="" src="../avr/images/analog_comparator.png" /></p>
+<p>รูป: บล็อกไดอะแกรมของ <strong>Analog Comparator</strong></p>
+<p>สัญญาณอินพุตสำหรับ <strong>IN+</strong> เลือกได้จากแหล่งที่มาต่อไปนี้ โดยจะต้องกำหนดค่าบิต 
+<code>ACBG</code> (<strong>Analog Comparator Bandgap Select</strong>)
+ในรีจิสเตอร์ <code>ACSR</code> (<strong>Analog Comparator Control and Status</strong>)</p>
+<ul>
+<li><code>ACBG=0</code>: ใช้แรงดันอินพุตที่รับจากขา <strong>AIN0 (PD6 Pin)</strong></li>
+<li><code>ACBG=1</code>: ใช้แรงดันอ้างอิงจากวงจรภายใน (<strong>Bandgap Reference Voltage</strong>)
+มีค่าประมาณ <strong>1.1V (+/-0.1V)</strong> สำหรับแรงดันไฟเลี้ยง <strong>VCC=+5V</strong></li>
+</ul>
+<p>สัญญาณอินพุตสำหรับ <strong>IN-</strong> เลือกได้จากแหล่งที่มาต่อไปนี้ โดยจะต้องกำหนดค่าบิต 
+<code>ACME</code> (<strong>Analog Comparator Multiplexer Enable</strong>)
+ในรีจิสเตอร์ <code>ADCSRB</code> (<strong>ADC Control and Status Register B</strong>) </p>
+<ul>
+<li><code>ACME=0</code>: ใช้แรงดันอินพุตที่รับจากขา <strong>AIN1 (PD7 Pin)</strong></li>
+<li><code>ACME=1</code>: ใช้แรงดันอินพุตที่เลือกจากวงจร <strong>ADC Multiplexer</strong>
+ซึ่งสามารถเขียนโปรแกรมให้เลือกจากอินพุตที่ขา <strong>A0 - A7</strong> ได้
+แต่วงจร <strong>ADC</strong> จะต้องถูกปิดการใช้งาน (โดยกำหนดให้บิต <code>ADEN=0</code> ในรีจิสเตอร์ <code>ADCSRA</code>)</li>
+</ul>
+<p>การเปิดใช้งานวงจร <strong>Analog Comparator</strong>
+จะต้องมีการกำหนดค่าบิต <code>ACD</code> (<strong>Analog Comparator Disable</strong>) ในรีจิสเตอร์ 
+<code>ACSR</code> ให้เป็น 0 แต่ถ้า <code>ACD=1</code> จะเป็นการปิดการใช้งานวงจรนี้ </p>
+<p>ผลการเปรียบเทียบหรือค่าเอาต์พุตของวงจรเปรียบเทียบ สามารถอ่านได้จากบิต 
+<code>ACO</code> (<strong>Analog Comparator Output</strong>) ในรีจิสเตอร์ <code>ACSR</code></p>
+<p>ในกรณีที่จะใช้ขา <strong>AIN0</strong> และ <strong>AIN1</strong> สำหรับการเปรียบเทียบแรงดัน จะต้องกำหนดค่าบิต 
+<code>AIN0D</code> และ <code>AIN1D</code> ในรีจิสเตอร์ <code>DIDR1</code> ให้เป็น 1 
+เพื่อปิดการใช้งาน <strong>Digital Input Buffer</strong> ที่ขาทั้งสอง</p>
+<p>ผลการเปรียบเทียบระดับแรงดันอินพุต สามารถนำไปใช้งานในกรณีต่อไปนี้ได้</p>
+<ul>
+<li>สร้างอินเทอร์รัพท์ (<strong>Analog Comparator Interrupt</strong>) โดยเลือกเงื่อนไขตามสถานะลอจิกของเอาต์พุต
+และกำหนดค่าบิต <code>ACIS[1:0]</code> เช่น เมื่อเกิดขอบขาขึ้น (<strong>Rising Edge</strong>) หรือ 
+ขอบขาลง (<strong>Falling Edge</strong>) หรือ ทั้งสองกรณี (<strong>Output Toggle</strong>)<br />
+และกำหนดค่าบิต <code>ACIE=1</code> (<strong>Analog Comparator Interrupt Enable</strong>)
+เพื่อเปิดใช้งานอินเทอร์รัพท์ ในขณะที่บิต <code>ACI</code> ในในรีจิสเตอร์ <code>ACSR</code>
+จะถูกใช้สำหรับการตรวจสอบหรือเคลียร์ <strong>Analog Comparator Interrupt Flag</strong></li>
+<li>สร้างเงื่อนไข (<strong>Trigger Condition</strong>) 
+สำหรับการอ่านและบันทึกค่าตัวนับของวงจร <strong>16-bit Timer1/Counter1</strong> โดยอัตโนมัติ
+ในกรณีนี้จะต้องกำหนดค่าบิต <code>ACIC</code> (<strong>Analog Comparator Input Capture</strong>) 
+ในรีจิสเตอร์ <code>ACSR</code> ให้ถูกต้องก่อนเริ่มใช้งาน</li>
+</ul>
+<p><img alt="" src="../avr/images/analog_comparator_reg-3.png" /></p>
+<p>รูป:  รีจิสเตอร์ <code>ACSR</code> ของวงจร <strong>Analog Comparator</strong></p>
+<p><img alt="" src="../avr/images/analog_comparator_reg-2.png" /></p>
+<p>รูป:  รีจิสเตอร์ <code>DIDR1</code> สำหรับขา <strong>AIN0/PD6</strong> และ <strong>AIN1/PD7</strong></p>
+<p><img alt="" src="../avr/images/adc_adcsrb_reg.png" /></p>
+<p>รูป: รีจิสเตอร์  <code>ADCSRB</code> ของวงจร <strong>ADC</strong></p>
+<p><img alt="" src="../avr/images/adc_adcsra_reg.png" /></p>
+<p>รูป: รีจิสเตอร์  <code>ADCSRA</code> ของวงจร <strong>ADC</strong></p>
+<p><img alt="" src="../avr/images/adc_admux_reg.png" /></p>
+<p>รูป: รีจิสเตอร์  <code>ADMUX</code> ของวงจร <strong>ADC</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1">&#9655; <strong>โค้ดตัวอย่างที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างแรกสาธิตการใช้วงจรเปรียบเทียบแรงดัน โดยเลือกใช้อินพุตที่ขา <strong>AIN0</strong> และ <strong>AIN1</strong>
+นำมาเปรียบเทียบกัน ผลการเปรียบเทียบจะถูกนำไปใช้ในการสร้างอินเทอร์รัพท์ (เมื่อเอาต์พุตเกิดขอบขาขึ้น)
+ฟังก์ชัน <strong>ISR</strong> ที่เกี่ยวข้องกับอินเทอร์รัพท์ (<code>ANALOG_COMP_vect</code>)
+จะทำหน้าที่สลับสถานะลอจิกที่ขาเอาต์พุต <strong>PB5</strong> ซึ่งใช้ในการตรวจสอบว่า มีการเกิดอินเทอร์รัพท์ขึ้น</p>
+<pre><code class="language-c">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+// Global variable
+uint8_t led_state = 0; // Used to keep the LED output state.
+
+void initAnalogComparator() {
+  // Disable the digital input buffer on AIN0 and AIN1 pins.
+  DIDR1 |= (1 &lt;&lt; AIN1D) | (1 &lt;&lt; AIN0D);
+  // Use the AIN0/PD6 and AIN1/PD7 pins as analog inputs.
+  // AIN0 is connected to the positive input.
+  // AIN1 is connected to the negative input.
+  ADCSRB &amp;= ~(1 &lt;&lt; ACME);
+  // Enable the analog comparator.
+  ACSR &amp;= ~(1 &lt;&lt; ACD);
+  // Enable Analog Comparator Interrupt on Rising Edge.
+  ACSR |= (1 &lt;&lt; ACIE) | (1 &lt;&lt; ACIS1) | (1 &lt;&lt; ACIS0);
+}
+
+int main() {
+  DDRB |= (1 &lt;&lt; DDB5); // Set PB5 as output.
+  initAnalogComparator(); // Initialize the analog comparator.
+  sei(); // Enable global interrupts.
+  while (1) {}
+}
+
+// Interrupt Service Routine for Analog Comparator
+ISR(ANALOG_COMP_vect) {
+  led_state ^= 1; // Toggle the LED output pin.
+  if (led_state) { PORTB |= (1 &lt;&lt; PB5); }
+  else { PORTB &amp;= ~(1 &lt;&lt; PB5); }
+}
+</code></pre>
+<p>ตัวอย่างรูปสัญญาณเอาต์พุต เมื่อป้อนสัญญาณรูปคลื่นไซน์ (<strong>Sine Wave</strong>,
+<strong>Vpp=2V</strong>, <strong>Voffset=1V</strong> หรือ <strong>Vlow=1V</strong> และ <strong>Vhigh=3V</strong>) และนำไปต่อเข้ากับขา <strong>AIN0</strong> (<strong>Arduino D6 Pin</strong>)
+ในขณะที่ขา <strong>AIN1</strong>  (<strong>Arduino D7 Pin</strong>) รับอินพุตจากวงจรแบ่งแรงดันไฟฟ้า โดยใช้ตัวต้านทานปรับค่าได้ขนาด <strong>10k</strong> โอห์ม</p>
+<p>แนะนำให้ต่อตัวเก็บประจุไฟฟ้าขนาด <strong>0.1uF</strong> อย่างละหนึ่งตัว เพิ่มที่ขา <strong>AIN0</strong> และ <strong>AIN1</strong> ไปยัง <strong>GND</strong>
+เพื่อลดปัญหาสัญญาณรบกวนที่เกิดขึ้นกับสัญญาณอินพุต</p>
+<p><img alt="" src="../avr/images/analog_comparator_uno.png" /></p>
+<p>รูป: แนวทางการต่อวงจรทดลองโดยใช้บอร์ด <strong>Arduino Uno</strong> เครื่องสร้างสัญญาณ และวงจรแบ่งแรงดันไฟฟ้า</p>
+<p><img alt="" src="../avr/images/analog_comparator_output-1.png" /></p>
+<p>รูป: คลื่นสัญญาณที่วัดได้โดยใช้เครื่องออสซิลโลสโคปแบบดิจิทัล 
+<strong>CH1:</strong> สัญญาณอินพุตรูปคลื่นไซน์ที่ขา <strong>AIN0/PD6</strong>
+<strong>CH2:</strong> สัญญาณจากวงจรแบ่งแรงดันไฟฟ้าที่ขา <strong>AIN1/PD7</strong> และ 
+<strong>CH3:</strong> สัญญาณเอาต์พุตที่ขา <strong>PB5</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2">&#9655; <strong>โค้ดตัวอย่างที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้แตกต่างจากตัวอย่างที่แล้วเพียงเล็กน้อย โดยเปลี่ยนเงื่อนไขการเกิดอินเทอรัพท์ดังนี้ 
+เมื่อเอาต์พุตของวงจรเปรียบเทียบ มีการเปลี่ยนแปลงสถานะลอจิก (<strong>Toggle Output</strong>) ให้สร้างอินเทอร์รัพท์
+และมีการเรียกฟังก์ชัน <strong>ISR</strong> (<code>ANALOG_COMP_vect</code>) ที่เกี่ยวข้องให้ทำงาน
+โดยจะสลับสถานะลอจิกที่ขาเอาต์พุต <strong>PB5</strong></p>
+<pre><code class="language-c">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+void initAnalogComparator() {
+  // Disable the digital input buffer on AIN0 and AIN1 pins.
+  DIDR1 |= (1 &lt;&lt; AIN1D) | (1 &lt;&lt; AIN0D);
+  // Use the AIN0/PD6 and AIN1/PD7 pins as analog inputs.
+  // AIN0 is connected to the positive input.
+  // AIN1 is connected to the negative input.
+  ADCSRB &amp;= ~(1 &lt;&lt; ACME);
+  // Enable Analog Comparator Interrupt on Both Edge.
+  ACSR &amp;= ~(1 &lt;&lt; ACD);
+  ACSR &amp;= ~((1 &lt;&lt; ACIS1) | (1 &lt;&lt; ACIS0)); 
+  ACSR |= (1 &lt;&lt; ACIE);
+}
+
+int main() {
+  DDRB |= (1 &lt;&lt; DDB5); // Set PB5 as output.
+  initAnalogComparator(); // Initialize the analog comparator.
+  sei(); // Enable global interrupts.
+  while(1) {}
+}
+
+ISR(ANALOG_COMP_vect) { 
+  PINB |= (1 &lt;&lt; PB5); // Toggle the PB5 output pin.
+}
+</code></pre>
+<p><img alt="" src="../avr/images/analog_comparator_output-2.png" /></p>
+<p>รูป: คลื่นสัญญาณที่วัดได้โดยใช้เครื่องออสซิลโลสโคปแบบดิจิทัล 
+<strong>CH1:</strong> สัญญาณอินพุตรูปคลื่นไซน์ที่ขา <strong>AIN0/PD6</strong>
+<strong>CH2:</strong> สัญญาณจากวงจรแบ่งแรงดันไฟฟ้าที่ขา <strong>AIN1/PD7</strong> และ 
+<strong>CH3:</strong> สัญญาณเอาต์พุตที่ขา <strong>PB5</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="3">&#9655; <strong>โค้ดตัวอย่างที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ มีการเลือกใช้สัญญาณอินพุตที่ขา <strong>AIN1</strong> และนำมาเปรียบเทียบกับแรงดันอ้างอิงภายใน
+และเมื่อเอาต์พุตของวงจรเปรียบเทียบมีการเปลี่ยนแปลงค่าลอจิก ให้สร้างอินเทอร์รัพท์
+และมีการเรียกฟังก์ชัน <strong>ISR</strong> (<code>ANALOG_COMP_vect</code>) ที่เกี่ยวข้องให้ทำงาน
+โดยจะสลับสถานะลอจิกที่ขาเอาต์พุต <strong>PB5</strong></p>
+<pre><code class="language-c">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+void initAnalogComparator() {
+  // Disable the digital input buffer on the AIN1/PD7 pin.
+  DIDR1 |= (1 &lt;&lt; AIN1D);
+  // The AIN0/PD6 pin is not used.
+  // The positive input of the comparator is connected to 
+  // the internal bandgap reference voltage.
+  // The AIN1/PD7 pin is connected to the negative input.
+  ADCSRB &amp;= ~(1 &lt;&lt; ACME);
+  // Enable Analog Comparator Interrupt on Both Edge.
+  ACSR &amp;= ~(1 &lt;&lt; ACD);
+  ACSR &amp;= ~((1 &lt;&lt; ACIS1) | (1 &lt;&lt; ACIS0));
+  ACSR |= (1 &lt;&lt; ACBG);
+  ACSR |= (1 &lt;&lt; ACIE);
+}
+
+int main() {
+  DDRB |= (1 &lt;&lt; DDB5); // Set PB5 as output.
+  initAnalogComparator(); // Initialize the analog comparator.
+  sei(); // Enable global interrupts.
+  while(1) {}
+}
+
+ISR(ANALOG_COMP_vect) { 
+  PINB |= (1 &lt;&lt; PB5); // Toggle the PB5 output pin.
+}
+</code></pre>
+<p><img alt="" src="../avr/images/analog_comparator_output-3.png" /></p>
+<p>รูป: คลื่นสัญญาณที่วัดได้โดยใช้เครื่องออสซิลโลสโคปแบบดิจิทัล 
+<strong>CH1:</strong> สัญญาณอินพุตรูปคลื่นไซน์ที่ขา <strong>AIN1/PD7</strong> และ
+<strong>CH3:</strong> สัญญาณเอาต์พุตที่ขา <strong>PB5</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4">&#9655; <strong>โค้ดตัวอย่างที่ 4</strong><a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการเลือกใช้ขา <strong>AIN0</strong> และ <strong>A0</strong> เพื่อนำมาใช้เป็นอินพุตสำหรับวงจรเปรียบเทียบสัญญาณแอนะล็อก</p>
+<pre><code class="language-c"> #include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+void initAnalogComparator() {
+  // Disable the digital input buffer on AIN0 and AIN1 pins.
+  DIDR0  |= (1 &lt;&lt; AIN0D);
+  // Compare AIN0 with A1 pins
+  ADCSRB |= (1 &lt;&lt; ACME); 
+  ADCSRA &amp;= ~(1 &lt;&lt; ADEN); // Disable ADC
+  ADMUX = 0; // Select A0 input (0b000..0b111 for A0..A7)
+  ACSR &amp;= ~((1 &lt;&lt; ACD) | (1 &lt;&lt; ACBG));
+  // Enable Analog Comparator Interrupt on Both Edge.
+  ACSR &amp;= ~((1 &lt;&lt; ACIS1) | (1 &lt;&lt; ACIS0)); 
+  ACSR |= (1 &lt;&lt; ACI) | (1 &lt;&lt; ACIE);
+}
+
+int main() {
+  DDRB |= (1 &lt;&lt; DDB5); // Set PB5 as output.
+  initAnalogComparator(); // Initialize the analog comparator.
+  sei(); // Enable global interrupts.
+  while(1) {}
+}
+
+ISR(ANALOG_COMP_vect) { 
+  PINB |= (1 &lt;&lt; PB5); // Toggle the PB5 output pin.
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดภาษาซี
+เพื่อใช้งานวงจร <strong>Analog Comparator</strong> ภายในชิป <strong>ATmega328P</strong>
+และตัวอย่างการเลือกใช้ช่องสัญญาณแอนะล็อกสำหรับการเปรียบเทียบแรงดันไฟฟ้า
+การกำหนดเงื่อนไขในการเกิดอินเทอร์รัพท์จากเอาต์พุตของวงจรเปรียบเทียบแรงดัน
+และการตอบสนองต่อการเกิดอินเทอร์รัพท์ด้วยฟังก์ชัน <strong>ISR</strong> ที่เกี่ยวข้อง</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-01-04 | Last Updated: 2024-01-04</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2023 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
