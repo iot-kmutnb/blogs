@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/mcp4725_dac_i2c/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>โมดูล MCP4725 DAC (Digital-to-Analog Converter) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mcp4725-dac-digital-to-analog-converter" class="nav-link">โมดูล MCP4725 DAC (Digital-to-Analog Converter)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#microchip-mcp4725" class="nav-link">&#9655; Microchip MCP4725</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c" class="nav-link">&#9655; ตัวอย่างโค้ด:  การตรวจสอบอุปกรณ์ที่เชื่อมต่อกับไมโครคอนโทรลเลอร์ด้วยบัส I2C</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-library-mcp4725" class="nav-link">&#9655; ตัวอย่างโค้ด: การใช้งาน Arduino Library สำหรับ  MCP4725</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dac-adc" class="nav-link">&#9655; ตัวอย่างโค้ด: การสร้างสัญญาณเอาต์พุตจาก DAC และอ่านค่าสัญญาณแอนะล็อกด้วย ADC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sine-wave-generation" class="nav-link">&#9655; ตัวอย่างโค้ด: การสร้างสัญญาณรูปคลื่นไซน์ (Sine Wave Generation)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mcp4725-dac-digital-to-analog-converter">โมดูล MCP4725 DAC (Digital-to-Analog Converter)<a class="headerlink" href="#mcp4725-dac-digital-to-analog-converter" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการใช้งานโมดูล <strong>MCP4725 DAC</strong> ในเบื้องต้น 
+โดยใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์และเขียนโปรแกรมด้วย <strong>Arduino Sketch</strong>
+เพื่อใช้ในการสร้างสัญญาณแอนะล็อกจำนวน 1 ช่องสัญญาณ</p>
+<p><strong>Keywords:</strong> <em>MCP4725</em>, <em>Digital-to-Analog Converter (DAC)</em>,
+<em>I2C Bus</em>, <em>Arduino Sketch</em>, <em>Analog Output</em>, <em>Analog Signal Waveform Generation</em></p>
+<ul>
+<li><a href="#microchip-mcp4725"><strong>Microchip MCP4725</strong></a></li>
+<li><a href="#i2c">ตัวอย่างโค้ด: การตรวจสอบอุปกรณ์ที่เชื่อมต่อกับไมโครคอนโทรลเลอร์ด้วยบัส <strong>I2C</strong></a></li>
+<li><a href="#arduino-library-mcp4725">ตัวอย่างโค้ด: การใช้งาน <strong>Arduino Library</strong> สำหรับ <strong>MCP4725</strong></a></li>
+<li><a href="#dac-adc">ตัวอย่างโค้ด: การสร้างสัญญาณเอาต์พุตจาก <strong>DAC</strong> และอ่านค่าสัญญาณแอนะล็อกด้วย <strong>ADC</strong></a></li>
+<li><a href="#sine-wave-generation">ตัวอย่างโค้ด: การสร้างสัญญาณรูปคลื่นไซน์ (<strong>Sine Wave Generation</strong>)</a></li>
+</ul>
+<hr />
+<h2 id="microchip-mcp4725">&#9655; <strong>Microchip MCP4725</strong><a class="headerlink" href="#microchip-mcp4725" title="Permanent link">#</a></h2>
+<p><strong>MCP4725</strong> ของบริษัท <strong>Microchip Technology Inc.</strong> เป็นไอซีสำหรับการสร้างสัญญาณแอนะล็อกจากข้อมูลดิจิทัล
+(<strong>Digital to Analog Converter: DAC</strong>) 
+ด้วยการเขียนโปรแกรมควบคุมผ่านทางบัส <strong>I2C</strong> </p>
+<p>ข้อมูลเชิงเทคนิคที่สำคัญของไอซีมีดังนี้
+(อ้างอิงจากเอกสาร <a href="mcp4725_datasheet.pdf"><strong>Datasheet</strong></a> ของผู้ผลิต)</p>
+<ul>
+<li>แรงดันไฟเลี้ยง (<strong>VDD</strong>)  สำหรับไอซี: <strong>2.7V ~ 5.5V</strong></li>
+<li>ตัวถังของไอซี: <strong>SOT-23-6</strong> มี 6 ขา</li>
+<li>ข้อมูลมีความละเอียด (<strong>Bit Resolution</strong>): 12 บิต</li>
+<li>ช่วงแรงดันเอาต์พุต: <strong>0V</strong> ถึง <strong>VDD</strong> (<strong>Rail-to-Rail Output</strong>)</li>
+<li>เชื่อมต่อด้วยบัส <strong>I2C</strong> สำหรับการเขียนโปรแกรมควบคุม</li>
+<li>ความเร็ว <strong>I2C</strong><ul>
+<li><strong>Standard-speed mode</strong>: <strong>100kHz</strong></li>
+<li><strong>Fast-speed mode</strong>: <strong>400kHz</strong></li>
+<li><strong>High-speed mode</strong>: <strong>3.4Mbps (max.)</strong></li>
+</ul>
+</li>
+<li>มีขา <strong>A0</strong>  (<strong>Address Pin</strong>) สำหรับกำหนดค่าบิตของอุปกรณ์<ul>
+<li>มีหมายเลขอุปกรณ์เลือกได้คือ: <code>0x60</code> (<strong>A0=0</strong>) หรือ <code>0x61</code> (<strong>A0=1</strong>)</li>
+</ul>
+</li>
+<li>ระยะเวลาเอาต์พุตเข้าสู่ระดับคงตัว (<strong>Output Settling Time</strong>): <strong>6us</strong> (typ.)
+ซึ่งเป็นระยะเวลาที่ต้องใช้ในการอัปเดตเอาต์พุตหลังจากมีการเขียนค่าใหม่และเอาต์พุตเปลี่ยนไปสู่ระดับแรงดันใหม่</li>
+<li>ความต้านทานของขาเอาต์พุต (<strong>Vout to Gnd</strong>): <strong>1 Ohm</strong> (<strong>Normal Mode</strong>)</li>
+<li>มีโหมดการประหยัดพลังงาน: <strong>Power-down Mode</strong> 1,2,3 นอกเหนือจาก <strong>Normal Mode</strong><ul>
+<li>ในแต่ละโหมดของ <strong>Power-down Mode</strong> เอาต์พุตจากวงจรออปแอมป์ภายใน จะไม่เชื่อมต่อกับขา <strong>Vout</strong>
+ และมีการเปิดใช้งานตัวต้านทานแบบ <strong>Pulldown</strong> ที่ขา <strong>Vout</strong> ให้เชื่อมต่อกับ <strong>GND</strong>
+(ขนาด <strong>1k</strong>, <strong>100k</strong> หรือ <strong>500k</strong> โอห์ม ตามโหมดที่เลือกใช้)</li>
+</ul>
+</li>
+<li>มีหน่วยความจำภายในแบบ <strong>EEPROM</strong> ขนาด 14 บิต สำหรับเก็บค่าการตั้งค่าใช้งานและค่าเอาต์พุต</li>
+</ul>
+<p><img alt="" src="mcp4725_block_diagram.png" /></p>
+<p>รูป: บล็อกไดอะแกรมของไอซี <strong>MCP4725</strong></p>
+<p><img alt="" src="dac_i2c_bus.png" /></p>
+<p>รูป: การเชื่อมต่อด้วยบัส <strong>I2C</strong></p>
+<p><img alt="" src="mcp4725_modules.png" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>MCP4725</strong> ซึ่งมีการใส่ตัวต้านทาน <strong>Pull-up</strong>
+สำหรับ <strong>SCL</strong> และ <strong>SDA</strong> มาให้แล้ว</p>
+<p><img alt="" src="dac_registers.png" /></p>
+<p>รูป: รีจิสเตอร์ของ <strong>MCP4725</strong></p>
+<p>ภายใน <strong>DAC Register</strong> ซึ่งมีขนาด 16 บิต ประกอบด้วย</p>
+<ul>
+<li><code>C[2:0]</code> 3 บิต สำหรับเลือกชนิดของคำสั่ง (<strong>Command Type</strong>)</li>
+<li><code>RDY/BSY</code> 1 บิต (<strong>Ready/Not Busy</strong>) เป็น <strong>Status Bit</strong> สำหรับการเขียนข้อมูลลงใน <strong>EEPROM</strong></li>
+<li><code>POR</code> 1 บิต</li>
+<li><code>PD[1:0]</code> 2 บิต สำหรับเลือกโหมดการทำงาน (<strong>Normal Mode</strong> และ <strong>Power-down Modes</strong>)</li>
+<li><code>D[11:0]</code> 12 บิต สำหรับเขียนข้อมูลอินพุต</li>
+</ul>
+<p>ถ้ากำหนดให้ <strong>Dn</strong> คือ ข้อมูลดิจิทัลขนาด 12 บิต
+(<strong>DAC Input Code</strong>) ซึ่งมีค่าอยู่ระหว่าง <strong>0..4095</strong>
+ข้อมูลจะถูกแปลงให้เป็นแรงดันเอาต์พุตโดยใช้ไอซี <strong>MCP4275</strong> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  V_{OUT} = V_{DD} \times \frac{D_n}{2^{12}}
+</script>
+</p>
+<p>โดยทั่วไปแล้ว การอัปเดตค่าสำหรับเอาต์พุต ก็จะใช้คำสั่ง <strong>Fast-Mode Write</strong></p>
+<p><img alt="" src="dac_cmd_fast_mode.png" /></p>
+<p>รูป: คำสั่งสำหรับ <strong>MCP4725</strong> และการใช้คำสั่งแบบ <strong>Fast-Mode Write</strong>
+ซึ่งจะมีการเขียนข้อมูล 3 ไบต์ ต่อการอัปเดตเอาต์พุตหนึ่งครั้ง (<strong>Single Input Code Update</strong>)</p>
+<p><img alt="" src="dac_cmd_write.png" /></p>
+<p>รูป: การเขียนข้อมูลไปยังรีจิสเตอร์ภายใน หากไม่ได้ใช้ <strong>Fast-Mode Write</strong>
+(จะต้องมีการเขียนข้อมูล 4 ไบต์ ต่อการอัปเดตเอาต์พุตหนึ่งครั้ง)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="dac_opamp.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจร <strong>MCP4725</strong> ร่วมกับวงจรไอซี <strong>OpAmp</strong>
+เพื่อสร้างแรงดันเอาต์พุตที่อยู่ในช่วงแรงดันไฟฟ้าเป็นบวกและลบได้
+(โดยใช้แรงดันไฟเลี้ยง <strong>VCC+</strong> และ <strong>VCC-</strong> สำหรับออปแอมป์)</p>
+<p>พารามิเตอร์ของวงจร <strong>DAC</strong> ซึ่งบ่งบอกความละเอียดและความแม่นยำในการทำงานของ <strong>DAC</strong> เช่น</p>
+<ul>
+<li><strong>LSB (Least Significant Bit)</strong>:
+ความละเอียดของเอาต์พุต มีหน่วยวัดเป็นโวลต์หรือมิลลิโวลต์
+(<strong>Ideal voltage difference between two successive input codes</strong>)
+ถ้ามีการเพิ่มหรือลดค่าของข้อมูลครั้งละหนึ่ง
+จะทำให้มีการเปลี่ยนแปลงแรงดันเอาต์พุตกี่โวลต์ ซึ่งคำนวณได้ดังนี้
+<script type="math/tex; mode=display">
+   LSB = \frac{V_{REF}}{2^{n}}, \; n=12,\, V_{REF} = VDD
+</script>
+เช่น <strong>VDD=5V</strong> และ <strong>n=12</strong> จะได้ <strong>LSB = 5V / 4096 =  1.22 mV</strong></li>
+<li><strong>INL (Integral Nonlinearity)</strong>:
+ความแตกต่างระหว่างแรงดันเอาต์พุตที่วัดได้จริงกับแรงดันเอาต์พุตที่ควรจะเป็น เป็นกี่เท่าของแรงดัน <strong>LSB</strong>
+<script type="math/tex; mode=display">
+   INL = \frac{ V_{OUT} - V_{Ideal} }{ LSB }
+</script>
+</li>
+<li><strong>DNL (Differential Nonlinearity)</strong>:
+ความแตกต่างของแรงดันเอาต์พุตของสองระดับถัดกันที่วัดได้จริง <script type="math/tex">\Delta V_{OUT}</script> ลบด้วยแรงดัน <strong>LSB</strong>
+เป็นกี่เท่าของแรงดัน <strong>LSB</strong>
+<script type="math/tex; mode=display">
+  DNL = \frac{ \Delta V_{OUT} - LSB }{ LSB }
+</script>
+</li>
+</ul>
+<p>ในการใช้งานขาเอาต์พุตของ <strong>MCP4725 DAC</strong> มีข้อควรระวังเช่น 
+การเลือกค่าความต้านทานมาเป็นโหลด หากมีความต้านทานต่ำ จะส่งผลต่อระดับแรงดันเอาต์พุต
+เช่น ถ้าตั้งค่าเอาต์พุตไว้สูงสุด (ค่าตัวเลขเท่ากับ <code>4095</code> หรือ <code>FFFh</code>)
+ควรจะได้แรงดันเอาต์พุตใกล้เคียง <strong>VDD</strong>
+แต่ถ้าใช้ความต้านทานต่ำมาเป็นโหลด (<strong>Load Resistance</strong>)
+แรงดันเอาต์พุตที่วัดได้จริง น้อยกว่าค่าที่ควรจะเป็น
+และค่าความต้านทานของโหลดที่ขาเอาต์พุต ก็ส่งผลต่อปริมาณกระแสที่ไหลเช่นกัน</p>
+<p><img alt="" src="mcp4725_output.png" /></p>
+<p>รูป: การเลือกใช้ค่าความต้านทานเป็นโหลดที่ขาเอาต์พุต เมื่อใช้ <strong>VDD=5V</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c">&#9655; <strong>ตัวอย่างโค้ด:  การตรวจสอบอุปกรณ์ที่เชื่อมต่อกับไมโครคอนโทรลเลอร์ด้วยบัส I2C</strong><a class="headerlink" href="#i2c" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างต่อไปนี้สาธิตการตรวจสอบเพื่อดูว่ามีอุปกรณ์ <strong>I2C Slave</strong>
+เชื่อมต่อกับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32-C3</strong> 
+(ใช้บอร์ด <a href="../../esp32/esp32_c3_super-mini/"><strong>Super-Mini ESP32-C3</strong></a>)
+และแสดงหมายเลขอุปกรณ์ที่ตรวจพบ</p>
+<p>ในตัวอย่างนี้ได้เลือกใช้ขา <strong>GPIO-6</strong> และ <strong>GPIO-7</strong>
+สำหรับสัญญาณ <strong>SDA</strong> และ <strong>SCL</strong> ของบัส <strong>I2C</strong> ตามลำดับ</p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+
+#define I2C_SDA_PIN   (6)
+#define I2C_SCL_PIN   (7)
+#define I2C_SPEED_MAX (1000000)
+
+void setup() {
+  Serial.begin( 115200 );
+  while (!Serial) { delay(10); }
+  // set I2C pins for ESP32-C3 Mini board
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN );
+  Wire.setClock( I2C_SPEED_MAX ); // ~750kHz
+}
+
+void i2c_scan() {
+  int n_devices = 0;
+  Serial.println( &quot;Scanning I2C bus...&quot; );
+  Serial.print( &quot;   &quot; );
+  for ( uint8_t col=0; col &lt; 16; col++ ) {
+    Serial.printf( &quot;%3x&quot;, col );
+  }
+  Serial.println( &quot;&quot; );
+
+  uint8_t addr=0;
+  for( uint8_t row=0; row &lt; 8; row++ ) {
+    Serial.printf( &quot;%02x:&quot;, row &lt;&lt; 4 );
+    for ( uint8_t col=0; col &lt; 16; col++ ) {
+      if ( row == 0 &amp;&amp; addr&lt;=1 ) {
+        Serial.print(&quot;   &quot;);
+      } else {
+        Wire.beginTransmission( addr );
+        if ( Wire.endTransmission()&gt;0 ) {
+          Serial.printf( &quot; --&quot; );
+        } else {
+          Serial.printf( &quot; %2x&quot;, addr );
+          n_devices++;
+        }
+      }
+      addr++;
+    }
+    Serial.println( &quot;&quot; );
+  }
+  Serial.println( &quot;---------------------\n&quot; );
+  Serial.flush();
+}
+
+void loop() {
+  i2c_scan();
+  delay(5000);
+}
+</code></pre>
+<p>ในโค้ดตัวอย่างได้มีการตั้งค่า <strong>I2C Frequency</strong> ไว้สูงสุด <strong>1MHz</strong>
+แต่ผลจากการวัดสัญญาณจริง การทำงานของ <strong>ESP32-C3</strong> จะสร้างสัญญาณ <strong>SCL</strong> ได้ความถี่สูงสุด
+ประมาณ <strong>750kHz</strong> ซึ่งได้ความถี่สูงกว่า <strong>Fast Mode (400kHz)</strong> โดยทั่วไป</p>
+<p><img alt="" src="arduino_code-1.png" /></p>
+<p>รูป:  สัญญาณ <strong>SCL</strong> และ <strong>SDA</strong> เมื่อวัดด้วยออสซิลโลสโคปดิจิทัล</p>
+<p><img alt="" src="waveform-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่แสดงให้เห็นว่าตรวจพบอุปกรณ์ที่มีหมายเลข <code>0x60</code>
+ซึ่งก็คือ โมดูล <strong>MCP4725</strong> ที่ได้นำมาต่อใช้งานกับบอร์ดไมโครคอนโทรลเลอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-library-mcp4725">&#9655; <strong>ตัวอย่างโค้ด: การใช้งาน Arduino Library สำหรับ  MCP4725</strong><a class="headerlink" href="#arduino-library-mcp4725" title="Permanent link">#</a></h2>
+<p>ถ้าต้องการใช้ <strong>Arduino Library</strong> สำหรับการใช้งาน <strong>MCP4725</strong>
+ก็มีไลบรารี เช่น 
+<a href="https://github.com/RobTillaart/MCP4725/"><code>RobTillaart/MCP4725/</code></a></p>
+<p>ตัวอย่างโค้ดสำหรับการสาธิตการใช้งานไลบรารีในเบื้องต้น มีดังนี้</p>
+<pre><code class="language-c++">#include &quot;MCP4725.h&quot;
+
+#define I2C_SDA_PIN   (6)  // GPIO-6
+#define I2C_SCL_PIN   (7)  // GPIO-7
+
+MCP4725 MCP(0x60); // Create an instance of the MCP4725 class.
+
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+  Serial.println(&quot;ESP32C3 - MCP4725 Demo....&quot;);
+  Serial.printf( &quot;MCP4725 Library v%s\n&quot;, MCP4725_VERSION );
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN ); // Set the SDA/SCL pins
+  Wire.setClock( 400000 ); // Set the I2C speed
+}
+
+void loop() {
+  static uint16_t value = 0;
+  static uint32_t ts_saved = 0;
+  uint32_t ts_now = micros();
+  if ( ts_now - ts_saved &gt;= 1000 ) { 
+    // Update the output very 1 msec.
+    ts_saved = ts_now;
+    value = (value+1) % 256;
+    MCP.writeDAC( 16*value );
+  } 
+}
+</code></pre>
+<p><img alt="" src="mcp4725_arduino_lib.png" /></p>
+<p>รูป: ตัวอย่างการติดตั้งไลบรารีสำหรับ <strong>Arduino IDE</strong> และทดลองโค้ดตัวอย่าง</p>
+<p><img alt="" src="waveform-2.png" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ได้จากการทำงานของโค้ดตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="dac-adc">&#9655; <strong>ตัวอย่างโค้ด: การสร้างสัญญาณเอาต์พุตจาก DAC และอ่านค่าสัญญาณแอนะล็อกด้วย ADC</strong><a class="headerlink" href="#dac-adc" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการสร้างและใช้งานฟังก์ชัน <code>writeRegisterMode(...)</code>
+และ <code>writeFastMode(...)</code> ที่สามารถใช้แทนกันได้สำหรับการส่งข้อมูลเพื่ออัปเดตเอาต์พุตของ
+<strong>MCP4725</strong> </p>
+<p>ในการอัปเดตข้อมูลแต่ละครั้ง จะมีการอ่านค่าแรงดันเอาต์พุตจากโมดูล <strong>DAC</strong> โดยใช้วงจร 
+<strong>ADC</strong> ภายในชิป <strong>ESP32-C3</strong> (เลือกใช้ขา <strong>GPIO-2</strong>) สำหรับสัญญาณแอนะล็อกอินพุต
+ซึ่งมีแรงดันไฟฟ้าอยู่ในช่วง <strong>0V</strong> แต่ไม่เกิน <strong>3V</strong></p>
+<pre><code class="language-c++">#include &lt;Wire.h&gt;
+
+#define AIN_PIN       (2)  // GPIO-2
+#define I2C_SDA_PIN   (6)  // GPIO-6
+#define I2C_SCL_PIN   (7)  // GPIO-7
+#define I2C_ADDR      (0x60) // Default 7-bit address of MCP4725 
+
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+  Serial.println(&quot;\n\nESP32C3 + MCP4725&quot;);
+  Wire.begin( I2C_SDA_PIN, I2C_SCL_PIN, 400000 /*freq.*/ );
+  pinMode( AIN_PIN, ANALOG );
+  analogSetPinAttenuation( AIN_PIN, ADC_11db );
+  analogReadResolution( 12 );
+}
+
+void writeRegisterMode(uint8_t cmd_byte, uint16_t value) {
+  Wire.beginTransmission(I2C_ADDR);
+  Wire.write(cmd_byte);
+  Wire.write((value &gt;&gt; 4) &amp; 0xff);
+  Wire.write((value &amp; 0x0f) &lt;&lt; 4);
+  Wire.endTransmission();
+}
+
+void writeFastMode(uint16_t value) {
+  Wire.beginTransmission(I2C_ADDR);
+  Wire.write((value &gt;&gt; 8) &amp; 0x0f); // high byte (no powerdown)
+  Wire.write(value &amp; 0xff);        // low byte
+  Wire.endTransmission();
+}
+
+uint16_t scale = 60;
+uint16_t cnt = 0; 
+const uint16_t CNT_MAX = 100;
+
+void loop() {
+  uint16_t value = (cnt &lt; CNT_MAX/2) ? cnt : CNT_MAX-cnt;
+  // C[2:0]= &quot;010&quot;, PD[1:0]=&quot;00&quot;
+  writeRegisterMode( 0b01000000, value*scale );
+  // writeFastMode( value*scale );
+  cnt = (cnt+1) % CNT_MAX;
+  Serial.println( String(&quot;MAX:4096,MIN:0,AIN:&quot;) + analogRead(AIN_PIN) );
+  delay(20);
+}
+</code></pre>
+<p><img alt="" src="waveform_updown.png" /></p>
+<p>รูป: ตัวอย่างการรับค่าและแสดงผลด้วย <strong>Arduino Serial Plotter</strong></p>
+<p><img alt="" src="esp32c3_mcp4725.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sine-wave-generation">&#9655; <strong>ตัวอย่างโค้ด: การสร้างสัญญาณรูปคลื่นไซน์ (Sine Wave Generation)</strong><a class="headerlink" href="#sine-wave-generation" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไปสาธิตการสร้างสัญญาณรูปคลื่นไซน์ 
+โดยใช้ข้อมูลในอาร์เรย์ที่มีการคำนวณจากฟังก์ชันไซน์ โดยมีจำนวนข้อมูลเท่ากับ
+<strong>N=20</strong> ซึ่งได้จากการชักตัวอย่างจากฟังก์ชันไซน์จำนวน 1 คาบ</p>
+<p>ในตัวอย่างนี้การอ่านค่าจากอาร์เรย์ตามลำดับแล้วนำไปใช้เป็นเอาต์พุตสำหรับ <strong>MCP4725</strong>
+ด้วยอัตราคงที่ จะอาศัยการทำงานของวงจร <strong>Hardware Timer</strong> ของ <strong>ESP32-C3</strong>
+โดยตั้งค่าให้เกิดอินเทอร์รัพท์ของวงจรตัวนับที่มีความละเอียดในการนับเท่ากับ
+1 ไมโครวินาที และกำหนดให้การเกิดอินเทอร์รัพท์ หรือ <strong>Alarm Period</strong> มีช่วงเวลาเท่ากับ
+1000 ไมโครวินาที และเกิดขึ้นซ้ำด้วยอัตราคงที่</p>
+<p>นอกจากนั้นแล้ว ในตัวอย่างนี้ได้สาธิตการสร้าง <strong>FreeRTOS Task</strong>
+เพื่อใช้ในการอัปเดตค่าเอาต์พุตของ <strong>MCP4275</strong> โดยเรียกใช้ฟังก์ชัน <code>writeFastMode(...)</code>
+เมื่อเกิดอินเทอร์รัพท์จากไทม์เมอร์ ฟังก์ชัน <code>onTimer()</code> ซึ่งทำหน้าที่เป็น 
+<strong>ISR (Interrupt Service Routine)</strong>
+หรือ <strong>Callback Function</strong> จะทำงาน และแจ้งผ่านการจัดการของ <strong>FreeRTOS</strong>
+ไปยังทาสก์ดังกล่าวให้อัปเดตค่าถัดไปสำหรับเอาต์พุต</p>
+<p>ในตัวอย่างนี้มีการกำหนดสถานะเอาต์พุตที่ขา <strong>GPIO-8</strong>  (<code>LED_PIN</code>)
+เมื่อเกิดอินเทอร์รัพท์และฟังก์ชัน <strong>ISR</strong> ทำงานในแต่ละครั้ง ขาเอาต์พุตนี้จะถูกเปลี่ยนเป็น <strong>HIGH</strong>
+เมื่อทาสก์ที่กำลังรออยู่เพื่ออัปเดตค่าเอาต์พุตในครั้งถัดไป ได้ทำงานอีกครั้ง จะเปลี่ยนให้ขาเอาต์พุตนี้เป็น <strong>LOW</strong>
+ดังนั้นความกว้างของพัลส์ที่เกิดขึ้นกับขาเอาต์พุตดังกล่าว เป็นตัวระบุว่า จะต้องใช้เวลาเท่าไหร่
+จึงทำให้ทาสก์ที่รออยู่ได้กลับมาทำงานอีกครั้งหลังจากเหตุการณ์อินเทอร์รัพท์</p>
+<pre><code>#include &lt;Wire.h&gt;
+
+#define LED_PIN       (8)  // GPIO-8
+#define I2C_SDA_PIN   (6)  // GPIO-6
+#define I2C_SCL_PIN   (7)  // GPIO-7
+#define I2C_ADDR      (0x60) // Default 7-bit address of the MCP4725 module
+#define I2C_SPEED_MAX (1000000)
+#define TIMER_FREQ    (1000000) // Frequency of the hardware timer in Hz
+#define ALARM_PERIOD  (1000)    // (1usec resolution)
+
+const uint32_t DAC_MAC_VALUE = ((1&lt;&lt;12)-1);
+const uint32_t N = 20;
+uint16_t SINE_TABLE[ N ] = {0};
+
+hw_timer_t *timer = NULL; // Hardware Timer
+TaskHandle_t updateDACTask = NULL; // Task handle
+
+void IRAM_ATTR onTimer() {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  digitalWrite(LED_PIN, HIGH);
+  vTaskNotifyGiveFromISR(updateDACTask, &amp;xHigherPriorityTaskWoken);
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(115200);
+  delay(200);
+  Serial.println(&quot;\n\nESP32C3 + MCP4725&quot;);
+
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 400000 /*freq.*/);
+  Wire.setClock(I2C_SPEED_MAX); // Set I2C speed higher
+  // Compute the sine wave table of N entries (for a single period)
+  for (int i = 0; i &lt; N; i++) {
+    SINE_TABLE[i] = DAC_MAC_VALUE * (sin(i*2*PI/N) + 1)/2;
+  }
+
+  xTaskCreate(updateDAC, &quot;DAC Update Task&quot;, 2048, NULL, 2, &amp;updateDACTask);
+
+  timer = timerBegin( TIMER_FREQ ); // 1MHz
+  if (timer == NULL) {
+    Serial.println(&quot;Timer init failed!!&quot;);
+  }
+  timerStop(timer);
+  timerAttachInterrupt(timer, &amp;onTimer);
+  timerAlarm(timer, ALARM_PERIOD /*period (ticks)*/,
+              true /*autoreload*/, 0 /*autoreload count*/);
+  timerStart(timer);
+  Serial.printf(&quot;Timer frequency: %lu MHz\n&quot;,
+                timerGetFrequency(timer) / 1000000);
+}
+
+void writeFastMode(uint16_t value) {
+  Wire.beginTransmission(I2C_ADDR);
+  Wire.write((value &gt;&gt; 8) &amp; 0x0f); // high byte (no powerdown)
+  Wire.write(value &amp; 0xff);        // low byte
+  Wire.endTransmission();
+}
+
+void updateDAC(void *parameter) {
+  static uint8_t index = 0;
+  for (;;) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    digitalWrite(LED_PIN, LOW);
+    uint16_t value = SINE_TABLE[index];
+    writeFastMode(value);
+    index = (index + 1) % N;
+  }
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="arduino_esp32_code.png" /></p>
+<p>รูป: การคอมไพล์โค้ด <strong>Arduino Sketch</strong> โดยใช้งาน <strong>Arduino ESP32 Core</strong></p>
+<p>หากนำโค้ดตัวอย่างไปทดลองใช้กับอุปกรณ์จริง และลองวัดสัญญาณจากบอร์ดไมโครคอนโทรลเลอร์
+ด้วยออสซิลโลสโคป ก็มีตัวอย่างรูปคลื่นสัญญาณดังนี้</p>
+<p><img alt="" src="waveform-4.png" /></p>
+<p>รูป: รูป: ตัวอย่างการวัดสัญญาณ <strong>CH1: Output</strong>, <strong>CH2: Output (filtered)</strong>, <strong>CH3: LED</strong></p>
+<p>จากรูปคลื่นสัญญาณ จะเห็นได้ว่า สัญญาณช่องแรก (<strong>CH1</strong>) เป็นสัญญาณจากขาเอาต์พุตของ
+<strong>MCP4275</strong> และช่องที่สอง  (<strong>CH2</strong>) เป็นสัญญาณเอาต์พุตที่ผ่านวงจรสัญญาณความถี่ต่ำ
+โดยใช้ <strong>Low-Pass Filter (R=10k, C=0.1uF)</strong> ซึ่งจะทำให้สัญญาณดูต่อเนื่องมากขึ้น
+และวัดความถี่ของสัญญาณเอาต์พุตได้ <strong>50Hz</strong> ซึ่งคำนวณได้จากอัตราการอัปเดตเอาต์พุต
+<strong>1kHz</strong> (ดูได้จากสัญญาณ <strong>CH3: LED</strong>) และหนึ่งคาบมีจำนวนข้อมูลเท่ากับ <strong>N=20</strong> ดังนั้น จึงได้ความถี่ <strong>1kHz/20 = 50Hz</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="waveform-3_3.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณ <strong>CH1: SCL</strong>, <strong>CH2: SDA</strong>, <strong>CH3: LED</strong></p>
+<p>ถ้ามีการปรับอัตราการเกิด <strong>Alarm</strong> หรือ ลดคาบเวลาของการอัปเดตเอาต์พุต 
+ก็จะได้ความถี่ของสัญญาณเอาต์พุตสูงขึ้น เช่น จากเดิม <strong>1kHz</strong> ก็ลองเปลี่ยนเป็น <strong>10kHz</strong>
+(ดูได้จากสัญญาณ <strong>CH3: LED</strong>)</p>
+<p><img alt="" src="waveform-3_2.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณ <strong>CH1: SCL</strong>, <strong>CH2: SDA</strong>, <strong>CH3: LED</strong></p>
+<p><img alt="" src="waveform-3_1.png" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณ <strong>CH1: SCL</strong>, <strong>CH2: SDA</strong>, <strong>CH3: LED</strong> (ขยายเวลา)</p>
+<p>จากรูปคลื่นสัญญาณจะเห็นช่วงเวลาที่ฟังก์ชัน  <code>writeFastMode(...)</code> ทำงาน
+โดยเขียนข้อมูลไปยังไอซี <strong>MCP4275</strong> ผ่านบัส <strong>I2C</strong> และมีการเขียนข้อมูลจำนวน 3 ไบต์ ต่อครั้ง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino</strong> เพื่อใช้งานโมดูล <strong>MCP4725 I2C DAC</strong>
+เพื่อสร้างสัญญาณแอนะล็อกเป็นเอาต์พุตหนึ่งช่องสัญญาณ และมีตัวอย่างการวัดสัญญาณจริงด้วยออสซิลโลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-01-06 | Last Updated: 2024-01-06</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
