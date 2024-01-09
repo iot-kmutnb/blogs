@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/rigol_scope_lxi/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: RIGOL DS1054Z (ผ่านเครือข่าย LAN) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#rigol-ds1054z-lan" class="nav-link">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: RIGOL DS1054Z (ผ่านเครือข่าย LAN)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#lxi" class="nav-link">&#9655; อุปกรณ์เครื่องมือวัดและการเชื่อมต่อด้วยโพรโตคอล LXI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rigol-ds1054z" class="nav-link">&#9655; การตั้งค่าใช้งานผ่านเครือข่ายให้กับอุปกรณ์ RIGOL DS1054Z</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pulseview" class="nav-link">&#9655; การใช้งาน PulseView</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างโค้ด Python: การเชื่อมต่อกับสโคป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python-png" class="nav-link">&#9655; ตัวอย่างโค้ด Python: การอ่านข้อมูลไฟล์ .PNG จากสโคป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python_1" class="nav-link">&#9655; ตัวอย่างโค้ด Python: การตั้งค่าพารามิเตอร์และอ่านค่าของช่องสัญญาณ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python_2" class="nav-link">&#9655; ตัวอย่างโค้ด Python: การอ่านข้อมูลสัญญาณจากสโคปและแสดงรูปกราฟ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="rigol-ds1054z-lan">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: RIGOL DS1054Z (ผ่านเครือข่าย LAN)<a class="headerlink" href="#rigol-ds1054z-lan" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการตั้งค่าออสซิลโลสโคป <strong>RIGOL DS1054Z</strong>
+เพื่อใช้งานผ่านระบบเครือข่าย <strong>Ethernet / LAN</strong>
+และเขียนโปรแกรมเชื่อมต่อโดยใช้โพรโทคอล <strong>TCP/IP</strong> ตามมาตรฐานของ <strong>LXI</strong></p>
+<p><strong>Keywords:</strong> <em>Rigol DS1054Z</em>, <em>Digital Storage Oscilloscope</em>, <em>LXI</em>, 
+<em>PulseView</em>, <em>Python Programming</em></p>
+<ul>
+<li><a href="#lxi">อุปกรณ์เครื่องมือวัดและการเชื่อมต่อด้วยโพรโตคอล <strong>LXI</strong></a></li>
+<li><a href="#rigol-ds1054z">การตั้งค่าใช้งานผ่านเครือข่ายให้กับอุปกรณ์ <strong>RIGOL DS1054Z</strong></a></li>
+<li><a href="#pulseview">การใช้งาน <strong>PulseView</strong></a></li>
+<li><a href="#python">ตัวอย่างโค้ด <strong>Python</strong>: การเชื่อมต่อกับสโคป</a></li>
+<li><a href="#python-png">ตัวอย่างโค้ด <strong>Python</strong>: การอ่านข้อมูลไฟล์ <strong>.PNG</strong> จากสโคป</a></li>
+<li><a href="#python_1">ตัวอย่างโค้ด <strong>Python</strong>: การตั้งค่าพารามิเตอร์และอ่านค่าของช่องสัญญาณ</a></li>
+<li><a href="#python_2">ตัวอย่างโค้ด <strong>Python</strong>: การอ่านข้อมูลสัญญาณจากสโคปและแสดงรูปกราฟ</a></li>
+</ul>
+<hr />
+<h2 id="lxi">&#9655; <strong>อุปกรณ์เครื่องมือวัดและการเชื่อมต่อด้วยโพรโตคอล LXI</strong><a class="headerlink" href="#lxi" title="Permanent link">#</a></h2>
+<p>อุปกรณ์เครื่องมือวัดและการทดสอบที่มีการใช้งานในปัจจุบัน อย่างเช่น
+ออสซิลโลสโคป ("สโคป") แบบดิจิทัล (<strong>Digital Oscilloscopes</strong>) เครื่องกำเนิดสัญญาณ
+(<strong>Function Generators</strong>) และแหล่งจ่ายแรงดันไฟฟ้าแบบดีซี (<strong>DC Power Supplies</strong>)
+หลายรุ่นจากหลายบริษัท สามารถเชื่อมต่อและใช้งานผ่าน <strong>Ethernet/LAN</strong> ได้จากระยะไกล
+จึงทำให้ผู้ใช้สามารถควบคุมและตั้งค่าการทำงานอุปกรณ์เหล่านี้ได้โดยไม่จำเป็นต้องใช้งานผ่านแผงควบคุมด้านหน้าของอุปกรณ์
+(<strong>Front Control Panel</strong>) </p>
+<p><a href="https://en.wikipedia.org/wiki/LAN_eXtensions_for_Instrumentation"><strong>LXI</strong></a> (<em>LAN eXtensions for Instrumentation</em>)
+เป็นโพรโตคอลหนึ่งสำหรับการสื่อสารกับอุปกรณ์เครื่องมือวัดและทดสอบและการใช้งานผ่าน <strong>Ethernet/LAN</strong>
+จัดทำโดยองค์กรที่มีชื่อว่า <a href="https://www.lxistandard.org/"><strong>LXI Consortium</strong></a>
+เริ่มต้นในปีค.ศ.  2005 และมีการอัปเดตมาตรฐานอีกหลายครั้ง
+ข้อดีของการใช้ <strong>LAN</strong> คือ ความเร็วในการสื่อสารข้อมูล
+<strong>LXI</strong> รองรับการใช้งานในระบบเครือข่าย <strong>TCP/IP</strong> โดยใช้ <strong>IPv4 / IPv6</strong></p>
+<p>อุปกรณ์หลายรุ่นของบริษัท <strong>Rigol</strong>
+มีพอร์ต <strong>RJ45</strong> สำหรับการเชื่อมต่อผ่านระบบเครือข่ายได้และรองรับการใช้งาน <strong>LXI</strong> เช่น
+<a href="https://int.rigol.com/products/detail/DS1000Z"><strong>Rigol DS1000Z Series Digital Storage Oscilloscopes (DSOs)</strong></a></p>
+<p>หลังจากได้มีการตั้งค่าการใช้งานในระบบเครือข่ายและเชื่อมต่อสาย <strong>LAN</strong> ที่พอร์ต <strong>RJ45</strong> แล้ว
+ก็สามารถใช้ซอฟต์แวร์ <strong>Open Source</strong> อย่างเช่น <a href="https://sigrok.org/wiki/Downloads"><strong>PulseView</strong></a> เชื่อมต่อและใช้งานได้</p>
+<p>หากต้องการเขียนโปรแกรมสื่อสารกับอุปกรณ์ด้วยโพรโตคอล <strong>LXI</strong> และใช้คำสั่งในรูปแบบที่เรียกว่า
+<strong>SCPI</strong> (<em>Standard Commands for Programmable Instruments</em>) 
+ก็ทำได้โดยใช้วิธี <strong>Socket-based Network Programming</strong> และใช้ภาษาคอมพิวเตอร์ได้หลายภาษา
+เช่น <strong>C/C++</strong>, <strong>Python</strong>, <strong>Java</strong>, <strong>MATLAB</strong> และ <strong>C#</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rigol-ds1054z">&#9655; <strong>การตั้งค่าใช้งานผ่านเครือข่ายให้กับอุปกรณ์ RIGOL DS1054Z</strong><a class="headerlink" href="#rigol-ds1054z" title="Permanent link">#</a></h2>
+<p><strong>ขั้นตอนการดำเนินการ</strong></p>
+<ol>
+<li>เปิดใช้งานอุปกรณ์ <strong>RIGOL DS1054Z</strong></li>
+<li>เชื่อมต่อสายวัด (สายโพรบ) จำนวน 2 ช่องสัญญาณ และใช้สัญญาณทดสอบ (<strong>Test Signal</strong>)
+จากตัวสโคปสำหรับการตรวจสอบความพร้อมในการใช้งานของสายโพรบทั้งสอง</li>
+<li>เชื่อมต่อสาย <strong>LAN</strong> ที่พอร์ต <strong>RJ45</strong> แบ่งเป็น 2 กรณี<ul>
+<li>เชื่อมต่อกับพอร์ต <strong>RJ45</strong> ของคอมพิวเตอร์ผู้ใช้ โดยไม่ผ่านอุปกรณ์ <strong>Network Switch / Router</strong></li>
+<li>เชื่อมต่อกับพอร์ต <strong>RJ45</strong> ผ่านอุปกรณ์ <strong>Network Switch / Router</strong> และอยู่ใน <strong>LAN</strong> เดียวกับคอมพิวเตอร์ผู้ใช้</li>
+</ul>
+</li>
+</ol>
+<p><img alt="" src="rigol_ds1054z-1.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณทดสอบ 2 ช่องสัญญาณ</p>
+<p>ในบทความนี้จะใช้วิธีแรกคือ การใช้สาย <strong>LAN</strong> เชื่อมต่อระหว่างสโคปกับคอมพิวเตอร์ผู้ใช้โดยตรง
+คอมพิวเตอร์ผู้ใช้ แบ่งเป็น 2 กรณีคือ ระบบปฏิบัติการ  <strong>Windows 10</strong> และ <strong>Ubuntu 22.04 LTS</strong>
+คอมพิวเตอร์ของผู้ใช้เชื่อมต่อกับอินเทอร์เน็ตผ่าน <strong>WiFi</strong> และแต่ใช้ <strong>LAN</strong> เชื่อมต่อกับสโคป</p>
+<p><strong>คำแนะนำ</strong>: ผู้ใช้ควรตั้งค่าการใช้งานในคอมพิวเตอร์ เพื่อแชร์อินเทอร์เน็ตผ่าน <strong>WiFi</strong>
+สำหรับอุปกรณ์อื่นที่เชื่อมต่อผ่าน <strong>LAN</strong> ให้สามารถใช้งานได้ก่อนทำขั้นตอนถัดไป</p>
+<ol>
+<li>กดปุ่ม <strong>"Utility"</strong> บนแผงควบคุมด้านหน้าของสโคป</li>
+<li>ทำคำสั่งจากเมนู <strong>"IO Setting &gt; LAN Conf."</strong></li>
+<li>ทำคำสั่ง <strong>"Initialize"</strong> เพื่อตั้งค่าการใช้งานผ่าน <strong>LAN</strong> โดยอัตโนมัติ
+แล้วเลือก <strong>"OK"</strong></li>
+</ol>
+<p><img alt="" src="rigol_ds1054z-2.png" /></p>
+<p>รูป: การทำคำสั่งจากเมนู <strong>"IO Setting &gt; LAN Conf."</strong></p>
+<p><img alt="" src="rigol_ds1054z-3.png" /></p>
+<p>รูป: การทำคำสั่ง <strong>Initialize</strong> เพื่อตั้งค่าการใช้งาน <strong>LAN Setting</strong> 
+ซึ่งจะได้รับหมายเลข <strong>IP</strong> และค่าอื่น ๆ ที่เกี่ยวข้องกับการใช้งานในระบบเครือข่าย</p>
+<p><img alt="" src="rigol_ds1054z-4.png" /></p>
+<p>รูป: กดปุ่ม <strong>OK</strong> หลังจากการทำคำสั่ง <strong>Initialize</strong></p>
+<p>เมื่อทำขั้นตอนได้ถูกต้องแล้ว จะมองเห็นหมายเลข <strong>IP</strong> ของสโคป และให้ลองใช้คำสั่ง
+<code>ping</code> ทดลสอบการเชื่อมต่อกับสโคป ถ้าทำได้สำเร็จ สโคปก็พร้อมสำหรับการใช้งานผ่าน <strong>LAN</strong></p>
+<p>ในรูปตัวอย่าง สโคปได้รับหมายเลข <strong>IP</strong> ตรงกับ <code>10.42.0.43</code>
+จากคอมพิวเตอร์ <strong>Ubuntu 22.04</strong> ที่มีหมายเลข <strong>IP</strong> ตรงกับ <code>10.42.0.1</code></p>
+<p><img alt="" src="ubuntu_ping_scope.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>ping</code> จากคอมพิวเตอร์ <strong>Ubuntu</strong></p>
+<p>&nbsp;</p>
+<p><strong>การแชร์อินเทอร์เน็ตสำหรับ Windows 10</strong></p>
+<ul>
+<li>ให้ไปที่เมนู <strong>Windows &gt; Settings &gt; Networks &amp; Internet &gt; WiFi &gt; Network and Sharing Center</strong></li>
+<li>คลิกเลือก <strong>WiFi</strong> ที่กำลังใช้งานเชื่อมต่อกับอินเทอร์เน็ต </li>
+<li>เลือก <strong>Wi-Fi Properties &gt; Sharing &gt; Internet Connection Sharing</strong>
+และอนุญาตให้แชร์การเชื่อมต่อได้</li>
+</ul>
+<p><img alt="" src="windows_wifi_internet_sharing.png" /></p>
+<p>รูป: การตั้งค่าเพื่อแชร์อินเทอร์เน็ตสำหรับ <strong>Windows 10</strong></p>
+<p><img alt="" src="rigol_ds1054z-5.png" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าการใช้งานผ่านเครือข่ายเมื่อเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ <strong>Windows 10</strong></p>
+<p><img alt="" src="windows_ping_scope.png" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>ping</code> จากคอมพิวเตอร์ <strong>Windows</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pulseview">&#9655; <strong>การใช้งาน PulseView</strong><a class="headerlink" href="#pulseview" title="Permanent link">#</a></h2>
+<p>ให้ดาวน์โหลดโปรแกรมและติดตั้งใช้งาน <a href="https://sigrok.org/wiki/Downloads"><strong>PulseView</strong></a>
+ในคอมพิวเตอร์ของผู้ใช้ และลองเชื่อมต่อกับสโคป</p>
+<p>เมื่อเปิดใช้งานซอฟต์แวร์ <strong>PulseView</strong></p>
+<ol>
+<li>เปลี่ยนการเชื่อมต่อกับอุปกรณ์จาก <strong>"Demo device"</strong>
+ให้เป็น <strong>"Rigol DS (rigol-ds)"</strong></li>
+<li>ตั้งค่าหมายเลข <strong>IP</strong> ของสโคปที่ต้องการเชื่อมต่อ (และหมายเลขพอร์ต) ให้ถูกต้อง</li>
+<li>ตรวจสอบการเชื่อมต่อไปยังสโคป (กดปุ่ม <strong>"Scan for devices using drier above"</strong>)</li>
+<li>ตั้งค่าพารามิเตอร์สำหรับ <strong>Trigger Condition</strong> ของสโคป เช่น <ul>
+<li><strong>Frame Limit: 1</strong></li>
+<li><strong>Time Base: 500 usec</strong></li>
+<li><strong>Trigger Source: CH1</strong></li>
+<li><strong>Trigger Slope: r (riging edge)</strong></li>
+</ul>
+</li>
+<li>เลือกช่องสัญญาณ <strong>CH1</strong> และตั้งค่าก่อนการเปิดใช้งาน <ul>
+<li>ตัวคูณของสายโพรบ <strong>Probe Factor: 1x</strong> </li>
+<li>การเลือก <strong>Input Coupling: DC</strong></li>
+<li>ตั้งค่า <strong>Volt/Div: 1V</strong></li>
+</ul>
+</li>
+<li>กดปุ่ม <strong>RUN</strong> เพื่ออ่านข้อมูลจากสโคป</li>
+<li>ตั้งค่าการแสดงรูปคลื่นสัญญาณ </li>
+<li>ทดลองใช้ช่องสัญญาณ <strong>CH1</strong> และ <strong>CH2</strong></li>
+</ol>
+<p><img alt="" src="pulseview_window.png" /></p>
+<p>รูป: การตั้งค่าก่อนการเชื่อมต่อจาก <strong>PulseView</strong> ไปยังสโคป</p>
+<p><img alt="" src="pulseview_rigol_connect.png" /></p>
+<p>รูป: การเชื่อมต่อจาก <strong>PulseView</strong> ไปยังสโคป</p>
+<p><img alt="" src="pulseview_rigol-1.png" /></p>
+<p>รูป: ตัวอย่างการเพิ่ม <strong>Vertical Cursors</strong> สำหรับการวัดความกว้างของช่วงเวลา</p>
+<p><img alt="" src="pulseview_rigol-2.png" /></p>
+<p>รูป: การตั้งค่าพารามิเตอร์สำหรับ <strong>CH1</strong></p>
+<p><img alt="" src="pulseview_rigol-3.png" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณโดยใช้ <strong>CH1</strong> และ <strong>CH2</strong></p>
+<p><img alt="" src="pulseview_rigol-4.png" /></p>
+<p>รูป: การเปลี่ยนขนาดของสัญญาณสำหรับการแสดงผล</p>
+<p><img alt="" src="pulseview_rigol-5.png" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณ <strong>CH1</strong> และ <strong>CH2</strong></p>
+<p>แนะนำให้ศึกษาเพิ่มเติมจากบทความ:
+<a href="../../tools/pulseview_rigol_ds1054z/">"การใช้งาน <strong>RIGOL DS1054Z + PulseView</strong>
+เพื่อการบันทึกและวิเคราะห์สัญญาณแอนะล็อก-ดิจิทัล</a></p>
+<p>เอกสารที่เกี่ยวข้องกับการส่งคำสั่งและตอบกลับจากสโคปสำหรับ <strong>RIGOL DS1000Z Series</strong>
+สามารถดูได้จาก
+<a href="MSO_DS1000Z_ProgrammingGuide_EN.pdf"><strong>"RIGOL Programming Guide (December 2015) - MSO1000Z/DS1000Z Series Digital Oscilloscopes"</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; <strong>ตัวอย่างโค้ด Python: การเชื่อมต่อกับสโคป</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>ตัวอย่างแรกสำหรับการเขียนโค้ด <strong>Python</strong> เป็นการเปิดใช้งาน <strong>Network Socket 
+(TCP/IP)</strong> เพื่อเชื่อมต่อไปยังสโคป และส่งคำสั่ง <code>*IDN</code> ซึ่งเป็น <strong>ASCII Command</strong>
+แล้วรอรับข้อความตอบกลับซึ่งเป็นข้อมูลเกี่ยวกับสโคป
+เช่น ชื่อผู้ผลิต ชื่อรุ่นหรือโมเดล หมายเลข <strong>Serial Number</strong> ของตัวเครื่อง เป็นต้น</p>
+<p><img alt="" src="idn_cmd.png" /></p>
+<p>รูป: คำสั่ง <code>*IDN</code> และคำอธิบาย</p>
+<pre><code class="language-python">import socket
+import sys
+
+# Specify the instrument's IP address
+instr_ip = '10.42.0.43' 
+# Specify the instrument's LXI port
+instr_port = 5555  
+
+try:
+    host = (instr_ip,instr_port)
+    sock = socket.create_connection(host, timeout=1.0) 
+except Exception as ex:
+    print(ex)
+    sys.exit(-1)
+
+def send_cmd(sock, cmd, read_response=True):
+    sock.sendall(cmd.encode())
+    if not read_response:
+        return None
+    resp_data = b''
+    try:
+        while True:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            resp_data += chunk
+    except TimeoutError as ex:
+        pass
+    return resp_data
+
+print ( f'IP: {instr_ip}, port: {instr_port}')
+# Use the following LXI/SCPI command to identify the instrument.
+cmd = '*IDN\n'
+response = send_cmd( sock, cmd )
+resp = response.decode().strip()
+names = [&quot;Vendor&quot;, &quot;Model&quot;, &quot;SN&quot;, &quot;Firmware Version&quot;]
+print(f&quot;Instrument Response: {resp}&quot;)
+values = resp.split(',')
+for k,v in dict(zip(names,values)).items():
+    print (f'{k}: {v}')
+
+if sock:
+    print('Socket closed...')
+    sock.close()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-png">&#9655; <strong>ตัวอย่างโค้ด Python: การอ่านข้อมูลไฟล์ .PNG จากสโคป</strong><a class="headerlink" href="#python-png" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไป สาธิตการส่งคำสั่ง <code>:DISP:DATA? ON,OFF,PNG</code>
+ไปยังสโคป เพื่อให้ส่งข้อมูลกลับมาแล้วบันทึกลงไฟล์ <strong>.PNG</strong>
+ซึ่งจะได้รูปกราฟิกเหมือนที่ปรากฎบนหน้าจอ <strong>LCD</strong> ของสโคป</p>
+<p><img alt="" src="cmd_display_capture.png" /></p>
+<p>รูป: คำอธิบายการใช้คำสั่ง  <code>:DISP:DATA?</code> ตามเอกสาร <strong>"RIGOL Programming Guide</strong></p>
+<pre><code class="language-python">import socket
+import sys
+import time
+
+# Specify the instrument's IP address
+instr_ip = '10.42.0.43' 
+# Specify the instrument's LXI port
+instr_port = 5555  
+
+try:
+    host = (instr_ip,instr_port)
+    sock = socket.create_connection(host, timeout=1.0) 
+except Exception as ex:
+    print(ex)
+    sys.exit(-1)
+
+def send_cmd(sock, cmd, read_response=True):
+    sock.sendall(cmd.encode())
+    time.sleep(0.25)
+    if not read_response:
+        return None
+    resp_data = b''
+    try:
+        while True:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            resp_data += chunk
+    except TimeoutError as ex:
+        pass
+    return resp_data
+
+print ( f'IP: {instr_ip}, port: {instr_port}')
+# Use the following LXI/SCPI command to identify the instrument.
+cmd = '*IDN?\n'
+print( send_cmd( sock, cmd ).decode().strip() )
+
+def write_screen_capture(sock, filename='capture.png'):
+        response = send_cmd(sock, ':DISP:DATA? ON,OFF,PNG\n')
+        raw_data = response[11:]
+        # save as a PNG image file
+        f = open(filename, 'wb')
+        f.write(raw_data)
+        f.close()
+        print(&quot;PNG file saved...&quot;)
+        return raw_data
+
+write_screen_capture(sock)
+
+if sock:
+    print('Socket closed...')
+    sock.close()
+</code></pre>
+<p><img alt="" src="waveform_capture.png" /></p>
+<p>รูป: ตัวอย่างไฟล์รูป <strong>.PNG</strong> ที่ได้จากสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python_1">&#9655; <strong>ตัวอย่างโค้ด Python: การตั้งค่าพารามิเตอร์และอ่านค่าของช่องสัญญาณ</strong><a class="headerlink" href="#python_1" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการส่งคำสั่งไปยังสโคป เพื่อตั้งค่าการใช้งานช่องสัญญาณ
+<strong>CH1</strong> และ <strong>CH2</strong> </p>
+<p>ตัวอย่างคำสั่งสำหรับช่อง <strong>CH1</strong> มีดังนี้</p>
+<ul>
+<li><code>:CHAN1:DISP ON</code> เปิดใช้งานการวัดสัญญาณช่อง <strong>CH1</strong></li>
+<li><code>:CHAN1:PROB 1</code> ตั้งค่าโพรบสำหรับช่อง <strong>CH1</strong> ให้เป็น <strong>1x</strong></li>
+<li><code>:CHAN1:SCAL 2.0</code> ตั้งค่า <strong>Volt/Div</strong> สำหรับ <strong>CH1</strong> ให้เป็น <strong>1V/Div</strong></li>
+<li><code>:CHAN1:OFFS 2.0</code> ตั้งค่าระดับของสัญญาณ (<strong>Vertical Offset</strong>) สำหรับ <strong>CH1</strong> ให้เลื่อนสูงขึ้นมา <strong>2V</strong> จากระดับกลางจอภาพ</li>
+</ul>
+<p>ตัวอย่างคำสั่งสำหรับช่อง <strong>CH2</strong> มีดังนี้</p>
+<ul>
+<li><code>:CHAN2:DISP ON</code> เปิดใช้งานการวัดสัญญาณช่อง <strong>CH2</strong></li>
+<li><code>:CHAN2:PROB 1</code> ตั้งค่าโพรบสำหรับช่อง <strong>CH2</strong> ให้เป็น <strong>1x</strong></li>
+<li><code>:CHAN2:SCAL 2.0</code> ตั้งค่า <strong>Volt/Div</strong> สำหรับ <strong>CH2</strong> ให้เป็น <strong>1V/Div</strong></li>
+<li><code>:CHAN2:OFFS -2.0</code> ตั้งค่าระดับของสัญญาณ  (<strong>Vertical Offset</strong>) สำหรับ <strong>CH2</strong> ให้เลื่อนลงมา <strong>2V</strong> จากระดับกลางจอภาพ</li>
+</ul>
+<p>ตัวอย่างคำสั่งสำหรับการตั้งค่า <strong>Time Base</strong></p>
+<ul>
+<li><code>:TIM:MAIN:SCAL 500.0e-6</code> ตั้งค่า <strong>Time/Div</strong> ให้เท่ากับ <strong>500usec</strong></li>
+</ul>
+<p>ตัวอย่างคำสั่งสำหรับการตั้งค่าเงื่อนไข <strong>Trigger</strong></p>
+<ul>
+<li><code>:TRIG:EDG:SOUR CHAN1</code> เลือกใช้ <strong>Edge Type</strong> และอินพุตเป็นช่อง <strong>CH1</strong></li>
+<li><code>:TRIG:EDG:SLOP POS</code> เลือกใช้ <strong>Rising Edge Type</strong></li>
+<li><code>:TRIG:EDG:LEV 1.5</code> ตั้งค่า <strong>Trigger Level</strong> ให้เท่ากับ <strong>1.5V</strong></li>
+</ul>
+<p><img alt="" src="cmd_channel-1.png" /></p>
+<p>รูป: ตัวอย่างของคำสั่งที่เกี่ยวข้องกับการตั้งค่าพารามิเตอร์ของช่องสัญญาณ</p>
+<p>&nbsp;</p>
+<pre><code class="language-python">import socket
+import sys
+import time 
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Specify the instrument's IP address
+instr_ip = '10.42.0.43' 
+# Specify the instrument's LXI port
+instr_port = 5555  
+
+try:
+    host = (instr_ip,instr_port)
+    sock = socket.create_connection(host, timeout=0.5) 
+except Exception as ex:
+    print(ex)
+    sys.exit(-1)
+
+def send_cmd(cmd, read_response=True, dly=0.3):
+    global sock
+    sock.sendall(cmd.encode())
+    time.sleep(dly)
+    if not read_response:
+        return None
+    resp_data = b''
+    try:
+        while True:
+            chunk = sock.recv(1024)
+            if not chunk:
+                break
+            resp_data += chunk
+    except TimeoutError as ex:
+        pass
+    return resp_data
+
+print ( f'IP: {instr_ip}, port: {instr_port}')
+# Use the following LXI/SCPI command to identify the instrument.
+cmd = '*IDN?\n'
+print( send_cmd( cmd ).decode().strip() )
+
+def set_channel(chan, probe=1.0, volts_per_div=1.0, offset_divs=0.0):
+    global sock
+    cmd = f':CHAN{chan}:DISP ON'
+    print(cmd)
+    send_cmd( cmd, False )
+    cmd = f':CHAN{chan}:PROB {probe}'
+    print(cmd)
+    send_cmd( cmd, False )
+    cmd = f':CHAN{chan}:SCAL {volts_per_div}'
+    print(cmd)
+    send_cmd( cmd, False )
+    cmd = f':CHAN{chan}:OFFS {offset_divs*volts_per_div}'
+    print(cmd)
+    send_cmd( cmd, False )
+
+def set_timebase(time_per_div=1e-3 ):
+    real_value_str = f'{time_per_div:0.3}'
+    cmd = f':TIM:MAIN:SCAL {real_value_str}'
+    print(cmd)
+    send_cmd( cmd, False )
+
+def set_trigger_edge(chan=1, pos_edge_type=True, level=0.0):
+    global sock
+    level  = f'{level:0.3e}'
+    cmd = f':TRIG:EDG:SOUR CHAN{chan}'
+    print(cmd)
+    send_cmd( cmd, False )
+
+    edge = ['NEG','POS'][pos_edge_type] 
+    cmd = f':TRIG:EDG:SLOP {edge}'
+    print(cmd)
+    send_cmd( cmd, False )
+
+    cmd = f':TRIG:EDG:LEV {level}'
+    print(cmd)
+    send_cmd( cmd, False )
+
+time_per_div = 500e-6
+volt_per_div = 2
+probe = 1
+set_timebase( time_per_div )
+set_channel( 1, probe, volt_per_div,  1)
+set_channel( 2, probe, volt_per_div, -1)
+set_trigger_edge( 1, True, 1.5 )
+
+def get_scale(channel=1):
+    global sock
+    cmd = f':CHAN{channel}:SCAL?'
+    print(cmd)
+    resp = send_cmd( cmd )
+    return float(resp.strip())
+
+print( 'CH1 volt/div:', get_scale(1) )
+print( 'CH2 volt/div:', get_scale(2) )
+
+# Close the socket connection
+if sock:
+    sock.close()
+</code></pre>
+<p><img alt="" src="python_output-1.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากการทำงานของโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python_2">&#9655; <strong>ตัวอย่างโค้ด Python: การอ่านข้อมูลสัญญาณจากสโคปและแสดงรูปกราฟ</strong><a class="headerlink" href="#python_2" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการใช้ส่งคำสั่งไปยังสโคป เพื่ออ่านข้อมูลสำหรับช่องสัญญาณ <strong>CH1</strong>
+แล้วนำมาแสดงผลโดยใช้ <strong>Matplotlib</strong> ข้อมูลแต่ละตัวมีขนาดหนึ่งไบต์ มีจำนวนข้อมูล <strong>Waveform Samples</strong>
+ที่ใช้สำหรับการวาดรูปกราฟ เท่ากับ <strong>1200</strong></p>
+<pre><code class="language-python">import socket
+import sys
+import time 
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Specify the instrument's IP address
+instr_ip = '10.42.0.43' 
+# Specify the instrument's LXI port
+instr_port = 5555  
+
+try:
+    host = (instr_ip,instr_port)
+    sock = socket.create_connection(host, timeout=0.5) 
+except Exception as ex:
+    print(ex)
+    sys.exit(-1)
+
+def send_cmd(cmd, read_response=True, dly=0.3):
+    global sock
+    sock.sendall(cmd.encode())
+    time.sleep(dly)
+    if not read_response:
+        return None
+    resp_data = b''
+    try:
+        while True:
+            chunk = sock.recv(1024)
+            if not chunk:
+                break
+            resp_data += chunk
+    except TimeoutError as ex:
+        pass
+    return resp_data
+
+print ( f'IP: {instr_ip}, port: {instr_port}')
+# Use the following LXI/SCPI command to identify the instrument.
+cmd = '*IDN?\n'
+print( send_cmd( cmd ).decode().strip() )
+
+def get_normal_mode_params(chan):
+    global sock
+    cmd_list = [
+        'WAV:XINC?',
+        'WAV:XOR?',
+        'WAV:XREF?',
+        'WAV:YINC?',
+        'WAV:YOR?',
+        'WAV:YREF?',
+    ]
+    cmd = f':WAV:SOUR CHAN{chan}'
+    print(cmd)
+    send_cmd( cmd, False )
+    params = []
+    for cmd in cmd_list:
+        print(cmd)
+        resp = send_cmd( cmd )
+        value = float( resp.strip() )
+        params.append( value )
+    return params
+
+def get_normal_mode_waveform_data(chan):
+    global sock
+    cmd_list = [
+        ':WAV:MODE NORM',
+        ':WAV:FORM BYTE',
+        ':WAV:DATA?'
+    ]
+    cmd = f':WAV:SOUR CHAN{chan}'
+    print(cmd)
+    send_cmd( cmd, False )
+    for cmd in cmd_list:
+        print(cmd)
+        resp = send_cmd( cmd, False )
+
+    # Receive and decode the waveform data
+    data = sock.recv(2048).strip()
+    data = data[11:] # Remove the first 11 header bytes
+    return data
+
+params = get_normal_mode_params(1)
+data = get_normal_mode_waveform_data(1)
+waveform = np.frombuffer(data, dtype=np.uint8)
+print( params )
+x_inc, x_orig, x_ref = tuple(params[0:3])
+y_inc, y_orig, y_ref = tuple(params[3:])
+
+# Calculate time values for each sample
+time_values = (np.arange(len(waveform)) * x_inc) + x_orig + x_ref
+# Calculate voltage values for each sample
+voltage_values = (waveform - y_orig - y_ref) * y_inc 
+
+# Plot the waveform data
+plt.plot(time_values, voltage_values)
+plt.title(&quot;Waveform in NORMAL Mode&quot;)
+plt.xlabel(&quot;Time (s)&quot;)
+plt.ylabel(&quot;Voltage (V)&quot;)
+plt.grid(True)
+plt.show()
+
+# Close the socket connection
+if sock:
+    sock.close()
+</code></pre>
+<p>ถ้าต้องการทำให้เส้นกราฟดูเรียบมากขึ้น (<strong>Smoothing</strong>)
+ก็สามารถใช้ตัวกรองแบบ <strong>Moving Average Filter</strong>
+โดยเพิ่มโค้ดต่อไปนี้ ก่อนใช้คำสั่ง <code>plt.plot()</code></p>
+<pre><code class="language-python"># Function to apply a simple moving average filter
+def moving_average(data, window_size):
+    return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
+
+# Set the window size for the moving average filter
+moving_window_size = 5
+
+# Apply the moving average filter
+voltage_values = moving_average(voltage_values, moving_window_size)
+time_values = time_values[moving_window_size-1:]
+</code></pre>
+<p><img alt="" src="waveform_plot-1.png" /></p>
+<p>รูป: ตัวอย่างรูปกราฟที่ได้จากสโคป (ขวามือ: มีการใช้ <strong>Moving Average Filter</strong>)</p>
+<p><img alt="" src="waveform_plot-2.png" /></p>
+<p>รูป: ตัวอย่างรูปกราฟที่ได้จากสโคป (ใช้เครื่องกำเนิดสัญญาณสำหรับ <strong>Sine</strong> และ <strong>Triangular Wave</strong>
+เป็นสัญญาณทดสอบให้สโคปช่อง <strong>CH1</strong> ตามลำดับ)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการใช้งานออสซิลโลสโคปรุ่น <strong>RIGOL DS1054Z</strong>
+โดยเชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ด้วยสาย <strong>LAN</strong> และใช้ซอฟต์แวร์ <strong>PulseView</strong>
+เป็น <strong>GUI</strong> สำหรับการใช้งานฟังก์ชันพื้นฐานของสโคป และมีตัวอย่างการเขียนโปรแกรมด้วยภาษา <strong>Python</strong>
+เพื่อตั้งค่าการใช้งานสโคป การวัดสัญญาณและการแสดงข้อมูลสำหรับรูปคลื่นสัญญาณที่ได้จากสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-01-08 | Last Updated: 2024-01-09</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
