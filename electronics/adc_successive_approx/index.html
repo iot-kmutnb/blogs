@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/adc_successive_approx/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้บอร์ด Arduino เลียนแบบการทำงานของวงจร Successive Approximation ADC - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#arduino-successive-approximation-adc" class="nav-link">การใช้บอร์ด Arduino เลียนแบบการทำงานของวงจร Successive Approximation ADC</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#successive-approximation-adc" class="nav-link">&#9655; หลักการทำงานของ  Successive Approximation ADC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sar-adc-arduino" class="nav-link">&#9655; การสาธิตหลักการทำงานของวงจร SAR ADC ด้วยบอร์ด Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-successive-approximation-adc">การใช้บอร์ด Arduino เลียนแบบการทำงานของวงจร Successive Approximation ADC<a class="headerlink" href="#arduino-successive-approximation-adc" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง หลักการทำงานของ <a href="https://en.wikipedia.org/wiki/Successive-approximation_ADC"><strong>Successive-Approximation (SAR) ADC</strong></a>
+ตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> และการใช้บอร์ด
+<strong>Arduino Nano</strong> เพื่อสาธิตหลักการทำงานของวงจร <strong>ADC</strong> ประเภทนี้</p>
+<p><strong>Keywords:</strong> <em>Arduino Uno / Nano</em>, <em>MCP4725 DAC</em>, 
+<em>Successive Approximation ADC</em>, <em>SAR ADC</em></p>
+<hr />
+<h2 id="successive-approximation-adc">&#9655; หลักการทำงานของ  <strong>Successive Approximation ADC</strong><a class="headerlink" href="#successive-approximation-adc" title="Permanent link">#</a></h2>
+<p>วงจร <strong>ADC</strong> (<em>Analog-to-Digital Converter</em>)
+ทำหน้าที่แปลงสัญญาณอินพุตแบบแอนะล็อก ซึ่งเป็นแรงดันไฟฟ้าในช่วงที่กำหนดไว้
+เช่น <strong>0V</strong> ถึง <strong>VREF</strong> (แรงดันอ้างอิงของวงจรสำหรับสัญญาณแอนะล็อก) ให้เป็นข้อมูลตัวเลขจำนวนเต็ม
+มีความละเอียดนับตามจำนวนบิตของข้อมูล เช่น ถ้ามีความละเอียด 10 บิต ก็จะได้ค่าในช่วง 0..1023
+แต่ถ้ามีความละเอียด 12 บิต ก็จะได้ค่าในช่วง 0..4095 เป็นต้น</p>
+<p>วงจร <strong>ADC</strong> มีหลายประเภท เช่น</p>
+<ul>
+<li><strong>Flash ADC / Parallel ADC</strong></li>
+<li><strong>Successive-Approximation (SAR) ADC</strong></li>
+<li><strong>Sigma-Delta ADC</strong></li>
+</ul>
+<p>ชิปไมโครคอนโทรลเลอร์ส่วนใหญ่ ถ้ามีวงจร <strong>ADC</strong> อยู่ภายใน ก็จะเป็นประเภท
+<strong>SAR ADC</strong> การทำงานของวงจรประเภทนี้ จะต้องอาศัยวงจรอินพุตที่เรียกว่า
+<a href="https://en.wikipedia.org/wiki/Sample_and_hold"><strong>Sample-and-Hold (S/H)</strong></a>
+โดยใช้ตัวเก็บประจุไฟฟ้าและทรานซิสเตอร์เป็นสวิตซ์ไฟฟ้า (เช่น มอสเฟต)
+เพื่อให้ระดับแรงดันอินพุตคงที่ในช่วงเวลาที่มีการแปลงเป็นข้อมูลดิจิทัล</p>
+<p>วงจรต่อไปนี้เป็นวงจรสาธิตหลักการทำงานของวงจร <strong>Sample &amp; Hold</strong> (อย่างง่าย)
+โดยใช้มอสเฟต (เลือกใช้ <a href="https://www.onsemi.com/pdf/datasheet/bss123-d.pdf"><strong>BSS123 N-Channel MOSFET</strong></a>)
+เป็นสวิตช์ไฟฟ้า มีสัญญาณพัลส์ที่มีคาบเป็นสัญญาณควบคุม  (<code>V_SAMPLING</code>) 
+สำหรับการทำงานการเปิดหรือปิดสวิตซ์ด้วยมอสเฟต และมีสัญญาณแอนะล็อกเป็นสัญญาณอินพุตรูปคลื่นไซน์ (<code>V_INPUT</code>)</p>
+<p>ข้อสังเกต: <strong>BSS123</strong> มีพารามิเตอร์ <script type="math/tex">V_{GS}(th)</script> (<strong>Gate Threshold Voltage</strong>)
+อย่างน้อย <strong>2V</strong> จึงจะทำให้มอสเฟตทำงานและนำไฟฟ้าได้ดี</p>
+<p><img alt="" src="sample_and_hold.png" /></p>
+<p>รูป: ตัวอย่างวงจร <strong>Sample &amp; Hold</strong> เพื่อสาธิตและจำลองการทำงาน โดยใช้ซอฟต์แวร์ <strong>EasyEDA</strong></p>
+<p>ช่วงที่สัญญาณควบคุมเป็น <strong>5V</strong> จะทำให้มอสเฟตนำไฟฟ้าได้ดี ("Active") ระหว่างขา <strong>D (Drain)</strong>
+และ <strong>S (Source)</strong> และทำให้ระดับแรงดันอินพุตปรับเปลี่ยนตามแรงดันอินพุต
+แต่ช่วงที่สัญญาณควบคุมเป็น <strong>0V</strong> มอสเฟตจะไม่นำไฟฟ้า ("Off") และแรงดันเอาต์พุตจะไม่เปลี่ยนแปลงตามอินพุต</p>
+<p><img alt="" src="sample_and_hold_sim.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานด้วย <strong>EasyEDA</strong> และรูปคลื่นสัญญาณ</p>
+<p>แรงดันของสัญญาณอินพุตเมื่อผ่านวงจน <strong>S &amp; H</strong> แล้ว จะถูกเปรียบเทียบกับแรงดันอ้างอิง
+โดยใช้วงจรเปรียบเทียบแรงดัน (<strong>Analog Voltage Comparator</strong>)
+แรงดันอ้างอิงจะถูกสร้างโดยใช้วงจร <strong>DAC</strong> (<em>Digital-to-Analog Converter</em>)
+เพื่อสร้างแรงดันแอนะล็อกสำหรับการตรวจสอบและประมาณค่าแรงดัน</p>
+<p>ในแต่ละรอบของการประมาณค่าและเปรียบเทียบ จะมีการปรับค่าแรงดันอ้างอิงให้เพิ่มขึ้นหรือลดลง 
+จนเข้าใกล้ค่าของระดับแรงดันอินพุต หรือมีผลต่างของแรงดันลดลงตามลำดับจนใกล้เคียงศูนย์
+เริ่มต้นแรงดันอ้างอิงจะเท่ากับ <strong>VCC/2</strong> (ครึ่งของของช่วงแรงดันสำหรับการค้นหา)
+ถ้าแรงดันอินพุตมากกว่าแรงดันอ้างอิง ผลการเปรียบเทียบจะได้ค่าบิตเป็น 1 และจะต้องเพิ่มแรงดันอ้างอิงในรอบถัดไป
+แต่ถ้าไม่ใช่ ก็จะได้ค่าเป็นบิตเป็น 0 และลดแรงดันอ้างอิงในรอบถัดไป ช่วงแรงดันสำหรับการค้นหาจะแคบลงเรื่อย ๆ ทีละครึ่งหนึ่ง
+(<strong>Halving</strong>)
+ผลของเปรียบเทียบแรงดันในแต่ละรอบ จะถูกเก็บไว้ในรีจิสเตอร์ที่เรียกว่า <strong>SAR</strong>
+การทำงานของวงจรในลักษณะนี้ คล้ายกับการค้นหาข้อมูลที่เรียงแล้วแบบ <strong>Binary Search</strong></p>
+<p><img alt="" src="sar_adc_block_diagram.png" /></p>
+<p>รูป: บล็อกไดอะแกรมของ <strong>SAR DAC</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sar-adc-arduino">&#9655; การสาธิตหลักการทำงานของวงจร <strong>SAR ADC</strong> ด้วยบอร์ด <strong>Arduino</strong><a class="headerlink" href="#sar-adc-arduino" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>Arduino Uno / Nano</strong> ที่มีชิปไมโครคอนโทรลเลอร์ <strong>ATmega328P</strong>
+มีวงจรภายใน <strong>ADC</strong> เป็นแบบ <strong>Successive Approximation ADC</strong>
+เพื่อใช้ในการอ่านค่าแรงดันแอนะล็อกที่ขาอินพุต เช่น <strong>A0-A7</strong> และมีคำสั่ง
+<code>analogRead(...)</code> ให้ใช้งาน และได้ค่าตัวเลขที่มีขนาด 10 บิต หรือ 0 ถึง 1023</p>
+<p>ถ้าจะไม่ใช้วงจร <strong>ADC</strong> เพื่อแปลงแรงดันไฟฟ้าของสัญญาณแอนะล็อกให้เป็นข้อมูลดิจิทัล
+จะต้องมีวงจรเปรียบเทียบแรงดันไฟฟ้าและวงจร <strong>DAC</strong>
+ดังนั้นจึงได้เลือกใช้โมดูล <strong>MCP4725 DAC (I2C, 12-bit resolution)</strong> นำมาต่อเพิ่ม และใช้วงจร
+<strong>Analog Comparator</strong> ที่มีอยู่แล้วภายในชิป <strong>ATmega328P</strong> สำหรับการเปรียบเทียบ
+นอกจากนั้นแล้วยังได้เลือกใช้ไลบรารี  <a href="https://github.com/RobTillaart/MCP4725"><code>MCP4725.h</code></a> สำหรับการเขียนโปรแกรม
+เพื่อความสะดวกในการเขียนโค้ดใช้งานโมดูล <strong>MCP4725</strong></p>
+<p>แนะนำให้ศึกษาจากบทความที่เกี่ยวข้องดังนี้</p>
+<ul>
+<li><a href="../../arduino/avr_gcc_part-10/">การเขียนโปรแกรมภาษา <strong>C</strong> สำหรับ <strong>AVR (ATmega328P)</strong>: ตอนที่ 10</a></li>
+<li><a href="../mcp4725_dac_i2c/">โมดูล <strong>MCP4725 DAC (Digital-to-Analog Converter)</strong></a></li>
+</ul>
+<p>หลักการทำงานของฮาร์ดแวร์และซอฟต์แวร์สำหรับสาธิตการทำงานของ <strong>SAR ADC</strong> มีดังนี้ </p>
+<ul>
+<li>เปิดใช้งานวงจร <strong>Analog Comparator</strong> ภายในชิป
+<strong>ATmega328P</strong> โดยเลือกใช้ขา <strong>AIN0 / PD6</strong> เปรียบเทียบกับขา <strong>A0</strong><ul>
+<li>แรงดันที่ขา <strong>AIN0 / PD6</strong> เป็นสัญญาณอินพุตที่ต้องการแปลงให้เป็นข้อมูลดิจิทัล
+เช่น มาจากวงจรแบ่งแรงดันไฟฟ้าโดยใช้ตัวต้านทานปรับค่าได้ <strong>10k</strong> โอห์ม และมีแรงดันอยู่ในช่วง <strong>0V..+5V</strong></li>
+<li>แรงดันที่ขา <strong>A0</strong> ได้จากขาเอาต์พุตของโมดูล <strong>MCP4725 DAC</strong>
+ซึ่งใช้แรงดันไฟเลี้ยง <strong>VCC=+5V</strong> จากบอร์ด <strong>Arduino</strong></li>
+</ul>
+</li>
+<li>สร้างแรงดันอ้างอิงสำหรับการเปรียบเทียบโดยใช้โมดูล <strong>MCP4725 DAC</strong> ที่เชื่อมต่อกับบอร์ด <strong>Arduino Uno / Nano</strong>
+ด้วยบัส <strong>I2C</strong> (ใช้ขา <strong>A4 / A5</strong> ของบอร์ด <strong>Arduino</strong> สำหรับสัญญาณ <strong>SDA / SCL</strong> ของบัส <strong>I2C</strong>)</li>
+<li>ให้แรงดันอ้างอิงเริ่มต้นที่ระดับ <strong>VCC/2</strong> และปรับขึ้นหรือลดในแต่ละรอบ เพื่อให้ผลต่างของแรงดันอ้างอิงกับแรงดันอินพุตเข้าใกล้ศูนย์
+เนื่องจาก <strong>MCP4725 DAC</strong> มีความละเอียด 12 บิต ดังนั้นจะมีการเปรียบเทียบแรงดัน และปรับค่าแรงดันอ้างอิงทั้งหมด 12 บิต</li>
+<li>อ่านค่าแรงดันอินพุตที่ขา <strong>A0</strong> โดยใช้วงจร <strong>ADC</strong> ภายในชิป ด้วยคำสั่ง
+<code>analogRead(A0)</code> แล้วนำค่าที่ได้ (มีขนาด 10 บิต) มาเปรียบเทียบ</li>
+</ul>
+<pre><code class="language-c++">#include &quot;MCP4725.h&quot;
+
+MCP4725 DAC(0x60); // Create an instance of the MCP4725 class.
+
+void i2c_scan() {
+  int n_devices = 0;
+  char sbuf[4];
+  Serial.println( &quot;Scanning I2C bus...&quot; );
+  Serial.print( &quot;   &quot; );
+  for ( uint8_t col=0; col &lt; 16; col++ ) {
+    sprintf( sbuf, &quot;%3x&quot;, col  );
+    Serial.print( sbuf );
+  }
+  Serial.println( &quot;&quot; );
+
+  uint8_t addr=0;
+  for( uint8_t row=0; row &lt; 8; row++ ) {
+    sprintf( sbuf, &quot;%02x:&quot;, row &lt;&lt; 4  );
+    Serial.print( sbuf );
+    for ( uint8_t col=0; col &lt; 16; col++ ) {
+      if ( row == 0 &amp;&amp; addr&lt;=1 ) {
+        Serial.print(&quot;   &quot;);
+      } else {
+        Wire.beginTransmission( addr );
+        if ( Wire.endTransmission()&gt;0 ) {
+          Serial.print( &quot; --&quot; );
+        } else {
+          sprintf( sbuf, &quot; %2x&quot;, addr );
+          Serial.print( sbuf );
+          n_devices++;
+        }
+      }
+      addr++;
+    }
+    Serial.println( &quot;&quot; );
+  }
+  Serial.println( &quot;---------------------\n&quot; );
+  Serial.flush();
+}
+
+void initAnalogComparator() {
+ // Disable the digital input buffer on AIN0 and AIN1 pins.
+  DIDR0  |= (1 &lt;&lt; AIN0D);
+  // Compare AIN0 with A0 pins
+  ADCSRB |= (1 &lt;&lt; ACME); 
+  ADCSRA &amp;= ~(1 &lt;&lt; ADEN); // Disable ADC
+  ADMUX = 0; // Select A0 input (0b000..0b111 for A0..A7)
+  ACSR &amp;= ~((1 &lt;&lt; ACD) | (1 &lt;&lt; ACBG));  
+  ACSR &amp;= ~(1 &lt;&lt; ACIE); // Disable Analog Comparator interrupt
+  ACSR |= (1 &lt;&lt; ACI);
+}
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(); 
+  Wire.setClock(400000);
+  DAC.begin();
+  i2c_scan();
+  if ( !DAC.isConnected() ) {
+    Serial.println( &quot;MCP4725 DAC is not connected!!!&quot; );
+  }
+  delay(2000);
+}
+
+void loop() {
+  int16_t value = 4096/2;
+  int16_t step = value/2;
+  // Initialize the the Analog Comparator
+  initAnalogComparator();
+  for ( int i=0; i &lt; 12; i++) {
+    // Send a 12-bit value to the MCP4725 DAC.
+    DAC.writeDAC( value );
+    // Check the ACO (Analog Output Compare) bit in ACSR.
+    if (!(ACSR &amp; (1&lt;&lt;ACO))) {
+      value -= step;
+    } else {
+      value += step;
+    }
+    // Reduce the step.
+    step /= 2;
+  }
+  // Re-enable the ADC.
+  ADCSRA |= (1 &lt;&lt; ADEN); 
+  // Read the analog input value on A0 pin.
+  int16_t adc_value = analogRead( A0 );
+  // Show the results.
+  Serial.println( String(&quot;DAC output     (12b): &quot;) + DAC.readDAC() );
+  Serial.println( String(&quot;Analog value   (10b): &quot;) + (value&gt;&gt;2) );
+  Serial.println( String(&quot;A0 input value (10b): &quot;) + adc_value );
+  Serial.println( F(&quot;-------------------------&quot;) );
+  delay(1000);
+}
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="nano_mcp4725_dac_i2c.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ด</p>
+<p>การวัดสัญญาณด้วยออสซิลโลสโคป (<strong>CH1</strong>: สัญญาณที่ขา <strong>A0</strong>
+มาจากโมดูล <strong>MCP4725</strong> และ <strong>CH2</strong>: สัญญาณที่ขา <strong>AIN0</strong> มาจากวงจรแบ่งแรงดันไฟฟ้า) 
+และข้อความเอาต์พุตที่ได้รับและแสดงผลใน
+<strong>Arduino Serial Monitor</strong> มีตัวอย่างดังนี้</p>
+<p><img alt="" src="output-1.png" /></p>
+<p>รูป: แรงดันอินพุตที่ขา <strong>A0</strong> มีค่าใกล้เคียงศูนย์</p>
+<p><img alt="" src="output-2.png" /></p>
+<p>รูป: แรงดันอินพุตที่ขา <strong>A0</strong> เพิ่มมากขึ้น (หมุนปรับค่าตัวต้านทานของวงจรแบ่งแรงดัน) แต่ยังน้อยกว่า <strong>2.5V</strong></p>
+<p><img alt="" src="output-3.png" /></p>
+<p>รูป: แรงดันอินพุตที่ขา <strong>A0</strong> เพิ่มมากขึ้น (อยู่ระหว่าง <strong>2.5V</strong> และ <strong>5V</strong>)</p>
+<p>จากรูปตัวอย่างที่ได้จากการทดลองจริง จะเห็นได้ว่า การแปลงแรงดันอินพุตให้เป็นข้อมูลดิจิทัลโดยใช้วงจรเปรียบเทียบและ
+<strong>DAC</strong> ซึ่งเป็นวิธีแรก จะได้ข้อมูลขนาด 12 บิต ดังนั้นจึงต้องลดจำนวนบิตและความละเอียดลงให้เป็น 10 บิต
+แล้วเปรียบเทียบค่าที่ได้จากการแปลงด้วยวงจร <strong>ADC</strong> ภายใน โดยใช้คำสั่ง <code>analogRead()</code> ซึ่งเป็นวิธีที่สอง
+ค่าที่ได้ในแต่ละวิธี ถือว่าใกล้เคียงกัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอ หลักการทำงานของวงจร  <strong>Successive Approximation (SAR) ADC</strong>
+และตัวอย่างการใช้บอร์ด <strong>Arduino Uno / Nano</strong> และโมดูล <strong>MCP4725 DAC</strong>
+พร้อมตัวอย่างโค้ดเพื่อสาธิตหลักการทำงานของวงจร <strong>SAR ADC</strong></p>
+<p>แนวทางการทดลองเพิ่มเติม เช่น ถ้าไม่ใช้โมดูล <strong>MCP4725 DAC</strong>
+ให้ลองต่อวงจร <strong>R-2R DAC + OpAmp Buffer</strong>
+และวงจรเปรียบเทียบแรงดัน <strong>Voltage Comparator</strong> บนเบรดบอร์ด เพื่อนำมาใช้งานร่วมกับบอร์ด <strong>Arduino Nano</strong>
+แล้วปรับแก้ไข <strong>Arduino Sketch</strong> เพื่ออ่านค่าแรงดันอินพุต</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-01-09 | Last Updated: 2024-01-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

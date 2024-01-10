@@ -8,7 +8,7 @@
         <meta name="author" content="RSP">
         <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/rigol_scope_lxi/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: RIGOL DS1054Z (ผ่านเครือข่าย LAN) - IoT Engineering Education</title>
+        <title>การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ RIGOL DS1054Z (ผ่านเครือข่าย LAN) - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#rigol-ds1054z-lan" class="nav-link">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: RIGOL DS1054Z (ผ่านเครือข่าย LAN)</a>
+            <li class="nav-item" data-level="1"><a href="#rigol-ds1054z-lan" class="nav-link">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ RIGOL DS1054Z (ผ่านเครือข่าย LAN)</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#lxi" class="nav-link">&#9655; อุปกรณ์เครื่องมือวัดและการเชื่อมต่อด้วยโพรโตคอล LXI</a>
               <ul class="nav flex-column">
@@ -130,12 +130,12 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="rigol-ds1054z-lan">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: RIGOL DS1054Z (ผ่านเครือข่าย LAN)<a class="headerlink" href="#rigol-ds1054z-lan" title="Permanent link">#</a></h1>
+<h1 id="rigol-ds1054z-lan">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ RIGOL DS1054Z (ผ่านเครือข่าย LAN)<a class="headerlink" href="#rigol-ds1054z-lan" title="Permanent link">#</a></h1>
 <p>บทความนี้กล่าวถึง ตัวอย่างการตั้งค่าออสซิลโลสโคป <strong>RIGOL DS1054Z</strong>
 เพื่อใช้งานผ่านระบบเครือข่าย <strong>Ethernet / LAN</strong>
 และเขียนโปรแกรมเชื่อมต่อโดยใช้โพรโทคอล <strong>TCP/IP</strong> ตามมาตรฐานของ <strong>LXI</strong></p>
 <p><strong>Keywords:</strong> <em>Rigol DS1054Z</em>, <em>Digital Storage Oscilloscope</em>, <em>LXI</em>, 
-<em>PulseView</em>, <em>Python Programming</em></p>
+<em>PulseView</em>, <em>SCPI</em>, <em>Python Programming</em></p>
 <ul>
 <li><a href="#lxi">อุปกรณ์เครื่องมือวัดและการเชื่อมต่อด้วยโพรโตคอล <strong>LXI</strong></a></li>
 <li><a href="#rigol-ds1054z">การตั้งค่าใช้งานผ่านเครือข่ายให้กับอุปกรณ์ <strong>RIGOL DS1054Z</strong></a></li>
@@ -147,27 +147,55 @@
 </ul>
 <hr />
 <h2 id="lxi">&#9655; <strong>อุปกรณ์เครื่องมือวัดและการเชื่อมต่อด้วยโพรโตคอล LXI</strong><a class="headerlink" href="#lxi" title="Permanent link">#</a></h2>
-<p>อุปกรณ์เครื่องมือวัดและการทดสอบที่มีการใช้งานในปัจจุบัน อย่างเช่น
+<p>เครื่องมือวัดและทดสอบทางไฟฟ้า (<strong>Test &amp; Measurement Instruments</strong>) ที่มีการใช้งานอยู่ในปัจจุบัน อย่างเช่น
 ออสซิลโลสโคป ("สโคป") แบบดิจิทัล (<strong>Digital Oscilloscopes</strong>) เครื่องกำเนิดสัญญาณ
 (<strong>Function Generators</strong>) และแหล่งจ่ายแรงดันไฟฟ้าแบบดีซี (<strong>DC Power Supplies</strong>)
-หลายรุ่นจากหลายบริษัท สามารถเชื่อมต่อและใช้งานผ่าน <strong>Ethernet/LAN</strong> ได้จากระยะไกล
-จึงทำให้ผู้ใช้สามารถควบคุมและตั้งค่าการทำงานอุปกรณ์เหล่านี้ได้โดยไม่จำเป็นต้องใช้งานผ่านแผงควบคุมด้านหน้าของอุปกรณ์
+หลายรุ่นจากหลายบริษัท สามารถเชื่อมต่อและใช้งานได้ผ่าน <strong>Ethernet/LAN</strong> 
+จึงทำให้ผู้ใช้สามารถควบคุมและตั้งค่าการทำงานอุปกรณ์เหล่านี้ได้จากระยะไกลได้
+โดยไม่จำเป็นต้องใช้งานผ่านแผงควบคุมที่อยู่ด้านหน้าของตัวอุปกรณ์
 (<strong>Front Control Panel</strong>) </p>
 <p><a href="https://en.wikipedia.org/wiki/LAN_eXtensions_for_Instrumentation"><strong>LXI</strong></a> (<em>LAN eXtensions for Instrumentation</em>)
-เป็นโพรโตคอลหนึ่งสำหรับการสื่อสารกับอุปกรณ์เครื่องมือวัดและทดสอบและการใช้งานผ่าน <strong>Ethernet/LAN</strong>
+เป็นโพรโตคอลหนึ่งสำหรับการสื่อสารกับอุปกรณ์เครื่องมือวัดและทดสอบด้วยวิธี <strong>Ethernet/LAN</strong>
 จัดทำโดยองค์กรที่มีชื่อว่า <a href="https://www.lxistandard.org/"><strong>LXI Consortium</strong></a>
-เริ่มต้นในปีค.ศ.  2005 และมีการอัปเดตมาตรฐานอีกหลายครั้ง
-ข้อดีของการใช้ <strong>LAN</strong> คือ ความเร็วในการสื่อสารข้อมูล
-<strong>LXI</strong> รองรับการใช้งานในระบบเครือข่าย <strong>TCP/IP</strong> โดยใช้ <strong>IPv4 / IPv6</strong></p>
+เริ่มต้นใช้งานในปีค.ศ.  2005 และมีการอัปเดตมาตรฐานอีกหลายครั้ง
+ข้อดีของการใช้ <strong>LAN</strong> คือ ความเร็วในการสื่อสารข้อมูล</p>
+<p><strong>LXI</strong> รองรับการใช้งานในระบบเครือข่าย <strong>TCP/IP</strong> ผ่าน <strong>Ethernet/LAN</strong> แบ่งเป็นสองกรณีคือ</p>
+<ul>
+<li><strong>VXI-11</strong> และ <strong>HiSLIP</strong> (ตามมาตรฐานของ <strong>VXIbus Consortium</strong>)</li>
+<li><strong>Raw TCP/IP Socket</strong></li>
+</ul>
+<p>โดยปรกติแล้ว การเขียนโปรแกรมควบคุมและใช้งานเครื่องมือวัดและทดสอบทางไฟฟ้า<br />
+(<strong>Programmatic Control of T &amp; M Instruments</strong>)
+มักจะใช้ <strong>API (Application Programming Interface)</strong>
+ที่ได้มีการกำหนดให้เป็นมาตรฐานโดย <a href="https://www.ivifoundation.org/"><strong>IVI (Interchangeable Virtual Instruments) Foundation</strong></a>
+เช่น <strong>VISA</strong> (<em>Virtual Instrument Software Architecture</em>)
+และมีไลบรารีสำหรับการเขียนโค้ดภาษา  <strong>Python</strong> เช่น</p>
+<ul>
+<li><a href="https://github.com/pyvisa/pyvisa">github.com/pyvisa/pyvisa</a></li>
+<li><a href="https://github.com/pyvisa/pyvisa-py">github.com/pyvisa/pyvisa-py</a></li>
+</ul>
 <p>อุปกรณ์หลายรุ่นของบริษัท <strong>Rigol</strong>
 มีพอร์ต <strong>RJ45</strong> สำหรับการเชื่อมต่อผ่านระบบเครือข่ายได้และรองรับการใช้งาน <strong>LXI</strong> เช่น
 <a href="https://int.rigol.com/products/detail/DS1000Z"><strong>Rigol DS1000Z Series Digital Storage Oscilloscopes (DSOs)</strong></a></p>
-<p>หลังจากได้มีการตั้งค่าการใช้งานในระบบเครือข่ายและเชื่อมต่อสาย <strong>LAN</strong> ที่พอร์ต <strong>RJ45</strong> แล้ว
-ก็สามารถใช้ซอฟต์แวร์ <strong>Open Source</strong> อย่างเช่น <a href="https://sigrok.org/wiki/Downloads"><strong>PulseView</strong></a> เชื่อมต่อและใช้งานได้</p>
-<p>หากต้องการเขียนโปรแกรมสื่อสารกับอุปกรณ์ด้วยโพรโตคอล <strong>LXI</strong> และใช้คำสั่งในรูปแบบที่เรียกว่า
-<strong>SCPI</strong> (<em>Standard Commands for Programmable Instruments</em>) 
-ก็ทำได้โดยใช้วิธี <strong>Socket-based Network Programming</strong> และใช้ภาษาคอมพิวเตอร์ได้หลายภาษา
-เช่น <strong>C/C++</strong>, <strong>Python</strong>, <strong>Java</strong>, <strong>MATLAB</strong> และ <strong>C#</strong> เป็นต้น</p>
+<p>หากต้องการเขียนโปรแกรมสื่อสารกับอุปกรณ์ด้วยโพรโตคอล <strong>LXI</strong> ด้วยวิธี <strong>Raw TCP/IP</strong>
+และใช้คำสั่งในรูปแบบที่เรียกว่า
+<a href="https://www.ivifoundation.org/About-IVI/scpi.html"><strong>SCPI</strong></a> 
+(<em>Standard Commands for Programmable Instruments</em>) 
+ก็ทำได้โดยใช้วิธี <strong>Network Socket Programming</strong> และใช้ภาษาคอมพิวเตอร์ได้หลายภาษา
+เช่น <strong>C/C++</strong>, <strong>Python</strong>, <strong>Java</strong>, <strong>MATLAB</strong> และ <strong>C#</strong> เป็นต้น
+รูปแบบของคำสั่ง <strong>SCPI</strong> สามารถศึกษาได้จากเอกสารต่อไปนี้</p>
+<ul>
+<li><a href="https://www.ivifoundation.org/downloads/SCPI/scpi-99.pdf"><strong>SCPI Volume 1: Syntax and Style (1999)</strong></a></li>
+</ul>
+<p>ตัวอย่างไลบรารีสำหรับภาษา <strong>Python</strong> ที่เกี่ยวข้องกับการใช้งาน <strong>Rigol DS1000Z</strong> เช่น</p>
+<ul>
+<li><a href="https://github.com/pklaus/ds1054z">github.com/pklaus/ds1054z</a></li>
+<li><a href="https://github.com/lumascet/pyrigol">github.com/lumascet/pyrigol</a></li>
+<li><a href="https://github.com/AlexZettler/Rigol1000z">github.com/AlexZettler/Rigol1000z</a></li>
+<li><a href="https://github.com/jeanyvesb9/Rigol1000z">github.com/jeanyvesb9/Rigol1000z</a></li>
+</ul>
+<p>ถ้าไม่ต้องการเขียนโปรแกรมควบคุม ผู้ใช้สามารถใช้ซอฟต์แวร์ <strong>Open Source</strong>
+อย่างเช่น <a href="https://sigrok.org/wiki/Downloads"><strong>PulseView</strong></a> เชื่อมต่อและใช้งานได้เช่นกัน</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="rigol-ds1054z">&#9655; <strong>การตั้งค่าใช้งานผ่านเครือข่ายให้กับอุปกรณ์ RIGOL DS1054Z</strong><a class="headerlink" href="#rigol-ds1054z" title="Permanent link">#</a></h2>
@@ -222,6 +250,8 @@
 <p>รูป: ตัวอย่างการตั้งค่าการใช้งานผ่านเครือข่ายเมื่อเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ <strong>Windows 10</strong></p>
 <p><img alt="" src="windows_ping_scope.png" /></p>
 <p>รูป: ตัวอย่างการทำคำสั่ง <code>ping</code> จากคอมพิวเตอร์ <strong>Windows</strong></p>
+<p><img alt="" src="ubuntu_internet_sharing.png" /></p>
+<p>รูป: การแชร์อินเทอร์เน็ตสำหรับ <strong>Ubuntu</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="pulseview">&#9655; <strong>การใช้งาน PulseView</strong><a class="headerlink" href="#pulseview" title="Permanent link">#</a></h2>
@@ -253,7 +283,7 @@
 <p><img alt="" src="pulseview_window.png" /></p>
 <p>รูป: การตั้งค่าก่อนการเชื่อมต่อจาก <strong>PulseView</strong> ไปยังสโคป</p>
 <p><img alt="" src="pulseview_rigol_connect.png" /></p>
-<p>รูป: การเชื่อมต่อจาก <strong>PulseView</strong> ไปยังสโคป</p>
+<p>รูป: การเชื่อมต่อจาก <strong>PulseView</strong> ไปยังสโคป (เลือกใช้โพรโตคอล <strong>Raw TCP</strong>)</p>
 <p><img alt="" src="pulseview_rigol-1.png" /></p>
 <p>รูป: ตัวอย่างการเพิ่ม <strong>Vertical Cursors</strong> สำหรับการวัดความกว้างของช่วงเวลา</p>
 <p><img alt="" src="pulseview_rigol-2.png" /></p>
@@ -396,14 +426,14 @@ if sock:
 <ul>
 <li><code>:CHAN1:DISP ON</code> เปิดใช้งานการวัดสัญญาณช่อง <strong>CH1</strong></li>
 <li><code>:CHAN1:PROB 1</code> ตั้งค่าโพรบสำหรับช่อง <strong>CH1</strong> ให้เป็น <strong>1x</strong></li>
-<li><code>:CHAN1:SCAL 2.0</code> ตั้งค่า <strong>Volt/Div</strong> สำหรับ <strong>CH1</strong> ให้เป็น <strong>1V/Div</strong></li>
+<li><code>:CHAN1:SCAL 2.0</code> ตั้งค่า <strong>Volt/Div</strong> สำหรับ <strong>CH1</strong> ให้เป็น <strong>2V/Div</strong></li>
 <li><code>:CHAN1:OFFS 2.0</code> ตั้งค่าระดับของสัญญาณ (<strong>Vertical Offset</strong>) สำหรับ <strong>CH1</strong> ให้เลื่อนสูงขึ้นมา <strong>2V</strong> จากระดับกลางจอภาพ</li>
 </ul>
 <p>ตัวอย่างคำสั่งสำหรับช่อง <strong>CH2</strong> มีดังนี้</p>
 <ul>
 <li><code>:CHAN2:DISP ON</code> เปิดใช้งานการวัดสัญญาณช่อง <strong>CH2</strong></li>
 <li><code>:CHAN2:PROB 1</code> ตั้งค่าโพรบสำหรับช่อง <strong>CH2</strong> ให้เป็น <strong>1x</strong></li>
-<li><code>:CHAN2:SCAL 2.0</code> ตั้งค่า <strong>Volt/Div</strong> สำหรับ <strong>CH2</strong> ให้เป็น <strong>1V/Div</strong></li>
+<li><code>:CHAN2:SCAL 2.0</code> ตั้งค่า <strong>Volt/Div</strong> สำหรับ <strong>CH2</strong> ให้เป็น <strong>2V/Div</strong></li>
 <li><code>:CHAN2:OFFS -2.0</code> ตั้งค่าระดับของสัญญาณ  (<strong>Vertical Offset</strong>) สำหรับ <strong>CH2</strong> ให้เลื่อนลงมา <strong>2V</strong> จากระดับกลางจอภาพ</li>
 </ul>
 <p>ตัวอย่างคำสั่งสำหรับการตั้งค่า <strong>Time Base</strong></p>
@@ -524,8 +554,8 @@ if sock:
 <hr />
 <h2 id="python_2">&#9655; <strong>ตัวอย่างโค้ด Python: การอ่านข้อมูลสัญญาณจากสโคปและแสดงรูปกราฟ</strong><a class="headerlink" href="#python_2" title="Permanent link">#</a></h2>
 <p>ตัวอย่างถัดไปสาธิตการใช้ส่งคำสั่งไปยังสโคป เพื่ออ่านข้อมูลสำหรับช่องสัญญาณ <strong>CH1</strong>
-แล้วนำมาแสดงผลโดยใช้ <strong>Matplotlib</strong> ข้อมูลแต่ละตัวมีขนาดหนึ่งไบต์ มีจำนวนข้อมูล <strong>Waveform Samples</strong>
-ที่ใช้สำหรับการวาดรูปกราฟ เท่ากับ <strong>1200</strong></p>
+แล้วนำมาแสดงผลโดยใช้ <strong>Matplotlib</strong> ข้อมูลแต่ละตัวมีขนาดหนึ่งไบต์ มีจำนวนข้อมูล
+<strong>Waveform Samples</strong> ที่ใช้สำหรับการวาดรูปกราฟ เท่ากับ <strong>1200</strong></p>
 <pre><code class="language-python">import socket
 import sys
 import time 
@@ -648,10 +678,13 @@ time_values = time_values[moving_window_size-1:]
 <p>รูป: ตัวอย่างรูปกราฟที่ได้จากสโคป (ขวามือ: มีการใช้ <strong>Moving Average Filter</strong>)</p>
 <p><img alt="" src="waveform_plot-2.png" /></p>
 <p>รูป: ตัวอย่างรูปกราฟที่ได้จากสโคป (ใช้เครื่องกำเนิดสัญญาณสำหรับ <strong>Sine</strong> และ <strong>Triangular Wave</strong>
-เป็นสัญญาณทดสอบให้สโคปช่อง <strong>CH1</strong> ตามลำดับ)</p>
+แอมพลิจูด <strong>5Vpp</strong> ความถี่ <strong>1kHz</strong> เป็นสัญญาณทดสอบให้สโคปช่อง <strong>CH1</strong> ตามลำดับ)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>การเรียนรู้เกี่ยวกับวงจรไฟฟ้าและอิเล็กทรอนิกส์ เกี่ยวข้องกับการวัดและทดสอบทางไฟฟ้า มีการใช้เครื่องมือและอุปกรณ์ที่เกี่ยวข้อง
+อุปกรณ์หลายรุ่นสามารถรองรับการเขียนโปรแกรมควบคุมได้ ดังนั้นการเขียนโปรแกรมด้วยภาษาคอมพิวเตอร์อย่างเช่น <strong>Python</strong>
+จึงเป็นอีกหนึ่งกิจกรรมที่ผู้เรียนควรได้มีโอกาสศึกษาและฝึกทักษะ</p>
 <p>บทความนี้นำเสนอตัวอย่างการใช้งานออสซิลโลสโคปรุ่น <strong>RIGOL DS1054Z</strong>
 โดยเชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ด้วยสาย <strong>LAN</strong> และใช้ซอฟต์แวร์ <strong>PulseView</strong>
 เป็น <strong>GUI</strong> สำหรับการใช้งานฟังก์ชันพื้นฐานของสโคป และมีตัวอย่างการเขียนโปรแกรมด้วยภาษา <strong>Python</strong>
