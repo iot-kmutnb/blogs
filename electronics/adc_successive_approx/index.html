@@ -99,6 +99,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#r-2r-dac" class="nav-link">&#9655; การใช้วงจร R-2R DAC และไอซีเปรียบเทียบแรงดัน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -115,7 +119,7 @@
 ตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> และการใช้บอร์ด
 <strong>Arduino Nano</strong> เพื่อสาธิตหลักการทำงานของวงจร <strong>ADC</strong> ประเภทนี้</p>
 <p><strong>Keywords:</strong> <em>Arduino Uno / Nano</em>, <em>MCP4725 DAC</em>, 
-<em>Successive Approximation ADC</em>, <em>SAR ADC</em></p>
+<em>Successive Approximation ADC</em>, <em>SAR ADC</em>, <em>R-2R DAC</em></p>
 <hr />
 <h2 id="successive-approximation-adc">&#9655; หลักการทำงานของ  <strong>Successive Approximation ADC</strong><a class="headerlink" href="#successive-approximation-adc" title="Permanent link">#</a></h2>
 <p>วงจร <strong>ADC</strong> (<em>Analog-to-Digital Converter</em>)
@@ -127,6 +131,7 @@
 <ul>
 <li><strong>Flash ADC / Parallel ADC</strong></li>
 <li><strong>Successive-Approximation (SAR) ADC</strong></li>
+<li><strong>Dual-Slope ADC</strong></li>
 <li><strong>Sigma-Delta ADC</strong></li>
 </ul>
 <p>ชิปไมโครคอนโทรลเลอร์ส่วนใหญ่ ถ้ามีวงจร <strong>ADC</strong> อยู่ภายใน ก็จะเป็นประเภท
@@ -134,30 +139,38 @@
 <a href="https://en.wikipedia.org/wiki/Sample_and_hold"><strong>Sample-and-Hold (S/H)</strong></a>
 โดยใช้ตัวเก็บประจุไฟฟ้าและทรานซิสเตอร์เป็นสวิตซ์ไฟฟ้า (เช่น มอสเฟต)
 เพื่อให้ระดับแรงดันอินพุตคงที่ในช่วงเวลาที่มีการแปลงเป็นข้อมูลดิจิทัล</p>
-<p>วงจรต่อไปนี้เป็นวงจรสาธิตหลักการทำงานของวงจร <strong>Sample &amp; Hold</strong> (อย่างง่าย)
-โดยใช้มอสเฟต (เลือกใช้ <a href="https://www.onsemi.com/pdf/datasheet/bss123-d.pdf"><strong>BSS123 N-Channel MOSFET</strong></a>)
-เป็นสวิตช์ไฟฟ้า มีสัญญาณพัลส์ที่มีคาบเป็นสัญญาณควบคุม  (<code>V_SAMPLING</code>) 
-สำหรับการทำงานการเปิดหรือปิดสวิตซ์ด้วยมอสเฟต และมีสัญญาณแอนะล็อกเป็นสัญญาณอินพุตรูปคลื่นไซน์ (<code>V_INPUT</code>)</p>
-<p>ข้อสังเกต: <strong>BSS123</strong> มีพารามิเตอร์ <script type="math/tex">V_{GS}(th)</script> (<strong>Gate Threshold Voltage</strong>)
-อย่างน้อย <strong>2V</strong> จึงจะทำให้มอสเฟตทำงานและนำไฟฟ้าได้ดี</p>
-<p><img alt="" src="sample_and_hold.png" /></p>
+<p>วงจรต่อไปนี้เป็นวงจรเพื่อการสาธิตหลักการทำงานของวงจร <strong>Sample &amp; Hold</strong>
+โดยใช้มอสเฟตเป็นสวิตช์ไฟฟ้า (เลือกใช้ <a href="https://www.onsemi.com/pdf/datasheet/bss123-d.pdf"><strong>BSS123</strong></a> สำหรับการสร้างวงจรและจำลองการทำงาน)
+มีสัญญาณพัลส์ที่มีคาบเป็นสัญญาณควบคุม  (<code>V_SAMPLING</code>) 
+สำหรับการทำงานการเปิดหรือปิดสวิตซ์ด้วยมอสเฟต และมีสัญญาณแอนะล็อกเป็นสัญญาณอินพุตรูปคลื่นไซน์ (<code>V_INPUT</code>)
+นอกจากนั้นแล้วยังมีไอซีบัฟเฟอร์ (<strong>Voltage Buffer</strong>) ในวงจรด้วย</p>
+<p>ข้อสังเกต: <strong>BSS123</strong> เป็นทรานซิสเตอร์ประเภท <strong>N-Channel Enhancement-Mode MOSFET</strong>
+ถ้า <script type="math/tex">V_{GS}(th)</script> (<strong>Gate Threshold Voltage</strong>)
+มีค่าอย่างน้อย <strong>2V</strong> จึงจะทำให้มอสเฟตทำงานและนำไฟฟ้าได้ดี 
+ในกรณีนี้แรงดันอินพุตจะต้องมีระดับต่ำกว่าแรงดันควบคุมอย่างน้อย <strong>2V</strong> สำหรับวงจรสาธิต</p>
+<p><img alt="" src="sample_and_hold_circuit.png" /></p>
 <p>รูป: ตัวอย่างวงจร <strong>Sample &amp; Hold</strong> เพื่อสาธิตและจำลองการทำงาน โดยใช้ซอฟต์แวร์ <strong>EasyEDA</strong></p>
 <p>ช่วงที่สัญญาณควบคุมเป็น <strong>5V</strong> จะทำให้มอสเฟตนำไฟฟ้าได้ดี ("Active") ระหว่างขา <strong>D (Drain)</strong>
-และ <strong>S (Source)</strong> และทำให้ระดับแรงดันอินพุตปรับเปลี่ยนตามแรงดันอินพุต
-แต่ช่วงที่สัญญาณควบคุมเป็น <strong>0V</strong> มอสเฟตจะไม่นำไฟฟ้า ("Off") และแรงดันเอาต์พุตจะไม่เปลี่ยนแปลงตามอินพุต</p>
-<p><img alt="" src="sample_and_hold_sim.png" /></p>
+และ <strong>S (Source)</strong> และทำให้ระดับแรงดันอินพุตปรับเปลี่ยนตามแรงดันอินพุตที่มีการเปลี่ยนแปลง
+แต่ช่วงเวลาที่สัญญาณควบคุมเป็น <strong>0V</strong> มอสเฟตจะไม่นำไฟฟ้า ("Off") ดังนั้นแรงดันเอาต์พุตจะไม่เปลี่ยนแปลงตามอินพุต</p>
+<p>จากรูปคลื่นสัญญาณจากการจำลองการทำงานของวงจร จะเห็นได้ว่า อินพุตเป็นสัญญาณรูปไซน์ แรงดันอยู่ในช่วง <strong>0V..3V</strong>
+สัญญาณควบคุมเป็นสัญญาณพัลส์และมีแรงดัน <strong>0V</strong> หรือ <strong>5V</strong> สัญญาณเอาต์พุตบางช่วงจะมีลักษณะคงที่และเป็นขั้นบันได</p>
+<p><img alt="" src="sample_and_hold_sim-1.png" /></p>
+<p><img alt="" src="sample_and_hold_sim-2.png" /></p>
 <p>รูป: ตัวอย่างการจำลองการทำงานด้วย <strong>EasyEDA</strong> และรูปคลื่นสัญญาณ</p>
-<p>แรงดันของสัญญาณอินพุตเมื่อผ่านวงจน <strong>S &amp; H</strong> แล้ว จะถูกเปรียบเทียบกับแรงดันอ้างอิง
+<p>แรงดันของสัญญาณอินพุตเมื่อผ่านวงจร <strong>S &amp; H</strong> แล้ว จะถูกเปรียบเทียบกับแรงดันอ้างอิง
 โดยใช้วงจรเปรียบเทียบแรงดัน (<strong>Analog Voltage Comparator</strong>)
 แรงดันอ้างอิงจะถูกสร้างโดยใช้วงจร <strong>DAC</strong> (<em>Digital-to-Analog Converter</em>)
-เพื่อสร้างแรงดันแอนะล็อกสำหรับการตรวจสอบและประมาณค่าแรงดัน</p>
+เพื่อสร้างแรงดันแอนะล็อกสำหรับการตรวจสอบและประมาณค่าแรงดันอินพุต</p>
 <p>ในแต่ละรอบของการประมาณค่าและเปรียบเทียบ จะมีการปรับค่าแรงดันอ้างอิงให้เพิ่มขึ้นหรือลดลง 
-จนเข้าใกล้ค่าของระดับแรงดันอินพุต หรือมีผลต่างของแรงดันลดลงตามลำดับจนใกล้เคียงศูนย์
-เริ่มต้นแรงดันอ้างอิงจะเท่ากับ <strong>VCC/2</strong> (ครึ่งของของช่วงแรงดันสำหรับการค้นหา)
-ถ้าแรงดันอินพุตมากกว่าแรงดันอ้างอิง ผลการเปรียบเทียบจะได้ค่าบิตเป็น 1 และจะต้องเพิ่มแรงดันอ้างอิงในรอบถัดไป
-แต่ถ้าไม่ใช่ ก็จะได้ค่าเป็นบิตเป็น 0 และลดแรงดันอ้างอิงในรอบถัดไป ช่วงแรงดันสำหรับการค้นหาจะแคบลงเรื่อย ๆ ทีละครึ่งหนึ่ง
-(<strong>Halving</strong>)
-ผลของเปรียบเทียบแรงดันในแต่ละรอบ จะถูกเก็บไว้ในรีจิสเตอร์ที่เรียกว่า <strong>SAR</strong>
+จนเข้าใกล้ค่าของระดับแรงดันอินพุต หรือมีผลต่างของแรงดันลดลงตามลำดับจนใกล้เคียงศูนย์</p>
+<ul>
+<li>เริ่มต้นแรงดันอ้างอิงจะเท่ากับ <strong>VCC/2</strong> (ครึ่งของของช่วงแรงดันสำหรับการค้นหา)</li>
+<li>ถ้าแรงดันอินพุตมากกว่าแรงดันอ้างอิง ผลการเปรียบเทียบจะได้ค่าบิตเป็น 1 และจะต้องเพิ่มแรงดันอ้างอิงในรอบถัดไป</li>
+<li>แต่ถ้าไม่ใช่ ก็จะได้ค่าเป็นบิตเป็น 0 และลดแรงดันอ้างอิงในรอบถัดไป</li>
+<li>ช่วงแรงดันสำหรับการค้นหาจะแคบลงเรื่อย ๆ ทีละครึ่งหนึ่ง (<strong>Halving</strong>)</li>
+</ul>
+<p>ผลของเปรียบเทียบแรงดันในแต่ละรอบ จะถูกเก็บไว้ในรีจิสเตอร์ที่เรียกว่า <strong>SAR</strong>
 การทำงานของวงจรในลักษณะนี้ คล้ายกับการค้นหาข้อมูลที่เรียงแล้วแบบ <strong>Binary Search</strong></p>
 <p><img alt="" src="sar_adc_block_diagram.png" /></p>
 <p>รูป: บล็อกไดอะแกรมของ <strong>SAR DAC</strong> </p>
@@ -172,8 +185,8 @@
 จะต้องมีวงจรเปรียบเทียบแรงดันไฟฟ้าและวงจร <strong>DAC</strong>
 ดังนั้นจึงได้เลือกใช้โมดูล <strong>MCP4725 DAC (I2C, 12-bit resolution)</strong> นำมาต่อเพิ่ม และใช้วงจร
 <strong>Analog Comparator</strong> ที่มีอยู่แล้วภายในชิป <strong>ATmega328P</strong> สำหรับการเปรียบเทียบ
-นอกจากนั้นแล้วยังได้เลือกใช้ไลบรารี  <a href="https://github.com/RobTillaart/MCP4725"><code>MCP4725.h</code></a> สำหรับการเขียนโปรแกรม
-เพื่อความสะดวกในการเขียนโค้ดใช้งานโมดูล <strong>MCP4725</strong></p>
+นอกจากนั้นแล้วยังได้เลือกใช้ไลบรารี  <a href="https://github.com/RobTillaart/MCP4725"><code>MCP4725.h</code></a>
+สำหรับการเขียนโปรแกรม <strong>Arduino Sketch</strong> เพื่อความสะดวกในการใช้งานโมดูล <strong>MCP4725</strong></p>
 <p>แนะนำให้ศึกษาจากบทความที่เกี่ยวข้องดังนี้</p>
 <ul>
 <li><a href="../../arduino/avr_gcc_part-10/">การเขียนโปรแกรมภาษา <strong>C</strong> สำหรับ <strong>AVR (ATmega328P)</strong>: ตอนที่ 10</a></li>
@@ -192,10 +205,13 @@
 <li>สร้างแรงดันอ้างอิงสำหรับการเปรียบเทียบโดยใช้โมดูล <strong>MCP4725 DAC</strong> ที่เชื่อมต่อกับบอร์ด <strong>Arduino Uno / Nano</strong>
 ด้วยบัส <strong>I2C</strong> (ใช้ขา <strong>A4 / A5</strong> ของบอร์ด <strong>Arduino</strong> สำหรับสัญญาณ <strong>SDA / SCL</strong> ของบัส <strong>I2C</strong>)</li>
 <li>ให้แรงดันอ้างอิงเริ่มต้นที่ระดับ <strong>VCC/2</strong> และปรับขึ้นหรือลดในแต่ละรอบ เพื่อให้ผลต่างของแรงดันอ้างอิงกับแรงดันอินพุตเข้าใกล้ศูนย์
-เนื่องจาก <strong>MCP4725 DAC</strong> มีความละเอียด 12 บิต ดังนั้นจะมีการเปรียบเทียบแรงดัน และปรับค่าแรงดันอ้างอิงทั้งหมด 12 บิต</li>
+เนื่องจาก <strong>MCP4725 DAC</strong> มีความละเอียด 12 บิต ดังนั้นจะมีการเปรียบเทียบแรงดัน และปรับค่าแรงดันอ้างอิงทั้งหมด 12 ครั้ง</li>
 <li>อ่านค่าแรงดันอินพุตที่ขา <strong>A0</strong> โดยใช้วงจร <strong>ADC</strong> ภายในชิป ด้วยคำสั่ง
 <code>analogRead(A0)</code> แล้วนำค่าที่ได้ (มีขนาด 10 บิต) มาเปรียบเทียบ</li>
 </ul>
+<p><strong>ข้อสังเกต:</strong> เนื่องจากแรงดันอินพุตได้จากวงจรแบ่งแรงดัน จึงถือว่าแรงดันอินพุตคงที่
+(หากไม่ได้หมุนปรับค่าในช่วงที่มีการแปลงเป็นข้อมูล) 
+ดังนั้นจึงไม่มีการต่อวงจร <strong>Sample &amp; Hold</strong></p>
 <pre><code class="language-c++">#include &quot;MCP4725.h&quot;
 
 MCP4725 DAC(0x60); // Create an instance of the MCP4725 class.
@@ -261,34 +277,36 @@ void setup() {
 }
 
 void loop() {
-  int16_t value = 4096/2;
-  int16_t step = value/2;
+  int16_t value = (1&lt;&lt;12)/2; // VCC/2
+  int16_t step  = value/2;
   // Initialize the the Analog Comparator
   initAnalogComparator();
   for ( int i=0; i &lt; 12; i++) {
     // Send a 12-bit value to the MCP4725 DAC.
     DAC.writeDAC( value );
     // Check the ACO (Analog Output Compare) bit in ACSR.
-    if (!(ACSR &amp; (1&lt;&lt;ACO))) {
-      value -= step;
-    } else {
+    if (ACSR &amp; (1&lt;&lt;ACO)) {
       value += step;
+    } else {
+      value -= step;
     }
     // Reduce the step.
-    step /= 2;
+    step /= 2; // Halving the step...
   }
   // Re-enable the ADC.
   ADCSRA |= (1 &lt;&lt; ADEN); 
-  // Read the analog input value on A0 pin.
-  int16_t adc_value = analogRead( A0 );
   // Show the results.
   Serial.println( String(&quot;DAC output     (12b): &quot;) + DAC.readDAC() );
   Serial.println( String(&quot;Analog value   (10b): &quot;) + (value&gt;&gt;2) );
-  Serial.println( String(&quot;A0 input value (10b): &quot;) + adc_value );
+  Serial.println( String(&quot;A0 input value (10b): &quot;) + analogRead(A0) );
+//Serial.println( String(&quot;A1 input value (10b): &quot;) + analogRead(A1) );
   Serial.println( F(&quot;-------------------------&quot;) );
   delay(1000);
 }
 </code></pre>
+<p>&nbsp;</p>
+<p>ถ้าเชื่อมต่อสัญญาณแอนะล็อกอินพุต จากวงจรแบ่งแรงดันไปยังขา <strong>A1</strong> ก็สามารถใช้คำสั่ง
+<code>analogRead(A1)</code> อ่านค่าแรงดันอินพุตเพื่อนำไปเปรียบเทียบได้เช่นกัน</p>
 <p>&nbsp;</p>
 <p><img alt="" src="nano_mcp4725_dac_i2c.jpg" /></p>
 <p>รูป: ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ด</p>
@@ -308,14 +326,85 @@ void loop() {
 ค่าที่ได้ในแต่ละวิธี ถือว่าใกล้เคียงกัน</p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="r-2r-dac">&#9655; <strong>การใช้วงจร R-2R DAC และไอซีเปรียบเทียบแรงดัน</strong><a class="headerlink" href="#r-2r-dac" title="Permanent link">#</a></h2>
+<p>อีกแนวทางหนึ่ง ถ้าไม่ใช้โมดูล <strong>MCP4725 DAC (12-bit)</strong> และวงจรเปรียบเทียบแรงดันภายในชิป <strong>ATmega32P</strong>
+ก็สามารถต่อวงจรบนเบรดบอร์ดดังต่อไปนี้ เพื่อนำมาใช้งานร่วมกับบอร์ด <strong>Arduino Nano</strong></p>
+<ul>
+<li>วงจร <strong>R-2R DAC</strong> (เลือกใช้ค่าความต้านทาน <strong>10k</strong> และ <strong>20k</strong> โอห์ม)
+เช่น มีความละเอียด 8 บิต และถ้าใช้แรงดัน <strong>VREF=5V</strong> จะได้ความละเอียด หรือ
+แรงดันไฟฟ้าต่อหนึ่งบิต เท่ากับ <strong>5000mV/256 = 19.531mV</strong></li>
+<li>ไอซี <strong>OpAmp</strong> ทำหน้าที่เป็นบัฟเฟอร์  (<strong>Voltage Buffer</strong>) สำหรับเอาต์พุตจากวงจร <strong>R-2R DAC</strong></li>
+<li>ไอซีเปรียบเทียบแรงดัน (<strong>Voltage Comparator IC</strong>) เช่น <strong>LM393</strong>
+สำหรับการเปรียบเทียบแรงดัน</li>
+<li>บอร์ดไมโครคอนโทรลเลอร์ <strong>Arduino Uno/Nano</strong> เพื่อกำหนดค่าเอาต์พุตที่ขาดิจิทัล จำนวน 8 ขา
+เพื่อควบคุมการทำงานของวงจร <strong>R-2R DAC</strong> ให้ได้ระดับแรงดันอ้างอิงตามที่ต้องการ</li>
+</ul>
+<p><img alt="" src="r_2r_dac_buffer_comparator.png" /></p>
+<p>รูป: ตัวอย่างผังวงจรและการจำลองการทำงานด้วย <strong>EasyEDA</strong> (ยังไม่มีการใช้บอร์ด <strong>Arduino</strong>)
+ซึ่งแสดงให้เห็นการทำงานของวงจร <strong>R-2R DAC</strong> และการเปรียบเทียบแรงดันด้วยไอซี <strong>LM393</strong></p>
+<p>&nbsp;</p>
+<p><img alt="" src="arduino_nano_sar_adc.png" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรเสมือนจริงโดยใช้ <strong>AUTODESK Tinkercad</strong></p>
+<p>จากรูปผังวงจร มีการใช้งานขาดิจิทัล <strong>4, 5, 6, 7, 8, 9, 10, 11</strong> (ทั้งหมด 8 ขา) ของบอร์ด <strong>Arduino Uno / Nano</strong>
+เป็นเอาต์พุตสำหรับนำไปต่อกับวงจร <strong>R-2R DAC</strong>
+และใช้ขาดิจิทัล <strong>2</strong> เป็นขาอินพุต โดยนำไปต่อกับขาเอาต์พุตของไอซีเปรียบเทียบแรงดัน</p>
+<p>แนวทางการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับวงจรสาธิต มีดังนี้</p>
+<pre><code class="language-c++">const int COMPARE_PIN = 2;
+const int DAC_PINS[] = {4,5,6,7,8,9,10,11};
+const int NUM_BITS = 8;
+const int VALUE_MAX = (1&lt;&lt;NUM_BITS);
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(COMPARE_PIN, INPUT_PULLUP);
+  for (int i=0; i &lt; NUM_BITS; i++) {
+    int pin = DAC_PINS[i];
+    pinMode( pin, OUTPUT );
+    digitalWrite( pin, HIGH );
+  }
+}
+
+void updateDAC( int value ) {
+  for ( int i=0; i &lt; NUM_BITS; i++) {
+    int pin = DAC_PINS[i];
+    int bit = (value &gt;&gt; (7-i)) &amp; 1;
+    digitalWrite( pin, bit );    
+  }
+}
+
+void loop() {
+  int value = VALUE_MAX/2;
+  int step  = value/2;
+  String result = &quot;0b&quot;;
+  for (int i=0; i &lt; NUM_BITS; i++) {
+    updateDAC(value);
+     if ( digitalRead(COMPARE_PIN) ) {
+        result += &quot;1&quot;;
+        value -= step;
+    } else {
+        result += &quot;0&quot;;
+        value += step;
+    }
+    step /= 2; // Halving the step...
+  }
+  uint32_t mV = value*5000ul/VALUE_MAX;
+  Serial.println( String(&quot;BIN value: &quot;) + result );
+  Serial.println( String(&quot;ADC value: &quot;) + value );
+  Serial.println( String(&quot;mV: &quot;) + mV );
+  Serial.println(&quot;-----------------------\n&quot;);
+  delay(100);
+}
+</code></pre>
+<p><img alt="" src="arduino_nano_sar_adc_sim.png" /></p>
+<p>รูป: ตัวอย่างผลการจำลองการทำงานด้วย <strong>AUTODESK Tinkercad</strong></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอ หลักการทำงานของวงจร  <strong>Successive Approximation (SAR) ADC</strong>
-และตัวอย่างการใช้บอร์ด <strong>Arduino Uno / Nano</strong> และโมดูล <strong>MCP4725 DAC</strong>
-พร้อมตัวอย่างโค้ดเพื่อสาธิตหลักการทำงานของวงจร <strong>SAR ADC</strong></p>
-<p>แนวทางการทดลองเพิ่มเติม เช่น ถ้าไม่ใช้โมดูล <strong>MCP4725 DAC</strong>
-ให้ลองต่อวงจร <strong>R-2R DAC + OpAmp Buffer</strong>
-และวงจรเปรียบเทียบแรงดัน <strong>Voltage Comparator</strong> บนเบรดบอร์ด เพื่อนำมาใช้งานร่วมกับบอร์ด <strong>Arduino Nano</strong>
-แล้วปรับแก้ไข <strong>Arduino Sketch</strong> เพื่ออ่านค่าแรงดันอินพุต</p>
+(หรือวงจรแปลงสัญญาณแอนะล็อกให้เป็นข้อมูลด้วยวิธีการประมาณค่าแบบสืบเนื่อง)
+และตัวอย่างการใช้บอร์ด <strong>Arduino Uno / Nano</strong> และโมดูล <strong>MCP4725 DAC (12-bit)</strong>
+หรือวงจร <strong>R-2R DAC (8-bit)</strong> ร่วมกับไอซีเปรียบเทียบแรงดัน
+พร้อมตัวอย่างโค้ดเพื่อสาธิตหลักการทำงานของวงจร <strong>SAR ADC</strong> </p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
