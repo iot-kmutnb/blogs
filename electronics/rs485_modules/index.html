@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/rs485_modules/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูลสื่อสาร **USB-to-RS485 / Serial-to-RS485 Transceiver** - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#usb-to-rs485-serial-to-rs485-transceiver" class="nav-link">การใช้งานโมดูลสื่อสาร USB-to-RS485 / Serial-to-RS485 Transceiver</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#rs485" class="nav-link">&#9655; การสื่อสารด้วย RS485</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rs485-transceiver" class="nav-link">&#9655; RS485 Transceiver</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างโค้ด Python เพื่อทดลองส่งข้อมูล</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="usb-to-rs485-serial-to-rs485-transceiver">การใช้งานโมดูลสื่อสาร <strong>USB-to-RS485 / Serial-to-RS485 Transceiver</strong><a class="headerlink" href="#usb-to-rs485-serial-to-rs485-transceiver" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การใช้งานโมดูลสื่อสาร <strong>RS485</strong> สำหรับคอมพิวเตอร์หรือบอร์ดไมโครคอนโทรลเลอร์
+และการเขียนโค้ด <strong>Python</strong> เพื่อลองส่งข้อมูลไบต์ออกไป</p>
+<p><strong>Keywords:</strong> <em>RS485 Transceiver</em>, 
+<em>Python</em>, <em>PySerial</em></p>
+<hr />
+<h2 id="rs485">&#9655; การสื่อสารด้วย <strong>RS485</strong><a class="headerlink" href="#rs485" title="Permanent link">#</a></h2>
+<p><a href="https://en.wikipedia.org/wiki/RS-485"><strong>RS485</strong></a> หรือรู้จักกันในชื่อ <strong> TIA-485(-A)</strong> หรือ <strong>EIA-485</strong>
+เป็นมาตรฐานสำหรับการสร้างสัญญาณทางไฟฟ้าเพื่อสื่อสารแบบบิตอนุกรม-อะซิงโครนัส (ไม่มีการสร้างสัญญาณ <strong>Clock</strong>
+เพื่อการสื่อสารข้อมูล ซึ่งเหมือนกรณีของ <strong>Serial/UART</strong>)
+ระหว่างอุปกรณ์ที่เชื่อมต่อกันแบบหลายจุด (<strong>Multi-point</strong> หรือ <strong>Multi-drop</strong>) ในระบบบัส</p>
+<p><strong>RS485</strong> รองรับการสื่อสารได้ระยะห่างถึง 1200 เมตร และอัตราในการส่งหรือรับข้อมูลบิตได้สูงถึง <strong>10Mbps</strong>
+แต่โดยปรกติแล้วก็จะเลือกใช้ค่า <strong>9600</strong> เป็นต้น</p>
+<p><strong>RS485</strong> ใช้สายสัญญาณหนึ่งคู่ ได้แก่ <strong>A</strong> (<em>non-inverting</em>)
+และ <strong>B</strong> (<em>inverting</em>) และเป็นการใช้สัญญาณไฟฟ้าสื่อสารแบบ <strong>Differential 
+Signaling</strong> เพื่อลดปัญหาของสัญญาณรบกวนจากภายนอกในขณะที่มีการรับส่งข้อมูล</p>
+<p>ผลต่างของทั้งสองสัญญาณ (เปรียบเทียบแรงดัน <script type="math/tex">V_A</script> กับ <script type="math/tex">V_B</script> มากกว่าหรือน้อยกว่ากัน)
+และต่างกันอย่างน้อย <strong>200mV</strong> เมื่อวัดสัญญาณที่ตัวรับ จะเป็นตัวกำหนดค่าบิต 0 หรือ 1</p>
+<ul>
+<li>ถ้า <script type="math/tex">V_A - V_B < -200mV</script> จะเป็นลอจิก 0</li>
+<li>ถ้า <script type="math/tex">V_A - V_B > +200mV</script> จะเป็นลอจิก 1 </li>
+</ul>
+<p>ถ้าใช้สายสัญญาณเพียงหนึ่งคู่ การสื่อสารด้วย <strong>RS485</strong> จะเป็นแบบ <strong>Half-Duplex</strong>
+กล่าวคือ ในแต่ละช่วงเวลาอุปกรณ์จะรับหรือส่งข้อมูลได้เท่านั้น (ไม่สามารถรับและส่งข้อมูลไบต์ในเวลาเดียวกันได้)
+แต่ถ้าใช้สัญญาณสองคู่ ก็สามารถทำงานแบบ <strong>Full-Duplex</strong> ได้</p>
+<p><img alt="" src="rs485_half_duplex_bus.png" /></p>
+<p>รูป: การเชื่อมต่อระหว่างอุปกรณ์ด้วย <strong>RS485 Half-Duplex</strong> (Source: TI)</p>
+<p><img alt="" src="rs485_failsafe_termination.png" /></p>
+<p>รูป: การใส่ตัวต้านทานที่ปลายทั้งสองด้าน (เรียกว่า <strong>Termination Resistance</strong> หรือ <script type="math/tex">R_T</script> ขนาด 120 โอห์ม)
+และการใส่ตัวต้านทาน (<script type="math/tex">R_B</script>) สำหรับ <strong>Failsafe Biasing</strong> (Source: TI)</p>
+<p>เอกสารอ้างอิงและศึกษาเพิ่มเติมในรายละเอียด</p>
+<ul>
+<li><a href="https://www.ti.com/lit/an/slla272d/slla272d.pdf"><strong>TI, Application Report: The RS-485 Design Guide</strong></a></li>
+<li><a href="https://www.ti.com/lit/wp/slla545/slla545.pdf"><strong>TI, Technical White Paper: RS-485 Basics Series</strong></a></li>
+<li><a href="https://www.renesas.com/us/en/document/whp/rs-485-transceiver-tutorial"><strong>Renesas, White Paper, RS-485 Transceiver Tutorial</strong></a></li>
+</ul>
+<hr />
+<h2 id="rs485-transceiver">&#9655; <strong>RS485 Transceiver</strong><a class="headerlink" href="#rs485-transceiver" title="Permanent link">#</a></h2>
+<p>ในการส่งหรือรับสัญญาณด้วย <strong>RS485</strong> จะต้องใช้ไอซีที่เรียกว่า <strong>RS485 Transceiver</strong> เช่น </p>
+<ul>
+<li><a href="https://www.analog.com/en/products/max485.html"><strong>MAX485</strong></a>
+และ <a href="https://www.analog.com/media/en/technical-documentation/data-sheets/max13487e-max13488e.pdf"><strong>MAX13485/MAX13486</strong></a>
+(<strong>Maxim Integrated / Analog Devices Inc.</strong>)</li>
+<li><a href="https://assets.maxlinear.com/web/documents/sp3485.pdf"><strong>SP3485EN</strong></a> (<strong>Exar / Maxlinear</strong>)</li>
+</ul>
+<p>ไอซีประเภทนี้ประกอบด้วยตัวส่ง (<strong>Driver</strong>) ที่ทำหน้าที่แปลงข้อมูลบิตให้เป็นสัญญาณ
+<strong>A</strong> และ <strong>B</strong> และตัวรับ (<strong>Receiver</strong>) ที่แปลงสัญญาณทั้งสองให้เป็นข้อมูลบิต
+และรองรับการใช้งานแบบ <strong>Half-Duplex</strong> เท่านั้น</p>
+<p>โดยทั่วไป ไอซี <strong>RS485 Transceiver</strong> มี 8 ขา ดังนี้</p>
+<ul>
+<li><strong>VCC (Supply Voltage)</strong>: แรงดันไฟเลี้ยงสำหรับไอซี</li>
+<li><strong>GND (Ground)</strong>: กราวนด์ของไอซี</li>
+<li><strong>DI (Driver Input, Input Direction)</strong>: สัญญาณดิจิทัล-อินพุตสำหรับวงจรตัวส่งภายในไอซี</li>
+<li><strong>RO (Receiver Output, Output Direction)</strong>: สัญญาณดิจิทัล-เอาต์พุตจากวงจรตัวรับภายในไอซี</li>
+<li><strong>DE (Driver Output Enable, Input Direction, Active-High)</strong>: สัญญาณควบคุมสำหรับการทำงานของตัวส่ง </li>
+<li><strong>/RE (Receiver Enable Input, Input Direction, Active-Low)</strong>: สัญญาณควบคุมสำหรับการทำงานของตัวรับ</li>
+<li><strong>A (Non-inverting I/O, Bi-directional)</strong></li>
+<li><strong>B (Inverting I/O, Bi-directional)</strong></li>
+</ul>
+<p>ตัวอย่างฟังก์ชันการทำงานของไอซี <strong>SP3485EN</strong> มีดังนี้</p>
+<p><img alt="" src="sp3485_transceiver-1.png" /></p>
+<p>รูป: <strong>SP3485EN Transceiver IC</strong></p>
+<p>ไอซี <strong>SP3485</strong> ใช้แรงดันไฟเลี้ยง <strong>3.3V ±5%</strong> และใช้กับแรงดันลอจิก <strong>5V</strong> ได้</p>
+<p>การทำงานของวงจรตัวส่งหรือวงจร "ไดรเวอร์"  </p>
+<ul>
+<li>สัญญาณควบคุมของวงจรตัวส่ง (<strong>D</strong>) คือ <strong>DE = Driver Enable (Active-High)</strong></li>
+<li>ถ้า  <strong>DE = High (Logic '1')</strong> วงจรตัวส่งจะขับสัญญาณเอาต์พุตที่ขา <strong>A</strong> และ <strong>B</strong></li>
+<li>ถ้า <strong>DE = Low (Logic '0')</strong> วงจรตัวส่งจะไม่ทำงานและสัญญาณเอาต์พุตจะอยู่ในสถานะ
+<strong>Tri-state (High-Impedance 'Z'</strong>)</li>
+<li>แรงดัน <strong>Common Mode Output Voltage</strong> ที่ขา <strong>A</strong> และ <strong>B</strong> จะอยู่ที่ระดับ <strong>VCC/2</strong> โดยทั่วไป</li>
+</ul>
+<p>การทำงานของวงจรตัวรับ </p>
+<ul>
+<li>สัญญาณควบคุมของตัวรับ (<strong>R</strong>) คือ <strong>/RE = Receiver Enable (Active-Low)</strong></li>
+<li>ถ้า  <strong>/RE = High (Logic '1')</strong> วงจรตัวรับจะไม่ทำงาน</li>
+<li>ถ้า <strong>/RE = Low (Logic '0')</strong> วงจรตัวรับจะทำงาน โดยตรวจสอบผลต่างของแรงดันไฟฟ้าระหว่างสัญญาณ
+<strong>A</strong> และ <strong>B</strong> ซึ่งจะต้องมีผลต่างไม่น้อยกว่า <strong>+/-200mV</strong> และได้สัญญาณลอจิกเป็นเอาต์พุต
+(<strong>Receiver Output: RO</strong>)</li>
+<li>ตัวรับมักมีฟังก์ชันสำหรับ <strong>Failsafe</strong> ในกรณีที่ไม่มีสัญญาณ <strong>A</strong> และ <strong>B</strong> เชื่อมต่อ
+(มีสถานะเป็น <strong>Tri-state</strong>) และเอาต์พุตของตัวรับจะได้ค่าลอจิกเป็น <strong>High</strong></li>
+<li>มีอิมพีแดนซ์ของอินพุต (<strong>Input Impedance</strong>) ของวงจรตัวรับ ระหว่างขา <strong>A</strong> กับ  <strong>B</strong> 
+มีค่าอย่างน้อย <strong>12kΩ</strong></li>
+<li>ตัวรับสามารถทนต่อแรงดัน <strong>Common Mode Voltage (CMR)</strong> ที่ขา <strong>A</strong> และ <strong>B</strong>
+(หรือ <script type="math/tex">(V_A+V_B)/2</script>) ได้ในช่วง  <strong>-7V .. +12V</strong> (หรือกว้างกว่า)</li>
+</ul>
+<p>ถ้า <strong>/RE=1</strong> และ <strong>DE=0</strong> จะทำให้ <strong>SP3485</strong> จะเข้าสู่โหมดประหยัดพลังงาน <strong>Shutdown Mode</strong></p>
+<p><img alt="" src="sp3485_transceiver-2.png" /></p>
+<p>รูป: ขาของไอซี <strong>SP3485EN</strong> และฟังก์ชันการทำงาน</p>
+<p>&nbsp;</p>
+<p>องค์ประกอบของโมดูล <strong>USB-to-RS485</strong> ที่สำคัญได้แก่</p>
+<ul>
+<li>ไอซีหรือวงจร <strong>USB-to-Serial Bridge</strong>
+เช่น <strong>FT232RL</strong>, <strong>CH340/341</strong> เป็นต้น</li>
+<li>ไอซี <strong>RS485 Transceiver</strong></li>
+<li>คอนเนกเตอร์เชื่อมต่อ เช่น <strong>Terminal Blocks</strong> 
+สำหรับสัญญาณ <strong>A</strong> และ <strong>B</strong> และ <strong>GND</strong></li>
+<li>คอนเนกเตอร์สำหรับ <strong>USB</strong></li>
+<li>ฟิวส์ป้องกันกระแสเกิน (<strong>Polyfuse</strong>) และแรงดันเกินช่วงที่กำหนดไว้  เช่น ไดโอดประเภท <strong>TVS (Transient-Voltage-Suppression)</strong></li>
+</ul>
+<p>แต่ถ้าเป็นโมดูล  <strong>Serial-RS485</strong> ด้านหนึ่งจะมีขา <strong>VCC</strong> (<strong>3.3V ~ 5V</strong>), <strong>GND</strong>, <strong>TX</strong> และ <strong>RX</strong>
+สำหรับนำไปต่อกับไมโครคอนโทรลเลอร์ และอีกด้านหนึ่งมีขา  <strong>A</strong>, <strong>B</strong> และ <strong>GND</strong> สำหรับนำไปต่อเข้ากับบัส
+<strong>RS485</strong></p>
+<p><img alt="" src="serial_rs485_modules.png" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>Serial-to-RS485</strong></p>
+<p><img alt="" src="serial_rs485_module_schematic.png" /></p>
+<p>รูป: ตัวอย่างผังวงจร</p>
+<p>ถ้าจะทดลองใช้โมดูล <strong>Serial-to-RS485</strong> กับคอมพิวเตอร์ผู้ใช้ ให้นำโมดูล
+<strong>USB-to-Serial Bridge</strong> มาต่อเพิ่ม โดยมีจุดเชื่อมต่อสัญญาณ <strong>TX</strong>
+และ <strong>RX</strong> ให้เชื่อมต่อกราวนด์ร่วมกัน และป้องแรงดันไฟเลี้ยง</p>
+<p><img alt="" src="usb_serial_rs485_interfacing.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งานร่วมกันระหว่างโมดูล <strong>USB-to-Serial Bridge</strong>
+และโมดูล <strong>Serial-to-RS485</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; ตัวอย่างโค้ด <strong>Python</strong> เพื่อทดลองส่งข้อมูล<a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>การใช้งานโมดูล <strong>RS485</strong> เพื่อรับส่งข้อมูลผ่านทาง <strong>USB</strong> ก็มีลักษณะการใช้งานเหมือนการใช้งานโมดูล
+<strong>USB-to-Serial</strong>
+ดังนั้นจึงสามารถใช้ไลบรารี <a href="https://pypi.org/project/pyserial/"><strong>PySerial</strong></a> ได้</p>
+<p>คำสั่งสำหรับการติดตั้ง <strong>PySerial</strong> มีดังนี้</p>
+<pre><code class="language-bash">$ pip3 install pyserial
+</code></pre>
+<p>ตัวอย่างโค้ด <strong>Python 3</strong> ที่ <strong>PySerial</strong> สำหรับการลองส่งข้อมูลไบต์
+<code>0x55</code> ด้วยความเร็ว (<strong>Baudrate</strong>) เท่ากับ <strong>9600</strong></p>
+<pre><code class="language-python">import serial
+
+# Print the version (tested with Pyserial v3.5)
+print(f&quot;PySerial version: {serial.__version__}&quot;)
+
+# Specify the serial port (e.g. /dev/ttyUSB0 for Linux)
+portName = '/dev/ttyUSB0'
+# Set the baudrate
+baudrate = 9600
+ser = serial.Serial( portName, baudrate )
+ser.write( b'\x55' )
+
+# Close the serial port
+ser.close()
+</code></pre>
+<p>ลองดูการวัดสัญญาณ <strong>A</strong> และ <strong>B</strong> ของโมดูลที่นำมาใช้งาน</p>
+<p><img alt="" src="usb_ft232rl_rs485.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>USB-to-RS485</strong> ที่ใช้ชิป <strong>FT232RL</strong></p>
+<p><img alt="" src="usb_ft232rl_rs485_waveform.png" /></p>
+<p>รูป: การวัดสัญญาณ <strong>A</strong> และ <strong>B</strong> ขณะที่มีการส่งข้อมูลหนึ่งไบต์ออกไป</p>
+<p>&nbsp;</p>
+<p><img alt="" src="usb_ch340_rs485_module.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>USB-to-RS485</strong> ที่ใช้ชิป <strong>CH340</strong></p>
+<p><img alt="" src="usb_ch340_rs485_waveform.png" /></p>
+<p>รูป: การวัดสัญญาณ <strong>A</strong> และ <strong>B</strong> ขณะที่มีการส่งข้อมูลหนึ่งไบต์ออกไป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอหลักการทำงานของระบบบัส <strong>RS485</strong> ในเบื้องต้น ได้ยกตัวอย่างโมดูล 
+<strong>USB-to-RS485</strong> และ <strong>Serial-to-RS485</strong> ที่ได้เลือกมาทดลองใช้งาน
+พร้อมตัวอย่างการวัดสัญญาณ <strong>A</strong> และ <strong>B</strong> ด้วยออสซิลโลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-01-17 | Last Updated: 2024-01-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
