@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/sensors/power_meter_sdm120_modbus/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#sdm120" class="nav-link">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; เพาเวอร์มิเตอร์แบบดิจิทัล</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sdm120m" class="nav-link">&#9655; มิเตอร์เฟสเดียว: SDM120(M)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างโค้ด: Python</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="sdm120">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120<a class="headerlink" href="#sdm120" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การทดลองอ่านค่าจากเพาเวอร์มิเตอร์เฟสเดียว รุ่น <strong>SDM120</strong> 
+โดยเชื่อมต่อผ่านบัส <strong>RS485</strong> และใช้โฟรโตคอล <strong>Modbus RTU</strong></p>
+<p><strong>Keywords:</strong> <em>Single-Phase Power Meter</em>,
+<em>RS485</em>, <em>Modbus RTU</em>, <em>Python</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>เพาเวอร์มิเตอร์แบบดิจิทัล</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>มิเตอร์วัดกำลังไฟฟ้า หรือ "เพาเวอร์มิเตอร์" แบบดิจิทัล (<strong>Digital Power Meter</strong>)
+เป็นอุปกรณ์ที่ใช้สำหรับการวัดค่าหรือพารามิเตอร์ต่าง ๆ สำหรับไฟฟ้ากระแสสลับ เช่น</p>
+<ul>
+<li>ความถี่ (<strong>Hz</strong>)</li>
+<li>แรงดันไฟฟ้า (<strong>V</strong>)</li>
+<li>กระแสไฟฟ้า (<strong>I</strong>) </li>
+<li>ค่าเพาเวอร์แฟคเตอร์  หรือ ค่าตัวประกอบกำลังไฟฟ้า (<strong>Power Factor</strong>)</li>
+<li>กำลังไฟฟ้าที่ใช้งานจริง (<strong>Real Power: kW</strong>) </li>
+<li>กำลังไฟฟ้าที่ปรากฏ (<strong>Apparent Power: kVA</strong>) </li>
+<li>กำลังไฟฟ้ารีแอคทีฟ (<strong>Reactive Power: kVAR</strong>)</li>
+<li>พลังงานไฟฟ้าที่ใช้ (<strong>Energy: kWh</strong>)</li>
+</ul>
+<p>มิเตอร์ไฟฟ้าประเภทนี้ จำแนกได้ตามจำนวนเฟสไฟฟ้าที่ต้องการวัดทางไฟฟ้า
+ได้แก่ มิเตอร์แบบเฟสเดียว 
+(<strong>Single-Phase Power Meter</strong>) และมิเตอร์แบบสามเฟส 
+(<strong>3-Phase Power Meter</strong>) 
+นอกจากมีหน้าจอแสดงผลแบบ <strong>LCD</strong> มิเตอร์ไฟฟ้าแบบดิจิทัลในยุคปัจจุบัน
+ยังรองรับการเชื่อมต่อด้วยโพรโทคอล <strong>Modbus RTU</strong>
+และเชื่อมต่อกับระบบบัส <strong>RS485</strong> ได้ด้วย</p>
+<p>การต่อวงจรไฟฟ้าเพื่อใช้งานมิเตอร์ มีหลายรูปแบบ โดยดูจากความจำเป็นที่ต้องใช้อุปกรณ์อื่นร่วมด้วยหรือไม่
+เช่น การใช้หม้อแปลงแรงดันไฟฟ้า (<strong>Potential Transformer: PT</strong>) 
+และหม้อแปลงกระแสไฟฟ้า (<strong>Current Transformer: CT</strong>)
+เพื่อการลดทอนแรงดันไฟฟ้าด้วย <strong>PT</strong> หรือลดกระแสไฟฟ้าด้วย <strong>CT</strong> 
+ให้มีค่าต่ำลงและอยู่ในช่วงเหมาะสมกับมิเตอร์ไฟฟ้า</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sdm120m">&#9655; <strong>มิเตอร์เฟสเดียว: SDM120(M)</strong><a class="headerlink" href="#sdm120m" title="Permanent link">#</a></h2>
+<p>ข้อมูลเชิงเทคนิคเกี่ยวกับมิเตอร์ไฟฟ้ารุ่น <a href="https://www.eastroneurope.com/products/view/sdm120modbus"><strong>SDM120-MODBUS</strong></a>
+(แบรนด์สินค้า <strong>Eastron</strong>)</p>
+<ul>
+<li>เป็นมิเตอร์ไฟฟ้าดิจิทัลแบบเฟสเดียว <strong>Single-Phase Digital Power Meter</strong></li>
+<li>เชื่อมต่อด้วยสาย <strong>L (Line)</strong> และ <strong>N (Neutral)</strong></li>
+<li>วัดกระแสไฟฟ้าโดยตรง (<strong>direct connected</strong>) ไม่ได้ใช้หม้อแปลงสำหรับวัดกระแส
+(<strong>Current Transformer: CT</strong>)</li>
+<li>คลาสความแม่นยำสำหรับการวัดแรงดันและกระแสไฟฟ้า: <strong>0.5</strong></li>
+<li>รองรับแรงดันอินพุต: <strong>176 ~ 276V AC</strong></li>
+<li>รองรับกระแสไฟฟ้า: <strong>0.25A ~ 5A (45A max.)</strong></li>
+<li>วัดค่าพลังงาน (<strong>kWh</strong>) และกำลังไฟฟ้า (<strong>kW</strong>) ได้ทั้งสองทิศทาง 
+(<strong>Bi-directional measurment</strong>)</li>
+<li>อ่านข้อมูลได้ผ่านบัส <strong>RS485</strong> ร่วมกับโพรโทคอล <strong>Modbus RTU</strong></li>
+<li>ค่า <strong>Baudrate</strong>: <strong>9600</strong> (default)</li>
+<li>ตั้งค่าหมายเลขอุปกรณ์ (<strong>Device Address</strong>) ได้ในช่วง <strong>1 ~ 247</strong></li>
+<li>ให้เอาต์พุตเป็นแบบพัลส์ (<strong>Pulsed Outputs</strong>)</li>
+<li>ผ่านมาตรฐาน <strong>MID</strong> (Measuring Instruments Directive, B and D)</li>
+<li>สามารถติดตั้งบนรางปีกนกได้ (<strong>DIN Rail Mounting</strong>)</li>
+</ul>
+<p><img alt="" src="sdm120.png" /></p>
+<p>รูป: <strong>SDM120</strong></p>
+<p><img alt="" src="sdm120_wiring_diagram.png" /></p>
+<p>รูป: การเชื่อมต่อกับมิเตอร์ (<strong>Wiring Diagram</strong>)</p>
+<p>การต่อสายไฟจาก <strong>L</strong> และ <strong>N</strong> ไปยังมิเตอร์และโหลดไฟฟ้า</p>
+<ul>
+<li><strong>1</strong>: สาย <strong>L (Line-In)</strong> เพื่อให้กระแสวิ่งเข้าไปในตัวมิเตอร์ </li>
+<li><strong>2</strong>  สาย <strong>L (Line-Out)</strong> เพื่อให้กระแสวิ่งออกจากตัวมิเตอร์ไปยังโหลดไฟฟ้า </li>
+<li><strong>3</strong>, <strong>4</strong>: สาย <strong>N</strong> (<strong>Neutral</strong>)</li>
+<li><strong>5</strong>, <strong>6</strong>, <strong>7</strong>: เป็นเอาต์พุตแบบพัลส์ <strong>Pulse Out 1</strong> (<strong>Export kWh</strong>), <strong>GND</strong>, 
+<strong>Pulse Out 2</strong> (<strong>Import kWh</strong>)</li>
+<li><strong>8</strong>, <strong>9</strong>, <strong>10</strong>:  <strong>GND</strong> ของวงจร สัญญาณ <strong>B</strong> และ <strong>A</strong> ตามลำดับ</li>
+</ul>
+<p><img alt="" src="sdm120_rs485_bus.png" /></p>
+<p>รูป: ตัวอย่างการต่อมิเตอร์หลายตัวในระบบบัส <strong>RS485</strong> และมีตัวต้านทาน <strong>120</strong> โอห์ม ปิดปลายทั้งสองด้าน</p>
+<p><strong>ไฟล์เอกสารสำหรับการใช้งานมิเตอร์</strong></p>
+<ul>
+<li><a href="sdm120_modbus_mid_datasheet.pdf"><strong>SDM120 Datasheet</strong></a></li>
+<li><a href="sdm120_mid_user_manual.pdf"><strong>SDM120 User Manual</strong></a></li>
+<li><a href="sdm120_protocol.pdf"><strong>SDM120 Protocol</strong></a></li>
+</ul>
+<p>ตามโพรโทคอลของ <a href="https://www.modbustools.com/modbus.html"><strong>Modbus RTU</strong></a>
+การเขียนหรืออ่านข้อมูลรีจิสเตอร์ แต่ละตัวมีขนาด 2 ไบต์ 
+หรือ 16 บิต ( <strong>Big-endian encoding</strong>) มีการจำแนกประเภทหรือแบ่งกลุ่มซึ่งจะใช้
+คำสั่ง <strong>Function Code (FC)</strong> แตกต่างกัน เช่น</p>
+<ul>
+<li><strong>Input Registers</strong> เป็นรีจิสเตอร์สำหรับข้อมูล (ขนาด 2 ไบต์) ที่ใช้เป็นอินพุตของโมดูลหรือมีการเปลี่ยนแปลงได้<ul>
+<li>ใช้คำสั่ง <strong>FC = 0x04 (Read Input Registers)</strong> อ่านค่าจากรีจิสเตอร์หนึ่งตัว (หรือมากกว่าหนึ่งตัวแต่มีแอดเดรสต่อเนื่องกัน)</li>
+</ul>
+</li>
+<li><strong>Holding Registers</strong> เป็นรีจิสเตอร์สำหรับข้อมูล (ขนาด 2 ไบต์) เช่น การตั้งค่าการใช้งานสำหรับโมดูล<ul>
+<li>ใช้คำสั่ง <strong>FC = 0x03 (Read Multiple Holding Registers)</strong> อ่านค่าจากรีจิสเตอร์หนึ่งตัว (หรือมากกว่าหนึ่งตัวแต่มีแอดเดรสต่อเนื่องกัน)</li>
+<li>ใช้คำสั่ง <strong>FC = 0x06 (Write Single Holding Register)</strong> เขียนค่ารีจิสเตอร์หนึ่งตัว</li>
+<li>ใช้คำสั่ง <strong>FC = 0x10 (Write Multiple Holding Registers)</strong> เขียนค่ารีจิสเตอร์มากกว่าหนึ่งตัว</li>
+</ul>
+</li>
+</ul>
+<p>รีจิสเตอร์ภายในมิเตอร์ <strong>SDM120</strong> แบ่งเป็น 2 กลุ่มคือ</p>
+<ul>
+<li>รีจิสเตอร์อินพุตของมิเตอร์ (<strong>Modbus Input Registers</strong>)
+ดังนั้นจึงใช้ <strong>Function Code</strong> เท่ากับ <strong>0x04</strong> ในการอ่านค่า</li>
+<li>รีจิสเตอร์สำหรับการตั้งค่าของมิเตอร์ (<strong>Modbus Holding Registers</strong>)
+ดังนั้นจึงใช้ <strong>Function Code</strong> เท่ากับ <strong>0x03</strong> ในการอ่านค่า</li>
+</ul>
+<p><img alt="" src="sdm120_input_registers.png" /></p>
+<p>รูป: แอดเดรสของรีจิสเตอร์อินพุตของมิเตอร์ (<strong>Modbus Input Registers</strong>)</p>
+<p>จากตารางจะเห็นได้ว่ามีการระบุแอดเดรสในช่วง <code>30001 ~ 30345</code>  สำหรับรีจิสเตอร์อินพุตแต่ละตัว
+ให้ดูที่แอดเดรสเริ่มต้น (<strong>Start Address Hex</strong>) ซึ่งเป็นเลขฐานสิบหก
+และใช้ <strong>Function Code = 0x03</strong> สำหรับการอ่านค่า </p>
+<ul>
+<li><code>0x0000 - 0x0001</code> หมายถึง รีจิสเตอร์ 2 ตัว (32 บิต) สำหรับแรงดันไฟฟ้า</li>
+<li><code>0x0006 - 0x0007</code> หมายถึง  รีจิสเตอร์ 2 ตัว (32 บิต) สำหรับกระแสไฟฟ้า</li>
+<li><code>0x000C - 0x000D</code> หมายถึง  รีจิสเตอร์ 2 ตัว (32 บิต) สำหรับกำลังไฟฟ้าที่ใช้จริง</li>
+</ul>
+<p><img alt="" src="sdm120_holding_registers.png" /></p>
+<p>รูป: แอดเดรสของรีจิสเตอร์สำหรับการตั้งค่าของมิเตอร์ (<strong>Modbus Holding Registers</strong>)</p>
+<p>จากตารางสำหรับรีจิสเตอร์เพื่อการตั้งค่าใช้งาน และใช้ <strong>Function Code = 0x4</strong> สำหรับการอ่านค่า </p>
+<ul>
+<li><code>0x0014</code> ~ <code>0x0015</code> หมายถึง  รีจิสเตอร์ 2 ตัว (32 บิต) สำหรับหมายเลขอุปกรณ์ (<strong>Device Address</strong>)</li>
+<li><code>0x001C</code> ~ <code>0x001D</code> หมายถึง  รีจิสเตอร์ 2 ตัว (32 บิต) สำหรับค่า <strong>Baudrate</strong> 
+(0=2400, 1=4800, 2=9600, ...)</li>
+</ul>
+<p>ถ้าต้องการอ่านค่าจากรีจิสเตอร์ เพื่อให้ได้ค่า <strong>float</strong> (32 บิต)<br />
+จะต้องส่งเฟรมข้อมูล (<strong>Request Frame</strong>) ไปยังมิเตอร์ โดยมีลำดับข้อมูลไบต์ดังนี้</p>
+<ul>
+<li><strong>Slave Address</strong>: แอดเดรสของมิเตอร์ (1 ไบต์)</li>
+<li><strong>Function Code</strong>: โค้ดของฟังก์ชัน  (1 ไบต์) เช่น <strong>0x03</strong> หรือ <strong>0x04</strong></li>
+<li><strong>Start Address (High Byte)</strong>: แอดเดรสเริ่มต้นของรีจิสเตอร์ที่ต้องการอ่านค่า (ไบต์สูง)</li>
+<li><strong>Start Address (Low Byte)</strong>: แอดเดรสเริ่มต้นของรีจิสเตอร์ที่ต้องการอ่านค่า (ไบต์ต่ำ)</li>
+<li><strong>Number of Registers (High Byte)</strong>: จำนวนรีจิสเตอร์ที่ต้องการอ่าน  (ไบต์สูง)</li>
+<li><strong>Number of Registers (Low Byte)</strong>: จำนวนรีจิสเตอร์ที่ต้องการอ่าน (ไบต์ต่ำ)</li>
+<li><strong>CRC16 (Low Byte)</strong>: ค่าตัวเลขสำหรับ <strong>16-bit CRC Checksum</strong> (ไบต์ต่ำ)</li>
+<li><strong>CRC16 (High Byte)</strong>: ค่าตัวเลขสำหรับ <strong>16-bit CRC Checksum</strong> (ไบต์สูง)</li>
+</ul>
+<p>เฟรมข้อมูลที่ได้รับการตอบกลับมา (<strong>Response Frame</strong>)
+หากทำคำสั่งได้ถูกต้อง (เช่น อ่านค่ารีจิเตอร์ 2 ตัว) มีลักษณะดังนี้</p>
+<ul>
+<li><strong>Slave Address</strong> แอดเดรสของมิเตอร์ (1 ไบต์)</li>
+<li><strong>Function Code</strong>: โค้ดของฟังก์ชัน  (1 ไบต์) เช่น <strong>0x03</strong> หรือ <strong>0x04</strong></li>
+<li><strong>Byte Count</strong>: จำนวนไบต์ของข้อมูลที่ตามมา</li>
+<li><strong>First Register (High Byte)</strong>: ค่าของรีจิสเตอร์ตัวแรก (ไบต์สูง)</li>
+<li><strong>First Register (Low Byte)</strong>: ค่าของรีจิสเตอร์ตัวแรก (ไบต์ต่ำ)</li>
+<li><strong>Second Register (High Byte)</strong>: ค่าของรีจิสเตอร์ตัวที่สอง (ไบต์สูง)</li>
+<li><strong>Second Register (Low Byte)</strong>: ค่าของรีจิสเตอร์ตัวที่สอง (ไบต์ต่ำ)</li>
+<li><strong>CRC16 (Low Byte)</strong>: ค่าตัวเลขสำหรับ <strong>16-bit CRC Checksum</strong> (ไบต์ต่ำ)</li>
+<li><strong>CRC16 (High Byte)</strong>: ค่าตัวเลขสำหรับ <strong>16-bit CRC Checksum</strong> (ไบต์สูง)</li>
+</ul>
+<p><img alt="" src="modbus_request_response.png" /></p>
+<p>รูป: เฟรมข้อมูลสำหรับการส่งคำสั่งไปยังมิเตอร์และเฟรมข้อมูลที่ได้รับตอบกลับจากมิเตอร์ เมื่อต้องการอ่านค่าในรีจิสเตอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python">&#9655; <strong>ตัวอย่างโค้ด: Python</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่าง <strong>Python</strong> ต่อไปนี้สาธิตการอ่านค่าจากมิเตอร์ ตามแอดเดรสของรีจิสเตอร์ต่าง ๆ 
+โดยใช้ไลบรารี <a href="https://minimalmodbus.readthedocs.io/en/stable/apiminimalmodbus.html"><strong>MinimalModbus</strong></a>
+และคอมพิวเตอร์ของผู้ใช้จะต้องเชื่อมต่อ
+โดยใช้อุปกรณ์ <strong>USB-to-RS485</strong> จึงจะสามารถเชื่อมต่อกับบัส <strong>RS485</strong> ไปยังมิเตอร์ไฟฟ้าได้
+ในโค้ดจะต้องมีการระบุหมายเลขของมิเตอร์ (อยู่ในช่วง <strong>1 ~ 247</strong>)
+พอร์มอนุกรมสำหรับการสื่อสาร เช่น <code>/dev/ttyUSB0</code> สำหรับ <strong>Linux</strong>
+และค่า <strong>Baurate</strong> ให้ตรงกับการตั้งค่าของมิเตอร์ เช่น <code>9600</code></p>
+<pre><code>#!/usr/bin/python
+
+import minimalmodbus
+import time
+
+# Set the device address
+addr = 1
+# Set the serial port
+serial_port = '/dev/ttyUSB0'
+
+rs485 = minimalmodbus.Instrument(serial_port, addr)
+rs485.serial.baudrate = 9600
+rs485.serial.bytesize = 8
+rs485.serial.parity   = minimalmodbus.serial.PARITY_NONE
+rs485.serial.stopbits = 1
+rs485.serial.timeout  = 0.5
+rs485.debug = False
+rs485.mode = minimalmodbus.MODE_RTU
+
+# Read float:
+#  registeraddress=??, functioncode=4, number_of_registers=2
+Volt    = rs485.read_float(0, 4, 2)
+Current = rs485.read_float(6, 4, 2)
+Active_Power   = rs485.read_float(12, 4, 2)
+Apparent_Power = rs485.read_float(18, 4, 2)
+Reactive_Power = rs485.read_float(24, 4, 2)
+Power_Factor   = rs485.read_float(30, 4, 2)
+Phase_Angle    = rs485.read_float(36, 4, 2)
+Frequency      = rs485.read_float(70, 4, 2)
+
+Import_Active_Energy   = rs485.read_float( 72, 4, 2)
+Export_Active_Energy   = rs485.read_float( 74, 4, 2)
+Import_Reactive_Energy = rs485.read_float( 76, 4, 2)
+Export_Reactive_Energy = rs485.read_float( 78, 4, 2)
+Total_Active_Energy    = rs485.read_float(342, 4, 2)
+Total_Reactive_Energy  = rs485.read_float(344, 4, 2)
+
+print( f'Voltage: {Volt:.1f} V' )
+print( f'Current: {Current:.1f} A' )
+print( f'Active power  : {Active_Power:.1f} W' )
+print( f'Apparent power: {Apparent_Power:.1f} VA' )
+print( f'Reactive power: {Reactive_Power:.1f} VAr' )
+print( f'Power factor  : {Power_Factor:.1f}' )
+print( f'Phase angle   : {Phase_Angle:.1f} Degree' )
+print( f'Frequency     : {Frequency:.1f} Hz' )
+print( f'Import active energy  : {Import_Active_Energy:.3f} kWh' )
+print( f'Export active energy  : {Export_Active_Energy:.3f} kWh' )
+print( f'Import reactive energy: {Import_Reactive_Energy:.3f} kVArh' )
+print( f'Export reactive energy: {Export_Reactive_Energy:.3f} kVArh' )
+print( f'Total active energy   : {Total_Active_Energy:.3f} kWh' )
+print( f'Total reactive energy : {Total_Reactive_Energy:.3f} kVARh' )
+</code></pre>
+<p>คำสั่งของ <strong>MinimalMobdus</strong> ที่ใช้ในการอ่านค่าจากริจีสเตอร์อินพุต คือ <code>read_float(...)</code> ซึ่งจะต้องระบุแอดเดรสของรีจิสเตอร์
+ตามด้วยค่าสำหรับ <strong>Function Code</strong> เช่น <strong>3</strong> หรือ <strong>4</strong> จำนวนของรีจิสเตอร์ที่ต้องการอ่าน
+(ถ้าเป็นข้อมูลตัวเลขแบบ <code>float</code> จะต้องอ่าน 2 ริจิสเตอร์ เพื่อให้ได้ 32 บิต) และลำดับของไบต์ข้อมูล
+(ค่า <strong>default</strong> คือ 0 ซึ่งหมายถึง <strong>Big-endian</strong>)</p>
+<pre><code>read_float( 
+    registeraddress: int, 
+    functioncode: int = 3, 
+    number_of_registers: int = 2, 
+    byteorder: int = 0) → float
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอการทดลองใช้งานเพาเวอร์มิเตอร์เฟสเดียว รุ่น <strong>SDM120 (Brand: Eastron)</strong>
+และตัวอย่างโค้ด <strong>Python</strong> เพื่อสาธิตการอ่านค่าจากมิเตอร์ โดยเชื่อมต่อผ่านบัส <strong>RS485</strong>
+และใช้โพรโทคอล <strong>Modbus RTU</strong> เพื่อส่งเฟรมข้อมูลสำหรับคำสั่งและข้อมูลตอบกลับ</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../electronics/rs485_modules/">การใช้งานโมดูลสื่อสาร <strong>RS485 Transceiver</strong></a></li>
+<li><a href="../xy-md02/">การใช้งานโมดูล <strong>XY-MD02 Temperature &amp; Humidity Sensor (RS485 Modbus RTU)</strong></a></li>
+<li><a href="../power_meter_cj-3d3ys/">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าสามเฟส: <strong>CJ-3D3YS (ZGCJ)</strong></a></li>
+<li><a href="../power_meter_zm194-d9y/">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าสามเฟส: <strong>ZM194-D9Y (ZJZM)</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-01-27 | Last Updated: 2024-01-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
