@@ -8,7 +8,7 @@
         <meta name="author" content="RSP">
         <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/sensors/power_meter_sdm120_modbus/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120 - IoT Engineering Education</title>
+        <title>การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120-Modbus - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#sdm120" class="nav-link">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120</a>
+            <li class="nav-item" data-level="1"><a href="#sdm120-modbus" class="nav-link">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120-Modbus</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; เพาเวอร์มิเตอร์แบบดิจิทัล</a>
               <ul class="nav flex-column">
@@ -100,6 +100,10 @@
               </ul>
             </li>
             <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างโค้ด: Python</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch" class="nav-link">&#9655; โค้ดตัวอย่าง: Arduino Sketch</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -114,11 +118,11 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="sdm120">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120<a class="headerlink" href="#sdm120" title="Permanent link">#</a></h1>
+<h1 id="sdm120-modbus">การอ่านค่าจากเพาเวอร์มิเตอร์ไฟฟ้าเฟสเดียว: SDM120-Modbus<a class="headerlink" href="#sdm120-modbus" title="Permanent link">#</a></h1>
 <p>บทความนี้กล่าวถึง การทดลองอ่านค่าจากเพาเวอร์มิเตอร์เฟสเดียว รุ่น <strong>SDM120</strong> 
 โดยเชื่อมต่อผ่านบัส <strong>RS485</strong> และใช้โฟรโตคอล <strong>Modbus RTU</strong></p>
-<p><strong>Keywords:</strong> <em>Single-Phase Power Meter</em>,
-<em>RS485</em>, <em>Modbus RTU</em>, <em>Python</em></p>
+<p><strong>Keywords:</strong> <em>Single-Phase Power Meter</em>, <em>SDM120M</em>,
+<em>RS485</em>, <em>Modbus RTU</em>, <em>Python</em>, <em>Arduino Sketch</em>, <em>ESP32-C3</em></p>
 <hr />
 <h2 id="_1">&#9655; <strong>เพาเวอร์มิเตอร์แบบดิจิทัล</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>มิเตอร์วัดกำลังไฟฟ้า หรือ "เพาเวอร์มิเตอร์" แบบดิจิทัล (<strong>Digital Power Meter</strong>)
@@ -130,8 +134,8 @@
 <li>ค่าเพาเวอร์แฟคเตอร์  หรือ ค่าตัวประกอบกำลังไฟฟ้า (<strong>Power Factor</strong>)</li>
 <li>กำลังไฟฟ้าที่ใช้งานจริง (<strong>Real Power: kW</strong>) </li>
 <li>กำลังไฟฟ้าที่ปรากฏ (<strong>Apparent Power: kVA</strong>) </li>
-<li>กำลังไฟฟ้ารีแอคทีฟ (<strong>Reactive Power: kVAR</strong>)</li>
-<li>พลังงานไฟฟ้าที่ใช้ (<strong>Energy: kWh</strong>)</li>
+<li>กำลังไฟฟ้ารีแอคทีฟ (<strong>Reactive Power: kVAr</strong>)</li>
+<li>พลังงานไฟฟ้าที่ใช้ (<strong>Active Energy: kWh</strong>)</li>
 </ul>
 <p>มิเตอร์ไฟฟ้าประเภทนี้ จำแนกได้ตามจำนวนเฟสไฟฟ้าที่ต้องการวัดทางไฟฟ้า
 ได้แก่ มิเตอร์แบบเฟสเดียว 
@@ -161,14 +165,14 @@
 <li>วัดค่าพลังงาน (<strong>kWh</strong>) และกำลังไฟฟ้า (<strong>kW</strong>) ได้ทั้งสองทิศทาง 
 (<strong>Bi-directional measurment</strong>)</li>
 <li>อ่านข้อมูลได้ผ่านบัส <strong>RS485</strong> ร่วมกับโพรโทคอล <strong>Modbus RTU</strong></li>
-<li>ค่า <strong>Baudrate</strong>: <strong>9600</strong> (default)</li>
+<li>ค่า <strong>Baudrate</strong>: <strong>2400</strong> (default), <strong>4800</strong>, <strong>9600</strong></li>
 <li>ตั้งค่าหมายเลขอุปกรณ์ (<strong>Device Address</strong>) ได้ในช่วง <strong>1 ~ 247</strong></li>
 <li>ให้เอาต์พุตเป็นแบบพัลส์ (<strong>Pulsed Outputs</strong>)</li>
 <li>ผ่านมาตรฐาน <strong>MID</strong> (Measuring Instruments Directive, B and D)</li>
 <li>สามารถติดตั้งบนรางปีกนกได้ (<strong>DIN Rail Mounting</strong>)</li>
 </ul>
 <p><img alt="" src="sdm120.png" /></p>
-<p>รูป: <strong>SDM120</strong></p>
+<p>รูป: <strong>SDM120M Digital Power Meter</strong></p>
 <p><img alt="" src="sdm120_wiring_diagram.png" /></p>
 <p>รูป: การเชื่อมต่อกับมิเตอร์ (<strong>Wiring Diagram</strong>)</p>
 <p>การต่อสายไฟจาก <strong>L</strong> และ <strong>N</strong> ไปยังมิเตอร์และโหลดไฟฟ้า</p>
@@ -182,6 +186,14 @@
 </ul>
 <p><img alt="" src="sdm120_rs485_bus.png" /></p>
 <p>รูป: ตัวอย่างการต่อมิเตอร์หลายตัวในระบบบัส <strong>RS485</strong> และมีตัวต้านทาน <strong>120</strong> โอห์ม ปิดปลายทั้งสองด้าน</p>
+<p><img alt="" src="sdm120_setup-1.jpg" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ที่ได้นำมาทดลอง</p>
+<p><img alt="" src="sdm120_voltage.jpg" /></p>
+<p>รูป: จอแสดงผล <strong>LCD</strong> เมื่อกดปุ่มเพื่อแสดงค่าแรงดันไฟฟ้า (<strong>AC Voltage</strong>) ที่วัดได้ด้วยมิเตอร์</p>
+<p><img alt="" src="sdm120_meter_id.jpg" /></p>
+<p>รูป:  จอแสดงผล <strong>LCD</strong> เมื่อกดปุ่มเพื่อแสดงค่า <strong>Meter ID (001)</strong></p>
+<p><img alt="" src="sdm120_baudrate_2400.jpg" /></p>
+<p>รูป: จอแสดงผล <strong>LCD</strong> เมื่อกดปุ่มเพื่อแสดงค่า <strong>Baudrate (2400: default)</strong></p>
 <p><strong>ไฟล์เอกสารสำหรับการใช้งานมิเตอร์</strong></p>
 <ul>
 <li><a href="sdm120_modbus_mid_datasheet.pdf"><strong>SDM120 Datasheet</strong></a></li>
@@ -265,19 +277,20 @@
 โดยใช้อุปกรณ์ <strong>USB-to-RS485</strong> จึงจะสามารถเชื่อมต่อกับบัส <strong>RS485</strong> ไปยังมิเตอร์ไฟฟ้าได้
 ในโค้ดจะต้องมีการระบุหมายเลขของมิเตอร์ (อยู่ในช่วง <strong>1 ~ 247</strong>)
 พอร์มอนุกรมสำหรับการสื่อสาร เช่น <code>/dev/ttyUSB0</code> สำหรับ <strong>Linux</strong>
-และค่า <strong>Baurate</strong> ให้ตรงกับการตั้งค่าของมิเตอร์ เช่น <code>9600</code></p>
+และค่า <strong>Baudrate</strong> ให้ตรงกับการตั้งค่าของมิเตอร์ เช่น <code>2400</code></p>
 <pre><code>#!/usr/bin/python
 
-import minimalmodbus
-import time
+import minimalmodbus # Use the MinimalModbus package
 
 # Set the device address
-addr = 1
+dev_addr = 1
 # Set the serial port
 serial_port = '/dev/ttyUSB0'
+# Set the baudrate
+baudrate = 2400 # default: 2400
 
-rs485 = minimalmodbus.Instrument(serial_port, addr)
-rs485.serial.baudrate = 9600
+rs485 = minimalmodbus.Instrument(serial_port, dev_addr)
+rs485.serial.baudrate = baudrate
 rs485.serial.bytesize = 8
 rs485.serial.parity   = minimalmodbus.serial.PARITY_NONE
 rs485.serial.stopbits = 1
@@ -285,38 +298,34 @@ rs485.serial.timeout  = 0.5
 rs485.debug = False
 rs485.mode = minimalmodbus.MODE_RTU
 
-# Read float:
-#  registeraddress=??, functioncode=4, number_of_registers=2
-Volt    = rs485.read_float(0, 4, 2)
-Current = rs485.read_float(6, 4, 2)
-Active_Power   = rs485.read_float(12, 4, 2)
-Apparent_Power = rs485.read_float(18, 4, 2)
-Reactive_Power = rs485.read_float(24, 4, 2)
-Power_Factor   = rs485.read_float(30, 4, 2)
-Phase_Angle    = rs485.read_float(36, 4, 2)
-Frequency      = rs485.read_float(70, 4, 2)
+params = [
+    {&quot;reg_addr&quot;: 0x0000, &quot;name&quot;: &quot;Voltage&quot;, &quot;unit&quot;: &quot;V&quot;},
+    {&quot;reg_addr&quot;: 0x0006, &quot;name&quot;: &quot;Current&quot;, &quot;unit&quot;: &quot;A&quot;},
+    {&quot;reg_addr&quot;: 0x000C, &quot;name&quot;: &quot;Active Power&quot;, &quot;unit&quot;: &quot;W&quot;},
+    {&quot;reg_addr&quot;: 0x0012, &quot;name&quot;: &quot;Apparent Power&quot;, &quot;unit&quot;: &quot;VA&quot;},
+    {&quot;reg_addr&quot;: 0x0018, &quot;name&quot;: &quot;Reactive Power&quot;, &quot;unit&quot;: &quot;VAr&quot;},
+    {&quot;reg_addr&quot;: 0x001E, &quot;name&quot;: &quot;Power Factor&quot;, &quot;unit&quot;: &quot;-&quot;},
+    {&quot;reg_addr&quot;: 0x0046, &quot;name&quot;: &quot;Frequency&quot;, &quot;unit&quot;: &quot;Hz&quot;},
+    {&quot;reg_addr&quot;: 0x0156, &quot;name&quot;: &quot;Total Active Energy&quot;, &quot;unit&quot;: &quot;kWh&quot;},
+]
 
-Import_Active_Energy   = rs485.read_float( 72, 4, 2)
-Export_Active_Energy   = rs485.read_float( 74, 4, 2)
-Import_Reactive_Energy = rs485.read_float( 76, 4, 2)
-Export_Reactive_Energy = rs485.read_float( 78, 4, 2)
-Total_Active_Energy    = rs485.read_float(342, 4, 2)
-Total_Reactive_Energy  = rs485.read_float(344, 4, 2)
-
-print( f'Voltage: {Volt:.1f} V' )
-print( f'Current: {Current:.1f} A' )
-print( f'Active power  : {Active_Power:.1f} W' )
-print( f'Apparent power: {Apparent_Power:.1f} VA' )
-print( f'Reactive power: {Reactive_Power:.1f} VAr' )
-print( f'Power factor  : {Power_Factor:.1f}' )
-print( f'Phase angle   : {Phase_Angle:.1f} Degree' )
-print( f'Frequency     : {Frequency:.1f} Hz' )
-print( f'Import active energy  : {Import_Active_Energy:.3f} kWh' )
-print( f'Export active energy  : {Export_Active_Energy:.3f} kWh' )
-print( f'Import reactive energy: {Import_Reactive_Energy:.3f} kVArh' )
-print( f'Export reactive energy: {Export_Reactive_Energy:.3f} kVArh' )
-print( f'Total active energy   : {Total_Active_Energy:.3f} kWh' )
-print( f'Total reactive energy : {Total_Reactive_Energy:.3f} kVARh' )
+print( &quot;SDM120 Modbus - Digital Power Meter &quot;)
+try:
+    for param in params:
+        value = rs485.read_float(
+                registeraddress=param[&quot;reg_addr&quot;], 
+                functioncode=4, 
+                number_of_registers=2 )
+        print(  f'0x{hex(param[&quot;reg_addr&quot;])[2:].zfill(4)}:',
+                f'{param[&quot;name&quot;]:&gt;20s},',
+                f'{value:7.3f}', 
+                f'[{param[&quot;unit&quot;]}]'  )
+except Exception as ex:
+    print(ex)
+finally:
+    if rs485.serial:
+        rs485.serial.close()
+    print('Done..')
 </code></pre>
 <p>คำสั่งของ <strong>MinimalMobdus</strong> ที่ใช้ในการอ่านค่าจากริจีสเตอร์อินพุต คือ <code>read_float(...)</code> ซึ่งจะต้องระบุแอดเดรสของรีจิสเตอร์
 ตามด้วยค่าสำหรับ <strong>Function Code</strong> เช่น <strong>3</strong> หรือ <strong>4</strong> จำนวนของรีจิสเตอร์ที่ต้องการอ่าน
@@ -328,11 +337,248 @@ print( f'Total reactive energy : {Total_Reactive_Energy:.3f} kVARh' )
     number_of_registers: int = 2, 
     byteorder: int = 0) → float
 </code></pre>
+<p><img alt="" src="python_demo.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากการรันโค้ดตัวอย่าง <strong>Python</strong></p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ดถัดไป (ตัดแสดงมาเฉพาะบางส่วนที่สำคัญ) แสดงการใช้คำสั่ง (ใช้ <strong>Function Code = 0x03</strong>)
+เพื่ออ่านค่าจากรีจิสเตอร์สำหรับการตั้งค่าใช้งานของมิเตอร์
+เช่น หมายเลของอุปกรณ์  (<strong>Meter ID</strong>) รหัสของมิเตอร์ (<strong>Serial Number</strong>) เป็นต้น มีดังนี้ </p>
+<pre><code class="language-python"># ....
+print( &quot;SDM120 Modbus - Digital Power Meter &quot;)
+
+METER_ID_REG_ADDR = 0x0014
+METER_SN_REG_ADDR = 0xFC00
+BAUDRATE_REG_ADDR = 0x001C
+
+value = rs485.read_float(
+                registeraddress=METER_ID_REG_ADDR, 
+                functioncode=3, 
+                number_of_registers=2 )
+meter_id = int(value)
+print(f'Meter ID: {meter_id}')
+
+value = rs485.read_long(
+                registeraddress=METER_SN_REG_ADDR, 
+                functioncode=3)
+meter_sn = hex(value)[2:].zfill(8)
+print(f'Meter S/N: {meter_sn} (hex)')
+
+value = rs485.read_float(
+            registeraddress=BAUDRATE_REG_ADDR, 
+            functioncode=3, 
+            number_of_registers=2 )
+value = int(value)
+if value &lt; 5:
+    meter_baudrate = (1&lt;&lt;value)*2400
+    print(f'Baudrate: {meter_baudrate}')
+</code></pre>
+<p>ถ้าต้องการจะเปลี่ยนค่า <strong>Baudrate</strong> เช่น จาก <strong>0=2400</strong> ให้เป็น <strong>2=9600</strong> 
+ก็มีตัวอย่างการเขียนโค้ด โดยใช้คำสั่งสำหรับ <strong>Function Code = 0x10</strong> ดังนี้</p>
+<pre><code class="language-python">BAUDRATE_REG_ADDR = 0x001C
+
+# Set the baudrate to 9600 (note: 0=2400, 1=4800, 2=9600)
+# To enter the setup mode, press the button on the meter for 5 sec.
+try:  
+    rs485.write_float( registeraddress=BAUDRATE_REG_ADDR, value=2 )
+except minimalmodbus.ModbusException as ex:
+    print( ex )
+</code></pre>
+<p><strong>ข้อสังเกต:</strong> ถ้าต้องการเขียนค่าลงในรีจิสเตอร์ เช่น เพื่อเปลี่ยนค่า <strong>Baudrate</strong>
+จะต้องมีการกดปุ่มที่มิเตอร์ค้างไว้ อย่างน้อย 5 วินาที
+เพื่อเข้าสู่โหมด <strong>Setup</strong> ก่อนการส่งคำสั่งไปยังมิเตอร์</p>
+<p><img alt="" src="sdm120_setup-2.jpg" /></p>
+<p>รูป: จอแสดงผลของมิเตอร์เมื่ออยู่ในโหมด <strong>Setup</strong></p>
+<p><img alt="" src="sdm120_baudrate_9600.jpg" /></p>
+<p>รูป: การตั้งค่า <strong>Baudrate</strong> ให้เป็น <strong>9600</strong> ได้สำเร็จแล้ว</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch">&#9655; <strong>โค้ดตัวอย่าง: Arduino Sketch</strong><a class="headerlink" href="#arduino-sketch" title="Permanent link">#</a></h2>
+<p>ในการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์  (เลือกใช้ <strong>ESP32-C3</strong>)
+จะต้องใช้ร่วมกับโมดูล <strong>Serial-to-RS485</strong> 
+ในตัวอย่างนี้ ได้เลือกใช้ขา <strong>Tx=GPIO21</strong> และ <strong>Rx=GPIO20</strong> สำหรับวงจร <strong>Hardware Serial</strong> 
+หมายเลข 0 ของ <strong>ESP32-C3 SoC</strong> เพื่อนำไปต่อกับโมดูล <strong>RS485 Transceiver</strong> 
+(ตั้งค่า <strong>Baudrate 9600</strong>)
+ขา <strong>A</strong> และ <strong>B</strong> ของโมดูล <strong>RS485 Transceiver</strong> เชื่อมต่อด้วยสายไฟหนึ่งคู่ไปยังช่องสัญญาณ 
+<strong>A</strong> และ <strong>B</strong>sr ของมิเตอร์ไฟฟ้า
+การเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ จะใช้วิธี <strong>USB-CDC</strong> เพื่อการอัปโหลด <strong>Arduino Sketch</strong>
+และการรับข้อความจากบอร์ดไมโครคอนโทรลเลอร์</p>
+<p>ฟังก์ชัน <code>read_regs(...)</code> ใช้สำหรับการอ่านค่าจากรีจิสเตอร์ขนาด 16 บิต ได้มากกว่าหนึ่งตัว
+และอีกฟังก์ชัน <code>read_float(...)</code> จะใช้สำหรับการอ่านค่าจากรีจิสเตอร์ตามแอดเดรสของรีจิสเตอร์ที่ต้องการ 
+แต่อ่านรีจิสเตอร์ 2 ตัว เพื่อให้ได้ค่าเป็น <strong>float</strong> (32 บิต)</p>
+<p>ฟังก์ชัน <code>calc_modbus_crc(...)</code> ใช้สำหรับการคำนวณค่า <strong>16-bit CRC</strong>
+และใช้ในการตรวจสอบความถูกต้องสำหรับเฟรมข้อมูลที่มีการส่งไปและได้รับตอบกลับมา</p>
+<pre><code class="language-c++">//////////////////////////////////////////////////////////////
+// Date: 2024-01-29
+// Board: Super-Mini ESP32-C3
+// Arduino IDE: v2.2.1
+// Arduino ESP32 Core: v3.0.0aplha3
+//////////////////////////////////////////////////////////////
+#include &lt;HardwareSerial.h&gt;
+
+// Use Hardware Serial 0 or 1
+#define HW_SERIAL (0)
+HardwareSerial RS485( HW_SERIAL ); 
+//#define RS485 Serial0
+
+void setup() {
+  Serial.begin(115200); // USB-CDC
+  while(!Serial);
+  RS485.begin(9600); // Set the baudrate for the power meter
+  // Set Tx/Rx pins for RS485-serial
+  if (HW_SERIAL==0) {
+    // Default pins for Serial0: RX=GPIO20, TX=GPIO21
+    RS485.setPins( 20 /*RX*/, 21 /*TX*/ );
+  } else {
+    // Default pins for Serial1: RX=GPIO18, TX=GPIO19
+    RS485.setPins( 10 /*RX*/, 9 /*TX*/ );
+  }
+  RS485.setRxTimeout(1);
+  RS485.flush();
+  delay(1000);
+  Serial.println(&quot;\n\n\n\n\n&quot;);
+  Serial.flush();
+  Serial.println( &quot;Arduino-ESP32C3 Demo...&quot; );
+  Serial.println( &quot;Power Meter Reading: Eastron SDM120 Modbus\n&quot;);
+  Serial.flush();
+}
+
+// Calculate the CRC of a Modbus RTU response.
+uint16_t calc_modbus_crc(const byte* data, size_t len) {
+  uint16_t crc = 0xFFFF;
+  for (size_t i=0; i &lt; len; i++) {
+    crc ^= data[i];
+    for (int j=0; j &lt; 8; j++) {
+      if (crc &amp; 1) {
+        crc &gt;&gt;= 1;
+        crc ^= 0xA001;
+      } else {
+        crc &gt;&gt;= 1;
+      }
+    }
+  }
+  return crc;
+}
+
+// Function to read modbus registers
+bool read_regs( byte dev_addr, byte func_code, 
+    uint16_t start_reg_addr, size_t num_regs, 
+    byte *result, uint32_t delay_ms=1 ) 
+{
+    byte reg_addr_hi = (start_reg_addr &gt;&gt; 8) &amp; 0xFF;
+    byte reg_addr_lo = start_reg_addr &amp; 0xFF;
+    byte num_regs_hi = (num_regs &gt;&gt; 8) &amp; 0xFF;
+    byte num_regs_lo = num_regs &amp; 0xFF;
+    byte req_frame[8] = { dev_addr, func_code,
+                          reg_addr_hi, reg_addr_lo,
+                          num_regs_hi, num_regs_lo };
+    size_t req_frame_len = sizeof(req_frame);
+    uint16_t crc = calc_modbus_crc(req_frame, req_frame_len-2 );
+    req_frame[req_frame_len-2] = crc &amp; 0xff;
+    req_frame[req_frame_len-1] = (crc &gt;&gt; 8) &amp; 0xff;
+    RS485.write( req_frame, req_frame_len );
+    delay( delay_ms );
+
+    size_t buf_len = 5 +(2*num_regs); 
+    byte resp_frame[ buf_len+1 ] = {0};
+    size_t resp_frame_len = 0;
+#if 1
+    resp_frame_len = RS485.readBytes( resp_frame, buf_len );
+#else
+    uint32_t retries = 100;
+    while ( resp_frame_len &lt; buf_len &amp;&amp; --retries &gt; 0 ) {
+      if ( RS485.available() ) {
+        resp_frame[resp_frame_len++] = RS485.read();
+      }
+      delay(1);
+    }
+#endif
+    if ( resp_frame_len &lt; buf_len ) {
+       return false; // error
+    }
+    uint16_t crc16, expected_crc16;
+    byte *crc_bytes = &amp;resp_frame[resp_frame_len-2];
+    expected_crc16 = (crc_bytes[1] &lt;&lt; 8) | crc_bytes[0];
+    crc16 = calc_modbus_crc(resp_frame, resp_frame_len-2);
+    if (crc16 == expected_crc16) {
+      memcpy( result, resp_frame, resp_frame_len );
+      return true; // ok
+    } else {
+      Serial.print(&quot;CRC error: &quot;);
+      Serial.print(crc16, HEX);
+      Serial.print(&quot; : &quot;);
+      Serial.println(expected_crc16, HEX);
+      return false; // error
+    }
+}
+
+bool read_float( 
+  uint8_t dev_addr, uint8_t func_code, 
+  uint16_t reg_start_addr, float *value ) 
+{
+  byte result[16] =  {0}; // frame buffer for response
+  if (read_regs(dev_addr, func_code, reg_start_addr, 2, result)){
+    uint32_t _value = (result[3]&lt;&lt; 24) | (result[4] &lt;&lt; 16)
+                    | (result[5]&lt;&lt; 8) | result[6];
+    *value = *((float *)&amp;_value);
+    return true; // success
+  }
+  *value = 0.0f;
+  return false; // error
+}
+
+typedef struct {
+  uint16_t reg_addr;
+  char name[20];
+  char unit[4];
+} param_t;
+
+param_t params[]= {
+  { 0x0000, &quot;Voltage&quot;,  &quot;V&quot;         }, 
+  { 0x0006, &quot;Current&quot;,  &quot;A&quot;         },
+  { 0x000C, &quot;Active Power&quot;, &quot;W&quot;     },
+  { 0x0012, &quot;Apparent Power&quot;, &quot;VA&quot;  },
+  { 0x0018, &quot;Reactive Power&quot;, &quot;VAr&quot; },
+  { 0x001E, &quot;Power Factor&quot;,  &quot;-&quot;    },
+  { 0x0046, &quot;Frequency&quot;, &quot;Hz&quot;       },
+  { 0x0156, &quot;Total Active Energy&quot;, &quot;kWh&quot; },
+};
+
+void loop() {  
+  uint8_t dev_addr = 0;  
+  float value;
+  int N = sizeof(params)/sizeof(param_t);
+  int index = 0;
+  uint8_t func_code = 0x04;
+  int attempts = 1;
+  while ( index &lt; N ) {
+    param_t *p = &amp;params[index];
+    if (read_float(dev_addr, func_code, p-&gt;reg_addr, &amp;value)) {   
+      Serial.printf( &quot;0x%04X: %20s, %7.3f [%s]\n&quot;, 
+                     p-&gt;reg_addr, p-&gt;name, value, p-&gt;unit );
+      index++;
+      attempts = 1;
+    } else {
+      attempts++;
+    }
+    delay(10);
+  }
+  Serial.println(&quot;============================================&quot;);
+  Serial.flush();
+  delay(2000);
+}
+//////////////////////////////////////////////////////////////
+</code></pre>
+<p><img alt="" src="arduino_demo.png" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากการรันโค้ดตัวอย่าง <strong>Arduino Sketch</strong>
+สำหรับบอร์ด <strong>ESP32-C3</strong></p>
+<p><img alt="" src="sdm120_esp32c3.jpg" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ที่ได้นำมาทดลอง (ใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32-C3 SuperMini</strong>)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอการทดลองใช้งานเพาเวอร์มิเตอร์เฟสเดียว รุ่น <strong>SDM120 (Brand: Eastron)</strong>
-และตัวอย่างโค้ด <strong>Python</strong> เพื่อสาธิตการอ่านค่าจากมิเตอร์ โดยเชื่อมต่อผ่านบัส <strong>RS485</strong>
+และตัวอย่างโค้ด <strong>Python</strong> และ <strong>Arduino-ESP32C3</strong>
+เพื่อสาธิตการอ่านค่าจากมิเตอร์ โดยเชื่อมต่อผ่านบัส <strong>RS485</strong>
 และใช้โพรโทคอล <strong>Modbus RTU</strong> เพื่อส่งเฟรมข้อมูลสำหรับคำสั่งและข้อมูลตอบกลับ</p>
 <p><strong>บทความที่เกี่ยวข้อง</strong></p>
 <ul>
@@ -344,7 +590,7 @@ print( f'Total reactive energy : {Total_Reactive_Energy:.3f} kVARh' )
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2024-01-27 | Last Updated: 2024-01-27</p></div>
+<p>Created: 2024-01-27 | Last Updated: 2024-01-29</p></div>
             </div>
         </div>
 
