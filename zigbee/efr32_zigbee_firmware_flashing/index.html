@@ -111,6 +111,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#emberznet-ezsp-efr32mg1b_1" class="nav-link">&#9655; การใช้งานเฟิร์มแวร์ EmberZNet / EZSP สำหรับ EFR32MG1B เวอร์ชันใหม่</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ปัญหาที่พบ</a>
               <ul class="nav flex-column">
               </ul>
@@ -285,6 +289,11 @@ Elelabs_EzspFwUtility: EZSP v8
 ซึ่งใช้ขา <strong>PB00 / PB01</strong> ของ <strong>EFR32MG21</strong> สำหรับ <strong>UART RX / TX</strong> ตามลำดับ
 และใช้ขา <strong>PA00</strong> สำหรับ <strong>Bootloader Pin</strong> หรือถ้ามีปุ่มกด <strong>BOOT</strong> และ <strong>RESET</strong>
 ให้กดปุ่ม <strong>BOOT</strong> ค้างไว้ก่อน แล้วกดปุ่ม <strong>RESET</strong> แล้วปล่อยปุ่มรีเซต </p>
+<p>ข้อสังเกต:</p>
+<ul>
+<li><strong>ZB-GW04 (v1.1)</strong> ไม่รองรับ <strong>Hardware Flow Control</strong> (ใช้ <strong>Software Flow Control</strong>)</li>
+<li><strong>ZB-GW04 (v1.2)</strong> รองรับ <strong>Hardware Flow Control</strong></li>
+</ul>
 <p>เฟิร์มแวร์ <strong>ZigBee 3.0 NCP firmware</strong> ที่สามารถนำมาใช้ได้ สามารถดาวน์โหลดได้จาก
 <a href="https://github.com/xsp1989/zigbeeFirmware/tree/master/firmware/Zigbee3.0_Dongle-NoSigned">https://github.com/xsp1989/zigbeeFirmware/</a>
 มีสองตัวเลือกคือ</p>
@@ -292,28 +301,68 @@ Elelabs_EzspFwUtility: EZSP v8
 <li><strong>Coordinator firmware</strong>: <code>ncp-uart-sw_v6.10.3_115200.gbl</code></li>
 <li><strong>Router firmware</strong>: <code>efr32mg21_zigbee_router_6.7.10.gbl</code></li>
 </ul>
-<p>ก่อนทำคำสั่งถัดไป จะต้องทำให้ชิป <strong>EFR32MG21</strong> เข้าสู่โหมด <strong>Bootloader</strong> ก่อน
-โดยการกดปุ่ม <strong>Bootloader</strong> หรือ เชื่อมต่อขา <strong>PA00</strong> กับ <strong>GND</strong> ชั่วขณะ
-ด้วยตัวต้านทาน <strong>100-300 &Omega;</strong></p>
+<p>ก่อนทำคำสั่งถัดไป โดยใช้ <strong>Python Script</strong> ของ <strong>Elelabs</strong>
+จะต้องทำให้ชิป <strong>EFR32MG21</strong> เข้าสู่โหมด <strong>Bootloader</strong> ก่อน
+โดยการกดปุ่ม <strong>BOOT</strong> (หรือ เชื่อมต่อขา <strong>PA00</strong> กับ <strong>GND</strong> ชั่วขณะ
+ด้วยตัวต้านทาน <strong>100-300 &Omega;</strong>) แล้วกดปุ่ม <strong>RESET</strong> แล้วปล่อย</p>
 <pre><code class="language-bash">$ python3 Elelabs_EzspFwUtility.py flash -p /dev/ttyUSB0 \
   -f ncp-uart-sw_v6.10.3_115200.gbl
 </code></pre>
 <p><img alt="" src="ubuntu_ncp_efr32mg21.png" /></p>
 <p>รูป: การทำคำสั่งใน <strong>Ubuntu VM</strong> เพื่อติดตั้งเฟิร์มแวร์ <strong>EmberZNet / EZSP</strong> (<strong>EFR32MG21</strong>)</p>
-<p>ถ้านำไปทดลองใช้กับ <strong>Zigbee2mqtt</strong> เมื่อเริ่มต้นทำงาน จะเห็นข้อความในลักษณะนี้</p>
+<p>เมื่อนำไปใช้กับ <strong>Zigbee2MQTT</strong> จะต้องมีการตั้งค่าในไฟล์ <code>data/configuration.yaml</code>
+ในส่วนที่เป็น <code>serial</code> จะต้องมี <code>adapter: ezsp</code> ดังนี้</p>
+<pre><code class="language-yaml">serial:
+  adapter: ezsp
+  port: /dev/ttyUSB0
+</code></pre>
+<p>เมื่อ  <strong>Zigbee2MQTT</strong> เริ่มต้นทำงาน จะเห็นข้อความในลักษณะนี้</p>
 <pre><code class="language-json">Coordinator firmware version: '{&quot;meta&quot;:{&quot;maintrel&quot;:&quot;3 &quot;,
 &quot;majorrel&quot;:&quot;6&quot;,&quot;minorrel&quot;:&quot;10&quot;,&quot;product&quot;:8,
 &quot;revision&quot;:&quot;6.10.3.0 build 297&quot;},&quot;type&quot;:&quot;EZSP v8&quot;}'
 </code></pre>
 <p>&nbsp;</p>
+<p>ซอฟต์แวร์อีกตัวเลือกหนึ่งที่สามารถใช้แทนที่ <strong>Elelabs Python Script</strong> คือ</p>
+<ul>
+<li><a href="https://github.com/NabuCasa/universal-silabs-flasher"><code>universal-silabs-flasher</code></a></li>
+<li><a href="https://github.com/agners/silabs-flasher"><code>silabs-flasher</code></a></li>
+</ul>
+<p>ถัดไปเป็นขั้นตอนการติดตั้งและใช้งาน <code>universal-silabs-flasher</code></p>
+<pre><code class="language-bash">$ pip3 install universal-silabs-flasher
+</code></pre>
+<p>ทดลองทำคำสั่ง เพื่อลองเชื่อมต่อกับ <strong>ZigBee USB Dongle</strong> ที่เสียบใช้งานอยู่กับคอมพิวเตอร์ของผู้ใช้</p>
+<pre><code class="language-bash">$ universal-silabs-flasher --device /dev/ttyUSB0 probe
+</code></pre>
+<p>ทำคำสั่งเพื่ออัปโหลดไฟล์ <strong>.gbl</strong> ไปยังอุปกรณ์</p>
+<pre><code class="language-bash">$ universal-silabs-flasher \
+  --device /dev/ttyUSB0 flash \
+  --firmware ncp-uart-sw_6.10.3_115200.gbl 
+</code></pre>
+<hr />
+<h2 id="emberznet-ezsp-efr32mg1b_1">&#9655; <strong>การใช้งานเฟิร์มแวร์ EmberZNet / EZSP สำหรับ EFR32MG1B เวอร์ชันใหม่</strong><a class="headerlink" href="#emberznet-ezsp-efr32mg1b_1" title="Permanent link">#</a></h2>
+<p>สำหรับการใช้งานโมดูล <strong>EFR32MG1B</strong> ผู้พัฒนา <strong>ZigBee2MQTT</strong>
+ได้แนะนำให้ใช้งาน <strong>Improved Ember v7.4.0+ (EZSP 13)</strong> เวอร์ชันใหม่กับ <strong>ZigBee2MQTT v1.36.0+</strong>
+และดาวน์โหลดไฟล์ <strong>.gbl</strong> ได้จาก <a href="https://github.com/darkxst/silabs-firmware-builder/tree/main/firmware_builds"><code>silabs-firmware-builder</code></a></p>
+<ul>
+<li>ทดลองใช้ไฟล์ <a href="https://github.com/darkxst/silabs-firmware-builder/raw/main/firmware_builds/zb-gw04-1v1/ncp-uart-hw-v7.4.2.0-zb-gw04-1v1-115200.gbl"><code>zb-gw04-1v1/ncp-uart-hw-v7.4.2.0-zb-gw04-1v1-115200.gbl</code></a></li>
+</ul>
+<p>ให้ตั้งค่าใช้งานในไฟล์ <code>data/configuration.yaml</code> สำหรับ <strong>ZigBee2MQTT</strong> ดังนี้</p>
+<pre><code class="language-yaml">serial:
+  adapter: ember
+  port: /dev/ttyUSB0
+</code></pre>
+<p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>ปัญหาที่พบ</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
-<p>ในกรณีที่ใช้ชิป <strong>CH340 USB-to-Serial</strong> (ID=<code>1a86:7523</code>)
-แล้วมองไม่เห็น <code>/dev/ttyUSB0</code> แต่สามารถเห็นรายการอุปกรณ์ดังกล่าวเมื่อทำคำสั่ง <code>lsusb</code>
+<p>1) ในกรณีที่ใช้ชิป <strong>CH340 USB-to-Serial</strong> (<strong>USB ID</strong> <code>1a86:7523</code>)
+แล้วมองไม่เห็นรายการ <code>/dev/ttyUSB0</code> แต่สามารถเห็นรายการอุปกรณ์ดังกล่าวเมื่อทำคำสั่ง <code>lsusb</code>
 สาเหตุหนึ่งอาจเป็นเพราะว่า มีโปรแกรมอื่นได้ใช้งานอุปกรณ์ดังกล่าวโดยอัตโนมัติในขณะนั้น
-เช่น <strong>brltty</strong> และ <strong>modemmanager</strong> ดังนั้นให้ลบโปรแกรมดังกล่าวออกไป</p>
+เช่น โปรแกรม <strong>brltty</strong> และ <strong>modemmanager</strong> ดังนั้นให้ลบโปรแกรมดังกล่าวออกไป </p>
 <pre><code class="language-bash">$ sudo apt remove brltty modemmanager
 </code></pre>
+<p>2) การดาวน์โหลดไฟล์ <strong>.gbl</strong> จาก <a href="https://github.com/xsp1989/zigbeeFirmware/tree/master/firmware/Zigbee3.0_Dongle-NoSigned/EZSP"><strong>Github</strong></a>
+ให้ตรวจสอบก่อนว่า ให้ดาวน์โหลดไฟล์แบบ <strong>Raw</strong></p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอวิธีการและอุปกรณ์ในการติดตั้งเฟิร์มแวร์สำหรับอุปกรณ์ที่ใช้ชิป 
@@ -322,7 +371,7 @@ Elelabs_EzspFwUtility: EZSP v8
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-09-26 | Last Updated: 2022-10-03</p></div>
+<p>Created: 2022-09-26 | Last Updated: 2024-06-21</p></div>
             </div>
         </div>
 

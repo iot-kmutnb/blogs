@@ -141,7 +141,7 @@
 (<strong>CC13xx / CC2538 / CC26xx Firmware Flasher</strong> พัฒนาโดย <strong>Jelmer Tiete</strong>) สำหรับ <strong>Linux/Ubuntu</strong> มีขั้นตอนตามลำดับดังนี้</p>
 <pre><code class="language-bash"># Install Python and packages.
 $ sudo apt install -y python3 python3-pip python3-setuptools
-$ sudo pip3 install pyserial intelhex python-magic 
+$ pip3 install pyserial intelhex python-magic 
 
 # Download the 'cc2583-bsl' repository from Github.
 $ git clone https://github.com/JelmerT/cc2538-bsl
@@ -150,11 +150,25 @@ $ git clone https://github.com/JelmerT/cc2538-bsl
 ให้ลองทำคำสั่งต่อไปนี้</p>
 <pre><code class="language-bash">$ python3 ./cc2538-bsl/cc2538-bsl.py -h
 </code></pre>
+<p>ถ้าต้องการให้ผู้ใช้ทั่วไปสามารถเข้าถึงอุปกรณ์ได้ ให้สร้างไฟล์ต่อไปนี้เพื่อนำไปใช้กับ <code>udev</code></p>
+<pre><code class="language-bash">$ sudo nano /etc/udev/rules.d/99-usb-serial.rules
+</code></pre>
+<pre><code class="language-text"># CP210x
+SUBSYSTEMS==&quot;usb&quot;, ATTRS{idVendor}==&quot;10c4&quot;, ATTRS{idProduct}==&quot;ea60&quot;, MODE=&quot;0666&quot;
+</code></pre>
+<p>เมื่อแก้ไขและบันทึกการเปลี่ยนแปลงลงไฟล์แล้ว ให้ทำคำสั่งต่อไปนี้ เพื่ออัปเดตการทำงานของ <code>udev</code></p>
+<pre><code class="language-bash">$ sudo udevadm control --reload 
+$ sudo udevadm trigger
+</code></pre>
+<p>เพิ่มชื่อผู้ใช้เข้าไปอยู่ในกลุ่ม <code>dialout</code></p>
+<pre><code class="language-bash">$ sudo usermod -a -G dialout $USER
+</code></pre>
+<p>&nbsp;</p>
 <p>ทำคำสั่งเพื่อตรวจสอบข้อมูลเกี่ยวกับอุปกรณ์</p>
 <pre><code class="language-bash">$ ls -l /dev/serial/by-id
 usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_XXXXX -&gt; ../../ttyUSB0
 </code></pre>
-<pre><code class="language-bash">$ sudo python3 ./cc2538-bsl/cc2538-bsl.py --bootloader-sonoff-usb
+<pre><code class="language-bash">$ python3 ./cc2538-bsl/cc2538-bsl.py --bootloader-sonoff-usb
 
 sonoff
 Opening port /dev/ttyUSB0, baud 500000
@@ -168,7 +182,7 @@ Primary IEEE Address: 00:12:4B:00:XX:XX:XX:XX
 $ unzip CC1352P2_CC2652P_launchpad_coordinator_20220219.zip
 
 # Flash the USB device with the .hex firmware file.
-$ sudo python3 ./cc2538-bsl/cc2538-bsl.py --bootloader-sonoff-usb \
+$ python3 ./cc2538-bsl/cc2538-bsl.py --bootloader-sonoff-usb \
    -e -w -v ./CC1352P2_CC2652P_launchpad_coordinator_20220219.hex
 </code></pre>
 <p><img alt="" src="ubuntu_cc2652p_flashing.png" /></p>
@@ -176,17 +190,6 @@ $ sudo python3 ./cc2538-bsl/cc2538-bsl.py --bootloader-sonoff-usb \
 ภายใต้การจัดการของซอฟต์แวร์ <strong>Oracle VirtualBox VM</strong> (<strong>Windows OS</strong>)</p>
 <p><img alt="" src="ubuntu_vm_cc2652p.png" /></p>
 <p>รูป: การเพิ่มรายการอุปกรณ์ <strong>USB Device</strong> ให้มองเห็นได้ใน <strong>Ubuntu 22.04 VM</strong></p>
-<p>&nbsp;</p>
-<p>ถ้าต้องการให้ผู้ใช้ทั่วไปสามารถเข้าถึงอุปกรณ์ได้ ให้สร้างไฟล์ต่อไปนี้เพื่อนำไปใช้กับ <code>udev</code></p>
-<pre><code class="language-bash">$ sudo nano /etc/udev/rules.d/99-usb-serial.rules
-</code></pre>
-<pre><code class="language-text"># CP210x
-SUBSYSTEMS==&quot;usb&quot;, ATTRS{idVendor}==&quot;10c4&quot;, ATTRS{idProduct}==&quot;ea60&quot;, MODE=&quot;0666&quot;
-</code></pre>
-<p>เมื่อแก้ไขและบันทึกการเปลี่ยนแปลงลงไฟล์แล้ว ให้ทำคำสั่งต่อไปนี้ เพื่ออัปเดตการทำงานของ <code>udev</code></p>
-<pre><code class="language-bash">$ sudo udevadm control --reload 
-$ sudo udevadm trigger
-</code></pre>
 <p>&nbsp;</p>
 <hr />
 <h2 id="segger-j-link-v9-jtag-programmer">&#9655; <strong>การใช้งาน SEGGER J-Link V9 / JTAG Programmer</strong><a class="headerlink" href="#segger-j-link-v9-jtag-programmer" title="Permanent link">#</a></h2>
@@ -236,7 +239,7 @@ $ openocd -f custom.cfg -c &quot;init; halt; program $FIRMWARE verify exit&quot;
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2022-09-24 | Last Updated: 2022-10-15</p></div>
+<p>Created: 2022-09-24 | Last Updated: 2024-06-21</p></div>
             </div>
         </div>
 
