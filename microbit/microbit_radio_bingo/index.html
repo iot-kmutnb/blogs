@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/microbit/microbit_radio_bingo/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างเกม Digital Bingo สำหรับบอร์ด Micro:bit - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#digital-bingo-microbit" class="nav-link">การสร้างเกม Digital Bingo สำหรับบอร์ด Micro:bit</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; บอร์ดไมโครบิตและการสื่อสารข้อมูลแบบไร้สาย</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#multi-board-editor" class="nav-link">&#9655; การใช้งาน Multi-Board Editor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#digital-bingo" class="nav-link">&#9655; ตัวอย่างโค้ดสาธิต Digital Bingo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; การทดสอบการทำงานกับบอร์ดไมโครบิต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="digital-bingo-microbit">การสร้างเกม Digital Bingo สำหรับบอร์ด Micro:bit<a class="headerlink" href="#digital-bingo-microbit" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>BBC Micro:bit</em>, <em>Microsoft MakeCode</em>, <em>TypeScript</em>, <em>Wireless Data Communication</em>, <em>2.4GHz Radio Interface</em>, <em>Event-Driven Programming</em>, <em>Digital Bingo Game</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>บอร์ดไมโครบิตและการสื่อสารข้อมูลแบบไร้สาย</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ "ไมโครบิต" (<strong>Micro:bit</strong>) ทั้งรุ่นแรกและรุ่นที่สอง (<strong>v1 &amp; v2</strong>)
+สามารถรับส่งข้อมูลและสื่อสารกันได้แบบไร้สาย (<strong>Wireless Data Communication</strong>) เนื่องจากใช้ชิปของบริษัท <strong>Nordic Semiconductor</strong> รุ่น <strong>nRF51822</strong> และ <strong>nRF52833</strong> ตามลำดับ
+ภายในชิปมีวงจรและเฟิร์มแวร์สำหรับการสื่อสารข้อมูลไร้สายด้วยคลื่นวิทยุย่านความถี่ <strong>2.4GHz</strong>
+และรองรับโพรโตคอล <strong>Bluetooth / BLE</strong> ด้วย</p>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดด้วย <strong>MakeCode JavaScript (JS)</strong> 
+หรือ <strong>Static TypeScript (STS)</strong> เพื่อรับส่งข้อมูลระหว่างบอร์ดไมโครบิต 2 บอร์ด และสาธิตการสร้างเกมที่มีชื่อว่า <strong>Digital Bingo</strong> </p>
+<p>ซอฟต์แวร์ที่ใช้คือ เว็บเบราว์เซอร์ เช่น <strong>Google Chrome</strong> และ <strong>Web App</strong>
+ที่มีชื่อว่า <a href="https://makecode.microbit.org/"><strong>MakeCode Editor for Micro:bit</strong></a> (<a href="https://makecode.microbit.org/">https://makecode.microbit.org/</a>)
+รองรับการเขียนโค้ดหลายรูปแบบ ทั้งแบบการต่อบล็อก (<strong>Block-based Coding</strong>) และการเขียนโค้ดด้วยภาษา <strong>JavaScript (JS) / Static TypeScript</strong> หรือ <strong>Python</strong> อีกทั้งยังสามารถจำลองการทำงานของโค้ดได้ (<strong>MakeCode Micro:bit Simulator</strong>) โดยยังไม่จำเป็นต้องใช้งานบอร์ดทดลองจริง</p>
+<p>จุดเด่นของซอฟต์แวร์อีกประการหนึ่งคือ ความสามารถในการแปลงให้เป็นโปรแกรมในรูปแบบการต่อบล็อก หรือสลับไปมาระหว่างโหมดการเขียนโค้ดด้วยภาษา <strong>JS / Python</strong> ได้โดยอัตโนมัติ</p>
+<p><img alt="" src="makecode_reference.png" /></p>
+<p>รูป: คำสั่งแบ่งตามกลุ่มสำหรับการเขียนโค้ดด้วย <strong>MakeCode</strong>
+(<a href="https://makecode.microbit.org/reference/">https://makecode.microbit.org/reference/</a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="multi-board-editor">&#9655; <strong>การใช้งาน Multi-Board Editor</strong><a class="headerlink" href="#multi-board-editor" title="Permanent link">#</a></h2>
+<p>เนื่องจากจะต้องใช้บอร์ดไมโครบิต 2 จำนวนบอร์ด และทำงานพร้อม ๆ กัน ดังนั้นถ้าจะจำลองการทำงานของบอร์ดทั้งสอง จะต้องเปิดใช้งาน <a href="https://makecode.com/multi#"><strong>Multi-Board Editor</strong></a>
+(<a href="https://makecode.com/multi#">https://makecode.com/multi#</a>)</p>
+<p>ผู้ใช้สามารถสร้างโปรเจกต์ (กดปุ่ม "<strong>New Project</strong>") แยกกันระหว่าง 2 บอร์ดที่จะใช้งาน แล้วเปิดโปรเจกต์ใน <strong>Editor</strong> ในส่วนการทำงานทางด้านซ้ายมือ และขวามือตามลำดับ</p>
+<p><img alt="" src="makecode-1.png" /></p>
+<p>รูป: <strong>MakeCode Multi-Board Editor</strong></p>
+<p><img alt="" src="makecode-2.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ เพื่อใช้กับบอร์ด <strong>Bingo Controller</strong></p>
+<p><img alt="" src="makecode-3.png" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ เพื่อใช้กับบอร์ด <strong>Bingo Player</strong></p>
+<p><img alt="" src="makecode-4.png" /></p>
+<p>รูป: การเลือกโหมดการเขียนโค้ดให้เป็น <strong>JavaScript (JS)</strong> แทนการต่อบล็อก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="digital-bingo">&#9655; <strong>ตัวอย่างโค้ดสาธิต Digital Bingo</strong><a class="headerlink" href="#digital-bingo" title="Permanent link">#</a></h2>
+<p>การทำงานของโค้ดตัวอย่างในบทความนี้ มีลักษณะการทำงานดังนี้</p>
+<ul>
+<li>ใช้บอร์ด <strong>Micro:bit</strong> จำนวน 2 บอร์ด แบ่งเป็นโค้ดสำหรับ <strong>Bingo Controller</strong>
+และ <strong>Bingo Player</strong></li>
+<li>การทำงานของ <strong>Bingo Player</strong>:<ul>
+<li>เมื่อเริ่มต้นทำงาน ให้สุ่มเลขสำหรับเซตที่มีตัวเลขจำนวนเต็ม จำนวน 25 ตัวเลข อยู่ระหว่าง 0 ถึง 24 และไม่ซ้ำกัน ค่าตัวเลขแต่ละตัว จะถูกนำไปแปลงเป็นพิกัด (x,y) บน <strong>LED Matrix</strong> ขนาด 5x5
+ถ้า <script type="math/tex">n</script> คือ ค่าตัวเลข ก็ให้แปลงเป็น <script type="math/tex">x = n \% 5</script> (หารแบบเหลือเศษ หรือ <strong>Modulo</strong>) และ <script type="math/tex">y = n / 5</script> (การหารแบบปัดเศษทิ้ง)</li>
+<li>รอให้มีการกด <strong>Button A</strong> หรือ เขย่าบอร์ดหนึ่งครั้ง (<strong>Shake</strong>) ถ้าเป็นเขย่าบอร์ด ก็จะเริ่มต้นดึงตัวเลขออกมาจากเซตหรือรายการ โดยต่อเนื่องและอัตโนมัติ แล้วส่งไปยังบอร์ด <strong>Bingo Player</strong> ทีละตัว เว้นระยะเวลา แล้วทำซ้ำไปจนครบตามจำนวนที่ตั้งไว้ เช่น 15 ตัว</li>
+<li>แต่ถ้าเป็นการกดปุ่ม <strong>Button A</strong> จะนำค่าตัวเลขในตำแหน่งแรกออกมาใช้เพียงหนึ่งตัว แล้วส่งไปยังบอร์ด <strong>Bingo Player</strong> ถ้าจะใช้ตัวเลขถัดไป ต้องกดปุ่มอีกครั้ง ไม่ทำโดยต่อเนื่องอัตโนมัติ</li>
+<li>ถ้าส่งตัวเลขไปจนครบตามจำนวนแล้ว ก็ให้โปรแกรมเริ่มต้นการทำงานใหม่ โดยทำคำสั่งของฟังก์ชัน <code>resetGame()</code> และส่งตัวเลขที่มีค่า -1 ไปยังอีกบอร์ดหนึ่ง เพื่อแจ้งให้ทราบว่า เป็นการเริ่มต้นใหม่</li>
+</ul>
+</li>
+<li>การทำงานของ <strong>Bingo Player</strong>:<ul>
+<li>เมื่อเริ่มต้นทำงาน ให้สุ่มเลขจำนวนสำหรับเซตที่มีตัวเลขจำนวนเต็ม จำนวน 25 ตัวเลข เหมือนกรณีของ <strong>Bingo Controller</strong></li>
+<li>เมื่อได้รับค่าตัวเลข มาแล้วก็ให้ตรวจสอบกับตัวเลขที่มีอยู่ว่า ตรงกับตำแหน่งใด แล้วเปลี่ยนสถานะของ <strong>LED</strong>
+ในตำแหน่ง <strong>(x,y)</strong> ที่เกี่ยวข้องกับตัวเลขดังกล่าว ให้อยู่ในสถานะ <strong>ON</strong> </li>
+<li>นอกจากนั้นแล้ว เมื่อได้รับตัวเลขและอัปเดตสถานะของ <strong>LED Matrix</strong> แล้ว จะต้องมีการตรวจสอบเงื่อนไข
+สำหรับ <strong>BINGO</strong> ด้วย กล่าวคือ มี <strong>LED</strong> อยู่ในสถานะ <strong>ON</strong> เต็มหนึ่งแถวแนวนอนหรือแนวตั้ง
+หรือแนวทแยงมุมหรือไม่ ถ้าใช่ แสดงว่า <strong>BINGO</strong></li>
+<li>ในกรณี <strong>BINGO</strong> จะกระพริบ <strong>LED Matrix</strong> และส่งข้อความ <code>BINGO</code> ไปยังอีกบอร์ดหนึ่งด้วย ก่อนที่จะรอคำสั่งเริ่มต้นใหม่</li>
+</ul>
+</li>
+</ul>
+<p>ลองดูตัวอย่างของตัวเลขทั้งหมด 25 ตัว ได้จากการสุ่มตัวเลข และแสดงให้อยู่ในรูปของเมทริกซ์
+ซ้ายมือสำหรับ <strong>Bingo Controller</strong> และขวามือสำหรับ <strong>Bingo Player</strong> ตามลำดับ</p>
+<p>ในการเลือกค่าตัวเลขในเมทริกซ์ทางซ้ายมือ จะทำจากแถวบนจากซ้ายไปขวา (ถ้าครบแถวก็ให้ขึ้นแถวใหม่)
+เลือกมาทีละตัว ไปตามลำดับ แต่จะไม่เกินจำนวนที่กำหนดไว้ เช่น 15</p>
+<p><img alt="" src="bingo_numbers-1.png" /></p>
+<p>รูป: ตัวอย่างตัวเลขที่ได้จากการสุ่มในสถานะเริ่มต้น (ทางซ้ายมือเป็นของ <strong>Bingo Controller</strong>
+ทางขวามือเป็นของ <strong>Bingo Player</strong>)</p>
+<p><img alt="" src="bingo_numbers-2.png" /></p>
+<p>รูป: เมื่อเลือกค่าตัวเลขตัวแรกในเมทริกซ์ทางซ้ายมือ คือ <code>5</code> ก็จะไปดูว่า 
+เลข <code>5</code> อยู่ในตำแหน่งใดของเมทริกซ์ทางขวามือ และตำแหน่งดังกล่าว ก็จะมีสถานะเป็น <strong>ON</strong>
+สำหรับ <strong>5x5 LED Matrix</strong> บนบอร์ด <strong>Bingo Player</strong></p>
+<p><img alt="" src="bingo_numbers-3.png" /></p>
+<p>รูป: ตัวเลขถัดไปในเมทริกซ์ทางซ้ายมือ คือ <code>8</code> และนำไปอัปเดตสถานะของเมทริกซ์ทางขวามือ</p>
+<p><img alt="" src="bingo_numbers-4.png" /></p>
+<p>รูป: ตัวเลขถัดไปในเมทริกซ์ทางซ้ายมือ คือ <code>1</code> และนำไปอัปเดตสถานะของเมทริกซ์ทางขวามือ</p>
+<p><img alt="" src="bingo_numbers-5.png" /></p>
+<p>รูป: ตัวเลขถัดไปในเมทริกซ์ทางซ้ายมือ คือ <code>20</code> และนำไปอัปเดตสถานะของเมทริกซ์ทางขวามือ</p>
+<p>ดังนั้นถ้าอ่านค่าจากตัวเลขไปตามลำดับ แต่ไม่เกินจำนวนตัวเลขที่กำหนดไว้ 
+(แนะนำให้เลือกค่า จำนวนตัวเลขให้อยู่ระหว่าง 11..15) โอกาสที่จะเกิดกรณี <strong>BINGO</strong> ก็เป็นไปได้มากขึ้น</p>
+<p><img alt="" src="makecode_sim-1.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงาน (<strong>Simulator Mode</strong>)</p>
+<p><img alt="" src="makecode_sim-2.png" /></p>
+<p>รูป: โหมดการจำลองการทำงานแบบ <strong>Fullscreen</strong></p>
+<p><img alt="" src="makecode_sim-3.png" /></p>
+<p>รูป: ตัวอย่างการเกิดกรณี <strong>BINGO</strong></p>
+<p><strong>Code: Bingo Controller</strong></p>
+<pre><code class="language-JavaScript">// Bingo Controller
+let numbers: number[] = []
+let poppedNumbers: number[] = []
+let maxPops = 15 // Choose a number between 10..15
+let keepRunning = false 
+
+// Function to display the corresponding LED for the number
+function showNumber(num: number) {
+    let x = num % 5
+    let y = Math.floor(num / 5)
+    led.plot(x, y)
+}
+
+function showNumbers() {
+    basic.clearScreen();
+    numbers.forEach(function (num) {
+        showNumber(num);
+        basic.pause(100); 
+    });
+    basic.pause(1000); 
+    basic.clearScreen();
+}
+
+// Function to pop a number from the list
+function popNumber() {
+    if (numbers.length &gt; 0) {
+        let n = numbers.pop()
+        poppedNumbers.push(n)
+        showNumber(n)
+        radio.sendNumber(n)
+    } else{
+        radio.sendNumber(-1) // Send reset command
+    }
+}
+
+function resetGame() {
+    keepRunning = false
+    basic.clearScreen()
+    radio.sendNumber(-1)  // Send reset command
+    // Generate a new set of unique random numbers from 0 to 24
+    numbers = []
+    for (let i = 0; i &lt; 25; i++) {
+        numbers.insertAt(0,i)
+        if (i % 2 == 1) {
+            numbers = numbers.sort(() =&gt; Math.random() - 0.5)
+        }
+    }
+    poppedNumbers = []
+    pause(1000)
+    showNumbers();
+}
+
+// Button A or shake to pop a number
+input.onButtonPressed(Button.A, function () {
+    if (poppedNumbers.length &lt; maxPops) {
+        popNumber()
+    } else {
+        resetGame()
+    }
+})
+
+input.onGesture(Gesture.Shake, function () {
+    keepRunning = !keepRunning
+})
+
+// Button B to reset the Bingo controller
+input.onButtonPressed(Button.B, function () {
+    resetGame()
+})
+
+radio.onReceivedString( function (receivedString: String) {
+   if (receivedString == &quot;BINGO&quot;) {
+       led.stopAnimation()
+       basic.clearScreen()
+       pause(500)
+       basic.showString(&quot;BINGO!&quot;)
+       pause(1000)
+       resetGame()
+   }
+})
+
+// Set the radio group
+radio.setGroup(1)
+// Show the let C for Bingo controller
+basic.showString('C')
+// Initialize the game
+resetGame()
+
+basic.forever( function() {
+    if (keepRunning) {
+        if (poppedNumbers.length &lt; maxPops) {
+           popNumber()
+           pause(1000)
+        } else {
+           resetGame()
+       }
+    }
+})
+</code></pre>
+<p><strong>Code: Bingo Player</strong></p>
+<pre><code class="language-JavaScript">
+// Bingo Player
+let numbers: number[] = []
+let marks: boolean[][] = []
+let bingo = false
+
+// Function to display the corresponding LED for the number
+function showNumber(num: number) {
+    let x = num % 5
+    let y = Math.floor(num / 5)
+    led.plot(x, y)
+}
+
+function showNumbers() {
+    basic.clearScreen();
+    numbers.forEach(function (num) {
+        showNumber(num);
+        basic.pause(100);
+    });
+    basic.clearScreen();
+}
+
+// Function to reset or initialize the game
+function resetGame() {
+    basic.clearScreen()
+    marks = []
+    bingo = false
+    // Initialize the 2D array with false (5x5 grid)
+    for (let x = 0; x &lt; 5; x++) {
+        marks[x] = []
+        for (let y = 0; y &lt; 5; y++) {
+            marks[x][y] = false
+        }
+    }
+    numbers = []
+    for (let i = 0; i &lt; 25; i++) {
+        numbers.insertAt(0, i)
+        if (i % 2 == 1) {
+            numbers = numbers.sort(() =&gt; Math.random() - 0.5)
+        }
+    }
+    showNumbers();
+}
+
+// Function to check for Bingo
+function checkBingo(): boolean {
+    let complete: boolean
+    // Check rows for Bingo
+    for (let y = 0; y &lt; 5; y++) {
+        complete = true
+        for (let x = 0; x &lt; 5; x++) {
+            if (!marks[x][y]) {
+                complete = false
+                break
+            }
+        }
+        if (complete) {
+            return true
+        }
+    }
+    // Check columns for Bingo
+    for (let x = 0; x &lt; 5; x++) {
+        complete = true
+        for (let y = 0; y &lt; 5; y++) {
+            if (!marks[x][y]) {
+                complete = false
+                break
+            }
+        }
+        if (complete) {
+            return true
+        }
+    }
+    // Check diagonals for Bingo
+    let diag1Complete = true
+    let diag2Complete = true
+    for (let i = 0; i &lt; 5; i++) {
+        // Check top-left to bottom-right diagonal
+        if (!marks[i][i]) {
+            diag1Complete = false
+        }
+        // Check top-right to bottom-left diagonal
+        if (!marks[4 - i][i]) {
+            diag2Complete = false
+        }
+    }
+    // Return true if any diagonal is complete
+    if (diag1Complete || diag2Complete) {
+        return true
+    }
+    // No Bingo found
+    return false
+}
+
+// Listen for numbers from the Bingo Controller
+radio.onReceivedNumber(function (n: number) {
+    if (n == -1) { // reset command received
+        resetGame()
+    }
+    else if (numbers.indexOf(n) !== -1) {
+        let index = numbers.indexOf(n)
+        let x = index % 5
+        let y = Math.floor(index / 5)
+        marks[x][y] = true  // Mark the number as found
+        led.plot(x, y)  // Light the corresponding LED
+        // Check for Bingo
+        if (checkBingo() &amp;&amp; !bingo) {
+            bingo = true
+            radio.sendString(&quot;BINGO&quot;)
+            for ( let i=0; i &lt; 5; i++) {
+               led.setBrightness(0)
+               pause(250)
+               led.setBrightness(255)
+               pause(250)
+            }
+            basic.clearScreen()
+            basic.showString(&quot;BINGO!&quot;)
+       }
+    } 
+})
+
+radio.onReceivedString(function (receivedString: String) {
+    if (!bingo &amp;&amp; receivedString == &quot;BINGO&quot;) {
+        basic.clearScreen()
+        resetGame()
+    }
+})
+
+// Set the radio group
+radio.setGroup(1)
+// Show the letter 'P' for Bingo player
+basic.showString('P')
+// Reset or initialize the game
+resetGame()
+</code></pre>
+<hr />
+<p>&nbsp;</p>
+<h2 id="_2">&#9655; <strong>การทดสอบการทำงานกับบอร์ดไมโครบิต</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>หากต้องการจะทดสอบการทำงานของโค้ดตัวอย่าง จะต้องมีบอร์ดไมโครบิตอย่างน้อย 2 บอร์ด
+และดาวน์โหลดโปรแกรมสำหรับ <strong>Bingo Controller</strong> และ <strong>Bingo Player</strong> แยกกัน
+แต่ถ้ามีมากกว่า 2 บอร์ด ก็เพิ่มจำนวน <strong>Bingo Players</strong> ได้</p>
+<p><img alt="" src="makecode_pairing-1.png" /></p>
+<p><img alt="" src="makecode_pairing-2.png" /></p>
+<p>รูป: ตัวอย่างการจับคู่ (<strong>Device Pairing</strong>) เมื่อเชื่อมต่อคอมพิวเตอร์กับบอร์ดไมโครบิต ผ่านทางพอร์ต <strong>USB</strong></p>
+<p><img alt="" src="makecode_download.png" /></p>
+<p>รูป: การดาวน์โหลดไฟล์โปรแกรมไปยังบอร์ดไมโครบิต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอ ตัวอย่างการเขียนโค้ดเพื่อสร้างเกมที่มีชื่อว่า <strong>Digital Bingo</strong>
+เพื่อนำไปทดลองใช้งานกับบอร์ด <strong>Micro:bit</strong> ซึ่งจะต้องมีอย่างน้อย 2 บอร์ด
+และเขียนโค้ดด้วยภาษา <strong>MakeCode JavaScript (JS)</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../microbit_radio_share_emotional_icon/">ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด <strong>Micro:bit</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-09-28 | Last Updated: 2024-09-28</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

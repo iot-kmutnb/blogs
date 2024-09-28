@@ -8,7 +8,7 @@
         <meta name="author" content="RSP">
         <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/microbit/microbit_radio_share_emotional_icon/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด Micro:bit V2 - IoT Engineering Education</title>
+        <title>ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด Micro:bit - IoT Engineering Education</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#microbit-v2" class="nav-link">ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด Micro:bit V2</a>
+            <li class="nav-item" data-level="1"><a href="#microbit" class="nav-link">ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด Micro:bit</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; บอร์ดไมโครบิตและการสื่อสารข้อมูลแบบไร้สาย</a>
               <ul class="nav flex-column">
@@ -99,7 +99,15 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; ตัวอย่างโค้ดสาธิต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#microbit-radio-interface" class="nav-link">&#9655; ตัวอย่างเพิ่มเติมสำหรับการใช้งาน Micro:bit Radio Interface</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -110,44 +118,195 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="microbit-v2">ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด Micro:bit V2<a class="headerlink" href="#microbit-v2" title="Permanent link">#</a></h1>
-<p><strong>Keywords:</strong> <em>BBC Micro:bit</em>, <em>Microsoft MakeCode</em>, <em>TypeScript</em>, <em>Wireless Data Communication</em></p>
+<h1 id="microbit">ตัวอย่างการรับส่งข้อมูลไร้สายระหว่างบอร์ด Micro:bit<a class="headerlink" href="#microbit" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>BBC Micro:bit</em>, <em>Microsoft MakeCode</em>, <em>TypeScript</em>, <em>Wireless Data Communication</em>, <em>2.4GHz Radio Interface</em>, <em>Event-Driven Programming</em></p>
 <hr />
 <h2 id="_1">&#9655; <strong>บอร์ดไมโครบิตและการสื่อสารข้อมูลแบบไร้สาย</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บอร์ดไมโครคอนโทรลเลอร์ "ไมโครบิต" (<strong>Micro:bit</strong>) ทั้งรุ่นแรกและรุ่นที่สอง (<strong>v1 &amp; v2</strong>)
-สามารถรับส่งข้อมูลสื่อสารไร้สาย (<strong>Wirless Data Communication</strong>) ด้วยคลื่นวิทยุความถี่ <strong>2.4GHz</strong> เนื่องจากใช้ชิปของบริษัท <strong>Nordic Semiconductor</strong> รุ่น <strong>nRF51822</strong> และ <strong>nRF52833</strong> ตามลำดับ</p>
-<p>ในบทความนี้จะนำเสนอตัวอย่างการเขียนโค้ดด้วย <strong>MakeCode Static TypeScript (STS)</strong>
-เพื่อรับส่งข้อมูลระหว่างบอร์ดไมโครบิต 2 บอร์ด และสำหรับการเขียนโค้ด ก็ทำได้สะดวก
-โดยใช้เว็บเบราว์เซอร์ <strong>Google Chrome</strong> เปิดใช้งาน <a href="https://makecode.microbit.org/"><strong>MakeCode Editor for Micro:bit</strong></a> และสร้างโปรเจกต์ใหม่
-(<strong>New Project</strong>) </p>
+สามารถรับส่งข้อมูลและสื่อสารกันได้แบบไร้สาย (<strong>Wireless Data Communication</strong>) เนื่องจากใช้ชิปของบริษัท <strong>Nordic Semiconductor</strong> รุ่น <strong>nRF51822</strong> และ <strong>nRF52833</strong> ตามลำดับ ภายในชิปมีวงจรและเฟิร์มแวร์สำหรับการสื่อสารข้อมูลไร้สายด้วยคลื่นวิทยุย่านความถี่ <strong>2.4GHz</strong> และรองรับโพรโตคอล <strong>Bluetooth / BLE</strong> ด้วย</p>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดด้วย <strong>MakeCode JavaScript (JS) / Static TypeScript (STS)</strong> เพื่อรับส่งข้อมูลระหว่างบอร์ดไมโครบิต 2 บอร์ด 
+และสำหรับการเขียนโค้ดเพื่อใช้งานกับบอร์ดไมโครบิต ก็ใช้เพียงเว็บเบราว์เซอร์ เช่น <strong>Google Chrome</strong> และไปยังเว็บไซต์ <a href="https://makecode.microbit.org/"><strong>MakeCode Editor for Micro:bit</strong></a> (<a href="https://makecode.microbit.org/">https://makecode.microbit.org/</a>)
+แล้วเริ่มต้นโดยการสร้างโปรเจกต์ใหม่ (<strong>New Project</strong>) ตามลำดับ</p>
 <p><a href="https://makecode.microbit.org/"><strong>MakeCode Editor for Micro:bit</strong></a>
-รองรับการเขียนโค้ดแบบต่อบล็อก (<strong>Block-based Coding</strong>) และเขียนโค้ดด้วยภาษา
-<strong>JavaScript (Static TypeScript)</strong> หรือ <strong>Python</strong> อีกทั้งยังสามารถจำลองการทำงานของโค้ดได้ (<strong>MakeCode Micro:bit Simulator</strong>) โดยยังไม่จำเป็นต้องใช้งานบอร์ดทดลองจริง</p>
-<hr />
-<h2 id="multi-board-editor">&#9655; <strong>การใช้งาน Multi-Board Editor</strong><a class="headerlink" href="#multi-board-editor" title="Permanent link">#</a></h2>
-<p>เนื่องจากจะต้องใช้บอร์ดไมโครบิต 2 บอร์ด และทำงานพร้อม ๆ กัน ดังนั้นถ้าจะจำลองการทำงานของบอร์ดทั้งสอง จะต้องเปิดใช้งาน <a href="https://makecode.com/multi#"><strong>Multi-Board Editor</strong></a></p>
-<p>ผู้ใช้สามารถสร้างโปรเจกต์แยกกันระหว่าง 2 บอร์ดที่จะใช้งาน แล้วเปิดโปรเจกต์ใน <strong>Editor</strong> ทั้งซ้ายมือ และขวามือ</p>
-<p><img alt="" src="makecode_multi_editor-1.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-2.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-3.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-4a.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-4b.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-5.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-6.png" /></p>
-<p>รูป: </p>
-<p><img alt="" src="makecode_multi_editor-7.png" /></p>
-<p>รูป: </p>
+รองรับการเขียนโค้ดหลายรูปแบบ ทั้งแบบการต่อบล็อก (<strong>Block-based Coding</strong>) และการเขียนโค้ดด้วยภาษา <strong>JavaScript (JS) / Static TypeScript</strong> หรือ <strong>Python</strong> อีกทั้งยังสามารถจำลองการทำงานของโค้ดได้ (<strong>MakeCode Micro:bit Simulator</strong>) โดยยังไม่จำเป็นต้องใช้งานบอร์ดทดลองจริง</p>
+<p>จุดเด่นของซอฟต์แวร์อีกประการหนึ่งคือ ความสามารถในการแปลงให้เป็นโปรแกรมในรูปแบบการต่อบล็อก หรือสลับไปมาระหว่างโหมดการเขียนโค้ดด้วยภาษา <strong>JS / Python</strong> ได้โดยอัตโนมัติ</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
-<p>บทความนี้ได้นำเสนอ
-&nbsp;</p>
+<h2 id="multi-board-editor">&#9655; <strong>การใช้งาน Multi-Board Editor</strong><a class="headerlink" href="#multi-board-editor" title="Permanent link">#</a></h2>
+<p>เนื่องจากจะต้องใช้บอร์ดไมโครบิต 2 จำนวนบอร์ด และทำงานพร้อม ๆ กัน ดังนั้นถ้าจะจำลองการทำงานของบอร์ดทั้งสอง จะต้องเปิดใช้งาน <a href="https://makecode.com/multi#"><strong>Multi-Board Editor</strong></a>
+(<a href="https://makecode.com/multi#">https://makecode.com/multi#</a>)</p>
+<p>ผู้ใช้สามารถสร้างโปรเจกต์ (กดปุ่ม "<strong>New Project</strong>") แยกกันระหว่าง 2 บอร์ดที่จะใช้งาน แล้วเปิดโปรเจกต์ใน <strong>Editor</strong> ในส่วนการทำงานทางด้านซ้ายมือ และขวามือตามลำดับ</p>
+<p><img alt="" src="makecode_multi_editor-1.png" /></p>
+<p>รูป: <strong>MakeCode Multi-Board Editor</strong></p>
+<p><img alt="" src="makecode_multi_editor-2.png" /></p>
+<p>รูป: ตัวอย่างการสร้างโปรเจกต์และทดลองเขียนโค้ด <strong>JS (JavaScript)</strong> </p>
+<p><img alt="" src="makecode_multi_editor-3.png" /></p>
+<p><img alt="" src="makecode_multi_editor-4a.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของโปรแกรม (<strong>Run simulator in fullscreen</strong>) หรือ หยุดการทำงานชั่วคราว ผู้ใช้สามารถกดปุ่ม <strong>A</strong> หรือ <strong>B</strong> ได้ รวมถึงการเขย่าบอร์ด (คลิกตรงจุดสีขาวที่มีข้อความ <strong>SHAKE</strong>)</p>
+<p><img alt="" src="makecode_multi_editor-5.png" /></p>
+<p>รูป: ตัวอย่างการแปลงโค้ด <strong>JS</strong> ให้อยู่ในรูปแบบการต่อบล็อก (ซ้ายมือ) 
+และ <strong>Python</strong> (ขวามือ)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>ตัวอย่างโค้ดสาธิต</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>การทำงานของโค้ดตัวอย่างในบทความนี้ มีลักษณะการทำงานดังนี้</p>
+<ul>
+<li>ใช้บอร์ด <strong>Micro:bit</strong> จำนวน 2 บอร์ด และใช้โค้ดเหมือนกัน</li>
+<li>เมื่อเริ่มต้นทำงาน โค้ดตัวอย่างตรวจสอบดูว่า มีการกดปุ่ม <strong>Button A</strong> 
+หรือ มีการเขย่าบอร์ด (<strong>Shake</strong>) หรือไม่ </li>
+<li>ถ้ามีเหตุการณ์ดังกล่าว ก็จะสุ่มเลือกไอคอน (<strong>Icon</strong>) จากรายการที่กำหนดไว้ (มี 3 ตัวเลือก ได้แก่ <code>Image.Heart</code>, <code>Image.Happy</code>, <code>Image.Sad</code>) ไปยังอีกบอร์ดหนึ่ง
+โดยส่งเป็นข้อความที่ระบุไอคอนที่ได้สุ่มเลือกมา</li>
+<li>ถ้าบอร์ดใดได้รับข้อความจากอีกบอร์ดหนึ่ง ก็ให้แสดงรูปสัญลักษณ์หรือไอคอนตามหมายเลขที่ได้รับมา บนแผง LED 5x5 พิกเซล</li>
+<li>แต่ถ้ากดปุ่ม <strong>Button B</strong> ก็จะแสดงระดับความแรงของสัญญาณคลื่นวิทยุที่ได้รับจากอีกบอร์ดหนึ่ง (<strong>Received Signal Strength Indicator</strong>) โดยแบ่งค่าตัวเลขให้อยู่ในช่วง 4 ระดับ</li>
+</ul>
+<pre><code class="language-JavaScript">// MakeCode Microbit Demo: Click or shake to send a randomized icon.
+
+let icons = [
+    IconNames.Heart,
+    IconNames.Happy,
+    IconNames.Sad
+]
+let selectedIcon = IconNames.Happy
+
+// Initialize with a very low RSSI value (lowest)
+let latestSignalStrength = -128  
+
+// Set the radio group to ensure both boards
+// are communicating on the same channel.
+radio.setGroup(1)
+
+// Function to pick and send a random icon
+function selectAndSendIcon() {
+    // Pick a random icon
+    selectedIcon = icons[randint(0, icons.length - 1)]
+
+    // Show the icon on the LED display
+    basic.showIcon(selectedIcon)
+
+    // Send the selected icon number to the other board over the radio
+    radio.sendNumber(selectedIcon)
+}
+
+// When button A is pressed on either micro:bit
+input.onButtonPressed(Button.A, function () {
+    selectAndSendIcon()
+})
+
+// When the micro:bit is shaken
+input.onGesture(Gesture.Shake, function () {
+    selectAndSendIcon()
+})
+
+// When a number (icon) is received over the radio
+// on either micro:bit
+radio.onReceivedNumber(function (receivedIcon: number) {
+    // Show the received icon on the LED display
+    basic.showIcon(receivedIcon)
+
+    // Get and store the signal strength (RSSI)
+    // of the last received message
+    latestSignalStrength =
+       radio.receivedPacket(RadioPacketProperty.SignalStrength)
+    // serial.writeLine(&quot;&quot; + latestSignalStrength)
+
+    // Optional: Play a sound when an icon is received
+    // Plays middle C for half a beat
+    music.playTone(262, music.beat(BeatFraction.Half)) 
+})
+
+// When button B is pressed, show signal strength
+input.onButtonPressed(Button.B, function () {
+    if (latestSignalStrength &gt; -60) {
+        // Strong signal (Full 5x5 square)
+        basic.showLeds(`
+            # # # # #
+            # # . # #
+            # . . . #
+            # # . # #
+            # # # # #
+        `)
+    } else if (latestSignalStrength &gt; -70) {
+        // Medium signal (3x3 square)
+        basic.showLeds(`
+            . # # # .
+            # # . # #
+            # . . . #
+            # # . # #
+            . # # # .
+        `)
+    } else if (latestSignalStrength &gt; -85) {
+        // Weak signal (2x2 square)
+        basic.showLeds(`
+            . . . . .
+            . # # # .
+            . # . # .
+            . # # # .
+            . . . . .
+        `)
+    } else {
+        // Very weak signal (single dot in the center)
+        basic.showLeds(`
+            . . . . .
+            . . . . .
+            . . # . .
+            . . . . .
+            . . . . .
+        `)
+    }
+    pause(1000)
+    basic.clearScreen()
+})
+</code></pre>
+<p>การทำงานของโปรแกรมมีลักษณะที่เรียกว่า <strong>Even-driven Programming</strong>
+ซึ่งจะมีการตรวจสอบเหตุการณ์ตามที่กำหนดไว้ และทำคำสั่งที่เกี่ยวข้องโดยอัตโนมัติ เช่น</p>
+<ul>
+<li>การใช้คำสั่ง <code>input.onButtonPressed(...)</code>
+ เพื่อตรวจสอบว่า มีการกดปุ่ม <strong>Button A</strong>  หรือ <strong>Button B</strong></li>
+<li>การใช้คำสั่ง <code>radio.onReceivedNumber(...)</code> 
+ เพื่อตรวจสอบว่า ได้รับข้อความ (ตัวเลข) จากบอร์ดอื่นผ่านทาง <strong>Radio Interface</strong> หรือไม่ </li>
+</ul>
+<p>ถ้ามีทำคำสั่งของฟังก์ชันภายในตามที่ได้ออกแบบไว้</p>
+<pre><code>input.onButtonPressed(Button.A, function () {
+    // perform a task or action
+})
+</code></pre>
+<pre><code>input.onButtonPressed(Button.B, function () {
+    // perform a task or action
+})
+</code></pre>
+<pre><code>radio.onReceivedNumber(function (receivedIcon: number) {
+    // perform a task or action
+})
+</code></pre>
+<p>ในกรณีที่มีการสร้างสัญญาณเสียง ถ้าเป็นบอร์ด
+<strong>Micro:bit v1</strong> จะต้องใช้ลำโพงเสียงมาต่อที่ขา <strong>Pin 0</strong> และ <strong>GND</strong>
+ของบอร์ด แต่ถ้าเป็น <strong>Micro:bit v2</strong> ก็มีวงจรและลำโพงเสียงขนาดเล็กอยู่บนบอร์ดแล้ว</p>
+<p><img alt="" src="makecode_multi_editor-4b.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ดไมโครบิต ในกรณีที่มีการใช้คำสั่งเพื่อสร้างสัญญาณเสียง
+ในกลุ่มคำสั่ง <code>music</code> เช่น <code>music.playTone(...)</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="microbit-radio-interface">&#9655; <strong>ตัวอย่างเพิ่มเติมสำหรับการใช้งาน Micro:bit Radio Interface</strong><a class="headerlink" href="#microbit-radio-interface" title="Permanent link">#</a></h2>
+<p>บนหน้าเว็บไซต์ของ <strong>Microsoft MakeCode Project</strong> มีตัวอย่างโปรเจกต์
+หรือโค้ดตัวอย่างในกลุ่มที่เรียกว่า "<strong>Radio Games</strong>" สาธิตการเขียนโค้ดเพื่อการสื่อสารข้อมูลแบบไร้สายด้วย <strong>Radio Interface</strong></p>
+<p><img alt="" src="makecode_multi_editor-6.png" /></p>
+<p><img alt="" src="makecode_multi_editor-7.png" /></p>
+<p>รูป: รายการโปรเจกต์ตัวอย่างแบ่งตามกลุ่มหรือหัวข้อ เช่น <strong>Radio Games</strong></p>
+<p>โค้ดตัวอย่างในบทความนี้ จะมีหลักการทำงานคล้ายกับตัวอย่าง <a href="https://makecode.microbit.org/projects/mood-radio"><strong>Mood Radio</strong></a> ซึ่งมีลักษณะตามรูปของโค้ดบล็อกต่อไปนี้</p>
+<p><img alt="" src="makecode_multi_editor-8.png" /></p>
+<p>รูป: โค้ดบล็อกสำหรับโปรเจกต์ <strong>Mood Radio</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด เพื่อสาธิตการใช้งานบอร์ดไมโครบิตจำนวน 2 บอร์ด
+สามารถรับส่งข้อมูลแบบไร้สายได้ และนำไปทดลองกับอุปกรณ์จริงได้หลังจากจำลองการทำงานของโค้ด
+และตรวจสอบผลการทำงานในเบื้องต้นแล้ว
+ในการทดลองจริง ก็อาจวางบอร์ดให้มีระยะห่างกัน และลองกดปุ่มหรือเขย่าบอร์ดเพื่อส่งสัญลักษณ์ (ไอคอน) ไปยังอีกบอร์ดหนึ่ง และดูว่า สามารถรับข้อความได้จริงหรือไม่</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../microbit_radio_bingo/">การสร้างเกม <strong>Digital Bingo</strong> สำหรับบอร์ด <strong>Micro:bit</strong></a></li>
+</ul>
+<p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
 <p>Created: 2024-09-28 | Last Updated: 2024-09-28</p></div>
