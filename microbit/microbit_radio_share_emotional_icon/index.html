@@ -152,56 +152,61 @@
 <p>การทำงานของโค้ดตัวอย่างในบทความนี้ มีลักษณะการทำงานดังนี้</p>
 <ul>
 <li>ใช้บอร์ด <strong>Micro:bit</strong> จำนวน 2 บอร์ด และใช้โค้ดเหมือนกัน</li>
-<li>เมื่อเริ่มต้นทำงาน โค้ดตัวอย่างตรวจสอบดูว่า มีการกดปุ่ม <strong>Button A</strong> 
-หรือ มีการเขย่าบอร์ด (<strong>Shake</strong>) หรือไม่ </li>
-<li>ถ้ามีเหตุการณ์ดังกล่าว ก็จะสุ่มเลือกไอคอน (<strong>Icon</strong>) จากรายการที่กำหนดไว้ (มี 3 ตัวเลือก ได้แก่ <code>Image.Heart</code>, <code>Image.Happy</code>, <code>Image.Sad</code>) ไปยังอีกบอร์ดหนึ่ง
-โดยส่งเป็นข้อความที่ระบุไอคอนที่ได้สุ่มเลือกมา</li>
-<li>ถ้าบอร์ดใดได้รับข้อความจากอีกบอร์ดหนึ่ง ก็ให้แสดงรูปสัญลักษณ์หรือไอคอนตามหมายเลขที่ได้รับมา บนแผง LED 5x5 พิกเซล</li>
+<li>เมื่อเริ่มต้นทำงาน โค้ดตัวอย่างตรวจสอบดูว่า มีการกดปุ่ม <strong>Button A</strong> หรือ มีการเขย่าบอร์ด (<strong>Shake</strong>) หรือไม่ </li>
+<li>ถ้ามีการเขย่าบอร์ด ให้เลือกไอคอน (<strong>Icon</strong>) ถัดไปจากรายการที่กำหนดไว้ (มี 3 ตัวเลือก ได้แก่ <code>Image.Heart</code>, <code>Image.Happy</code>, <code>Image.Sad</code>) และกดปุ่ม <strong>Button A</strong> ให้ส่งหมายเลขของไอคอนไปยังอีกบอร์ดหนึ่ง เพื่อนำไปแสดงผล</li>
+<li>ถ้าบอร์ดใดได้รับข้อความจากอีกบอร์ดหนึ่ง ก็ให้แสดงรูปสัญลักษณ์หรือไอคอนตามหมายเลขที่ได้รับมา
+บนแผง <strong>LED 5x5</strong> พิกเซล</li>
 <li>แต่ถ้ากดปุ่ม <strong>Button B</strong> ก็จะแสดงระดับความแรงของสัญญาณคลื่นวิทยุที่ได้รับจากอีกบอร์ดหนึ่ง (<strong>Received Signal Strength Indicator</strong>) โดยแบ่งค่าตัวเลขให้อยู่ในช่วง 4 ระดับ</li>
 </ul>
-<pre><code class="language-JavaScript">// MakeCode Microbit Demo: Click or shake to send a randomized icon.
+<pre><code class="language-JavaScript">// MakeCode Microbit Demo: 
+// Shake to select the next icon.
+// Click to send the selected icon.
 
 let icons = [
     IconNames.Heart,
     IconNames.Happy,
     IconNames.Sad
 ]
-let selectedIcon = IconNames.Happy
+let selectedIconIndex = 0
+
+basic.showIcon(icons[selectedIconIndex])
 
 // Initialize with a very low RSSI value (lowest)
-let latestSignalStrength = -128  
+let latestSignalStrength = -128
 
 // Set the radio group to ensure both boards
 // are communicating on the same channel.
 radio.setGroup(1)
+// Send Tx power (0=lowest, 7=highest)
+radio.setTransmitPower(7)
 
 // Function to pick and send a random icon
-function selectAndSendIcon() {
-    // Pick a random icon
-    selectedIcon = icons[randint(0, icons.length - 1)]
-
+function selectIcon() {
+    // Pick the next icon
+    selectedIconIndex = (selectedIconIndex+1) %  icons.length;
     // Show the icon on the LED display
-    basic.showIcon(selectedIcon)
-
-    // Send the selected icon number to the other board over the radio
-    radio.sendNumber(selectedIcon)
+    basic.showIcon(icons[selectedIconIndex])
 }
 
-// When button A is pressed on either micro:bit
+// When button A is pressed 
 input.onButtonPressed(Button.A, function () {
-    selectAndSendIcon()
+    // Show the icon on the LED display
+    basic.showIcon(icons[selectedIconIndex])
+    // Send the Icon index
+    radio.sendNumber(selectedIconIndex)
 })
 
 // When the micro:bit is shaken
 input.onGesture(Gesture.Shake, function () {
-    selectAndSendIcon()
+    selectIcon()
 })
 
 // When a number (icon) is received over the radio
 // on either micro:bit
-radio.onReceivedNumber(function (receivedIcon: number) {
+radio.onReceivedNumber(function (receivedIconIndex: number) {
+    serial.writeLine(&quot;&quot; + receivedIconIndex )
     // Show the received icon on the LED display
-    basic.showIcon(receivedIcon)
+    basic.showIcon(icons[receivedIconIndex])
 
     // Get and store the signal strength (RSSI)
     // of the last received message
@@ -284,6 +289,12 @@ input.onButtonPressed(Button.B, function () {
 <p><img alt="" src="makecode_multi_editor-4b.png" /></p>
 <p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ดไมโครบิต ในกรณีที่มีการใช้คำสั่งเพื่อสร้างสัญญาณเสียง
 ในกลุ่มคำสั่ง <code>music</code> เช่น <code>music.playTone(...)</code></p>
+<p><img alt="" src="makecode_simulation_two_boards.png" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานของบอร์ดไมโครบิต 2 บอร์ดพร้อมกัน</p>
+<p><img alt="" src="microbit_v2_boards.jpg" /></p>
+<p>รูป: บอร์ด <strong>Micro:bit v2.20</strong> ที่ได้นำมาทดลอง  มีแบตเตอรี่ ทำให้สะดวกต่อการนำไปทดลองใช้งาน ไม่ต้องเสียบสาย <strong>USB</strong></p>
+<p><img alt="" src="microbit_boards_emotional_faces.jpg" /></p>
+<p>รูป: บอร์ด <strong>Micro:bit</strong> แสดงรูปไอคอนที่มีการส่งระหว่างสองบอร์ด</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="microbit-radio-interface">&#9655; <strong>ตัวอย่างเพิ่มเติมสำหรับการใช้งาน Micro:bit Radio Interface</strong><a class="headerlink" href="#microbit-radio-interface" title="Permanent link">#</a></h2>
@@ -309,7 +320,7 @@ input.onButtonPressed(Button.B, function () {
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2024-09-28 | Last Updated: 2024-09-28</p></div>
+<p>Created: 2024-09-28 | Last Updated: 2024-10-01</p></div>
             </div>
         </div>
 
