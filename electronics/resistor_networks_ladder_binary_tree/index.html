@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/resistor_networks_ladder_binary_tree/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>โครงข่ายของตัวต้านทานและการหาค่าความต้านทานรวม - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#_1" class="nav-link">โครงข่ายของตัวต้านทานและการหาค่าความต้านทานรวม</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กิจกรรมการเรียนรู้วงจรไฟฟ้าโดยใช้ตัวต้านทาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#binary-tree" class="nav-link">&#9655; การต่อตัวต้านทานตามรูปแบบ Binary Tree</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#binary-tree_1" class="nav-link">&#9655; การจำลองการต่อตัวต้านทานเป็นโครงข่ายตามรูปแบบ Binary Tree</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#binary-tree_2" class="nav-link">&#9655; การวิเคราะห์หาค่าความตัวต้านทานรวมของโครงข่าย Binary Tree</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ladder" class="nav-link">&#9655; การต่อตัวต้านทานแบบ Ladder</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="_1">โครงข่ายของตัวต้านทานและการหาค่าความต้านทานรวม<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong>  <em>Circuit Simulation</em>, <em>AUTODESK Tinkercad</em>, <em>Resistor Network</em>,
+<em>Ladder Diagram</em>, <em>Binary Tree Diagram</em>, <em>Recurrence Equations</em></p>
+<hr />
+<h2 id="_2">&#9655; <strong>กิจกรรมการเรียนรู้วงจรไฟฟ้าโดยใช้ตัวต้านทาน</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอกิจกรรมการเรียนรู้ที่ใช้ตัวต้านทานหลายตัว และทุกตัวมีค่าเท่ากัน นำมาต่อวงจรเข้าด้วยกัน
+โดยสร้างเป็นโครงข่ายของตัวต้านทาน
+(<strong>Resistor Networks</strong>) ตามรูปแบบที่กำหนดไว้ แบ่งออกเป็น 2 รูปแบบ คือ</p>
+<ol>
+<li>แผนภูมิต้นไม้แบบทวิภาค (<strong>Binary Tree</strong>)</li>
+<li>แผนภูมิบันได (<strong>Ladder Structure</strong>)</li>
+</ol>
+<p>เมื่อได้ต่อวงจรโดยใช้ตัวต้านทานแล้วตามรูปแบบที่ 1 หรือ 2 
+โจทย์ถัดไปก็คือ การหาความต้านทานรวมระหว่าง 2 จุด ซึ่งถูกกำหนดให้เป็นจุดปลายของโครงข่ายตัวต้านทานดังกล่าว
+และก็สามารถทำได้หลายวิธี เช่น</p>
+<ul>
+<li>การคำนวณในเชิงทฤษฎี</li>
+<li>การวัดด้วยมัลติมิเตอร์</li>
+<li>การใช้ซอฟต์แวร์ช่วยวิเคราะห์วงจรไฟฟ้า</li>
+</ul>
+<p>เนื่องจากว่า รูปแบบการต่อตัวต้านทาน มีลักษณะเฉพาะ และค่าความต้านทานของทุกตัวเท่ากัน
+ดังนั้นการคำนวณค่าความต้านรวมโดยใช้วิธีเชิงวิเคราะห์ (<strong>Analytic Method</strong>) จึงทำได้ไม่ยากนัก</p>
+<p>แต่ถ้าใช้วิธีการวัด ก็แบ่งเป็น วิธีแรกคือ การจำลองการทำงานของวงจรไฟฟ้าโดยใช้ซอฟต์แวร์ เช่น <strong>AUTODESK Tinkercad - Circuits</strong>
+(<a href="https://www.tinkercad.com/circuits">https://www.tinkercad.com/circuits</a>) 
+ซึ่งเป็น <strong>Web App</strong> ใช้งานได้ฟรี และเปิดใช้งานด้วยเว็บเบราว์เซอร์ และวิธีที่สองคือ การทดลองวัดปริมาณทางไฟฟ้าด้วยมัลติมิเตอร์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="binary-tree">&#9655; <strong>การต่อตัวต้านทานตามรูปแบบ Binary Tree</strong><a class="headerlink" href="#binary-tree" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการต่อตัวต้านทานตามรูปแบบแผนภูมิต้นไม้ทวิภาค มีดังนี้</p>
+<ol>
+<li>เริ่มต้นด้วยตัวต้านทาน 1 ตัว ซึ่งถือว่า เป็นชั้นแรก </li>
+<li>ในชั้นที่สอง ให้นำตัวต้านทานครั้งละ 2 ตัว โดยต่อเข้าที่ปลายด้านล่างของตัวต้านทานตัวแรก ดังนั้นตัวต้านทานที่นำมาต่อเพิ่มแต่ละตัว
+เป็นกิ่ง (<strong>Branches</strong>) ที่แยกออกมา 2 กิ่ง </li>
+<li>ในชั้นที่สาม ให้นำตัวต้านทาน 2 ตัว ไปต่อเข้ากับแต่ละกิ่งของชั้นที่สอง และนำมาต่อให้ครบทุกกิ่ง </li>
+<li>ชั้นถัดไปก็ให้ทำในลักษณะเดียวกัน ตามจำนวนชั้นที่ต้องการต่อตัวต้านทาน</li>
+<li>เมื่อได้จำนวนชั้นของตัวต้านทานตามต้องการแล้ว ให้นำปลายด้านล่างสุดของตัวต้านทานแต่ละกิ่งเชื่อมต่อถึงกันทั้งหมด 
+รวมกันเป็นปลายด้านล่าง</li>
+</ol>
+<p><img alt="" src="resistor_bin_tree_3_layers.png" /></p>
+<p>รูป: ตัวอย่างการต่อตัวต้านทานตามรูปแบบ <strong>Binary Tree</strong> และมีความสูงเท่ากับ 3 ชั้น</p>
+<p>ถ้าให้ <script type="math/tex">h</script> คือ จำนวนชั้น หรือ ความสูงของต้นไม้ทวิภาค จำนวนของตัวต้านทานที่มีอยู่ คือ <script type="math/tex">(2^h-1)</script>
+เช่น <script type="math/tex">h=3</script> จะมีจำนวนของตัวต้านทานเท่ากับ <script type="math/tex">2^3 - 1 = 7</script> ตัว</p>
+<p><strong>คำถาม:</strong> จากปลายด้านบนสุดจนถึงปลายด้านล่างมีค่าความต้านทานกี่โอห์ม</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="binary-tree_1">&#9655; <strong>การจำลองการต่อตัวต้านทานเป็นโครงข่ายตามรูปแบบ Binary Tree</strong><a class="headerlink" href="#binary-tree_1" title="Permanent link">#</a></h2>
+<p>รูปต่อไปนี้เป็นตัวอย่างการต่อตัวต้านทานแบบเสมือนจริง โดยใช้ซอฟต์แวร์ <strong>AUTODESK Tinkercad</strong>
+และการใช้มัลติมิเตอร์วัดปริมาณทางไฟฟ้า เลือกใช้ค่าความต้านทานคงที่ <script type="math/tex">R=1k\Omega</script> ทุกตัว</p>
+<p>รูปทางซ้ายมือสาธิตการใช้โหมดการวัดเป็น "โอห์มมิเตอร์"
+(<strong>Ohm meter</strong>) และรูปทางขวามือสาธิตการใช้โหมดการวัดเป็นแอมมิเตอร์ 
+(<strong>Ammeter</strong>) โดยมีแหล่งจ่ายไฟ <strong>DC</strong> คงที่
+เช่น <strong>3V</strong> จากแบตเตอรี่ (สมมุติว่า แรงดันไฟฟ้าคงที่)</p>
+<p>ในกรณีที่วัดปริมาณกระแสไฟฟ้าที่ไหลผ่าน เมื่อมีแหล่งจ่ายเป็นแรงดันไฟฟ้าคงที่ เช่น <script type="math/tex">3V</script>
+วัดกระแสได้ประมาณ <script type="math/tex">2mA</script> ดังนั้นจึงได้ค่าความต้านทานรวม <script type="math/tex">1.5k\Omega</script> ตามกฎของโอห์ม <script type="math/tex">V/I = R</script>
+</p>
+<p><img alt="" src="bin_tree_measurement-1.png" /></p>
+<p>รูป: การวัดปริมาณทางไฟฟ้าด้วยมัลติมิเตอร์</p>
+<p><img alt="" src="bin_tree_measurement-2.png" /></p>
+<p>รูป: การวัดค่าความต้านทานด้วยมัลติมิเตอร์ ตามแผนภูมิต้นไม้ทวิภาคของตัวต้านทาน ความสูง 4 ชั้น</p>
+<p><img alt="" src="bin_tree_measurement-3.png" /></p>
+<p>รูป: การวัดค่าความต้านทานด้วยมัลติมิเตอร์ ตามแผนภูมิต้นไม้ทวิภาคของตัวต้านทาน ความสูง 5 ชั้น</p>
+<p>จากการจำลองการทำงาน จะเห็นได้ว่า วัดความต้านทานรวม (<script type="math/tex">R_{total}</script>) ระหว่างปลายด้านบนและด้านล่าง
+ได้ประมาณ <script type="math/tex">1.87k\,\Omega</script> สำหรับความสูง 4 ชั้น และประมาณ <script type="math/tex">1.94k\,\Omega</script> สำหรับความสูง 5 ชั้น
+ตามลำดับ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="binary-tree_2">&#9655; <strong>การวิเคราะห์หาค่าความตัวต้านทานรวมของโครงข่าย Binary Tree</strong><a class="headerlink" href="#binary-tree_2" title="Permanent link">#</a></h2>
+<p>การคำนวณหาค่าความต้านทานรวมสำหรับโครงสร้างแผนภูมิต้นไม้ทวิภาค สามารถใช้หลักการคำนวณตาม "สมการเวียนเกิด"
+หรือความสัมพันธ์แบบเวียนเกิด (<strong>Recurrence Relationship</strong>) ได้ดังนี้</p>
+<ul>
+<li>Recursive Case: <script type="math/tex">\;\; R_{total}(h) = R + \frac{R_{total}(h-1)}{2}</script>
+</li>
+<li>Base Case: <script type="math/tex">\qquad\;\, R_{total}(1) = R</script>
+</li>
+</ul>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+h=1: & \; R_{total}(1) = R = 1k\,\Omega \\
+h=2: & \; R_{total}(2) = R + \frac{R_{total}(1)}{2} = \frac{3}{2}R = 1.5\,k\Omega \\
+h=3: & \; R_{total}(3) = R + \frac{R_{total}(2)}{2} = \frac{7}{4}R = 1.75\,k\Omega \\
+h=4: & \; R_{total}(4) = R + \frac{R_{total}(3)}{2} = \frac{15}{8}R = 1.875\,k\Omega\\
+h=5: & \; R_{total}(5) = R + \frac{R_{total}(3)}{2} = \frac{31}{16}R = 1.9375\,k\Omega\\
+& ... \\
+& \; R_{total}(h) = \frac{2^h-1}{2^{(h-1)}} R = (2 - \frac{1}{2^{(h-1)}}) R
+\end{align}</script>
+</p>
+<p><strong>คำถาม:</strong> ถ้ามีจำนวนชั้นของโครงข่ายตัวต้านทานแบบ <strong>Binary Tree</strong> เพิ่มขึ้นไปเรื่อย ๆ
+แนวโน้มของค่า <script type="math/tex">R_{total}</script> จะเป็นอย่างไร? </p>
+<p><strong>คำตอบ</strong>: จะได้ค่า <script type="math/tex">\lim_{h\rightarrow \infty} R_{total}(h) = 2R</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ladder">&#9655; <strong>การต่อตัวต้านทานแบบ Ladder</strong><a class="headerlink" href="#ladder" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการต่อตัวต้านทานตามรูปแบบ <strong>Ladder</strong> มีดังนี้</p>
+<ol>
+<li>เริ่มต้นด้วยตัวต้านทาน 2 ตัว นำมาต่ออนุกรมกัน ให้เป็นชั้นแรกของโครงข่ายตัวต้านทาน </li>
+<li>ในชั้นถัดไป ให้นำตัวต้านทานครั้งละ 2 ตัว ต่ออนุกรมกันแล้วนำปลายทั้งสองไปต่อขนานกับตัวต้านทานหนึ่งตัวในชั้นแรก</li>
+</ol>
+<p><img alt="" src="ladder_measurement-1.png" /></p>
+<p>รูป: ตัวอย่างการต่อตัวต้านทานแบบ <strong>Ladder</strong> จำนวน 2 ชั้น และการวัดค่าความต้านทานด้วยโอห์มมิเตอร์</p>
+<p><img alt="" src="ladder_measurement-2.png" /></p>
+<p>รูป: ตัวอย่างการวัดปริมาณกระแส และมีแหล่งจ่ายแรงดันคงที่ <strong>3V</strong> สำหรับโครงข่ายตัวต้านทาน</p>
+<p><img alt="" src="ladder_measurement-3.png" /></p>
+<p>รูป: ตัวอย่างการต่อตัวต้านทานแบบ <strong>Ladder</strong> จำนวน 5 ชั้น และการวัดค่าความต้านทานด้วยโอห์มมิเตอร์</p>
+<p>การคำนวณหาความต้านทานรวมสำหรับจำนวนชั้น <script type="math/tex">n</script> หรือ <script type="math/tex">R_{total}(n)</script> ทำตามสูตรคำนวณของ "สมการเวียนเกิด" ได้ดังนี้</p>
+<ul>
+<li>Recursive Case: <script type="math/tex"> \;\; R_{total}(n) = R + \frac{1}{\frac{1}{R} + \frac{1}{R_{total}(n-1)}}, \, n \gt 1</script>
+</li>
+<li>Base Case: <script type="math/tex">\qquad\;\,  R_{total}(1) = 2R </script>
+</li>
+</ul>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+n=1: & \; R_{total}(1) = \; 2R = 2 \cdot 1k\,\Omega \\
+n=2: & \; R_{total}(2) = \frac{5}{3}R = 1.667k\,\Omega \\
+n=3: & \; R_{total}(3) = \frac{13}{8}R = 1.625k\,\Omega \\
+n=4: & \; R_{total}(4) = \frac{34}{21}R = 1.619k\,\Omega \\
+& ... \\
+\end{align}</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอกิจกรรมการเรียนรู้ โดยใช้ตัวต้านทานจำนวนหนึ่ง นำมาต่อกันให้เป็นโครงข่ายของตัวต้านทาน
+ซึ่งสามารถนำไปใช้ทดลองและฝึกต่อวงจรตัวต้านทานบนแผงต่อวงจร (เบรดบอร์ด) ได้
+การหาค่าความต้านทานรวมระหว่างสองจุดที่กำหนดไว้ การฝึกใช้มัลติมิเตอร์เพื่อวัดปริมาณทางไฟฟ้า
+และการใช้โปรแกรมหรือซอฟต์แวร์อย่างเช่น <strong>AUTODESK TinkerCAD</strong>
+จำลองการทำงานของวงจรแบบเสมือนจริง</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../resistor_network_lab/">การฝึกต่อวงจรบนเบรดบอร์ดด้วยตัวต้านทานและวัดค่าความต้านทานรวม</a></li>
+<li><a href="../tinkercad_microbit_resistance_mesurement/">การวัดค่าความต้านทานด้วยไมโครบิตและจำลองการทำงานด้วย AUTODESK Tinkercad</a></li>
+</ul>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-10-01 | Last Updated: 2024-10-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
