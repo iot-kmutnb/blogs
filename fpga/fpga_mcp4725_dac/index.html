@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/fpga_mcp4725_dac/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานโมดูล MCP4725 I2C DAC - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fpga-mcp4725-i2c-dac" class="nav-link">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานโมดูล MCP4725 I2C DAC</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#mcp4725-12-bit-i2c-dac" class="nav-link">&#9655; MCP4725: 12-bit I2C DAC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#i2c-master-vhdl" class="nav-link">&#9655; I2C Master (VHDL)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl-i2c-master-mcp4725" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด VHDL สาธิตการใช้งาน I2C Master สำหรับ MCP4725</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#fpga" class="nav-link">&#9655; การทดสอบการทำงานของวงจรโดยใช้บอร์ด FPGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fpga-mcp4725-i2c-dac">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานโมดูล MCP4725 I2C DAC<a class="headerlink" href="#fpga-mcp4725-i2c-dac" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Digital Logic Design</em>, <em>VHDL</em>, <em>Intel / Altera FPGA</em>, <em>Quartus Prime</em>, <em>MCP4725 DAC</em>, <em>I2C</em>, <em>IP Core</em> </p>
+<hr />
+<h2 id="mcp4725-12-bit-i2c-dac">&#9655; <strong>MCP4725: 12-bit I2C DAC</strong><a class="headerlink" href="#mcp4725-12-bit-i2c-dac" title="Permanent link">#</a></h2>
+<p><strong>MCP4725</strong> เป็นไอซีประเภท <strong>DAC</strong> (<em>Digital to Analog Converter</em>)
+ของบริษัท <strong>Microchip Technology Inc.</strong> ใช้สำหรับการแปลงข้อมูลดิจิทัล 12 บิต ให้เป็นสัญญาณแอนะล็อก
+และใช้บัส <strong>I2C</strong> ที่มีสัญญาณ <strong>SCL</strong> และ <strong>SDA</strong> ในการสื่อสารข้อมูลกับชิปตัวอื่น 
+เช่น ไมโครคอนโทลเลอร์ เป็นต้น สำหรับรายละเอียดเกี่ยวกับ <strong>MCP4725</strong> แนะนำให้ศึกษาจากบทความ
+<a href="../../electronics/mcp4725_dac_i2c/">"การใช้งานโมดูล <strong>MCP4725 DAC (Digital-to-Analog Converter)</strong>"</a></p>
+<p>ข้อมูลเชิงเทคนิคที่สำคัญของไอซีมีดังนี้ </p>
+<ul>
+<li>แรงดันไฟเลี้ยง (<strong>VDD</strong>) สำหรับไอซี: <strong>2.7V ~ 5.5V</strong><ul>
+<li>ถ้านำไปใช้ร่วมกับบอร์ด <strong>FPGA</strong> หรือ ไมโครคอนโทรลเลอร์ เช่น <strong>ESP32</strong> ให้ใช้ <strong>VDD = 3.3V</strong></li>
+</ul>
+</li>
+<li>ข้อมูลมีความละเอียด (<strong>Bit Resolution</strong>): 12 บิต</li>
+<li>ช่วงแรงดันเอาต์พุต: <strong>0V ~ VDD</strong> (Rail-to-Rail Output)</li>
+<li>เชื่อมต่อด้วยบัส <strong>I2C</strong> สำหรับการเขียนโปรแกรมควบคุมการทำงานของไอซี</li>
+<li>ความเร็วของบัส <strong>I2C</strong><ul>
+<li>Standard-speed mode: <strong>100kHz</strong></li>
+<li>Fast-speed mode: <strong>400kHz</strong></li>
+<li>High-speed mode: <strong>3.4MHz</strong></li>
+</ul>
+</li>
+<li>มีขา <strong>A0</strong> (1-Bit Address Pin) สำหรับกำหนดค่าบิตของอุปกรณ์<ul>
+<li>มีหมายเลขอุปกรณ์เลือกได้คือ: <code>0x60</code> (<strong>A0=0</strong>) หรือ <code>0x61</code> (<strong>A0=1</strong>)</li>
+</ul>
+</li>
+</ul>
+<p>การเขียนข้อมูลเพื่อใช้เป็นเอาต์พุตของ <strong>MCP4725</strong> มีหลายรูปแบบ คือ</p>
+<ul>
+<li>เขียนข้อมูลลงใน <strong>EEPROM</strong> (ข้อมูลไม่สูญหายเมื่อปิดไฟเลี้ยง)</li>
+<li>เขียนข้อมูลลงในรีจิสเตอร์ของ <strong>DAC</strong> </li>
+<li>เขียนข้อมูลลงใน <strong>EEPROM</strong> และ <strong>DAC Register</strong></li>
+</ul>
+<p><img alt="" src="mcp4725_info.png" /></p>
+<p>รูป: ข้อมูลบางส่วนจาก <strong>Datasheet</strong> ของไอซี <strong>MCP4725</strong></p>
+<p>ในบทความนี้ วงจรดิจิทัลใน <strong>FPGA</strong> ทำหน้าที่เป็น <strong>I2C Master</strong> และ <strong>MCP4725</strong> ทำหน้าที่เป็น <strong>I2C Slave</strong></p>
+<p>การส่งข้อมูลไปยัง <strong>MCP4725</strong> จะใช้วิธีเขียนข้อมูลแบบ <strong>Fast Mode Write Command</strong>
+ลงในรีจิสเตอร์ของ <strong>DAC</strong> เท่านั้น ซึ่งมีหลักการทำงานดังนี้</p>
+<ul>
+<li>การส่งข้อมูลด้วยบัส <strong>I2C</strong> จะต้องเริ่มต้นด้วยการส่งสัญญาณ <strong>I2C START Condition</strong> แล้วตามข้อมูลไบต์
+แล้วจบด้วย <strong>I2C STOP Condition</strong></li>
+<li>การส่งข้อมูลไปยัง <strong>MCP4725</strong> ในตัวอย่างนี้ เป็นการเขียนข้อมูลเพียงอย่างเดียว <strong>Write Operation</strong>
+ไม่มีการอ่านข้อมูล (<strong>Read Operation</strong>)</li>
+<li>ไบต์แรกซึ่งเรียกว่า <strong>Address Byte</strong> มีแอดเดรสของอุปกรณ์ขนาด 7 บิต (<code>0x60</code>) และบิต <code>R/W=0</code> ซึ่งบ่งบอกว่า จะเขียนข้อมูล
+ดังนั้นไบต์แรกคือ <code>1100_0000</code> (bin) ซึ่งมีบิต <code>A2 A1 A0 = 0 0 0</code></li>
+<li>ไบต์ที่สองประกอบด้วย 4 บิต <code>0000</code> (<code>C2</code> <code>C1</code> <code>PD1</code> <code>PD0</code> ตามลำดับ) สำหรับคำสั่ง และ 4 บิต
+(<code>D11</code> .. <code>D8</code>) ของข้อมูล 12 บิต เพื่อใช้เป็นเอาต์พุตของ <strong>DAC</strong></li>
+<li>ไบต์ที่สามคือ 8 บิต (<code>D7</code> .. <code>D0</code>) ที่เหลือของข้อมูล 12 บิต</li>
+<li>แต่ถ้าต้องการส่งข้อมูลต่อเนื่องครั้งละ 2 ไบต์ (ไม่ต้องส่งไบต์แอดเดรส) ไปยัง <strong>DAC</strong> ก็ทำได้ โดยยังไม่ต้องส่ง <strong>STOP Condition</strong></li>
+</ul>
+<p><img alt="" src="mcp4725_fast_mode_write.png" /></p>
+<p>รูป: ลำดับการส่งข้อมูลต่อเนื่องไปยัง <strong>MCP4725</strong> ในโหมด <strong>Fast Mode Write Command</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="i2c-master-vhdl">&#9655; <strong>I2C Master (VHDL)</strong><a class="headerlink" href="#i2c-master-vhdl" title="Permanent link">#</a></h2>
+<p>โดยทั่วไปแล้ว โมดูล <strong>MCP4725</strong> นิยมใช้กับไมโครคอนโทรลเลอร์ และในกรณีที่เขียนโค้ดด้วย <strong>Arduino</strong>
+ก็มีไลบรารี <a href="https://docs.arduino.cc/learn/communication/wire/"><code>Wire</code></a>
+และไลบรารีสำหรับ <strong>MCP4725</strong> เพื่อความสะดวกและง่ายต่อการเขียนโค้ด เช่น</p>
+<ul>
+<li><a href="https://github.com/adafruit/Adafruit_MCP4725"><code>adafruit/Adafruit_MCP4725</code></a> </li>
+<li><a href="https://github.com/RobTillaart/MCP4725"><code>RobTillaart/MCP4725</code></a></li>
+<li><a href="https://github.com/DFRobot/DFRobot_MCP4725"><code>DFRobot/DFRobot_MCP4725</code></a></li>
+</ul>
+<p>บทความนี้นำเสนอตัวอย่างการทดลองใช้งานชิป <strong>MCP4725</strong> (ใช้โมดูล <strong>GY-4725</strong>) ร่วมกับบอร์ด <strong>FPGA</strong>
+และสาธิตการเขียนโค้ด <strong>VHDL</strong> เพื่อออกแบบวงจรดิจิทัล โดยเลือกใช้งาน <strong>IP Core</strong>
+ที่ทำหน้าที่เป็น <strong>I2C Master</strong> สำหรับการส่งข้อมูลผ่านบัส <strong>I2C</strong> ไปยังไอซี <strong>MCP4725</strong></p>
+<ul>
+<li><a href="i2c_master.vhd"><code>i2c_master.vhd</code></a>
+เป็นไฟล์ <strong>IP Core</strong> สำหรับ <strong>I2C Master</strong> </li>
+<li>ดูคำอธิบายการใช้งานได้จาก <a href="https://forum.digikey.com/t/i2c-master-vhdl/12797"><strong>DigiKey Tech Forum: I2C Master (VHDL)</strong></a> </li>
+</ul>
+<p><img alt="" src="i2c_bus.png" /></p>
+<p>รูป: การเชื่อมต่อระหว่าง <strong>I2C Master IP Core</strong> กับวงจรของผู้ใช้ (<strong>User Logic</strong>)</p>
+<p><img alt="" src="i2c_master_interface.png" /></p>
+<p>รูป: ขา <strong>I/O</strong> ของ <strong>I2C Master IP Core</strong></p>
+<p><img alt="" src="i2c_master_core_vhdl.jpg" /></p>
+<p>รูป: <strong>VHDL Entity</strong> ของ <strong>I2C Master IP Core</strong></p>
+<p>สัญญาณ <code>ena</code> เป็นสัญญาณอินพุตควบคุม ถ้าเป็นลอจิก <code>1</code> จะทำให้ <strong>I2C Master</strong>
+เริ่มทำงาน โดยอ่านค่า 7 บิตจากสัญญาณอินพุต <code>addr</code> ซึ่งจะมีค่า <code>0x60</code> สำหรับอุปกรณ์ <strong>MCP4725</strong>
+และจะต้องกำหนดค่าลอจิกให้สัญญาณอินพุต <code>rw</code> ซึ่งเป็นบิตสำหรับเลือกว่า จะเขียนหรือจะอ่านข้อมูล</p>
+<p>ในตัวอย่างนี้เป็นการส่งข้อมูลเท่านั้น ดังนั้นสัญญาณอินพุต <code>rw</code> จึงเป็นลอจิก <code>0</code>
+และจะต้องกำหนดค่า 8 บิต ให้สัญญาณอินพุต <code>data_wr</code> เพื่อการเขียนข้อมูลไบต์และเป็นข้อมูลไบต์ตัวที่สอง </p>
+<p>เมื่อเริ่มต้นการทำงานหลังจากกำหนดให้ <code>ena</code> เป็นลอจิก <code>1</code> แล้ว สัญญาณเอาต์พุต <code>busy</code> จะเปลี่ยนเป็นลอจิก <code>1</code>
+จากนั้นจึงมีการส่งสัญญาณที่เรียกว่า <strong>START Condition</strong> ตามด้วยไบต์แรก (หรือ <strong>Address Byte</strong>)</p>
+<p>เมื่อได้รับบิตที่เรียกว่า <strong>ACK</strong> (หรือ <strong>Acknowledge Bit</strong>) หลังจากส่งไบต์แรกแล้ว ก็จะส่งไบต์ที่สองถัดไป
+แต่ถ้าสัญญาณ <code>ack_error</code> เป็นลอจิก <code>1</code> แสดงว่า ไม่ได้รับสัญญาณบิต <strong>ACK</strong> จากไอซี <strong>MCP4725</strong>
+มีความผิดพลาดเกิดขึ้น ให้จบการเขียนข้อมูลไปยังไอซี</p>
+<p>เมื่อได้รับบิตที่เรียกว่า <strong>ACK</strong>  (ค่าของ <code>ack_error</code> เป็นลอจิก <code>0</code>) หลังจากส่งไบต์ที่สองแล้ว
+ก็จะส่งไบต์ที่สามถัดไป ดังนั้นจึงต้องอัปเดตค่าให้กับสัญญาณอินพุต  <code>data_wr</code> เพื่อใช้เป็นข้อมูลไบต์ถัดไป
+แล้วรอตรวจสอบสัญญาณ <code>ack_error</code> เพื่อดูว่า ได้รับบิต <strong>ACK</strong> หรือไม่</p>
+<p>เมื่อส่งข้อมูลครบสามไบต์ เพื่ออัปเดตค่าให้เอาต์พุตของ <strong>MCP4725 DAC</strong> ในหนึ่งรอบ 
+ก็ให้สัญญาณ <code>ena</code> เป็น <code>0</code> เพื่อจบการส่งข้อมูลไปยังไอซี ซึ่งจะจบด้วยการสร้างสัญญาณที่เรียกว่า <strong>STOP Condition</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-i2c-master-mcp4725">&#9655; <strong>ตัวอย่างการเขียนโค้ด VHDL สาธิตการใช้งาน I2C Master สำหรับ MCP4725</strong><a class="headerlink" href="#vhdl-i2c-master-mcp4725" title="Permanent link">#</a></h2>
+<p>โค้ด <strong>VHDL</strong> ต่อไปนี้สาธิตการใช้งาน <strong>I2C Master IP Core</strong> โดยสร้างวงจรในส่วน <strong>User Logic</strong>
+เพื่อเขียนข้อมูลไปยังไอซี <strong>MCP4725</strong> ความถี่ของสัญญาณ <strong>Clock</strong> ของบอร์ด <strong>FPGA</strong> ที่ใช้คือ <strong>50MHz</strong>
+และความถี่ของบัส <strong>I2C</strong> ก็ถูกกำหนดด้วยค่าคงที่ <code>I2C_CLK_SPEED</code> เช่น ลองเลือกค่าต่อไปนี้ในการทดลอง</p>
+<ul>
+<li><code>100_000</code> (100kHz)</li>
+<li><code>400_000</code> (400kHz)</li>
+<li><code>1_000_000</code> (1MHz)</li>
+</ul>
+<p>ข้อมูลที่จะนำไปใช้สำหรับ <strong>DAC Output</strong> ได้จากข้อมูลถูกคำนวณและเก็บเอาไว้ในตาราง หรือ อาร์เรย์ที่มีชื่อว่า
+<code>sample_table</code> มีจำนวนข้อมูล <strong>2^M = 256 (M=8)</strong> และใช้ <code>sample_index</code> เป็นตัวเลือกข้อมูลในอาร์เรย์ดังกล่าว
+<code>sample_index</code> จะมีค่าเพิ่มขึ้นทีละหนึ่ง อยู่ในช่วง <code>0</code> ถึง <code>255</code> และวนซ้ำใหม่</p>
+<p><strong>File</strong>: <a href="mcp4725_dac.vhd"><code>mcp4725_dac.vhd</code></a></p>
+<pre><code class="language-VHDL">library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.math_real.all;
+
+entity mcp4725_dac is
+  port (
+    NRESET  : in std_logic;
+    CLK     : in std_logic;
+    I2C_SDA : inout std_logic;
+    I2C_SCL : inout std_logic;
+    STATUS  : out std_logic
+  );
+end mcp4725_dac;
+
+architecture behavior of mcp4725_dac is
+  -- 7-bit I2C device address for MCP4725 (0x60)
+  constant I2C_ADDR      : std_logic_vector(6 downto 0) := &quot;1100000&quot;;
+  constant I2C_CLK_SPEED : integer := 1_000_000; -- I2C speed
+
+  constant BW        : integer := 12; -- 12 bits for DAC output
+  constant M         : integer := 8;
+  constant MAX_INDEX : integer := 2 ** M - 1;
+
+  subtype sample_t is std_logic_vector((BW - 1) downto 0);
+  type sample_table_t is array(0 to MAX_INDEX) of sample_t;
+
+  function init_table return sample_table_t is
+    variable LUT : sample_table_t;
+    variable x   : REAL;
+  begin
+    for i in 0 to MAX_INDEX loop
+      -- staircase function (16 levels)
+      LUT(i) := std_logic_vector(to_unsigned(i mod 16, 4)) &amp; x&quot;ff&quot;;
+    end loop;
+    return LUT;
+  end function;
+
+  signal sample_table : sample_table_t               := init_table;
+  signal sample_index : integer range 0 to MAX_INDEX := 0;
+
+  type state_type is (ST_IDLE, ST_START, ST_WR_1, ST_WR_2, ST_STOP);
+  signal state : state_type := ST_IDLE;
+
+  signal busy        : std_logic;
+  signal ack_error   : std_logic;
+  signal ena         : std_logic := '0';
+  signal rw          : std_logic := '0';
+  signal data_wr     : std_logic_vector(7 downto 0);
+  signal data_buffer : std_logic_vector(15 downto 0);
+  signal busy_prev   : std_logic_vector(1 downto 0);
+  signal wait_cnt    : integer := 0;
+
+begin
+
+  -- I2C Master Instantiation
+  i2c_master_inst : entity work.i2c_master
+    generic map (
+      input_clk =&gt; 50_000_000, -- Assume system clock of 50 MHz
+      bus_clk   =&gt; I2C_CLK_SPEED
+    )
+    port map (
+      clk       =&gt; CLK,
+      reset_n   =&gt; NRESET,
+      ena       =&gt; ena,
+      addr      =&gt; I2C_ADDR,
+      rw        =&gt; rw,
+      data_wr   =&gt; data_wr,
+      busy      =&gt; busy,
+      ack_error =&gt; ack_error,
+      sda       =&gt; I2C_SDA,
+      scl       =&gt; I2C_SCL
+    );
+
+  STATUS &lt;= busy; -- Use the STATUS output to monitor the busy signal
+
+  process (NRESET, CLK)
+  begin
+    if NRESET = '0' then
+      state        &lt;= ST_IDLE;
+      ena          &lt;= '0';
+      rw           &lt;= '0';
+      busy_prev    &lt;= (others =&gt; '0');
+      sample_index &lt;= 0;
+      wait_cnt     &lt;= 10000;
+
+    elsif rising_edge(CLK) then
+
+      busy_prev &lt;= busy_prev(0) &amp; busy;
+
+      case state is
+        when ST_IDLE =&gt;
+          -- Prepare the data (Fast Write Mode)
+          data_buffer &lt;= &quot;0000&quot; &amp; sample_table(sample_index);
+          state       &lt;= ST_START;
+          ena         &lt;= '0';
+
+        when ST_START =&gt;
+          -- Set up for I2C transmission  
+          ena     &lt;= '1'; -- Start I2C transaction
+          rw      &lt;= '0'; -- write operation  
+          data_wr &lt;= data_buffer(15 downto 8); -- the high byte 
+          state   &lt;= ST_WR_1;
+
+        when ST_WR_1 =&gt;
+          if I2C_SCL = '0' and busy = '1' then
+            data_wr &lt;= data_buffer(7 downto 0); -- the low byte         
+          end if;
+          if busy_prev = &quot;10&quot; then -- busy goes low
+            if ack_error = '0' then -- ACK
+              state &lt;= ST_WR_2;
+            else -- No ACK
+              ena   &lt;= '0';
+              state &lt;= ST_STOP;
+            end if;
+          end if;
+
+        when ST_WR_2 =&gt;
+          if busy_prev = &quot;01&quot; then -- busy goes high
+            ena &lt;= '0';
+          elsif busy_prev = &quot;10&quot; then -- busy goes low
+            if ack_error = '0' then -- ACK
+              if sample_index = MAX_INDEX then
+                sample_index &lt;= 0;
+              else
+                sample_index &lt;= sample_index + 1;
+              end if;
+              state &lt;= ST_IDLE;
+            else -- No ACK
+              state &lt;= ST_STOP;
+            end if;
+          end if;
+
+        when ST_STOP =&gt;
+          if wait_cnt = 0 then
+            wait_cnt     &lt;= 10000;
+            ena          &lt;= '0';
+            state        &lt;= ST_IDLE;
+            sample_index &lt;= 0;
+          else
+            wait_cnt &lt;= wait_cnt - 1;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+
+      end case;
+    end if;
+  end process;
+
+end behavior;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="fpga">&#9655; <strong>การทดสอบการทำงานของวงจรโดยใช้บอร์ด FPGA</strong><a class="headerlink" href="#fpga" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่าง <strong>VHDL</strong> ได้ถูกนำไปทดลองใช้กับอร์ด <strong>FPGA</strong> เลือกใช้ชิป <strong>Intel / Altera Cyclone IV EP4CE6E22C8</strong>
+และคอมไพล์โค้ดด้วยซอฟต์แวร์ <strong>Quartus Prime Lite Edition v22.1</strong></p>
+<p>ตัวอย่างไฟล์ <strong>Tcl Script</strong> เพื่อกำหนดตำแหน่งและระดับแรงดันไฟฟ้าของขาสัญญาณ มีดังนี้ 
+(หากใช้บอร์ดอื่น ก็จะต้องตั้งค่าให้ถูกต้องตามบอร์ด <strong>FPGA</strong> ได้ที่เลือกใช้งาน)</p>
+<pre><code># Pin &amp; Location Assignments
+# set_global_assignment -name FAMILY &quot;Cyclone IV E&quot;
+# set_global_assignment -name DEVICE EP4CE6E22C8
+
+set_location_assignment PIN_86 -to NRESET
+set_location_assignment PIN_23 -to CLK
+set_location_assignment PIN_50 -to STATUS
+set_location_assignment PIN_51 -to I2C_SDA
+set_location_assignment PIN_52 -to I2C_SCL
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to NRESET
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to STATUS
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SDA
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SCL
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าต้องการสร้างรูปคลื่นสัญญาณไซน์ (<strong>Sinusoidal Waveform</strong>) สามารถลองใช้โค้ดต่อไปนี้
+สำหรับฟังก์ชัน <code>init_table</code> เพื่อกำหนดค่าเริ่มต้นให้อาร์เรย์ <code>sample_table</code> </p>
+<pre><code class="language-vhdl">  function init_table return sample_table_t is
+    variable LUT : sample_table_t;
+    variable x   : REAL;
+  begin
+    for i in 0 to MAX_INDEX loop
+      -- sinusoidal waveform (with DC offset)
+      x      := (1.0 + SIN(2.0 * MATH_PI * real(i) / real(2**M)))/2.0;
+      LUT(i) := std_logic_vector(to_unsigned(integer(x * real(2**BW - 1)), 12));
+    end loop;
+    return LUT;
+  end function;
+</code></pre>
+<p>ถ้าต้องการสร้างรูปคลื่นสัญญาณสามเหลี่ยม (<strong>Triangle Waveform</strong>) ก็สามารถลองใช้โค้ดต่อไปนี้</p>
+<pre><code class="language-vhdl">  function init_table return sample_table_t is
+    variable LUT : sample_table_t;
+    variable x   : REAL;
+  begin
+    for i in 0 to MAX_INDEX loop
+      -- triangle waveform (with DC offset)
+      x      := 1.0 - real(2*abs(MAX_INDEX/2 - i)) / real(2 ** M);
+      LUT(i) := std_logic_vector(to_unsigned(integer(x * real(2**BW - 1)), 12));
+    end loop;
+    return LUT;
+  end function;
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="cyc4_mcp4725_demo.jpg" /></p>
+<p>รูป: บอร์ด <strong>Cyclone IV FPGA</strong> ที่ได้นำมาทดลอง</p>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตของ <strong>MCP4725</strong> มีดังนี้</p>
+<p><img alt="" src="dac_wave_staircase.jpg" /></p>
+<p>รูป: สัญญาณตามฟังก์ชันขั้นบันได (<strong>Staircase Waveform</strong>)</p>
+<p><img alt="" src="dac_triangle_wave.jpg" /></p>
+<p>รูป: สัญญาณคลื่นสามเหลี่ยม (<strong>Triangle Waveform</strong>)</p>
+<p><img alt="" src="dac_wave_sine.jpg" /></p>
+<p>รูป: สัญญาณตามฟังก์ชันไซน์ (<strong>Sinusoidal Waveform</strong>)</p>
+<p>ถัดไปเป็นตัวอย่างการวิเคราะห์สัญญาณของบัส <strong>I2C</strong> (<strong>SCL</strong> และ  <strong>SDA</strong>)
+และสัญญาณเอาต์พุต <strong>STATUS</strong> โดยใช้อุปกรณ์ <strong>USB Logic Analyzer</strong></p>
+<p><img alt="" src="dac_i2c_waveform-1.jpg" /></p>
+<p><img alt="" src="dac_i2c_waveform-2.jpg" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณ เมื่อเลือกใช้ฟังก์ชันขั้นบันได (<strong>Staircase Waveform</strong>)</p>
+<p>ลำดับข้อมูลสำหรับเอาต์พุต (ไม่รวมไบต์แอดเดรส) จากข้อมูลตัวอย่าง มีดังนี้ <code>00_FF</code>, <code>01_FF</code>, <code>02_FF</code> ...  <code>0F_FF</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการออกแบบวงจรดิจิทัลสำหรับ <strong>FPGA</strong>
+เพื่อทดลองใช้งานโมดูล <strong>MCP4725 DAC (12-bit Analog Resolution)</strong>
+เชื่อมต่อด้วยบัส <strong>I2C</strong> และสร้างสัญญาณเอาต์พุต-แอนะล็อก 1 ช่อง
+และได้สาธิตการใช้งาน <strong>I2C Master IP Core</strong> ที่ได้มีการเผยแพร่อยู่ในอินเทอร์เน็ต
+และได้เลือกมาทดลองใช้งานเป็นตัวอย่าง</p>
+<p>การสื่อสารข้อมูลด้วยบัส <strong>I2C</strong> เพื่อสร้างสัญญาณรายคาบโดยใช้ <strong>MCP4725 DAC</strong>
+มีข้อจำกัดคือ ความเร็วในการส่งข้อมูล ดังนั้นความถี่ของสัญญาณเอาต์พุตที่ได้จึงไม่สูงมาก 
+ในเชิงเปรียบเทียบ ไอซี <strong>SPI DAC</strong> จะใช้ความถี่ได้สูงกว่า <strong>I2C DAC</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-13 | Last Updated: 2024-10-14</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

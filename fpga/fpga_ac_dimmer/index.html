@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/fpga_ac_dimmer/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานโมดูล AC Dimmer - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fpga-ac-dimmer" class="nav-link">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานโมดูล AC Dimmer</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#triac-ac-dimmer" class="nav-link">&#9655; ไอซี Triac สำหรับโมดูล AC Dimmer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ac-dimmer" class="nav-link">&#9655; การสร้างวงจรดิจิทัลควบคุมการทำงานของโมดูล AC Dimmer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; การทดลองกับอุปกรณ์ฮาร์ดแวร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fpga-ac-dimmer">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานโมดูล AC Dimmer<a class="headerlink" href="#fpga-ac-dimmer" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Digital Logic Design</em>, <em>VHDL</em>, <em>Intel / Altera FPGA</em>, <em>Quartus Prime</em>, <em>AC Dimmer</em>, <em>Opto-Triac</em>, <em>Light Bulb Dimming</em></p>
+<hr />
+<h2 id="triac-ac-dimmer">&#9655; <strong>ไอซี Triac สำหรับโมดูล AC Dimmer</strong><a class="headerlink" href="#triac-ac-dimmer" title="Permanent link">#</a></h2>
+<p>โดยทั่วไปแล้ว โมดูลหรี่ไฟสำหรับโหลดไฟฟ้ากระแสสลับ หรือ <strong>AC Dimmer</strong> เช่น สำหรับการนำไปใช้กับหลอดไฟแบบไส้ (<strong>Incandescent light bulb</strong>) เพื่อปรับความสว่าง เป็นต้น มักจะใช้ไอซีประเภทที่เรียกว่า "ไตรแอก" (<strong>Triac: Triode for Alternating Current</strong>) ซึ่งเป็นอุปกรณ์สารกึ่งตัวนำ
+และสามารถทำหน้าที่เป็นสวิตซ์เปิดหรือปิดการจ่ายกำลังไฟฟ้าให้โหลดได้ มีฟังก์ชันการทำงานคล้ายกับอุปกรณ์สารกึ่งตัวนำที่เรียกว่า
+<strong>SCR (Silicon Controlled Rectifier)</strong> แต่ไตรแอกทำงานได้กับไฟฟ้ากระแสสลับ (กระแสไหลได้ทั้งสองทิศทาง)
+ไตรแอกมักนิยมใช้งานคู่กับไอซีประเภทที่เรียกว่า "ออปโตคัปเปลอร์" (<strong>Opto-coupler</strong>)
+ซึ่งทำหน้าที่แยกสัญญาณด้วยแสง เช่น <strong>4N25</strong></p>
+<p>ไอซี "ออปโต-ไตรแอก" (<strong>Opto-Triac</strong> หรือ <strong>Optocoupler - Triac Driver Output</strong>) เช่น เบอร์ <strong>MOC3020</strong> และ <strong>MOC3041</strong> ก็เป็นอีกประเภทหนึ่งที่ได้รวบวงจรทั้งสองชนิดไว้ด้วยกัน แต่ภาคเอาต์พุตของไอซีสามารถใช้กับกระแสไฟฟ้าค่อนข้างจำกัด (เช่น ไม่เกิน 1A) ถ้าจะใช้กับโหลดไฟฟ้าที่มีกำลังไฟฟ้าค่อนข้างสูง ก็จะใช้กับไตรแอกภายนอกที่ทนกระแสไฟฟ้าได้มากขึ้น (5A หรือ 10A) เช่น ไอซี 
+<strong>BT138-600E</strong> หรือ <strong>BTB16-600BW</strong> เป็นต้น</p>
+<p>ไอซี <strong>MOC3041M</strong> หรือ <strong>MOC3163M</strong> เป็น "ออปโต-ไตรแอก" ที่มีวงจรอยู่ภายในเพื่อตรวจสอบการเปลี่ยนทิศทางของแรงดันไฟฟ้ากระแสสลับ หรือ เรียกว่า <strong>Zero-Crossing Detection</strong> </p>
+<p><img alt="" src="opto_triac_zc.png" /></p>
+<p>รูป: <strong>Optocoupler - Triac Driver Output with Zero-Crossing Detector</strong></p>
+<p>อุปกรณ์ที่ได้เลือกมาทดลองใช้งานคือ <a href="https://robotdyn.com/catalog/ac-dimmers.html"><strong>1-Channel AC Dimmer Module</strong></a> ของบริษัท <strong>RobotDyn</strong> จากประเทศจีน
+และมีขาสำหรับการเชื่อมต่อดังนี้</p>
+<ul>
+<li><strong>VCC</strong> แรงดันไฟเลี้ยง <strong>3.3V</strong> หรือ <strong>5V</strong></li>
+<li><strong>GND</strong> กราวนด์ของวงจร <strong>GND</strong></li>
+<li><strong>ZC</strong> (<strong>Zero-Crossing</strong>) เป็นสัญญาณดิจิทัล-เอาต์พุต มีลักษณะเป็นสัญญาณพัลส์</li>
+<li><strong>PSM / DIM</strong> เป็นสัญญาณดิจิทัล-อินพุต มีลักษณะเป็นพัลส์กระตุ้นเพื่อให้ไตรแอกทำงานและจ่ายกระแสให้โหลดไฟฟ้าได้</li>
+</ul>
+<p><img alt="" src="robotdyn_ac_dimmer.png" /></p>
+<p>รูป: โมดูล <strong>RobotDyn 1-Channel AC Dimmer Module</strong></p>
+<p>จากรูปจะเห็นได้ว่า มีการใช้ไอซี <strong>MOC3021 Opto-Triac Driver</strong> ไอซี <strong>4N25 Optocoupler</strong>
+ไอซี <strong>Full-wave Bridge Rectifier</strong> และไอซี <strong>Triac</strong></p>
+<p>การต่อใช้งานโมดูลสำหรับไฟฟ้า <strong>AC</strong> ในภาคอินพุต มีดังนี้</p>
+<ul>
+<li>การป้อนไฟฟ้า <strong>AC</strong> เป็นอินพุต: ให้ต่อสายไฟ <strong>L</strong> และ <strong>N</strong> จากปลั๊กไฟ เข้าที่ตำแหน่ง <strong>IN</strong> และ <strong>N</strong> ของ <strong>Terminal Block</strong></li>
+<li>การป้อนไฟฟ้า <strong>AC</strong> ให้กับโหลด: ให้ต่อสายไฟ <strong>L</strong> และ <strong>N</strong> จากตำแหน่ง <strong>OUT</strong> และ <strong>N</strong> ของ <strong>Terminal Block</strong> ไปยังหลอดไฟ</li>
+</ul>
+<p><img alt="" src="schematic-1.png" /></p>
+<p>รูป: ตัวอย่างผังวงจร</p>
+<p>การเปิดหรือปิดการจ่ายกำลังไฟฟ้าให้โหลดไฟฟ้ากระแสสลับ โดยใช้วงจรไตรแอก
+โดยปรกติแล้ว จะเกิดขึ้นในขณะที่เกิดเหตุการณ์ที่เรียกว่า <strong>Zero-Crossing</strong> ซึ่งจะเกิดขึ้นทุก ๆ 10 มิลลิวินาที
+สำหรับระบบไฟฟ้า <strong>AC</strong> ที่มีความถี่ <strong>50Hz</strong> แต่ถ้าต้องการปรับการจ่ายกำลังไฟฟ้าให้น้อยลง
+ก็ให้หน่วงเวลาไว้ก่อนกระตุ้นให้ไตรแอกทำงาน ยิ่งหน่วงเวลามากขึ้น ก็จะทำให้โหลดไฟฟ้าได้กำลังไฟฟ้าน้อยลงต่อหนึ่งรอบไซเคิล</p>
+<p>โมดูล <strong>AC Dimmer</strong> ใช้ <strong>4N25 Optocoupler</strong> ทำหน้าที่ตรวจสอบว่า แรงดันไฟฟ้า <strong>AC Input</strong>
+ซึ่งถูกเรียงกระแสให้ไหลในทิศทางเดียวแล้ว มีระดับแรงดันใกล้เคียง <strong>0V</strong> หรือไม่ ช่วงเวลาสั้น ๆ ดังกล่าว 
+จะให้สัญญาณเอาต์พุตเป็นพัลส์ <strong>HIGH</strong>  และใช้เป็นสัญญาณเอาต์พุต <strong>ZC (Zero-Crossing)</strong></p>
+<p>รูปต่อไปนี้เป็นตัวอย่างคลื่นสัญญาณ <strong>AC Input 220Vrms / 50Hz</strong> และคลื่นสัญญาณที่ถูกควบคุมด้วยวงจร <strong>AC Dimmer</strong>
+ซึ่งจะเห็นได้ว่า สัญญาณเอาต์พุตจะไม่เป็นรูปไซน์ เนื่องจากบางช่วงเวลาของหนึ่งไซเคิล จะมีแรงดันไฟฟ้าเป็น <strong>0V</strong>
+ช่วงที่มีแรงดันไฟฟ้าเท่ากับหรือใกล้เคียง <strong>0V</strong> นี้ เป็นช่วงที่โหลดไฟฟ้าถูกปิดการจ่ายกำลังไฟฟ้า</p>
+<p><img alt="" src="forward_phase_ac_dimmer-1.png" /></p>
+<p>รูป: การควบคุมการจ่ายไฟให้โหลดไฟฟ้าด้วย <strong>AC Dimmer</strong> (Leading-Edge Traic Dimming)</p>
+<p>โค้ด <strong>Python</strong> ต่อไปนี้ ใช้สำหรับการวาดรูปกราฟคลื่นสัญญาณเป็นตัวอย่าง และช่วยให้เข้าใจหลักการทำงานของวงจร <strong>AC Dimmer</strong></p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants
+f = 50      # Frequency in Hz
+Vrms = 220  # RMS Voltage in Volts
+Vpeak = Vrms * np.sqrt(2)  # Peak Voltage
+T = 1 / f   # Period of the sine wave
+
+sample_rate = 1e5  # Sampling rate
+# time steps for signal sampling between 0 to T (one period)
+ts = np.linspace(0, T, int(sample_rate * T), endpoint=False)
+# Generate samples for the sine wave for one period
+sine_wave = Vpeak * np.sin(2 * np.pi * f * ts)
+
+# Sine wave with first n% set to 0V
+n = len(ts)
+phase_start = 15 # phase in percentage
+[t0,t1,t2] = (n * np.array([phase_start,50,50+phase_start])/ 100).astype(int)
+
+sine_wave_modified = sine_wave.copy()
+sine_wave_modified[0:t0]  = 0
+sine_wave_modified[t1:t2] = 0
+
+# Plotting
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
+
+# First figure: Full sine wave
+ax1.plot(ts * 1000, sine_wave, label='50Hz Sine Wave Input')
+ax1.set_title('50Hz Sine Wave (220V RMS) - Full Period')
+ax1.set_xlabel('Time (ms)')
+ax1.set_ylabel('Voltage (V)')
+ax1.grid(True)
+ax1.legend()
+
+# Second figure: Sine wave with first n% set to 0V
+ax2.plot(ts * 1000, sine_wave_modified, label=f'Sine Wave Output', color='r')
+ax2.set_title( 'Forward-phase Control Dimmer')
+ax2.set_xlabel('Time (ms)')
+ax2.set_ylabel('Voltage (V)')
+ax2.grid(True)
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ac-dimmer">&#9655; <strong>การสร้างวงจรดิจิทัลควบคุมการทำงานของโมดูล AC Dimmer</strong><a class="headerlink" href="#ac-dimmer" title="Permanent link">#</a></h2>
+<p>โดยปรกติแล้ว ในการควบคุมการทำงานของโมดูล <strong>AC Dimmer</strong> ก็นิยมใช้บอร์ดไมโครคอนโทรลเลอร์
+เขียนโปรแกรมด้วยภาษา <strong>C/C++</strong> เป็นต้น แต่ในบทความนี้ ลองมาดูตัวอย่างการเขียนโค้ด <strong>VHDL</strong>
+เพื่อนำไปสร้างเป็นวงจรดิจิทัลสำหรับ <strong>FPGA</strong> และนำไปทดสอบกับบอร์ด <strong>Terasic DE10-Lite FPGA</strong></p>
+<p>ในการออกแบบวงจร ได้เลือกใช้โมดูล <strong>Rotary Encoder Switch</strong>
+ซึ่งจะให้สัญญาณดิจิทัล <code>SW_A</code> กับ <code>SW_B</code> เป็นสัญญาณพัลส์ (บางโมดูลอาจใช้ชื่อสัญญาณเป็น <code>S1</code> และ <code>S2</code>
+หรือ <code>CLK</code> และ <code>DT</code> เป็นต้น)
+ถ้าไม่มีการหมุนหรือเปลี่ยนตำแหน่งเชิงมุม สัญญาณทั้งสอง จะมีค่าลอจิกเป็น <strong>HIGH</strong> 
+หากหมุนในทิศทางทวนหรือตามเข็มนาฬิกา จะทำให้มีการเปลี่ยนค่าลอจิกเกิดขึ้นทั้งสองสัญญาณ
+(<strong>Logic Level Transition</strong>) แต่เกิดขึ้นไม่พร้อมกัน</p>
+<p><img alt="" src="rotary_encoder_module.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>Rotary Encoder Switch</strong></p>
+<p><img alt="" src="rotary_encoder_waveform-1.png" /></p>
+<p><img alt="" src="rotary_encoder_waveform-2.png" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณจากโมดูล <strong>Rotary Encoder Switch</strong> เมื่อมีการหมุนในทิศทางที่แตกต่างกัน</p>
+<p>ในตัวอย่างนี้ การหมุนปุ่มดังกล่าว จะใช้สำหรับการปรับลดหรือเพิ่มการหน่วงเวลาของสัญญาณกระตุ้น <code>PSM  / DIM</code>
+ให้ไอซีไตรแอก หลังจากเกิดสัญญาณพัลส์ <code>ZC</code> ในแต่ละรอบ (เกิดขึ้นทุก ๆ 10 มิลลิวินาที หรือ 100Hz)</p>
+<p>วงจรดิจิทัลใช้สัญญาณ <code>CLK</code> ความถี่ <strong>50MHz</strong> ของวงจรบนบอร์ด <strong>FPGA</strong> สำหรับกำหนดจังหวะการทำงานของวงจรดิจิทัล
+และมีสัญญาณอินพุต <code>nRST</code> สำหรับรีเซตการทำงานของวงจร (<strong>Active-Low Asynchronous Reset</strong>)</p>
+<p>วงจรจะทำหน้าที่คอยตรวจสอบการเปลี่ยนแปลงของสัญญาณ <code>SW_A</code> กับ <code>SW_B</code>
+และดูว่า มีการหมุนไปในทิศทางใด เพื่อนำมาเพิ่มหรือลดค่าของตัวนับ <code>set_delay_cnt</code>
+ซึ่งจะถูกนำไปใช้ในการหน่วงเวลาสำหรับสัญญาณพัลส์ <code>PSM / DIM</code> 
+การตรวจสอบสัญญาณอินพุต และอัปเดตค่าตัวนับ จะเกิดขึ้นด้วยอัตราคงที่ (เช่น 500Hz)</p>
+<p>&nbsp;</p>
+<p><strong>File: de10_lite_ac_dimmer.vhd</strong></p>
+<pre><code>----------------------------------------------------------------------------
+-- Date: 2024-09-10
+-- Target Board: Terasic DE10 Lite FPGA Board
+-- Purpose: Demonstrate AC dimming for a light bulb
+----------------------------------------------------------------------------
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+USE IEEE.math_real.ALL;
+
+ENTITY de10_lite_ac_dimmer IS
+  GENERIC (
+    CLK_HZ : NATURAL := 50000000
+  );
+  PORT (
+    CLK  : IN STD_LOGIC; -- system clock input (50MHz)
+    nRST : IN STD_LOGIC; -- active-low asynchronous reset input
+    SW_A : IN STD_LOGIC; -- digital input for rotary encoder switch A
+    SW_B : IN STD_LOGIC; -- digital input for rotary encoder switch B
+    ZC   : IN STD_LOGIC; -- digital input for zero crossing pulse
+    PSM  : OUT STD_LOGIC -- digital output for triac trigger pulse
+  );
+END de10_lite_ac_dimmer;
+
+ARCHITECTURE behave OF de10_lite_ac_dimmer IS
+
+  TYPE state_type IS (ST_IDLE, ST_DELAY, ST_PULSE_START, ST_PULSE_HIGH);
+  SIGNAL state : state_type := ST_IDLE;
+
+  SIGNAL pulse_out      : STD_LOGIC;
+  SIGNAL pulse_in       : STD_LOGIC;
+  SIGNAL pulse_in_prev  : STD_LOGIC;
+  SIGNAL pulse_detected : STD_LOGIC := '0';
+
+  CONSTANT UPDATE_CNT_MAX : INTEGER := (CLK_HZ/500) - 1;
+  SIGNAL sw_capture       : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS =&gt; '1');
+  SIGNAL update_enable    : STD_LOGIC := '0';
+  SIGNAL change_detected  : STD_LOGIC := '0';
+  SIGNAL delay_cnt_inc    : STD_LOGIC := '0';
+  SIGNAL delay_cnt_dec    : STD_LOGIC := '0';
+
+  CONSTANT DELAY_CNT_MAX  : INTEGER := (CLK_HZ/100) * 90 / 100 - 1;
+  CONSTANT BW : INTEGER := INTEGER(ceil(log2(real(DELAY_CNT_MAX))));
+  SIGNAL set_delay_cnt : INTEGER RANGE 0 TO (2 ** BW - 1) := 0;
+  SIGNAL delay_cnt     : unsigned(19 DOWNTO 0) := (OTHERS =&gt; '0');
+
+  CONSTANT PULSE_WIDTH_CNT_MAX : unsigned(15 DOWNTO 0) 
+                               := to_unsigned(20000, 16);
+  SIGNAL pulse_width_cnt : unsigned(15 DOWNTO 0) := (OTHERS =&gt; '0');
+
+BEGIN
+  -- This process implements switch debouncing logic.
+  P1 : PROCESS (nRST, CLK)
+    VARIABLE update_cnt : INTEGER RANGE 0 TO UPDATE_CNT_MAX := 0;
+  BEGIN
+    IF nRST = '0' THEN
+      update_cnt := 0;
+      sw_capture &lt;= (OTHERS =&gt; '1');
+      update_enable &lt;= '0';
+    ELSIF rising_edge(CLK) THEN
+      IF update_cnt = UPDATE_CNT_MAX THEN
+        update_cnt := 0;
+        update_enable &lt;= '1';
+        sw_capture &lt;= sw_capture(1 DOWNTO 0) &amp; (SW_A &amp; SW_B);
+      ELSE
+        update_cnt := update_cnt + 1;
+        update_enable &lt;= '0';
+      END IF;
+
+    END IF;
+  END PROCESS;
+
+  -- Detect the falling edge on the captured SW_A signal.
+  change_detected &lt;= sw_capture(3) AND (NOT sw_capture(1));
+  delay_cnt_inc &lt;= change_detected AND (NOT sw_capture(0)); -- Increment
+  delay_cnt_dec &lt;= change_detected AND sw_capture(0);       -- Decrement
+
+  P2 : PROCESS (nRST, CLK)
+  BEGIN
+    IF nRST = '0' THEN
+      set_delay_cnt &lt;= 20000;
+    ELSIF rising_edge(CLK) THEN
+      IF update_enable = '1' THEN
+        IF delay_cnt_inc = '1' THEN
+          IF set_delay_cnt &lt;= DELAY_CNT_MAX THEN
+            set_delay_cnt &lt;= set_delay_cnt + 2000;
+          END IF;
+        ELSIF delay_cnt_dec = '1' THEN
+          IF set_delay_cnt &gt; 20000 THEN
+            set_delay_cnt &lt;= set_delay_cnt - 2000;
+          END IF;
+        END IF;
+      ELSIF set_delay_cnt &lt; 20000 THEN
+        set_delay_cnt &lt;= 20000;
+      END IF;
+    END IF;
+  END PROCESS;
+
+  P3 : PROCESS (CLK, nRST)
+  BEGIN
+    IF nRST = '0' THEN
+      state &lt;= ST_IDLE;
+      pulse_in_prev &lt;= '0';
+      pulse_out &lt;= '0';
+      delay_cnt &lt;= (OTHERS =&gt; '0');
+      pulse_width_cnt &lt;= (OTHERS =&gt; '0');
+
+    ELSIF rising_edge(CLK) THEN
+      pulse_in_prev &lt;= pulse_in;
+      pulse_in &lt;= ZC; -- Capture the zero-crossing (ZC) pulse
+
+      CASE state IS
+        WHEN ST_IDLE =&gt;
+          pulse_out &lt;= '0';
+          delay_cnt &lt;= (OTHERS =&gt; '0');
+          pulse_width_cnt &lt;= (OTHERS =&gt; '0');
+          -- Detect the rising edge of the ZC pulse
+          IF pulse_in = '1' AND pulse_in_prev = '0' THEN
+            state &lt;= ST_DELAY;
+          END IF;
+
+        WHEN ST_DELAY =&gt;
+          IF delay_cnt &lt; to_unsigned(set_delay_cnt, BW) THEN
+            delay_cnt &lt;= delay_cnt + 1;
+          ELSE
+            state &lt;= ST_PULSE_START;
+          END IF;
+
+        WHEN ST_PULSE_START =&gt;
+          pulse_out &lt;= '1';
+          state &lt;= ST_PULSE_HIGH;
+
+        WHEN ST_PULSE_HIGH =&gt;
+          IF pulse_width_cnt &lt; PULSE_WIDTH_CNT_MAX THEN
+            pulse_width_cnt &lt;= pulse_width_cnt + 1;
+          ELSE
+            pulse_out &lt;= '0';
+            state &lt;= ST_IDLE;
+          END IF;
+
+        WHEN OTHERS =&gt;
+          state &lt;= ST_IDLE;
+
+      END CASE;
+    END IF;
+  END PROCESS;
+
+  PSM &lt;= pulse_out;
+
+END behave;
+</code></pre>
+<p>ตัวอย่างไฟล์ <strong>Tcl Script</strong> สำหรับเลือกใช้ขาชิป <strong>10M50DAF4847CG FPGA</strong> สำหรับสัญญาณ <strong>I/O</strong> มีดังนี้</p>
+<pre><code># Pin &amp; Location Assignments
+# ==========================
+
+set_location_assignment PIN_P11 -to CLK
+set_location_assignment PIN_B8  -to nRST
+# GPIO18
+set_location_assignment PIN_AB11 -to PSM 
+# GPIO20
+set_location_assignment PIN_AB10 -to ZC
+# GPIO22
+set_location_assignment PIN_AA9 -to SW_A
+# GPIO24
+set_location_assignment PIN_AA8 -to SW_B
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to nRST
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ZC
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to PSM
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW_A
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW_B
+</code></pre>
+<p><img alt="" src="quartus.png" /></p>
+<p>รูป: การใช้ซอฟต์แวร์ <strong>Intel Quartus Prime Lite Edition v22.1 (Ubuntu)</strong> ในการแปลงโค้ด <strong>VHDL</strong>
+ให้เป็นไฟล์ <strong>Bitstream</strong> เพื่อนำไปทดลองใช้กับบอร์ด <strong>FPGA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การทดลองกับอุปกรณ์ฮาร์ดแวร์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>เมื่อได้ออกแบบวงจรดิจิทัลได้สำเร็จแล้ว ถัดไปเป็นการทดสอบการทำงานกับอุปกรณ์จริง</p>
+<p><strong>คำเตือน:</strong> การทดลองที่มีการใช้ไฟฟ้า <strong>AC</strong> จะต้องทำด้วยความระมัดระวัง เพื่อมิให้เกิดอันตรายต่อชีวิต
+หรือความเสียหายต่อวงจร หากต่อวงจรไม่ถูกต้อง</p>
+<p><strong>คำแนะนำ:</strong> ก่อนทดลองใช้บอร์ด <strong>FPGA</strong> เชื่อมต่อกับโมดูล <strong>AC Dimmer</strong> 
+ในเบื้องต้นยังไม่ต้องใช้โมดูลหรี่ไฟ และให้ใช้ <strong>Function Generator</strong> มาสร้างสัญญาณพัลส์ให้กับบอร์ด <strong>FPGA</strong>
+โดยสร้างสัญญาณ <strong>ZC</strong> ซึ่งเป็นสัญญาณรายคาบ ตั้งค่าความถี่ <strong>100 Hz</strong> 
+แรงดันไฟฟ้าอยู่ระหว่าง <strong>0V</strong> ถึง <strong>3.3V</strong> ตั้งค่า <strong>Duty Cycle</strong> สำหรับสัญญาณพัลส์
+(<strong>Pulse</strong>) เช่น ไม่เกิน 5% เพื่อดูการทำงานของวงจรดิจิทัล และใช้ออสซิลโลสโคปวัดสัญญาณ <strong>ZC</strong>
+และสัญญาณพัลส์ <strong>PSM / DIM</strong> ที่เป็นเอาต์พุตจากบอร์ด <strong>FPGA</strong></p>
+<p><img alt="" src="de10_lite_board_wiring.jpg" /></p>
+<p>รูป: ตำแหน่งของขา <strong>I/O</strong> ของบอร์ด <strong>FPGA</strong> และไฟเลี้ยง <strong>3.3V &amp; GND</strong> สำหรับโมดูล <strong>AC Dimmer</strong></p>
+<p><img alt="" src="hardware_setup-1.jpg" /></p>
+<p>รูป: การเชื่อมต่อสายไฟ <strong>AC</strong> สำหรับจ่ายไฟ และโหลดไฟฟ้า (หลอดไฟ)</p>
+<p><img alt="" src="dimming-1.jpg" /></p>
+<p>รูป: การปรับความสว่างสูงสุด</p>
+<p><img alt="" src="dimming-2.jpg" /></p>
+<p>รูป: การปรับความสว่างลดลง</p>
+<p><img alt="" src="ac_dimmer_pulses-1.png" /></p>
+<p>รูป: สัญญาณ<strong>ZC</strong> (CH1) และ <strong>PSM </strong> (CH2) เมื่อมีการหน่วงเวลาน้อยมาก
+หลังจากเกิดสัญญาณพัลส์ <strong>ZC</strong> แล้วตามด้วยการเกิดพัลส์ <strong>PSM</strong>
+ในกรณีนี้จะทำให้หลอดไฟสว่างสูงสุด</p>
+<p><img alt="" src="ac_dimmer_pulses-2.png" /></p>
+<p>รูป: สัญญาณพัลส์ <strong>ZC</strong> และ <strong>PSM</strong> เมื่อมีการหน่วงเวลาปานกลาง
+ซึ่งจะทำให้หลอดไฟสว่างลดลง</p>
+<p><img alt="" src="ac_dimmer_pulses-3.png" /></p>
+<p>รูป: สัญญาณพัลส์ <strong>ZC</strong> และ <strong>PSM</strong> เมื่อมีการหน่วงเวลามากสุด
+ซึ่งจะทำให้หลอดไฟไม่สว่าง</p>
+<p>จากรูปสัญญาณตัวอย่าง จะเห็นได้ว่า มีการหน่วงเวลานับจากการเกิดสัญญาณพัลส์ <strong>ZC</strong> แล้วตามด้วยพัลส์ <strong>PSM</strong>
+ในแต่ละไซเคิล แต่การหน่วงเวลาจะต้องน้อยกว่า 10 มิลลิวินาที</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอ ตัวอย่างการใช้งานโมดูล <strong>AC Dimmer</strong> และนำมาใช้เป็นโจทย์ฝึกการออกแบบวงจรดิจิทัลด้วยภาษา <strong>VHDL</strong>
+เพื่อนำไปใช้กับบอร์ด <strong>FPGA</strong>  โดยเลือกใช้บอร์ด <strong>Terasic DE10-Lite FPGA (Intel MAX 10 FPGA)</strong> 
+และสาธิตการทดลองใช้งานกับหลอดไฟแบบไส้เพื่อปรับความสว่างของหลอดไฟได้</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-10 | Last Updated: 2024-10-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/fpga_dds_r2r_dac/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อสร้างสัญญาณรูปไซน์ด้วยวิธี DDS (Direct Digital Synthesis) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fpga-dds-direct-digital-synthesis" class="nav-link">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อสร้างสัญญาณรูปไซน์ด้วยวิธี DDS (Direct Digital Synthesis)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#direct-digital-synthesis" class="nav-link">&#9655; วงจรดิจิทัลสร้างสัญญาณด้วยเทคนิค Direct Digital Synthesis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#verilog-dds" class="nav-link">&#9655; การเขียนโค้ด Verilog สำหรับวงจร DDS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#verilog" class="nav-link">&#9655; การจำลองการทำงานของโค้ด  Verilog</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#r-2r-dac" class="nav-link">&#9655; วงจร R-2R DAC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#verilog-fpga" class="nav-link">&#9655; การแปลงโค้ด Verilog เพื่อนำไปใช้กับบอร์ด FPGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#oscilloscope" class="nav-link">&#9655; การวัดสัญญาณเอาต์พุตด้วย Oscilloscope</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fpga-dds-direct-digital-synthesis">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อสร้างสัญญาณรูปไซน์ด้วยวิธี DDS (Direct Digital Synthesis)<a class="headerlink" href="#fpga-dds-direct-digital-synthesis" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Digital Logic Design</em>, <em>VHDL</em>, <em>Intel / Altera FPGA</em>, <em>Quartus Prime</em>, <em>DDS</em>, 
+<em>Signal Generation</em>, <em>R-2R DAC</em></p>
+<hr />
+<h2 id="direct-digital-synthesis">&#9655; <strong>วงจรดิจิทัลสร้างสัญญาณด้วยเทคนิค Direct Digital Synthesis</strong><a class="headerlink" href="#direct-digital-synthesis" title="Permanent link">#</a></h2>
+<p>การสร้างสัญญาณเอาต์พุตด้วยวงจรดิจิทัล เช่น สัญญาณที่มีคาบและเป็นรูปคลื่นไซน์ มีวิธีหนึ่งที่สามารถนำมาใช้ได้
+เรียกว่า <strong>DDS (Direct Digital Synthesis)</strong></p>
+<p>องค์ประกอบสำคัญของวงจร <strong>DDS</strong> ได้แก่</p>
+<ul>
+<li>"วงจรสะสมเฟส" (<strong>Phase Accumulator</strong>): วงจรส่วนนี้ทำหน้าที่เป็นตัวนับ (<strong>Counter</strong>)
+ที่มีค่าเพิ่มขึ้นตามจังหวะของสัญญาณ <strong>Clock</strong> การเพิ่มเฟสอย่างต่อเนื่องก็เปรียบเสมือนการเพิ่มมุมให้กับฟังก์ชันไซน์ และเมื่อถึงค่าสูงสุด (<script type="math/tex">2\pi</script>) ก็จะวนกลับมาที่ 0 ใหม่ ดังนั้นอัตราการเพิ่มเฟส จะช้าหรือเร็วก็ส่งผลต่อความถี่ของสัญญาณรูปไซน์ที่ได้</li>
+<li>"ตัวแปลงเฟสเป็นแอมพลิจูด" (<strong>Phase-to-Amplitude Converter</strong>): วงจรนี้รับค่าจากวงจรบวกสะสมเฟส
+แล้วแปลงให้เป็นค่าแอมพลิจูด โดยทั่วไปจะใช้วิธีอ่านค่าจากตารางค่าคงที่ เรียกว่า <strong>Lookup Table (LUT)</strong>
+ถ้าเป็นรูปคลื่นไซน์ ก็เรียกว่า <strong>Sinewave LUT</strong> สำหรับข้อมูลที่ได้จากการชักตัวอย่างค่าของฟังก์ชันไซน์สำหรับมุมหรือเฟส <script type="math/tex">0 .. 2\pi</script>
+</li>
+<li>วงจรแปลงข้อมูลดิจิทัลให้เป็นสัญญาณแอนะล็อก (<strong>Digital-to-Analog Converter: DAC</strong>)</li>
+</ul>
+<p><img alt="" src="dds_block_diagram.png" /></p>
+<p><img alt="" src="dds_signal_flow.png" /></p>
+<p>รูป: องค์ประกอบของวงจร <strong>DDS</strong> (Image Source: <a href="https://www.analog.com/en/resources/analog-dialogue/articles/all-about-direct-digital-synthesis.html">Analog Devices</a>)</p>
+<p>การเลือกความกว้างบิตของวงจรสะสมเฟส ส่งผลต่อความละเอียดของอัตราการเพิ่มเฟส (ความถี่เชิงมุม) 
+ดังนั้นจึงเป็นตัวกำหนดความละเอียดในการเลือกความถี่ของสัญญาณเอาต์พุต (<strong>Frequency Resolution</strong>)</p>
+<p>ยกตัวอย่างเช่น ถ้าใช้ความถี่ของระบบเท่ากับ <script type="math/tex">f_{sys} = 50</script> MHz วงจรสะสมเฟส มีความละเอียด (<script type="math/tex">N</script>) เท่ากับ 16 บิต 
+จะได้ความละเอียดของความถี่ <script type="math/tex">\Delta f = f_{sys} \div {2^N}</script> ซึ่งได้เท่ากับ <script type="math/tex">762.934</script> Hz แต่ถ้าเป็น 24 บิต 
+จะได้ <script type="math/tex">2.980</script> Hz เป็นต้น</p>
+<p>ในขณะที่ความกว้างบิตของค่าตัวเลขใน <strong>Lookup Table</strong> ส่งผลต่อความละเอียดของแอมพลิจูดที่ได้
+และเป็นตัวกำหนดความละเอียดของวงจร <strong>DAC</strong> ด้วยเช่นกัน</p>
+<p>การใช้วงจรสะสมเฟสที่มีความละเอียดสูง ก็อาจทำให้ LUT มีขนาดใหญ่มากเกินไป
+หนึ่งในวิธีที่นิยมใช้มากที่สุดคือ การตัดบิตที่มีความสำคัญน้อยออกไปจำนวนหนึ่ง ก่อนที่จะนำเอาต์พุตจากวงจรสะสมเฟสไปใช้เป็นอินพุตสำหรับ <strong>LUT</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="verilog-dds">&#9655; <strong>การเขียนโค้ด Verilog สำหรับวงจร DDS</strong><a class="headerlink" href="#verilog-dds" title="Permanent link">#</a></h2>
+<p>ในการออกแบบวงจรดิจิทัล ได้กำหนดรูปแบบอินเทอร์เฟสของวงจร ดังนี้</p>
+<ul>
+<li><code>CLK</code> เป็นสัญญาณอินพุตสำหรับ <strong>Clock</strong> ของวงจร (ใช้ความถี่ <strong>50MHz</strong>)</li>
+<li><code>nRST</code> เป็นสัญญาณอินพุตสำหรับรีเซตการทำงานของวงจร (<strong>Active-Low Asynchronous Global Reset</strong>)</li>
+<li><code>SEL[3:0]</code> เป็นอินพุตขนาด 4 บิต เพื่อเลือกค่าสำหรับการเพิ่มเฟสให้กับวงจรสะสมเฟส</li>
+<li><code>DOUT[BW-1:0]</code> เป็นเอาต์พุตขนาด <code>BW</code> (เช่น 8 บิต) เพื่อนำไปต่อกับวงจร <strong>DAC</strong> ภายนอก </li>
+</ul>
+<p>วงจรนี้มีการกำหนดและใช้งานพารามิเตอร์ ดังนี้</p>
+<ul>
+<li><code>N</code> เป็นความละเอียดของวงจรสะสมเฟส เช่น เลือกค่า <code>N</code> เท่ากับ 16</li>
+<li><code>M</code> เป็นตัวกำหนดขนาดของ <strong>LUT</strong> เพื่อเก็บค่าคงที่สำหรับรูปคลื่นไซน์หนึ่งคาบเต็ม
+เช่น ถ้าให้ <code>M</code> เท่ากับ 8 จะมีจำนวนข้อมูลเก็บไว้ใน <strong>LUT</strong> เท่ากับ <script type="math/tex">2^8 = 256</script>
+แต่ถ้า <code>M</code> เท่ากับ 10 จะมีขนาดเท่ากับ  <script type="math/tex">2^{10} = 1024</script>
+</li>
+<li><code>BW</code> เป็นความละเอียดของข้อมูลที่ได้จาก <strong>LUT</strong> เท่ากับ 8 บิต เพื่อนำไปใช้กับวงจร <strong>DAC</strong> ขนาด 8 บิต</li>
+</ul>
+<pre><code class="language-verilog">module dds (
+    input wire CLK,                   // 50MHz clock input
+    input wire nRST,                  // Asynchronous active-low reset
+    input wire [3:0] SEL,             // Select signal for turning word
+    output reg unsigned [BW-1:0] DOUT // unsigned output (DDS output)
+);
+    // module parameter
+    parameter BW = 8;
+
+    // local parameters
+    localparam N = 16;      // Phase accumulator bits (16-bit)
+    localparam M =  8;      // Sine table resolution (2^M samples)
+    localparam TABLE_SIZE = 2**M; // Size of the sine table 
+
+    // Registers for the phase accumulator, and tuning words and sample index
+    reg [N-1:0]  phase_acc;
+    reg [N-1:0]  turning_word;
+    wire [M-1:0] sample_index;
+
+    reg [7:0] count;  // 8-bit counter registers
+    reg ce;
+
+    // Sine table or LUT (unsigned 8-bit values, pre-calculated)
+    reg unsigned [BW-1:0] sine_table [TABLE_SIZE-1:0];
+
+    localparam MAX_VALUE = (2**(BW-1)) - 1;
+
+    // Initialize sine table using a generate loop
+    integer i = 0;
+
+    //initial begin
+    //  for (i = 0; i &lt; TABLE_SIZE; i = i + 1) begin
+    //    sine_table[i] = $floor(MAX_VALUE * (1+$sin(2*3.14159*i/TABLE_SIZE))/2);
+    //  end
+    //end
+
+    // Initialize the sine table with precomputed values
+    initial begin
+      $readmemh(&quot;sine_table.txt&quot;, sine_table, 0, 2**M-1); // Load from hex file
+    end
+
+    // Counter logic
+    always @(posedge CLK or negedge nRST) begin
+        if (!nRST) begin
+            count &lt;= 8'b0;      // Reset the counter to 0
+            ce &lt;= 1'b0;         // Reset CE (count enable) to 0
+        end
+        else begin
+            if (count == 8'd4) begin  // Clock divider /5
+                count &lt;= 8'b0;  // Reset the counter to 0 after it reaches 4.
+                ce &lt;= 1'b1;     // Set CE high for one cycle
+            end
+            else begin
+                count &lt;= count + 1'b1;  // Increment the counter
+                ce &lt;= 1'b0;             // Keep CE low
+            end
+        end
+    end
+
+    // DDS operation (on each clock cycle)
+    always @(posedge CLK or negedge nRST) begin
+        if (!nRST) begin
+            // Reset phase accumulator and output
+            phase_acc &lt;= 0;
+            turning_word &lt;= 0;
+        end else begin
+            turning_word[3:0] &lt;= SEL;
+            if (ce) begin
+               // Update phase accumulator based on selected tuning word
+               phase_acc &lt;= phase_acc + turning_word;
+               // Output corresponding sine value from the lookup table
+            end
+        end
+    end
+
+    // Output the sine table value (registered)
+    always @(posedge CLK) begin
+        DOUT &lt;= sine_table[sample_index];
+    end
+
+    // Use some bits of the phase accumulator output as LUT input
+    assign sample_index = phase_acc[N-1 : N-M];
+
+endmodule
+</code></pre>
+<p>&nbsp;</p>
+<p>ในวงจรนี้มีการลดความถี่ของตัวนับ จาก <strong>50 MHz</strong>  ด้วยตัวหาร <strong>/5</strong> ดังนั้นวงจรสะสมเฟสขนาด 16 บิต จะนับด้วยความถี่
+<strong>10 MHz</strong> หรือมีความละเอียดในเชิงความถี่ <script type="math/tex">10 \cdot  10^6 \div 2^{16} = 152.6\,Hz</script>
+</p>
+<p>ค่าคงที่ของ <strong>LUT</strong> สำหรับฟังก์ชันไซน์หนึ่งคาบ จะได้จากข้อมูลที่ถูกเก็บไว้ในไฟล์ <code>sine_table.txt</code>
+และมีหนึ่งค่าตัวเลข (ฐานสิบหก) ต่อหนึ่งบรรทัด และโค้ด <strong>Python</strong> ต่อไปนี้
+ใช้สำหรับการคำนวณค่าตัวเลขตามลำดับ เพื่อนำไปใส่ลงในไฟล์ <code>sine_table.txt</code></p>
+<pre><code class="language-python">import math
+
+M = 8
+BW = 8           # Bitwidth for sample values
+SAMPLES = 2**M   # Number of samples
+MAX_VALUE = (2**BW - 1)  # Maximum value (unsigned integer)
+
+output = []
+for i in range(2**M):
+    # Calculate a sine value
+    sine_value = (1 + math.sin(2 * math.pi * i / SAMPLES))/2
+    # Scale sine value to the desired range 
+    value = int(MAX_VALUE * sine_value)
+    # Append the value (a hex string) 
+    output.append(f&quot;{hex(value)[2:].zfill(2)}&quot;)
+
+print( &quot;\n&quot;.join(output) ) # show output
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="verilog">&#9655; <strong>การจำลองการทำงานของโค้ด  Verilog</strong><a class="headerlink" href="#verilog" title="Permanent link">#</a></h2>
+<p>เมื่อได้เขียนโค้ดสำหรับวงจรดิจิทัล <strong>DDS</strong> แล้ว ถ้ดไปเป็นตัวอย่างการเขียนโค้ด <strong>Verilog Testbench</strong>
+เพื่อใช้ในการทดสอบและจำลองการทำงานของวงจรดิจิทัล โดยมีตัวอย่างดังนี้</p>
+<pre><code class="language-Verilog">`timescale 1ns/1ps
+
+module tb_dds;
+    // Testbench signals
+    reg t_CLK;
+    reg t_nRST;
+    reg [3:0] t_SEL;
+    wire unsigned [7:0] t_DOUT;
+
+    // Instantiate the DDS module
+    dds uut (
+        .CLK(t_CLK), .nRST(t_nRST), .SEL(t_SEL), .DOUT(t_DOUT)
+    );
+
+    // Clock generation (50MHz)
+    always begin
+        #10 t_CLK = ~t_CLK; // Toggle clock every 10ns -&gt; 50MHz
+    end
+
+    integer i;
+
+    initial begin
+        t_CLK = 0;
+        t_nRST = 0;
+        t_SEL  = 0;
+        #100 t_nRST = 1;  // De-assert reset
+
+        #1000;
+        @(posedge t_CLK); // Wait for the next rising edge of the clock
+        t_SEL &lt;= 4'd1;
+
+        i = 0;
+        while (i &lt; 10) begin
+            #500000;
+            while (t_DOUT != 0) begin
+              @(posedge t_CLK);  // Wait for the next rising edge of the clock
+            end
+            t_SEL &lt;= t_SEL + 4'd1;
+            i = i + 1;
+        end
+
+        // End simulation
+        $finish;
+    end
+
+    // Monitor the signals
+    initial begin
+        $dumpfile(&quot;output.vcd&quot;);  // Specify the name of the VCD file
+        $dumpvars(0, tb_dds); 
+    end 
+
+endmodule
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นการสาธิตการใช้ซอฟต์แวร์ <strong>Open Source</strong> สำหรับ <strong>Ubuntu</strong> 
+ได้แก่ <strong>Icarus Verilog Simulator</strong> และ <strong>GTKWave</strong>
+และคำสั่งการติดตั้งและใช้งานสำหรับ <strong>Ubuntu 22.4 LTS</strong> มีดังนี้</p>
+<pre><code># Install iverilog and gtkwave for Ubuntu
+$ sudo apt install iverilog gtkwave
+
+# Check the version of Icarus Verilog simulator
+$ iverilog -V  | grep Icarus | head -n 1
+Icarus Verilog version 12.0 (stable)
+
+# Compile the Verilog (Std.2005) source files
+$ iverilog -g2005 -o dds_sim dds.v dds_tb.v 
+
+# Run the testbench simulation 
+$ vvp dds_sim
+
+# Open the waveform file (.vcd) with GTKWave
+$ gtkwave output.vcd
+</code></pre>
+<p><img alt="" src="dds_verilog_sim.png" /></p>
+<p><img alt="" src="gtkwave_analog_view.png" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณที่ได้จากการจำลองการทำงานของวงจร <strong>DDS</strong> และแสดงผลด้วยโปรแกรม <strong>GTKWave</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="r-2r-dac">&#9655; <strong>วงจร R-2R DAC</strong><a class="headerlink" href="#r-2r-dac" title="Permanent link">#</a></h2>
+<p>เอาต์พุตจากวงจร <strong>DDS</strong> เป็นข้อมูลขนาด 8 บิต (<strong>Unsigned</strong>) ถ้าจะแปลงให้เป็นสัญญาณแอนะล็อก
+ก็สามารถเลือกใช้วงจร <strong>DAC</strong> ประเภทที่เรียกว่า <strong>R-2R</strong> โดยใช้เพียงตัวต้านทานนำมาต่อกันบนเบรดบอร์ด
+และมีไอซีออปแอมป์ (<strong>OpAmp</strong>) ทำหน้าที่เป็นวงจร <strong>Voltage Buffer (Voltage Follower)</strong>
+แนะนำให้ศึกษาหลักการทำงานของวงจร <strong>R-2R DAC</strong> จากบทความ
+<a href="../../electronics/r2r_lab/">"การฝึกต่อวงจรบนเบรดบอร์ด: วงจร <strong>R-2R</strong>"</a></p>
+<p>ค่าตัวต้านทานที่เลือกใช้คือ <strong>R=10k</strong> และ <strong>2R=20k</strong> โอห์ม (แนะนำให้เลือกใช้ตัวต้านทานที่มีความคลาดเคลื่อน +/-1%)
+และไอซีออปแอมป์ที่ใช้เป็นเบอร์ <strong>LM358N</strong> ใช้ไฟเลี้ยง <strong>VCC=5V</strong> และ <strong>GND=0V</strong></p>
+<p>เอาต์พุต <code>DOUT[7:0]</code> เมื่อมีลอจิกเป็น <strong>HIGH</strong> จะมีแรงดันไฟฟ้าประมาณ <strong>3.3V</strong>
+ดังนั้นเมื่อแปลงข้อมูล 8 บิต ให้เป็นสัญญาณแอนะล็อก จะได้แรงดันอยู่ในช่วง <strong>0V ~ 3.3V</strong>
+ถ้าต้องการจะได้แรงดันไฟฟ้าสำหรับสัญญาณเอาต์พุตรูปไซน์ที่มีทั้งบวกและลบ
+ก็จะต้องมีการต่อวงจรเพิ่ม เพื่อปรับค่า <strong>Voltage Offset</strong>
+สำหรับสัญญาณเอาต์พุต หรือนำไปต่ออนุกรมกับตัวเก็บประจุไฟฟ้าเพื่อตัดค่า <strong>DC Offset</strong> ออกไป</p>
+<p><img alt="" src="dac_r2r_breadboard.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจร <strong>R-2R DAC (8-bit)</strong> บนเบรดบอร์ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="verilog-fpga">&#9655; <strong>การแปลงโค้ด Verilog เพื่อนำไปใช้กับบอร์ด FPGA</strong><a class="headerlink" href="#verilog-fpga" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>FPGA</strong> ที่ได้เลือกมาใช้ในการทดลองคือ บอร์ด <a href="https://ftp.intel.com/Public/Pub/fpgaup/pub/Intel_Material/Boards/DE10-Lite/DE10_Lite_User_Manual.pdf"><strong>Terasic DE10-Lite Development Kit</strong></a> ซึ่งมีชิป <strong>Intel MAX 10 FPGA (10M50DAF484C7G)</strong> 
+และซอฟต์แวร์ที่ใช้คือ <a href="https://www.intel.com/content/www/us/en/software-kit/757262/intel-quartus-prime-lite-edition-design-software-version-22-1-for-windows.html"><strong>Intel Quartus Prime Lite Edition v22.1</strong></a>  (ทดลองใช้งานกับระบบ <strong>Linux Ubuntu</strong>)</p>
+<p>การเลือกขาสัญญาณต่าง ๆ สำหรับวงจร <strong>DDS</strong> เป็นไปตามคำสั่งของไฟล์ <strong>Tcl Script</strong> ดังนี้</p>
+<ul>
+<li>สัญญาณ <code>CLK</code> ได้จากสัญญาณ <strong>CLK 50MHz</strong> จากวงจรบนบอร์ด <strong>FPGA</strong></li>
+<li>สัญญาณ <code>nRST</code> ได้จากวงจรปุ่มกด <code>KEY[0]</code> ที่มีอยู่บนบอร์ด <strong>FPGA</strong></li>
+<li>สัญญาณอินพุต <code>SEL[3:0]</code> ได้จากวงจรสวิตช์เลื่อน (<strong>Slide Switches</strong>) ที่มีอยู่แล้วบนบอร์ด <strong>FPGA</strong></li>
+<li>สัญญาณเอาต์พุต <code>DOUT[7:0]</code> ใช้ขา <strong>GPIO Pin Headers</strong> จำนวน 8 ขา บนบอร์ด <strong>FPGA</strong></li>
+</ul>
+<pre><code># Pin &amp; Location Assignments
+# ==========================
+
+# MAX10_CLK1_50
+set_location_assignment PIN_P11 -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+# KEY[0]
+set_location_assignment PIN_B8 -to nRST
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to nRST
+# SW[0]
+set_location_assignment PIN_C10 -to SEL[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SEL[0]
+# SW[1]
+set_location_assignment PIN_C11 -to SEL[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SEL[1]
+# SW[2]
+set_location_assignment PIN_D12 -to SEL[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SEL[2]
+# SW[3]
+set_location_assignment PIN_C12 -to SEL[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SEL[3]
+# GPIO10
+set_location_assignment PIN_W5 -to DOUT[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[0]
+# GPIO12
+set_location_assignment PIN_AA14 -to DOUT[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[1]
+# GPIO14
+set_location_assignment PIN_W12 -to DOUT[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[2]
+# GPIO16
+set_location_assignment PIN_AB12 -to DOUT[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[3]
+# GPIO18
+set_location_assignment PIN_AB11 -to DOUT[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[4]
+# GPIO20
+set_location_assignment PIN_AB10 -to DOUT[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[5]
+# GPIO22
+set_location_assignment PIN_AA9 -to DOUT[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[6]
+# GPIO24
+set_location_assignment PIN_AA8 -to DOUT[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[7]
+</code></pre>
+<p><img alt="" src="dds_quartus_rtl_view.png" /></p>
+<p>รูป: การสังเคราะห์วงจรลอจิกและตัวอย่างแผนผังวงจรที่ได้ (<strong>RTL View</strong>)</p>
+<p><img alt="" src="hardware_setup-2.jpg" /></p>
+<p>รูป: การต่อวงจร <strong>R-2R DAC</strong> บนเบรดบอร์ด เพื่อนำไปใช้กับบอร์ด <strong>FPGA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="oscilloscope">&#9655; <strong>การวัดสัญญาณเอาต์พุตด้วย Oscilloscope</strong><a class="headerlink" href="#oscilloscope" title="Permanent link">#</a></h2>
+<p>เมื่ออัปโหลดไฟล์ <strong>Bitstream</strong> ไปยังบอร์ด <strong>FPGA</strong> ได้แล้ว ขั้นตอนถัดไปคือ การวัดสัญญาณเอาต์พุตที่ได้จาก
+วงจร <strong>R-2R DAC</strong> ทดลองเปลี่ยนตำแแหน่งของ <strong>Slide Switch</strong> 4 ตัว และสังเกตความถี่และรูปคลื่นสัญญาณเอาต์พุตที่ได้</p>
+<p><img alt="" src="hardware_setup-2.jpg" /></p>
+<p>รูป: การวัดสัญญาณเอาต์พุตจากวงจร <strong>R-2R DAC</strong> ด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="sine_wave-1.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณเอาต์พุต เมื่อตั้งค่าสวิตช์เลื่อนเป็น <code>SEL[3:0]="0001"</code> (วัดความถี่ไปประมาณ <strong>153 Hz</strong>)</p>
+<p><img alt="" src="sine_wave-2.png" /></p>
+<p>รูป: เมื่อตั้งค่าสวิตช์เลื่อนเป็น <code>SEL[3:0]="0010"</code> (ได้ความถี่เพิ่มเป็น 2 เท่า)</p>
+<p><img alt="" src="sine_wave-3.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณเอาต์พุต  เมื่อตั้งค่าสวิตช์เลื่อนเป็น <code>SEL[3:0]="0011"</code></p>
+<p><img alt="" src="sine_wave-4.png" /></p>
+<p>รูป: เมื่อตั้งค่าสวิตช์เลื่อนเป็น <code>SEL[3:0]="1111"</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการออกแบบวงจรดิจิทัลเพื่อใช้กับบอร์ด <strong>FPGA</strong> และใช้วิธี <strong>DDS</strong>
+เพื่อใช้ในการสร้างสัญญาณเอาต์พุตรูปคลื่นไซน์ และสามารถปรับเลือกความถี่ได้โดยการเลื่อนตำแหน่งของ <strong>Slide Switches</strong>
+และได้สาธิตการใช้งานวงจร <strong>R-2R DAC</strong> เพื่อแปลงข้อมูลดิจิทัล 8 บิต ให้เป็นสัญญาณแอนะล็อกในช่วง <strong>0V ~ 3.3V</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-12 | Last Updated: 2024-10-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
