@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/fpga_adc_spi/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่ออ่านค่าจากไอซี ADC เชื่อมต่อด้วยบัส SPI - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fpga-adc-spi" class="nav-link">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่ออ่านค่าจากไอซี ADC เชื่อมต่อด้วยบัส SPI</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#adc-spi" class="nav-link">&#9655; การเชื่อมต่อกับไอซีประเภท ADC ด้วยบัส SPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl-adc128s022" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด VHDL สำหรับ ADC128S022</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl-mcp3208" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด VHDL สำหรับ MCP3208</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fpga-adc-spi">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่ออ่านค่าจากไอซี ADC เชื่อมต่อด้วยบัส SPI<a class="headerlink" href="#fpga-adc-spi" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Digital Logic Design</em>, <em>VHDL</em>, <em>Intel / Altera FPGA</em>, <em>Quartus Prime</em>,
+<em>12-bit SPI ADC</em>, <em>MCP3208</em>, <em>ADC128S022</em></p>
+<hr />
+<h2 id="adc-spi">&#9655; <strong>การเชื่อมต่อกับไอซีประเภท ADC ด้วยบัส SPI</strong><a class="headerlink" href="#adc-spi" title="Permanent link">#</a></h2>
+<p>ไอซี <strong>ADC (Analog Digital Converter)</strong> ทำหน้าที่แปลงสัญญาณอินพุต-แอนะล็อก
+ให้เป็นข้อมูลดิจิทัล และมักนิยมใช้วิธีสื่อสารข้อมูลกับอุปกรณ์อื่นด้วยบัส <a href="https://en.wikipedia.org/wiki/Serial_Peripheral_Interface"><strong>SPI</strong></a>
+(<em>Serial Peripheral Interface</em>) โดยใช้สัญญาณ 4 เส้น
+(<strong>4-Wire SPI</strong>) ได้แก่ </p>
+<ul>
+<li><strong>SCK</strong> (<em>SPI Serial Clock</em>)</li>
+<li><strong>MOSI</strong> (<em>SPI Master Out Serial In</em>)</li>
+<li><strong>MISO</strong> (<em>SPI Master In Slave Out</em>)</li>
+<li><strong>/CS</strong> (<em>SPI Chip Select - Active-Low</em>)</li>
+</ul>
+<p>การรับส่งข้อมูลด้วยบัส <strong>SPI</strong> จะใช้วิธีการเลื่อนบิตทีละบิต ตามจังหวะการทำงานของสัญญาณ <strong>SCK</strong>
+โดยใช้สัญญาณข้อมูลแบ่งเป็น 2 ทิศทาง คือ <strong>MOSI</strong> และ <strong>MISO</strong> ตามลำดับ
+โดยมีอุปกรณ์ตัวหนึ่งทำหน้าที่เป็น <strong>SPI Master</strong> (ชิป <strong>FPGA</strong>)
+และอีกอุปกรณ์หนึ่งทำหน้าที่เป็น <strong>SPI Slave</strong> (ไอซี <strong>SPI ADC</strong>)</p>
+<p>บทความนี้นำเสนอตัวอย่างการใช้งานไอซี <strong>SPI ADC</strong> และเชื่อมต่อกับวงจรในชิป <strong>FPGA</strong> 
+โดยเลือกใช้ไอซี 2 เบอร์ ได้แก่</p>
+<ul>
+<li><a href="https://www.ti.com/lit/ds/symlink/adc128s022.pdf"><strong>ADC128S022</strong></a>
+ของบริษัท <strong>Texas Instruments (TI)</strong><ul>
+<li>จำนวนช่องอินพุต (<strong>Number of Inputs</strong>): <strong>8</strong></li>
+<li>ความละเอียดของข้อมูล (<strong>ADC resolution</strong>): <strong>12-bit</strong></li>
+<li>ประเภทของ <strong>ADC</strong>: <strong>SAR (Sucessive Approximative Register)</strong> </li>
+<li>แรงดันไฟเลี้ยง (<strong>VCC</strong>): <strong>2.7V ~ 5.25V</strong></li>
+<li>ความเร็วในการแปลงข้อมูล (<strong>Conversion Rate</strong>): <strong>50 ~ 200kSa/s</strong> (ขึ้นอยู่กับ <strong>VCC</strong> ที่ใช้)</li>
+<li>โหมดการทำงานของ <strong>SPI</strong> หรือ การตั้งค่า <strong>(CPOL,CPHA)</strong>: <strong>(0,0)</strong>  และ <strong>(1,1)</strong></li>
+<li>ความถี่ของสัญญาณ <strong>SCK</strong> (<script type="math/tex">f_{sclk}</script>): <strong>0.8MHz ~ 3.2MHz</strong></li>
+</ul>
+</li>
+<li><a href="https://ww1.microchip.com/downloads/en/devicedoc/21298e.pdf"><strong>MCP3208</strong></a> ของบริษัท <strong>Microchip Technology</strong><ul>
+<li>จำนวนช่องอินพุต (<strong>Number of Inputs</strong>): <strong>8</strong></li>
+<li>ความละเอียดของข้อมูล (<strong>ADC resolution</strong>): <strong>12-bit</strong></li>
+<li>ประเภทของ <strong>ADC</strong>: <strong>SAR (Sucessive Approximative Register)</strong> </li>
+<li>แรงดันไฟเลี้ยง (<strong>VDD</strong>): <strong>2.7V ~ 5.5V</strong></li>
+<li>ความเร็วในการแปลงข้อมูล (<strong>Conversion Rate or Sampling Rate</strong>): <strong>50 ~ 200kSa/s</strong><ul>
+<li>VDD=5V: 100 kSa/s (max.) </li>
+<li>VDD=2.7V: 100 kSa/s (max.)</li>
+</ul>
+</li>
+<li>โหมดการทำงานของ <strong>SPI</strong> หรือ การตั้งค่า <strong>(CPOL,CPHA)</strong>: <strong>(0,0)</strong>  และ <strong>(1,1)</strong></li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="adc128s022-1.png" /></p>
+<p>รูป: ไอซี <strong>ADC128S022</strong> ตัวถัง (<strong>IC Package</strong>) และบล็อกไดแอะแกรม</p>
+<p><img alt="" src="adc128s022-2.png" /></p>
+<p>รูป: การเชื่อมต่อไอซี <strong>ADC128S022</strong> กับอุปกรณ์อื่น เช่น ไมโครคอนโทรลเลอร์ (<strong>MCU</strong>)</p>
+<p><img alt="" src="adc128s022-3.png" /></p>
+<p>รูป: ลำดับการรับส่งบืตข้อมูลของ <strong>ADC128S022</strong> ด้วยบัส <strong>SPI</strong></p>
+<p><img alt="" src="mcp3208-1.png" /></p>
+<p>รูป: ไอซี <strong>MCP3208</strong> ตัวถัง (<strong>IC Package</strong>) และบล็อกไดแอะแกรม</p>
+<p><img alt="" src="mcp3208-2.png" /></p>
+<p>รูป: ขาของไอซี <strong>MCP3208</strong> และตารางสำหรับกำหนดค่าบิต <code>Single/Diff</code> <code>D2</code> <code>D1</code> <code>D0</code></p>
+<p><img alt="" src="mcp3208-3.png" /></p>
+<p>รูป: ลำดับการรับส่งบืตข้อมูลของ <strong>MCP3208</strong> ด้วยบัส <strong>SPI</strong></p>
+<p>ไอซี <strong>ADC128S022</strong> และ <strong>MCP3208</strong> สื่อสารข้อมูลด้วยบัส <strong>SPI</strong> แต่ก็มีความแตกต่าง ดังนี้</p>
+<ul>
+<li><strong>ADC128S022</strong> และ <strong>MCP3208</strong> มีขาอินพุตแอนะล็อก 8 ขา และจะต้องมีการเลือกขาอินพุตหนึ่งช่องจาก 8 ช่อง
+ก่อนที่จะทำการขั้นตอน <strong>ADC</strong> ดังนั้นจะต้องการกำหนดค่าบิตเลือกช่องสัญญาณให้ถูกต้องก่อน</li>
+<li>ในกรณีของ <strong>MCP3208</strong> สามารถเลือกใช้สัญญาณแบบ <strong>Single-ended</strong>
+(วัดสัญญาณเทียบกับ <strong>Analog GND</strong>) หรือแบบ <strong>Pseudo-Differential</strong> โดยใช้สัญญาณเป็นคู่
+เช่น <strong>CH0=IN+</strong> คู่กับ <strong>CH1=IN-</strong> โดยจะนำหาผลต่างของแรงดันไฟฟ้าของทั้งสองช่องแล้วจึงนำไปแปลงเป็นข้อมูลดิจิทัล
+ดังนั้นจะต้องกำหนดค่าบิตเพื่อเลือกรูปแบบการใช้ชาอินพุตให้ถูกต้อง
+ในขณะที่ <strong>ADC128S022</strong> ใช้อินพุตแอนะล็อก 8 ขา แบบ <strong>Single-ended</strong></li>
+<li>การส่งข้อมูลสำหรับ <strong>ADC128S022</strong> จะต้องมีการเลื่อนบิตข้อมูลผ่านขา <strong>MOSI</strong> และ <strong>MISO</strong>
+ทั้งหมด 16 บิต สำหรับการอ่านข้อมูล 12 บิต ในแต่ละรอบ แต่ในกรณีของ <strong>MCP3208</strong> จะต้องเลื่อนบิตทั้งหมด 24 บิต
+สำหรับการอ่านข้อมูล 12 บิต ในแต่ละรอบ</li>
+</ul>
+<p>บอร์ด <strong>FPGA</strong> ที่จะนำมาใช้ในการทดลองเป็นบอร์ด <strong>Terasic DE0-Nano</strong>
+และบนบอร์ดมี  <strong>ADC128S022</strong> อยู่ด้วย ไม่ต้องต่อวงจรเพิ่ม
+แต่ถ้าเป็น <strong>MCP3208</strong> จะต้องมีการต่อวงจรบนเบรดบอร์ด และใช้วัดสัญญาณแอนะล็อกแบบ <strong>Single-ended</strong> เท่านั้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-adc128s022">&#9655; <strong>ตัวอย่างการเขียนโค้ด VHDL สำหรับ ADC128S022</strong><a class="headerlink" href="#vhdl-adc128s022" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>VHDL</strong> เพื่ออ่านค่า 12 บิต จากไอซี <strong>ADC128S022</strong>
+วงจรดิจิทัลสำหรับบอร์ด <strong>FPGA</strong> มีสัญญาณอินพุต <code>CLK</code> ใช้ความถี่ <strong>50MHz</strong> 
+และใช้ปุ่มกดสำหรับสัญญาณรีเซต <code>NRST</code> (<strong>Active-low</strong>)</p>
+<p>สำหรับการเชื่อมต่อกับไอซี <strong>ADC128S022</strong> มีขาสัญญาณได้แก่
+<code>ADC_CSN</code> (<em>Chip Select</em>), <code>ADC_SCLK</code> (<em>SPI Clock</em>)
+<code>ADC_MOSI</code> (<em>SPI MOSI</em>) และ <code>ADC_MISO</code> (<em>SPI MISO</em>)</p>
+<p><code>SPI_CLK_DIV</code> เป็นค่าคงที่แบบเลขจำนวนเต็ม ใช้เป็นค่าตัวหาความถี่สำหรับการสร้างสัญญาณเอาต์พุต
+<code>ADC_SCLK</code> ในตัวอย่างนี้จะได้ความถี่ <strong>1MHz</strong></p>
+<p>ในตัวอย่างนี้ เป็นการสาธิตการอ่านค่าจากแอนะล็อกอินพุตของ <strong>ADC</strong> เพียงหนึ่งช่องเท่านั้น โดยกำหนดค่าให้กับสัญญาณ
+<code>channel</code> ขนาด 3 บิต</p>
+<p>ข้อมูล 12 บิต ที่อ่านได้จะถูกนำมาใช้เป็นเอาต์พุต <code>LEDS[7:0]</code> ในการแสดงระดับของแอมพลิจูด
+ด้วย <strong>LED</strong> จำนวน 8 ดวง (แสดงค่า 8 ระดับ) บนบอร์ด <strong>FPGA</strong></p>
+<pre><code class="language-vhdl">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
+entity de0nano_adc_demo is
+  port (
+    CLK      : in std_logic; -- 50 MHz system clock
+    NRST     : in std_logic; -- Active-low asynchronous reset
+    ADC_CSN  : out std_logic; -- ADC SPI chip-select
+    ADC_SCLK : out std_logic; -- ADC SPI SCLK
+    ADC_MOSI : out std_logic; -- ADC SPI MOSI
+    ADC_MISO : in std_logic;  -- ADC SPI MISO
+    LEDS     : out std_logic_vector(7 downto 0) -- 8-bit ADC OUTPUT
+  );
+end de0nano_adc_demo;
+
+architecture behavioral of de0nano_adc_demo is
+
+  constant SPI_CLK_DIV : integer := 25;
+  constant DATA_WIDTH  : integer := 16; -- for ADC128S022
+
+  type state_type is (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_WAIT);
+  signal state : state_type := ST_IDLE;
+
+  signal cs_n : std_logic := '1';
+  signal sclk : std_logic := '0';
+  signal mosi : std_logic := '0';
+
+  signal bit_index : integer range 0 to DATA_WIDTH - 1 := 0;
+  signal adc_data  : std_logic_vector(11 downto 0)     := (others =&gt; '0');
+  signal channel   : std_logic_vector(2 downto 0)      := &quot;000&quot;;
+
+  signal shift_en  : std_logic := '0';
+  signal shift_reg : std_logic_vector(DATA_WIDTH - 1 downto 0);
+
+  constant WAIT_CNT_MAX : integer := 31;
+  signal wait_cnt       : integer := 0;
+
+begin
+
+  adc_csn  &lt;= cs_n;
+  adc_sclk &lt;= sclk;
+  adc_mosi &lt;= mosi;
+
+  --LEDS &lt;= adc_data(11 downto 4); -- show 8-bit ADC value directly to LEDs
+
+  process (adc_data)
+    variable leds_on : integer range 0 to 7;
+    variable value   : integer range 0 to 255;
+  begin
+    value   := to_integer(unsigned(adc_data(11 downto 4)));
+    value   := value / 32;
+    leds_on := value;
+    LEDS                   &lt;= (others =&gt; '0'); -- Default to all LEDs OFF
+    LEDS(leds_on downto 0) &lt;= (others =&gt; '1'); -- Turn ON the corresponding LEDs
+  end process;
+
+  process (CLK, NRST)
+    variable count : integer range 0 to SPI_CLK_DIV - 1 := 0;
+  begin
+    if NRST = '0' then
+      count := 0;
+      shift_en &lt;= '0';
+    elsif rising_edge(CLK) then
+      if count = SPI_CLK_DIV - 1 then
+        count := 0;
+        shift_en &lt;= '1';
+      else
+        count := count + 1;
+        shift_en &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      cs_n      &lt;= '1';
+      mosi      &lt;= '0';
+      sclk      &lt;= '0';
+      adc_data  &lt;= (others =&gt; '0');
+      channel   &lt;= (others =&gt; '0');
+      bit_index &lt;= 0;
+      wait_cnt  &lt;= 0;
+      state     &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case state is
+        when ST_IDLE =&gt;
+          bit_index &lt;= 0;
+          channel   &lt;= &quot;001&quot;; -- Select channel ADC_IN1
+          cs_n      &lt;= '1';
+          sclk      &lt;= '1';
+          state     &lt;= ST_START;
+
+        when ST_START  =&gt;
+          shift_reg  &lt;= (others =&gt; '0');
+          shift_reg(13 downto 11) &lt;= channel; -- for ADC128S022
+          cs_n   &lt;= '0';
+          state  &lt;= ST_SCK_L;
+
+        when ST_SCK_L =&gt;
+          if shift_en = '1' then
+            sclk  &lt;= '0';
+            mosi  &lt;= shift_reg(shift_reg'left);
+            state &lt;= ST_SCK_H;
+          end if;
+
+        when ST_SCK_H =&gt;
+          if shift_en = '1' then
+            sclk      &lt;= '1';
+            shift_reg &lt;= shift_reg(shift_reg'left - 1 downto 0) &amp; adc_miso;
+            if bit_index = DATA_WIDTH - 1 then
+              cs_n     &lt;= '1';
+              wait_cnt &lt;= WAIT_CNT_MAX;
+              state    &lt;= ST_WAIT;
+            else
+              bit_index &lt;= bit_index + 1;
+              state     &lt;= ST_SCK_L;
+            end if;
+          end if;
+
+        when ST_WAIT =&gt;
+          adc_data &lt;= shift_reg(11 downto 0);
+          if wait_cnt = 0 then
+            state &lt;= ST_IDLE;
+          else
+            wait_cnt &lt;= wait_cnt - 1;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+end behavioral;
+</code></pre>
+<p>ถัดไปเป็นไฟล์ <strong>Tcl Script</strong> เพื่อใช้ในการเลือกใช้ขา <strong>I/O</strong> ของ <strong>FPGA</strong> บน <strong>DE0-Nano</strong>
+สำหรับสัญญาณ <strong>I/O</strong> ของวงจรดิจิทัล</p>
+<pre><code class="language-text"># Pin &amp; Location Assignments
+# set_global_assignment -name FAMILY &quot;Cyclone IV E&quot;
+# set_global_assignment -name DEVICE EP4CE6E22C8
+
+set_location_assignment PIN_J15 -to NRST
+set_location_assignment PIN_R8  -to CLK
+set_location_assignment PIN_A10 -to ADC_CSN
+set_location_assignment PIN_A9  -to ADC_MISO
+set_location_assignment PIN_B10 -to ADC_MOSI
+set_location_assignment PIN_B14 -to ADC_SCLK
+set_location_assignment PIN_A15 -to LEDS[0]
+set_location_assignment PIN_A13 -to LEDS[1]
+set_location_assignment PIN_B13 -to LEDS[2]
+set_location_assignment PIN_A11 -to LEDS[3]
+set_location_assignment PIN_D1  -to LEDS[4]
+set_location_assignment PIN_F3  -to LEDS[5]
+set_location_assignment PIN_B1  -to LEDS[6]
+set_location_assignment PIN_L3  -to LEDS[7]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to NRST
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_CSN
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MISO
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MOSI
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_SCLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
+</code></pre>
+<p>ในการทดลองกับอุปกรณ์จริง โดยใช้ตัวต้านทานปรับค่าได้ นำมาต่อเป็นวงจรแบ่งแรงดัน (<strong>Voltage Divider</strong>)
+และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> กับ <strong>Gnd</strong> จากบอร์ด <strong>FPGA</strong>
+ลองหมุนปรับค่าแรงดัน แล้วสังเกตการเปลี่ยนแปลงของ <strong>LEDS</strong> บนบอร์ด <strong>FPGA</strong></p>
+<p><img alt="" src="adc128s022_de0nano.jpg" /></p>
+<p>รูป: แผนผังแสดงการเชื่อมต่อระหว่างไอซี <strong>ADC</strong> กับชิป <strong>Cyclone IV FPGA</strong> บนบอร์ด <strong>DE0-Nano</strong></p>
+<p><img alt="" src="de0nano_connector.jpg" /></p>
+<p>รูป:แผนผังแสดงตำแหน่งของขา <strong>I/O</strong> ของคอนเนกเตอร์ (<strong>JP3</strong>) และใช้ในการเชื่อมต่อกับวงจรแบ่งแรงดัน
+และรับสัญญาณแอนะล็อกอินพุต</p>
+<p><img alt="" src="de0nano_demo-1.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองสำหรับบอร์ด <strong>DE0-Nano</strong> (ใช้แรงดันไฟเลี้ยงจากขา <strong>VCC3P3</strong> และ <strong>GND</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-mcp3208">&#9655; <strong>ตัวอย่างการเขียนโค้ด VHDL สำหรับ MCP3208</strong><a class="headerlink" href="#vhdl-mcp3208" title="Permanent link">#</a></h2>
+<p>โค้ด <strong>VHDL</strong> ต่อไปนี้ จะใช้สำหรับไอซี <strong> MCP3208</strong> และมีความแตกต่างจากโค้ดตัวอย่างที่แล้วแค่บางตำแหน่งเท่านั้น
+ได้แก่ การกำหนดค่า <code>DATA_WIDTH</code> เปลี่ยนจากเดิม 16 บิต เป็น 24 บิต
+และการกำหนดค่าให้ <code>shift_reg</code> ในบิต 18 ถึง บิต 14</p>
+<pre><code class="language-vhdl">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
+entity de0nano_adc_demo is
+  port (
+    CLK      : in std_logic; -- 50 MHz system clock
+    NRST     : in std_logic; -- Active-low asynchronous reset
+    ADC_CSN  : out std_logic; -- ADC SPI chip-select
+    ADC_SCLK : out std_logic; -- ADC SPI SCLK
+    ADC_MOSI : out std_logic; -- ADC SPI MOSI
+    ADC_MISO : in std_logic;  -- ADC SPI MISO
+    LEDS     : out std_logic_vector(7 downto 0) -- 8-bit ADC OUTPUT
+  );
+end de0nano_adc_demo;
+
+architecture behavioral of de0nano_adc_demo is
+
+  constant SPI_CLK_DIV  : integer := 25;
+  constant DATA_WIDTH   : integer := 24; -- for MCP3208 ***
+
+  type state_type is (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_WAIT);
+  signal state : state_type := ST_IDLE;
+
+  signal cs_n : std_logic := '1';
+  signal sclk : std_logic := '0';
+  signal mosi : std_logic := '0';
+
+  signal bit_index : integer range 0 to DATA_WIDTH - 1 := 0;
+  signal adc_data  : std_logic_vector(11 downto 0)     := (others =&gt; '0');
+  signal channel   : std_logic_vector(2 downto 0)      := &quot;000&quot;;
+
+  signal shift_en  : std_logic := '0';
+  signal shift_reg : std_logic_vector(DATA_WIDTH - 1 downto 0);
+
+  constant WAIT_CNT_MAX : integer := 31;
+  signal wait_cnt       : integer := 0;
+
+begin
+
+  adc_csn  &lt;= cs_n;
+  adc_sclk &lt;= sclk;
+  adc_mosi &lt;= mosi;
+
+  --LEDS &lt;= adc_data(11 downto 4);
+
+  process (adc_data)
+    variable leds_on : integer range 0 to 7;
+    variable value   : integer range 0 to 255;
+  begin
+    value   := to_integer(unsigned(adc_data(11 downto 4)));
+    value   := value / 32;
+    leds_on := value;
+    -- Generate LED pattern based on leds_on
+    LEDS                   &lt;= (others =&gt; '0'); -- Default to all LEDs OFF
+    LEDS(leds_on downto 0) &lt;= (others =&gt; '1'); -- Turn ON the corresponding LEDs
+  end process;
+
+  process (CLK, NRST)
+    variable count : integer range 0 to SPI_CLK_DIV - 1 := 0;
+  begin
+    if NRST = '0' then
+      count := 0;
+      shift_en &lt;= '0';
+    elsif rising_edge(CLK) then
+      if count = SPI_CLK_DIV - 1 then
+        count := 0;
+        shift_en &lt;= '1';
+      else
+        count := count + 1;
+        shift_en &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      cs_n      &lt;= '1';
+      mosi      &lt;= '0';
+      sclk      &lt;= '0';
+      adc_data  &lt;= (others =&gt; '0');
+      channel   &lt;= (others =&gt; '0');
+      bit_index &lt;= 0;
+      wait_cnt  &lt;= 0;
+      state     &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case state is
+        when ST_IDLE =&gt;
+          bit_index &lt;= 0;
+          channel   &lt;= &quot;001&quot;; -- Select channel ADC_IN1
+          cs_n      &lt;= '1';
+          sclk      &lt;= '1';
+          state     &lt;= ST_START;
+
+        when ST_START  =&gt;
+          shift_reg  &lt;= (others =&gt; '0');
+          shift_reg(18 DOWNTO 14) &lt;= &quot;11&quot; &amp; channel; -- for MCP3208 ***         
+          cs_n   &lt;= '0';
+          state  &lt;= ST_SCK_L;
+
+        when ST_SCK_L =&gt;
+          if shift_en = '1' then
+            sclk  &lt;= '0';
+            mosi  &lt;= shift_reg(shift_reg'left);
+            state &lt;= ST_SCK_H;
+          end if;
+
+        when ST_SCK_H =&gt;
+          if shift_en = '1' then
+            sclk      &lt;= '1';
+            shift_reg &lt;= shift_reg(shift_reg'left - 1 downto 0) &amp; adc_miso;
+            if bit_index = DATA_WIDTH - 1 then
+              cs_n     &lt;= '1';
+              wait_cnt &lt;= WAIT_CNT_MAX;
+              state    &lt;= ST_WAIT;
+            else
+              bit_index &lt;= bit_index + 1;
+              state     &lt;= ST_SCK_L;
+            end if;
+          end if;
+
+        when ST_WAIT =&gt;
+          adc_data &lt;= shift_reg(11 downto 0);
+          if wait_cnt = 0 then
+            state &lt;= ST_IDLE;
+          else
+            wait_cnt &lt;= wait_cnt - 1;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+end behavioral;
+</code></pre>
+<p>ถัดไปเป็นไฟล์ <strong>Tcl Script</strong> เพื่อใช้ในการเลือกใช้ขา <strong>I/O</strong> ของ <strong>FPGA</strong> บน <strong>DE0-Nano</strong>
+สำหรับสัญญาณ <strong>I/O</strong> ของวงจรดิจิทัล</p>
+<pre><code class="language-text"># Pin &amp; Location Assignments
+# set_global_assignment -name FAMILY &quot;Cyclone IV E&quot;
+# set_global_assignment -name DEVICE EP4CE6E22C8
+
+# GPIO_123 PIN_N16 ADC_SCLK
+# GPIO_121 PIN_P16 ADC_MISO
+# GPIO_119 PIN_L15 ADC_MOSI
+# GPIO_117 PIB_K16 ASC_CSN
+
+set_location_assignment PIN_J15 -to NRST
+set_location_assignment PIN_R8  -to CLK
+set_location_assignment PIN_K16 -to ADC_CSN
+set_location_assignment PIN_P16 -to ADC_MISO
+set_location_assignment PIN_L15 -to ADC_MOSI
+set_location_assignment PIN_N16 -to ADC_SCLK
+set_location_assignment PIN_A15 -to LEDS[0]
+set_location_assignment PIN_A13 -to LEDS[1]
+set_location_assignment PIN_B13 -to LEDS[2]
+set_location_assignment PIN_A11 -to LEDS[3]
+set_location_assignment PIN_D1  -to LEDS[4]
+set_location_assignment PIN_F3  -to LEDS[5]
+set_location_assignment PIN_B1  -to LEDS[6]
+set_location_assignment PIN_L3  -to LEDS[7]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to NRST
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_CSN
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MISO
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MOSI
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_SCLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
+</code></pre>
+<p><img alt="" src="de0nano_gpio0-1_connectors.jpg" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งของขา <strong>I/O</strong> สำหรับคอนเนกเตอร์ <strong>GPIO-0 (JP1)</strong> และ <strong>GPIO-1 (JP2)</strong>
+(ให้สังเกตขาหมายเลข 1 และทิศทางการจัดเรียงขาตามหมายเลข)</p>
+<p><img alt="" src="de0nano_gpio_table.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขา <strong>GPIO</strong> ของคอนเนกเตอร์บนบอร์ด และขาของชิป <strong>FPGA</strong></p>
+<p><img alt="" src="de0nano_demo-2.jpg" /></p>
+<p><img alt="" src="de0nano_demo-3.jpg" /></p>
+<p>รูป: การต่อวงจรเพื่อทดลองใช้ไอซี <strong>MCP3208</strong> บนเบรดบอร์ดร่วมกับบอร์ด <strong>DE0-Nano</strong></p>
+<p><img alt="" src="spi_capture-1.jpg" /></p>
+<p><img alt="" src="spi_capture-2.jpg" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณ <strong>SPI</strong> ด้วย <strong>USB Logic Analyzer</strong></p>
+<p>จากการวัดสัญญาณ จะเห็นได้ว่า ความถี่ของสัญญาณ <strong>SCLK</strong> อยู่ที่ประมาณ <strong>1MHz</strong>
+และจะมีการอ่านค่า <strong>ADC</strong> ซ้ำไปเรื่อย ๆ ด้วยอัตราประมาณ 40,000 ครั้งต่อวินาที</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการออกแบบวงจรดิจิทัลเพื่อใช้กับบอร์ด <strong>FPGA</strong> และอ่านข้อมูลจากไอซี
+<strong>ADC</strong> ที่ทำหน้าที่แปลงสัญญาณแอนะล็อกให้เป็นข้อมูลดิจิทัล และสื่อสารกับบอร์ด <strong>FPGA</strong> ด้วยบัส <strong>SPI</strong>
+ในการทดลองได้เลือกใช้สัญญาณอินพุตเพียงหนึ่งช่อง และทดลองใช้บอร์ด <strong>DE0-Nano (Cyclone IV FPGA</strong>)
+ร่วมกับไอซี <strong>ADC128S022</strong> และ <strong>MCP3208</strong> ตามลำดับ</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../arduino/arduino-spi-master-slave/">การสื่อสารด้วยบัส <strong>SPI</strong> และเขียนโปรแกรมด้วย <strong>Arduino Uno / Nano</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-16 | Last Updated: 2024-10-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
