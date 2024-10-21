@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/de10_lite_intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนะนำการใช้งานบอร์ด Terasic DE10 Lite Development Kit - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#terasic-de10-lite-development-kit" class="nav-link">แนะนำการใช้งานบอร์ด Terasic DE10 Lite Development Kit</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#terasic-de10-lite" class="nav-link">&#9655; Terasic DE10 Lite</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#de10-lite" class="nav-link">&#9655; องค์ประกอบที่สำคัญของบอร์ด DE10-Lite</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#fpga-bistream" class="nav-link">&#9655; ฮาร์ดแวร์และซอฟต์แวร์สำหรับการอัปโหลดไฟล์ FPGA Bistream</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#io-fpga-de10-lite" class="nav-link">&#9655; การใช้งานขา I/O ของชิป FPGA บนบอร์ด DE10 Lite</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="terasic-de10-lite-development-kit">แนะนำการใช้งานบอร์ด Terasic DE10 Lite Development Kit<a class="headerlink" href="#terasic-de10-lite-development-kit" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>FPGA</em>, <em>Intel / Altera MAX 10</em>, <em>DE10 Lite FPGA Board</em></p>
+<hr />
+<h2 id="terasic-de10-lite">&#9655; <strong>Terasic DE10 Lite</strong><a class="headerlink" href="#terasic-de10-lite" title="Permanent link">#</a></h2>
+<p><a href="https://www.terasic.com.tw/cgi-bin/page/archive.pl?Language=English&amp;CategoryNo=234&amp;No=1021&amp;PartNo=4"><strong>DE10-Lite</strong></a> เป็นบอร์ด <strong>FPGA</strong> ของบริษัท <strong>Terasic (Taiwan)</strong>
+และมีชิปหลักคือ <strong>Intel / Altera MAX 10 FPGA (Device: <code>10M50DAF484C7G</code>)</strong>
+เริ่มจำหน่ายครั้งแรกในปีค.ศ. 2016</p>
+<p>นอกเหนือจาก <strong>DE10-Lite</strong> ยังมีบอร์ด <strong>Intel / Altera FPGA</strong> ของ <strong>Terasic</strong> ที่เป็นตัวเลือกอีกหลายบอร์ด เช่น</p>
+<ul>
+<li><strong>DE0-CV</strong>: Cyclone V, <code>5CEBA4F23C7</code></li>
+<li><strong>DE0-Nano</strong>: Cyclone IV-E, <code>EP4CE22F17C6</code></li>
+<li><strong>DE0-Nano-SoC</strong>: Cyclone V SoC, <code>5CSEMA4U23C6</code></li>
+<li><strong>DE1-SoC</strong>: Cyclone V SoC, <code>5CSEMA5F31C6</code></li>
+<li><strong>DE2-115</strong>: Cyclone IV-E, <code>EP4CE115F29C7</code></li>
+<li><strong>DE10-Standard</strong>: Cyclone V SoC, <code>5CSXFC6D6F31C6</code></li>
+<li><strong>DE10-Nano</strong>: Cyclone V-SE, <code>5CSEBA6U2317</code></li>
+</ul>
+<p>บอร์ด <strong>DE10-Lite</strong> มีขนาดไม่ใหญ่  ราคาประมาณ 5,000 บาท
+(ไม่รวม VAT) เชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ด้วยสาย <strong>USB</strong>: <strong>Type-A Male to Type-B Male</strong>
+และใช้แรงดันไฟเลี้ยง <strong>+5Vdc</strong> จากพอร์ต <strong>USB</strong> สำหรับการทำงานของวงจร ดังนั้นจึงสะดวกต่อการใช้งาน</p>
+<p><img alt="" src="de10_lite_kit.jpg" /></p>
+<p>รูป: <strong>Terasic DE10 Lite Development Kit</strong> (Source: Intel)</p>
+<p><img alt="" src="de10_lite_top_bottom.jpg" /> (Source: Terasic)</p>
+<p>รูป: มุมมองของบอร์ดจากด้านบนและด้านล่าง</p>
+<p>ซอฟต์แวร์ที่ใช้การออกแบบวงจรด้วยชิป <strong>FPGA</strong> เรียกว่า
+<strong>FPGA Design Software</strong> และซอฟต์แวร์ที่จะต้องใช้ มีชื่อว่า <a href="https://www.intel.com/content/www/us/en/products/details/fpga/development-tools/quartus-prime.html"><strong>Quartus Prime</strong></a> (เวอร์ชันล่าสุดในขณะที่เขียนบทความนี้คือ  <strong>v24.1</strong>) แบ่งเป็น 3 ตัวเลือก</p>
+<ul>
+<li><strong>Quartus Prime Lite Edition (license-free)</strong>: ใช้งานได้ฟรี และรองรับการใช้งานชิป <code>10M50DAF484C7G</code>
+ดังนั้นจึงแนะนำให้ติดตั้งและใช้งานซอฟต์แวร์นี้</li>
+<li><strong>Quartus Prime Standard Edition | Pro Edition</strong>: จะต้องเสียค่าลิขสิทธิ์ในการใช้งานซอฟต์แวร์</li>
+</ul>
+<hr />
+<h2 id="de10-lite">&#9655; องค์ประกอบที่สำคัญของบอร์ด <strong>DE10-Lite</strong><a class="headerlink" href="#de10-lite" title="Permanent link">#</a></h2>
+<p>ข้อมูลต่อไปนี้อ้างอิงจากเอกสาร <a href="de10_lite_user_manual.pdf"><strong>DE10-Lite User Manual</strong></a>
+และไฟล์ <a href="de10_lite_e0.pdf"><strong>Schematic (Rev.E0)</strong></a>
+ผู้ใช้สามารถดาวน์โหลดไฟล์ <a href="https://download.terasic.com/downloads/cd-rom/de10-lite/DE10-Lite_v.2.1.0_SystemCD.zip"><strong>DE10-Lite_v.2.1.0_SystemCD.zip (2020-06-05)</strong></a> ได้จากเว็บไซต์ของบริษัท </p>
+<ul>
+<li><strong>FPGA Device</strong>: <strong>10M50DAF484C7G</strong><ul>
+<li><strong>Logic Elements (LEs)</strong>: 50K</li>
+<li><strong>M9K Memory</strong>: 1,638 Kbits</li>
+<li><strong>Embedded User Flash Memory</strong>: 5,888 Kbits</li>
+<li><strong>18 × 18 Multipliers</strong>: 144 </li>
+<li><strong>PLLs</strong>: 4</li>
+</ul>
+</li>
+<li><strong>Onboard USB Blaster</strong></li>
+<li><strong>SDRAM (Synchronous Dynamic RAM)</strong>: 64MB, 16-bit data wide, 3.3V LVCMOS</li>
+<li><strong>Power Supply</strong>: <strong>+5Vdc</strong><ul>
+<li><strong>2-pin header (5V &amp; GND pins)</strong></li>
+<li><strong>USB Port</strong></li>
+</ul>
+</li>
+<li><strong>2x20-pin GPIO Headers</strong></li>
+<li><strong>1x Arduino Uno R3 Connector</strong><ul>
+<li><strong>Digital GPIO Pins</strong>: 3.3V logic (<em>not 5V !!!</em>)</li>
+<li><strong>6x Analog Inputs</strong>: 0V ~ 3.3V</li>
+</ul>
+</li>
+<li><strong>6-Digit 7-Segment Display</strong> (3.3 LVTTL)</li>
+<li><strong>10x LEDs</strong> (3.3 LVTTL)</li>
+<li><strong>10x Slide Switches</strong> (3.3 LVTTL)</li>
+<li><strong>VGA Connector (D-sub Connector)</strong>: 4-bit resistor-network DAC for RGB</li>
+<li><strong>2x User Push Buttons (Active-low)</strong>: <strong>KEY0</strong> (<code>PIN_B8</code>) &amp; <strong>KEY1</strong> (<code>PIN_A7</code>)</li>
+<li><strong>3-axis Accelerometer (G-Sensor)</strong>: <strong>ADXL345</strong> (I2C &amp; SPI mode)</li>
+<li><strong>4-Output Clock Signal Generator</strong>: 4 Outputs (3.3V LVTTL)<ul>
+<li>Y1: 24MHz for USB Blaster</li>
+<li>Y3: ADC CLK 10MHz (FPGA Pin: <code>PIN_N5</code>)</li>
+<li>Y4: MAX10 CLK1 50MHz (FPGA Pin: <code>PIN_P11</code>)</li>
+<li>Y5: MAX10 CLK2 50MHz (FPGA Pin: <code>PIN_N14</code>)</li>
+</ul>
+</li>
+<li><strong>4x Status LEDs</strong>:<ul>
+<li>D1: <code>ULED</code> (USB Blaster Status)</li>
+<li>D2: <code>CONF_DONE</code> (FPGA Configuration Status)</li>
+<li>D3: Not Used</li>
+<li>D4: System Power Status</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="de0_lite_components.jpg" /></p>
+<p>รูป: บล็อกไดอะแกรมแสดงองค์ประกอบของบอร์ด <strong>DE10 Lite</strong></p>
+<p>บริษัท <strong>Terasic</strong> ได้พัฒนาตัวอย่างการออกแบบวงจรเป็นระบบคอมพิวเตอร์ผังตัวที่มีซีพียู <strong>NIOS II</strong> ขนาด 32 บิต
+ของบริษัท <strong>Intel / Altera</strong> เพื่อสาธิตการใช้งานสำหรับบอร์ด <strong>DE10 Lite</strong>
+และเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ด้วยวิธี <strong>USB-JTAG</strong> ไปยังวงจรภายในชิป <strong>FPGA</strong>
+โดยต้องดาวน์โหลดไฟล์สำหรับซอฟต์แวร์ที่มีชื่อว่า <strong>DE10 Lite ControlPanel</strong></p>
+<p><img alt="" src="de10_lite_demo.jpg" /></p>
+<p>รูป: วงจรตัวอย่างสาธิตการใช้งาน <strong>NIOS II 32-bit Soft-CPU</strong> สำหรับบอร์ด <strong>DE10 Lite</strong></p>
+<p>บอร์ด <strong>FPGA</strong> มีวงจรที่ทำหน้าที่แปลงแรงดันไฟฟ้าจากระดับ <strong>+5V</strong> (<code>VCC5</code>) และไม่เกิน 5.5V ให้เป็นแรงดันไฟฟ้าต่ำลงมา
+สำหรับการทำงานของวงจรต่าง ๆ บนบอร์ด <strong>DE10 Lite</strong> ได้แก่</p>
+<ul>
+<li><strong>3.3V</strong> (<code>VCC3P3</code>) </li>
+<li><strong>+2.5V</strong> (<code>VCC2P5</code>)</li>
+<li><strong>1.8V</strong> (<code>VCC1P8</code>)</li>
+<li><strong>+1.2V</strong> (<code>VCC1P2</code>)</li>
+</ul>
+<p>ในส่วน <strong>I/O Banks</strong> ของชิป <strong>FPGA</strong> บนบอร์ด <strong>DE10-Lite</strong> มีการเลือกใช้ระดับแรงดันไฟฟ้าที่แตกต่างกันสำหรับ <strong>VCCIO</strong>
+(<strong>3.3V</strong> หรือ <strong>2.5V</strong>) และมีตัวอย่างบางส่วน ดังนี้</p>
+<p><img alt="" src="de10_lite_io_banks.jpg" /></p>
+<p>รูป: ผังวงจรแสดงตัวอย่างการเลือกใช้แรงดันไฟฟ้า <strong>VCCIO</strong> สำหรับ <strong>I/O Banks</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="fpga-bistream">&#9655; ฮาร์ดแวร์และซอฟต์แวร์สำหรับการอัปโหลดไฟล์ <strong>FPGA Bistream</strong><a class="headerlink" href="#fpga-bistream" title="Permanent link">#</a></h2>
+<p>ไฟล์ข้อมูลที่เรียกว่า "บิตสตรีม" (<strong>Bitstream</strong>) เช่น ไฟล์ <code>.sof</code> และ <code>.pof</code>
+ซึ่งได้จากการทำงานของซอฟต์แวร์ <strong>Quartus</strong> เมื่อมีการแปลงวงจรดิจิทัลที่ได้ออกแบบไว้และได้ไฟล์บิตสตรีมแล้ว
+จะต้องใช้อุปกรณ์ที่เรียกว่า <strong>USB Blaster</strong> ซึ่งมีอยู่บนบอร์ด <strong>DE10 Lite</strong> แล้ว
+ร่วมกับซอฟต์แวร์ที่ใช้คือ <strong>Quartus Programmer</strong> เพื่อโปรแกรมชิป <strong>FPGA</strong> ด้วยไฟล์ดังกล่าว</p>
+<p><img alt="" src="max10_usb_jtag.jpg" /></p>
+<p>รูป: การโปรแกรมชิป <strong>FPGA</strong> ด้วยวงจร <strong>JTAG</strong> ที่มีอยู่บนบอร์ด <strong>FPGA</strong></p>
+<p>วงจร <strong>USB Blaster</strong> ประกอบด้วยไอซี <strong>FTDI FT245BL</strong> ทำงานในโหมด <strong>8-bit FIFO</strong>
+และชิป <strong>Altera MAX II CPLD (EPM240T100)</strong> วงจรทำหน้าที่เชื่อมต่อด้านหนึ่งกับพอร์ต <strong>USB</strong> ของคอมพิวเตอร์ผู้ใช้
+และอีกด้านเชื่อมต่อกับพอร์ต <strong>JTAG</strong> ของชิป <strong>FPGA</strong> 
+ด้วยสัญญาณ <strong>TCK</strong>, <strong>TMS</strong>, <strong>TDI</strong> และ <strong>TDO</strong> (ใช้แรงดันไฟเลี้ยง <strong>+2.5V</strong> สำหรับลอจิก)</p>
+<p>วงจร <strong>USB Blaster</strong> ใช้สำหรับการอัปโหลด "บิตสตรีม" ผ่าน <strong>JTAG</strong> แบ่งเป็น 2 กรณี คือ</p>
+<ul>
+<li>เขียนข้อมูลไปยังหน่วยความจำ <strong>SRAM-based (Non-volatile) Configuration Memory (CRAM)</strong> ภายในชิป <strong>MAX 10</strong>
+แต่เมื่อปิดไฟเลี้ยงของบอร์ด ข้อมูลจะหายไป โดยปรกติ ก็เลือกใช้วิธีนี้ในช่วงการออกแบบวงจรดิจิทัลและทดลองกับบอร์ด <strong>FPGA</strong></li>
+<li>เขียนข้อมูลไปยังหน่วยความจำที่เรียกว่า <strong>CFM</strong> (<em>Configuration Flash Memory</em>): ภายในชิป <strong>MAX 10</strong>
+มีหน่วยความจำแฟลช (<strong>On-chip Flash Memory</strong>) ร่วมไว้ให้แล้ว (ไม่ต้องใช้ไอซี <strong>Serial Flash Memory</strong> ภายนอก)
+ส่วนหนึ่งของหน่วยความจำประเภทนี้ ใช้เป็น <strong>CFM</strong> เพื่อเก็บข้อมูลของบิตสตรีม และส่วนที่เหลือใช้สำหรับ <strong>User Data</strong></li>
+</ul>
+<p><img alt="" src="max10_internal_cfm.jpg" /></p>
+<p>รูป: การเขียนข้อมูลลงในหน่วยความจำ  <strong>CRAM</strong> หรือ <strong>CFM</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="io-fpga-de10-lite">&#9655; <strong>การใช้งานขา I/O ของชิป FPGA บนบอร์ด DE10 Lite</strong><a class="headerlink" href="#io-fpga-de10-lite" title="Permanent link">#</a></h2>
+<p>ชิป <strong>MAX 10 FPGA</strong> (<code>10M50DAF484C7G</code>) มีขา <strong>I/O</strong> จำนวนมาก และส่วนหนึ่งจะใช้สำหรับการเชื่อมต่อกับวงจรต่าง ๆ บนบอร์ด
+ดังนั้นจะต้องกำหนดหมายเลขขา <strong>I/O</strong> ให้ถูกต้องสำหรับสัญญาณอินพุตและเอาต์พุตของวงจรดิจิทัล (เรียกขั้นตอนนี้ว่า <strong>FPGA Pin Assignment</strong>) โดยทำได้ 2 วิธี คือ</p>
+<ul>
+<li>ใช้เครื่องมือซอฟต์แวร์ที่เรียกว่า <strong>Pin Planner</strong> ซึ่งเป็นส่วนหนึ่งของโปรแกรม <strong> Quartus Prime </strong></li>
+<li>ใช้ไฟล์  <strong>Tcl Script</strong> (ตัวอย่างไฟล์ <a href="set_pins.tcl"><code>set_pins.tcl</code></a>)
+เพื่อตั้งค่าการใช้งานขา <strong>I/O</strong></li>
+</ul>
+<p>วงจรบนบอร์ด <strong>DE10-Lite</strong> สำหรับการใช้งานระดับพื้นฐาน ได้แก่</p>
+<ul>
+<li>วงจรสร้างสัญญาณอินพุตสำหรับ <strong>Clock</strong> ของระบบ (สำหรับการออกแบบวงจรดิจิทัลแบบ <strong>Synchronous Design</strong>)</li>
+<li>วงจรปุ่มกด (<strong>Push Buttons</strong>) และสวิตช์เลื่อนสองทาง ใช้เป็นอินพุตแบบดิจิทัล</li>
+<li>วงจร <strong>LEDs</strong>  ใช้เป็นเอาต์พุตแบบดิจิทัล</li>
+<li>วงจร <strong>7-Segment Display</strong> ใช้เป็นเอาต์พุตแบบดิจิทัล</li>
+</ul>
+<p><img alt="" src="max10_clk_pins.jpg" /></p>
+<p>รูป: ขาสัญญาณ <strong>Clock</strong> มี 3 ตัวเลือก</p>
+<p><img alt="" src="de10_clock_generator.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับไอซีที่ใช้ในการสร้างสัญญาณ <strong>Clock</strong></p>
+<p><img alt="" src="de10_lite_leds.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับ <strong>LEDs</strong> (<strong>LED</strong> แต่ละตัว มีตัวต้านทาน <strong>1k</strong> โอห์ม ต่ออนุกรมอยู่)</p>
+<p>บอร์ด <strong>DE10 Lite</strong> มีวงจร <strong>LEDs (active-high)</strong> จำนวน 10 ตำแหน่ง เป็นเอาต์พุตแบบดิจิทัล (<strong>3.3V LVTTL</strong>)
+สำหรับการแสดงสถานะลอจิก และมีการใช้งาน <strong>FPGA Pins</strong> ดังนี้</p>
+<p><img alt="" src="max10_leds_pins.jpg" /></p>
+<p>รูป: ตารางแสดงการใช้ขา <strong>I/O</strong> สำหรับ <strong>LEDs</strong></p>
+<p>บอร์ด <strong>DE10 Lite</strong> มีปุ่มกด 2 ปุ่ม ทำงานแบบ <strong>Active-Low</strong> 
+และมีวงจรสวิตช์แบบเลื่อนสองทาง (<strong>Slide Switches</strong>) จำนวน 10 ตำแหน่ง
+เป็นอินพุตแบบดิจิทัล (<strong>3.3V LVTTL</strong>) และมีการใช้งาน <strong>FPGA Pins</strong> ดังนี้</p>
+<p><img alt="" src="de10_lite_keys.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับปุ่มกด</p>
+<p><img alt="" src="de10_lite_schmitt_trigger.jpg" /></p>
+<p>รูป: การใช้ไอซี <strong>74AUC17 Hex Schmitt-Trigger Buffer</strong> สำหรับสัญญาณจากปุ่มกด
+เพื่อช่วยลดปัญหาจากการกระเด้งของปุ่มกด (<strong>Switch Debouncing Circuit</strong>)</p>
+<p><img alt="" src="max10_keys_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับวงจรปุ่มกด</p>
+<p><img alt="" src="de10_lite_switches.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับวงจรสวิตช์เลื่อนสองทาง (มีตัวต้านทาน 120 โอห์มต่ออนุกรมอยู่)</p>
+<p><img alt="" src="max10_switches_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับวงจรสวิตช์เลื่อนสองทาง</p>
+<p><img alt="" src="de10_lite_7seg.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับ <strong>7-Segment Display</strong></p>
+<p><img alt="" src="max10_hex_7seg_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับ <strong>7-Segment Display</strong> ทั้งหมด 6 หลัก
+(มีตัวต้านทาน 2k โอห์ม ต่ออนุกรมอยู่)</p>
+<p>&nbsp;</p>
+<p>ในกรณีที่ต้องการต่อวงจรภายนอกใช้งานเพิ่มเติมจากวงจรที่มีบนบอร์ด จะต้องใช้ขาของคอนเนกเตอร์ต่อไปนี้</p>
+<ul>
+<li>คอนเนกเตอร์ <strong>2x20 Pins (Male Pin Headers)</strong></li>
+<li>คอนเนกเตอร์ตามรูปแบบของ <strong>Arduino Shield</strong></li>
+</ul>
+<p><img alt="" src="max10_gpio_connectors.jpg" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขา <strong>I/O</strong> ของคอนเนกเตอร์แบบ <strong>2x20-Pins</strong></p>
+<p><img alt="" src="max10_gpio_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขา <strong>FPGA Pins</strong> และชื่อสัญญาณของคอนเนกเตอร์ <strong>GPIOs</strong></p>
+<p><img alt="" src="max10_arduino_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขา <strong>FPGA Pins</strong> และชื่อสัญญาณของคอนเนกเตอร์ <strong>Arduino Shield</strong></p>
+<p><img alt="" src="max10_arduino_shield.jpg" /></p>
+<p>รูป: แผนผังแสดงตำแหน่งขาสำหรับ <strong>Arduino Shield Connector</strong> บนบอร์ด <strong>DE10 Lite</strong></p>
+<p><img alt="" src="max10_arduino_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับ <strong>Arduino Shield</strong></p>
+<p><strong>คำเตือน</strong>: บอร์ด <strong>DE10 Lite</strong> ไม่สามารถนำไปต่อใช้งานกับวงจรอื่นที่ทำงานด้วยแรงดันไฟเลี้ยงสูงกว่า <strong>3.3V</strong>
+เช่น การรับสัญญาณอินพุตลอจิกที่ระดับ <strong>5V</strong> จากวงจรอื่น เพราะจะทำให้วงจรภายในชิป <strong>FPGA</strong> เสียหายได้</p>
+<p>&nbsp;</p>
+<p>วงจรบนบอร์ด <strong>DE10 Lite</strong> สำหรับการฝึกออกแบบวงจรที่มีความซับซ้อน ได้แก่</p>
+<ul>
+<li>ไอซีวัดความเร่งแบบสามแกน (<strong>3-axis Accelerometer: ADXL345</strong>)</li>
+<li>วงจรตัวต้านทานสำหรับ <strong>DAC (Digital-to-Analog Converter)</strong> ขนาด 4 บิต ต่อหนึ่งสีของ <strong>RGB</strong>
+เพื่อนำไปใช้กับสัญญาณ <strong>VGA</strong></li>
+<li>ไอซีหน่วยความจำแบบ <strong>SDRAM</strong> ซึ่งใช้ขาสัญญาณ <strong>I/O</strong> ค่อนข้างมาก</li>
+</ul>
+<p><img alt="" src="de10_lite_imu.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับ <strong>ADXL345</strong></p>
+<p><img alt="" src="max10_imu_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับ <strong>ADXL345</strong></p>
+<p><img alt="" src="max10_vga_interfacing.jpg" /></p>
+<p>รูป: วงจรสำหรับการสร้างสัญญาณเอาต์พุต <strong>VGA</strong></p>
+<p><img alt="" src="de10_lite_vga.jpg" /></p>
+<p>รูป: ผังวงจรสำหรับการสร้างสัญญาณเอาต์พุต <strong>VGA</strong></p>
+<p><img alt="" src="max10_vga_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับ <strong>VGA Output</strong></p>
+<p><img alt="" src="max10_sdram_interfacing.jpg" /></p>
+<p>รูป: การเชื่อมต่อระหว่างไอซี <strong>SDRAM</strong> กับชิป <strong>MAX 10 FPGA</strong></p>
+<p><img alt="" src="max10_sdram_pins.jpg" /></p>
+<p>รูป: ตารางแสดงหมายเลขขาสำหรับ <strong>SDRAM</strong></p>
+<p><strong>ข้อสังเกต</strong></p>
+<ul>
+<li>ชิป <strong>MAX 10 FPGA</strong> มีวงจร <strong>12-bit ADC (Analog-to-Digital Converter)</strong> ประเภท
+<a href="https://en.wikipedia.org/wiki/Successive-approximation_ADC"><strong>SAR</strong></a>)
+อยู่ภายใน และรับสัญญาณอินพุต-แอนะล็อกจากขา <code>ADC_IN0</code> ~ <code>ADC_IN5</code> จากคอนเนกเตอร์ <strong>Arduino Shield</strong>
+ไปผ่านวงจรแแบ่งแรงดันและไอซีออปแอมป์ (<strong>OpAmp</strong>) เพื่อลดระดับแรงดันไฟฟ้าให้อยู่ในช่วง <strong>0V ~ 2.5V</strong>
+แต่ขา  <code>ADC_IN6</code> และ <code>ADC_IN7</code> ไม่ต่อใช้งาน</li>
+</ul>
+<p><img alt="" src="de10_lite_adc.jpg" /></p>
+<p>รูป: ตัวอย่างผังวงจร <strong>OpAmp buffer</strong> (ใช้ไอซี <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/21882d.pdf"><strong>MCP6244</strong></a> และแรงดันไฟเลี้ยง <strong>+3.3V</strong>)
+สำหรับสัญญาณอินพุต-แอนะล็อก 1 ช่องสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอข้อมูลเบื้องต้นเกี่ยวกับฮาร์ดแวร์ของบอร์ด <strong>Terasic DE10 Lite</strong>
+ซึ่งมีชิป <strong>Intel / Altera MAX 10 FPGA</strong> ซึ่งต้องใช้งานร่วมกับซอฟต์แวร์
+<strong>Intel Quartus Prime Lite Edition</strong> ผู้ใช้ควรศึกษาวงจรและการทำงานของบอร์ด <strong>FPGA</strong>
+ให้เข้าใจก่อน โดยเฉพาะอย่างยิ่ง เมื่อจำเป็นต้องต่อวงจรภายนอกเพิ่มเพื่อใช้งานกับบอร์ด <strong>FPGA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-20 | Last Updated: 2024-10-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

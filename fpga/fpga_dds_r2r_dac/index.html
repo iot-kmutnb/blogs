@@ -137,7 +137,7 @@
 <ul>
 <li>"วงจรสะสมเฟส" (<strong>Phase Accumulator</strong>): วงจรส่วนนี้ทำหน้าที่เป็นตัวนับ (<strong>Counter</strong>)
 ที่มีค่าเพิ่มขึ้นตามจังหวะของสัญญาณ <strong>Clock</strong> การเพิ่มเฟสอย่างต่อเนื่องก็เปรียบเสมือนการเพิ่มมุมให้กับฟังก์ชันไซน์ และเมื่อถึงค่าสูงสุด (<script type="math/tex">2\pi</script>) ก็จะวนกลับมาที่ 0 ใหม่ ดังนั้นอัตราการเพิ่มเฟส จะช้าหรือเร็วก็ส่งผลต่อความถี่ของสัญญาณรูปไซน์ที่ได้</li>
-<li>"ตัวแปลงเฟสเป็นแอมพลิจูด" (<strong>Phase-to-Amplitude Converter</strong>): วงจรนี้รับค่าจากวงจรบวกสะสมเฟส
+<li>"ตัวแปลงเฟสเป็นแอมพลิจูด" (<strong>Phase-to-Amplitude Converter</strong>): วงจรนี้รับค่าจากวงจรสะสมเฟส
 แล้วแปลงให้เป็นค่าแอมพลิจูด โดยทั่วไปจะใช้วิธีอ่านค่าจากตารางค่าคงที่ เรียกว่า <strong>Lookup Table (LUT)</strong>
 ถ้าเป็นรูปคลื่นไซน์ ก็เรียกว่า <strong>Sinewave LUT</strong> สำหรับข้อมูลที่ได้จากการชักตัวอย่างค่าของฟังก์ชันไซน์สำหรับมุมหรือเฟส <script type="math/tex">0 .. 2\pi</script>
 </li>
@@ -260,8 +260,9 @@
 endmodule
 </code></pre>
 <p>&nbsp;</p>
-<p>ในวงจรนี้มีการลดความถี่ของตัวนับ จาก <strong>50 MHz</strong>  ด้วยตัวหาร <strong>/5</strong> ดังนั้นวงจรสะสมเฟสขนาด 16 บิต จะนับด้วยความถี่
-<strong>10 MHz</strong> หรือมีความละเอียดในเชิงความถี่ <script type="math/tex">10 \cdot  10^6 \div 2^{16} = 152.6\,Hz</script>
+<p>ในวงจรนี้มีการลดความถี่ของตัวนับ จาก <strong>50 MHz</strong>  ด้วยตัวหาร <strong>/5</strong>
+ดังนั้นวงจรสะสมเฟสขนาด 16 บิต จะนับด้วยความถี่ <strong>10 MHz</strong>
+หรือมีความละเอียดในเชิงความถี่ <script type="math/tex">10 \cdot  10^6 \div 2^{16} = 152.6\,Hz</script>
 </p>
 <p>ค่าคงที่ของ <strong>LUT</strong> สำหรับฟังก์ชันไซน์หนึ่งคาบ จะได้จากข้อมูลที่ถูกเก็บไว้ในไฟล์ <code>sine_table.txt</code>
 และมีหนึ่งค่าตัวเลข (ฐานสิบหก) ต่อหนึ่งบรรทัด และโค้ด <strong>Python</strong> ต่อไปนี้
@@ -324,7 +325,7 @@ module tb_dds;
         while (i &lt; 10) begin
             #500000;
             while (t_DOUT != 0) begin
-              @(posedge t_CLK);  // Wait for the next rising edge of the clock
+              @(posedge t_CLK);  // Wait for the next rising edge
             end
             t_SEL &lt;= t_SEL + 4'd1;
             i = i + 1;
@@ -344,16 +345,17 @@ endmodule
 </code></pre>
 <p>&nbsp;</p>
 <p>ถัดไปเป็นการสาธิตการใช้ซอฟต์แวร์ <strong>Open Source</strong> สำหรับ <strong>Ubuntu</strong> 
-ได้แก่ <strong>Icarus Verilog Simulator</strong> และ <strong>GTKWave</strong>
-และคำสั่งการติดตั้งและใช้งานสำหรับ <strong>Ubuntu 22.4 LTS</strong> มีดังนี้</p>
+ได้แก่ <strong>Icarus Verilog Simulator</strong> และ <strong>GTKWave</strong></p>
+<p>คำสั่งในการติดตั้งสำหรับ <strong>Ubuntu 22.4 LTS</strong> มีดังนี้</p>
 <pre><code># Install iverilog and gtkwave for Ubuntu
 $ sudo apt install iverilog gtkwave
 
 # Check the version of Icarus Verilog simulator
 $ iverilog -V  | grep Icarus | head -n 1
 Icarus Verilog version 12.0 (stable)
-
-# Compile the Verilog (Std.2005) source files
+</code></pre>
+<p>คำสั่งสำหรับการคอมไพล์โค้ดและจำลองการทำงานของ <strong>Verilog Testbench</strong></p>
+<pre><code># Compile the Verilog (Std.2005) source files
 $ iverilog -g2005 -o dds_sim dds.v dds_tb.v 
 
 # Run the testbench simulation 
@@ -468,7 +470,7 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT[7]
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2024-10-12 | Last Updated: 2024-10-12</p></div>
+<p>Created: 2024-10-12 | Last Updated: 2024-10-19</p></div>
             </div>
         </div>
 
