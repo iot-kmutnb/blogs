@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/signaltap_intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนะนำการใช้งานซอฟต์แวร์ Signal Tap Logic Analyzer - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#signal-tap-logic-analyzer" class="nav-link">แนะนำการใช้งานซอฟต์แวร์ Signal Tap Logic Analyzer</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#logic-analyzer-for-fpga-design" class="nav-link">&#9655; แนะนำซอฟต์แวร์ Logic Analyzer for FPGA Design</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#signal-tap" class="nav-link">&#9655; การใช้งาน Signal Tap สำหรับวงจรดิจิทัลตัวอย่าง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#signal-tap-logic-analyzer_1" class="nav-link">&#9655; การเพิ่ม Signal Tap Logic Analyzer ในวงจรของผู้ใช้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#advanced-trigger-conditions" class="nav-link">&#9655; การทดลองใช้งาน Advanced Trigger Conditions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="signal-tap-logic-analyzer">แนะนำการใช้งานซอฟต์แวร์ Signal Tap Logic Analyzer<a class="headerlink" href="#signal-tap-logic-analyzer" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Intel / Altera FPGA</em>, <em>Signal Tap</em>, <em>Embedded Logic Analyzer</em>,
+<em>FPGA Debugging</em></p>
+<hr />
+<h2 id="logic-analyzer-for-fpga-design">&#9655; <strong>แนะนำซอฟต์แวร์ Logic Analyzer for FPGA Design</strong><a class="headerlink" href="#logic-analyzer-for-fpga-design" title="Permanent link">#</a></h2>
+<p>การดีบักวงจรดิจิทัล อาจต้องอาศัยการสังเกตการเปลี่ยนแปลงของสัญญาณที่เกิดขึ้นกับวงจรภายในชิปในแต่ละช่วงเวลา
+การที่จะมองเห็นได้สถานะลอจิกได้ (<strong>Visibility</strong>) จะต้องมีการเลือกและนำสัญญาณดังกล่าวไปยังวงจรลอจิกเพื่อการดีบัก
+และสำหรับวัตถุประสงค์นี้ <strong>FPGA Logic Analyzer</strong> จึงเป็นเครื่องมือที่สามารถนำมาใช้ได้ แต่ละบริษัท <strong>FPGA Vendors</strong>
+ก็มีซอฟต์แวร์ของตัวเอง เช่น</p>
+<ul>
+<li><strong>Intel / Altera</strong>: <strong>Signal Tap / Quartus Prime</strong></li>
+<li><strong>AMD / Xilinx</strong>: <strong>ChipScope Integrated Logic Analyzer (ILA) / Vivado Design Suite</strong></li>
+<li><strong>Lattice Semiconductor</strong>: <strong>Reveal Logic Analyzer / Lattice Diamond Design Suite</strong></li>
+<li><strong>Gowin Semiconductor</strong>: <strong>Gowin Analysis Oscilloscope (GAO) / GOWIN EDA </strong></li>
+</ul>
+<p>วงจรดิจิทัลสำหรับการดีบักประเภทนี้มักเรียกว่า <strong>Embedded Logic Analyzer (ELA)</strong> หรือ <strong>On-chip Logic Analyzer</strong>
+ทำหน้าที่อ่านค่าลอจิกของสัญญาณดิจิทัลภายในชิป <strong>FPGA</strong> ในขณะที่วงจรทำงาน และบันทึกข้อมูลลงในหน่วยความจำ</p>
+<p><strong>Signal Tap Logic Analyzer</strong> เป็นชื่อของเครื่องมือประเภทซอฟต์แวร์ ซึ่งเป็นส่วนหนึ่งของ
+<strong>Quartus Prime Software</strong> สำหรับการออกแบบวงจรดิจิทัลด้วยชิป <strong>FPGA</strong>
+ช่วยในการวิเคราะห์สัญญาณและดีบักการทำงานของวงจรดิจิทัลภายในชิป <strong>FPGA</strong>
+และสามารถใช้งานได้ฟรีสำหรับ <strong>Quartus Prime Lite Edition</strong></p>
+<p><strong>Signal Tap IP Core</strong> เป็น <strong>Soft IP Core</strong>
+หรือวงจรดิจิทัลที่ถูกสร้างขึ้นโดยอัตโนมัติตามรูปแบบการตั้งค่าการใช้งานโดยผู้ใช้ 
+และจะถูกนำไปใส่รวมกับวงจรดิจิทัลที่ได้มีการออกแบบโดยผู้ใช้ (หรือ <strong>User Design</strong>) 
+ดังนั้นวงจรส่วนนี้จึงต้องใช้ทรัพยากรของชิป <strong>FPGA</strong> ด้วย</p>
+<p><img alt="" src="signaltap_block_diagram.jpg" /></p>
+<p>รูป: บล็อกไดอะแกรมสำหรับ <strong>Signal Tap Logic Analyzer</strong> (Source: Intel / Altera)</p>
+<p><img alt="" src="signaltap_gui.jpg" /></p>
+<p>รูป: ซอฟต์แวร์ในส่วน <strong>GUI</strong> สำหรับ <strong>Signal Tap Logic Analyzer</strong> (Source: Intel / Altera)</p>
+<p><img alt="" src="signaltap_flow.jpg" /></p>
+<p>รูป: ลำดับขั้นตอนการใช้งาน  <strong>Signal Tap Logic Analyzer</strong> ในซอฟต์แวร์ <strong>Quartus Prime</strong>  (Source: Intel / Altera)</p>
+<p>ผู้ใช้จะต้องตั้งค่าเงื่อนไขสำหรับ <strong>Signal Trigger Conditions</strong> และเลือกสัญญาณในวงจรดิจิทัลที่ต้องการจะบันทึกค่า
+(<strong>Signal Selection for Probing</strong>) และจะต้องระบุขนาดของหน่วยความจำที่ใช้ในการบันทึกข้อมูล (<strong>Memory Depth</strong>)</p>
+<p>คำว่า "ทริกเกอร์" (<strong>Trigger</strong>) หมายถึง การเริ่มต้นทำงานของ <strong>Logic Analyzer</strong> และบันทึกข้อมูลลงในหน่วยความจำ 
+การทำงานของวงจรสำหรับ <strong>Trigger</strong> อาจเป็นแบบต่อเนื่อง (<strong>AUTO / Continuous</strong>) 
+หรือเป็นแบบ <strong>Start / Stop</strong> เช่น เมื่อเกิดเหตุการณ์ที่เป็นไปตามเงื่อนไขของทริกเกอร์ ก็ให้หยุดการทำงานชั่วคราว
+ข้อมูลที่ถูกบันทึกในหน่วยความจำ จะถูกอ่านออกมาจากชิป <strong>FPGA</strong> โดยใช้อุปกรณ์ <strong>USB-JTAG FPGA Programmer</strong>
+อย่างเช่น <strong>USB Blaster</strong> แล้วแสดงให้อยู่ในรูปคลื่นสัญญาณดิจิทัล (<strong>Signal Waveforms</strong>)</p>
+<p>การตั้งค่าเงื่อนไขสำหรับ <strong>Trigger Conditions</strong> แบ่งเป็นสองประเภทหลักคือ </p>
+<ul>
+<li>ประเภทแรกเป็นเหตุการณ์ขอบขาขึ้นหรือขาลง (<strong>Edge Type: Rising-Edge, Falling-Edge, Either Edge</strong>)</li>
+<li>อีกประเภทหนึ่งคือ ดูจากระดับของสัญญาณหรือค่าลอจิก เช่น <strong>Low-Level (0)</strong> หรือ <strong>High-Level (1)</strong> เป็นต้น</li>
+</ul>
+<p>ผู้ใช้สามารถสร้างเงื่อนไขเชิงลอจิกที่มีหลายเงื่อนไขย่อยได้ โดยการใช้ตัวดำเนินการเชิงลอจิก (อย่างเช่น <strong>AND, OR, NOT</strong>)
+ให้เป็นนิพจน์เชิงลอจิก (<strong>Logical Expression</strong>)</p>
+<p>สัญญาณที่นำมาใช้ในการสร้างเงื่อนไขสำหรับ <strong>Trigger</strong> คือ สัญญาณจากภายในวงจร (<strong>Internal Trigger Source</strong>)
+หรืออาจเป็นสัญญาณภายนอกก็ได้ (<strong>External Trigger Input</strong>) ผ่านเข้ามาทางขา <strong>I/O</strong> ของชิป <strong>FPGA</strong></p>
+<p>ชนิดและปริมาณทรัพยากรของชิปที่จะต้องใช้สำหรับวงจรของ <strong>SignalTap IP Core</strong> ขึ้นอยู่กับการตั้งค่า 
+เช่น เงื่อนไขสำหรับทริกเกอร์ และจำนวนสัญญาณและจำนวนข้อมูลที่ต้องการบันทึก 
+ถ้าต้องใช้หน่วยความจำความจุมาก แนะนำให้เลือกใช้ <strong>Block RAM</strong> ในชิป <strong>FPGA</strong> เช่น
+หน่วยความจำแบบบล็อก <strong>M9K</strong> ในชิป <strong>MAX 10 FPGA</strong> เป็นต้น</p>
+<p>วงจร <strong>Signal Tap</strong> ในหนึ่งโปรเจกต์ สามารถมีได้มากกว่าหนึ่งชุด เรียกว่า  <strong>Signal Tap Instance</strong>
+เพียงแต่จะเลือกใช้ได้ครั้งละหนึ่งชุด และการตั้งค่าที่เกี่ยวข้องมีดังนี้</p>
+<ul>
+<li><strong>Data</strong>: การตั้งค่าในส่วนของข้อมูล เช่น จำนวนช่องสัญญาณ (ไม่เกิน 4096)
+จำนวนข้อมูลที่สามารถบันทึกได้สูงสุดสำหรับแต่ละสัญญาณ (<strong>Memory Depth</strong>) และชนิดของหน่วยความที่จะใช้
+เช่น <strong>AUTO</strong> (เลือกอัตโมนัติโดยซอฟต์แวร์)  หรือเจาะจงใช้ <strong>Block RAM</strong> เป็นต้น</li>
+<li><strong>Segmented Acquisition (Buffer Type)</strong>: การใช้หน่วยความจำทั้งหมดใช้กับเงื่อนไขทริกเกอร์เดียว 
+(<strong>Non-segmented buffer</strong>)
+หรือ จะแบ่งออกเป็นหลายส่วน (<strong>Segmented buffer</strong>) แต่ละส่วนใช้กับเงื่อนไขทริกเกอร์แยกกันตามลำดับ</li>
+<li><strong>Storage Qualifier</strong>: การเลือกรูปแบบการบันทึกข้อมูล เช่น การบันทึกข้อมูลต่อเนื่อง (<strong>Continuous</strong>)
+และการบันทึกข้อมูลแบบมีเงื่อนไข <strong>Start / Stop</strong></li>
+<li><strong>Trigger</strong>: การเลือกสัญญาณสำหรับนำมาใช้ตั้งเงื่อนไขของทริกเกอร์ (<strong>Trigger Input</strong>) การตั้งเงื่อนไขทริกเกอร์ (<strong>Trigger Conditions</strong>)</li>
+<li><strong>Pipeline Factor</strong>: การกำหนดระดับของการทำงานแบบ <strong>Pipeline</strong> ซึ่งเป็นการเพิ่มรีจิสเตอร์ หรือ "ฟลิปฟลอป"
+(เรียกว่า <strong>Pipeline Registers</strong>) เพื่อช่วยให้วงจรดิจิทัลสามารถใช้ความถี่ของสัญญาณ <strong>CLK</strong>  ได้สูงขึ้น (หรือค่า <strong>Fmax</strong>)</li>
+<li><strong>Trigger Position</strong>: การกำหนดตำแหน่งการเริ่มบันทึกข้อมูลนับจากเหตุการณ์ที่เกิดขึ้นตามเงื่อนไขของทริกเกอร์
+แบ่งออกเป็น 3 กรณี<ul>
+<li><strong>Post-trigger position</strong>: บันทึกข้อมูลก่อนการเกิดทริกเกอร์</li>
+<li><strong>Pre-trigger position</strong>:  บันทึกข้อมูลหลังจากเกิดทริกเกอร์</li>
+<li><strong>Center-trigger position</strong>: บันทึกข้อมูลทั้งก่อนและหลังการเกิดทริกเกอร์</li>
+</ul>
+</li>
+<li><strong>Node Search</strong>: หมายถึง การค้นหาชื่อและเลือกสัญญาณในวงจรดิจิทัลเพื่อนำมาใช้กับวงจร <strong>Signal Tap</strong>
+แบ่งเป็นหลายประเภท เช่น<ul>
+<li><strong>Pre-Synthesis Nodes</strong>: ชื่อสัญญาณในวงจรก่อนขั้นตอน <strong>Logic Synthesis</strong> </li>
+<li><strong>Post-Fit Nodes</strong> : ชื่อสัญญาณในวงจรหลังทำขั้นตอนที่เรียกว่า <strong>Fitting</strong>
+(มีขั้นตอนย่อย เช่น <strong>Technology Mapping</strong> และ <strong>Place-and-Route</strong>)</li>
+</ul>
+</li>
+</ul>
+<p>การตั้งค่าใช้งานสำหรับ <strong>Signal Tap</strong> จะถูกเก็บลงในไฟล์ <code>.stp</code> (<strong>Signal Tap Logic Analyzer File</strong>)
+และเป็นส่วนหนึ่งของโปรเจกต์</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="signal-tap">&#9655; <strong>การใช้งาน Signal Tap สำหรับวงจรดิจิทัลตัวอย่าง</strong><a class="headerlink" href="#signal-tap" title="Permanent link">#</a></h2>
+<p>การใช้งานและตั้งค่า <strong>Signal Tap</strong> ทำได้ไม่ยาก และเพื่อการสาธิต
+ถัดไปจะใช้วงจรดิจิทัลที่เขียนด้วยภาษา <strong>VHDL</strong> เป็นตัวอย่าง และทดลองใช้กับบอร์ด <strong>DE10-Lite (MAX 10 FPGA)</strong></p>
+<p>วงจรมีอินเทอร์เฟซดังนี้</p>
+<ul>
+<li><code>CLK</code>: 50 MHz clock (input)</li>
+<li><code>RESET_N</code>: Active-low asynchronous reset (input)</li>
+<li><code>ENA</code>:  Count enable (input)</li>
+<li><code>LEDR[9:0]</code>: 10-bit output for onboard LEDs (output)</li>
+</ul>
+<p>วงจรนี้ใช้ความถี่ <strong>50MHz</strong> มีตัวนับแบบไบนารีขนาด 24 บิต (ตามค่าของพารามิเตอร์ <code>BW</code>) 
+โดยให้นับขึ้นทีละหนึ่งด้วยอัตรา <strong>1MHz</strong> และจะนับขึ้นก็ต่อเมื่อสัญญาณอินพุต <code>ENA=1</code> 
+ภายในมีวงจรสร้างสัญญาณพัลส์ <code>ce_pulse</code> (<em>Clock Enable Pulse</em>)
+ทุก ๆ 1 ไมโครวินาที และใช้สำหรับกำหนดจังหวะการนับขึ้นของตัวนับ 24 บิต
+สัญญาณอินพุต <code>RESET_N</code> ทำงานแบบ <strong>Active-low</strong> ใช้สำหรับรีเซตการทำงานของวงจรดิจิทัล</p>
+<p>เอาต์พุตมีขนาด 10 บิต นำไปต่อกับวงจร <strong>LED</strong> บนบอร์ด <strong>FPGA</strong> 
+โดยเลือกมาใช้ 10 บิต เป็นสำคัญสุดจากรีจิสเตอร์ของวงจรตัวนับขนาด 24 บิต</p>
+<pre><code class="language-VHDL">library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity top_level is
+  generic ( 
+     BW : integer := 24
+  );
+  port (
+     CLK     : in  std_logic;   -- 50 MHz clock input
+     RESET_N : in  std_logic;   -- Active-low asynchronous reset
+     ENA     : in  std_logic;   -- Count enable (active-high)
+     LEDR    : out std_logic_vector(9 downto 0)  -- 10-bit output
+  );
+end entity top_level;
+
+architecture behavioral of top_level is
+  constant SYS_CLK   : integer := integer(50e6); -- 50MHz
+  constant CNT_CLK   : integer := integer(1e6);  -- 1MHz
+  constant CLK_DIV   : integer := SYS_CLK / CNT_CLK - 1;
+  signal clk_div_cnt : integer := 0;
+  signal ce_pulse    : std_logic := '0';
+  signal enable      : std_logic := '0';
+  signal counter     : unsigned(BW-1 downto 0) := (others =&gt; '0');
+
+begin
+
+  clk_div_proc: process (CLK, RESET_N)
+  begin
+    if RESET_N = '0' then
+       clk_div_cnt &lt;= 0;
+       ce_pulse &lt;= '0';
+    elsif rising_edge(CLK) then
+       if clk_div_cnt = CLK_DIV then
+          ce_pulse &lt;= '1';
+          clk_div_cnt &lt;= 0; 
+       else
+          ce_pulse &lt;= '0';
+          clk_div_cnt &lt;= clk_div_cnt + 1;
+       end if;
+    end if;
+  end process;
+
+  upcounter_proc: process (CLK, RESET_N)
+  begin
+    if RESET_N = '0' then
+       counter &lt;= (others =&gt; '0');
+       enable &lt;= '0';
+    elsif rising_edge(CLK) then
+       enable &lt;= ENA;
+       if ce_pulse = '1' and enable = '1' then
+          counter &lt;= counter + 1;
+       end if;
+    end if;
+  end process;
+
+  -- Output the 10 most-significant bits of the 24-bit counter to the LEDs
+  LEDR &lt;= std_logic_vector(counter(counter'left downto counter'length-10));
+
+end architecture behavioral;
+</code></pre>
+<p><img alt="" src="quartus_prime_compile.jpg" /></p>
+<p>รูป: การคอมไพล์โค้ด <strong>VHDL</strong> สำหรับโปรเจกต์ตัวอย่าง</p>
+<p><img alt="" src="quartus_prime_set_pins.jpg" /></p>
+<p>รูป: การกำหนดขา <strong>I/O Pins</strong> สำหรับบอร์ด <strong>DE10-Lite</strong> ที่ได้เลือกใช้ </p>
+<p><img alt="" src="quartus_prime_pin_planner.jpg" /></p>
+<p>รูป: การตรวจสอบการเลือกใช้ขา  <strong>I/O Pins</strong> ในส่วนของ <strong>Pin Planner</strong></p>
+<p><strong>File</strong>: <code>set_pins.tcl</code> (ไฟล์ <strong>Tcl Script</strong> สำหรับการเลือกใช้ขาของ <strong>FPGA</strong>)</p>
+<pre><code class="language-text">#============================================================
+# FPAG pin assignments
+#set_global_assignment -name FAMILY &quot;MAX 10 FPGA&quot;
+#set_global_assignment -name DEVICE 10M50DAF484C7G
+#============================================================
+
+set_location_assignment PIN_P11 -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+
+set_location_assignment PIN_B8 -to RESET_N
+set_instance_assignment -name IO_STANDARD &quot;3.3 V SCHMITT TRIGGER&quot; -to RESET_N
+
+set_location_assignment PIN_C10 -to ENA
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ENA
+
+set_location_assignment PIN_A8 -to LEDR[0]
+set_location_assignment PIN_A9 -to LEDR[1]
+set_location_assignment PIN_A10 -to LEDR[2]
+set_location_assignment PIN_B10 -to LEDR[3]
+set_location_assignment PIN_D13 -to LEDR[4]
+set_location_assignment PIN_C13 -to LEDR[5]
+set_location_assignment PIN_E14 -to LEDR[6]
+set_location_assignment PIN_D14 -to LEDR[7]
+set_location_assignment PIN_A11 -to LEDR[8]
+set_location_assignment PIN_B11 -to LEDR[9]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[8]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDR[9]
+
+#============================================================
+# End of pin assignments
+#============================================================
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="signal-tap-logic-analyzer_1">&#9655; <strong>การเพิ่ม Signal Tap Logic Analyzer ในวงจรของผู้ใช้</strong><a class="headerlink" href="#signal-tap-logic-analyzer_1" title="Permanent link">#</a></h2>
+<p>เมื่อสร้างโปรเจกต์ใน <strong>Quartus Prime Lite Edition</strong> เขียนโค้ด <strong>VHDL</strong> ตามโค้ดตัวอย่าง 
+กำหนดขาสัญญาณสำหรับบอร์ด <strong>FPGA</strong> และคอมไพล์โดยได้แล้วตามลำดับของ <strong>FPGA Design Flow</strong> ได้สำเร็จแล้ว
+ขั้นตอนถัดไปคือ การเพิ่มวงจร <strong>Signal Tap II</strong> เข้าไว้ในโปรเจกต์ </p>
+<p>ในหน้าต่างหลักของ <strong>Quartus Prime</strong> เริ่มต้นด้วยเมนูคำสั่ง <strong>File &gt; New &gt; Verification / Debugging Files</strong> 
+เลือก <strong>Signal Tap Logic Analyzer</strong> จากนั้นจะเปิดหน้าต่างใหม่สำหรับ <strong>Signal Tap</strong></p>
+<p><img alt="" src="stp_add_signaltap.jpg" /></p>
+<p>รูป: สร้างไฟล์ <strong>Signal Tap Logic Analyzer File</strong> และเพิ่มไว้ในโปรเจกต์</p>
+<p>ขั้นตอนการตั้งค่าใช้งาน <strong>Signal Tap Instance</strong></p>
+<ul>
+<li>เลือกสัญญาณ <strong>CLK</strong> ของวงจร (ผู้ใช้สามารถค้นหาชื่อสัญญาณได้โดยใช้ <strong>Node Finder</strong> )
+เพื่อใช้กับ <strong>Signal Tap</strong> เช่น ใช้สัญญาณ <strong>CLK 50MHz</strong> ของบอร์ด <strong>FPGA</strong>
+ดังนั้นความถี่นี้จึงเป็นตัวกำหนด <strong>Sample Rate</strong></li>
+<li>เลือกสัญญาณที่ต้องการอ่านค่า และบันทึกลงในหน่วยความจำ (ค่าเริ่มต้นสำหรับขนาดของหน่วยความจำ หรือ 
+<strong>Memory Depth</strong> คือ 128) เช่น สัญญาณจากรีจิสเตอร์ของวงจรตัวนับ และสัญญาณอื่นของวงจรที่สนใจ</li>
+<li>เลือกสัญญาณที่จะใช้เป็น <strong>Trigger Source</strong> และตั้งค่า <strong>Trigger Condition</strong>
+เช่น สัญญาณควบคุมการทำงานของตัวนับ </li>
+<li>เมื่อตั้งค่าการใช้งาน <strong>Signal Tap</strong> ในเบื้องต้นแล้ว ให้บันทึกการตั้งค่าลงในไฟล์ <code>.stp</code>
+ให้เป็นส่วนหนึ่งของโปรเจกต์ การแก้ไขการตั้งค่าใด ๆ สำหรับ <strong>Signal Tap</strong> จะต้องมีการทำขั้นตอน <strong>Compilation</strong>
+สำหรับโปรเจกต์ทุกครั้ง และอัปโหลดไฟล์บิตสตรีมไปยังบอร์ด <strong>FPGA</strong></li>
+</ul>
+<p><img alt="" src="stp_add_clk.jpg" /></p>
+<p>รูป: ตั้งค่าการใช้งานในส่วน <strong>Data Section</strong></p>
+<p><img alt="" src="stp_find_node_clk.jpg" /></p>
+<p>รูป: ค้นหา <strong>Node</strong> ซึ่งเป็นชื่อสัญญาณ <strong>CLK</strong> เพื่อใช้กับวงจร <strong>Signal Tap</strong></p>
+<p><img alt="" src="stp_find_node_counter.jpg" /></p>
+<p>รูป: ค้นหาและเพิ่ม <strong>Node</strong> สำหรับสัญญาณที่ต้องการบันทึกค่า เช่น สัญญาณ <code>counter</code> 
+ซึ่งเป็นค่าของรีจิสเตอร์ของวงจรตัวนับ</p>
+<p><img alt="" src="stp_start_compilation.jpg" /></p>
+<p>รูป: ตรวจสอบการตั้งค่าเงื่อนไขสำหรับทริกเกอร์ </p>
+<p><img alt="" src="stp_save_config.jpg" /></p>
+<p>รูป: บันทึกการตั้งค่าและเริ่มขั้นตอน <strong>Start Compilation</strong> ใหม่อีกครั้ง</p>
+<p>&nbsp;</p>
+<p>เมื่อคอมไพล์โปรเจกต์ใหม่และอัปโหลดไฟล์ "บิตสตรีม" โดยใช้ <strong>Quartus Programmer</strong>
+ไปยังบอร์ด <strong>FPGA</strong> ผ่านทาง <strong>USB Blaster</strong> ได้สำเร็จ
+ซอฟต์แวร์จะขึ้นสถานะเป็น <strong>"Ready to acquire"</strong> จากนั้นให้กดปุ่ม <strong>"Run Analysis"</strong> เพื่อเริ่มต้นทำงาน</p>
+<p><img alt="" src="stp_waveform-1.jpg" /></p>
+<p>รูป: ตัวอย่างการแสดงผลข้อมูลที่บันทึกได้ตามการเปลี่ยนแปลงเชิงเวลา เป็นคลื่นสัญญาณดิจิทัล
+(ในกรณีที่เลือก <strong>Storage Qualifier: Continuous</strong> และไม่ได้ระบุเงื่อนไขทริกเกอร์) </p>
+<p>หากไม่ได้กำหนดเงื่อนไขทริกเกอร์ เมื่อวงจร <strong>Signal Tap</strong> ทำงาน ก็จะอ่านค่าสัญญาณแบบต่อเนื่องไปจนกว่าจะกดปุ่มหยุด</p>
+<p>ถัดไปลองเปลี่ยนมาตั้งเงื่อนไขทริกเกอร์ โดยเลือกสัญญาณในวงจรมาสร้างเป็นสัญญาณเงื่อนไข 
+เช่น ทริกเกอร์เกิดขึ้นเมื่อสัญญาณ <code>enable</code> มีการเปลี่ยนแปลงสถานะลอจิก
+และลองเปลี่ยนมาใช้ <strong>Storage Qualifier: Start / Stop</strong></p>
+<p><img alt="" src="stp_trigger_edge.jpg" /></p>
+<p>รูป: การตั้งค่าทริกเกอร์โดยตรวจสอบการเปลี่ยนแปลงของสัญญาณ <code>enable</code> ในวงจร</p>
+<p><img alt="" src="stp_start_stop.jpg" /></p>
+<p>รูป: การเลือกใช้ <strong>Storage Qualifier: Start / Stop</strong></p>
+<p><img alt="" src="stp_waveform-2.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณดิจิทัลจากข้อมูลที่บันทึกได้ และตำแหน่งการเกิดทริกเกอร์ </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="advanced-trigger-conditions">&#9655; <strong>การทดลองใช้งาน Advanced Trigger Conditions</strong><a class="headerlink" href="#advanced-trigger-conditions" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นการทดลองใช้เงื่อนไขทริกเกอร์ ที่มีความซับซ้อนมากขึ้น และกำหนดเงื่อนไข
+โดยใช้ <strong>Advanced Trigger Condition Editor</strong> เช่น การเลือกใช้ <strong>ELD
+(Edge &amp; Level Detector)</strong> และโอเปอร์เรเตอร์รูปแบบต่าง ๆ </p>
+<p>ตัวอย่างต่อไปนี้เป็นการสร้างเงื่อนไขทริกเกอร์ เช่น สัญญาณ <code>enable</code> ที่มีการเปลี่ยนแปลงค่าลอจิก 
+เป็น "ขอบขาขึ้น" หรือ "ขอบขาลง" ก็ได้ (<strong>Either Edge</strong>) และสัญญาณ <code>ce_pulse</code> มีค่าลอจิก <code>1</code> ด้วย</p>
+<p><img alt="" src="stp_advanced_trigger-1.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่า <strong>Advanced Trigger Condition</strong> แบบที่ 1</p>
+<p><img alt="" src="stp_advanced_trigger-2.jpg" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณจากข้อมูลที่ได้</p>
+<p>ลองแก้ไขเพิ่มเติมเงื่อนไขทริกเกอร์ เช่น สัญญาณ <code>enable</code> ที่การเปลี่ยนแปลงลอจิก
+(<strong>Either Edge</strong>) และ สัญญาณ <code>ce_pulse</code> มีค่าลอจิก <code>1</code> และเมื่อสัญญาณ
+<code>counter</code> ซึ่งเป็นข้อมูลแบบ <strong>24-bit Unsigned</strong> มีค่าเท่ากับ <code>9999</code> (dec) </p>
+<p><img alt="" src="stp_advanced_trigger-3.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่า <strong>Advanced Trigger Condition</strong> แบบที่ 2</p>
+<p><img alt="" src="stp_advanced_trigger-4.jpg" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณจากข้อมูลที่ได้จากบอร์ด <strong>FPGA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการใช้งาน <strong>Signal Tap Logic Analyzer</strong> ซึ่งเป็นส่วนหนึ่งของซอฟต์แวร์
+<strong>Quartus Prime Lite Edition (v22.1)</strong> และสาธิตให้เห็นว่า 
+การใช้งานเครื่องมือประเภทนี้ช่วยให้นักออกแบบวงจรดิจิทัล
+สามารถดีบักการทำงานของวงจร โดยเลือกดูสัญญาณของวงจรในชิป <strong>FPGA</strong> และการตั้งค่าเงื่อนไขทริกเกอร์
+ดังนั้น <strong>Embedded Logic Analyzer</strong> จึงถือว่าเป็นอีกตัวเลือกหนึ่งแทนการใช้เครื่องมือวัดภายนอก
+เช่น ออสซิลโลสโคป หรือ เครื่องวิเคราะห์สัญญาณลอจิกภายนอก</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-21 | Last Updated: 2024-10-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
