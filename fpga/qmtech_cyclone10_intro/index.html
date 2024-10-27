@@ -155,7 +155,7 @@
 <p>บอร์ดไม่ได้รวมวงจร <strong>USB Blaster</strong> ไว้บนบอร์ด ดังนั้นผู้ใช้จะต้องหาอุปกรณ์ <strong>USB Blaster</strong> มาใช้ร่วมด้วย</p>
 <p><img alt="" src="cyclone10_starter_kit_demo.jpg" /></p>
 <p>รูป: ตัวอย่างการใช้งานบอร์ด <strong>FPGA</strong> ร่วมกับอุปกรณ์  <strong>Low-cost USB Blaster (Clone)</strong> </p>
-<p>แรงดันไฟเลี้ยงสำหรับการทำงานของบอร์ดได้จาก 2 ตัวเลือก ได้แก่ <strong>DC Plug (center-positive, 5V)</strong> และ <strong>Mini-USB</strong></p>
+<p>แรงดันไฟเลี้ยงสำหรับการทำงานของบอร์ดได้จาก <strong>DC Plug (center-positive, 5V)</strong></p>
 <p>แนะนำให้ผู้อ่าน ศึกษารายละเอียดของบอร์ดและวงจรที่เกี่ยวข้องจากไฟล์ 
 <a href="cyclone10_v1_schematic.pdf"><strong>Schematic</strong></a>
 และตัดบางส่วนมานำเสนอในบทความนี้</p>
@@ -191,7 +191,7 @@
 <p>รูป: ไอซี <strong>CP2102N USB-to-Serial IC</strong> และคอนเนกเตอร์ <strong>Mini-USB</strong></p>
 <p><img alt="" src="schematic-3.jpg" /></p>
 <p>รูป: ไอซี <strong>TPD12S016 (HDMI Interface Device)</strong> และพอร์ต <strong>HDMI</strong></p>
-<p><img alt="" src="./qmtech_cyclone10_intro/schematic-19.jpg" /></p>
+<p><img alt="" src="schematic-10.jpg" /></p>
 <p>รูป: วงจรมีไอซี <strong>Realtek RTL8211EG</strong></p>
 <p><strong>ข้อสังเกต:</strong> บอร์ด <strong>FPGA</strong> รุ่นนี้ มีวงจรต่อไปนี้ </p>
 <ul>
@@ -666,23 +666,16 @@ architecture testbench of cyc10_uart_tx_demo_tb is
 begin
     -- Instantiate the design under test (DUT)
     uut: cyc10_uart_tx_demo
-        port map (
-            CLK   =&gt; clk,
-            NRST  =&gt; nrst,
-            BTN   =&gt; btn,
-            RXD   =&gt; rxd,
-            TXD   =&gt; txd,
-            LEDS  =&gt; leds
-        );
+       port map ( CLK =&gt; clk, NRST =&gt; nrst, BTN =&gt; btn,
+            RXD =&gt; rxd, TXD =&gt; txd, LEDS =&gt; leds );
 
-    clk_proc : process
+    clk_proc : process -- Clock generation process
     begin
       clk &lt;= '0'; wait for CLK_PERIOD / 2;
       clk &lt;= '1'; wait for CLK_PERIOD / 2;
     end process;
 
-    -- Stimulus process
-    stim_proc : process
+    stim_proc : process -- Stimulus process
     begin
         -- Reset the system
         nrst &lt;= '0';
@@ -697,13 +690,12 @@ begin
 
         -- Wait for some time to observe UART transmission
         wait for 1 ms;
-
         wait;
     end process;
 
 end testbench;
 </code></pre>
-<p>ไฟล์ <code>sim.do</code> ซึ่งเป็น <strong>Tcl Script</strong> สำหรับการรันคำสั่งเพื่อการจำลองการทำงาน</p>
+<p>ไฟล์ <code>sim.do</code> ซึ่งเป็นตัวอย่างโค้ด <strong>Tcl Script</strong> สำหรับการรันคำสั่งเพื่อการจำลองการทำงาน</p>
 <pre><code class="language-text">transcript on
 
 # Delete the 'rtl_work' if it exists.
@@ -716,8 +708,8 @@ vlib rtl_work
 vmap work rtl_work
 
 # Compile VHDL code
-vcom -2008 -work work {C:/Work/FPGA_designs/cyc10_uart_tx_demo/cyc10_uart_tx_demo.vhd}
-vcom -2008 -work work {C:/Work/FPGA_designs/cyc10_uart_tx_demo/cyc10_uart_tx_demo_tb.vhd}
+vcom -2008 -work work {./cyc10_uart_tx_demo/cyc10_uart_tx_demo.vhd}
+vcom -2008 -work work {./cyc10_uart_tx_demo/cyc10_uart_tx_demo_tb.vhd}
 
 # Load the VHDL testbench
 vsim -voptargs=&quot;+acc&quot; work.cyc10_uart_tx_demo_tb(testbench) 
@@ -743,7 +735,7 @@ run 1ms
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2024-10-22 | Last Updated: 2024-10-23</p></div>
+<p>Created: 2024-10-22 | Last Updated: 2024-10-27</p></div>
             </div>
         </div>
 
