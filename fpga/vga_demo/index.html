@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/vga_demo/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างสัญญาณเอาต์พุตสำหรับ VGA Display - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#vga-display" class="nav-link">การสร้างสัญญาณเอาต์พุตสำหรับ VGA Display</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#vga" class="nav-link">&#9655; การสร้างสัญญาณสำหรับจอภาพ VGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vga-terasic-de10-lite-fpga" class="nav-link">&#9655; การใช้งาน VGA สำหรับบอร์ด Terasic DE10-Lite FPGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="vga-display">การสร้างสัญญาณเอาต์พุตสำหรับ VGA Display<a class="headerlink" href="#vga-display" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>VGA</em>, <em>Intel / Altera MAX 10 FPGA</em>, <em>DE10-Lite FPGA Board</em></p>
+<hr />
+<h2 id="vga">&#9655; <strong>การสร้างสัญญาณสำหรับจอภาพ VGA</strong><a class="headerlink" href="#vga" title="Permanent link">#</a></h2>
+<p><a href="https://en.wikipedia.org/wiki/Video_Graphics_Array"><strong>VGA (Video Graphics Array)</strong></a>
+เป็นมาตรฐานการส่งข้อมูลกราฟิกสำหรับจอมอนิเตอร์แบบ <strong>CRT</strong> หรือจอภาพแบบ <strong>LCD</strong>
+แต่ในปัจจุบันมีการใช้งานมาตรฐาน <strong>VGA</strong> น้อยลง และถูกแทนที่ด้วยมาตรฐานอื่น เช่น <strong>DVI-D</strong> และ <strong>HDMI</strong></p>
+<p><strong>VGA</strong> ทำงานโดยการสแกนสัญญาณทีละเส้นจากซ้ายไปขวา (<strong>Horizontal Scan</strong>) 
+และจากบนลงล่าง (<strong>Vertical Scan</strong>) ผ่านการทำงานร่วมกันระหว่างสัญญาณ <strong>RGB</strong>, <strong>HSYNC</strong> และ <strong>VSYNC</strong></p>
+<p>สัญญาณที่ใช้สำหรับ <strong>VGA</strong> มีดังนี้</p>
+<ul>
+<li>สัญญาณดิจิทัล <strong>Horizontal Sync (HSYNC)</strong>: 
+เป็นสัญญาณพัลส์แบบ <strong>Active-Low</strong> ใช้กำหนดช่วงเวลาในการสแกนเส้นแนวนอนแต่ละเส้นบนจอภาพ</li>
+<li>สัญญาณดิจิทัล <strong>Vertical Sync (VSYNC)</strong>: 
+เป็นสัญญาณพัลส์แบบ <strong>Active-Low</strong> ใช้กำหนดช่วงเวลาในการสแกนเฟรมใหม่ เริ่มจากด้านบนสุดของจอภาพ</li>
+<li>สัญญาณแอนะล็อกสำหรับสีแดง สีน้ำเงิน และสีเขียว (<strong>RGB</strong>): กำหนดค่าสี เช่น ถ้าใช้ 4 บิต สำหรับแต่ละสี <strong>(R,G,B)</strong>
+ก็จะได้ 16^3 = 4096 สี แต่ถ้าใช้ 8 บิต ก็จะได้ 256^3 = 16,777,216 สี ที่ใช้ในการแสดงผลแต่ละพิกเซลได้</li>
+</ul>
+<p>การกำหนด <strong>Signal Timing</strong> สำหรับ <strong>VGA</strong> มีความสำคัญในการควบคุมการแสดงผลภาพให้ถูกต้องตามมาตรฐาน <strong>VGA</strong>
+แบ่งเป็นแนวนอนและแนวตั้ง</p>
+<p><strong>Horizontal Timing</strong> (แนวนอน) เป็นการสแกนแต่ละเส้นจากซ้ายไปขวา มีการแบ่งช่วงเวลาตามลำดับดังนี้:</p>
+<ul>
+<li><strong>Horizontal Visible Area (Active Video)</strong>: พื้นที่ที่แสดงผลพิกเซลจริง</li>
+<li><strong>Front Porch</strong>: ช่วงเวลาหลังการแสดงผลของเส้นแต่ละเส้น ก่อนถึงสัญญาณพัลส์ <strong>HSYNC</strong></li>
+<li><strong>Horizontal Sync (HSYNC Pulse, Active-Low)</strong>: สัญญาณที่บอกให้เริ่มเส้นถัดไปในจอภาพ </li>
+<li><strong>Back Porch</strong>: ช่วงเวลาหลัง <strong>HSYNC</strong> ที่ไม่แสดงผล ใช้เพื่อให้เวลาในจอภาพเตรียมพิกเซลใหม่</li>
+</ul>
+<p><strong>Vertical Timing</strong> (แนวตั้ง) การกำหนดเฟรมจากบนลงล่าง มีการแบ่งช่วงและลำดับดังนี้:</p>
+<ul>
+<li><strong>Vertical Visible Area (Active Video)</strong>: พื้นที่ที่แสดงผลเฟรมจริงในแนวตั้ง</li>
+<li><strong>Front Porch</strong>: ช่วงเวลาหลังจากการแสดงผลทุกเส้น ก่อนถึงสัญญาณพัลส์ <strong>VSYNC</strong></li>
+<li><strong>Vertical Sync (VSYNC Pulse, Active-Low)</strong>: สัญญาณที่บอกให้เริ่มเฟรมใหม่ตั้งแต่ด้านบนของจอภาพ</li>
+<li><strong>Back Porch</strong>: ช่วงเวลาหลัง <strong>VSYNC</strong> ที่ไม่แสดงผล ใช้เพื่อให้เวลาจอภาพเตรียมการแสดงผลเฟรมใหม่</li>
+</ul>
+<p><img alt="" src="vga_timing.png" /></p>
+<p>รูป: การแบ่งช่วงสัญญาณตามข้อกำหนดของ <strong>VGA Timing Spec</strong> </p>
+<p>ตัวอย่าง <strong>VGA Timing Spec</strong> ที่มีความละเอียด <strong>640x480 @ 60Hz</strong></p>
+<table>
+<thead>
+<tr>
+<th>Timing Parameter</th>
+<th>Horizontal (Pixels)</th>
+<th>Vertical (Lines)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Active Video</strong></td>
+<td>640</td>
+<td>480</td>
+</tr>
+<tr>
+<td><strong>Front Porch</strong></td>
+<td>16</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>Sync Pulse </strong></td>
+<td>96</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Back Porch</strong></td>
+<td>48</td>
+<td>33</td>
+</tr>
+<tr>
+<td><strong>Total Period</strong></td>
+<td>800</td>
+<td>525</td>
+</tr>
+</tbody>
+</table>
+<p>การทำงานของ <strong>VGA 640x480 @ 60Hz</strong> จะใช้ความถี่ <strong>25.175MHz</strong> (<strong>Pixel Clock</strong>)</p>
+<ul>
+<li>อัตราการอัปเดตเฟรม (<strong>Frame refresh rate</strong>): 60 Hz</li>
+<li>ความถี่ของพิกเซล (<strong>Pixel frequency</strong>): 25.175 MHz (800 pixels * 525 lines * 60 Hz = 25.20 Mpixels/s)</li>
+</ul>
+<p>ตัวอย่าง <strong>VGA Timing Spec</strong> ที่มีความละเอียด <strong>800x600 @ 72Hz</strong></p>
+<table>
+<thead>
+<tr>
+<th>Timing Parameter</th>
+<th>Horizontal (Pixels)</th>
+<th>Vertical (Lines)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Active Video</strong></td>
+<td>800</td>
+<td>600</td>
+</tr>
+<tr>
+<td><strong>Front Porch</strong></td>
+<td>56</td>
+<td>37</td>
+</tr>
+<tr>
+<td><strong>Sync Pulse</strong></td>
+<td>120</td>
+<td>6</td>
+</tr>
+<tr>
+<td><strong>Back Porch</strong></td>
+<td>64</td>
+<td>23</td>
+</tr>
+<tr>
+<td><strong>Total Period</strong></td>
+<td>1040</td>
+<td>666</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>อัตราการอัปเดตเฟรม (<strong>Frame refresh rate</strong>): 72 Hz</li>
+<li>ความถี่ของพิกเซล (<strong>Pixel frequency</strong>): 50 MHz (1040 pixels * 666 lines * 72 Hz = 49.87 Mpixels/s)</li>
+</ul>
+<hr />
+<h2 id="vga-terasic-de10-lite-fpga">&#9655; <strong>การใช้งาน VGA สำหรับบอร์ด Terasic DE10-Lite FPGA</strong><a class="headerlink" href="#vga-terasic-de10-lite-fpga" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>FPGA</strong> อย่างเช่น <strong>Terasic DE10-Lite FPGA</strong> มีวงจรและคอนเนกเตอร์สำหรับการเชื่อมต่อสัญญาณ <strong>VGA</strong>
+ดังนั้นจึงสามารถนำไปใช้งานได้อย่างสะดวก และมีผังวงจรบางส่วนดังนี้</p>
+<p><img alt="" src="../de10_lite_intro/de10_lite_vga.jpg" /></p>
+<p>รูป: วงจรตัวต้านทานและคอนเนกเตอร์ <strong>D-Sub (15-pin)</strong> สำหรับ <strong>VGA</strong></p>
+<p>จะเห็นได้ว่า มีการใช้ตัวต้านทานแบบ <strong>R-2R DAC</strong> ในการแปลงสัญญาณดิจิทัล 4 บิต ให้เป็นสัญญาณแอนะล็อก
+สำหรับแต่ละสี (<strong>R,G,B</strong>)</p>
+<p>ถัดไปเป็นโค้ด <strong>VHDL</strong> สำหรับการสาธิตการสร้างสัญญาณ <strong>VGA</strong> ขนาด <strong>800x600</strong> พิกเซล
+และใช้สัญญาณ <strong>Clock</strong> เท่ากับ <strong>50MHz</strong> ซึ่งสามารถใช้กับบอร์ด <strong>DE10-Lite</strong> ได้
+โดยไม่ต้องใช้วงจร <code>ALT_PLL</code> เพื่อสร้างสัญญาณความถี่อื่น</p>
+<p>ในตัวอย่างนี้มีการใช้สัญญาณ <code>h_count</code> กับ <code>v_count</code> สำหรับตัวนับแนวนอน และตัวนับแนวตั้ง ตามลำดับ
+และจะมีการตรวจสอบในระหว่างการนับ เพื่อกำหนดช่วงเวลาและสร้างสัญญาณพัลส์
+<code>vga_hs</code> (<strong>HSYNC</strong>) และ <code>vga_vs</code> (<strong>VSYNC</strong>) เป็นเอาต์พุต ตามลำดับ
+และมี <code>vga_r</code>, <code>vga_g</code> และ <code>vga_b</code> เป็นสัญญาณเอาต์พุต ขนาด 4 บิต </p>
+<p>วงจรนี้สาธิตการวาดรูปคลื่นสัญญาณสามเหลี่ยมบนจอภาพ <strong>VGA</strong> โดยใช้ค่าของ <code>h_count</code> 
+มาคำนวณแอมพลิจูดของคลื่นสัญญาณและได้ค่า <code>y_wave</code> เพื่อนำไปกำหนดค่าสีบนจอภาพ
+การกำหนดค่าสี <strong>RGB</strong> จะเกิดขึ้นเมื่อสัญญาณ <code>visible_area=1</code> (<strong>Active Video</strong>) 
+แต่ถ้ามีค่า  <code>visible_area=0</code> จะให้ <strong>RGB* มีค่าเป็น 0 ทั้งหมด (</strong>Blank**)</p>
+<pre><code class="language-VHDL">library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity de10_lite_vga_demo is
+    port (
+        clk      : in std_logic;   -- 50MHz clock input
+        reset_n  : in std_logic;   -- active-low asynchronous reset 
+        vga_hs   : out std_logic;  -- VGA Hsync output
+        vga_vs   : out std_logic;  -- VGA Vsync output
+        vga_r, vga_g, vga_b : out std_logic_vector(3 downto 0) -- 4-bit R,G,B
+    );
+end de10_lite_vga_demo;
+
+architecture behavioral of de10_lite_vga_demo is
+    -- VGA timing constants (see: http://www.tinyvga.com/vga-timing)
+    constant H_ACTIVE_AREA   : integer := 800;
+    constant V_ACTIVE_AREA   : integer := 600;
+
+    -- Horizontal timing
+    constant H_FRONT_PORCH   : integer := 56;
+    constant H_SYNC_PULSE    : integer := 120;
+    constant H_BACK_PORCH    : integer := 64;
+    constant H_TOTAL         : integer 
+             := H_ACTIVE_AREA + H_FRONT_PORCH + H_SYNC_PULSE + H_BACK_PORCH;
+
+    -- Vertical timing
+    constant V_FRONT_PORCH    : integer := 37;
+    constant V_SYNC_PULSE     : integer := 6;
+    constant V_BACK_PORCH     : integer := 23;
+    constant V_TOTAL          : integer  
+             := V_ACTIVE_AREA + V_FRONT_PORCH + V_SYNC_PULSE + V_BACK_PORCH;
+
+    constant CENTER_Y         : integer := V_ACTIVE_AREA / 2;
+    constant CENTER_X         : integer := H_ACTIVE_AREA / 2;
+
+    -- Internal signals for counters
+    signal h_count, v_count   : integer := 0;
+    signal visible_area       : std_logic := '0';
+
+    signal vga_clk : std_logic := '0'; -- VGA clock
+
+begin
+
+    vga_clk &lt;= clk;
+
+    vga_sync_proc: process(vga_clk, reset_n)
+    begin
+        if reset_n = '0' then
+            h_count &lt;= 0;
+            v_count &lt;= 0;
+        elsif rising_edge(vga_clk) then
+            -- Horizontal counter
+            if h_count = H_TOTAL - 1 then
+                h_count &lt;= 0;
+                -- Vertical counter
+                if v_count = V_TOTAL - 1 then
+                    v_count &lt;= 0;
+                else
+                    v_count &lt;= v_count + 1;
+                end if;
+            else
+                h_count &lt;= h_count + 1;
+            end if;
+        end if;
+    end process;
+
+     -- Generate Hsync pulse
+    vga_hs &lt;= '0' when (h_count &gt;= H_ACTIVE_AREA + H_FRONT_PORCH 
+               and h_count &lt; H_ACTIVE_AREA + H_FRONT_PORCH + H_SYNC_PULSE)
+               else '1';
+
+    -- Generate Vsync pulse
+    vga_vs &lt;= '0' when (v_count &gt;= V_ACTIVE_AREA + V_FRONT_PORCH
+               and v_count &lt; V_ACTIVE_AREA + V_FRONT_PORCH + V_SYNC_PULSE) 
+               else '1';
+
+    -- Determine if the current pixel is in the visible area
+    visible_area &lt;= '1' when (h_count &lt; H_ACTIVE_AREA 
+               and v_count &lt; V_ACTIVE_AREA) else '0';
+
+    -- Simple waveform drawing demo
+    process (vga_clk)
+        variable y_wave : integer;
+    begin
+        if rising_edge(vga_clk) then
+            if visible_area = '1' then
+                -- Calculate y position of the wave based on current x position
+                y_wave := CENTER_Y - 4*abs(40 - (h_count mod 80));
+
+                -- Set pixel color based on conditions for waveform
+                if v_count = y_wave then
+                    -- Draw waveform in red
+                    vga_r &lt;= &quot;1111&quot;;  
+                    vga_g &lt;= &quot;0000&quot;;
+                    vga_b &lt;= &quot;0000&quot;;
+                elsif v_count = CENTER_Y then
+                    -- Draw vertical line 
+                    vga_r &lt;= &quot;0000&quot;;
+                    vga_g &lt;= &quot;1111&quot;;
+                    vga_b &lt;= &quot;0000&quot;;
+                else
+                    -- Default background color 
+                    vga_r &lt;= &quot;1111&quot;;
+                    vga_g &lt;= &quot;1111&quot;;
+                    vga_b &lt;= &quot;1111&quot;;
+                end if;
+            else
+                -- Default background color outside visible area
+                vga_r &lt;= &quot;0000&quot;;
+                vga_g &lt;= &quot;0000&quot;;
+                vga_b &lt;= &quot;0000&quot;;
+            end if;
+        end if;
+    end process;
+
+end behavioral;
+</code></pre>
+<p>ไฟล์ <strong>Tcl Script</strong> สำหรับการตั้งค่าเพื่อเลือกใช้ขา <strong>I/O</strong> ของ <strong>MAX 10 FPGA</strong> บนบอร์ด <strong>DE10-Lite</strong>
+มีดังนี้</p>
+<pre><code class="language-text">#set_global_assignment -name DEVICE 10M50DAF484C7G
+#set_global_assignment -name FAMILY &quot;MAX 10&quot;
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to *
+set_instance_assignment -name IO_STANDARD &quot;3.3 V Schmitt Trigger&quot; -to reset_n
+
+set_location_assignment PIN_P11  -to clk
+set_location_assignment PIN_B8   -to reset_n
+set_location_assignment PIN_P1   -to vga_b[0]
+set_location_assignment PIN_T1   -to vga_b[1]
+set_location_assignment PIN_P4   -to vga_b[2]
+set_location_assignment PIN_N2   -to vga_b[3]
+set_location_assignment PIN_W1   -to vga_g[0]
+set_location_assignment PIN_T2   -to vga_g[1]
+set_location_assignment PIN_R2   -to vga_g[2]
+set_location_assignment PIN_R1   -to vga_g[3]
+set_location_assignment PIN_AA1  -to vga_r[0]
+set_location_assignment PIN_V1   -to vga_r[1]
+set_location_assignment PIN_Y2   -to vga_r[2]
+set_location_assignment PIN_Y1   -to vga_r[3]
+set_location_assignment PIN_N3   -to vga_hs
+set_location_assignment PIN_N1   -to vga_vs
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด <strong>VHDL</strong> เพื่อสร้างสัญญาณดิจิทัลเพื่อนำไปใช้สำหรับการแสดงผลบนจอภาพแบบ <strong>VGA</strong>
+ขนาด 800 x 600 พิกเซล โดยได้ทดลองใช้กับบอร์ด <strong>Terasic DE10-Lite (MAX 10 FPGA)</strong>
+และสาธิตการสร้างรูปคลื่นสัญญาณสามเหลี่ยมบนจอภาพ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-31 | Last Updated: 2024-10-31</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
