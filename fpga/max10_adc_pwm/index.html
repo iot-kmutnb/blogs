@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/max10_adc_pwm/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานวงจร ADC ภายในชิป MAX 10 FPGA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#adc-max-10-fpga" class="nav-link">การใช้งานวงจร ADC ภายในชิป MAX 10 FPGA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#adc" class="nav-link">&#9655; วงจร ADC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#altpll-ip-core" class="nav-link">&#9655; การใช้งาน ALTPLL IP Core</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#adc-ip-core" class="nav-link">&#9655; การใช้งาน ADC IP Core</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#pwm-2" class="nav-link">&#9655; โค้ดสาธิตการสร้างสัญญาณ PWM จำนวน 2 ช่องเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="adc-max-10-fpga">การใช้งานวงจร ADC ภายในชิป MAX 10 FPGA<a class="headerlink" href="#adc-max-10-fpga" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>:  <em>Intel / Altera MAX 10 FPGA</em>, <em>DE10-Lite FPGA Board</em>, 
+<em>ADC</em>, <em>PWM</em>, <em>Analog Input</em></p>
+<hr />
+<h2 id="adc">&#9655; <strong>วงจร ADC</strong><a class="headerlink" href="#adc" title="Permanent link">#</a></h2>
+<p>ชิป <strong>MAX 10 FPGA</strong> มีวงจร <strong>12-bit SAR ADC (Analog-to-Digital Converter)</strong> อยู่ภายใน 
+และรับสัญญาณอินพุต-แอนะล็อกที่ช่องสัญญาณ <code>ADC_IN0</code> ~ <code>ADC_IN5</code>
+ของคอนเนกเตอร์ <strong>Arduino Shield</strong> บนบอร์ด (แรงดันไฟฟ้าอยู่ในช่วง <strong>0V ~ 5V</strong>)</p>
+<p>สัญญาณอินพุตจะถูกลดระดับแรงดันลงครึ่งหนึ่ง โดยใช้วงจรแบ่งแรงดัน และมีวงจรออปแอมป์ (<strong>OpAmp</strong>)
+ซึ่งทำหน้าที่เป็น <strong>Voltage Buffer</strong> 
+ดังนั้นแรงดันไฟฟ้าที่ผ่านเข้าไปยังวงจร <strong>ADC1</strong> ภายในชิป <strong>MAX 10 FPGA</strong> จะอยู่ในช่วง <strong>0V ~ 2.5V</strong>
+และใช้เลือกใช้แรงดันอ้างอิง (<strong>Analog Reference Voltage</strong>) ภายใน <strong>Vref = 2.5V</strong>
+แต่ขา <code>ADC_IN6</code> และ <code>ADC_IN7</code> ไม่ได้ต่อใช้งาน</p>
+<p>การทำงานของวงจร <strong>ADC</strong> ใช้ความถี่ เพื่อกำหนดจังหวะการทำงาน ได้สูงสุด <strong>10MHz</strong>
+และสามารถอ่านและแปลงค่าสัญญาณได้อัตราสูงถึง <strong>1MSamples/s</strong></p>
+<p>ในการใช้งานวงจร <strong>ADC</strong> ภายในชิป <strong>MAX 10</strong> จะต้องมีการสร้างวงจรจาก <strong>IP Cores</strong>
+โดยใช้ซอฟต์แวร์ <strong>Quartus Prime</strong> และเลือกชนิดของวงจรจาก <strong>IP Catalog</strong> ได้แก่</p>
+<ul>
+<li><code>ALTPLL</code> รับสัญญาณ <strong>Clock (50MHz)</strong> จากบอร์ด แล้วนำไปป้อนเข้าที่ขา <code>inclk0</code>
+เพื่อสร้างสัญญาณ <strong>Clock</strong> ที่ขาเอาต์พุต <code>c0</code> ให้มีความถี่ <strong>50MHz</strong> และที่ขาเอาต์พุต <code>c1</code> ให้มีความถี่ <strong>10MHz</strong>
+(เจาะจงใช้กับวงจร <strong>ADC</strong>) ตามลำดับ แต่ทั้งสองสัญญาณมีเฟสตรงกัน (<strong>in-phase</strong>)</li>
+<li><code>ADC</code> เป็นวงจรภายในชิป <strong>MAX 10</strong> มีช่องสัญญาณแอนะล็อก-อินพุต 8 ช่อง จากภายนอก ผู้ใช้จะต้องตั้งค่าใช้งานให้ถูกต้อง</li>
+</ul>
+<p>ผลลัพธ์จากการตั้งค่าและสร้างวงจรจก <strong>IP Core</strong> จะได้เป็นโค้ด <strong>VHDL</strong> หรือ <strong>Verilog</strong>
+เพื่อนำมาใช้ในโปรเจกต์</p>
+<p>ข้อสังเกต: บอร์ด <strong>DE10-Lite</strong> มีสัญญาณอินพุต <strong>10MHz</strong> บนบอร์ด และสามารถนำมาใช้เป็นสัญญาณ
+<strong>ADC Clock</strong> ได้เช่นกัน แต่ในตัวอย่างนี้ ได้เลือกใช้ <strong>ALTPLL</strong> เพื่อสาธิตการสร้างสัญญาณ <strong>Clock</strong> ภายในชิป <strong>FPGA</strong>
+จากสัญญาณอินพุตความถี่ <strong>50MHz</strong> จากภายนอก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="altpll-ip-core">&#9655; <strong>การใช้งาน ALTPLL IP Core</strong><a class="headerlink" href="#altpll-ip-core" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการสร้างวงจร <strong>ALTPLL</strong> มีดังนี้</p>
+<ol>
+<li>เลือก <strong>Library ➤ Basic Functions ➤ Clocks &amp; PLLs ➤ PLL ➤ ALTPLL</strong></li>
+<li>ตั้งชื่อวงจรสำหรับ <strong>ALTPLL</strong> ที่ต้องการสร้าง และเลือกไดเรกทอรีสำหรับการจัดเก็บไฟล์</li>
+<li>กำหนดค่าความถี่สำหรับสัญญาณอินพุต <code>inclk0</code> ให้เท่ากับ <strong>50MHz</strong>
+และค่าความถี่สำหรับขาเอาต์พุต <code>c0</code> และ <code>c1</code> ให้เท่ากับ <strong>50MHz</strong> และ <strong>10MHz</strong>
+ตามลำดับ มีค่า <strong>Duty Cycle = 50%</strong> และ <strong>Phase Shift = 0.0 deg</strong></li>
+<li>กดปุุุ่มเพื่อสร้างโค้ด <strong>HDL</strong> เพื่อนำไปใช้กับโปรเจกต์ 
+ไฟล์ <code>.qip</code> (<strong>Quartus Prime IP File</strong>) จะต้องถูกนำไปใส่ในโปรเจกต์ด้วย</li>
+</ol>
+<p><img alt="" src="altpll-1.jpg" /></p>
+<p>รูป: การสร้างวงจร <strong>ALTPLL IP Core</strong> ใน <strong>IP Catalog</strong> เพื่อนำมาใช้ในโปรเจกต์</p>
+<p><img alt="" src="altpll-2.jpg" /></p>
+<p>รูป: ตั้งค่าความถี่ของสัญญาณอินพุต ใน <strong>MegaWizard Plug-in Manager</strong></p>
+<p><img alt="" src="altpll-3.jpg" /></p>
+<p>รูป: ตั้งค่าความถี่ของสัญญาณเอาต์พุต <code>c0</code> เท่ากับ <strong>50.00 MHz</strong></p>
+<p><img alt="" src="altpll-4.jpg" /></p>
+<p>รูป: ตั้งค่าความถี่ของสัญญาณเอาต์พุต <code>c1</code> เท่ากับ <strong>10.00 MHz</strong></p>
+<p><img alt="" src="altpll-5.jpg" /></p>
+<p>รูป: สรุปการตั้งค่า <code>ALTPLL</code> ก่อนการสร้างโค้ด <strong>HDL</strong></p>
+<p><img alt="" src="altpll-6.jpg" /></p>
+<p>รูป: การเพิ่มไฟล์ <code>.qip</code> ในโปรเจกต์ โดยอัตโนมัติ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="adc-ip-core">&#9655; <strong>การใช้งาน ADC IP Core</strong><a class="headerlink" href="#adc-ip-core" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการสร้างวงจร <strong>ADC</strong> มีดังนี้</p>
+<ol>
+<li>เลือก <strong>Library ➤ Processors &amp; Peripherals ➤ Peripherals ➤ Modular ADC Core ...</strong></li>
+<li>ตั้งชื่อวงจร <strong>ADC</strong> ที่ต้องการสร้าง และเลือกไดเรกทอรีสำหรับการจัดเก็บไฟล์</li>
+<li>เลือกโหมดการทำงานแบบ <strong>ADC Control Core Only</strong>
+ตั้งค่า <strong>ADC Sample Rate = 1MHz</strong> และ <strong>ADC Input Clock = 10MHz</strong>
+เลือกใช้ <strong>Analog Reference Voltage = Internal</strong></li>
+</ol>
+<p><img alt="" src="adc-1.jpg" /></p>
+<p>รูป: เริ่มต้นการสร้างวงจรจาก <strong>Modular ADC Core Intel FPGA IP</strong></p>
+<p><img alt="" src="adc-2.jpg" /></p>
+<p>รูป: ตั้งชื่อวงจรที่ต้องการสร้างจาก <strong>ADC IP Core</strong> </p>
+<p><img alt="" src="adc-3.jpg" /></p>
+<p>รูป: เลือกโหมดการทำงานเป็นแบบ <strong>ADC Control Core Only</strong>
+สำหรับ <strong>1st ADC</strong></p>
+<p><img alt="" src="adc-4.jpg" /></p>
+<p>รูป: คลิกเลือก <strong>User Channel 1</strong> (<code>ADCIN[1]</code>) จนถึง <strong>User Channel 6</strong> (<code>ADCIN[6]</code>) 
+เพื่อเปิดใช้งาน</p>
+<p><img alt="" src="adc-5.jpg" /></p>
+<p>รูป: กดปุ่ม <strong>Generate</strong> เมื่อได้ตั้งค่าการใช้งานแล้ว</p>
+<p><img alt="" src="adc-6.jpg" /></p>
+<p>รูป: การแจ้งเตือนให้ผู้ใช้เพิ่มไฟล์ <code>.qsys</code> ในโปรเจกต์ เพื่อใช้งาน <strong>ADC IP Core</strong>
+ที่ถูกสร้างเป็นวงจรแล้ว</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pwm-2">&#9655; <strong>โค้ดสาธิตการสร้างสัญญาณ PWM จำนวน 2 ช่องเอาต์พุต</strong><a class="headerlink" href="#pwm-2" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>VHDL</strong> สำหรับวงจรที่มีชื่อว่า <code>de10_lite_adc_pwm</code> 
+สาธิตการใช้วงจร <code>altpll_block</code> และ <code>adc1_block</code> (สร้างจาก <strong>Altera IP Cores</strong>
+ในขั้นตอนที่ได้นำเสนอไปแล้ว) เพื่อใช้ในการแปลงระดับแรงดันของสัญญาณแอนะล็อก-อินพุต
+ให้เป็นข้อมูลขนาด 12 บิต </p>
+<p>ในตัวอย่างนี้จะเลือกใช้เพียง 2 ช่องอินพุต และสลับการเลือกใช้ช่องอินพุต ได้แก่ <code>ADC_AN0</code>
+(<code>ADCIN[1]</code>) และ <code>ADC_AN1</code> (<code>ADCIN[2]</code>)
+แล้วนำค่าที่อ่านได้ไปใช้ในการกำหนดค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> จำนวน 2 ช่อง ตามลำดับ
+แต่มีข้อสังเกตว่า ถ้าค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> ช่องแรกเพิ่มขึ้น สัญญาณ <strong>PWM</strong> จะลดลง
+(เปลี่ยนแปลงในทิศทางตรงกันข้าม)</p>
+<p>การสร้างสัญญาณ <strong>PWM</strong> จะใช้ตัวนับขนาด 12 บิต นับค่าเริ่มต้นจาก <code>0</code> ถึง <code>4095</code> แล้ววนซ้ำ
+วงจรตัวนับทำงานด้วยความถี่ <strong>50MHz</strong> ดังนั้นจะได้ความถี่ของสัญญาณ <strong>PWM</strong> เท่ากับ
+<strong>50MHz / 4096 = 12,207.03 Hz</strong></p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+
+ENTITY de10_lite_adc_pwm IS
+ PORT (
+   clk     : IN STD_LOGIC; -- 50 MHz system clock input
+   reset_n : IN STD_LOGIC; -- active-low asynchronous reset
+   pwm      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0) -- 2-channel PWM output
+ );
+END de10_lite_adc_pwm;
+
+ARCHITECTURE synth OF de10_lite_adc_pwm IS
+
+ COMPONENT altpll_block IS
+  PORT (
+     areset : IN STD_LOGIC := '0';
+     inclk0 : IN STD_LOGIC := '0'; -- 50MHz clock input
+     c0     : OUT STD_LOGIC; -- 50MHz clock output
+     c1     : OUT STD_LOGIC; -- 10MHz clock output
+     locked : OUT STD_LOGIC
+  );
+ END COMPONENT;
+
+ COMPONENT adc1_block IS
+  PORT (
+    clock_clk              : IN STD_LOGIC; 
+    reset_sink_reset_n     : IN STD_LOGIC;
+    adc_pll_clock_clk      : IN STD_LOGIC;
+    adc_pll_locked_export  : IN STD_LOGIC;
+    command_valid          : IN STD_LOGIC;
+    command_channel        : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
+    command_startofpacket  : IN STD_LOGIC;
+    command_endofpacket    : IN STD_LOGIC;
+    command_ready          : OUT STD_LOGIC;
+    response_valid         : OUT STD_LOGIC;
+    response_channel       : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    response_data          : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    response_startofpacket : OUT STD_LOGIC;
+    response_endofpacket   : OUT STD_LOGIC
+ );
+ END COMPONENT;
+
+ SIGNAL sys_clk          : STD_LOGIC;
+ SIGNAL adc_clk          : STD_LOGIC;
+ SIGNAL adc_cmd_valid    : STD_LOGIC;
+ SIGNAL adc_req_channel  : STD_LOGIC_VECTOR(4 DOWNTO 0);
+ SIGNAL adc_cmd_ready    : STD_LOGIC;
+ SIGNAL adc_resp_valid   : STD_LOGIC;
+ SIGNAL adc_resp_channel : STD_LOGIC_VECTOR(4 DOWNTO 0);
+ SIGNAL adc_resp_data    : STD_LOGIC_VECTOR(11 DOWNTO 0);
+ SIGNAL pwm_cnt          : UNSIGNED(11 DOWNTO 0);
+ SIGNAL adc_channel      : UNSIGNED(4 DOWNTO 0);
+ SIGNAL sample_data_ch1  : UNSIGNED(11 DOWNTO 0);
+ SIGNAL sample_data_ch2  : UNSIGNED(11 DOWNTO 0);
+
+BEGIN
+
+ altpll_block_inst : altpll_block PORT MAP(
+  areset =&gt; NOT (reset_n),
+    inclk0  =&gt; clk,     -- 50MHz
+    c0      =&gt; sys_clk, -- 50MHz
+    c1      =&gt; adc_clk, -- 10MHz
+    locked  =&gt; OPEN
+ );
+
+ adc1_block_inst : COMPONENT adc1_block
+  PORT MAP(
+    clock_clk              =&gt; sys_clk,
+    reset_sink_reset_n     =&gt; reset_n,
+    adc_pll_clock_clk      =&gt; adc_clk,
+    adc_pll_locked_export  =&gt; '1',
+    command_valid          =&gt; adc_cmd_valid,
+    command_channel        =&gt; adc_req_channel,
+    command_startofpacket  =&gt; '1',
+    command_endofpacket    =&gt; '1',
+    command_ready          =&gt; adc_cmd_ready,
+    response_valid         =&gt; adc_resp_valid,
+    response_channel       =&gt; adc_resp_channel,
+    response_data          =&gt; adc_resp_data,
+    response_startofpacket =&gt; OPEN,
+    response_endofpacket   =&gt; OPEN
+  );
+
+  adc_cmd_proc : PROCESS (reset_n, sys_clk)
+  BEGIN
+    IF reset_n = '0' THEN
+       adc_req_channel &lt;= (OTHERS =&gt; '0');
+       adc_cmd_valid   &lt;= '0';
+       adc_channel     &lt;= &quot;00001&quot;;
+
+    ELSIF rising_edge(sys_clk) THEN
+       adc_cmd_valid &lt;= '1';
+       IF adc_cmd_ready = '1' THEN
+         adc_req_channel &lt;= STD_LOGIC_VECTOR(adc_channel);
+         IF adc_channel = &quot;00010&quot; THEN
+           adc_channel &lt;= &quot;00001&quot;;
+         ELSE
+           adc_channel &lt;= adc_channel + 1; -- next channel
+         END IF;
+       END IF;
+    END IF;
+  END PROCESS;
+
+  -- read the sampled value from the ADC
+  adc_read_proc : PROCESS (reset_n, sys_clk)
+  BEGIN
+    IF reset_n = '0' THEN
+      pwm_cnt         &lt;= (OTHERS =&gt; '0');
+      sample_data_ch1 &lt;= (OTHERS =&gt; '0');
+      sample_data_ch2 &lt;= (OTHERS =&gt; '0');
+
+    ELSIF rising_edge(sys_clk) THEN
+      IF adc_resp_valid = '1' THEN
+        IF adc_resp_channel = &quot;00001&quot; THEN 
+          sample_data_ch1 &lt;= unsigned(adc_resp_data);
+        END IF;
+        IF adc_resp_channel = &quot;00010&quot; THEN
+          sample_data_ch2 &lt;= 4095 - unsigned(adc_resp_data);
+        END IF;
+      END IF;
+
+      IF pwm_cnt = 4095 THEN
+        pwm_cnt &lt;= (OTHERS =&gt; '0'); -- reset PWM counter
+      ELSE
+        pwm_cnt &lt;= pwm_cnt + 1;     -- increment PWM counter
+      END IF;
+    END IF;
+  END PROCESS;
+
+  -- PWM output (two channels)
+  pwm(0) &lt;= '1' WHEN (pwm_cnt &lt; sample_data_ch1) ELSE '0';
+  pwm(1) &lt;= '1' WHEN (pwm_cnt &lt; sample_data_ch2) ELSE '0';
+
+ END synth;
+</code></pre>
+<p>การตั้งค่าเพื่อใช้งานขา <strong>FPGA I/Os</strong> ในรูปแบบของไฟล์ <strong>Tcl Script</strong> มีดังนี้ </p>
+<pre><code class="language-text">#set_global_assignment -name DEVICE 10M50DAF484C7G
+#set_global_assignment -name FAMILY &quot;MAX 10&quot;
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to *
+set_instance_assignment -name IO_STANDARD &quot;3.3 V Schmitt Trigger&quot; -to reset_n
+
+set_location_assignment PIN_P11  -to clk
+set_location_assignment PIN_B8   -to reset_n
+set_location_assignment PIN_Y7   -to pwm[0]
+set_location_assignment PIN_AA8  -to pwm[1]
+</code></pre>
+<p>&nbsp;</p>
+<p>ในการทดลองกับบอร์ด <strong>DE10-Lite</strong> ได้มีการต่อวงจรแบ่งแรงดัน
+(<strong>Voltage Divider</strong>) บนเบรดบอร์ด เพื่อสร้างสัญญาณแอนะล็อกเป็นอินพุต
+โดยให้มีระดับแรงดันไฟฟ้าอยู่ในช่วง <strong>0V ~ 3.3V</strong> และนำไปป้อนให้ช่องอินพุต 
+<code>ADC_IN1</code> และ <code>ADC_IN2</code> เหมือนกัน ส่วนสัญญาณ <strong>PWM</strong> ที่เป็นเอาต์พุต
+ได้นำใช้กับขา <code>PIN_Y7</code> และ <code>PIN_AA8</code> ของ <strong>MAX 10 FPGA</strong> ตามลำดับ</p>
+<p><img alt="" src="pwm-1.jpg" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณ <strong>PWM</strong> ทั้งสองช่อง เมื่อวัดด้วยออสซิลโลสโคปดิจิทัล
+(ลองหมุนปรับค่าตัวต้านทาน ให้ได้แรงดันไฟฟ้าใกล้เคียง <strong>3.3V</strong>)</p>
+<p>จากรูปคลื่นสัญญาณ จะเห็นได้ว่า ความถี่ของสัญญาณ <strong>PWM</strong> (ช่องแรก) ประมาณ <code>12.2kHz</code>
+มีคาบ <code>82 usec</code>  และความกว้างพัลส์ <code>55 usec</code> หรือ คิดเป็นค่า
+<strong>Duty Cycle</strong> เท่ากับ <code>55 / 82 x 100 = 67%</code> </p>
+<p>ข้อสังเกต: เมื่อหมุนปรับค่าตัวต้านทาน จนได้แรงดันสูงสุด หรือได้ประมาณ <code>3.3V</code>
+ค่าที่ใช้จริงสำหรับ <strong>ADC</strong> คือ <code>3.3V/2</code> และเมื่อนำไปคำนวณค่า <strong>Duty Cycle</strong> จะได้
+<code>100 x (3.3V/2)/2.5V</code> หรือ คิดเป็น <code>66%</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการใช้งานวงจร <strong>ADC</strong> ภายในชิป <strong>MAX 10 FPGA</strong>
+โดยอ่านค่าจากสัญญาณแอนะล็อก-อินพุต 2 ช่องสัญญาณ แล้วนำไปใช้ในการปรับค่า <strong>Duty Cycle</strong>
+ของสัญญาณ <strong>PWM</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../de10_lite_intro/">แนะนำการใช้งานบอร์ด <strong>Terasic DE10 Lite Development Kit</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-31 | Last Updated: 2024-11-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

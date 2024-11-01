@@ -128,19 +128,18 @@
 <li>สัญญาณแอนะล็อกสำหรับสีแดง สีน้ำเงิน และสีเขียว (<strong>RGB</strong>): กำหนดค่าสี เช่น ถ้าใช้ 4 บิต สำหรับแต่ละสี <strong>(R,G,B)</strong>
 ก็จะได้ 16^3 = 4096 สี แต่ถ้าใช้ 8 บิต ก็จะได้ 256^3 = 16,777,216 สี ที่ใช้ในการแสดงผลแต่ละพิกเซลได้</li>
 </ul>
-<p>การกำหนด <strong>Signal Timing</strong> สำหรับ <strong>VGA</strong> มีความสำคัญในการควบคุมการแสดงผลภาพให้ถูกต้องตามมาตรฐาน <strong>VGA</strong>
-แบ่งเป็นแนวนอนและแนวตั้ง</p>
+<p>ข้อกำหนดในเชิงเวลา (<strong>Signal Timing Spec</strong>) สำหรับ <strong>VGA</strong> มีความสำคัญในการแสดงผลภาพให้ถูกต้องตามมาตรฐาน <strong>VGA</strong> โดยแบ่งเป็นข้อกำหนดเชิงเวลาสำหรับแนวนอนและแนวตั้ง</p>
 <p><strong>Horizontal Timing</strong> (แนวนอน) เป็นการสแกนแต่ละเส้นจากซ้ายไปขวา มีการแบ่งช่วงเวลาตามลำดับดังนี้:</p>
 <ul>
-<li><strong>Horizontal Visible Area (Active Video)</strong>: พื้นที่ที่แสดงผลพิกเซลจริง</li>
-<li><strong>Front Porch</strong>: ช่วงเวลาหลังการแสดงผลของเส้นแต่ละเส้น ก่อนถึงสัญญาณพัลส์ <strong>HSYNC</strong></li>
-<li><strong>Horizontal Sync (HSYNC Pulse, Active-Low)</strong>: สัญญาณที่บอกให้เริ่มเส้นถัดไปในจอภาพ </li>
+<li><strong>Horizontal Visible Area (Active Video)</strong>: เป็นช่วงเวลาที่แสดงผลพิกเซลจริงในแต่ละเส้น (<strong>Line</strong>)</li>
+<li><strong>Front Porch</strong>: เป็นช่วงเวลาหลังการแสดงผลของเส้นแต่ละเส้น และก่อนถึงสัญญาณพัลส์ <strong>HSYNC</strong></li>
+<li><strong>Horizontal Sync (HSYNC Pulse, Active-Low)</strong>: ช่วงเวลาที่ให้สัญญาณเพื่อบอกให้เริ่มเส้นถัดไปในจอภาพ </li>
 <li><strong>Back Porch</strong>: ช่วงเวลาหลัง <strong>HSYNC</strong> ที่ไม่แสดงผล ใช้เพื่อให้เวลาในจอภาพเตรียมพิกเซลใหม่</li>
 </ul>
 <p><strong>Vertical Timing</strong> (แนวตั้ง) การกำหนดเฟรมจากบนลงล่าง มีการแบ่งช่วงและลำดับดังนี้:</p>
 <ul>
-<li><strong>Vertical Visible Area (Active Video)</strong>: พื้นที่ที่แสดงผลเฟรมจริงในแนวตั้ง</li>
-<li><strong>Front Porch</strong>: ช่วงเวลาหลังจากการแสดงผลทุกเส้น ก่อนถึงสัญญาณพัลส์ <strong>VSYNC</strong></li>
+<li><strong>Vertical Visible Area (Active Video)</strong>: เป็นช่วงเวลาที่แสดงผลพิกเซลจริงของเฟรมในแนวตั้ง</li>
+<li><strong>Front Porch</strong>: เป็นช่วงเวลาหลังจากการแสดงผลทุกเส้น ก่อนถึงสัญญาณพัลส์ <strong>VSYNC</strong></li>
 <li><strong>Vertical Sync (VSYNC Pulse, Active-Low)</strong>: สัญญาณที่บอกให้เริ่มเฟรมใหม่ตั้งแต่ด้านบนของจอภาพ</li>
 <li><strong>Back Porch</strong>: ช่วงเวลาหลัง <strong>VSYNC</strong> ที่ไม่แสดงผล ใช้เพื่อให้เวลาจอภาพเตรียมการแสดงผลเฟรมใหม่</li>
 </ul>
@@ -235,136 +234,157 @@
 ดังนั้นจึงสามารถนำไปใช้งานได้อย่างสะดวก และมีผังวงจรบางส่วนดังนี้</p>
 <p><img alt="" src="../de10_lite_intro/de10_lite_vga.jpg" /></p>
 <p>รูป: วงจรตัวต้านทานและคอนเนกเตอร์ <strong>D-Sub (15-pin)</strong> สำหรับ <strong>VGA</strong></p>
-<p>จะเห็นได้ว่า มีการใช้ตัวต้านทานแบบ <strong>R-2R DAC</strong> ในการแปลงสัญญาณดิจิทัล 4 บิต ให้เป็นสัญญาณแอนะล็อก
+<p>จากผังวงจร จะเห็นได้ว่า มีการใช้ตัวต้านทานแบบ <strong>R-2R DAC</strong> ในการแปลงสัญญาณดิจิทัล 4 บิต ให้เป็นสัญญาณแอนะล็อก
 สำหรับแต่ละสี (<strong>R,G,B</strong>)</p>
-<p>ถัดไปเป็นโค้ด <strong>VHDL</strong> สำหรับการสาธิตการสร้างสัญญาณ <strong>VGA</strong> ขนาด <strong>800x600</strong> พิกเซล
+<p>ถัดไปเป็นโค้ด <strong>VHDL</strong> เพื่อสาธิตการสร้างสัญญาณ <strong>VGA</strong> ขนาด <strong>800x600</strong> พิกเซล
 และใช้สัญญาณ <strong>Clock</strong> เท่ากับ <strong>50MHz</strong> ซึ่งสามารถใช้กับบอร์ด <strong>DE10-Lite</strong> ได้
-โดยไม่ต้องใช้วงจร <code>ALT_PLL</code> เพื่อสร้างสัญญาณความถี่อื่น</p>
+โดยไม่ต้องใช้วงจร <code>ALTPLL</code> (<strong>PLL: Phase-Locked Loop</strong>) 
+เพื่อสร้างสัญญาณความถี่อื่น และใช้งานภายในชิป <strong>FPGA</strong></p>
 <p>ในตัวอย่างนี้มีการใช้สัญญาณ <code>h_count</code> กับ <code>v_count</code> สำหรับตัวนับแนวนอน และตัวนับแนวตั้ง ตามลำดับ
 และจะมีการตรวจสอบในระหว่างการนับ เพื่อกำหนดช่วงเวลาและสร้างสัญญาณพัลส์
 <code>vga_hs</code> (<strong>HSYNC</strong>) และ <code>vga_vs</code> (<strong>VSYNC</strong>) เป็นเอาต์พุต ตามลำดับ
 และมี <code>vga_r</code>, <code>vga_g</code> และ <code>vga_b</code> เป็นสัญญาณเอาต์พุต ขนาด 4 บิต </p>
-<p>วงจรนี้สาธิตการวาดรูปคลื่นสัญญาณสามเหลี่ยมบนจอภาพ <strong>VGA</strong> โดยใช้ค่าของ <code>h_count</code> 
-มาคำนวณแอมพลิจูดของคลื่นสัญญาณและได้ค่า <code>y_wave</code> เพื่อนำไปกำหนดค่าสีบนจอภาพ
+<p>วงจรนี้สาธิตการกำหนดค่าสี <strong>RGB</strong> (อย่างละ 4 บิต รวม 12 บิต) ให้แต่ละพิกเซล
+โดยพิจารณาจากค่าของตัวนับ <code>h_count</code> และ <code>v_count</code> สำหรับค่าในแกน x และ y ตามลำดับ
 การกำหนดค่าสี <strong>RGB</strong> จะเกิดขึ้นเมื่อสัญญาณ <code>visible_area=1</code> (<strong>Active Video</strong>) 
-แต่ถ้ามีค่า  <code>visible_area=0</code> จะให้ <strong>RGB* มีค่าเป็น 0 ทั้งหมด (</strong>Blank**)</p>
-<pre><code class="language-VHDL">library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+แต่ถ้ามีค่า <code>visible_area=0</code> จะให้ <strong>RGB</strong> มีค่าเป็น 0 ทั้งหมด (<strong>Blank</strong>)</p>
+<pre><code class="language-VHDL">-- DATE: 2024-10-31
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-entity de10_lite_vga_demo is
-    port (
-        clk      : in std_logic;   -- 50MHz clock input
-        reset_n  : in std_logic;   -- active-low asynchronous reset 
-        vga_hs   : out std_logic;  -- VGA Hsync output
-        vga_vs   : out std_logic;  -- VGA Vsync output
-        vga_r, vga_g, vga_b : out std_logic_vector(3 downto 0) -- 4-bit R,G,B
+ENTITY de10_lite_vga_demo IS
+    PORT (
+       clk     : IN STD_LOGIC; -- 50MHz clock input
+       reset_n : IN STD_LOGIC; -- active-low asynchronous reset 
+       vga_hs  : OUT STD_LOGIC; -- VGA Hsync output
+       vga_vs  : OUT STD_LOGIC; -- VGA Vsync output
+       vga_r, vga_g, vga_b : OUT STD_LOGIC_VECTOR(3 DOWNTO 0) -- 4-bit R,G,B
     );
-end de10_lite_vga_demo;
+END de10_lite_vga_demo;
 
-architecture behavioral of de10_lite_vga_demo is
+ARCHITECTURE behavioral OF de10_lite_vga_demo IS
     -- VGA timing constants (see: http://www.tinyvga.com/vga-timing)
-    constant H_ACTIVE_AREA   : integer := 800;
-    constant V_ACTIVE_AREA   : integer := 600;
+    CONSTANT H_ACTIVE_AREA : INTEGER := 800;
+    CONSTANT V_ACTIVE_AREA : INTEGER := 600;
 
     -- Horizontal timing
-    constant H_FRONT_PORCH   : integer := 56;
-    constant H_SYNC_PULSE    : integer := 120;
-    constant H_BACK_PORCH    : integer := 64;
-    constant H_TOTAL         : integer 
+    CONSTANT H_FRONT_PORCH : INTEGER := 56;
+    CONSTANT H_SYNC_PULSE  : INTEGER := 120;
+    CONSTANT H_BACK_PORCH  : INTEGER := 64;
+    CONSTANT H_TOTAL : INTEGER
              := H_ACTIVE_AREA + H_FRONT_PORCH + H_SYNC_PULSE + H_BACK_PORCH;
 
     -- Vertical timing
-    constant V_FRONT_PORCH    : integer := 37;
-    constant V_SYNC_PULSE     : integer := 6;
-    constant V_BACK_PORCH     : integer := 23;
-    constant V_TOTAL          : integer  
+    CONSTANT V_FRONT_PORCH : INTEGER := 37;
+    CONSTANT V_SYNC_PULSE  : INTEGER := 6;
+    CONSTANT V_BACK_PORCH  : INTEGER := 23;
+    CONSTANT V_TOTAL : INTEGER
              := V_ACTIVE_AREA + V_FRONT_PORCH + V_SYNC_PULSE + V_BACK_PORCH;
 
-    constant CENTER_Y         : integer := V_ACTIVE_AREA / 2;
-    constant CENTER_X         : integer := H_ACTIVE_AREA / 2;
+    CONSTANT CENTER_Y : INTEGER := V_ACTIVE_AREA / 2;
+    CONSTANT CENTER_X : INTEGER := H_ACTIVE_AREA / 2;
 
     -- Internal signals for counters
-    signal h_count, v_count   : integer := 0;
-    signal visible_area       : std_logic := '0';
+    SIGNAL h_count, v_count : INTEGER := 0;
+    SIGNAL visible_area : STD_LOGIC := '0';
 
-    signal vga_clk : std_logic := '0'; -- VGA clock
+    SIGNAL vga_clk : STD_LOGIC := '0'; -- VGA clock
+    SIGNAL hsync, vsync : STD_LOGIC := '1';
 
-begin
+BEGIN
 
-    vga_clk &lt;= clk;
+    vga_clk &lt;= clk; -- Use 50MHz clock for VGA pixel clock
 
-    vga_sync_proc: process(vga_clk, reset_n)
-    begin
-        if reset_n = '0' then
+    vga_sync_proc : PROCESS (vga_clk, reset_n)
+    BEGIN
+        IF reset_n = '0' THEN
             h_count &lt;= 0;
             v_count &lt;= 0;
-        elsif rising_edge(vga_clk) then
+        ELSIF rising_edge(vga_clk) THEN
             -- Horizontal counter
-            if h_count = H_TOTAL - 1 then
+            IF h_count = H_TOTAL - 1 THEN
                 h_count &lt;= 0;
                 -- Vertical counter
-                if v_count = V_TOTAL - 1 then
+                IF v_count = V_TOTAL - 1 THEN
                     v_count &lt;= 0;
-                else
+                ELSE
                     v_count &lt;= v_count + 1;
-                end if;
-            else
+                END IF;
+            ELSE
                 h_count &lt;= h_count + 1;
-            end if;
-        end if;
-    end process;
+            END IF;
+        END IF;
+    END PROCESS;
 
-     -- Generate Hsync pulse
-    vga_hs &lt;= '0' when (h_count &gt;= H_ACTIVE_AREA + H_FRONT_PORCH 
-               and h_count &lt; H_ACTIVE_AREA + H_FRONT_PORCH + H_SYNC_PULSE)
-               else '1';
+    -- Generate Hsync pulse (combinatioral)
+    hsync &lt;= '0' WHEN (h_count &gt;= H_ACTIVE_AREA + H_FRONT_PORCH
+        AND h_count &lt; H_ACTIVE_AREA + H_FRONT_PORCH + H_SYNC_PULSE)
+        ELSE '1';
 
-    -- Generate Vsync pulse
-    vga_vs &lt;= '0' when (v_count &gt;= V_ACTIVE_AREA + V_FRONT_PORCH
-               and v_count &lt; V_ACTIVE_AREA + V_FRONT_PORCH + V_SYNC_PULSE) 
-               else '1';
+    -- Generate Vsync pulse (combinatioral)
+    vsync &lt;= '0' WHEN (v_count &gt;= V_ACTIVE_AREA + V_FRONT_PORCH
+        AND v_count &lt; V_ACTIVE_AREA + V_FRONT_PORCH + V_SYNC_PULSE)
+        ELSE '1';
 
     -- Determine if the current pixel is in the visible area
-    visible_area &lt;= '1' when (h_count &lt; H_ACTIVE_AREA 
-               and v_count &lt; V_ACTIVE_AREA) else '0';
+    visible_area &lt;= '1' WHEN (h_count &lt; H_ACTIVE_AREA
+        AND v_count &lt; V_ACTIVE_AREA) ELSE '0';
+
+    PROCESS (vga_clk)
+    BEGIN
+        -- Update Hsync &amp; Vsync outputs synchronized with the pixel clock
+        IF rising_edge(vga_clk) THEN
+            vga_hs &lt;= hsync;
+            vga_vs &lt;= vsync;
+        END IF;
+    END PROCESS;
 
     -- Simple waveform drawing demo
-    process (vga_clk)
-        variable y_wave : integer;
-    begin
-        if rising_edge(vga_clk) then
-            if visible_area = '1' then
-                -- Calculate y position of the wave based on current x position
-                y_wave := CENTER_Y - 4*abs(40 - (h_count mod 80));
+    PROCESS (vga_clk)
+        VARIABLE r_value : STD_LOGIC_VECTOR(3 DOWNTO 0);
+        VARIABLE g_value : STD_LOGIC_VECTOR(3 DOWNTO 0);
+        VARIABLE b_value : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    BEGIN
+        IF rising_edge(vga_clk) THEN
+            r_value := &quot;0000&quot;;
+            g_value := &quot;0000&quot;;
+            b_value := &quot;0000&quot;;
 
-                -- Set pixel color based on conditions for waveform
-                if v_count = y_wave then
-                    -- Draw waveform in red
-                    vga_r &lt;= &quot;1111&quot;;  
-                    vga_g &lt;= &quot;0000&quot;;
-                    vga_b &lt;= &quot;0000&quot;;
-                elsif v_count = CENTER_Y then
-                    -- Draw vertical line 
-                    vga_r &lt;= &quot;0000&quot;;
-                    vga_g &lt;= &quot;1111&quot;;
-                    vga_b &lt;= &quot;0000&quot;;
-                else
-                    -- Default background color 
-                    vga_r &lt;= &quot;1111&quot;;
-                    vga_g &lt;= &quot;1111&quot;;
-                    vga_b &lt;= &quot;1111&quot;;
-                end if;
-            else
-                -- Default background color outside visible area
-                vga_r &lt;= &quot;0000&quot;;
-                vga_g &lt;= &quot;0000&quot;;
-                vga_b &lt;= &quot;0000&quot;;
-            end if;
-        end if;
-    end process;
+            IF visible_area = '1' THEN
 
-end behavioral;
+                -- Use the h_count and v_count values to the set RGB value
+                IF h_count &lt; v_count THEN
+                    IF h_count &lt; H_ACTIVE_AREA/2 THEN
+                        r_value := &quot;0000&quot;;
+                        g_value := &quot;1111&quot;;
+                        b_value := &quot;0000&quot;;
+                    ELSE
+                        r_value := &quot;1111&quot;;
+                        g_value := &quot;0000&quot;;
+                        b_value := &quot;0000&quot;;
+                    END IF;
+                ELSE
+                    IF h_count &lt; H_ACTIVE_AREA/2 THEN
+                        r_value := &quot;1111&quot;;
+                        g_value := &quot;1111&quot;;
+                        b_value := &quot;0000&quot;;
+                    ELSE
+                        r_value := &quot;1111&quot;;
+                        g_value := &quot;0000&quot;;
+                        b_value := &quot;1111&quot;;
+                    END IF;
+                END IF;
+            END IF;
+
+            -- Update the RGB output
+            vga_r &lt;= r_value;
+            vga_g &lt;= g_value;
+            vga_b &lt;= b_value;
+        END IF;
+    END PROCESS;
+
+END behavioral;
 </code></pre>
 <p>ไฟล์ <strong>Tcl Script</strong> สำหรับการตั้งค่าเพื่อเลือกใช้ขา <strong>I/O</strong> ของ <strong>MAX 10 FPGA</strong> บนบอร์ด <strong>DE10-Lite</strong>
 มีดังนี้</p>
@@ -391,16 +411,49 @@ set_location_assignment PIN_Y1   -to vga_r[3]
 set_location_assignment PIN_N3   -to vga_hs
 set_location_assignment PIN_N1   -to vga_vs
 </code></pre>
+<p>ไฟล์สำหรับกำหนด <strong>Timing Spec</strong> สำหรับสัญญาณ <strong>Clock</strong></p>
+<pre><code class="language-text"># Synopsys design constraints file (.sdc)
+
+# timing spec for clocks signals
+
+# the main clock of 50MHz (period = 20 ns)
+create_clock -name clk -period 20.0 [get_ports clk]
+
+# derived clock with a period of 20 ns
+create_generated_clock -name vga_clk -source [get_ports clk] \
+   -divide_by 1 [get_ports vga_clk]
+</code></pre>
+<p><img alt="" src="vga_test.jpg" /></p>
+<p>รูป: หน้าจอ <strong>LCD</strong> แสดงผลที่ได้จากการกำหนดค่าสีให้พิกเซล </p>
+<p>การทดสอบการทำงานของวงจร จะต้องใช้สัญญาณ <strong>VGA</strong> จากบอร์ด <strong>DE10-Lite</strong>
+นำไปต่อกับจอภาพ <strong>LCD</strong> ที่รองรับการใช้งาน <strong>VGA</strong> ได้</p>
+<p>คำแนะนำ: หากต้องการนำสัญญาณ <strong>VGA</strong> ไปใช้กับจอภาพแบบ <strong>HDMI</strong> 
+ก็สามารถใช้อุปกรณ์เสริม ที่เป็นตัวแปลงสัญญาณ <strong>VGA</strong> ให้เป็นสัญญาณ <strong>HDMI</strong> ได้</p>
+<p>นอกจากนั้น การใช้ <strong>Signal Tap IP Core</strong> เป็นอีกหนึ่งตัวช่วยในการวิเคราะห์การทำงานของวงจร
+ตามตัวอย่างการใช้งานต่อไปนี้</p>
+<p><img alt="" src="stp_vga-1.jpg" /></p>
+<p>รูป: การตั้งค่าการใช้งาน <strong>Signal Tap</strong></p>
+<p><img alt="" src="stp_vga-2.jpg" /></p>
+<p>รูป: ตัวอย่างสัญญาณที่ได้จากการทำงานของ  <strong>Signal Tap</strong></p>
+<p><img alt="" src="stp_vga-3.jpg" /></p>
+<p>รูป: ตัวอย่างสัญญาณที่ได้จากการทำงานของ  <strong>Signal Tap</strong> เมื่อซูมขยายสัญญาณ</p>
+<p>การตั้งค่าทริกเกอร์ (<strong>Trigger</strong>) สำหรับ <strong>Signal Tap</strong> ในตัวอย่างนี้ เป็นดังนี้
+ทริกเกอร์จะเกิดขึ้นเมื่อสัญญาณ <code>visible_area</code> เปลี่ยนจาก <code>0-&gt;1</code> หรือ เกิดขอบขาขึ้น</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
-<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด <strong>VHDL</strong> เพื่อสร้างสัญญาณดิจิทัลเพื่อนำไปใช้สำหรับการแสดงผลบนจอภาพแบบ <strong>VGA</strong>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด <strong>VHDL</strong> เพื่อสร้างสัญญาณดิจิทัล
+และนำไปใช้สำหรับการแสดงผลบนจอภาพแบบ <strong>VGA</strong>
 ขนาด 800 x 600 พิกเซล โดยได้ทดลองใช้กับบอร์ด <strong>Terasic DE10-Lite (MAX 10 FPGA)</strong>
 และสาธิตการสร้างรูปคลื่นสัญญาณสามเหลี่ยมบนจอภาพ</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../de10_lite_intro/">แนะนำการใช้งานบอร์ด <strong>Terasic DE10 Lite Development Kit</strong></a></li>
+</ul>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2024-10-31 | Last Updated: 2024-10-31</p></div>
+<p>Created: 2024-10-31 | Last Updated: 2024-11-01</p></div>
             </div>
         </div>
 
