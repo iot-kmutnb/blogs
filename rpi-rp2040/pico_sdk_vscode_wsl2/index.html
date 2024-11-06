@@ -107,6 +107,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#vs-code-raspberry-pi-pico-extension" class="nav-link">&#9655; การใช้งาน VS Code + Raspberry Pi Pico Extension</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -221,7 +225,7 @@ $ git clone -b master https://github.com/raspberrypi/pico-examples.git
 <pre><code class="language-bash">$ sudo apt install git build-essential cmake gcc-arm-none-eabi \
   libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 </code></pre>
-<p>ลองตรวจสอบเวอร์ชันของโปรแกรม เช่น <code>cmake</code> และ  <code>arm-none-eabi-gcc</code></p>
+<p>ลองตรวจสอบเวอร์ชันของโปรแกรม เช่น <code>cmake</code> และ <code>arm-none-eabi-gcc</code></p>
 <pre><code class="language-bash">$ cmake --version
 cmake version 3.16.3
 ...
@@ -231,44 +235,59 @@ arm-none-eabi-gcc (15:9-2019-q4-0ubuntu1) 9.2.1 20191025 (release)
 ...
 </code></pre>
 <p>หากลองทำคำสั่ง <code>tree</code> เพื่อแสดงรายการไฟล์ภายในไดเรกทอรี จะได้ตัวอย่างของเอาต์พุตดังนี้</p>
-<pre><code class="language-bash">$ tree -L 2 $HOME/pico
+<pre><code class="language-text">$ tree -L 2 $HOME/pico
 
 ├── pico-examples
-│   ├── CMakeLists.txt
-│   ├── CONTRIBUTING.md
-│   ├── LICENSE.TXT
-│   ├── README.md
-│   ├── adc
-│   ├── blink
-│   ├── clocks
-│   ├── cmake
-│   ├── divider
-│   ├── dma
-│   ├── example_auto_set_url.cmake
-│   ├── flash
-│   ├── gpio
-│   ├── hello_world
-│   ├── i2c
-│   ├── ide
-│   ├── interp
-│   ├── multicore
-│   ├── pico_sdk_import.cmake
-│   ├── picoboard
-│   ├── pio
-│   ├── pwm
-│   ├── reset
-│   ├── rtc
-│   ├── spi
-│   ├── system
-│   ├── timer
-│   ├── uart
-│   ├── usb
-│   └── watchdog
+│   ├── CMakeLists.txt
+│   ├── CONTRIBUTING.md
+│   ├── LICENSE.TXT
+│   ├── README.md
+│   ├── adc
+│   ├── blink
+│   ├── blink_simple
+│   ├── bootloaders
+│   ├── build
+│   ├── clocks
+│   ├── cmake
+│   ├── dcp
+│   ├── divider
+│   ├── dma
+│   ├── example_auto_set_url.cmake
+│   ├── flash
+│   ├── freertos
+│   ├── gpio
+│   ├── hello_world
+│   ├── hstx
+│   ├── i2c
+│   ├── ide
+│   ├── interp
+│   ├── multicore
+│   ├── otp
+│   ├── pico_extras_import_optional.cmake
+│   ├── pico_sdk_import.cmake
+│   ├── pico_w
+│   ├── picoboard
+│   ├── pio
+│   ├── pwm
+│   ├── reset
+│   ├── rtc
+│   ├── sha
+│   ├── spi
+│   ├── system
+│   ├── timer
+│   ├── uart
+│   ├── universal
+│   ├── usb
+│   └── watchdog
 └── pico-sdk
+    ├── BUILD.bazel
     ├── CMakeLists.txt
     ├── CONTRIBUTING.md
     ├── LICENSE.TXT
+    ├── MODULE.bazel
     ├── README.md
+    ├── WORKSPACE
+    ├── bazel
     ├── cmake
     ├── docs
     ├── external
@@ -278,10 +297,55 @@ arm-none-eabi-gcc (15:9-2019-q4-0ubuntu1) 9.2.1 20191025 (release)
     ├── src
     ├── test
     └── tools
-33 directories, 12 files
+</code></pre>
+<p><strong>อัปเดต: 2024-11-05</strong></p>
+<p><strong>Pico-SDK v2.0.0</strong> จะใช้โปรแกรมที่มีชื่อว่า <code>picotool</code> 
+สำหรับการแปลงไฟล์ <code>.elf</code> ให้เป็นไฟล์ <code>.uf2</code> (<strong>ELF-to-UF2 conversion</strong>) เพื่อนำไปใช้กับบอร์ด <strong>Raspberry Pi Pico</strong> ดังนั้นแนะนำให้ดาวน์โหลดและติดตั้งโปรแกรมนี้ด้วย ตามขั้นตอนต่อไปนี้</p>
+<pre><code class="language-text">$ cd $HOME/pico
+$ git clone https://github.com/raspberrypi/picotool.git
+$ cd picotool
+
+$ sudo apt install build-essential pkg-config libusb-1.0-0-dev cmake
+
+# Build the picotool executable file
+$ mkdir -p build &amp;&amp; cd build
+$ cmake .. -DPICO_SDK_PATH=$HOME/pico/pico-sdk
+$ make
+$ sudo make install
+
+# Copy the udev rules file to /etc/udev/rules.d/.
+$ sudo cp $HOME/pico/picotool/udev/99-picotool.rules /etc/udev/rules.d/
+
+# Check the version of picotool
+$ picotool version
+picotool v2.0.0 (Linux, GNU-11.4.0, Release)
+</code></pre>
+<p>ถัดไปลองทำขั้นตอน <strong>Build</strong> สำหรับ <strong>Pico-SDK examples</strong></p>
+<pre><code class="language-text"># Build all Pico examples.
+$ cd $HOME/pico/pico-examples/
+$ mkdir -p build &amp;&amp; cd build
+$ cmake ..
+$ make
+
+# Show the directory structure for the blink project. 
+$ tree -L 2 blink
+blink
+├── blink.bin
+├── blink.dis
+├── blink.elf
+├── blink.elf.map
+├── blink.uf2
+├── CMakeFiles
+│   ├── blink.dir
+│   ├── CMakeDirectoryInformation.cmake
+│   └── progress.marks
+├── cmake_install.cmake
+└── Makefile
+
+2 directories, 9 files
 </code></pre>
 <p>&nbsp;</p>
-<p>ขั้นตอนที่ 4) สร้างโปรเจกต์ใหม่ เช่น เก็บไว้ในไดเรกทอรี <code>$HOME/pico/led_blink</code> เพื่อทดลองคอมไพล์โค้ดภาษา <strong>C</strong> </p>
+<p>ขั้นตอนที่ 4) ลองสร้างโปรเจกต์ใหม่ เช่น เก็บไว้ในไดเรกทอรี <code>$HOME/pico/led_blink</code> เพื่อทดลองคอมไพล์โค้ดภาษา <strong>C</strong> </p>
 <pre><code class="language-bash"># change to the '$HOME/pico' directory
 $ cd $HOME/pico
 # make a new directory for the project
@@ -405,6 +469,30 @@ $ code .
 <p>รูป: แสดงตัวอย่างการทำขั้นตอน <strong>Build</strong> เพื่อคอมไพล์โค้ดตัวอย่างและสร้างไฟล์เอาต์พุต <code>.uf2</code></p>
 <p>&nbsp;</p>
 <hr />
+<h2 id="vs-code-raspberry-pi-pico-extension">&#9655; <strong>การใช้งาน VS Code + Raspberry Pi Pico Extension</strong><a class="headerlink" href="#vs-code-raspberry-pi-pico-extension" title="Permanent link">#</a></h2>
+<p><strong>อัปเดต:</strong> ในเดือนมีนาคม ค.ศ. 2024 ทีมพัฒนาซอฟต์แวร์ของ <strong>Raspberry Pi Ltd.</strong>
+ได้เปิดตัว <strong>Pico VS Code Extension</strong> (<a href="https://github.com/raspberrypi/pico-vscode"><code>pico-vscode-extension</code></a>) สำหรับการใช้งานร่วมกับ <strong>Microsoft VS Code IDE</strong> ทำให้สะดวกในการสร้างโปรเจกต์ใหม่ การสร้างโปรเจกต์จากตัวอย่าง การนำเข้าโปรเจกต์ที่มีอยู่แล้ว
+การเขียนโค้ด และทำขั้นตอน <strong>Build</strong> เป็นต้น</p>
+<p><img alt="" src="images/pico_ext-1.png" /></p>
+<p>รูป: การติดตั้ง <strong>Pico VS Code Extension</strong> (ทดลองใช้กับ <strong>VS Code IDE / Ubuntu</strong>)</p>
+<p><img alt="" src="images/pico_ext-2.png" /></p>
+<p>รูป: ลองสร้างโปรเจกต์ใหม่จากโปรเจกต์ตัวอย่าง <code>blink</code> จาก <strong>Pico-SDK examples</strong></p>
+<p><img alt="" src="images/pico_ext-3.png" /></p>
+<p>รูป: ทำขั้นตอน <strong>Compile Project</strong></p>
+<p><img alt="" src="images/pico_ext-4.png" /></p>
+<p>รูป: ทำขั้นตอน <strong>Run Project (USB)</strong></p>
+<p>เมื่อคอมไพล์โค้ดในโปรเจกต์ได้สำเร็จแล้ว หากต้องการจะอัปโหลดไฟล์ <code>.uf2</code> ไปยังบอร์ด <strong>Raspberry Pi Pico</strong>
+จะต้องทำให้บอร์ดอยู่ในโหมด <strong>BOOTSEL</strong> ก่อน ซึ่งจะมองเห็น <strong>USB Flash Drive</strong> ของบอร์ดได้ในระบบ
+จากนั้นจึงกดปุ่มทำขั้นตอน  <strong>Run Project (USB)</strong> โดยใช้คำสั่ง <code>picotool</code> เป็นลำดับถัดไป</p>
+<p>ถัดไปให้ลองสร้างโปรเจกต์ใหม่ โดยเลือกจากตัวอย่าง <code>hello_usb</code> เพื่อส่งข้อความจากบอร์ด <strong>Pico</strong>
+มายังคอมพิวเตอร์ของผู้ใช้ โดยใช้ <strong>USB-CDC</strong> (แทนการใช้ <strong>Hardware UART 0</strong>)</p>
+<p><img alt="" src="images/pico_ext-5.png" /></p>
+<p>รูป: ตัวอย่าง <strong>CMakeFiles.txt</strong> ของโปรเจกต์ <code>hello_usb</code></p>
+<p><img alt="" src="images/pico_ext-6.png" /></p>
+<p>รูป: การเปิดใช้งาน <strong>Serial Monitor</strong> ใน <strong>VS Code IDE</strong> เพื่อรับข้อความจากบอร์ด <strong>Pico</strong>
+เมื่อมีการทำคำสั่ง <code>printf(...)</code></p>
+<p>&nbsp;</p>
+<hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอขั้นตอนการติดตั้งซอฟต์แวร์ต่าง ๆ เช่น <strong>VS Code</strong> และ <strong>Pico C/C++ SDK</strong>
 สำหรับระบบปฏิบัติการ <strong>Windows</strong> ที่ทำงานร่วมกับ
@@ -413,7 +501,7 @@ $ code .
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-02-21 | Last Updated: 2022-04-19</p></div>
+<p>Created: 2022-02-21 | Last Updated: 2024-11-05</p></div>
             </div>
         </div>
 
