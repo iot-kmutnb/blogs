@@ -154,6 +154,8 @@
 <li>แรงดันไฟเลี้ยง (<strong>VDD</strong>): <strong>2.7V ~ 5.5V</strong></li>
 <li>ความเร็วในการแปลงข้อมูล (<strong>Conversion Rate or Sampling Rate</strong>): <strong>50k ~ 200k Samples/s</strong></li>
 <li>โหมดการทำงานของ <strong>SPI</strong> หรือ การตั้งค่า <strong>(CPOL,CPHA)</strong>: <strong>(0,0)</strong>  และ <strong>(1,1)</strong></li>
+<li>ในการต่อวงจรทดลอง ให้ใช้แรงดันไฟเลี้ยง <strong>3.3V</strong> สำหรับขา <strong>VDD</strong> และขา <strong>VREF</strong>
+และขา <strong>DGND (Digital Ground)</strong> กับ <strong>AGND (Analog Ground)</strong> ต่อร่วมกัน (<strong>Common Ground</strong>) เข้ากับกราวด์ของระบบ</li>
 </ul>
 </li>
 </ul>
@@ -195,31 +197,39 @@
 <code>ADC_CSN</code> (<em>Chip Select</em>), <code>ADC_SCLK</code> (<em>SPI Clock</em>)
 <code>ADC_MOSI</code> (<em>SPI MOSI</em>) และ <code>ADC_MISO</code> (<em>SPI MISO</em>)</p>
 <p><code>SPI_CLK_DIV</code> เป็นค่าคงที่แบบเลขจำนวนเต็ม ใช้เป็นค่าตัวหารความถี่สำหรับการสร้างสัญญาณเอาต์พุต
-<code>ADC_SCLK</code> ในตัวอย่างนี้จะได้ความถี่ <strong>1MHz</strong></p>
+<code>ADC_SCLK</code> ในตัวอย่างนี้จะได้ความถี่ <strong>1MHz</strong> และเลือกโหมดการทำงานเป็น <strong>SPI Mode 3</strong></p>
 <p>ในตัวอย่างนี้ เป็นการสาธิตการอ่านค่าจากแอนะล็อกอินพุตของ <strong>ADC</strong> เพียงหนึ่งช่องเท่านั้น โดยกำหนดค่าให้กับสัญญาณ
-<code>channel</code> ขนาด 3 บิต</p>
+<code>channel</code> ขนาด 3 บิต (ตั้งค่าเป็น <code>001</code> ซึ่งตรงกับขา <code>Analog_In1</code> ของบอร์ด)
+มีการกำหนดขนาดของรีจิสเตอร์สำหรับเลื่อนข้อมูลบิต (<em>Shift Register</em>*) เป็น 16 บิต</p>
 <p>ข้อมูล 12 บิต ที่อ่านได้จะถูกนำมาใช้เป็นเอาต์พุต <code>LEDS[7:0]</code> ในการแสดงระดับของแอมพลิจูด
 ด้วย <strong>LED</strong> จำนวน 8 ดวง (แสดงค่า 8 ระดับ) บนบอร์ด <strong>FPGA</strong></p>
+<p>นอกจากนั้นแล้ว ยังมีการนำค่าที่อ่านได้จาก <strong>ADC</strong> ซึ่งมีขนาด 12 บิต นำไปเปรียบเทียบกับตัวนับขนาด 12 บิต
+(นับด้วยความถี่ <strong>50MHz</strong>)
+เพื่อสร้างสัญญาณเอาต์พุต <strong>PWM</strong> (<em>Pulse Width Modulation</em>) จำนวน 1 ช่องสัญญาณ
+ความถี่ของสัญญาณ <strong>PWM</strong> เท่ากับ <code>50MHz / 2^12 = 12.207kHz</code></p>
 <pre><code class="language-vhdl">library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 entity de0nano_adc_demo is
   port (
-    CLK      : in std_logic; -- 50 MHz system clock
-    NRST     : in std_logic; -- Active-low asynchronous reset
+    CLK      : in  std_logic; -- 50 MHz system clock
+    NRST     : in  std_logic; -- Active-low asynchronous reset
     ADC_CSN  : out std_logic; -- ADC SPI chip-select
     ADC_SCLK : out std_logic; -- ADC SPI SCLK
     ADC_MOSI : out std_logic; -- ADC SPI MOSI
-    ADC_MISO : in std_logic;  -- ADC SPI MISO
-    LEDS     : out std_logic_vector(7 downto 0) -- 8-bit ADC OUTPUT
+    ADC_MISO : in  std_logic; -- ADC SPI MISO
+    LEDS     : out std_logic_vector(7 downto 0); -- 8-bit ADC OUTPUT
+    PWM      : out std_logic -- single-channel PWM output
   );
 end de0nano_adc_demo;
 
 architecture behavioral of de0nano_adc_demo is
 
   constant SPI_CLK_DIV : integer := 25;
-  constant DATA_WIDTH  : integer := 16; -- for ADC128S022
+  constant SREG_BW     : integer := 16; -- for ADC128S022
+  constant ADC_BW      : integer := 12; -- ADC resolution
+  constant PWM_BW      : integer := 12; -- PWM resolution
 
   type state_type is (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_WAIT);
   signal state : state_type := ST_IDLE;
@@ -228,15 +238,19 @@ architecture behavioral of de0nano_adc_demo is
   signal sclk : std_logic := '0';
   signal mosi : std_logic := '0';
 
-  signal bit_index : integer range 0 to DATA_WIDTH - 1 := 0;
-  signal adc_data  : std_logic_vector(11 downto 0)  := (others =&gt; '0');
-  signal channel   : std_logic_vector(2 downto 0)   := &quot;000&quot;;
+  signal adc_data : std_logic_vector(ADC_BW-1 downto 0) := (others =&gt; '0');
+  signal channel  : std_logic_vector(2 downto 0)        := &quot;000&quot;;
+  signal data_valid : std_logic                         := '0';
 
-  signal shift_en  : std_logic := '0';
-  signal shift_reg : std_logic_vector(DATA_WIDTH - 1 downto 0);
+  signal bit_index  : integer range 0 to SREG_BW-1 := 0;
+  signal shift_reg  : std_logic_vector(SREG_BW-1 downto 0);
+  signal shift_en   : std_logic := '0';
 
-  constant WAIT_CNT_MAX : integer := 31;
-  signal wait_cnt       : integer := 0;
+  constant WAIT_CNT_MAX  : integer := 500-1;
+  signal wait_cnt        : integer := 0;
+
+  signal pwm_cnt         : UNSIGNED(PWM_BW-1 downto 0) := (others =&gt; '0');
+  signal saved_adc_value : UNSIGNED(ADC_BW-1 downto 0) := (others =&gt; '0');
 
 begin
 
@@ -246,7 +260,8 @@ begin
 
   --LEDS &lt;= adc_data(11 downto 4); -- show 8-bit ADC value directly to LEDs
 
-  process (adc_data)
+  -- voltage level indicator using 8 LEDs
+  led_level_proc : process (adc_data)
     variable leds_on : integer range 0 to 7;
     variable value   : integer range 0 to 255;
   begin
@@ -254,11 +269,11 @@ begin
     value   := value / 32;
     leds_on := value;
     LEDS &lt;= (others =&gt; '0'); -- Default to all LEDs OFF
-    LEDS(leds_on downto 0) &lt;= (others =&gt; '1'); -- Turn ON the corresponding LEDs
+    LEDS(leds_on downto 0) &lt;= (others =&gt; '1'); -- Turn ON the LEDs
   end process;
 
-  process (CLK, NRST)
-    variable count : integer range 0 to SPI_CLK_DIV - 1 := 0;
+  adc_sck_tick_proc : process (CLK, NRST)
+    variable count : integer range 0 to SPI_CLK_DIV-1 := 0;
   begin
     if NRST = '0' then
       count := 0;
@@ -274,57 +289,66 @@ begin
     end if;
   end process;
 
-  process (CLK, NRST)
+  adc_read_proc : process (CLK, NRST)
   begin
     if NRST = '0' then
-      cs_n      &lt;= '1';
-      mosi      &lt;= '0';
-      sclk      &lt;= '0';
-      adc_data  &lt;= (others =&gt; '0');
-      channel   &lt;= (others =&gt; '0');
-      bit_index &lt;= 0;
-      wait_cnt  &lt;= 0;
-      state     &lt;= ST_IDLE;
+      cs_n       &lt;= '1';
+      mosi       &lt;= '0';
+      sclk       &lt;= '0';
+      adc_data   &lt;= (others =&gt; '0');
+      channel    &lt;= (others =&gt; '0');
+      bit_index  &lt;= 0;
+      wait_cnt   &lt;= 0;
+      data_valid &lt;= '1';
+      state      &lt;= ST_IDLE;
 
     elsif rising_edge(CLK) then
 
       case state is
         when ST_IDLE =&gt;
-          bit_index &lt;= 0;
           channel   &lt;= &quot;001&quot;; -- Select channel ADC_IN1
+          bit_index &lt;= 0;
           cs_n      &lt;= '1';
           sclk      &lt;= '1';
           state     &lt;= ST_START;
 
         when ST_START  =&gt;
-          shift_reg  &lt;= (others =&gt; '0');
-          shift_reg(13 downto 11) &lt;= channel; -- for ADC128S022
-          cs_n   &lt;= '0';
-          state  &lt;= ST_SCK_L;
+         if shift_en = '1' then
+            shift_reg &lt;= (others =&gt; '0');
+            shift_reg(13 downto 11) &lt;= channel; -- for ADC128S022
+            cs_n &lt;= '0';
+            sclk &lt;= '1';
+            data_valid &lt;= '0';
+            state &lt;= ST_SCK_L;
+         end if;
 
         when ST_SCK_L =&gt;
           if shift_en = '1' then
-            sclk  &lt;= '0';
-            mosi  &lt;= shift_reg(shift_reg'left);
+            sclk &lt;= '0';
+            mosi &lt;= shift_reg(shift_reg'left);
             state &lt;= ST_SCK_H;
           end if;
 
         when ST_SCK_H =&gt;
           if shift_en = '1' then
-            sclk      &lt;= '1';
-            shift_reg &lt;= shift_reg(shift_reg'left - 1 downto 0) &amp; adc_miso;
-            if bit_index = DATA_WIDTH - 1 then
-              cs_n     &lt;= '1';
+            sclk &lt;= '1';
+            shift_reg &lt;= shift_reg(shift_reg'left-1 downto 0) &amp; adc_miso;
+            if bit_index = SREG_BW-1 then
               wait_cnt &lt;= WAIT_CNT_MAX;
-              state    &lt;= ST_WAIT;
+              state &lt;= ST_WAIT;
             else
               bit_index &lt;= bit_index + 1;
-              state     &lt;= ST_SCK_L;
+              state &lt;= ST_SCK_L;
             end if;
           end if;
 
         when ST_WAIT =&gt;
-          adc_data &lt;= shift_reg(11 downto 0);
+          if shift_en = '1' then
+            SCLK &lt;= '1';
+            data_valid &lt;= '1';
+            adc_data &lt;= shift_reg(ADC_BW-1 downto 0);
+            cs_n &lt;= '1';
+          end if;
           if wait_cnt = 0 then
             state &lt;= ST_IDLE;
           else
@@ -336,6 +360,25 @@ begin
       end case;
     end if;
   end process;
+
+  pwm_count_proc : process (NRST, CLK)
+  begin
+    if NRST = '0' then
+      pwm_cnt &lt;= (others =&gt; '0');
+    elsif rising_edge(CLK) then
+      if pwm_cnt = 2 ** PWM_BW - 1 then
+        if data_valid = '1' then
+          saved_adc_value &lt;= unsigned(adc_data);
+        end if;
+        pwm_cnt &lt;= (others =&gt; '0'); -- reset PWM counter
+      else
+        pwm_cnt &lt;= pwm_cnt + 1; -- increment PWM counter
+      end if;
+    end if;
+  end process;
+
+  -- PWM output
+  pwm &lt;= '1' when (pwm_cnt &lt; saved_adc_value) else '0';
 
 end behavioral;
 </code></pre>
@@ -359,25 +402,17 @@ set_location_assignment PIN_D1  -to LEDS[4]
 set_location_assignment PIN_F3  -to LEDS[5]
 set_location_assignment PIN_B1  -to LEDS[6]
 set_location_assignment PIN_L3  -to LEDS[7]
+set_location_assignment PIN_A14  -to PWM
 
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to NRST
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_CSN
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MISO
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MOSI
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_SCLK
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[0]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[2]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[3]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[4]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[5]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[6]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to *
 </code></pre>
-<p>ในการทดลองกับอุปกรณ์จริง โดยใช้ตัวต้านทานปรับค่าได้ นำมาต่อเป็นวงจรแบ่งแรงดันไฟฟ้า (<strong>Voltage Divider</strong>)
-และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> กับ <strong>GND</strong> จากบอร์ด <strong>FPGA</strong>
-ลองหมุนปรับค่าแรงดันไฟฟ้า แล้วสังเกตการเปลี่ยนแปลงสถานะ <strong>LEDS</strong> บนบอร์ด <strong>FPGA</strong></p>
+<p>&nbsp;</p>
+<p>ในการทดลองกับอุปกรณ์จริง ได้ใช้ตัวต้านทานปรับค่าได้ (<strong>10k</strong> โอห์ม)
+นำมาต่อเป็นวงจรแบ่งแรงดันไฟฟ้า (<strong>Voltage Divider</strong>)
+และใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong> กับ <strong>GND</strong> จากบอร์ด <strong>FPGA</strong> ในการต่อวงจรบนเบรดบอร์ด</p>
+<p>เมื่อต่อวงจรได้ถูกต้องแล้ว ลองหมุนปรับค่าแรงดันไฟฟ้าที่ใช้เป็นสัญญาณอินพุต-แอนะล็อก
+แล้วสังเกตการเปลี่ยนแปลงสถานะ <strong>LEDS</strong> บนบอร์ด <strong>FPGA</strong>
+และใช้ออสซิลโลสโคป วัดสัญญาณเอาต์พุต <strong>PWM</strong> </p>
 <p><img alt="" src="adc128s022_de0nano.jpg" /></p>
 <p>รูป: แผนผังแสดงการเชื่อมต่อระหว่างไอซี <strong>ADC</strong> กับชิป <strong>Cyclone IV FPGA</strong> บนบอร์ด <strong>DE0-Nano</strong></p>
 <p><img alt="" src="de0nano_connector.jpg" /></p>
@@ -386,150 +421,161 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
 <p><img alt="" src="de0nano_demo-1.jpg" /></p>
 <p>รูป: การต่อวงจรทดลองสำหรับบอร์ด <strong>DE0-Nano</strong> (ใช้แรงดันไฟเลี้ยงจากขา <strong>VCC3P3</strong> และ <strong>GND</strong>)</p>
 <p>&nbsp;</p>
+<p><strong>Signal Tap</strong> สามารถนำมาใส่เพิ่มไว้ในวงจรของผู้ใช้ เพื่อช่วยในการบันทึกและวิเคราะห์สัญญาณที่เกิดขึ้นจริง
+ในชิป <strong>FPGA</strong> โดยเลือกมาบางสัญญาณ เช่น สัญญาณที่เกี่ยวข้องกับการทำงานของบัส <strong>SPI</strong> 
+และข้อมูลที่อ่านได้จาก <strong>ADC</strong> ตามรูปตัวอย่างดังนี้</p>
+<p><img alt="" src="stp-1.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>Signal Tap</strong> เพื่อบันทึกค่าลอจิกของสัญญาณภายในชิป <strong>FPGA</strong> ที่ถูกเลือกมาวิเคราะห์</p>
+<p><img alt="" src="stp-2.jpg" /></p>
+<p>รูป: คลื่นสัญญาณดิจิทัลที่ได้จากวงจร  <strong>Signal Tap</strong></p>
+<p><img alt="" src="pwm_waveform.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณเอาต์พุต <strong>PWM</strong> ที่วัดได้ โดยใช้ออสซิลโลสโคป (ปรับค่า <strong>Duty Cycle</strong> จากน้อยไปมาก)</p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="vhdl-mcp3208">&#9655; <strong>ตัวอย่างการเขียนโค้ด VHDL สำหรับ MCP3208</strong><a class="headerlink" href="#vhdl-mcp3208" title="Permanent link">#</a></h2>
-<p>โค้ด <strong>VHDL</strong> ต่อไปนี้ จะใช้สำหรับไอซี <strong> MCP3208</strong> และมีความแตกต่างจากโค้ดตัวอย่างที่แล้วแค่บางตำแหน่งเท่านั้น
-ได้แก่ การกำหนดค่า <code>DATA_WIDTH</code> เปลี่ยนจากเดิม 16 บิต เป็น 24 บิต
-และการกำหนดค่าให้ <code>shift_reg</code> ในบิตที่ 18 ถึง 14</p>
-<pre><code class="language-vhdl">library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.all;
+<p>โค้ด <strong>VHDL</strong> ต่อไปนี้ จะใช้สำหรับไอซี <strong> MCP3208</strong> การรับส่งข้อมูลจะทำในโหมด <strong>SPI Mode 0</strong>
+มีการกำหนดขนาดของรีจิสเตอร์สำหรับเลื่อนข้อมูลบิต จากเดิม 16 บิต เป็น 24 บิต
+และการกำหนดค่าให้ <code>shift_reg</code> ในบิตที่ 18 ถึง 14 เพื่อเลือกหมายเลขของช่องสัญญาณอินพุต</p>
+<p>ในตัวอย่างนี้ สัญญาณเอาต์พุตที่นำไปใช้กับ <strong>LEDs</strong> บนบอร์ด <strong>DE0-Nano</strong> เป็นข้อมูล 8 บิต ที่อ่านได้จาก <strong>ADC</strong> 
+โดยเลือกมาใช้เพียง 8 บิต (บิตที่ 11 ถึง 4) จากทั้งหมด 12 บิต</p>
+<pre><code class="language-vhdl">LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-entity de0nano_adc_demo is
-  port (
-    CLK      : in std_logic; -- 50 MHz system clock
-    NRST     : in std_logic; -- Active-low asynchronous reset
-    ADC_CSN  : out std_logic; -- ADC SPI chip-select
-    ADC_SCLK : out std_logic; -- ADC SPI SCLK
-    ADC_MOSI : out std_logic; -- ADC SPI MOSI
-    ADC_MISO : in std_logic;  -- ADC SPI MISO
-    LEDS     : out std_logic_vector(7 downto 0) -- 8-bit ADC OUTPUT
+ENTITY de0nano_adc_demo IS
+  PORT (
+    CLK      : IN  STD_LOGIC; -- 50 MHz system clock
+    NRST     : IN  STD_LOGIC; -- Active-low asynchronous reset
+    ADC_CSN  : OUT STD_LOGIC; -- ADC SPI chip-select
+    ADC_SCLK : OUT STD_LOGIC; -- ADC SPI SCLK
+    ADC_MOSI : OUT STD_LOGIC; -- ADC SPI MOSI
+    ADC_MISO : IN  STD_LOGIC; -- ADC SPI MISO
+    LEDS     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0) -- 8-bit LED OUTPUT
   );
-end de0nano_adc_demo;
+END de0nano_adc_demo;
 
-architecture behavioral of de0nano_adc_demo is
+ARCHITECTURE behavioral OF de0nano_adc_demo IS
 
-  constant SPI_CLK_DIV  : integer := 25;
-  constant DATA_WIDTH   : integer := 24; -- for MCP3208 ***
+  CONSTANT SPI_CLK_DIV : INTEGER := 25;
+  CONSTANT SREG_BW     : INTEGER := 24; -- for MCP3208 ***
+  CONSTANT ADC_BW      : INTEGER := 12;
 
-  type state_type is (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_WAIT);
-  signal state : state_type := ST_IDLE;
+  TYPE state_type IS (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_WAIT);
+  SIGNAL state : state_type := ST_IDLE;
 
-  signal cs_n : std_logic := '1';
-  signal sclk : std_logic := '0';
-  signal mosi : std_logic := '0';
+  SIGNAL cs_n : STD_LOGIC := '1';
+  SIGNAL sclk : STD_LOGIC := '0';
+  SIGNAL mosi : STD_LOGIC := '0';
 
-  signal bit_index : integer range 0 to DATA_WIDTH - 1 := 0;
-  signal adc_data  : std_logic_vector(11 downto 0) := (others =&gt; '0');
-  signal channel   : std_logic_vector(2 downto 0)  := &quot;000&quot;;
+  SIGNAL adc_data : STD_LOGIC_VECTOR(ADC_BW-1 DOWNTO 0) := (OTHERS =&gt; '0');
+  SIGNAL channel  : STD_LOGIC_VECTOR(2 DOWNTO 0) := &quot;000&quot;;
+  SIGNAL data_valid : STD_LOGIC := '0';
 
-  signal shift_en  : std_logic := '0';
-  signal shift_reg : std_logic_vector(DATA_WIDTH - 1 downto 0);
+  SIGNAL bit_index : INTEGER RANGE 0 TO SREG_BW - 1 := 0;
+  SIGNAL shift_reg : STD_LOGIC_VECTOR(SREG_BW-1 DOWNTO 0);
+  SIGNAL shift_en  : STD_LOGIC := '0';
 
-  constant WAIT_CNT_MAX : integer := 31;
-  signal wait_cnt       : integer := 0;
+  CONSTANT WAIT_CNT_MAX : INTEGER := 100-1;
+  SIGNAL wait_cnt : INTEGER := 0;
 
-begin
+BEGIN
 
   adc_csn  &lt;= cs_n;
   adc_sclk &lt;= sclk;
   adc_mosi &lt;= mosi;
 
-  --LEDS &lt;= adc_data(11 downto 4);
+  LEDS &lt;= adc_data(11 downto 4); -- use bits 11 to 4 for LEDs
 
-  process (adc_data)
-    variable leds_on : integer range 0 to 7;
-    variable value   : integer range 0 to 255;
-  begin
-    value   := to_integer(unsigned(adc_data(11 downto 4)));
-    value   := value / 32;
-    leds_on := value;
-    -- Generate LED pattern based on leds_on
-    LEDS &lt;= (others =&gt; '0'); -- Default to all LEDs OFF
-    LEDS(leds_on downto 0) &lt;= (others =&gt; '1'); -- Turn ON the corresponding LEDs
-  end process;
-
-  process (CLK, NRST)
-    variable count : integer range 0 to SPI_CLK_DIV - 1 := 0;
-  begin
-    if NRST = '0' then
+  PROCESS (CLK, NRST)
+    VARIABLE count : INTEGER RANGE 0 TO SPI_CLK_DIV-1 := 0;
+  BEGIN
+    IF NRST = '0' THEN
       count := 0;
       shift_en &lt;= '0';
-    elsif rising_edge(CLK) then
-      if count = SPI_CLK_DIV - 1 then
+    ELSIF rising_edge(CLK) THEN
+      IF count = SPI_CLK_DIV-1 THEN
         count := 0;
         shift_en &lt;= '1';
-      else
+      ELSE
         count := count + 1;
         shift_en &lt;= '0';
-      end if;
-    end if;
-  end process;
+      END IF;
+    END IF;
+  END PROCESS;
 
-  process (CLK, NRST)
-  begin
-    if NRST = '0' then
-      cs_n      &lt;= '1';
-      mosi      &lt;= '0';
-      sclk      &lt;= '0';
-      adc_data  &lt;= (others =&gt; '0');
-      channel   &lt;= (others =&gt; '0');
-      bit_index &lt;= 0;
-      wait_cnt  &lt;= 0;
-      state     &lt;= ST_IDLE;
+  PROCESS (CLK, NRST)
+  BEGIN
+    IF NRST = '0' THEN
+      cs_n &lt;= '1';
+      mosi &lt;= '0';
+      sclk &lt;= '0';
+      adc_data   &lt;= (OTHERS =&gt; '0');
+      channel    &lt;= (OTHERS =&gt; '0');
+      bit_index  &lt;= 0;
+      wait_cnt   &lt;= 0;
+      data_valid &lt;= '1';      
+      state      &lt;= ST_IDLE;
 
-    elsif rising_edge(CLK) then
+    ELSIF rising_edge(CLK) THEN
 
-      case state is
-        when ST_IDLE =&gt;
+      CASE state IS
+        WHEN ST_IDLE =&gt;
           bit_index &lt;= 0;
-          channel   &lt;= &quot;001&quot;; -- Select channel ADC_IN1
-          cs_n      &lt;= '1';
-          sclk      &lt;= '1';
-          state     &lt;= ST_START;
+          channel &lt;= &quot;001&quot;; -- Select channel ADC_IN1
+          cs_n &lt;= '1';
+          sclk &lt;= '0';
+          state &lt;= ST_START;
 
-        when ST_START  =&gt;
-          shift_reg  &lt;= (others =&gt; '0');
-          shift_reg(18 DOWNTO 14) &lt;= &quot;11&quot; &amp; channel; -- for MCP3208 ***         
-          cs_n   &lt;= '0';
-          state  &lt;= ST_SCK_L;
+        WHEN ST_START =&gt;
+          IF shift_en = '1' then
+            shift_reg &lt;= (OTHERS =&gt; '0');
+            shift_reg(18 DOWNTO 14) &lt;= &quot;11&quot; &amp; channel; -- for MCP3208 ***         
+            cs_n &lt;= '0';
+            sclk  &lt;= '0';
+            data_valid &lt;= '0';
+            state &lt;= ST_SCK_L;
+          END IF;
 
-        when ST_SCK_L =&gt;
-          if shift_en = '1' then
+        WHEN ST_SCK_L =&gt;
+          IF shift_en = '1' THEN
             sclk  &lt;= '0';
             mosi  &lt;= shift_reg(shift_reg'left);
             state &lt;= ST_SCK_H;
-          end if;
+          END IF;
 
-        when ST_SCK_H =&gt;
-          if shift_en = '1' then
-            sclk      &lt;= '1';
-            shift_reg &lt;= shift_reg(shift_reg'left - 1 downto 0) &amp; adc_miso;
-            if bit_index = DATA_WIDTH - 1 then
-              cs_n     &lt;= '1';
+        WHEN ST_SCK_H =&gt;
+          IF shift_en = '1' THEN
+            sclk &lt;= '1';
+            shift_reg &lt;= shift_reg(shift_reg'left-1 DOWNTO 0) &amp; adc_miso;
+            IF bit_index = SREG_BW - 1 THEN
               wait_cnt &lt;= WAIT_CNT_MAX;
-              state    &lt;= ST_WAIT;
-            else
+              state &lt;= ST_WAIT;
+            ELSE
               bit_index &lt;= bit_index + 1;
-              state     &lt;= ST_SCK_L;
-            end if;
-          end if;
+              state &lt;= ST_SCK_L;
+            END IF;
+          END IF;
 
-        when ST_WAIT =&gt;
-          adc_data &lt;= shift_reg(11 downto 0);
-          if wait_cnt = 0 then
+        WHEN ST_WAIT =&gt;
+          IF shift_en = '1' then
+            sclk &lt;= '0';
+            cs_n &lt;= '1';
+            data_valid &lt;= '1';
+            adc_data &lt;= shift_reg(ADC_BW-1 DOWNTO 0);
+          END IF;
+          IF wait_cnt = 0 THEN
             state &lt;= ST_IDLE;
-          else
+          ELSE
             wait_cnt &lt;= wait_cnt - 1;
-          end if;
+          END IF;
 
-        when others =&gt;
+        WHEN OTHERS =&gt;
           state &lt;= ST_IDLE;
-      end case;
-    end if;
-  end process;
+      END CASE;
+    END IF;
+  END PROCESS;
 
-end behavioral;
+END behavioral;
 </code></pre>
 <p>ถัดไปเป็นไฟล์ <strong>Tcl Script</strong> เพื่อใช้ในการเลือกใช้ขา <strong>I/O</strong> ของ <strong>FPGA</strong> บน <strong>DE0-Nano</strong>
 สำหรับสัญญาณ <strong>I/O</strong> ของวงจรดิจิทัล</p>
@@ -557,21 +603,10 @@ set_location_assignment PIN_F3  -to LEDS[5]
 set_location_assignment PIN_B1  -to LEDS[6]
 set_location_assignment PIN_L3  -to LEDS[7]
 
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to NRST
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_CSN
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MISO
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_MOSI
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to ADC_SCLK
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[0]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[2]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[3]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[4]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[5]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[6]
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to * 
 </code></pre>
+<p>ในการต่อวงจรบนเบรดบอร์ดร่วมกับบอร์ด <strong>DE0-Nano</strong> ได้เลือกใช้ขา <strong>FPGA I/Os</strong> 
+ของคอนเนกเตอร์ <strong>GPIO-0</strong> (ดูแผนผังของตำแหน่งขาและทิศทางการกำหนดหมายเลขขาตามลำดับจากรูปภาพประกอบ)</p>
 <p><img alt="" src="de0nano_gpio0-1_connectors.jpg" /></p>
 <p>รูป: แผนผังแสดงตำแหน่งของขา <strong>I/O</strong> สำหรับคอนเนกเตอร์ <strong>GPIO-0 (JP1)</strong> และ <strong>GPIO-1 (JP2)</strong>
 (ให้สังเกตขาหมายเลข 1 และทิศทางการจัดเรียงขาตามหมายเลข)</p>
@@ -580,11 +615,8 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
 <p><img alt="" src="de0nano_demo-2.jpg" /></p>
 <p><img alt="" src="de0nano_demo-3.jpg" /></p>
 <p>รูป: การต่อวงจรเพื่อทดลองใช้ไอซี <strong>MCP3208</strong> บนเบรดบอร์ดร่วมกับบอร์ด <strong>DE0-Nano</strong></p>
-<p><img alt="" src="spi_capture-1.jpg" /></p>
-<p><img alt="" src="spi_capture-2.jpg" /></p>
-<p>รูป: ตัวอย่างการวัดสัญญาณ <strong>SPI</strong> ด้วย <strong>USB Logic Analyzer</strong></p>
-<p>จากการวัดสัญญาณ จะเห็นได้ว่า ความถี่ของสัญญาณ <strong>SCLK</strong> อยู่ที่ประมาณ <strong>1MHz</strong>
-และจะมีการอ่านค่า <strong>ADC</strong> ซ้ำไปเรื่อย ๆ ด้วยอัตราประมาณ 40,000 ครั้งต่อวินาที</p>
+<p><img alt="" src="stp-3.jpg" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณด้วย <strong>Signal Tap</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -594,13 +626,14 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
 ร่วมกับไอซี <strong>ADC128S022</strong> และ <strong>MCP3208</strong> ตามลำดับ</p>
 <p><strong>บทความที่เกี่ยวข้อง</strong></p>
 <ul>
+<li><a href="../signaltap_intro/">แนะนำการใช้งานซอฟต์แวร์ <strong>Signal Tap Logic Analyzer</strong></a></li>
 <li><a href="../../arduino/arduino-spi-master-slave/">การสื่อสารด้วยบัส <strong>SPI</strong> และเขียนโปรแกรมด้วย <strong>Arduino Uno / Nano</strong></a></li>
 <li><a href="../../esp32/esp32-spi-master-slave/">การเขียนโค้ด <strong>Arduino-ESP32</strong> เพื่อการใช้เชื่อมต่อด้วยบัส <strong>SPI Master-Slave</strong></a></li>
 </ul>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2024-10-16 | Last Updated: 2024-10-21</p></div>
+<p>Created: 2024-10-16 | Last Updated: 2024-11-06</p></div>
             </div>
         </div>
 
