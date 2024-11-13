@@ -257,7 +257,7 @@ architecture behavior of mcp4725_dac is
 
   constant BW        : integer := 12; -- 12 bits for DAC output
   constant M         : integer := 8;
-  constant MAX_INDEX : integer := 2 ** M - 1;
+  constant MAX_INDEX : integer := 2**M - 1;
 
   subtype sample_t is std_logic_vector((BW - 1) downto 0);
   type sample_table_t is array(0 to MAX_INDEX) of sample_t;
@@ -273,7 +273,7 @@ architecture behavior of mcp4725_dac is
     return LUT;
   end function;
 
-  signal sample_table : sample_table_t               := init_table;
+  signal sample_table : sample_table_t := init_table;
   signal sample_index : integer range 0 to MAX_INDEX := 0;
 
   type state_type is (ST_IDLE, ST_START, ST_WR_1, ST_WR_2, ST_STOP);
@@ -283,9 +283,9 @@ architecture behavior of mcp4725_dac is
   signal ack_error   : std_logic;
   signal ena         : std_logic := '0';
   signal rw          : std_logic := '0';
-  signal data_wr     : std_logic_vector(7 downto 0);
+  signal data_wr     : std_logic_vector( 7 downto 0);
   signal data_buffer : std_logic_vector(15 downto 0);
-  signal busy_prev   : std_logic_vector(1 downto 0);
+  signal busy_prev   : std_logic_vector( 1 downto 0);
   signal wait_cnt    : integer := 0;
 
 begin
@@ -421,7 +421,7 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SCL
     for i in 0 to MAX_INDEX loop
       -- sinusoidal waveform (with DC offset)
       x      := (1.0 + SIN(2.0 * MATH_PI * real(i) / real(2**M)))/2.0;
-      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)),12));
+      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)),BW));
     end loop;
     return LUT;
   end function;
@@ -434,7 +434,7 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SCL
     for i in 0 to MAX_INDEX loop
       -- triangle waveform (with DC offset)
       x      := 1.0 - real(2*abs(MAX_INDEX/2 - i)) / real(2**M);
-      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)),12));
+      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)),BW));
     end loop;
     return LUT;
   end function;
@@ -449,12 +449,13 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SCL
 <p>รูป: สัญญาณคลื่นสามเหลี่ยม (<strong>Triangle Waveform</strong>)</p>
 <p><img alt="" src="dac_wave_sine.jpg" /></p>
 <p>รูป: สัญญาณตามฟังก์ชันไซน์ (<strong>Sinusoidal Waveform</strong>)</p>
-<p>ถัดไปเป็นตัวอย่างการวิเคราะห์สัญญาณของบัส <strong>I2C</strong> (<strong>SCL</strong> และ  <strong>SDA</strong>)
+<p>ถัดไปเป็นตัวอย่างการวิเคราะห์สัญญาณของบัส <strong>I2C</strong> (<strong>SCL</strong> และ <strong>SDA</strong>)
 และสัญญาณเอาต์พุต <strong>STATUS</strong> โดยใช้อุปกรณ์ <strong>USB Logic Analyzer</strong></p>
 <p><img alt="" src="dac_i2c_waveform-1.jpg" /></p>
 <p><img alt="" src="dac_i2c_waveform-2.jpg" /></p>
 <p>รูป: ตัวอย่างรูปคลื่นสัญญาณ เมื่อเลือกใช้ฟังก์ชันขั้นบันได (<strong>Staircase Waveform</strong>)</p>
-<p>ลำดับข้อมูลสำหรับเอาต์พุต (ไม่รวมไบต์แอดเดรส) จากข้อมูลตัวอย่าง มีดังนี้ <code>00_FF</code>, <code>01_FF</code>, <code>02_FF</code> ...  <code>0F_FF</code></p>
+<p>ลำดับข้อมูลสำหรับเอาต์พุต (ไม่รวมไบต์แอดเดรส) จากข้อมูลตัวอย่าง มีดังนี้
+<code>00_FF</code>, <code>01_FF</code>, <code>02_FF</code> ...  <code>0F_FF</code></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -463,9 +464,9 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SCL
 เชื่อมต่อด้วยบัส <strong>I2C</strong> และสร้างสัญญาณเอาต์พุต-แอนะล็อก 1 ช่อง
 และได้สาธิตการใช้งาน <strong>I2C Master IP Core</strong> ที่ได้มีการเผยแพร่อยู่ในอินเทอร์เน็ต
 และได้เลือกมาทดลองใช้งานเป็นตัวอย่าง</p>
-<p>การสื่อสารข้อมูลด้วยบัส <strong>I2C</strong> เพื่อสร้างสัญญาณรายคาบโดยใช้ <strong>MCP4725 DAC</strong>
+<p>การสื่อสารข้อมูลด้วยบัส <strong>I2C</strong> เพื่อสร้างสัญญาณรายคาบ โดยใช้ไอซี <strong>MCP4725 DAC</strong>
 มีข้อจำกัดคือ ความเร็วในการส่งข้อมูล ดังนั้นความถี่ของสัญญาณเอาต์พุตที่ได้จึงไม่สูงมาก 
-ในเชิงเปรียบเทียบ ไอซี <strong>SPI DAC</strong> จะใช้ความถี่ได้สูงกว่า <strong>I2C DAC</strong></p>
+ในเชิงเปรียบเทียบ ไอซีประเภท <strong>SPI DAC</strong> จะใช้ความถี่ได้สูงกว่า <strong>I2C DAC</strong> ในการส่งข้อมูลบิต</p>
 <p><strong>บทความที่เกี่ยวข้อง</strong></p>
 <ul>
 <li><a href="../../electronics/mcp4725_dac_i2c/">การใช้งานโมดูล <strong>MCP4725 DAC (Digital-to-Analog Converter)</strong></a></li>
@@ -473,7 +474,7 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to I2C_SCL
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2024-10-13 | Last Updated: 2024-10-18</p></div>
+<p>Created: 2024-10-13 | Last Updated: 2024-11-13</p></div>
             </div>
         </div>
 

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/fpga_mcp41010/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานไอซีตัวต้านทานปรับค่าได้แบบดิจิทัลสำหรับ FPGA - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fpga" class="nav-link">การใช้งานไอซีตัวต้านทานปรับค่าได้แบบดิจิทัลสำหรับ FPGA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#digital-potentiometer" class="nav-link">&#9655; การเชื่อมต่อกับไอซีประเภท Digital Potentiometer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl-mcp41010-fpga" class="nav-link">&#9655; ตัวอย่างโค้ด VHDL สำหรับทดลองใช้ไอซี MCP41010 ร่วมกับบอร์ด FPGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#quartus-prime-lite-edition" class="nav-link">&#9655; การคอมไพล์โค้ดด้วย Quartus Prime Lite Edition</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl" class="nav-link">&#9655; ตัวอย่างโค้ด VHDL สำหรับการสร้างสัญญาณคาบรูปคลื่นไซน์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fpga">การใช้งานไอซีตัวต้านทานปรับค่าได้แบบดิจิทัลสำหรับ FPGA<a class="headerlink" href="#fpga" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Digital Logic Design</em>, <em>VHDL</em>, <em>Intel / Altera FPGA</em>, <em>Quartus Prime</em>,
+<em>8-bit Digital Potentiometer</em>, <em>MCP41010</em>, <em>SPI Bus</em></p>
+<p><strong>ความรู้และทักษะพื้นฐานที่เกี่ยวข้อง</strong></p>
+<ul>
+<li>อิเล็กทรอนิกส์ (<strong>Electronics</strong>): 
+การสร้างวงจรแบ่งแรงดัน (<strong>Voltage Divider</strong>) ด้วยไอซีตัวต้านทานปรับค่าได้ (<strong>Trimpot</strong>)
+การแปลงสัญญาณดิจิทัลเป็นแอนะล็อก (<strong>DAC</strong>)
+การสื่อสารด้วยบัส (<strong>SPI</strong>) การเชื่อมต่อ <strong>I/O</strong> รวมถึงการศึกษาเอกสาร <strong>Datasheet</strong> ของไอซี 
+<strong>MCP41010</strong> </li>
+<li>การออกแบบวงจรลอจิก (<strong>Logic Design</strong>): การออกแบบวงจรดิจิทัล และการใช้งานชิป <strong>Cyclone IV FPGA</strong></li>
+<li>การวัด (<strong>Measurement</strong>): การใช้ <strong>Signal Tap Logic Analyzer</strong> 
+การตั้งค่า <strong>Trigger Conditions</strong> และการวัดสัญญาณด้วยออสซิลโลสโคป</li>
+<li>การเขียนโค้ดและการใช้ซอฟต์แวร์ (<strong>Software/Coding</strong>): การเขียนโค้ดด้วย <strong>VHDL</strong> 
+และการใช้งาน <strong>Intel Quartus Prime (Lite Edition)</strong></li>
+</ul>
+<hr />
+<h2 id="digital-potentiometer">&#9655; <strong>การเชื่อมต่อกับไอซีประเภท Digital Potentiometer</strong><a class="headerlink" href="#digital-potentiometer" title="Permanent link">#</a></h2>
+<p><strong>MCP41010</strong> เป็นตัวอย่างของไอซีประเภทตัวต้านทานปรับค่าได้แบบดิจิทัล
+(<strong>Digital Potentiometer</strong>) และสามารถนำมาสร้างเป็นวงจรแบ่งแรงดัน
+(<strong>Voltage Divider</strong>) ที่ปรับเปลี่ยนระดับแรงดันไฟฟ้า และใช้เป็นสัญญาณเอาต์พุตแบบแอนะล็อกได้</p>
+<p>ในการปรับค่าความต้านทานของไอซี <strong>MCP41010</strong> จะต้องกำหนดค่าไบต์คำสั่ง หรือ <strong>Command Byte</strong> 
+โดยให้มีค่าบิต <code>C1C0 = "01"</code> และ <code>P1P0 = "01"</code> ดังนั้นจะได้ไบต์คำสั่งเป็น <code>0x11</code> (hex)
+และถัดจากไบต์คำสั่ง จึงเป็นข้อมูลหนึ่งไบต์ (<strong>Data Byte</strong>) เพื่อกำหนดค่าความต้านทาน โดยเลือกได้ 256 ระดับ (0..255)
+การส่งไบต์คำสั่งและไบต์ข้อมูลรวม 16 บิต จะต้องใช้วิธีเลื่อนบิตข้อมูลตามรูปแบบของบัส <strong>SPI</strong></p>
+<p><img alt="" src="../../electronics/digi_pot/mcp41010_cmd.png" /></p>
+<p>รูป: ไบต์คำสั่ง <strong>Command Byte</strong> สำหรับ <strong>MCP41010</strong></p>
+<p><img alt="" src="../../electronics/digi_pot/mcp41010_spi.png" /></p>
+<p>รูป: การส่งไบต์คำสั่งและไบต์ข้อมูล 16 บิต สำหรับบัส <strong>SPI</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-mcp41010-fpga">&#9655; <strong>ตัวอย่างโค้ด VHDL สำหรับทดลองใช้ไอซี MCP41010 ร่วมกับบอร์ด FPGA</strong><a class="headerlink" href="#vhdl-mcp41010-fpga" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไป ใช้สำหรับวงจรดิจิทัลที่มีชื่อว่า <code>mcp41010</code> ทำหน้าที่รับข้อมูล 8 บิต 
+เข้ามาเป็นอินพุต <code>DATA</code> เมื่อสัญญาณอินพุต
+<code>START</code> เป็นลอจิก <code>1</code> จะมีการเก็บค่าลงในรีจิสเตอร์ภายใน แล้วจึงมีการส่งข้อมูลออก
+โดยการเลื่อนบิตทีละบิต ตามการทำงานของวงจร <strong>FSM</strong> (<em>Finite State Machine</em>) 
+มีขาสัญญาณเอาต์พุตสำหรับบัส <strong>SPI</strong> ได้แก่ <code>CSN</code> (Chip Select), <code>SCLK</code> (Serial Clock)
+และ <code>SDATA</code> (Serial Data) 
+ในระหว่างการส่งข้อมูลบิต สัญญาณเอาต์พุต <code>BUSY</code> จะเป็น <code>1</code> แล้วเปลี่ยนเป็น <code>0</code> เมื่อจบการส่งข้อมูล</p>
+<p>วงจรนี้ทำงานด้วยสัญญาณอินพุต <strong>Clock</strong> ความถี่ <strong>50MHz</strong> (มีคาบเวลา <strong>20ns</strong>)
+และมีการกำหนดค่าคงที่ <code>SPI_CLK_DIV</code> ให้เท่ากับ <code>5</code> ในโค้ดตัวอย่าง สำหรับการทำงานของวงจรที่ทำหน้าที่เป็น 
+<strong>SPI Master</strong> เพื่อสื่อสารข้อมูลกับไอซี <strong>MCP41010</strong> (เป็น <strong>SPI Slave</strong>)</p>
+<p>ความถี่ของสัญญาณ <strong>SPI Clock (SCLK)</strong> จะได้เท่ากับ <strong>50MHz / (2 * 5)</strong> หรือ <strong>5MHz</strong></p>
+<pre><code class="language-VHDL">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
+entity mcp41010 is
+  port (
+    CLK  : in std_logic; -- 50 MHz system clock
+    NRST : in std_logic; -- Active-low asynchronous reset
+    -------------------------------------------
+    START : in std_logic;
+    DATA  : in std_logic_vector(7 downto 0);
+    BUSY  : buffer std_logic;
+    -------------------------------------------
+    CSN   : out std_logic; -- Chip-Select
+    SCLK  : out std_logic; -- Serial Clock
+    SDATA : out std_logic  -- Serial Data
+    -------------------------------------------
+  );
+end mcp41010;
+
+architecture behavioral of mcp41010 is
+
+  constant SPI_CLK_DIV : integer := 5; -- 50MH/5 =&gt; 5MHz SCLK freq.
+  constant DATA_WIDTH  : integer := 16;
+
+  type state_type is (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_END);
+  signal state : state_type := ST_IDLE;
+
+  signal bit_cnt   : integer range 0 to DATA_WIDTH := 0;
+  signal shift_en  : std_logic := '0';
+  signal shift_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
+
+begin
+
+  process (CLK, NRST)
+    variable count : integer range 0 to (SPI_CLK_DIV-1) := 0;
+  begin
+    if NRST = '0' then
+      count := 0;
+      shift_en &lt;= '0';
+    elsif rising_edge(CLK) then
+      if count = (SPI_CLK_DIV - 1) then
+        count := 0;
+        shift_en &lt;= '1';
+      else
+        count := count + 1;
+        shift_en &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      SCLK    &lt;= '0';
+      SDATA   &lt;= '0';
+      BUSY    &lt;= '0';
+      bit_cnt &lt;= 0;
+      state   &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case state is
+        when ST_IDLE =&gt;
+          bit_cnt &lt;= 0;
+          SCLK    &lt;= '0';
+          SDATA   &lt;= '0';
+          if START = '1' then
+            state                  &lt;= ST_SCK_L;
+            shift_reg(15 downto 8) &lt;= b&quot;0001_0001&quot;;
+            shift_reg(7 downto 0)  &lt;= data;
+            BUSY                   &lt;= '1';
+          end if;
+
+        when ST_SCK_L =&gt;
+          if shift_en = '1' then
+            SCLK  &lt;= '0';
+            SDATA &lt;= shift_reg(shift_reg'left);
+            if bit_cnt = DATA_WIDTH then
+              state &lt;= ST_END;
+            else
+              state &lt;= ST_SCK_H;
+            end if;
+          end if;
+
+        when ST_SCK_H =&gt;
+          if shift_en = '1' then
+            SCLK      &lt;= '1';
+            shift_reg &lt;= shift_reg(shift_reg'left-1 downto 0) &amp; '0';
+            bit_cnt   &lt;= bit_cnt + 1;
+            state     &lt;= ST_SCK_L;
+          end if;
+
+        when ST_END =&gt;
+          if shift_en = '1' then
+            SCLK  &lt;= '0';
+            BUSY  &lt;= '0';
+            state &lt;= ST_IDLE;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+  CSN &lt;= not BUSY;
+
+end behavioral;
+</code></pre>
+<p><img alt="" src="mcp41010_entity.png" /></p>
+<p>รูป: <strong>VHDL Entity</strong> <code>mcp41010</code> </p>
+<p>&nbsp;</p>
+<p>วงจรถัดไปมีชื่อว่า <code>de0nano_mcp41010_demo</code> ใช้สัญญาณอินพุต <strong>Clock</strong>
+ความถี่ <strong>50MHz</strong> และมีการนำวงจร <code>mcp41010</code> มาใช้เป็นองค์ประกอบ 
+และมีการสร้างสัญญาณ <code>START</code> ให้เป็นลอจิก <code>1</code> พร้อมกับข้อมูลขนาด 8 บิต สำหรับ <code>DATA</code>
+และถ้าสัญญาณ <code>BUSY</code> มีค่าเป็น <code>0</code> ก็จะเข้าสู่ขั้นตอนการส่งข้อมูลออกด้วยบัส <strong>SPI</strong></p>
+<p>อัตราการเขียนข้อมูล 8 บิต เพื่อส่งให้ไอซี <strong>MCP41010</strong> นำไปสร้างสัญญาณเอาต์พุต 
+จะเกิดขึ้นทุก ๆ 500 ไซเคิล ของสัญญาณ <strong>Clock (50MHz)</strong> หรือคิดเป็น
+<strong>50MHz / 500 = 100kHz</strong> หรือ <strong>100,000 Samples/sec</strong></p>
+<p>ข้อมูล 8 บิต ที่ถูกสร้างขึ้นมาและนำมาใช้ตามลำดับ เป็นไปตามรูปคลื่นสัญญาณแบบสามเหลี่ยม
+(<strong>Triangular Wave</strong>) มีการนับขึ้น (<strong>Count up</strong>) จาก <code>0</code> ถึง <code>255</code> ทีละหนึ่ง
+และตามด้วยการนับลง (<strong>Count Down</strong>) จาก <code>255</code> ถึง <code>0</code> ในหนึ่งคาบ
+ดังนั้นจะได้สัญญาณคาบรูปสามเหลี่ยมที่มีความถี่ <strong>100kHz / 512 = 195.3Hz</strong></p>
+<pre><code class="language-VHDL">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
+entity de0nano_mcp41010_demo is
+  port (
+    CLK   : in std_logic; -- 50 MHz system clock
+    NRST  : in std_logic; -- Active-low asynchronous reset
+    CSN   : out std_logic;
+    SCLK  : out std_logic;
+    SDATA : out std_logic
+  );
+end de0nano_mcp41010_demo;
+
+architecture synth of de0nano_mcp41010_demo is
+
+  component mcp41010
+    port (
+      CLK   : in std_logic;
+      NRST  : in std_logic;
+      START : in std_logic;
+      DATA  : in std_logic_vector(7 downto 0);
+      BUSY  : buffer std_logic;
+      CSN   : out std_logic;
+      SCLK  : out std_logic;
+      SDATA : out std_logic
+    );
+  end component;
+
+  type state_type is (ST_IDLE, ST_START);
+  signal state : state_type := ST_IDLE;
+
+  -- Signals to interface with mcp41010
+  signal start : std_logic := '0';
+  signal data  : std_logic_vector(7 downto 0) := (others =&gt; '0');
+  signal busy  : std_logic;
+
+  -- Internal signals for triangular wave generation
+  signal updown  : std_logic := '1';
+  signal counter : integer range 0 to 255 := 0;
+
+  constant COUNT_MAX : integer := (500) - 1;
+  signal count       : integer range 0 to COUNT_MAX;
+  signal tick        : std_logic;
+
+begin
+
+  -- Instantiate mcp41010 component
+  mcp41010_inst : mcp41010
+  port map
+  (
+    CLK   =&gt; CLK,
+    NRST  =&gt; NRST,
+    START =&gt; start,
+    DATA  =&gt; data,
+    BUSY  =&gt; busy,
+    CSN   =&gt; csn,
+    SCLK  =&gt; sclk,
+    SDATA =&gt; sdata
+  );
+
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      tick  &lt;= '0';
+      count &lt;= 0;
+    elsif rising_edge(CLK) then
+      if count = COUNT_MAX then
+        count &lt;= 0;
+        tick  &lt;= '1';
+      else
+        count &lt;= count + 1;
+        tick  &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  -- Triangular wave generator process
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      counter &lt;= 0;
+      updown  &lt;= '1';
+      start   &lt;= '0';
+      state   &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case STATE is
+        when ST_IDLE =&gt;
+          start &lt;= '0';
+          if tick = '1' and busy = '0' then
+            -- Set data and trigger start signal
+            data  &lt;= std_logic_vector(TO_UNSIGNED(counter, 8));
+            start &lt;= '1';
+            state &lt;= ST_START;
+          end if;
+
+        when ST_START =&gt;
+          if busy = '1' then
+            start &lt;= '0';
+            -- Update counter for triangular waveform
+            if updown = '1' then
+              if counter = 255 then
+                updown &lt;= '0'; -- count down
+              else
+                counter &lt;= counter + 1;
+              end if;
+            else
+              if counter = 0 then
+                updown &lt;= '1'; -- count up
+              else
+                counter &lt;= counter - 1;
+              end if;
+            end if;
+            state &lt;= ST_IDLE;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+end synth;
+</code></pre>
+<p>ไฟล์สำหรับการตั้งค่าการใช้งานขา <strong>FPGA I/O</strong> ของบอร์ด <strong>Terasic DE0-Nano</strong> มีดังนี้</p>
+<pre><code class="language-tcl"># Pin &amp; Location Assignments
+# set_global_assignment -name FAMILY &quot;Cyclone IV E&quot;
+# set_global_assignment -name DEVICE EP4CE22F17C6N 
+
+# GPIO_117 PIN_K16 CSN
+# GPIO_119 PIN_L15 MISO
+# GPIO_121 PIN_P16 MOSI
+# GPIO_123 PIN_N16 SCLK
+
+set_location_assignment PIN_J15 -to NRST
+set_location_assignment PIN_R8  -to CLK
+set_location_assignment PIN_K16 -to CSN
+set_location_assignment PIN_P16 -to SDATA
+set_location_assignment PIN_N16 -to SCLK
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to *
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="quartus-prime-lite-edition">&#9655; <strong>การคอมไพล์โค้ดด้วย Quartus Prime Lite Edition</strong><a class="headerlink" href="#quartus-prime-lite-edition" title="Permanent link">#</a></h2>
+<p>ขั้นตอนถัดไป เป็นการใช้ซอฟต์แวร์ <strong>Intel Quartus Prime Lite Edition v22.1</strong> 
+แปลงโค้ด <strong>VHDL</strong> ให้เป็นวงจรดิจิทัล เพื่อนำไปใช้กับบอร์ด <strong>FPGA (Cyclone IV)</strong></p>
+<p><img alt="" src="quartus_synth.jpg" /></p>
+<p>รูป: ซอฟต์แวร์  <strong>Intel Quartus Prime Lite Edition v22.1</strong></p>
+<p>เมื่อทำขั้นตอน <strong>Compilation</strong> ได้เสร็จสมบูรณ์แล้ว ก็ทดลองกับบอร์ด <strong>FPGA</strong>
+และวัดสัญญาณเอาต์พุตที่ได้จากไอซี <strong>MCP41010</strong> โดยใช้ออสซิลโลสโคปแบบดิจิทัล
+จากรูปตัวอย่าง จะเห็นได้ว่า มีลักษณะเป็นสัญญาณคาบรูปสามเหลี่ยม และมีความถี่ <strong>195Hz</strong></p>
+<p><img alt="" src="triangular_waveform.png" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณเอาต์พุต</p>
+<p><img alt="" src="spi_wave-1.jpg" /></p>
+<p><img alt="" src="spi_wave-2.jpg" /></p>
+<p>รูป: สัญญาณจากออสซิลโลสโคป <strong>CH1: SCLK</strong> และ <strong>CH2: CSN</strong></p>
+<p>จากรูปสัญญาณที่วัดได้ด้วยออสซิลโลสโคป จะเห็นได้ว่า ความถี่ของสัญญาณ <strong>SCLK</strong>
+เท่ากับ <strong>5MHz</strong> และระยะห่างระหว่างขอบขาลงของสัญญาณ <strong>CSN</strong> วัดได้ <strong>10us</strong></p>
+<p>ถัดไปเป็นตัวอย่างการใช้ <strong>Signal Tap Logic Analyzer</strong>
+สำหรับวงจรดิจิทัล มีการเลือกสัญญาณดิจิทัลของวงจรมาบางส่วนเพื่อบันทึกค่าลอจิก 
+และมีการตั้งค่าเงื่อนไขสำหรับทริกเกอร์ เป็นขอบขาลง (<strong>Falling Edge</strong>) ของสัญญาณ <strong>CSN</strong>
+เมื่อเงื่อนไขของทริกเกอร์เป็นจริง ก็จะมีการบันทึกข้อมูลตามจังหวะของสัญญาณ <strong>50MHz Clock</strong></p>
+<p>จากรูปจะเห็นได้ว่า ในช่วงเวลาที่สัญญาณ <strong>CSN</strong> มีค่าลอจิกเป็น <strong>Low</strong> มีความกว้างเท่ากับ
+170 ไซเคิล หรือ คิดเป็น <strong>(170 * 20ns) = 3,400 ns</strong> หรือ คิดเป็น <strong>3.4us</strong></p>
+<p><img alt="" src="stp-1.jpg" /></p>
+<p>รูป: สัญญาณดิจิทัลที่ได้จากการทำงานของ <strong>Signal Tap Logic Analyzer</strong></p>
+<p><img alt="" src="stp-2.jpg" /></p>
+<p>รูป: ระยะเวลาในการเกิดขอบขาลงของสัญญาณ <strong>CSN</strong> ถัดกันสองครั้ง เท่ากับ 500 ไซเคิล
+(คิดเป็นคาบเวลา <strong>10us</strong> หรือ ความถี่ <strong>100kHz</strong>)</p>
+<p><img alt="" src="de0nano_mcp41010.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองบนเบรดบอร์ดร่วมกับบอร์ด <strong>Terasic DE0-Nano FPGA</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl">&#9655; <strong>ตัวอย่างโค้ด VHDL สำหรับการสร้างสัญญาณคาบรูปคลื่นไซน์</strong><a class="headerlink" href="#vhdl" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการสร้างสัญญาณคาบตามรูปคลื่นไซน์ โดยการสร้างตาราง หรืออาร์เรย์เก็บข้อมูล
+หรือค่าคงที่ ขนาด 8 บิต เป็นเลขจำนวนเต็มแบบ <strong>Unsigned</strong> มีจำนวน 256 ตัวเลข
+ตัวเลขเหล่านี้ได้จากการคำนวณค่าของฟังก์ชันไซน์ในหนึ่งคาบ และมีการบวกค่า <strong>DC Offset</strong>
+เพื่อให้แอมพลิจูดเป็นบวก (ไม่เป็นลบ) และมีค่าอยู่ในช่วง 0..255</p>
+<pre><code class="language-VHDL">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+use IEEE.MATH_REAL.all;
+
+entity de0nano_mcp41010_demo is
+  port (
+    CLK   : in std_logic; -- 50 MHz system clock
+    NRST  : in std_logic; -- Active-low asynchronous reset
+    CSN   : out std_logic;
+    SCLK  : out std_logic;
+    SDATA : out std_logic
+  );
+end de0nano_mcp41010_demo;
+
+architecture synth of de0nano_mcp41010_demo is
+
+  component mcp41010
+    port (
+      CLK   : in std_logic;
+      NRST  : in std_logic;
+      START : in std_logic;
+      DATA  : in std_logic_vector(7 downto 0);
+      BUSY  : buffer std_logic;
+      CSN   : out std_logic;
+      SCLK  : out std_logic;
+      SDATA : out std_logic
+    );
+  end component;
+
+  type state_type is (ST_IDLE, ST_START);
+  signal state : state_type := ST_IDLE;
+
+  -- Signals to interface with mcp41010
+  signal start : std_logic := '0';
+  signal data  : std_logic_vector(7 downto 0) := (others =&gt; '0');
+  signal busy  : std_logic;
+
+  constant BW        : integer := 8; -- 8 bits for DAC output
+  constant M         : integer := 8;
+  constant MAX_INDEX : integer := 2 ** M - 1;
+
+  subtype sample_t is std_logic_vector((BW - 1) downto 0);
+  type sample_table_t is array(0 to MAX_INDEX) of sample_t;
+
+  function init_table return sample_table_t is
+    variable LUT : sample_table_t;
+    variable x   : REAL;
+  begin
+    for i in 0 to MAX_INDEX loop
+      -- sinusoidal waveform (with DC offset)
+      x      := (1.0 + SIN(2.0 * MATH_PI * real(i) / real(2 ** M)))/2.0;
+      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)), M));
+    end loop;
+    return LUT;
+  end function;
+
+  -- Signal to index through LUT
+  signal lut_index : integer range 0 to (2 ** M - 1) := 0;
+  signal lut_table : sample_table_t := init_table;
+
+  constant COUNT_MAX : integer := (500) - 1;
+  signal count       : integer range 0 to COUNT_MAX;
+  signal tick        : std_logic;
+
+begin
+
+  -- Instantiate mcp41010 component
+  mcp41010_inst : mcp41010
+  port map
+  (
+    CLK   =&gt; CLK,
+    NRST  =&gt; NRST,
+    START =&gt; start,
+    DATA  =&gt; data,
+    BUSY  =&gt; busy,
+    CSN   =&gt; CSN,
+    SCLK  =&gt; SCLK,
+    SDATA =&gt; SDATA
+  );
+
+  -- Process for tick generation
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      tick  &lt;= '0';
+      count &lt;= 0;
+    elsif rising_edge(CLK) then
+      if count = COUNT_MAX then
+        count &lt;= 0;
+        tick  &lt;= '1';
+      else
+        count &lt;= count + 1;
+        tick  &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  -- Sine wave generator process
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      lut_index &lt;= 0;
+      start     &lt;= '0';
+      state     &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case state is
+        when ST_IDLE =&gt;
+          start &lt;= '0';
+          if tick = '1' and busy = '0' then
+            -- Set data from LUT and trigger start signal
+            data  &lt;= lut_table(lut_index);
+            start &lt;= '1';
+            state &lt;= ST_START;
+          end if;
+
+        when ST_START =&gt;
+          if busy = '1' then
+            start &lt;= '0';
+            -- Increment LUT index for next sine value
+            if lut_index = MAX_INDEX then
+              lut_index &lt;= 0; -- reset to beginning of LUT
+            else
+              lut_index &lt;= lut_index + 1;
+            end if;
+            state &lt;= ST_IDLE;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+end synth;
+</code></pre>
+<p><img alt="" src="sine_wave-1.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุต (สัญญาณคาบรูปคลื่นไซน์) ซึ่งวัดความถี่ได้ประมาณ <strong>391Hz</strong></p>
+<p><img alt="" src="sine_wave-2.jpg" /></p>
+<p><img alt="" src="sine_wave-3.jpg" /></p>
+<p>รูป: สเปกตรัมของคลื่นสัญญาณโดยใช้การประมวลผลด้วย <strong>FFT</strong> (<em>Fast Fourier Transform</em>)
+สำหรับสัญญาณเอาต์พุตในโหมด <strong>AC Coupling</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการออกแบบวงจรดิจิทัลเพื่อใช้กับบอร์ด <strong>FPGA</strong>
+โดยได้เลือกใช้บอร์ด <strong>DE0-Nano (Cyclone IV FPGA</strong>)
+และมีการเขียนข้อมูล 8 บิต ไปยังไอซี <strong>MCP41040 Digital Potentiometer</strong> 
+ด้วยอัตราคงที่ และได้สัญญาณเอาต์พุตเป็นสัญญาณแอนะล็อก</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../signaltap_intro/">แนะนำการใช้งานซอฟต์แวร์ <strong>Signal Tap Logic Analyzer</strong></a></li>
+<li><a href="../../electronics/digi_pot/">การใช้งานไอซีตัวต้านทานปรับค่าได้แบบดิจิทัล (<strong>Digital Potentiometer</strong>)</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-11-13 | Last Updated: 2024-11-13</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
