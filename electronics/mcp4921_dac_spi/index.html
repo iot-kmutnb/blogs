@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/mcp4921_dac_spi/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูล MCP4921 SPI DAC (Digital-to-Analog Converter) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mcp4921-spi-dac-digital-to-analog-converter" class="nav-link">การใช้งานโมดูล MCP4921 SPI DAC (Digital-to-Analog Converter)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#microchip-mcp492x" class="nav-link">&#9655; Microchip MCP492x</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-sketch-arduino-uno-r4" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด Arduino Sketch สำหรับบอร์ด Arduino Uno R4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mcp4921-spi-dac-digital-to-analog-converter">การใช้งานโมดูล MCP4921 SPI DAC (Digital-to-Analog Converter)<a class="headerlink" href="#mcp4921-spi-dac-digital-to-analog-converter" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการใช้งานโมดูล <strong>MCP4921 DAC</strong> ในเบื้องต้น 
+โดยใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ และเขียนโปรแกรมด้วย <strong>Arduino Sketch</strong>
+เพื่อสร้างสัญญาณแอนะล็อก จำนวน 1 ช่องสัญญาณ</p>
+<p><strong>Keywords:</strong> <em>MCP4921</em>, <em>Digital-to-Analog Converter (DAC)</em>,
+<em>SPI Bus</em>, <em>Arduino Sketch</em>, <em>Analog Output</em>, <em>Analog Signal Waveform Generation</em></p>
+<hr />
+<h2 id="microchip-mcp492x">&#9655; <strong>Microchip MCP492x</strong><a class="headerlink" href="#microchip-mcp492x" title="Permanent link">#</a></h2>
+<p>ไอซี <a href="https://ww1.microchip.com/downloads/en/devicedoc/21897b.pdf"><strong>MCP4921 / MCP4922</strong></a> ของบริษัท <strong>Microchip</strong> เป็นตัวอย่างของไอซีในประเภท <strong>DAC</strong> (<em>Digital to Analog Converter</em>) 
+และทำหน้าที่แปลงข้อมูลดิจิทัลให้เป็นสัญญาณแอนะล็อก ไอซีดังกล่าวมีเอาต์พุต 1 ช่อง หรือ 2 ช่องสัญญาณตามลำดับ</p>
+<p>ไอซี <strong>MCP4921</strong> มีขาเพียง 8 ขา ในขณะที่ <strong>MCP4922</strong> มี 14 ขา
+มีวงจร <strong>DAC</strong> จำนวน 2 ชุด (<code>DAC_A</code> และ <code>DAC_B</code>) และมีขา <code>/SHDN</code> (Shutdown)
+เพื่อเข้าสู่โหมดการประหยัดพลังงานได้</p>
+<p>แต่ในบทความนี้จะขอกล่าวถึงเฉพาะไอซี <strong>MCP4921</strong> เท่านั้น ซึ่งมีคุณสมบัติโดยสรุป ดังต่อไปนี้</p>
+<ul>
+<li>Single DAC, Rail-to-Rail Output</li>
+<li>DAC Resolution: 12 bits</li>
+<li>Voltage Supply: 2.7V to 5.5V (Single-Supply)</li>
+<li>SPI Interface: Mode (0,0) and (1,1)</li>
+<li>SPI Frequency: 20 MHz (max.)</li>
+<li>External VREF Input Pin</li>
+<li>Settling Time: 4.5 µs</li>
+<li>Selectable Gain (G): 1x or 2x</li>
+<li>No shutdown pin</li>
+</ul>
+<p><img alt="" src="mcp492x_pins.jpg" /></p>
+<p>รูป: บล็อกไดอะแกรม และขาของไอซี</p>
+<p>การส่งข้อมูลไปยังไอซี <strong>MCP492x</strong> จะใช้วิธีเลื่อนบิตเข้าที่ขา
+<code>SDI</code> (<em>Serial Data Input</em>) ตามจังหวะของสัญญาณ <code>SCK</code> (<em>Serial Clock</em>) 
+เมื่อลอจิกของสัญญาณ <code>/CS</code> ได้เปลี่ยนจาก <code>1</code> เป็น <code>0</code> </p>
+<p>เมื่อได้เลื่อนบิตคำสั่งและข้อมูลทั้งหมด 16 บิต ไปยังรีจิสเตอร์ภายในได้ครบแล้ว
+จะต้องมีการสร้างสัญญาณพัลส์แบบ <strong>Low-Active</strong> ที่ขา<code>/LDAC</code> ซึ่งจะต้องมีความกว้างอย่างน้อย <code>100 ns</code>
+และเกิดขึ้นหลังจากสัญญาณ <code>/CS</code> เป็นจาก <code>0</code> เป็น <code>1</code> แล้วอย่างน้อย <code>40 ns</code></p>
+<p>ไอซี <strong>MCP492x</strong> มีขาอินพุต <code>VREF</code> สำหรับการทำงานของวงจร <strong>DAC</strong> 
+ภายในแต่ละชุด และ <code>VREF</code> จะต้องมีระดับแรงดันคงที่ และมีระดับไม่เกิน <code>VDD</code>
+แรงดันอ้างอิง <code>VREF</code> สามารถเลือกได้ว่า จะให้ผ่านหรือไม่ผ่านวงจรบัฟเฟอร์
+(<strong>Buffer</strong>) ที่อยู่ภายในไอซี โดยทั่วไปแล้ว ก็ใช้ <code>VREF</code> เท่ากับแรงดันไฟเลี้ยง <code>VDD</code> </p>
+<p>วงจร <strong>DAC</strong> แต่ละชุดภายในไอซี มีวงจรขยายสัญญาณ
+(<strong>OpAmp</strong>) ที่สามารถโปรแกรมเลือกอัตราขยายได้ 
+(<strong>Programmable Gain</strong>) ระหว่าง <code>1x</code> กับ <code>2x</code></p>
+<p><img alt="" src="mcp492x_spi_bus.jpg" /></p>
+<p>รูป: การส่งข้อมูลด้วยบัส <strong>SPI</strong> ไปยังไอซี <strong>MCP492x</strong></p>
+<p><img alt="" src="mcp492x_reg.jpg" /></p>
+<p>รูป: รีจิสเตอร์ <strong>Write Command Register</strong> และความหมายของบิตที่เกี่ยวของ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch-arduino-uno-r4">&#9655; ตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Arduino Uno R4</strong><a class="headerlink" href="#arduino-sketch-arduino-uno-r4" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างต่อไปนี้ จะใช้กับบอร์ด <strong>Arduino Uno R4 Wi-Fi</strong> ซึ่งทำงานด้วยแรงดันไฟเลี้ยง <strong>+5V</strong>
+และเริ่มต้นการทำงานด้วยฟังก์ชัน <code>setup()</code> มีการเปิดใช้งานวงจรตัวนับ (<strong>Hardware Timer</strong>)
+ของไมโครคอนโทรลเลอร์ <a href="https://docs.arduino.cc/resources/datasheets/ra4m1-datasheet.pdf"><strong>RA4M1</strong></a> (<em>32-bit Arm Cortex-M4F, 48MHz</em>)
+โดยใช้ฟังก์ชันของคลาส <a href="https://github.com/arduino/ArduinoCore-renesas/blob/main/cores/arduino/FspTimer.h"><code>FspTimer</code></a> และมีการเปิดใช้งานอินเทอร์รัพท์ด้วยอัตราคงที่
+เช่น <strong>50kHz</strong></p>
+<p>วงจรตัวนับภายใน <strong>RA4M1</strong> มี 2 ประเภท และแต่ละประเภท มีได้มากกว่าหนึ่งวงจร</p>
+<ul>
+<li><strong>AGT</strong> (<em>Asynchronous General Purpose Timer</em>): 16-bit</li>
+<li><strong>GPT</strong> (<em>General Purpose PWM Timer</em>): 16-bit / 32-bit</li>
+</ul>
+<p>ในโค้ดตัวอย่าง ได้เลือกใช้ <code>GPT Timer</code></p>
+<p>ทุกครั้งที่มีการเกิดอินเทอร์รัพท์จากวงจรตัวนับ จะมีการเรียกใช้ฟังก์ชัน <code>timerCallback(...)</code> และเรียกฟังก์ชัน
+<code>writeDAC(...)</code> เพื่อส่งบิตคำสั่ง 4 บิต และข้อมูลขนาด 12 บิต รวมเป็น 16 บิต
+ไปยังไอซี <strong>MCP4921</strong> โดยใช้บัส <strong>SPI</strong> ในโหมด <code>(0,0)</code> และได้ตั้งค่าความถี่ไว้ <code>4MHz</code> โดยประมาณ</p>
+<p>แรงดันไฟเลี้ยงและขาสัญญาณที่ใช้ในการสื่อสารข้อมูลกับไอซี <strong>MCP4921</strong> (ใช้แรงดันไฟเลี้ยง <strong>+5V</strong>) มีดังนี้</p>
+<ul>
+<li><code>SCK</code> : <code>D13</code> </li>
+<li><code>SDI</code> : <code>D11</code></li>
+<li><code>/CS</code> : <code>D10</code></li>
+<li><code>/LDAC</code>: <code>D9</code></li>
+<li><code>VDD</code> : <code>5V</code></li>
+<li><code>VREFA</code>: <code>5V</code></li>
+<li><code>AVSS</code> : <code>GND</code></li>
+</ul>
+<p>ข้อมูลเป็นแบบ <strong>8-bit Unsigned</strong> และอ่านค่าตามลำดับจากอาร์เรย์ของค่าคงที่ <code>SAMPLES_TABLE[...]</code>
+ที่ได้จากการชักตัวอย่าง <code>256</code> ตัวเลข (<code>NUM_SAMPLES</code>) ของฟังก์ชันรูปคลื่นไซน์ 
+ในช่วงหนึ่งคาบ และมีค่าอยู่ในช่วง 0..255</p>
+<p>การอัปเดตค่าสำหรับ <strong>DAC</strong> จะเกิดขึ้นด้วยอัตรา <strong>50kHz</strong> หรือ <strong>50k Samples/sec</strong> 
+ดังนั้นจะได้สัญญาณรูปไซน์ที่มีความถี่เท่ากับ <strong>50kHz / 256 = 195.3Hz</strong></p>
+<pre><code class="language-C++">#include &lt;SPI.h&gt;
+#include &lt;FspTimer.h&gt;    // Use the FspTimer class
+
+const int CS_PIN   = 10; // Chip select pin (active-low)
+const int LDAC_PIN = 9;  // Load DAC output (active-low)
+
+const int NUM_SAMPLES = 256;
+uint16_t SAMPLES_TABLE[ NUM_SAMPLES ];
+
+FspTimer timer;
+uint8_t sample_index = 0;
+
+void writeDAC( uint16_t value ) {
+  // MCP4921 16-bit write command register
+  // Bit 15: #A/B  = 0 for DAC A selection 
+  // Bit 14: BUF   = 0 for Unbuffered VREF
+  // Bit 13: #GA   = 1 for 1x Gain
+  // Bit 12: #SHDN = 1 for Enabled (Not Shutdown)
+  // Bits 11-0: 12-bit data value
+
+  uint16_t cmd_data = (0b0011 &lt;&lt; 12) | (value &amp; 0x0FFF);
+  // Begin SPI transaction with specified settings 
+  SPI.beginTransaction( SPISettings(4000000, MSBFIRST, SPI_MODE0) ); 
+  digitalWrite( CS_PIN, LOW );   // Select the device
+  SPI.transfer16( cmd_data );    // Write command and data
+  digitalWrite(CS_PIN, HIGH);    // Deselect the device
+  SPI.endTransaction();          // End SPI transaction
+  digitalWrite( LDAC_PIN, LOW ); // Latch DAC output register
+  digitalWrite( LDAC_PIN, HIGH );
+}
+
+void timerCallback(timer_callback_args_t __attribute((unused)) *p_args) {
+  writeDAC(SAMPLES_TABLE[sample_index++]);
+  if (sample_index &gt;= NUM_SAMPLES) sample_index = 0;
+}
+
+void timerInit() {
+  timer_mode_t timer_mode = TIMER_MODE_PERIODIC;
+  uint8_t timer_type = GPT_TIMER;  
+  float timer_freq_hz = 50e3f;  // Timer tick rate = 50kHz
+  int timer_index = FspTimer::get_available_timer(timer_type);
+
+  if (timer_index &lt; 0) {
+      timer_index = FspTimer::get_available_timer(timer_type, true);
+  }
+  if (timer_index &gt;= 0) {
+     timer.begin(timer_mode, timer_type, timer_index, 
+                 timer_freq_hz, 0.0, timerCallback, nullptr);    
+     timer.setup_overflow_irq();
+     timer.open();
+     timer.start();
+  }
+}
+
+void setup() {
+   pinMode( CS_PIN, OUTPUT );
+   digitalWrite( CS_PIN, HIGH );    
+   pinMode( LDAC_PIN, OUTPUT );
+   digitalWrite( LDAC_PIN, HIGH );
+   SPI.begin(); 
+
+   // Initialize the sample table 
+   const uint32_t A = (1 &lt;&lt; 11) - 1; // Scale
+   for (int i = 0; i &lt; NUM_SAMPLES; i++) {
+      SAMPLES_TABLE[i] = (uint16_t)(A*(1+sin(2*PI*i/NUM_SAMPLES)));
+   }
+   // Initialize the hardware timer
+   timerInit(); 
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="uno_r4_mcp4921.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองบนเบรดบอร์ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino</strong> สำหรับบอร์ด
+<strong>Arduino Uno R4</strong> และต่อวงจรใช้งานร่วมกับไอซี <strong>MCP4921 SPI DAC</strong>
+เพื่อสร้างสัญญาณแอนะล็อกเป็นเอาต์พุตหนึ่งช่องสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-11-13 | Last Updated: 2024-11-13</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

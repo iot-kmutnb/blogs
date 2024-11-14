@@ -183,7 +183,7 @@ end mcp41010;
 
 architecture behavioral of mcp41010 is
 
-  constant SPI_CLK_DIV : integer := 5; -- 50MH/5 =&gt; 5MHz SCLK freq.
+  constant SPI_CLK_DIV : integer := 5; -- 50MH/(2*5) =&gt; 5MHz SCLK freq.
   constant DATA_WIDTH  : integer := 16;
 
   type state_type is (ST_IDLE, ST_START, ST_SCK_H, ST_SCK_L, ST_END);
@@ -326,6 +326,7 @@ architecture synth of de0nano_mcp41010_demo is
   signal updown  : std_logic := '1';
   signal counter : integer range 0 to 255 := 0;
 
+  -- Internal constant and signal for tick counter
   constant COUNT_MAX : integer := (500) - 1;
   signal count       : integer range 0 to COUNT_MAX;
   signal tick        : std_logic;
@@ -499,16 +500,16 @@ architecture synth of de0nano_mcp41010_demo is
   type state_type is (ST_IDLE, ST_START);
   signal state : state_type := ST_IDLE;
 
+  constant BW        : integer := 8; -- 8 bits for DAC output
+  constant M         : integer := 8; -- log2(#samples)
+  constant MAX_INDEX : integer := 2**M - 1;
+
   -- Signals to interface with mcp41010
   signal start : std_logic := '0';
-  signal data  : std_logic_vector(7 downto 0) := (others =&gt; '0');
+  signal data  : std_logic_vector(BW downto 0) := (others =&gt; '0');
   signal busy  : std_logic;
 
-  constant BW        : integer := 8; -- 8 bits for DAC output
-  constant M         : integer := 8;
-  constant MAX_INDEX : integer := 2 ** M - 1;
-
-  subtype sample_t is std_logic_vector((BW - 1) downto 0);
+  subtype sample_t is std_logic_vector((BW-1) downto 0);
   type sample_table_t is array(0 to MAX_INDEX) of sample_t;
 
   function init_table return sample_table_t is
@@ -517,14 +518,14 @@ architecture synth of de0nano_mcp41010_demo is
   begin
     for i in 0 to MAX_INDEX loop
       -- sinusoidal waveform (with DC offset)
-      x      := (1.0 + SIN(2.0 * MATH_PI * real(i) / real(2 ** M)))/2.0;
-      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)), M));
+      x      := (1.0 + SIN(2.0*MATH_PI*real(i) / real(2**M)))/2.0;
+      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)),BW));
     end loop;
     return LUT;
   end function;
 
   -- Signal to index through LUT
-  signal lut_index : integer range 0 to (2 ** M - 1) := 0;
+  signal lut_index : integer range 0 to (2**M - 1) := 0;
   signal lut_table : sample_table_t := init_table;
 
   constant COUNT_MAX : integer := (500) - 1;
@@ -535,8 +536,7 @@ begin
 
   -- Instantiate mcp41010 component
   mcp41010_inst : mcp41010
-  port map
-  (
+  port map (
     CLK   =&gt; CLK,
     NRST  =&gt; NRST,
     START =&gt; start,
