@@ -139,8 +139,9 @@
 <p><strong>MCP41010</strong> เป็นตัวอย่างของไอซีประเภทตัวต้านทานปรับค่าได้แบบดิจิทัล
 (<strong>Digital Potentiometer</strong>) และสามารถนำมาสร้างเป็นวงจรแบ่งแรงดัน
 (<strong>Voltage Divider</strong>) ที่ปรับเปลี่ยนระดับแรงดันไฟฟ้า และใช้เป็นสัญญาณเอาต์พุตแบบแอนะล็อกได้</p>
-<p>ในการปรับค่าความต้านทานของไอซี <strong>MCP41010</strong> จะต้องกำหนดค่าไบต์คำสั่ง หรือ <strong>Command Byte</strong> 
-โดยให้มีค่าบิต <code>C1C0 = "01"</code> และ <code>P1P0 = "01"</code> ดังนั้นจะได้ไบต์คำสั่งเป็น <code>0x11</code> (hex)
+<p>ในการปรับค่าความต้านทานของไอซี <strong>MCP41010</strong> จะต้องตั้งค่าไบต์คำสั่ง หรือ <strong>Command Byte</strong> 
+โดยให้มีค่าบิต <code>C1C0 = "01"</code>  เพื่อเข้าสู่โหมดการเขียน และ
+<code>P1P0 = "01"</code> เพื่อใช้กับตัวต้านทานวงจรแรก ดังนั้นจะได้ไบต์คำสั่งเป็น <code>0x11</code> (hex)
 และถัดจากไบต์คำสั่ง จึงเป็นข้อมูลหนึ่งไบต์ (<strong>Data Byte</strong>) เพื่อกำหนดค่าความต้านทาน โดยเลือกได้ 256 ระดับ (0..255)
 การส่งไบต์คำสั่งและไบต์ข้อมูลรวม 16 บิต จะต้องใช้วิธีเลื่อนบิตข้อมูลตามรูปแบบของบัส <strong>SPI</strong></p>
 <p><img alt="" src="../../electronics/digi_pot/mcp41010_cmd.png" /></p>
@@ -271,20 +272,21 @@ begin
 
 end behavioral;
 </code></pre>
-<p><img alt="" src="mcp41010_entity.png" /></p>
-<p>รูป: <strong>VHDL Entity</strong> <code>mcp41010</code> </p>
+<p><img alt="" src="mcp41010_vhdl_entity.jpg" /></p>
+<p>รูป: <strong>VHDL Entity</strong> <code>mcp41010</code> และ <code>de0nano_mcp41010_demo</code></p>
 <p>&nbsp;</p>
-<p>วงจรถัดไปมีชื่อว่า <code>de0nano_mcp41010_demo</code> ใช้สัญญาณอินพุต <strong>Clock</strong>
-ความถี่ <strong>50MHz</strong> และมีการนำวงจร <code>mcp41010</code> มาใช้เป็นองค์ประกอบ 
-และมีการสร้างสัญญาณ <code>START</code> ให้เป็นลอจิก <code>1</code> พร้อมกับข้อมูลขนาด 8 บิต สำหรับ <code>DATA</code>
-และถ้าสัญญาณ <code>BUSY</code> มีค่าเป็น <code>0</code> ก็จะเข้าสู่ขั้นตอนการส่งข้อมูลออกด้วยบัส <strong>SPI</strong></p>
-<p>อัตราการเขียนข้อมูล 8 บิต เพื่อส่งให้ไอซี <strong>MCP41010</strong> นำไปสร้างสัญญาณเอาต์พุต 
-จะเกิดขึ้นทุก ๆ 500 ไซเคิล ของสัญญาณ <strong>Clock (50MHz)</strong> หรือคิดเป็น
-<strong>50MHz / 500 = 100kHz</strong> หรือ <strong>100,000 Samples/sec</strong></p>
+<p>วงจรถัดไป <code>de0nano_mcp41010_demo</code> ใช้สัญญาณอินพุต <strong>Clock</strong>
+ที่มีความถี่ <strong>50MHz</strong> และมีการใช้งาน <code>mcp41010</code>
+เป็นส่วนประกอบหลักในการสร้างสัญญาณเอาต์พุตแบบแอนะล็อก
+โดยมีสัญญาณควบคุม <code>START</code> เป็นลอจิก <code>1</code> พร้อมข้อมูล <code>DATA</code> ขนาด 8 บิต 
+เมื่อสัญญาณ <code>BUSY</code> มีค่าเป็น <code>0</code> วงจรจะเริ่มขั้นตอนการส่งข้อมูลออกด้วยบัส <strong>SPI</strong></p>
+<p>การส่งข้อมูล 8 บิตนี้ จะเกิดขึ้นทุก ๆ 500 ไซเคิล หรือ รอบของสัญญาณ <strong>Clock (50MHz)</strong>
+และส่งให้ไอซี <strong>MCP41010</strong> นำไปสร้างสัญญาณเอาต์พุต 
+โดยที่มีอัตราการอัปเดตข้อมูล <strong>50MHz / 500 = 100kHz</strong> หรือ <strong>100,000 Samples/sec</strong></p>
 <p>ข้อมูล 8 บิต ที่ถูกสร้างขึ้นมาและนำมาใช้ตามลำดับ เป็นไปตามรูปคลื่นสัญญาณแบบสามเหลี่ยม
 (<strong>Triangular Wave</strong>) มีการนับขึ้น (<strong>Count up</strong>) จาก <code>0</code> ถึง <code>255</code> ทีละหนึ่ง
 และตามด้วยการนับลง (<strong>Count Down</strong>) จาก <code>255</code> ถึง <code>0</code> ในหนึ่งคาบ
-ดังนั้นจะได้สัญญาณคาบรูปสามเหลี่ยมที่มีความถี่ <strong>100kHz / 512 = 195.3Hz</strong></p>
+ดังนั้นคลื่นสามเหลี่ยมนี้ จะมีความถี่ <strong>100kHz / 512 = 195.3Hz</strong></p>
 <pre><code class="language-VHDL">library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
@@ -622,10 +624,9 @@ end synth;
 <li><a href="../signaltap_intro/">แนะนำการใช้งานซอฟต์แวร์ <strong>Signal Tap Logic Analyzer</strong></a></li>
 <li><a href="../../electronics/digi_pot/">การใช้งานไอซีตัวต้านทานปรับค่าได้แบบดิจิทัล (<strong>Digital Potentiometer</strong>)</a></li>
 </ul>
-<p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2024-11-13 | Last Updated: 2024-11-13</p></div>
+<p>Created: 2024-11-13 | Last Updated: 2024-11-14</p></div>
             </div>
         </div>
 

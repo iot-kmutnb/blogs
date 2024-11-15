@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/mcp3201_adc_spi/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานไอซี MCP3201 SPI ADC - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#mcp3201-spi-adc" class="nav-link">การใช้งานไอซี MCP3201 SPI ADC</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#microchip-mcp3201" class="nav-link">&#9655; Microchip MCP3201</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-uno-r4-wifi" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด: Arduino Uno R4 WiFi</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arduino-esp32" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด: Arduino ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="mcp3201-spi-adc">การใช้งานไอซี MCP3201 SPI ADC<a class="headerlink" href="#mcp3201-spi-adc" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการใช้งานไอซี <strong>MCP3201 ADC</strong> ในเบื้องต้น 
+โดยใช้งานร่วมกับบอร์ดไมโครคอนโทรลเลอร์ และเขียนโปรแกรมด้วย <strong>Arduino Sketch</strong>
+เพื่อวัดค่าสัญญาณแอนะล็อก จำนวน 1 ช่องสัญญาณ</p>
+<p><strong>Keywords:</strong> <em>MCP3201</em>, <em>Analog-to-Digital Converter (ADC)</em>,
+<em>SPI Bus</em>, <em>Arduino Sketch</em>, <em>Arduino Uno R4</em>, <em>RA4M1</em>, <em>ESP32</em></p>
+<hr />
+<h2 id="microchip-mcp3201">&#9655; <strong>Microchip MCP3201</strong><a class="headerlink" href="#microchip-mcp3201" title="Permanent link">#</a></h2>
+<p><strong>MCP3201</strong> เป็นไอซีที่มีวงจรแปลงสัญญาณแอนะล็อกเป็นดิจิทัล (<strong>Analog-to-Digital Converter: ADC</strong>) 
+และรองรับการสื่อสารแบบ <strong>SPI</strong> (<em>Serial Peripheral Interface</em>) 
+ไอซีเบอร์นี้มีช่องรับสัญญาณแอนะล็อกหนึ่งช่อง และใช้แรงดันไฟเลี้ยงในช่วง <strong>2.7V</strong> ถึง <strong>5.5V</strong>
+นอกจากนี้ยังมีความละเอียดสูงถึง 12 บิต ทำให้สามารถแปลงสัญญาณแบ่งได้ <strong>4096</strong> ระดับ
+(มีค่าตัวเลขในช่วง 0..4095)</p>
+<p>ขาของไอซี <strong>MCP3201</strong> มีดังนี้</p>
+<ul>
+<li><strong>VDD (Voltage Supply)</strong>: เป็นขาไฟเลี้ยง</li>
+<li><strong>VSS (Ground)</strong>: เป็นขาสัญญาณกราวด์ (<strong>GND</strong>) ของไอซี ซึ่งต้องต่อร่วมกับกราวด์ของระบบ</li>
+<li><strong>VIN+ (Analog Input Positive)</strong>:
+เป็นขาสัญญาณแอนะล็อกอินพุตสำหรับรับสัญญาณอินพุต และรับแรงดันได้ในช่วง  <strong>0V</strong> ถึง <strong>VREF</strong></li>
+<li><strong>VIN- (Analog Input Negative)</strong>: เป็นขาที่ใช้เป็นแรงดันอ้างอิงของสัญญาณอินพุต 
+โดยทั่วไปจะต่อกับ <strong>VSS</strong></li>
+<li><strong>DOUT (Data Out)</strong>: เป็นขาเอาต์พุตสำหรับส่งข้อมูลดิจิทัลแบบ <strong>SPI</strong></li>
+<li><strong>/CS (Chip Select)</strong>: เป็นขาสัญญาณควบคุมการเริ่มต้นการสื่อสาร <strong>SPI</strong> ทำงานแบบ <strong>Active-Low</strong></li>
+<li><strong>SCK (Serial Clock)</strong>: เป็นขาสัญญาณนาฬิกาที่ใช้ควบคุมจังหวะการส่งข้อมูลระหว่างไอซีกับไมโครคอนโทรลเลอร์</li>
+</ul>
+<p><img alt="" src="mcp3201_block.jpg" /></p>
+<p>รูป: บล็อกไดอะแกรม ตัวถังและตำแหน่งขาของไอซี <strong>MCP3201</strong></p>
+<p>ความเร็วในการแปลงข้อมูล (<strong>Sampling Rate</strong>) ของไอซี:</p>
+<ul>
+<li><strong>100 ksps (VDD=5V)</strong> และ <strong>50 ksps (VDD=2.7V)</strong></li>
+</ul>
+<p>ความถี่สูงสุดสำหรับ <strong>SCK</strong>:</p>
+<ul>
+<li><strong>1.6MHz (VDD=5V)</strong> และ <strong>0.8MHz (VDD=2.7V)</strong></li>
+</ul>
+<p>การแปลงสัญญาณของ <strong>MCP3201</strong> ใช้เทคนิคที่เรียกว่า
+<strong>Successive Approximation Register (SAR)</strong>
+ซึ่งเป็นวิธีการแปลงที่พบได้ทั่วไปสำหรับไอซี <strong>ADC</strong> โดยทั่วไปแล้ว ขั้นตอนการแปลงเริ่มต้นจากการเก็บค่าสัญญาณแอนะล็อก
+ที่ผ่านเข้ามายังวงจร <strong>Sample &amp; Hold (S/H)</strong> ซึ่งทำให้มีค่าคงที่ก่อนทำขั้นตอน <strong>ADC</strong> จากนั้นวงจร <strong>SAR</strong> 
+จะเปรียบเทียบแรงดันแอนะล็อกอินพุตกับแรงดันที่สร้างขึ้นโดยวงจร <strong>DAC</strong> โดยเริ่มจากการกำหนดค่าบิตสูงสุดก่อน
+(<strong>MSB</strong>) แล้วปรับบิตแต่ละบิตจากบิตสูงสุดไปยังบิตต่ำสุด (<strong>LSB</strong>)</p>
+<p>ในแต่ละครั้งของการเปรียบเทียบ ค่าบิตในรีจิสเตอร์จะถูกปรับตามผลของการเปรียบเทียบ จนได้ค่าที่เข้าใกล้แรงดันอินพุต 
+ดังนั้นในความละเอียด 12 บิต จะมีการเปรียบเทียบทั้งหมด 12 ครั้ง หรือตามจังหวะสัญญาณ <strong>Clock</strong> ทั้งหมด 12 ไซเคิล</p>
+<p><img alt="" src="mcp3201_spi_bus.jpg" /></p>
+<p>รูป: การสื่อสารข้อมูลด้วยบัส <strong>SPI</strong> ในโหมด <code>(0,0)</code></p>
+<p>จากรูปสัญญาณ <strong>Timing Diagram</strong> ของ <strong>MCP3201</strong> เมื่อได้เลื่อนบิต 16 บิต แล้ว 
+ซึ่งเป็นข้อมูลที่ถูกส่งออกมาทางขา <strong>DOUT</strong> จำเป็นต้องทำการดึงเฉพาะ 12 บิตที่เป็นข้อมูลที่แท้จริงจาก <strong>ADC</strong> 
+ดังนั้นจะต้องเลื่อนบิตไปทงาขวา 1 บิต แล้วจึงจะได้ข้อมูล 12 บิต (11 – 0) เป็นค่าที่ถูกต้อง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-uno-r4-wifi">&#9655; ตัวอย่างการเขียนโค้ด: <strong>Arduino Uno R4 WiFi</strong><a class="headerlink" href="#arduino-uno-r4-wifi" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ด <strong>Arduino Uno R4</strong> 
+โดยเปิดใช้งานวงจรตัวนับ (<strong>Hardware Timer</strong>) และใช้คำสั่งจากคลาส <code>FspTimer</code> 
+เพื่อสร้างอินเทอร์รัพท์ที่อัตราคงที่ <strong>20kHz</strong>
+ซึ่งจะใช้เป็นอัตราการชักตัวอย่างสัญญาณแอนะล็อกจากอินพุตของไอซี <strong>MCP3201</strong></p>
+<p>ข้อมูลที่ได้จากการชักตัวอย่าง มีขนาด <strong>12</strong> บิต แต่เก็บอยู่ในข้อมูลตามรูปแบบ <strong>16-bit Unsigned</strong> 
+และนำไปใส่ลงในบัฟเฟอร์ขนาด <strong>1024</strong> ค่า (<code>BUF_SIZE</code>) 
+เมื่อบันทึกข้อมูลได้ตามจำนวนที่ต้องการแล้ว ก็เซตค่าลอจิกของตัวแปร <code>done</code> ให้เป็น <code>1</code> 
+และหยุดการบันทึกค่าชั่วคราว จนกว่าจะมีการเคลียร์ค่าของ <code>done</code> </p>
+<p>ข้อมูลที่ถูกเก็บไว้ในอาร์เรย์ <code>buffer</code> จะถูกส่งไปยังคอมพิวเตอร์ผ่านทาง <code>Serial</code> 
+และนำไปแสดงผลเป็นรูปกราฟสัญญาณใน <strong>Arduino Serial Plotter</strong></p>
+<p>การใช้งานวงจร <strong>SPI</strong> ก็ทำได้ง่าย โดยใช้ฟังก์ชันของคลาส <code>SPI</code> มีการกำหนดความเร็วในการรับส่งข้อมูลด้วยบัส 
+<strong>SPI</strong> ไว้เท่ากับ <strong>1MHz</strong> และจะทำงานในโหมด <code>(0,0)</code></p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;FspTimer.h&gt;  // Use the FspTimer class
+
+#define  TICK_RATE      (20e3)
+#define  VREF           (4720UL) // voltage reference in mV
+#define  CS_PIN         (10)     // Chip select pin (active-low)
+#define  BUF_SIZE       (1024)   // Number of samples
+
+uint16_t buffer[BUF_SIZE] = {0}; // Buffer to store ADC samples
+uint16_t sampleCount = 0;        // Counter to keep track of samples
+volatile boolean done = false;   // Done flag for ADC sampling
+
+FspTimer timer; // GPT Timer
+
+// Function to read a 12-bit value from MCP3201 via SPI
+uint16_t readADC() {
+  uint16_t value = 0;
+  SPI.beginTransaction( SPISettings(1000000, MSBFIRST, SPI_MODE0) );
+  // Select MCP3201 by setting CS low
+  digitalWrite( CS_PIN, LOW );
+  value = SPI.transfer16( 0x0000 ); // Read high byte
+  // Release MCP3201 by setting CS high
+  digitalWrite( CS_PIN, HIGH );
+  SPI.endTransaction();
+  return (value &gt;&gt; 1) &amp; 0x0FFF;
+}
+
+// Timer callback function
+void timerCallback(timer_callback_args_t __attribute__((unused)) *p_args) {
+  uint16_t value = readADC(); // read the ADC value
+  // If not done, write value into buffer and increment sample count
+  if (!done) {
+    buffer[sampleCount++] = value;
+    // If buffer is full, set done flag
+    if (sampleCount == BUF_SIZE) {
+      done = true;
+    }
+  }
+}
+
+// Initialize the timer for periodic sampling
+void timerInit() {
+  timer_mode_t timer_mode = TIMER_MODE_PERIODIC;
+  uint8_t timer_type  = GPT_TIMER;  
+  float timer_freq_hz = TICK_RATE;  // Timer tick rate
+  int timer_index = FspTimer::get_available_timer(timer_type);
+  if (timer_index &lt; 0) {
+    timer_index = FspTimer::get_available_timer(timer_type, true);
+  }
+  if (timer_index &gt;= 0) {
+    timer.begin(timer_mode, timer_type, timer_index, 
+                timer_freq_hz, 0.0, timerCallback, nullptr);    
+    timer.setup_overflow_irq();
+    timer.open();
+    timer.start();
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode( CS_PIN, OUTPUT );
+  digitalWrite( CS_PIN, HIGH );    
+  SPI.begin();  // Initialize SPI
+  timerInit();  // Initialize Timer
+}
+
+void loop() {
+  // If done flag is set, send all samples in buffer to serial
+  if (done) {
+    for (int i=0; i &lt; BUF_SIZE; i++) {
+      Serial.println( String(&quot; mV:&quot;) + VREF*buffer[i]/4096);
+    }
+    Serial.flush();    
+    // Clear done flag and reset sample count
+    done = false;
+    sampleCount = 0;
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ในการทดลองได้เลือกใช้โมดูลไมโครโฟนเสียงแบบแอนะล็อก  <strong>MAX4466</strong> (ใช้แรงดันไฟเลี้ยง <strong>+5V</strong>)
+เพื่อสร้างสัญญาณอินพุตให้กับไอซี <strong>MCP3201</strong>
+สัญญาณเสียงได้จากคลิปเสียงคลื่นไซน์ ความถี่ <strong>1kHz</strong></p>
+<p><img alt="" src="uno_r4_microphone.jpg" /></p>
+<p>รูป: การต่อวงจรบนเบรดบอร์ด เพื่อใช้งานกับบอร์ด <strong>Uno R4 Wi-Fi</strong></p>
+<p><img alt="" src="uno_r4_plot.jpg" /></p>
+<p>รูป: ตัวอย่างรูปกราฟเมื่อแสดงผลข้อมูลใน <strong>Arduino Serial Plotter</strong>
+ซึ่งมองเห็นเป็นรูปไซน์</p>
+<p>ตัวอย่างการวัดสัญญาณจากโมดูลไมโครโฟนด้วยออสซิลโลสโคป มีดังนี้</p>
+<p><img alt="" src="sine_1khz_waveform.jpg" /></p>
+<p>รูป: สัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง (แสดงผลในโหมด <strong>DC Coupling</strong>)
+และสัญญาณมีค่า <strong>DC Offect</strong> ประมาณ <strong>1.2V</strong></p>
+<p><img alt="" src="sine_1khz_ac_coupling.jpg" /></p>
+<p>รูป: สัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง (แสดงผลในโหมด <strong>AC Coupling</strong>)</p>
+<p><img alt="" src="sine_1khz_fft_spectrum.jpg" /></p>
+<p>รูป: สเปกตรัมเชิงความถี่ของสัญญาณแอนะล็อกจากโมดูลไมโครโฟนเสียง</p>
+<p>จากสเปกตรัมเชิงความถี่ของสัญญาณ จะเห็นได้ว่า กราฟมีค่าสูงสุดอยู่ที่ความถี่ <strong>1kHz</strong></p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการวัดสัญญาณของบัส <strong>SPI</strong>: ช่อง <strong>CH1</strong> คือ สัญญาณ <code>/CS</code> และ
+ช่อง <strong>CH2</strong> คือ สัญญาณ <code>SCK</code> ตามลำดับ และจะเห็นได้ว่า 
+ในกรณีนี้ <code>SCK</code> มีความถี่ <strong>1MHz</strong> และอัตราการชักตัวอย่าง (<strong>Fs</strong>) เท่ากับ <strong>20kHz</strong> 
+มีช่วงเวลาการสื่อสารผ่านบัส <strong>SPI</strong> (ช่วงที่ <code>/CS</code> เป็นลอจิก <code>0</code>) ประมาณ <strong>21.5 us</strong></p>
+<p><img alt="" src="uno_r4_spi_waveform-1.jpg" /></p>
+<p><img alt="" src="uno_r4_spi_waveform-2.jpg" /></p>
+<p><img alt="" src="uno_r4_spi_waveform-3.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่วัดได้สำหรับ <code>/CS</code> และ <code>SCK</code> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32">&#9655; ตัวอย่างการเขียนโค้ด: <strong>Arduino ESP32</strong><a class="headerlink" href="#arduino-esp32" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+ซึ่งจะแตกต่างจากโค้ดตัวอย่างที่แล้วสำหรับ <strong>Arduino Uno R4</strong> ในบางส่วน เช่น</p>
+<ul>
+<li>การใช้งานวงจรตัวนับ (<strong>Hardware Timer</strong>) ซึ่งดูได้จากฟังก์ชัน
+<code>timerInit(...)</code> ที่แตกต่างออกไป </li>
+<li>การเลือกใช้ขา <strong>GPIO</strong> ของ <strong>ESP32</strong> สำหรับ <strong>SPI</strong> </li>
+</ul>
+<p>ในตัวอย่างนี้ได้เลือกใช้ <code>VSPI</code> ซึ่งมีการใช้งาน <strong>GPIO</strong> สำหรับบัส <strong>SPI</strong> ดังนี้</p>
+<ul>
+<li><code>MOSI</code>=23, <code>MISO</code>=19, <code>SCLK</code>=18, <code>CS</code>=5</li>
+</ul>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+
+#define  TICK_RATE      (20e3)
+#define  TIMER_FREQ_HZ  (1e6)
+#define  PERIOD_TICKS   ((uint32_t)(TIMER_FREQ_HZ/TICK_RATE))
+
+#define  VREF           (3311UL) // voltage reference in mV
+#define  CS_PIN         (5)      // Chip select pin (active-low)
+#define  BUF_SIZE       (1024)   // Number of samples
+
+uint16_t buffer[BUF_SIZE] = {0}; // Buffer to store ADC samples
+uint16_t sampleCount = 0;        // Counter to keep track of samples
+volatile boolean done = false;   // Done flag for ADC sampling
+
+hw_timer_t *timer = NULL; // Timer handle
+
+// Function to read a 12-bit value from MCP3201 via SPI
+uint16_t readADC() {
+  uint16_t value = 0;
+  SPI.beginTransaction( SPISettings(1000000, MSBFIRST, SPI_MODE0) );
+  // Select MCP3201 by setting CS low
+  digitalWrite( CS_PIN, LOW );
+  value = SPI.transfer16(0x0000); // Read high byte
+  // Release MCP3201 by setting CS high
+  digitalWrite( CS_PIN, HIGH );
+  SPI.endTransaction();
+  return (value &gt;&gt; 1) &amp; 0x0FFF;
+}
+
+// Timer interrupt callback function
+void IRAM_ATTR timerCallback() {
+  uint16_t value = readADC(); // read the ADC value
+  digitalWrite( LED_BUILTIN, HIGH );
+  // If not done, write value into buffer and increment sample count
+  if (!done) {
+    buffer[sampleCount++] = value;
+    // If buffer is full, set done flag
+    if (sampleCount == BUF_SIZE) {
+      done = true;
+    }
+  }
+  digitalWrite( LED_BUILTIN, LOW );
+}
+
+// Initialize the timer for periodic sampling
+void timerInit() {
+  timer = timerBegin( TIMER_FREQ_HZ );
+  if (timer == NULL){
+    Serial.println(&quot;Timer init failed!!&quot;);
+  }
+  timerStop( timer );
+  timerAlarm( timer, PERIOD_TICKS /*period (ticks)*/, 
+              true /*autoreload*/, 0 /*autoreload count*/ );
+  timerAttachInterrupt( timer, &amp;timerCallback );
+  timerStart( timer );
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode( LED_BUILTIN, OUTPUT );
+  pinMode( CS_PIN, OUTPUT );
+  digitalWrite( CS_PIN, HIGH );
+  // Uses default VSPI pins: MOSI=23, MISO=19, SCLK=18, and CS=5
+  SPI.begin(); // Initialize VSPI 
+  timerInit(); // Initialze Timer
+}
+
+void loop() {
+  // If done flag is set, send all samples in buffer to serial
+  if (done) {
+    for (int i=0; i &lt; BUF_SIZE; i++) {
+      Serial.println( String(&quot; mV:&quot;) + VREF*buffer[i]/4096);
+    }
+    Serial.flush();    
+    // Clear done flag and reset sample count
+    done = false;
+    sampleCount = 0;
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>เมื่อนำโค้ดตัวอย่างนี้ไปทดลองกับบอร์ด <strong>ESP32</strong> (<strong>WeMos Lolin32 Lite</strong>)
+และวัดสัญญาณด้วยออสซิลโลโคป จะได้คลื่นสัญญาณตามตัวอย่างดังนี้</p>
+<p><img alt="" src="esp32_spi_waveform-1.jpg" /></p>
+<p><img alt="" src="esp32_spi_waveform-2.jpg" /></p>
+<p>รูป: สัญญาณ <strong>CH1</strong>: <code>/CS</code> และ <strong>CH2</strong>: <code>SCK</code></p>
+<p><img alt="" src="esp32_serial_plotter.jpg" /></p>
+<p>รูป: การแสดงผลข้อมูลจากการอ่านค่า <strong>ADC</strong> โดยใช้ <strong>Arduino Serial Plotter</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino</strong> สำหรับบอร์ด
+<strong>Arduino Uno R4</strong> และ <strong>ESP32 (WeMos Lolin32 Lite)</strong> 
+และต่อวงจรใช้งานร่วมกับไอซี <strong>MCP3201 SPI ADC</strong>
+เพื่ออ่านค่าสัญญาณแอนะล็อกหนึ่งช่องสัญญาณ</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../arduino/arduino_uno_r4_wifi/">การใช้งานบอร์ด <strong>Arduino Uno R4 WiFi</strong> ในเบื้องต้น</a></li>
+<li><a href="../adc_successive_approx/">การใช้บอร์ด <strong>Arduino</strong> เลียนแบบการทำงานของวงจร <strong>Successive Approximation ADC</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-11-14 | Last Updated: 2024-11-14</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
