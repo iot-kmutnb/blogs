@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/fpga_mcp4921_dac/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานไอซี MCP4921 SPI DAC - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#fpga-mcp4921-spi-dac" class="nav-link">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานไอซี MCP4921 SPI DAC</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#mcp4921-spi-dac" class="nav-link">&#9655; ไอซี MCP4921 SPI DAC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#vhdl" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ด VHDL เพื่อทดลองใช้งาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fpga-mcp4921-spi-dac">การออกแบบวงจรดิจิทัลสำหรับ FPGA เพื่อใช้งานไอซี MCP4921 SPI DAC<a class="headerlink" href="#fpga-mcp4921-spi-dac" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Digital Logic Design</em>, <em>VHDL</em>, <em>Intel / Altera FPGA</em>, <em>Quartus Prime</em>, <em>MCP4921 DAC</em>, <em>SPI</em></p>
+<p><strong>ความรู้และทักษะพื้นฐานที่เกี่ยวข้อง</strong></p>
+<ul>
+<li>อิเล็กทรอนิกส์ (<strong>Electronics</strong>): การใช้งาน <strong>MCP4921 DAC</strong> การสื่อสารผ่านบัส <strong>SPI</strong> และการศึกษาเอกสาร <strong>Datasheet</strong> ของไอซี</li>
+<li>การออกแบบวงจรลอจิก (<strong>Logic Design</strong>): การออกแบบวงจรดิจิทัลโดยใช้ <strong>FSM</strong> (<strong>Finite-State Machine</strong>)
+และการใช้งาน <strong>Intel Cyclone IV FPGA</strong></li>
+<li>การประมวลผลสัญญาณดิจิทัล: การสร้างสัญญาณแบบคาบ (เช่น สัญญาณไซน์)
+การบันทึกสัญญาณในชิป <strong>FPGA</strong> เพื่อการวิเคราะห์สัญญาณด้วย <strong>Signal Tap Logic Analyzer</strong></li>
+<li>การวัด (<strong>Measurement</strong>): การใช้งานออสซิลโลสโคปเพื่อวัดสัญญาณดิจิทัล</li>
+<li>การเขียนโค้ดและการใช้ซอฟต์แวร์ (<strong>Software/Coding</strong>): การเขียนโค้ดด้วย <strong>VHDL</strong> การใช้งานซอฟต์แวร์ <strong>Intel Quartus Prime (Lite Edition)</strong></li>
+</ul>
+<hr />
+<h2 id="mcp4921-spi-dac">&#9655; <strong>ไอซี MCP4921 SPI DAC</strong><a class="headerlink" href="#mcp4921-spi-dac" title="Permanent link">#</a></h2>
+<p><strong>MCP4921</strong> ของบริษัท <strong>Microchip</strong> เป็นไอซีในประเภท <strong>DAC</strong> (<em>Digital to Analog Converter</em>) 
+ทำหน้าที่แปลงข้อมูลดิจิทัลให้เป็นสัญญาณแอนะล็อก โดยมีเอาต์พุต 1 ช่อง</p>
+<p><strong>คุณสมบัติสำคัญของไอซี:</strong></p>
+<ul>
+<li>เอาต์พุตของวงจร <strong>DAC</strong> จำนวน 1 ช่อง เป็นแบบ <strong>Rail-to-Rail Output</strong> (ให้สัญญาณได้เต็มช่วงแรงดัน)</li>
+<li>ความละเอียด (<strong>Resolution</strong>): สามารถแปลงข้อมูลดิจิทัล 12 บิตเป็นแรงดันแอนะล็อกได้.</li>
+<li>แรงดันไฟเลี้ยง (<strong>Voltage Supply</strong>): 2.7V ถึง 5.5V</li>
+<li>อินเทอร์เฟซด้วยบัส <strong>SPI</strong><ul>
+<li>รองรับ <strong>SPI Mode</strong>: (0,0) และ (1,1)</li>
+<li>ความถี่ <strong>SPI</strong>: สูงสุด  20 MHz</li>
+</ul>
+</li>
+<li>มีขาสำหรับเชื่อมต่อแรงดันอ้างอิง (<code>VREF</code>) <ul>
+<li>ต้องมีความเสถียรและไม่เกินแรงดัน <code>VDD</code></li>
+<li>ปกติใช้ <code>VREF</code> เท่ากับ <code>VDD</code></li>
+</ul>
+</li>
+<li>เวลาตอบสนอง (<strong>Settling Time</strong>): 4.5 µs</li>
+<li>อัตราขยายที่เลือกได้ (<strong>Programmable Gain</strong>): 1x หรือ 2x (มีวงจรขยายสัญญาณในตัว)</li>
+<li>ไม่มีขา <strong>Shutdown</strong> (<code>/SHDN</code>)</li>
+</ul>
+<p><img alt="" src="../../electronics/mcp4921_dac_spi/mcp492x_pins.jpg" /></p>
+<p>รูป: ไอซี <strong>MCP4921</strong> และการใช้งานขาของไอซี</p>
+<p>การส่งข้อมูลผ่าน <strong>SPI</strong> จะใช้ขา <strong>SDI (Serial Data Input)</strong> 
+ในการเลื่อนข้อมูล 16 บิตเข้าสู่รีจิสเตอร์ของไอซี
+จังหวะของการส่งข้อมูลถูกควบคุมโดยสัญญาณ <code>SCK</code> (<em>Serial Clock</em>)
+สัญญาณควบคุม <code>/CS</code> (<strong>Chip Select</strong>) ต้องเปลี่ยนจาก <strong>High</strong> เป็น <strong>Low</strong> เพื่อเริ่มต้นการส่งข้อมูล</p>
+<p>หลังจากส่งคำสั่งและข้อมูลครบ 16 บิตแล้ว
+ต้องสร้างพัลส์แบบ <strong>Low-Active</strong> ที่ขา <code>/LDAC</code> โดยมีความกว้างอย่างน้อย 100 ns
+พัลส์นี้ต้องเกิดหลังจาก <code>/CS</code> เปลี่ยนจาก Low เป็น High อย่างน้อย 40 ns</p>
+<p><img alt="" src="../../electronics/mcp4921_dac_spi/mcp492x_spi_bus.jpg" /></p>
+<p>รูป: การสื่อสารข้อมูลด้วยบัส <strong>SPI</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl">&#9655; <strong>ตัวอย่างการเขียนโค้ด VHDL เพื่อทดลองใช้งาน</strong><a class="headerlink" href="#vhdl" title="Permanent link">#</a></h2>
+<p>โค้ด <strong>VHDL</strong> (<code>mcp4921.vhd</code>) เป็นตัวอย่างการสร้างวงจรดิจิทัล เพื่อรับข้อมูล <code>DATA</code> ขนาด 12 บิต
+เมื่อสัญญาณอินพุต <code>START</code> เปลี่ยนสถานะลอจิกเป็น <code>1</code> จากนั้นจึงเริ่มกระบวนการส่งข้อมูล 16 บิต 
+ไปยังไอซี <strong>MCP4921</strong> ในระหว่างนั้น สัญญาณเอาต์พุต <code>BUSY</code> มีสถานะลอจิก <code>1</code></p>
+<p>การทำงานของวงจรนี้ เป็นการสร้างสัญญาณสำหรับไอซี <strong>MCP4921</strong> ได้แก่
+<code>CSN</code>, <code>SCLK</code>, <code>SDATA</code> และ <code>LDAC</code> </p>
+<p>การทำงานของวงจร จะใช้สัญญาณ <code>CLK</code> เป็นตัวกำหนดจังหวะการทำงาน โดยเลือกใช้ความถี่ <strong>50MHz</strong>
+และสร้างสัญญาณ <code>SCK</code> ตามความถี่ <strong>5MHz</strong> ในการส่งข้อมูลบิต
+วงจรนี้มีสัญญาณอินพุต <code>NRST</code> สำหรับการรีเซตวงจร (<strong>Active-Low Asynchronous Reset</strong>)</p>
+<pre><code class="language-vhdl">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
+entity mcp4921 is
+  port (
+    CLK  : in std_logic; -- 50 MHz system clock
+    NRST : in std_logic; -- Active-low asynchronous reset
+    -------------------------------------------
+    START : in std_logic;
+    DATA  : in std_logic_vector(11 downto 0);
+    BUSY  : buffer std_logic;
+    -------------------------------------------
+    CSN   : out std_logic; -- Chip-Select
+    SCLK  : out std_logic; -- Serial Clock
+    SDATA : out std_logic; -- Serial Data
+    LDAC  : out std_logic  -- Latch DAC register
+    -------------------------------------------
+  );
+end mcp4921;
+
+architecture behavioral of mcp4921 is
+
+  constant SPI_CLK_DIV : integer :=  5; -- 50MH/(2*5) =&gt; 5MHz SCK freq.
+  constant DATA_WIDTH  : integer := 16;
+
+  type state_type is (ST_IDLE,ST_START,ST_SCK_H,ST_SCK_L,ST_END,ST_LDAC);
+  signal state : state_type := ST_IDLE;
+
+  signal bit_cnt   : integer range 0 to DATA_WIDTH := 0;
+  signal shift_en  : std_logic := '0';
+  signal shift_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
+
+  constant WAIT_CNT_MAX : integer := (4) - 1;
+  signal wait_cnt       : integer range 0 to WAIT_CNT_MAX := 0;
+
+begin
+
+  process (CLK, NRST)
+    variable count : integer range 0 to (SPI_CLK_DIV-1) := 0;
+  begin
+    if NRST = '0' then
+      count := 0;
+      shift_en &lt;= '0';
+    elsif rising_edge(CLK) then
+      if count = (SPI_CLK_DIV-1) then
+        count := 0;
+        shift_en &lt;= '1';
+      else
+        count := count + 1;
+        shift_en &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      SCLK     &lt;= '0';
+      SDATA    &lt;= '0';
+      BUSY     &lt;= '0';
+      LDAC     &lt;= '1';
+      wait_cnt &lt;= 0;
+      bit_cnt  &lt;= 0;
+      state    &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case state is
+        when ST_IDLE =&gt;
+          bit_cnt &lt;= 0;
+          SCLK    &lt;= '0';
+          SDATA   &lt;= '0';
+          if START = '1' then
+            state     &lt;= ST_SCK_L;
+            shift_reg &lt;= b&quot;0011&quot; &amp; data;
+            BUSY      &lt;= '1';
+          end if;
+
+        when ST_SCK_L =&gt;
+          if shift_en = '1' then
+            SCLK  &lt;= '0';
+            SDATA &lt;= shift_reg(shift_reg'left);
+            if bit_cnt = DATA_WIDTH then
+              state &lt;= ST_END;
+            else
+              state &lt;= ST_SCK_H;
+            end if;
+          end if;
+
+        when ST_SCK_H =&gt;
+          if shift_en = '1' then
+            SCLK      &lt;= '1';
+            shift_reg &lt;= shift_reg(shift_reg'left-1 downto 0) &amp; '0';
+            bit_cnt   &lt;= bit_cnt + 1;
+            state     &lt;= ST_SCK_L;
+          end if;
+
+        when ST_END =&gt;
+          if shift_en = '1' then
+            SCLK     &lt;= '0';
+            BUSY     &lt;= '0';
+            wait_cnt &lt;= WAIT_CNT_MAX;
+            state    &lt;= ST_LDAC;
+          end if;
+
+        when ST_LDAC =&gt;
+          if wait_cnt = 0 then
+            LDAC  &lt;= '1';
+            state &lt;= ST_IDLE;
+          else
+            wait_cnt &lt;= wait_cnt - 1;
+            LDAC     &lt;= '0';
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+  CSN &lt;= not BUSY;
+
+end behavioral;
+</code></pre>
+<p>&nbsp;</p>
+<p>โค้ด <strong>VHDL</strong> ถัดไป (<code>de0nano_mcp4921_demo.vhd</code>) เป็นตัวอย่างการใช้งานวงจร
+<code>mcp4921.vhd</code> เพื่อสาธิตการเขียนข้อมูลขนาด 12 บิต ตามลำดับ เพื่อสร้างสัญญาณเอาต์พุตรูปคลื่นไซน์
+โดยให้มีแรงดันไฟเลี้ยงอยู่ในช่วง <strong>0V</strong> ถึง <strong>3.3V</strong> </p>
+<p>ระยะเวลาในการเขียข้อมูลแต่ละค่าคือ <strong>4us</strong> หรือ มีอัตราการเขียนข้อมูล <strong>250kHz</strong>
+ข้อมูลที่นำมาเขียนได้จากอาร์เรย์ของค่าคงที่ขนาด 12 บิต สำหรับฟังก์ชันไซน์ และมีข้อมูล 256 ค่า
+ดังนั้นความถี่ของสัญญาณเอาต์พุต จะได้เท่ากับ <strong>250kHz / 256 = 976.56Hz</strong></p>
+<pre><code class="language-vhdl">library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+use IEEE.MATH_REAL.all;
+
+entity de0nano_mcp4921_demo is
+  port (
+    CLK   : in std_logic; -- 50 MHz system clock
+    NRST  : in std_logic; -- Active-low asynchronous reset
+    CSN   : out std_logic;
+    SCLK  : out std_logic;
+    SDATA : out std_logic;
+    LDAC  : out std_logic
+  );
+end de0nano_mcp4921_demo;
+
+architecture synth of de0nano_mcp4921_demo is
+
+  type state_type is (ST_IDLE, ST_START);
+  signal state : state_type := ST_IDLE;
+
+  constant BW        : integer := 12; -- 12 bits for DAC output
+  constant M         : integer := 8;
+  constant MAX_INDEX : integer := 2**M - 1;
+
+  signal start : std_logic := '0';
+  signal data  : std_logic_vector(BW-1 downto 0) := (others =&gt; '0');
+  signal busy  : std_logic;
+
+  subtype sample_t is std_logic_vector((BW-1) downto 0);
+  type sample_table_t is array(0 to MAX_INDEX) of sample_t;
+
+  function init_table return sample_table_t is
+    variable LUT : sample_table_t;
+    variable x   : REAL;
+  begin
+    for i in 0 to MAX_INDEX loop
+      -- sinusoidal waveform (with DC offset)
+      x      := (1.0 + SIN(2.0 * MATH_PI * real(i) / real(2**M)))/2.0;
+      LUT(i) := std_logic_vector(to_unsigned(integer(x*real(2**BW-1)),BW));
+    end loop;
+    return LUT;
+  end function;
+
+  -- Signal to index through LUT
+  signal lut_index : integer range 0 to (2**M - 1) := 0;
+  signal lut_table : sample_table_t := init_table;
+
+  constant COUNT_MAX : integer := (200) - 1;
+  signal count       : integer range 0 to COUNT_MAX;
+  signal tick        : std_logic;
+
+begin
+
+  -- Instantiate mcp4921 component
+  mcp4921_inst : entity work.mcp4921
+    port map (
+      CLK   =&gt; CLK,
+      NRST  =&gt; NRST,
+      START =&gt; start,
+      DATA  =&gt; data,
+      BUSY  =&gt; busy,
+      CSN   =&gt; CSN,
+      SCLK  =&gt; SCLK,
+      SDATA =&gt; SDATA,
+      LDAC  =&gt; LDAC
+    );
+
+  -- Clock divider process for tick generation
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      tick  &lt;= '0';
+      count &lt;= 0;
+    elsif rising_edge(CLK) then
+      if count = COUNT_MAX then
+        count &lt;= 0;
+        tick  &lt;= '1';
+      else
+        count &lt;= count + 1;
+        tick  &lt;= '0';
+      end if;
+    end if;
+  end process;
+
+  -- Sine wave generator process
+  process (CLK, NRST)
+  begin
+    if NRST = '0' then
+      lut_index &lt;= 0;
+      start &lt;= '0';
+      state &lt;= ST_IDLE;
+
+    elsif rising_edge(CLK) then
+
+      case state is
+        when ST_IDLE =&gt;
+          start &lt;= '0';
+          if tick = '1' and busy = '0' then
+            -- Set data from LUT and trigger start signal
+            data  &lt;= lut_table(lut_index);
+            start &lt;= '1';
+            state &lt;= ST_START;
+          end if;
+
+        when ST_START =&gt;
+          if busy = '1' then
+            start &lt;= '0';
+            -- Increment LUT index for next sine value
+            if lut_index = MAX_INDEX then
+              lut_index &lt;= 0; -- reset to beginning of LUT
+            else
+              lut_index &lt;= lut_index + 1;
+            end if;
+            state &lt;= ST_IDLE;
+          end if;
+
+        when others =&gt;
+          state &lt;= ST_IDLE;
+      end case;
+    end if;
+  end process;
+
+end synth;
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="de0nano_mcp4921.jpg" /></p>
+<p>รูป: การต่อวงจรทดลองไอซี <strong>MCP4921</strong> บนเบรดบอร์ด</p>
+<p><img alt="" src="output_dc_coupling.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตรูปคลื่นไซน์ (โหมดแสดงผล <strong>DC Coupling</strong>)</p>
+<p><img alt="" src="output_ac_coupling.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตรูปคลื่นไซน์ (โหมดแสดงผล <strong>AC Coupling</strong>)</p>
+<p><img alt="" src="spi_bus-1.jpg" /></p>
+<p><img alt="" src="spi_bus-2.jpg" /></p>
+<p>รรูป: สัญญาณบัส <strong>SPI</strong> (<strong>CH1</strong>: <code>CSN</code> และ <strong>CH2</strong>: <code>SCK</code>) </p>
+<p>ผลการวัดสัญญาณแสดงให้เห็นว่า ความถี่ของ <strong>SCK</strong> เท่ากับ <strong>5MHz</strong>
+และมีอัตราการอัปเดตค่าเอาต์พุตของ <strong>DAC</strong> เท่ากับ <strong>250kHz</strong>
+ความถี่ของไซน์ ได้ประมาณ <strong>980Hz</strong></p>
+<p>ถัดไปเป็นตัวอย่างการใช้ <strong>Signal Tap Logic Analyzer IP Core</strong>
+เพื่อบันทึกค่าของสัญญาณที่ได้เลือกมาวิเคราะห์และแสดงผลเป็นรูปคลื่นสัญญาณ 
+มีทั้งสัญญาณดิจิทัลที่ขาเอาต์พุต และสัญญญาณภายในของวงจร</p>
+<p><img alt="" src="stp-1.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าใช้งาน <strong>Signal Tap Logic Analyzer</strong></p>
+<p><img alt="" src="stp-2.jpg" /></p>
+<p><img alt="" src="stp-3.jpg" /></p>
+<p>รูป: สัญญาณดิจิทัลที่ได้จากการทำงานของ <strong>Signal Tap Logic Analyzer</strong></p>
+<p>ระยะเวลาระหว่างขอบขาลงและขอบขาขึ้นของสัญญาณ <code>/CS</code> ห่างกัน 170 ไซเคิล (<strong>170 * 20ns = 3.4us</strong>)
+และระยะเวลาระหว่างขอบขาลงของสัญญาณ <code>/CS</code> ถัดไปสองครั้ง ห่างกัน 200 ไซเคิล (<strong>200 * 20ns = 4us</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการออกแบบวงจรดิจิทัลสำหรับ <strong>FPGA</strong>
+เพื่อทดลองใช้งานโมดูล <strong>MCP4921 12-bit SPI DAC</strong>
+เชื่อมต่อด้วยบัส <strong>SPI</strong> และสร้างสัญญาณเอาต์พุต-แอนะล็อก 1 ช่อง</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../electronics/mcp4921_dac_spi/">การใช้งานโมดูล <strong>MCP4921 DAC (Digital-to-Analog Converter)</strong></a> และเขียนโค้ดด้วย <strong>Arduino</strong> สำหรับบอร์ด <strong>Uno R4 Wi-Fi</strong> และ <strong>ESP32</strong></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-10-17 | Last Updated: 2024-11-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -99,7 +99,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; โค้ด Python สำหรับรับข้อมูลและวาดกราฟด้วยคอมพิวเตอร์</a>
+            <li class="nav-item" data-level="2"><a href="#python" class="nav-link">&#9655; โค้ด Python สำหรับรับข้อมูลและแสดงรูปกราฟ</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -138,32 +138,37 @@
 <p>&nbsp;</p>
 <hr />
 <h2 id="arduino-sketch-esp32">&#9655; <strong>โค้ด Arduino Sketch สำหรับ ESP32</strong><a class="headerlink" href="#arduino-sketch-esp32" title="Permanent link">#</a></h2>
-<p>โค้ดต่อไปนี้ สาธิตการอ่านค่าจาก <strong>ADC</strong> ที่ขา <strong>GPIO34</strong> โดยใช้วงจร
+<p>โค้ดต่อไปนี้ สาธิตการอ่านค่าจาก <strong>ADC</strong> ที่ขา <strong>GPIO34</strong> โดยใช้วงจรตัวนับ หรือ
 <strong>Hardware Timer</strong> ทำหน้าที่กำหนดอัตราการอ่านค่าจาก <strong>ADC</strong>
-โดยเรียกใช้ฟังก์ชัน <code>timer_callback()</code></p>
-<p>ในโค้ดตัวอย่าง ได้กำหนดอัตราการชักตัวอย่างจากสัญญาณแอนะล็อกไว้ที่ความเร็ว <strong>Fs = 10000</strong> ตัวอย่างต่อวินาที
-การอ่านข้อมูลจากอินพุตและเก็บข้อมูลลงในอาร์เรย์ <code>samples[]</code> จะเริ่มต้นหลังจากได้รับข้อความหนึ่งบรรทัด (จบท้ายด้วย <code>\n</code>)
-จากพอร์ต <strong>Serial</strong> และทำต่อเนื่องจนได้ข้อมูลครบ <strong>N = 1024</strong> (เลือกจำนวนค่าตัวเลขให้เหมาะกับการนำไปคำนวณด้วย <strong>FFT</strong>)</p>
-<p>เมื่อได้ข้อมูลครบแล้ว ในขั้นตอนถัดไป ข้อมูลแต่ละตัวในอาร์เรย์ จะถูกส่งเป็นข้อความทีละบรรทัดผ่าน <strong>Serial</strong>
-ด้วยความเร็ว <strong>Baudrate = 921600</strong> จนครบ แล้วจึงเริ่มการอ่านค่า <strong>ADC</strong>
+โดยเรียกใช้ฟังก์ชัน <code>timer_callback()</code> เมื่อเกิดอินเทอร์รัพท์จากการทำงานของวงจรตัวนับ</p>
+<p>ในโค้ดตัวอย่างได้กำหนดอัตราการชักตัวอย่างจากสัญญาณแอนะล็อกไว้ที่ความเร็ว <strong>Fs = 10000</strong> ตัวอย่างต่อวินาที
+การอ่านข้อมูลจากอินพุตและเก็บข้อมูลลงในอาร์เรย์ <code>samples[]</code> จะทำไปจนกว่าจะได้ข้อมูลครบตามจำนวนในอาร์เรย์
+<code>N = 512</code> (ให้เลือกจำนวนค่าตัวเลขให้เหมาะกับการนำไปคำนวณด้วย <strong>FFT</strong>)</p>
+<p>เมื่อได้ข้อมูลครบแล้วในขั้นตอนถัดไป ข้อมูลในอาร์เรย์ จะถูกส่งเป็นข้อความทีละบรรทัดผ่าน <strong>Serial</strong>
+ด้วยความเร็ว <strong>Baudrate = 921600</strong> จนครบทุกตัว แล้วจึงเริ่มการอ่านค่า <strong>ADC</strong>
 และเก็บข้อมูลลงในอาร์เรย์ในรอบถัดไป</p>
-<pre><code class="language-c++">const int ADC_PIN = 34;   // ADC1_CH6 / GPIO34 pin
-const int LED_PIN = 22;   // LED pin
+<pre><code class="language-c++">// ESP32 Board: WeMos Lolin 32 
+// MAX9814 Module or MAX4466 Module (Analog Microphone)
+
+#define TIMER_FREQ_HZ  (1e6)
+#define FS             (10e3)
+#define IRQ_TICK_COUNT (TIMER_FREQ_HZ / FS)
+
+#define ADC_PIN GPIO_NUM_34   // ADC1_CH6 / GPIO34 pin
+#define LED_PIN GPIO_NUM_22   // LED pin
 
 uint32_t sample_index = 0;
-bool sampling = false;
+bool sampling = true;
 QueueHandle_t adc_queue;
 
-const uint32_t Fs = 10000; // Sampling frequency (Hz)
-const uint32_t N  = 1024;  // Number of samples
+const uint32_t Fs = 10000;  // Sampling frequency (Hz)
+const uint32_t N  =   512;  // Number of samples
 uint32_t sample_count = 0;
-uint16_t samples[N];
+uint16_t samples[ N ];
 
 // Callback function of the hardware timer.
 void IRAM_ATTR timer_callback() {
-  if (!sampling)
-      return;
-  digitalWrite( LED_PIN, HIGH );
+  gpio_set_level( LED_PIN, 1 );
   // Read the ADC input channel.
   uint16_t value = (uint16_t)analogReadMilliVolts( ADC_PIN );
   samples[sample_count++] = value;
@@ -177,7 +182,7 @@ void IRAM_ATTR timer_callback() {
       portYIELD_FROM_ISR();
     }
   }
-  digitalWrite( LED_PIN, LOW );
+  gpio_set_level( LED_PIN, 0 );
 }
 
 // Initialize the ADC input channel.
@@ -191,11 +196,11 @@ void initADC() {
 // Initialize the hardware timer.
 void initTimer( uint32_t hw_timer_unit=0 ) {
   static hw_timer_t *timer = NULL;
-  timer = timerBegin( 1000000UL ); // 1MHz (1us tick)
+  timer = timerBegin( TIMER_FREQ_HZ ); // 1MHz (1us tick)
   timerWrite(timer, 0);
   // Attach the callback function (ISR) to the timer
   timerAttachInterrupt( timer, &amp;timer_callback );
-  timerAlarm(timer, (1000000UL/Fs) /*interval*/,
+  timerAlarm(timer, IRQ_TICK_COUNT /*ticks*/,
              true /*reload*/, 0 /*reload value*/);
   timerRestart(timer);
 }
@@ -213,17 +218,10 @@ void setup() {
 
 void loop() {
   uint32_t flag;
-  while (Serial.available()) {
-    if (Serial.read() == '\n') {
-       sampling = true; // Start the input sampling.
-    }
-  }
   if (xQueueReceive(adc_queue, &amp;flag, pdMS_TO_TICKS(5))) {
-    Serial.println(&quot;+++&quot;); // Used as the frame-start symbol
-    Serial.flush();
     for ( uint32_t i=0; i &lt; N; i++ ) {
       // Send the sample as a string to serial.
-      Serial.printf(&quot;%u\n&quot;, samples[i] );
+      Serial.printf(&quot;%lu\n&quot;, samples[i] );
     }
     Serial.flush();
     sampling = true;
@@ -231,12 +229,13 @@ void loop() {
 }
 </code></pre>
 <p><img alt="" src="esp32_max4466.jpg" /></p>
+<p><img alt="" src="esp32_analog_mic.jpg" /></p>
 <p>รูป: การต่อวงจรทดลองโดยใช้บอร์ด <strong>ESP32</strong> และโมดูล <strong>MAX4466</strong> (ใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong>)</p>
 <p>&nbsp;</p>
 <hr />
-<h2 id="python">&#9655; <strong>โค้ด Python สำหรับรับข้อมูลและวาดกราฟด้วยคอมพิวเตอร์</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<h2 id="python">&#9655; <strong>โค้ด Python สำหรับรับข้อมูลและแสดงรูปกราฟ</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
 <p>ตัวอย่างถัดไปเป็นโค้ด <strong>Python</strong> สาธิตการรับข้อความจากพอร์ต <strong>Serial</strong>
-โดยใช้แพ็คเกจ <a href="https://pypi.org/project/pyserial/"><strong>PySerial</strong></a>
+โดยใช้แพ็คเกจ <a href="https://pypi.org/project/pyserial/"><code>PySerial</code></a>
 แล้วนำมาแสดงผลในรูปของกราฟแบบ <strong>Time Series</strong> 
 และแสดงสเปกตรัมความถี่สำหรับขนาด (<strong>Magnitude Spectrum</strong>)
 เมื่อนำไปผ่านการแปลงข้อมูลด้วยวิธี <strong>FFT</strong> โดยใช้แพ็คเกจ <strong>NumPy / Matplotlib</strong></p>
@@ -248,17 +247,26 @@ from matplotlib.animation import FuncAnimation
 import signal
 import serial
 
+# NumPy: v2.1.3
+# PySerial: v3.5
+print( f'NumPy: v{np.__version__}' ) 
+print( f'PySerial: v{serial.__version__}' ) 
+
 # Initialize serial port 
-serial_port = 'COM13' # 'COMx' (Windows) or '/dev/ttyUSBx' (Linux)
+serial_port = '/dev/ttyUSB0' # 'COMx' (Windows) or '/dev/ttyUSBx' (Linux)
 ser = serial.Serial(serial_port, baudrate=921600, timeout=0.04)
-ser.write(b'\r\n') # Send a newline char to start the sampling
+
+# Send a newline char to start the sampling
+ser.write(b'\r\n') 
 ser.flush()
 
-N_SAMPLES   = 1024  # Number of samples
-SAMPLE_RATE = 10000 # Set sampling rate.
+N_SAMPLES   = 512   # Number of samples
+SAMPLE_RATE = 10000 # Set sampling rate
 # Aliases
 N  = N_SAMPLES
 Fs = SAMPLE_RATE 
+
+mag_limits = [0, 3000]  # lower and upper limits for amplitude
 
 # Initialize plots
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
@@ -270,8 +278,7 @@ ax1.set_title('Samples')
 ax1.set_xlabel('Time [s]')
 ax1.set_ylabel('Amplitude')
 ax1.set_xlim(ts[0], ts[-1])
-amplitude_limits = [0, 3300]
-ax1.set_ylim(amplitude_limits)
+ax1.set_ylim(mag_limits)
 ax1.grid(False)
 
 # Plot for FFT-based frequency spectrum
@@ -288,51 +295,47 @@ ax2.grid(True)
 # Adjust vertical spacing between subplots
 plt.subplots_adjust(hspace=0.4)
 
-def read_data_from_serial(n):
-    samples = []
-    err_count = 0
-    while len(samples) &lt; n:
+def read_data_from_serial(buffer, n):
+    cnt  = 0
+    while cnt &lt; n:
         try:
             line = ser.readline()
         except ValueError:
             print( &quot;No data received from serial..&quot;)
-            return None
+            return buffer
         try:
             # Read a line from serial and convert to float
             line = line.decode().strip()
-            if line[0:3] == &quot;+++&quot;:
-                samples.clear()
-                continue
             value = float(line)
-            if value &gt; 3300:
-                value = 3300
-            elif value &lt; 0:
-                value = 0
-            samples.append(value)
+            if value &lt; mag_limits[0] or value &gt; mag_limits[1]:
+                print('Value range over-limit')
+            buffer = np.append(buffer, [value])
+            if len(buffer) &gt;= n:
+                buffer = np.delete(buffer,0)
+            cnt = cnt+1
         except ValueError as ex:
-            err_count += 1
-            #print(ex, err_count)
-            if err_count &gt;= 3:
-                return None
-    return samples
+            print( 'Value error', ex )
+    return buffer
 
 def read_test_data(n):
-    f0 = 500  # The fundamental frequency 
-    A = 1000  # The amplitude
+    f0 = 1000  # The fundamental frequency 
+    A  = 1000  # The amplitude [-1000,1000]
     noise = 0.01*np.random.uniform(-1,1,size=n)
-    data = A*( 1.67 + np.sin( 2*np.pi*f0*np.arange(n)/Fs) 
+    dc = 0.0
+    buffer = A*( dc  + np.sin( 2*np.pi*f0*np.arange(n)/Fs) 
                  + noise ).astype(np.float32)
-    return data
+    return buffer
 
 saved_data = np.zeros(N)
+data = saved_data
 
 # Function to update the plot
 def update_plot(frame):
-    global data1, data2
+    global data1, data2, data
     # Use generated data.
     #data = read_test_data(N)
     # Read the data from the serial port
-    data = read_data_from_serial(N)
+    data = read_data_from_serial(data, N)
     if data is None:
         data = saved_data
     # Apply a window function (Hanning window)
@@ -359,17 +362,21 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Create animation (set the update interval in msec)
 ani = FuncAnimation( fig, update_plot, blit=True, 
-                     interval=25, save_count=1 )
+                     interval=5, save_count=1 )
 
 # Show the plot in non-blocking mode
 plt.show()
 </code></pre>
 <p>หากทดสอบการทำงานของระบบ โดยใช้สัญญาณเสียงความถี่คงที่ เช่น <strong>Sine Wave 1kHz</strong>
 จะได้ผลในลักษณะต่อไปนี้</p>
-<p><img alt="" src="sound_test_1khz.png" /></p>
+<p><img alt="" src="sound_test_500hz.jpg" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>500Hz</strong></p>
+<p><img alt="" src="sound_test_1khz.jpg" /></p>
 <p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>1kHz</strong></p>
-<p><img alt="" src="sound_test_440hz.png" /></p>
-<p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>440Hz</strong></p>
+<p><img alt="" src="sound_test_2khz.jpg" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>2kHz</strong></p>
+<p><img alt="" src="sound_test_4khz.jpg" /></p>
+<p>รูป: ตัวอย่างสเปกตรัมความถี่ของสัญญาณเสียง เมื่อทดสอบกับสัญญาณที่มีความถี่ <strong>4kHz</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
@@ -385,7 +392,7 @@ plt.show()
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2023-11-17 | Last Updated: 2023-11-21</p></div>
+<p>Created: 2023-11-17 | Last Updated: 2024-11-15</p></div>
             </div>
         </div>
 
