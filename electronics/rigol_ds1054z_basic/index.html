@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/rigol_ds1054z_basic/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนะนำการใช้งานออสซิลโลสโคป RIGOL DS1054Z ในเบื้องต้น - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#rigol-ds1054z" class="nav-link">แนะนำการใช้งานออสซิลโลสโคป RIGOL DS1054Z ในเบื้องต้น</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; ฟังก์ชันการทำงานของออสซิลโลสโคป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_2" class="nav-link">&#9655; การตั้งค่า "ทริกเกอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_3" class="nav-link">&#9655; โหมดการทำงานสำหรับ "ทริกเกอร์"</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_4" class="nav-link">&#9655; สัญญาณทดสอบและการวัดสัญญาณ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#timediv" class="nav-link">&#9655; การปรับเลือกค่า Time/Div</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#coupling" class="nav-link">&#9655; การเลือกโหมด Coupling สำหรับสัญญาณอินพุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#voltdiv-2" class="nav-link">&#9655; การตั้งค่า Volt/Div สำหรับ 2 ช่องอินพุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_5" class="nav-link">&#9655; การปรับค่าตัวคูณสำหรับลดทอนสัญญาณ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_6" class="nav-link">&#9655; การวัดพารามิเตอร์ของสัญญาณ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_7" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="rigol-ds1054z">แนะนำการใช้งานออสซิลโลสโคป RIGOL DS1054Z ในเบื้องต้น<a class="headerlink" href="#rigol-ds1054z" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการใช้งานออสซิลโลสโคป <strong>RIGOL DS1054Z</strong></p>
+<p><strong>Keywords:</strong> <em>Rigol DS1054Z</em>, <em>Digital Storage Oscilloscope</em>,
+<em>Trigger Mode</em>, <em>Trigger Type</em>, <em>Input Coupling Mode</em>, <em>Probe Attenuation Setting</em>,
+<em>Time/Div</em>, <em>Volt/Div</em>, <em>Timing &amp; Electrical Parameter Measurement</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>ฟังก์ชันการทำงานของออสซิลโลสโคป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ออสซิลโลสโคปแบบดิจิทัล  (<strong>Digital Oscilloscope</strong>) เป็นเครื่องมือวัดสัญญาณไฟฟ้า 
+ทั้งแบบแอนะล็อกและดิจิทัล อาจเป็นสัญญาณคาบ
+(<strong>Periodic</strong>) และไม่มีคาบ (<strong>Aperiodic</strong>) ก็ได้
+ในการทดลองวงจรไฟฟ้าระดับพื้นฐาน มักเป็นสัญญาณคาบ เช่น สัญญาณรูปคลื่นไซน์ สัญญาณรูปคลื่นสี่เหลี่ยม เป็นต้น</p>
+<p>สิ่งที่ควรรู้เกี่ยวกับการใช้งานออสซิลโลสโคปในเบื้องต้น มีดังนี้</p>
+<ul>
+<li>การใช้งานสายวัด หรือ สายโพรบ (<strong>Measurement Probe</strong>) 
+และการเชื่อมต่อกับเครื่องออสซิลโลสโคป ช่องรับสัญญาณอินพุตซึ่งมีมากกว่าหนึ่งช่อง 
+การตั้งค่าลดทอนสัญญาณ (<strong>Probe Attenuation Setting</strong>)
+และการต่อสายกราวด์  (<strong>Ground</strong>) ของวงจรกับระบบกราวด์ของออสซิลโลสโคป</li>
+<li>การตั้งค่าทริกเกอร์ (<strong>Trigger Settings</strong>) การเลือกใช้ประเภทของทริกเกอร์  (<strong>Trigger Type</strong>)
+การเลือกช่องสัญญาณอินพุตสำหรับทริกเกอร์ (<strong>Trigger Source</strong>) และโหมดการแสดงผลสำหรับทริกเกอร์
+(<strong>Trigger Mode</strong>)</li>
+<li>โหมดการเชื่อมต่อกับสัญญาณอินพุต (<strong>Input Coupling Mode</strong>)</li>
+<li>การตั้งค่า <strong>Time/Div</strong> (แกนนอนสำหรับเวลา) และ <strong>Volt/Div</strong> (แกนตั้งสำหรับแรงดันไฟฟ้า)</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>การตั้งค่า "ทริกเกอร์</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ทริกเกอร์ (<strong>Trigger</strong>) คือ ฟังก์ชันการทำงานที่สำคัญของออสซิลโลสโคป
+เพื่อเลือกแสดงสัญญาณในตำแหน่งหรือช่วงเวลาที่สนใจ โดยตัวเลือกทั่วไปสำหรับออสซิลโลสโคปของ <strong>RIGOL</strong> 
+ที่มีการใช้งานบ่อย ได้แก่</p>
+<ul>
+<li><strong>Edge (Slope) Trigger</strong>: ทริกเกอร์ที่เกิดขึ้นตรงขอบสัญญาณ เช่น <ul>
+<li>ขาขึ้น (<strong>Rising Edge</strong>) หรือ มีความชันเป็นบวก (<strong>Positive Slope</strong>)</li>
+<li>ขาลง (<strong>Falling Edge</strong>) หรือ มีความชันเป็นลบ (<strong>Negative Slope</strong>) </li>
+<li>เป็นได้ทั้งสองกรณี (<strong>Any Edge</strong>)</li>
+</ul>
+</li>
+<li><strong>Pulse (Width) Trigger</strong>: กำหนดเงื่อนไขตามความกว้างพัลส์ (<strong>Pulse Width</strong>) สำหรับทริกเกอร์
+เช่น ความกว้างพัลส์มากกว่าค่าที่กำหนด หรือน้อยกว่า เป็นต้น</li>
+</ul>
+<hr />
+<h2 id="_3">&#9655; <strong>โหมดการทำงานสำหรับ "ทริกเกอร์"</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>การเลือกโหมดสำหรับทริกเกอร์และแสดงผล (<strong>Trigger Mode</strong>) มี 3 ตัวเลือก</p>
+<ul>
+<li><code>AUTO</code>: เป็นโหมดทำงานอัตโนมัติ หากทริกเกอร์ยังไม่ทำงาน ก็จะแสดงรูปสัญญาณที่วัดได้และอัปเดตโดยอัตโนมัติ
+หากเป็นสัญญาณคาบซึ่งมีความถี่คงที่ เมื่อทริกเกอร์ทำงาน จะได้รูปคลื่นสัญญาณนิ่ง ไม่เลื่อนไปมา
+และทริกเกอร์จะเกิดขึ้นซ้ำด้วยอัตราคงที่</li>
+<li><code>NORMAL</code>: หากเปลี่ยนไปใช้โหมด <code>NORMAL</code> ก็จะทำงานได้คล้ายกับ <code>AUTO</code> 
+แต่จะรอจนกว่าทริกเกอร์ทำงาน แล้วหยุดชั่วคราว คอยจนกว่าจะเกิดทริกเกอร์ครั้งถัดไป 
+หากทริกเกอร์เกิดขึ้นเพียงครั้งเดียว ก็จะคงรูปสัญญาณที่ได้ไว้ไม่เปลี่ยนแปลง
+โหมดนี้เหมาะสำหรับตรวจจับเหตุการณ์ที่เกิดขึ้นเพียงครั้งเดียว หรือเกิดขึ้นซ้ำได้ 
+หากเป็นสัญญาณคาบ ก็จะได้รูปคลื่นสัญญาณนิ่ง เหมือนโหมด <code>AUTO</code></li>
+<li><code>SINGLE</code>: รอทริกเกอร์ให้ทำงาน และเมื่อทำงานแล้วจะหยุดทันที ไม่มีการอัปเดตสัญญาณอีก จนกว่าจะกดปุ่มเริ่มใหม่</li>
+</ul>
+<hr />
+<h2 id="_4">&#9655; <strong>สัญญาณทดสอบและการวัดสัญญาณ</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>โดยปรกติแล้ว ออสซิลโลสโคปจะใช้สำหรับวัดสัญญาณไฟฟ้า เช่น สัญญาณที่มาจากวงจรไฟฟ้าหรืออิเล็กทรอนิกส์
+หรือเครื่องกำเนิดสัญญาณไฟฟ้าสำหรับการทดสอบวงจร เป็นต้น</p>
+<p>ออสซิลโลสโคป <strong>RIGOL</strong> เช่น รุ่น <a href="https://assets.testequity.com/te1/Documents/pdf/rigol/Rigol-DS1054Z-Manual.pdf"><strong>DS1054Z</strong></a>
+มีช่องเอาต์พุต 1 ช่อง สำหรับสร้างสัญญาณทดสอบ 
+(<strong>Built-in Test Signal</strong>) และตรวจสอบความพร้อมและความถูกต้องของสายโพรบก่อนใช้งาน</p>
+<p>สัญญาณทดสอบเป็นสัญญาณคาบ มีความถี่ <strong>1kHz</strong> และเป็นรูปคลื่นสี่เหลี่ยม 
+(<strong>Rectangular Wave</strong>) และถือว่าเป็นสัญญาณดิจิทัล ซึ่งมีแรงดันไฟฟ้าอยู่สองระดับ 
+มีระดับแรงดันไฟฟ้าอยู่ในช่วง 0V (ต่ำสุด หรือ <strong>LOW</strong>) และ 3V (สูงสุด หรือ <strong>HIGH</strong>) </p>
+<p>ถัดไปเป็นตัวอย่างการวัดสัญญาณทดสอบ โดยวัดสัญญาณด้วยสายโพรบ ช่อง <strong>CH1</strong> 
+จากทั้งหมด 4 ช่องสัญญาณอินพุต (<strong>CH1 .. CH4</strong>) 
+ให้ลองสังเกตการตั้งค่าใช้งานและรูปคลื่นสัญญาณบนหน้าจอ <strong>LCD</strong> </p>
+<ul>
+<li>การตั้งค่าระดับของทริกเกอร์ (<strong>Trigger Level</strong>): 
+ใช้ปุ่มหมุนเลื่อนระดับขึ้นหรือลง สังเกตดูเส้นประในแนวนอน (มีสัญลักษณ์ <code>T</code>) 
+ปรับระดับเส้นทริกเกอร์ให้อยู่ระหว่างค่าต่ำสุดและสูงสุดของสัญญาณทดสอบ</li>
+<li>การตั้งค่า <strong>Time/Div</strong>: ใช้ปุ่มหมุนปรับเพื่อเพิ่มหรือลด 
+รูปคลื่นสัญญาณจะถูกย่อหรือขยายออกในแกนเวลา (แนวนอน) 
+อย่างน้อยควรจะเห็นรูปคลื่นสัญญาณหนึ่งคาบ หรือมากกว่า</li>
+<li>การตั้งค่า <strong>Volt/Div</strong>: ใช้ปุ่มหมุนปรับเพื่อเพิ่มหรือลด 
+รูปสัญญาณจะถูกย่ออหรือขยายออกในแกนแรงดันไฟฟ้า (แนวตั้ง) ไม่ให้มีขนาดเล็กหรือใหญ่เกินไป</li>
+</ul>
+<p><img alt="" src="rigol_panel.jpg" /></p>
+<p>รูป: แผงด้านหน้า (<strong>Front Panel</strong>) ที่มีปุ่มกดและปุ่มหมุนได้สำหรับฟังก์ชันต่าง ๆ </p>
+<p>จากรูป <strong>Front Panel</strong> ของสโคป <a href="Rigol-DS1054Z-Manual.pdf"><strong>RIGOL DS1054Z</strong></a>
+ในบริเวณมุมขวาล่าง 
+จะมีส่วนที่เรียกว่า <strong>"Probe Compensation Terminal"</strong> หรือ 
+<strong>"Calibration Signal Output"</strong>
+เป็นสัญญาณทดสอบของสโคป ที่ใช้สำหรับทดสอบโพรบ และมักต่อกับ <strong>Hook Clip</strong> ของสายโพรบ</p>
+<p>&nbsp;</p>
+<p><img alt="" src="test_trigger-1.jpg" /></p>
+<p>รูป: การปรับระดับสำหรับทริกเกอร (<strong>Trigger Level</strong>) </p>
+<p>จากรูปสัญญาณจะเห็นได้ว่า มีอัตราส่วนของช่วงเวลาที่เป็นแรงดันสูงสุดกับแรงดันต่ำสุดในหนึ่งคาบ เท่ากับ 50:50 
+(หรือเรียกว่า มีค่า <strong>Duty Cycle 50%</strong>)</p>
+<p>ตำแหน่งที่เส้นประของทริกเกอร์ในแนวนอน ตัดกับเส้นแนวตั้งของทริกเกอร์ (สังเกตสัญลักษณ์ <code>T</code>) 
+คือ ตำแหน่งของจุดทริกเกอร์บนคลื่นสัญญาณ ประเภทของทริกเกอร์ที่ได้เลือกใช้ในกรณีนี้คือ 
+<strong>Edge</strong> เลือก <strong>Slope: Rising Edge</strong> (ขอบขาขึ้น) 
+และเลือกช่องสัญญาณเพื่อใช้สำหรับทริกเกอร์ (<strong>Trigger Source</strong>) เป็น <strong>CH1</strong></p>
+<p>หากเลื่อนระดับแรงดันทริกเกอร์ ให้ต่ำกว่าระดับแรงดันต่ำสุดของสัญญาณ หรือสูงกว่าระดับแรงดันสูงสุดของสัญญาณ 
+ผลลัพธ์ที่ได้คือ สัญญาณจะเลื่อนไปมา ไม่นิ่ง ถ้าเลือกแสดงผลในโหมด <code>AUTO</code> 
+หรือ จะตรวจจับทริกเกอร์ไม่ได้ถ้าแสดงผลในโหมด <code>NORMAL</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="timediv">&#9655; <strong>การปรับเลือกค่า Time/Div</strong><a class="headerlink" href="#timediv" title="Permanent link">#</a></h2>
+<p><strong>Time/Div</strong> (<strong>Time per Division</strong>) ของสโคป คือ 
+การตั้งค่าที่บ่งบอกระยะเวลาของแต่ละช่องบนจอแสดงผลของเครื่องมือวัด
+การปรับ <strong>Time/Div</strong> ให้เหมาะสมจะช่วยให้การวิเคราะห์สัญญาณทำได้ดีขึ้น 
+เพราะสามารถแสดงการเปลี่ยนแปลงของสัญญาณในลักษณะที่ชัดเจนและเข้าใจง่ายขึ้น </p>
+<p>จากรูปตัวอย่างต่อไปนี้ เป็นการทดลองปรับเปลี่ยนค่า <strong>Time/Div</strong> เช่น
+<strong>2.00ms/Div</strong> <strong>100us/Div</strong> และ <strong>2us/Div</strong> </p>
+<p>รูปสัญญาณที่ปรากฏดูเริ่มไม่เป็นสี่เหลี่ยม สังเกตความโค้งได้ชัดเจน ในตำแหน่งที่เป็นทริกเกอรสำหรับขอบขาขึ้น
+(การเปลี่ยนแปลงระดับของสัญญาณในช่วงเวลาสั้น ๆ มีข้อจำกัด)</p>
+<p><img alt="" src="time_div-1.jpg" /></p>
+<p>รูป: การตั้งค่า <strong>Time/Div = 2.00ms</strong></p>
+<p><img alt="" src="time_div-2.jpg" /></p>
+<p>รูป: การตั้งค่า <strong>Time/Div = 100us</strong> (หนึ่งคาบของสัญญาณทดสอบ มีความกว้าง 10 ช่อง
+ๆ ละ 100 ไมโครวินาที หรือ คำนวณเป็นคาบเวลาได้ 1 มิลลิวินาที หรือ ความถี่ <strong>1kHz</strong>)</p>
+<p><img alt="" src="time_div-3.jpg" /></p>
+<p>รูป: การตั้งค่า <strong>Time/Div = 2us</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="coupling">&#9655; <strong>การเลือกโหมด Coupling สำหรับสัญญาณอินพุต</strong><a class="headerlink" href="#coupling" title="Permanent link">#</a></h2>
+<p>โหมดการเลือกนำเข้าสัญญาณอินพต หรือ <strong>Coupling Mode</strong> มี 3 ตัวเลือก ได้แก่</p>
+<ul>
+<li><strong>DC Coupling</strong>: การเลือกโหมด <strong>DC Coupling</strong> จะส่งทั้งสัญญาณ 
+<strong>AC</strong> และ <strong>DC</strong> เข้าไปยังวงจรแสดงผล ทำให้รูปสัญญาณที่แสดงเป็นตัวแทนของสัญญาณจริง</li>
+<li><strong>AC Coupling</strong>: โหมด <strong>AC Coupling</strong> จะกรอง (<strong>Filter</strong>) 
+หรือตัดส่วนที่เป็นสัญญาณ <strong>DC</strong> ออก และปล่อยให้ผ่านเฉพาะส่วนที่เป็น <strong>AC</strong> เท่านั้น 
+ซึ่งทำให้ <strong>DC Offset</strong> หายไปจากรูปสัญญาณที่แสดง </li>
+<li><strong>GND</strong>: โหมด <strong>GND</strong> จะแสดงเส้นกราวด์ของวงจรเพื่อใช้เป็นจุดอ้างอิง</li>
+</ul>
+<p><img alt="" src="sine_plot.jpg" /></p>
+<p>รูป: ตัวอย่างสัญญาณรูปคลื่นไซน์ที่มีค่า <strong>DC Offset = 2.5V</strong> และรูปสัญญาณที่มีการตัด <strong>DC Offset</strong> ออกไป</p>
+<p>หากสัญญาณคาบ (เช่น ไซน์) ไม่มี <strong>DC Offset</strong> การเลือก <strong>DC</strong> หรือ 
+<strong>AC Coupling</strong> จะไม่ส่งผลให้เกิดความแตกต่างในการแสดงผล</p>
+<p>แต่ถ้าสัญญาณมีค่า <strong>DC Offset</strong> ซึ่งไม่เท่ากับ 0V เป็นได้ทั้งบวกและลบ 
+เมื่อแสดงผลในโหมด <strong>AC Coupling</strong> ส่วนที่เป็น <strong>DC Offset</strong> จะถูกตัดออก</p>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างการวัดสัญญาณทดสอบและเลือกโหมด <strong>AC Coupling</strong></p>
+<p><img alt="" src="coupling-1.jpg" /></p>
+<p>รูป: การเลือกระหว่าง <strong>DC Coupling</strong> กับ <strong>AC Coupling</strong></p>
+<p><img alt="" src="coupling-gnd.jpg" /></p>
+<p>รูป: การเลือก <strong>Input Coupling Mode</strong> เป็น <strong>GND</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="voltdiv-2">&#9655; <strong>การตั้งค่า Volt/Div สำหรับ 2 ช่องอินพุต</strong><a class="headerlink" href="#voltdiv-2" title="Permanent link">#</a></h2>
+<p>หากนำสัญญาณทดสอบไปใช้กับช่องอินพุต <strong>CH1</strong> และ <strong>CH2</strong>
+หากตั้งค่าการแสดงผลเหมือนกัน สัญญาณที่แสดงควรเหมือนกัน 
+(ยกเว้นกรณีที่มีปัญหาเกี่ยวกับฮาร์ดแวร์หรือค่าชดเชยของโพรบแต่ละช่องอินพุต)</p>
+<p>ในการตั้งค่าแสดงผลของออสซิลโลสโคป ค่า <strong>Time/Div</strong> ของช่องสัญญาณทุกช่องจะใช้เหมือนกัน
+เช่น <strong>Time/Div = 500 us</strong> (ไมโครวินาที) ตามรูปตัวอย่าง
+แต่สามารถเลือกใช้ค่า <strong>Volt/Div</strong> สำหรับแต่ละช่องสัญญาณแตกต่างกันได้</p>
+<p>ถัดไปเป็นตัวอย่างของรูปคลื่นสัญญาณทดสอบ และวัดโดยใช้ช่องอินพุต <strong>CH1</strong> และ <strong>CH2</strong>
+แต่มีการปรับระดับให้สัญญาณทั้งสองไม่ทับซ้อนกัน </p>
+<p>การปรับตำแหน่งแนวตั้งของสัญญาณบนหน้าจอ (<strong>Vertical Offset</strong>)
+เพื่อป้องกันไม่ให้สัญญาณทับซ้อนกันนั้น เป็นวิธีปฏิบัติที่ช่วยให้อ่านค่าสัญญาณได้ง่ายขึ้น</p>
+<p><img alt="" src="ch1_ch2-1.jpg" /></p>
+<p>รูป: การแสดงผลคลื่นสัญญาณทดสอบสำหรับช่อง <strong>CH1</strong> และ <strong>CH2</strong>
+(มีการตั้งค่า <strong>Volt/Div</strong> เหมือนกัน คือ <strong>1V/Div</strong>) </p>
+<p><img alt="" src="ch1_ch2-2.jpg" /></p>
+<p>รูป: การตั้งค่า <strong>Volt/Div</strong> ต่างกันสำหรับช่องสัญญาณทั้งสองช่อง
+  <strong>1V/Div</strong> และ   <strong>2V/Div</strong> ตามลำดับ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_5">&#9655; <strong>การปรับค่าตัวคูณสำหรับลดทอนสัญญาณ</strong><a class="headerlink" href="#_5" title="Permanent link">#</a></h2>
+<p>สายโพรบสำหรับวัดสัญญาณที่นำมาต่อใช้งานกับออสซิลโลสโคป 
+มีให้เลือกใช้หลายแบบ เช่น การลดทอนขนาดของสัญญาณ (<strong>Signal Attenuation</strong>) 
+หรือเรียกว่า ค่าลดทอน (<strong>Attenuation Factor</strong>) ซึ่งมักเรียกว่าโพรบ <code>1x</code>, <code>10x</code> หรือ <code>100x</code>
+โดยตัวเลขเหล่านี้แสดงถึงอัตราการลดขนาดของสัญญาณ:</p>
+<ul>
+<li><code>1x</code> (1:1): ไม่มีการลดทอนสัญญาณ  (สัญญาณส่งเข้ามายังออสซิลโลสโคปที่ระดับจริง)</li>
+<li><code>10x</code> (10:1): ลดขนาดสัญญาณลง 10 เท่า</li>
+</ul>
+<p>โพรบบางรุ่นสามารถปรับการลดทอนได้ (เช่น <code>1x</code> / <code>10x</code>) 
+และผู้ใช้ต้องตั้งค่าการลดทอนในออสซิลโลสโคปให้ตรงกับค่าในโพรบ</p>
+<p>ลองดูความแตกต่างระหว่างการตั้งค่า <code>1x</code> และ <code>10x</code> ในออสซิลโลสโคป สำหรับโพรบที่มีค่าลดทอน<code>1x</code></p>
+<ul>
+<li>ถ้าใช้โพรบ <code>1x</code> และตั้งค่าในสโคปเป็น <code>10x</code>:
+หากตั้งค่าในออสซิลโลสโคปเป็น <code>10x</code> สัญญาณที่เข้ามาถูกมองว่า มีการลดทอน 10 เท่า 
+ดังนั้นจึงคูณค่าที่วัดได้กลับขึ้นไป 10 เท่า ผลลัพธ์ที่ได้คือ สัญญาณที่แสดง มากกว่าค่าจริง 10 เท่า</li>
+<li>ถ้าใช้โพรบ <code>10x</code> และเลือกในสโคปเป็น 1x สัญญาณที่วัดได้ จะน้อยว่าค่าจริง 10 เท่า</li>
+</ul>
+<p><img alt="" src="probe_multiplier-1.jpg" /></p>
+<p>รูป: การตั้งค่าตัวคูณภายในของออสซิลโลสโคป <strong>10x</strong></p>
+<p><img alt="" src="probe_multiplier-2.jpg" /></p>
+<p>รูป: การตั้งค่าตัวคูณภายในของออสซิลโลสโคป <strong>1x</strong></p>
+<hr />
+<h2 id="_6">&#9655; <strong>การวัดพารามิเตอร์ของสัญญาณ</strong><a class="headerlink" href="#_6" title="Permanent link">#</a></h2>
+<p>ออสซิลโลสโคปแบบดิจิทัล สามารถวัดพารามิเตอร์ของสัญญาณไฟฟ้าได้โดยอัตโนมัติ
+(สโคปรุ่น <strong>RIGOL DS1054Z</strong> มีแถบของปุ่มกดในแนวตั้งทางซ้ายมือถัดจากจอ <strong>LCD</strong>)
+หากเป็นสัญญาณคาบ ก็มีพารามิเตอร์อย่างเช่น ความถี่ (<strong>Frequency</strong>) คาบเวลา (<strong>Period</strong>) 
+แอมพลิจูด (<strong>Amplitude</strong>) การวัดค่า <strong>RMS</strong> (Root-Mean-Square) ของสัญญาณ
+ความกว้างพัลส์ช่วงที่เป็น <strong>High</strong> และ <strong>Low</strong> เป็นต้น</p>
+<p>ลองดูตัวอย่างการเลือกพารามิเตอร์และวัดสัญญาณ โดยแบ่งเป็นสองกลุ่ม คือ พารามิเตอร์เชิงเวลา
+และพารามิเตอร์สำหรับแรงดันไฟฟ้า </p>
+<p><img alt="" src="measurement-1.jpg" /></p>
+<p>รูป: ตัวอย่างการเลือกวัดค่าพารามิเตอร์เชิงเวลาของสัญญาณทดสอบโดยอัตโนมัติช่องอินพุต <code>CH1</code>
+(สังเกตแถบตัวเลือกทางซ้ายมือ และตัวเลขที่ได้จากการวัดในแถบด้านล่างของจอ <strong>LCD</strong>)</p>
+<p><img alt="" src="measurement-4.jpg" /></p>
+<p><img alt="" src="measurement-2.jpg" /></p>
+<p>รูป: ตัวอย่างการเลือกวัดค่าพารามิเตอร์เชิงเวลาและแรงดันไฟฟ้าช่องอินพุต <code>CH1</code>
+(สังเกตแถบตัวเลือกทางซ้ายมือ และตัวเลขที่ได้จากการวัดในแถบด้านล่างของจอ <strong>LCD</strong>)</p>
+<p>ในการวัดสัญญาณ ผู้ใช้สามารถเปิดโหมดการใช้งานเคอร์เซอร์ (<strong>Cursor</strong>) ได้
+ซึ่งจะมีการวัดค่าในตำแหน่งจุดตัดของเคอร์เซอร์บนคลื่นสัญญาณ ตามตัวอย่าง</p>
+<p><img alt="" src="cursor-1.jpg" /></p>
+<p>รูป: การวัดช่วงเวลาสำหรับขอบขาขึ้นของสัญญาณ (<strong>Rise Time</strong>)</p>
+<p><img alt="" src="cursor-2.jpg" /></p>
+<p>รูป: การวัดช่วงเวลาสำหรับขอบขาลงของสัญญาณ  (<strong>Fall Time</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_7">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_7" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการใช้ออสซิลโลสโคป รุ่น <strong>RIGOL DS1054Z</strong>
+โดยทดลองวัดสัญญาณทดสอบที่สร้างได้จากวงจรภายในตัวเครื่อง และวัดค่าพารามิเตอร์ต่าง ๆ ของสัญญาณทดสอบ
+ได้แก่ พารามิเตอร์เชิงเวลา เช่น ความถี่  คาบเวลา และความกว้างของพัลส์ 
+และพารามิเตอร์สำหรับขนาดของสัญญาณ เช่น แอมพลิจูด และระดับแรงดันไฟฟ้า</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-11-20 | Last Updated: 2024-11-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
