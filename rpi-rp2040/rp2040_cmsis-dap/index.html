@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/rpi-rp2040/rp2040_cmsis-dap/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้ Raspberry Pi RP2040 เป็นอุปกรณ์ CMSIS-DAP Debug Probe - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/julia.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-966FQ6RN6W');
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#raspberry-pi-rp2040-cmsis-dap-debug-probe" class="nav-link">การใช้ Raspberry Pi RP2040 เป็นอุปกรณ์ CMSIS-DAP Debug Probe</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#cmsis-dap-swd-debug-probe" class="nav-link">&#9655; CMSIS-DAP / SWD Debug Probe</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#rp2040-swd-debug-probe" class="nav-link">&#9655; RP2040 SWD Debug Probe</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#openocd" class="nav-link">&#9655; การทดลองใช้งานร่วมกับ OpenOCD</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#openocd-rp2040" class="nav-link">&#9655; ตัวอย่างการใช้ OpenOCD เพื่ออัปโหลดโปรแกรมไปยังบอร์ด RP2040</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#nrf52840" class="nav-link">&#9655; ตัวอย่างการใช้งานสำหรับบอร์ด nRF52840</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="raspberry-pi-rp2040-cmsis-dap-debug-probe">การใช้ Raspberry Pi RP2040 เป็นอุปกรณ์ CMSIS-DAP Debug Probe<a class="headerlink" href="#raspberry-pi-rp2040-cmsis-dap-debug-probe" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="cmsis-dap-swd-debug-probe">&#9655; <strong>CMSIS-DAP / SWD Debug Probe</strong><a class="headerlink" href="#cmsis-dap-swd-debug-probe" title="Permanent link">#</a></h2>
+<p>ในการพัฒนาซอฟต์แวร์สำหรับระบบสมองกลฝังตัวที่ใช้ไมโครคอนโทรลเลอร์เป็นตัวประมวลผล 
+(<strong>Embedded System Programming</strong>) การดีบักเฟิร์มแวร์ ถือเป็นขั้นตอนสำคัญที่ต้องใช้เครื่องมือเฉพาะ
+เพื่อการอัปโหลดโปรแกรมไปยังหน่วยความจำแฟลช และการตรวจสอบและแก้ไขข้อผิดพลาด</p>
+<p>เครื่องมืออย่างหนึ่งที่ได้รับความนิยมคือ <strong>CMSIS-DAP Debug Probe</strong> สำหรับชิปที่ใช้ซีพียูตระกูล
+<strong>Arm Cortex-M Series</strong> และมักใช้ร่วมกับอินเทอร์เฟซสำหรับการดีบักที่เรียกว่า
+<strong>SWD (Serial Wire Debug)</strong> โดยมีจุดเด่นคือ การใช้งานผ่านขาเพียงสองขา (<code>SWDIO</code> และ <code>SWCLK</code>) 
+ซึ่งต่างจากโปรโตคอล <strong>JTAG</strong> ที่ต้องการขาเชื่อมต่อมากกว่า <strong>SWD</strong></p>
+<p><a href="https://arm-software.github.io/CMSIS_5/DAP/html/index.html"><strong>CMSIS-DAP</strong></a>
+ย่อมาจาก <em>Cortex Microcontroller Software Interface Standard - Debug Access Port</em> 
+เป็นมาตรฐานที่พัฒนาโดยบริษัท <strong>ARM</strong> เพื่อช่วยให้การดีบักและโปรแกรมไมโครคอนโทรลเลอร์ที่ใช้ <strong>ARM Cortex</strong> </p>
+<p>อุปกรณ์ <strong>CMSIS-DAP Debug Probe</strong> สามารถเชื่อมต่อระหว่างคอมพิวเตอร์ (ผ่านพอร์ต <strong>USB</strong> ของผู้ใช้)
+กับชิปไมโครคอนโทรลเลอร์ (ผ่านอินเทอร์เฟซ <strong>SWD</strong>) เพื่อทำหน้าที่ต่อไปนี้</p>
+<ul>
+<li><strong>Flashing Firmware</strong>: อัปโหลดไฟล์โปรแกรมลงในหน่วยความจำของไมโครคอนโทรลเลอร์</li>
+<li><strong>On-chip Debugging</strong>: ตรวจสอบการทำงานของโปรแกรมในขณะที่ทำงานโดยใช้ชิปไมโครคอนโทรลเลอร์</li>
+<li><strong>System Monitoring</strong>: อ่านค่าข้อมูลต่าง ๆ เช่น สถานะของรีจิสเตอร์หรือพอร์ตอินพุตเอาต์พุต</li>
+</ul>
+<p>อุปกรณ์ประเภท <strong>CMSIS-DAP Debug Probe</strong> รองรับการทำงานร่วมกับซอฟต์แวร์ <strong>IDE</strong> เช่น </p>
+<ul>
+<li><strong>Arm Keil µVision IDE</strong></li>
+<li><a href="https://code.visualstudio.com/"><strong>VS Code IDE</strong></a> + <a href="https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug"><strong>Cortex-Debug</strong></a></li>
+<li><a href="https://openocd.org/"><strong>OpenOCD</strong></a></li>
+</ul>
+<p>อุปกรณ์ <strong>CMSIS-DAP Debug Probe</strong> มีขายและให้เลือกใช้จากหลายผู้ผลิต
+และแตกต่างกัน เช่น ชิปไมโครคอนโทรลเลอร์ที่เลือกใช้งาน (<code>STM32</code>, <code>RP2040</code>, <code>SAMD21</code>, <code>ESP32S3</code>, ...)
+และความเร็วในการประมวลผล หรือ ความเร็วของสัญญาณ <strong>SWCLK</strong> เป็นต้น</p>
+<p>เฟิร์มแวร์สำหรับ  <strong>CMSIS-DAP Debug Probe</strong>  ที่เป็น <strong>Open Source</strong> ก็มีให้เลือกและลองใช้งานได้ ดังนี้</p>
+<ul>
+<li><a href="https://github.com/ARMmbed/DAPLink"><strong>ARM DAPLink</strong></a></li>
+<li><a href="https://github.com/devanlai/dap42"><strong>DAP42</strong></a></li>
+<li><a href="https://github.com/ataradov/free-dap"><strong>Free-DAP</strong></a></li>
+<li><a href="https://github.com/adafruit/Adafruit_DAP"><strong>Adafruit-DAP</strong></a></li>
+<li><a href="https://github.com/espressif/esp-usb-bridge"><strong>ESP-USB-Bridge</strong></a></li>
+</ul>
+<hr />
+<h2 id="rp2040-swd-debug-probe">&#9655; <strong>RP2040 SWD Debug Probe</strong><a class="headerlink" href="#rp2040-swd-debug-probe" title="Permanent link">#</a></h2>
+<p>บริษัท <strong>RPi Ltd.</strong> มีอุปกรณ์ <strong>SWD Debug Probe</strong> ที่ใช้ชิป <strong>RP2040</strong>
+เรียกว่า <a href="https://www.raspberrypi.com/products/debug-probe/"><strong>Pico Debug Probe</strong></a>
+แต่ผู้ใช้ก็สามารถดาวน์โหลดไฟล์เฟิร์มแวร์ (ชนิดของไฟล์คือ <code>.uf2</code>)
+มาใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>RP2040</strong> เช่น <strong>Raspberry Pi Pico</strong> และ
+<strong>RP2350</strong> เช่น <strong>Raspberry Pi Pico 2</strong> </p>
+<ul>
+<li><strong>UF2 file for Debug Probe</strong>: <a href="https://github.com/raspberrypi/debugprobe/releases/download/debugprobe-v2.2.0/debugprobe.uf2"><code>debugprobe.uf2</code></a></li>
+<li><strong>UF2 file for Pico</strong>: <a href="https://github.com/raspberrypi/debugprobe/releases/download/debugprobe-v2.2.0/debugprobe_on_pico.uf2"><code>debugprobe_on_pico.uf2</code></a></li>
+<li><strong>UF2 file for Pico 2</strong>: <a href="https://github.com/raspberrypi/debugprobe/releases/download/debugprobe-v2.2.0/debugprobe_on_pico2.uf2"><code>debugprobe_on_pico2.uf2</code></a></li>
+<li><strong>GitHub Repo</strong>: <a href="https://github.com/raspberrypi/debugprobe/releases"><code>raspberrypi/debugprobe</code></a></li>
+</ul>
+<p>ขาอุปกรณ์สำหรับการเชื่อมต่อที่สำคัญคือ</p>
+<ul>
+<li><strong>UART</strong>: <ul>
+<li><code>UART_TX</code>: <code>GPIO4</code> </li>
+<li><code>UART_RX</code>: <code>GPOI5</code></li>
+</ul>
+</li>
+<li><strong>SWD</strong>: <ul>
+<li><code>SWCLK</code>: <code>GPIO2</code></li>
+<li><code>SWDIO</code>: <code>GPIO3</code></li>
+</ul>
+</li>
+</ul>
+<p>ถัดไปเป็นตัวอย่างและขั้นตอนการใช้บอร์ด <a href="https://www.waveshare.com/wiki/RP2040-Zero"><strong>WaveShare RP2040-Zero</strong></a>
+เป็นอุปกรณ์ <strong>Pico Debug Probe</strong></p>
+<ol>
+<li>ดาวน์โหลดไฟล์ <code>debugprobe_on_pico.uf2</code> (ได้ทดลองใช้เวอร์ชัน <code>v2.2.0</code>)</li>
+<li>เชื่อมต่อบอร์ด  <strong>WaveShare RP2040-Zero</strong> กับคอมพิวเตอร์ของผู้ใช้ผ่านทางพอร์ต <strong>USB</strong></li>
+<li>กดปุ่ม <strong>BOOT</strong> ค้างไว้ และกดปุ่ม <strong>RESET</strong> แล้วปล่อย เพื่อทำให้บอร์ดเข้าสู่โหมด <strong>RP2 BOOTSEL</strong> 
+จะมองเห็นไดรฟ์ของบอร์ด (<strong>USB Mass Storage</strong>) เช่น ในไดรฟ์<code>D:</code> ชื่อ <code>RPI-RP2</code> สำหรับ <strong>Windows</strong> เป็นต้น</li>
+<li>นำไฟล์ <code>debugprobe_on_pico.uf2</code> ไปใส่ลงในไดรฟ์ จากนั้นอุปกรณ์จะรีเซตตัวเองและเริ่มทำงาน</li>
+</ol>
+<p><img alt="" src="waveshare_zero_rp2040.jpg" /></p>
+<p>รูป: บอร์ด <strong>WaveShare RP2040-Zero</strong> และตำแหน่งขาของบอร์ด</p>
+<p><img alt="" src="rp2040_drive.jpg" /></p>
+<p>รูป: ตัวอย่างการนำไฟล์ <code>debugprobe_on_pico.uf2</code> ไปใส่ลงในไดรฟ์ของบอร์ด </p>
+<p>ในกรณีที่ใช้ <strong>WSL2 Ubuntu</strong> ก็มีตัวอย่างไฟล์ <strong>Bash Script</strong> (<code>copy_uf2.sh</code>) 
+สำหรับการนำไฟล์ <code>.uf2</code> ไปใส่ลงในไดรฟ์ของบอร์ด <strong>RP2040</strong> ซึ่งจะเป็นไดรฟ์แบบ <strong>Removable Flash Drive</strong>
+ดังนั้นก่อนทำคำสั่งด้วยสคริปต์นี้ จะต้องทำให้บอร์ด <strong>RP2040</strong> อยู่ในโหมด <strong>RP2 BOOTSEL</strong> ก่อนทุกครั้ง</p>
+<pre><code class="language-bash">#!/bin/bash
+
+# Ensure two arguments are provided
+if [ &quot;$#&quot; -ne 2 ]; then
+    echo &quot;Usage: $0 &lt;source-file&gt; &lt;window-drive&gt;&quot;
+    exit 1
+fi
+
+SRC_FILE=$1
+PICO_DRV=$2
+MOUNT_DIR=&quot;/mnt/pico_${PICO_DRV,,}&quot;
+PICO_DRV=&quot;${PICO_DRV^^}:&quot;
+
+# Check if the source file exists
+if [ ! -f &quot;$SRC_FILE&quot; ]; then
+    echo &quot;Error: Source file '$SRC_FILE' does not exist.&quot;
+    exit 2
+fi
+
+if [[ &quot;${SRC_FILE##*.}&quot; != &quot;uf2&quot; ]]; then
+    echo &quot;Error: Source file '$SRC_FILE' is not a .uf2 file.&quot;
+    exit 2
+fi
+
+echo &quot;mount Windows drive $PICO_DRV to '$MOUNT_DIR'&quot;
+if [[ &quot;${PICO_DRV}&quot; != &quot;C:&quot; ]]; then
+    sudo mkdir -p &quot;$MOUNT_DIR&quot; 2&gt;/dev/null
+    sudo mount -t drvfs &quot;$PICO_DRV&quot; &quot;$MOUNT_DIR&quot; &amp;&amp; cp &quot;$SRC_FILE&quot; &quot;$MOUNT_DIR&quot;
+    sudo umount &quot;$MOUNT_DIR&quot; 2&gt;/dev/null
+    sudo rm -fr &quot;$MOUNT_DIR&quot; 2&gt;/dev/null
+else
+    echo &quot;Ignore drive C:&quot;
+    exit 3
+fi
+
+echo &quot;Done...&quot;
+</code></pre>
+<p><img alt="" src="copy_uf2_win.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>copy_uf2.sh</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="openocd">&#9655; <strong>การทดลองใช้งานร่วมกับ OpenOCD</strong><a class="headerlink" href="#openocd" title="Permanent link">#</a></h2>
+<p>โปรแกรม <strong>OpenOCD</strong> สามารถนำมาใช้งานกับระบบปฏิบัติการได้ทั้ง <strong>Windows</strong>, <strong>Linux</strong>
+และ <strong>Mac OS</strong> แต่ในบทความนี้จะกล่าวถึงเฉพาะ <strong>Windows</strong> และ <strong>Ubuntu / WSL2</strong></p>
+<p>ตัวอย่างการทำคำสั่งสำหรับ <strong>Ubuntu 22.04 / 24.04 LTS</strong> (ไม่ได้ใช้ <strong>WSL2</strong>)</p>
+<pre><code class="language-text"># Install the openocd software package.
+$ sudo apt install openocd
+
+# Detect the Pico Debug Probe.
+$ lsusb | grep &quot;Raspberry Pi&quot;
+Bus 001 Device 043: ID 2e8a:000c Raspberry Pi Debugprobe on Pico (CMSIS-DAP)
+</code></pre>
+<p>&nbsp;</p>
+<pre><code class="language-text"># Use the openocd tool to connect to the Pico Debug Probe.
+$ openocd -s tcl -f interface/cmsis-dap.cfg 
+ -c &quot;transport select swd&quot; -c &quot;adapter speed 4000&quot; -c &quot;init; exit&quot; 
+
+Open On-Chip Debugger 0.11.0
+Licensed under GNU GPL v2
+For bug reports, read
+ http://openocd.org/doc/doxygen/bugs.html
+swd
+adapter speed: 4000 kHz
+
+Info : Using CMSIS-DAPv2 interface with VID:PID=0x2e8a:0x000c, serial=....
+Info : CMSIS-DAP: SWD  Supported
+Info : CMSIS-DAP: FW Version = 2.0.0
+Info : CMSIS-DAP: Interface Initialised (SWD)
+Info : SWCLK/TCK = 0 SWDIO/TMS = 0 TDI = 0 TDO = 0 nTRST = 0 nRESET = 0
+Info : CMSIS-DAP: Interface ready
+Info : clock speed 4000 kHz
+Warn : gdb services need one or more targets defined
+</code></pre>
+<p>&nbsp;</p>
+<p><strong>ข้อสังเกต:</strong> หากจะใช้คำสั่ง <code>openocd</code> จาก <strong>WSL2 Ubuntu</strong> โดยตรง จะต้องมีขั้นตอนเพิ่ม
+จึงจะสามารถเรียกใช้คำสั่ง <code>openocd</code> กับอุปกรณ์ <strong>USB Device</strong> อย่างเช่น <strong>CMSIS-DAP Debug Probe</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="openocd-rp2040">&#9655; <strong>ตัวอย่างการใช้ OpenOCD เพื่ออัปโหลดโปรแกรมไปยังบอร์ด RP2040</strong><a class="headerlink" href="#openocd-rp2040" title="Permanent link">#</a></h2>
+<p>โดยปรกติแล้ว ถ้าเขียนโปรแกรมสำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>RP2040</strong> ก็ใช้วิธีเข้าสู่โหมด
+<strong>UF2 BOOTSEL</strong> แล้วนำไฟล์ <code>.uf2</code> ไปใส่ลงในไดรฟ์ของบอร์ด ซึ่งก็เป็นวิธีที่ทำได้ง่าย 
+แต่อีกวิธีหนึ่งคือ การใช้วิธี <strong>SWD</strong> โดยใช้อุปกรณ์ <strong>CMSIS-DAP Debug Probe</strong></p>
+<p>ถัดไปเป็นตัวอย่างการทำคำสั่งภายใน <strong>WSL2 Ubuntu</strong> แต่จะเรียกใช้โปรแกรม
+<strong>OpenOCD</strong> ที่ใช้กับ <strong>Windows 10 / 11</strong> ดังนั้นจึงต้องมีการติดตั้งโปรแกรม
+<strong>OpenOCD</strong> สำหรับระบบปฏิบัติการ <strong>Windows</strong> ให้พร้อมก่อนใช้งาน</p>
+<p><img alt="" src="openocd_win.jpg" /></p>
+<p>รูป: เว็บไซต์สำหรับดาวน์โหลดโปรแกรม <a href="https://gnutoolchains.com/arm-eabi/openocd/"><strong>OpenOCD for Windows</strong></a></p>
+<p>ในตัวอย่างนี้ได้ติดตั้งโปรแกรมที่ได้ดาวน์โหลดไฟล์ <code>.7z</code> และมาแตกไฟล์ไว้ในไดเรกทอรี ตามตัวอย่างดังนี้</p>
+<p><code>c/Tools/OpenOCD-20240916-0.12.0/</code></p>
+<p>และมองเห็นได้จาก <strong>WSL2 Ubuntu</strong> โดยใช้ชื่อไดเรกทอรี</p>
+<p><code>/mnt/c/Tools/OpenOCD-20240916-0.12.0/</code></p>
+<p>จากนั้นลองทำคำสั่งใน <strong>WSL2 Ubuntu Terminal</strong> ตามตัวอย่างดังนี้ </p>
+<pre><code class="language-text">$ cat /etc/os-release | head -1
+PRETTY_NAME=&quot;Ubuntu 24.04.1 LTS&quot;
+
+# Create an alias (short command) for the openocd.exe program.
+$ alias openocd.exe='/mnt/c/Tools/OpenOCD-20240916-0.12.0/bin/openocd.exe'
+
+# Check the version of the openocd program.
+$ openocd.exe --version
+Open On-Chip Debugger 0.12.0 (2024-09-16) 
+
+$ openocd.exe \
+  -f interface/cmsis-dap.cfg -c &quot;transport select swd&quot; \
+  -f target/rp2040.cfg -c &quot;adapter speed 2000&quot; \
+  -c &quot;targets rp2040.core0&quot; -c &quot;init; dap info; exit&quot;
+</code></pre>
+<p>ถัดไปเป็นตัวอย่างการทำคำสั่ง <code>openocd.exe</code> เพื่ออัปโหลดไฟล์ <code>led_blink.elf</code>
+ที่ได้จากการคอมไพล์โค้ดด้วย <strong>Pico C/C++ SDK</strong> (<a href="../../rpi-rp2040/pico_sdk_vscode_wsl2/">ดูตัวอย่างการติดตั้งและใช้งานซอฟต์แวร์</a>)
+และอัปโหลดไฟล์ดังกล่าวไปยังบอร์ด <strong>RP2040</strong> </p>
+<pre><code class="language-text">$ openocd.exe \
+  -f interface/cmsis-dap.cfg -c &quot;transport select swd&quot; \
+  -f target/rp2040.cfg -c &quot;adapter speed 2000&quot; \
+  -c &quot;targets rp2040.core0&quot; \
+  -c 'program ./led_blink.elf verify reset exit'
+</code></pre>
+<p><img alt="" src="rp2040_flashing.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้บอร์ด <strong>Waveshare RP2040-Zero</strong> เป็นอุปกรณ์ <strong>Debug Probe</strong>
+และนำไปใช้กับอีกบอร์ด <strong>RP2040</strong> อีกบอร์ดหนึ่ง (เรียกว่า <strong>Target Board</strong>)
+โดยเชื่อมต่อด้วยอินเทอร์เฟส <strong>SWD</strong> (<code>SWCLK</code>, <code>SWDIO</code>, <code>GND</code>)</p>
+<p><img alt="" src="openocd_rp2040_flashing-1.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>openocd.exe</code></p>
+<p><img alt="" src="openocd_rp2040_flashing-2.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>openocd.exe</code> เพื่ออัปโหลดไฟล์ <code>.elf</code> ไปยังบอร์ด <strong>RP2040</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="nrf52840">&#9655; <strong>ตัวอย่างการใช้งานสำหรับบอร์ด nRF52840</strong><a class="headerlink" href="#nrf52840" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการใช้อุปกรณ์ <strong>SWD Debug Probe</strong> ร่วมกับ <strong>OpenOCD</strong>
+เพื่อเขียนไฟล์ <strong>Adafruit nRF52 Bootloader</strong> ไปยังชิป <a href="../../nrf_soc/"><strong>nRF52840 SoC</strong></a>
+เช่น บอร์ด <a href="https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/"><strong>MakerDiary nRF58240 MDK USB Dongle</strong></a></p>
+<p>ไฟล์ที่ได้ทดลองใช้: <a href="https://github.com/adafruit/Adafruit_nRF52_Bootloader/releases/download/0.9.2/mdk_nrf52840_dongle_bootloader-0.9.2_s140_6.1.1.hex"><code>mdk_nrf52840_dongle_bootloader-0.9.2_s140_6.1.1.hex</code></a> </p>
+<p>คำสั่งต่อไปนี้เป็นตัวอย่างการใช้โปรแกรม <strong>OpenOCD</strong> ลบหน่วยความจำแฟลชภายในชิป <strong>nRF52840</strong>
+แล้วจึงเขียนไฟล์ <code>.hex</code> (ใช้ชื่อไฟล์ <code>bootloader.hex</code>) ลงในชิปดังกล่าว</p>
+<pre><code class="language-text">$ alias openocd.exe='/mnt/c/Tools/OpenOCD-20240916-0.12.0/bin/openocd.exe'
+$ openocd.exe \
+  -s tcl -f interface/cmsis-dap.cfg -f target/nrf52.cfg \
+  -c &quot;transport select swd&quot; -c &quot;adapter speed 4000&quot; \
+  -c &quot;init; targets; reset init; nrf5 mass_erase; halt&quot; \
+  -c &quot;program bootloader.hex verify reset exit&quot;
+</code></pre>
+<p><img alt="" src="mdk_nrf52840_usb_dongle.jpg" /></p>
+<p>รูป: บอร์ด <a href="https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/"><strong>MakerDiary nRF58240 MDK USB Dongle</strong></a></p>
+<p><img alt="" src="nrf52840_flashing.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้บอร์ด <strong>Waveshare RP2040-Zero</strong> เป็นอุปกรณ์ <strong>Debug Probe</strong>
+ร่วมกับบอร์ด <a href="https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/"><strong>MakerDiary nRF58240 MDK USB Dongle</strong></a>
+เชื่อมต่อกันด้วย <strong>SWD Interface</strong></p>
+<p><img alt="" src="nrf52_flashing.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>openocd.exe</code></p>
+<p>เมื่อบอร์ด <a href="https://github.com/makerdiary/nrf52840-mdk-usb-dongle"><strong>nRF58240 MDK USB Dongle</strong></a>
+ได้มีการติดตั้ง <strong>Adafruit nRF52 Bootloader</strong> แล้ว และเมื่อกดปุ่ม <strong>RESET</strong> แบบ <strong>Double-Click</strong> จะเข้าสู่โหมด <strong>UF2 BOOT</strong>
+และมองเห็นไฟล์ <code>INFO_UF2.TXT</code> อยู่ภายใน</p>
+<p><img alt="" src="nrf52_uf2_boot.jpg" /></p>
+<p>รูป: ตัวอย่างเนื้อหาภายในไฟล์ <code>INFO_UF2.TXT</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>RP2040</strong>
+ให้เป็นอุปกรณ์ <strong>CMSIS-DAP / SWD Debug Probe</strong> โดยเลือกใช้บอร์ด
+<strong>WaveShare RP2040-Zero</strong> ซึ่งมีขนาดเล็กและราคาไม่แพง
+มีการสาธิตการใช้งานอุปกรณ์ร่วมกับโปรแกรม <strong>OpenOCD</strong> ที่เป็น <strong>Open Source</strong> 
+โดยสาธิตเฉพาะการทดลองเขียนไฟล์ (<strong>Flashing</strong>) ไปยังบอร์ดไมโครคอนโทรลเลอร์อย่างเช่น <strong>RP2040</strong> และ <strong>nRF52840</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-12-10 | Last Updated: 2024-12-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
