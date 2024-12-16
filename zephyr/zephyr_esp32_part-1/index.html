@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/zephyr/zephyr_esp32_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งาน Zephyr RTOS สำหรับไมโครคอนโทรลเลอร์ Espressif ESP32 (ตอนที่ 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#zephyr-rtos-espressif-esp32-1" class="nav-link">การใช้งาน Zephyr RTOS สำหรับไมโครคอนโทรลเลอร์ Espressif ESP32 (ตอนที่ 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#esp32-soc" class="nav-link">&#9655; บอร์ด ESP32 SoC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#new-project-creation" class="nav-link">&#9655; การเริ่มต้นสร้างโปรเจกต์ใหม่ (New Project Creation)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#led-blinking" class="nav-link">&#9655; การสร้างเธรดสำหรับ LED Blinking</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#io-polling-loop" class="nav-link">&#9655; การเขียนโค้ดแบบ I/O Polling Loop</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#esp32-c3" class="nav-link">&#9655; การทดลองกับบอร์ด ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zephyr-rtos-espressif-esp32-1">การใช้งาน Zephyr RTOS สำหรับไมโครคอนโทรลเลอร์ Espressif ESP32 (ตอนที่ 1)<a class="headerlink" href="#zephyr-rtos-espressif-esp32-1" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Zephyr RTOS</em>, <em>Zephyr IDE</em>, <em>Extension Pack for VS Code IDE</em>, 
+<em>ESP32</em></p>
+<hr />
+<h2 id="esp32-soc">&#9655; บอร์ด <strong>ESP32 SoC</strong><a class="headerlink" href="#esp32-soc" title="Permanent link">#</a></h2>
+<p><strong>Zephyr RTOS</strong> เป็นระบบปฏิบัติการเวลาจริงแบบ <strong>Open Source</strong>
+ที่รองรับการใช้งานชิปและบอร์ดไมโครคอนโทรลเลอร์หลายตัวเลือก
+รวมถึง <strong>ESP32 / ESP32-S2 / ESP32-S3 SoC</strong> ซึ่งมีซีพียูที่ทำงานตามสถาปัตยกรรม 
+<strong>Xtensa 32-bit CPU Core (LX6 / LX7)</strong> มีทั้งแบบ <strong>Single-Core</strong> และ <strong>Dual-Core</strong>
+และชิป <strong>ESP32-C3 / ESP32-C6 (RISC-V)</strong></p>
+<p>ชิป <strong>ESP32</strong> ได้รับความนิยมอย่างมากในช่วงหลายปีที่ผ่านมา มีบอร์ดไมโครคอนโทรลเลอร์ให้เลือกใช้จำนวนมาก
+อีกทั้งยังสามารถเขียนโปรแกรมด้วย <strong>Arduino</strong> และ <strong>ESP-IDF</strong> ที่ทำงานด้วยระบบปฏิบัติการเวลาจริง
+<strong>FreeRTOS</strong> </p>
+<p>บทความนี้จะนำเสนอตัวอย่างการเขียนโค้ดและใช้งาน <a href="https://docs.zephyrproject.org/latest/boards/espressif/index.html"><strong>Zephyr RTOS for ESP32</strong></a>
+ที่เป็นอีกตัวเลือกหนึ่ง แต่ก็มีความซับซ้อนกว่า <strong>FreeRTOS</strong></p>
+<p>แนะนำให้ติดตั้งและใช้งานซอฟต์แวร์ <a href="../zephyr_ide/"><strong>VS Code IDE + Zephyr IDE Extension Pack</strong></a>
+ให้พร้อมใช้งานก่อน โดยจะต้องสร้าง <strong>Zephyr Workspace</strong> และติดตั้งซอฟต์แวร์ที่เกี่ยวข้อง
+(ในบทความนี้ได้ทดลองใช้ <strong>Zephyr v4.0.0</strong>)</p>
+<hr />
+<h2 id="new-project-creation">&#9655; การเริ่มต้นสร้างโปรเจกต์ใหม่ (<strong>New Project Creation</strong>)<a class="headerlink" href="#new-project-creation" title="Permanent link">#</a></h2>
+<p>เริ่มต้นให้สร้างโปรเจกต์ใหม่ใน <strong>Zephyr Workspace</strong> 
+โดยเลือกวิธีสร้างจากโปรเจกต์ตัวอย่าง เช่น <code>led_blinky</code>
+ในตัวอย่างนี้ได้ตั้งชื่อ <code>led_blink_esp32</code> สำหรับโปรเจกต์ใหม่</p>
+<p>กดปุ่ม <code>Ctrl+Shift+P</code> แล้วเลือก "<strong>Zephyr IDE: Create Project From Template</strong>"</p>
+<p><img alt="" src="zephyr_esp32-1.jpg" /></p>
+<p>รูป: การทำขั้นตอน <strong>Zephyr IDE: Create Project From Template</strong></p>
+<p><img alt="" src="zephyr_esp32-2.jpg" /></p>
+<p>รูป: เลือกโปรเจกต์ตัวอย่างจาก <code>basic\led_blinky</code> ของ <strong>Zephyr</strong></p>
+<p><img alt="" src="zephyr_esp32-3.jpg" /></p>
+<p>รูป: ขั้นตอนการเพิ่ม <strong>Build</strong> สำหรับบอร์ด <strong>ESP32</strong></p>
+<p>ในตัวเลือก <strong>PROJECTS</strong> ที่มีการสร้างโปรเจกต์ใหม่แล้ว
+ซึ่งในตัวอย่างคือ <code>led_blink_esp32</code> ให้กดปุ่ม "<strong>Add Build</strong>"
+เพื่อสร้างไดเรกทอรีสำหรับการคอมไพล์โค้ดในโปรเจกต์
+และในขั้นตอนนี้จะต้องมีการเลือกบอร์ดไมโครคอนโทรลเลอร์</p>
+<p>ในกรณีตัวอย่างได้ให้เลือกบอร์ด <code>esp32-devkitc-wroom/esp32/</code> สำหรับ <strong>ESP32</strong> ซึ่งมีสองตัวเลือก
+(โมเดลของฮาร์ดแวร์) โดยจำแนกตามแกนของซีพียูภายในชิป <strong>ESP32</strong> ที่จะใช้สำหรับการรันโค้ดของ <strong>Zephyr</strong></p>
+<ul>
+<li><code>esp32/procpu</code> หมายถึง  <strong>CPU Core 0</strong></li>
+<li><code>esp32/appcpu</code> หมายถึง  <strong>CPU Core 1</strong></li>
+</ul>
+<p>จากนั้นให้เลือกประเภทของ <strong>Build</strong> เช่น <strong>Debug</strong></p>
+<p><img alt="" src="zephyr_esp32-4.jpg" /></p>
+<p>รูป: การเลือกประเภทของ <strong>Build</strong> เช่น <strong>Debug</strong> หรือ <strong>Release</strong></p>
+<p>ให้แก้ไขหรือสร้างไฟล์ในโปรเจกต์ เช่น</p>
+<ul>
+<li><code>main.c</code> สำหรับเขียนโค้ดตามตัวอย่าง</li>
+<li><code>proj.conf</code> สำหรับการตั้งค่าในการคอมไพล์โค้ดในโปรเจกต์ เช่น  <code>CONFIG_GPIO=y</code> และอื่น ๆ</li>
+<li><code>app.overlay</code> เป็นไฟล์สำหรับ <strong>Device Tree Overlay</strong> เช่น การกำหนดขา <strong>GPIO</strong>
+เพื่อใช้งานให้ตรงกับบอร์ดไมโครคอนโทรลเลอร์ที่จะใช้งาน</li>
+</ul>
+<p>โค้ดตัวอย่างที่ได้จาก <code>basic\led_blinky</code> มีดังนี้</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+#include &lt;zephyr/kernel.h&gt;
+
+#define SLEEP_TIME_MS 1000
+
+#define LED0_NODE DT_ALIAS(led0)
+
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+int main(void) {
+  int ret;
+  bool led_state = true;
+  if (!gpio_is_ready_dt(&amp;led)) {
+    return 0;
+  }
+  ret = gpio_pin_configure_dt(&amp;led, GPIO_OUTPUT_ACTIVE);
+  if (ret &lt; 0) {
+    return 0;
+  }
+  while (1) {
+    ret = gpio_pin_toggle_dt(&amp;led);
+    if (ret &lt; 0) {
+      return 0;
+    }
+    led_state = !led_state;
+    printf(&quot;LED state: %s\n&quot;, led_state ? &quot;ON&quot; : &quot;OFF&quot;);
+    k_msleep(SLEEP_TIME_MS);
+  }
+  return 0;
+}
+</code></pre>
+<p>ก่อนที่จะทำขั้นตอน <strong>Build</strong> เพื่อคอมไพล์โค้ดสำหรับ <strong>ESP32</strong>
+จะต้องตั้งค่าใช้งานสำหรับโปรเจกต์ในไฟล์ <code>prof.conf</code> และ <code>app.overlay</code> ตามตัวอย่างดังนี้ </p>
+<p><strong>File</strong>: <code>proj.conf</code></p>
+<pre><code class="language-text">CONFIG_GPIO=y
+CONFIG_ESP32_USE_UNSUPPORTED_REVISION=y
+</code></pre>
+<p><img alt="" src="zephyr_esp32-5.jpg" /></p>
+<p>รูป: ตัวอย่างไฟล์ <code>proj.conf</code></p>
+<p><img alt="" src="zephyr_esp32-6.jpg" /></p>
+<p>รูป: ตัวอย่างไฟล์ <code>app.overlay</code></p>
+<p>&nbsp;</p>
+<p><strong>Zephyr</strong> มีวิธีการจัดการและใช้งานวงจรต่าง ๆ ของชิป <strong>SoC</strong> โดยกำหนดรูปแบบของโครงสร้างข้อมูล
+เป็นแบบ "แผนภูมิต้นไม้" เรียกว่า <strong>Device Tree</strong> ซึ่งประกอบด้วยโหนด (<strong>Nodes</strong>) ต่าง ๆ ในแต่ละระดับ 
+และบันทึกอยู่ในไฟล์ที่เรียกว่า <a href="https://docs.zephyrproject.org/latest/build/dts/intro-syntax-structure.html"><strong>Device Tree Source (.dts)</strong></a></p>
+<p><img alt="" src="devtree_structure.jpg" /></p>
+<p>รูป: ตัวอย่างโครงสร้างของ <strong>Device Tree</strong> และไฟล์ <strong>DTS</strong></p>
+<p>จากโครงสร้างตัวอย่าง จะเห็นได้ว่า โหนดแรกเริ่ม เรียกว่า <strong>Root Node</strong> และใช้สัญลักษณ์เป็น <code>/</code>
+และมีโหนดในระดับชั้นถัดไป (เรียกว่า <strong>Child Node</strong>) ที่มีชื่อ (<strong>Node Label</strong>)
+เรียกว่า <code>soc</code> ซึ่งมีโหนดย่อยลงไป เช่น <code>i2c</code> (เป็นหนึ่งตัวอย่างของวงจรภายในชิป) และมีการกำหนดคุณสมบัติไว้ด้วย
+(เช่น สำหรับชิป <strong>nRF</strong>) แต่ถ้าเป็นโหนด <code>soc</code> สำหรับชิป <strong>ESP32</strong> ก็จะมีรายละเอียดที่แตกต่างไป</p>
+<p>ดูตัวอย่างไฟล์ <strong>DTS</strong> สำหรับบอร์ด <code>esp32_devkitc_wroom</code></p>
+<ul>
+<li><a href="https://github.com/soburi/zephyr/blob/main/boards/espressif/esp32_devkitc_wroom/esp32_devkitc_wroom_procpu.dts">esp32_devkitc_wroom/esp32_devkitc_wroom_procpu.dts</a></li>
+<li><a href="https://github.com/soburi/zephyr/blob/main/boards/espressif/esp32_devkitc_wroom/esp32_devkitc_wroom_appcpu.dts">esp32_devkitc_wroom/esp32_devkitc_wroom_appcpu.dts</a></li>
+</ul>
+<p>การคอมไพล์โค้ดของโปรเจกต์ จะต้องมีไฟล์ <code>zephyr.dts</code> สำหรับบอร์ดไมโครคอนโทรลเลอร์ที่ได้เลือกใช้งาน
+และผู้ใช้สามารถตรวจสอบรายละเอียดได้จากไฟล์ดังกล่าว ในรูปถัดไปเป็นตัวอย่างไฟล์สำหรับบอร์ด <strong>ESP32</strong></p>
+<p><img alt="" src="zephyr_esp32_devtree.jpg" /></p>
+<p>รูป: ตัวอย่างไฟล์ <code>zephyr.dts</code> ที่ใช้สำหรับขั้นตอน <strong>Build</strong></p>
+<p>ไฟล์ <code>.overlay</code> เป็นไฟล์ประเภท <strong>Device Tree Overlay</strong>
+และใช้กำหนดค่าใหม่ (หรือเพิ่มเติม) โดยผู้ใช้ สำหรับ <strong>Device Tree</strong> เช่น 
+ส่วนที่เกี่ยวข้องกับการใช้งานวงจรประเภทต่าง ๆ ภายในชิป </p>
+<p><strong>File</strong>: <code>app.overlay</code></p>
+<pre><code class="language-text">/ {
+    aliases {
+        led0 = &amp;led0;
+    };
+
+    leds {
+        compatible = &quot;gpio-leds&quot;;
+        led0: led_0 {
+            gpios = &lt;&amp;gpio0 22 GPIO_ACTIVE_LOW&gt;;
+            label = &quot;LED 0&quot;;
+        };
+    };
+};
+</code></pre>
+<p>เนื่องจากในบทความนี้ได้เลือกใช้บอร์ด <strong>WeMos Lolin32 Lite</strong>
+จึงต้องเลือกขา <strong>GPIO 22</strong> สำหรับ <strong>LED (active-low)</strong> 
+อ้างอิงชื่อโหนดเป็น <code>led0</code> และเป็นส่วนหนึ่งของโหนดใน <strong>Device Tree</strong> ที่มีชื่อว่า <code>leds</code>
+(เรียกว่า <strong>LED Groups</strong>) และใช้ได้กับ <strong>Zephyr GPIO LEDs Driver</strong> ที่มีชื่อว่า <code>gpio-leds</code></p>
+<p>&nbsp;</p>
+<p>การทำขั้นตอน <strong>Build</strong> สามารถทำได้อีกวิธี โดยการทำคำสั่ง <code>west</code> ดังนี้</p>
+<pre><code class="language-text">west build -b esp32_devkitc_wroom/esp32/procpu led_blink_esp32 
+</code></pre>
+<p><img alt="" src="west_build.jpg" /></p>
+<p>รูป: ตัวอย่างการคำสั่ง <code>west build</code></p>
+<p>หากทำขั้นตอน <strong>Build</strong> เพื่อคอมไพล์โค้ดได้สำเร็จแล้ว ถัดไปให้อัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด <strong>ESP32</strong>
+ที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้กับพอร์ต <strong>USB</strong></p>
+<p><img alt="" src="zephyr_esp32-7.jpg" /></p>
+<p>รูป: ขั้นตอนการ <strong>Build</strong> และอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ด
+(ให้เพิ่ม <strong>Runner</strong> เป็น <code>default</code> สำหรับ <strong>Build</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blinking">&#9655; การสร้างเธรดสำหรับ  <strong>LED Blinking</strong><a class="headerlink" href="#led-blinking" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการสร้าง "เธรด" (<strong>Thread</strong>) เพื่อให้ทำหน้าที่สลับสถานะลอจิกของ <strong>LED</strong> 
+แทนที่จะใช้ "เธรดหลัก" (<strong>Main Thread</strong>) สำหรับงานดังกล่าว</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;zephyr/kernel.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+
+// Use the led0 alias for the onboard LED
+#define LED_NODE DT_ALIAS(led0)
+
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
+
+#define SLEEP_TIME_MS (1000)
+#define THREAD_STACK_SIZE (512)
+#define THREAD_PRIORITY (5)
+
+void led_blink_func(void *, void *, void *);
+
+K_THREAD_DEFINE(led_blink_tid, THREAD_STACK_SIZE,
+                led_blink_func, NULL, NULL, NULL,
+                THREAD_PRIORITY, 0, 0);
+
+void show_running_thread() {
+  struct k_thread *thread = k_current_get();
+  const char *thread_name = k_thread_name_get(thread);
+  if (thread_name != NULL) {
+    printk(&quot;Current thread name: %s (prio = %d)\n&quot;,
+           thread_name, k_thread_priority_get(thread));
+  } else {
+    printk(&quot;Current thread: @%p (prio = %d)\n&quot;,
+           thread, k_thread_priority_get(thread));
+  }
+}
+
+void main(void) {
+  printk(&quot;Zephyr OS on %s\n&quot;, CONFIG_SOC);
+  show_running_thread();
+  while (1) {
+    k_sleep(K_FOREVER);  // The main thread sleeps forever
+  }
+}
+
+void led_blink_func(void *p1, void *p2, void *p3) {
+  int state = 0;
+  if (!gpio_is_ready_dt(&amp;led)) {
+    printk(&quot;Error: gpio-leds device %s not ready\n&quot;, led.port-&gt;name);
+    return;
+  }
+  if (gpio_pin_configure_dt(&amp;led, GPIO_OUTPUT_ACTIVE)!=0) {
+    return;
+  }
+  k_msleep(1000);
+  for (;;) {
+    show_running_thread();
+    (void)gpio_pin_set_dt(&amp;led, state ^= 1);
+    printk(&quot;LED toggle: %d\n&quot;, state);
+    k_msleep(SLEEP_TIME_MS);
+  }
+}
+</code></pre>
+<p><img alt="" src="zephyr_esp32-8.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้รับผ่านทาง <strong>USB-Serial</strong></p>
+<p>ลองเปรียบเทียบการทำงานโดยใช้ <strong>Wokwi Simulator</strong> </p>
+<p><img alt="" src="wokwi_esp32_zephyr_sim.jpg" /></p>
+<p>รูป: ตัวอย่างการจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="io-polling-loop">&#9655; การเขียนโค้ดแบบ <strong>I/O Polling Loop</strong><a class="headerlink" href="#io-polling-loop" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการสาธิตการอ่านค่าจากวงจรปุ่มกดภายนอกที่ทำงานแบบ <strong>Active-Low</strong>
+โดยนำมาต่อเข้ากับขา <strong>GPIO-2</strong> เพื่อใช้งานเป็น <strong>User Button</strong>
+และเขียนโค้ดเพื่อให้โปรแกรมตรวจสอบสถานะของอินพุตจากปุ่มกด แล้วอัปเดตสถานะของ <strong>LED</strong></p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;zephyr/kernel.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+
+// Use the led0 alias for the onboard LED
+#define LED_NODE DT_ALIAS(led0)
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
+
+// Use the sw1 button on GPI0-2 pin
+#define SW_NODE DT_ALIAS(sw1)
+static const struct gpio_dt_spec sw = GPIO_DT_SPEC_GET(SW_NODE, gpios);
+
+#define SLEEP_TIME_MS (50)
+
+void main(void) {
+  printk(&quot;Zephyr OS on %s\n&quot;, CONFIG_SOC);
+  if (!gpio_is_ready_dt(&amp;led)) {
+    printk(&quot;Error: gpio-leds device %s not ready\n&quot;, led.port-&gt;name);
+    return;
+  }
+  if (gpio_pin_configure_dt(&amp;led, GPIO_OUTPUT_ACTIVE)!=0) {
+    return;
+  }
+  if (!gpio_is_ready_dt(&amp;sw)) {
+    printk(&quot;Error: gpio-keys device %s not ready\n&quot;, sw.port-&gt;name);
+    return;
+  }
+  if (gpio_pin_configure_dt(&amp;sw, GPIO_INPUT)!=0) {
+    return;
+  }
+
+  (void)gpio_pin_set_dt(&amp;led, 0);  // Turn off the LED
+
+  int last_value = 0;
+  while (1) {                                 // Polling loop
+    int value = gpio_pin_get_dt(&amp;sw);         // Read button input
+    if (value &gt;= 0 &amp;&amp; last_value != value) {  // Update LED output
+      (void)gpio_pin_set_dt(&amp;led, value);
+      printk(&quot;value: %d\n&quot;, value);
+      last_value = value;
+    }
+    k_msleep(SLEEP_TIME_MS);
+  }
+}
+</code></pre>
+<p>สำหรับตัวอย่างนี้ จะต้องมีการใช้ไฟล์ <code>app.overlay</code> ดังนี้</p>
+<pre><code class="language-text">/ {
+    aliases {
+        led0 = &amp;led0;
+        sw0 = &amp;button0;
+        sw1 = &amp;button1;
+    };
+
+    buttons {
+        compatible = &quot;gpio-keys&quot;;
+        button0: button_0 {
+            gpios = &lt;&amp;gpio0 0 GPIO_ACTIVE_LOW&gt;;
+            label = &quot;BOOT button&quot;;
+        };
+        button1: button_1 {
+            gpios = &lt;&amp;gpio0 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)&gt;;
+            label = &quot;User Button&quot;;
+        };
+    };
+
+    leds {
+        compatible = &quot;gpio-leds&quot;;
+        led0: led_0 {
+            gpios = &lt;&amp;gpio0 22 GPIO_ACTIVE_LOW&gt;;
+            label = &quot;LED 0&quot;;
+        };
+    };
+};
+</code></pre>
+<p>เมื่อกดปุ่มค้างไว้ จะได้ลอจิกเป็น <code>true (1)</code> และปล่อยปุ่มได้ลอจิก <code>false (0)</code> ซึ่งจะส่งผลให้ <strong>LED</strong>
+สว่างเมื่อกดปุ่มและมีค่าลอจิกเป็น <code>1</code> และดับลงเมื่อปล่อยปุ่ม และมีข้อสังเกตว่า วงจรปุ่มและวงจร <strong>LED</strong> ทำงานแบบ <strong>active-low</strong></p>
+<p>การใช้คำสั่งของ <strong>Zephyr GPIO driver</strong> อย่างเช่น <code>gpio_pin_get_dt()</code> ซึ่งมีการเรียกใช้คำสั่ง   <code>gpio_pin_get()</code> เพื่ออ่านค่าลอจิกของขา <strong>GPIO</strong> ที่เป็นอินพุต
+สามารถศึกษาได้จากเอกสารออนไลน์ <strong>Zephyr API Doc</strong>: 
+<a href="https://docs.zephyrproject.org/apidoc/latest/group__gpio__interface.html"><code>group__gpio__interface.html</code></a></p>
+<p><img alt="" src="gpio_pin_get_dt.jpg" /></p>
+<p>รูป: คำสั่ง <code>gpio_pin_get_dt()</code></p>
+<p><img alt="" src="gpio_pin_get.jpg" /></p>
+<p>รูป: คำสั่ง <code>gpio_pin_get()</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-c3">&#9655; การทดลองกับบอร์ด <strong>ESP32-C3</strong><a class="headerlink" href="#esp32-c3" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้ใช้โค้ดจากตัวอย่างที่แล้ว แต่จะเปลี่ยนมาลองใช้บอร์ดไมโครคอนโทรลเลอร์ที่มีชิป <strong>ESP32C3</strong>
+และเลือกใช้บอร์ดที่สื่อสารกับคอมพิวเตอร์ผ่าน <strong>USB</strong> โดยตรง (ไม่มีชิปหรือวงจรภายนอกสำหรับ <strong>USB-to-Serial Bridge</strong>) เช่น</p>
+<ul>
+<li>บอร์ด <a href="../../esp32/esp32-luatos_core_c3/"><strong>LUATOS CORE-ESP32C3</strong></a></li>
+<li>บอร์ด <a href="../../esp32/esp32_c3_weact_studio/"><strong>WeAct Studio ESP32-C3FH4 Mini Core</strong></a></li>
+</ul>
+<p>ดังนั้นจึงต้องมีการสร้าง <strong>Build</strong> ใหม่ และแก้ไขไฟล์ <code>app.overlay</code> สำหรับขา <strong>GPIO</strong> ให้ตรงกับบอร์ดที่ใช้งาน
+ในตัวอย่างนี้ได้มีการต่อวงจรปุ่มกดภายนอก (<strong>Active-low</strong>) สำหรับขา <strong>GPIO-2</strong>
+และใช้วงจร <strong>LED</strong> บนบอร์ด ซึ่งตรงกับขา <strong>GPIO-8</strong></p>
+<p><strong>File</strong>: <code>app.overlay</code></p>
+<pre><code class="language-c">/ {
+    aliases {
+        led0 = &amp;led0;
+        sw0 = &amp;button0;
+        sw1 = &amp;button1;
+    };
+
+    buttons {
+        compatible = &quot;gpio-keys&quot;;
+        button0: button_0 {
+            gpios = &lt;&amp;gpio0 9 GPIO_ACTIVE_LOW&gt;;
+            label = &quot;BOOT button&quot;;
+        };
+        button1: button_1 {
+            gpios = &lt;&amp;gpio0 2 GPIO_ACTIVE_LOW&gt;;
+            label = &quot;User button&quot;;
+        };        
+    };
+
+    leds {
+        compatible = &quot;gpio-leds&quot;;
+        led0: led_0 {
+            gpios = &lt;&amp;gpio0 8 GPIO_ACTIVE_LOW&gt;;
+            label = &quot;LED 0&quot;;
+        };
+    };
+};
+</code></pre>
+<p><img alt="" src="esp32c3_build.jpg" /></p>
+<p>รูป: การทำขั้นตอน <strong>Build</strong> สำหรับ <strong>ESP32C3</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; กล่าวสรุป<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการสร้างโปรเจกต์ใหม่ใน <strong>VS Code IDE + Zephyr IDE Extension</strong>
+(ทดลองกับระบบปฏิบัติการ <strong>Windows 11</strong>)
+ได้ทดลองเขียนโค้ดร่วมกับ <strong>Zephyr RTOS</strong> ในเบื้องต้น
+และมีตัวอย่างโค้ดที่สามารถนำไปทดลองใช้กับบอร์ด <strong>ESP32</strong> และ <strong>ESP32C3</strong> ได้จริง</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-12-14 | Last Updated: 2024-12-15</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

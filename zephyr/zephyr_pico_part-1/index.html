@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/zephyr/zephyr_pico_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งาน Zephyr RTOS สำหรับ Raspberry Pi Pico (ตอนที่ 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#zephyr-rtos-raspberry-pi-pico-1" class="nav-link">การใช้งาน Zephyr RTOS สำหรับ Raspberry Pi Pico (ตอนที่ 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#raspberry-pico" class="nav-link">&#9655; บอร์ด Raspberry Pico</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การเริ่มต้นสร้างโปรเจกต์ใหม่</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#usb-cdc" class="nav-link">&#9655; การส่งข้อความผ่านทาง USB-CDC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#led" class="nav-link">&#9655; การอ่านค่าจากปุ่มกดและใช้เป็นค่าเอาต์พุตสำหรับ LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zephyr-rtos-raspberry-pi-pico-1">การใช้งาน Zephyr RTOS สำหรับ Raspberry Pi Pico (ตอนที่ 1)<a class="headerlink" href="#zephyr-rtos-raspberry-pi-pico-1" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Zephyr RTOS</em>, <em>Zephyr IDE</em>, <em>Extension Pack for VS Code IDE</em>, 
+<em>Raspberry Pi Pico</em></p>
+<hr />
+<h2 id="raspberry-pico">&#9655; บอร์ด <strong>Raspberry Pico</strong><a class="headerlink" href="#raspberry-pico" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ของ <strong>Raspberry Pi</strong> มีหลายรุ่นในปัจจุบัน เช่น</p>
+<ul>
+<li><strong>Raspberry Pi Pico</strong> (ใช้ชิป <strong>RP2040 SoC</strong>)</li>
+<li><strong>Raspberry Pi Pico W</strong> (มีโมดูล <strong>CYW43439: WiFi / BLE</strong>)</li>
+<li><strong>Raspberry Pi Pico 2</strong> (ใช้ชิป <strong>RP2350 SoC</strong>)</li>
+<li><strong>Raspberry Pi Pico 2 W</strong> (มีโมดูล <strong>CYW43439: WiFi / BLE</strong>)</li>
+</ul>
+<p>ในขณะที่เขียนบทความนี้ <strong>Zephyr RTOS</strong> รองรับการใช้งานสำหรับบอร์ด 
+<a href="https://docs.zephyrproject.org/latest/boards/raspberrypi/rpi_pico/doc/index.html"><strong>Pico / Pico-W</strong></a>
+แต่ก็สามารถใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>RP2040</strong> ของบริษัทอื่นได้ เช่น
+<strong>Waveshare RP2040 Zero</strong> และ <strong>VCC-GND Studio YD_RP2040</strong></p>
+<p><img alt="" src="zephyr_pico_support.jpg" /></p>
+<p>รูป: รายการวงจรภายในของ <strong>RP2040</strong> และการใช้งานได้กับ <strong>Zephyr RTOS</strong></p>
+<p><img alt="" src="yd_rp2040_board.jpg" /></p>
+<p>รูป: ตัวอย่างบอร์ด <strong>YD-RP2040</strong> ที่ได้นำมาทดลองใช้งานแทน <strong>Pico</strong>
+( <a href="rp2040-yd_schematic.pdf"><strong>Schematic .PDF</strong></a>
+| <a href="yd_rp2040_schematic.jpg"><strong>Schematic .JPG</strong></a>)</p>
+<p><img alt="" src="rp2040-yd_pinout.jpg" /></p>
+<p>รูป: <strong>YD-RP2040 Pinout</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; การเริ่มต้นสร้างโปรเจกต์ใหม่<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>เริ่มต้นให้สร้างโปรเจกต์ใหม่ใน <strong>Zephyr Workspace</strong> 
+โดยเลือกวิธีสร้างจากโปรเจกต์ตัวอย่าง เช่น <code>led_blinky</code>
+ในตัวอย่างนี้ได้ตั้งชื่อ <code>led_blink_pico</code> สำหรับโปรเจกต์ใหม่</p>
+<p>กดปุ่ม <code>Ctrl+Shift+P</code> แล้วเลือก "<strong>Zephyr IDE: Create Project From Template</strong>"
+เพื่อสร้างโปรเจกต์ใหม่จากตัวอย่าง  <code>basic\led_blinkly</code> และใช้ชื่อเป็น <code>led_blink_pico</code></p>
+<p><img alt="" src="zephyr_ide-1.jpg" /></p>
+<p>รูป: <strong>VS Code - Zephyr IDE</strong> ที่มีการติดตั้งซอฟต์แวร์และสร้าง <strong>Workspace</strong> ไว้แล้ว </p>
+<p><img alt="" src="zephyr_ide-2.jpg" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่ โดยเลือกจากตัวอย่างของ <strong>Zephyr SDK</strong> (เลือก <code>basic\led_blinkly</code>)</p>
+<p>ทำขั้นตอน "<strong>Add Build</strong>" ในโปรเจกต์ โดยเลือกใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico (RP2040)</strong></p>
+<p><img alt="" src="zephyr_ide-3.jpg" /></p>
+<p>รูป: การตั้งชื่อโปรเจกต์ใหม่</p>
+<p>เมื่อสร้าง <strong>Build</strong> และเลือกบอร์ดไมโครคอนโทรลเลอร์ แล้วจึงทำขั้นตอน <strong>Build</strong>
+เพื่อคอมไพล์โค้ดในโปรเจกต์</p>
+<p><img alt="" src="zephyr_ide-4.jpg" /></p>
+<p>รูป: การเลือกบอร์ด <code>rpi_pico/rp2040</code></p>
+<p><img alt="" src="zephyr_ide-5.jpg" /></p>
+<p>รูป: การทำขั้นตอน <strong>Build</strong></p>
+<p>เลือกวิธีการอัปโหลดไฟล์เฟิร์มแวร์ โดยตั้งค่า <strong>Runner</strong> ให้เป็น<code>uf2</code> สำหรับบอร์ด <strong>Pico</strong>
+แล้วทำขั้นตอน <strong>Flash</strong></p>
+<p><img alt="" src="zephyr_ide-6.jpg" /></p>
+<p>รูป: การทำขั้นตอน <strong>Flash</strong></p>
+<p>เมื่อถึงขั้นตอนนี้ แสดงว่า เราสามารถใช้ <strong>Zephyr IDE</strong> และเขียนโค้ดสำหรับบอร์ด <strong>Pico</strong> ได้สำเร็จแล้ว</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="usb-cdc">&#9655; การส่งข้อความผ่านทาง <strong>USB-CDC</strong><a class="headerlink" href="#usb-cdc" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไปสาธิตการส่งข้อความผ่านทางพอร์ต <strong>USB</strong> 
+ที่เกิดจากการใช้คำสั่ง <code>printk()</code> โดยใช้ <strong>USB-CDC</strong> </p>
+<p><strong>File</strong>: <code>main.c</code></p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+#include &lt;zephyr/kernel.h&gt;
+#include &lt;zephyr/usb/usb_device.h&gt;
+#include &lt;zephyr/drivers/uart.h&gt;
+
+// Check if the overlay exists for CDC UART console
+BUILD_ASSERT(DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console),
+                                zephyr_cdc_acm_uart),
+             &quot;Console device is not ACM CDC UART device&quot;);
+
+#define SLEEP_TIME_MS (1000)
+
+#define LED0_NODE DT_ALIAS(led0)
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+// Configure the console output (USB Serial).
+const struct device *usb_dev = DEVICE_DT_GET(DT_NODELABEL(cdc_acm_uart0));
+//const struct device *usb_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+
+void main(void) {
+  // Check if USB can be initialized.
+  if (usb_enable(NULL) != 0) {
+    return;
+  }
+  // Wait for a console connection, if the DTR flag was set to activate USB.
+  uint32_t dtr = 0;
+  while (!dtr) {
+    uart_line_ctrl_get(usb_dev, UART_LINE_CTRL_DTR, &amp;dtr);
+    k_sleep(K_MSEC(100));
+  }
+
+  if (!gpio_is_ready_dt(&amp;led)) {
+    return;
+  }
+  if (gpio_pin_configure_dt(&amp;led, GPIO_OUTPUT_ACTIVE) != 0) {
+    return;
+  }
+
+  bool led_state = true;
+  while (1) {
+    led_state = !led_state;
+    (void)gpio_pin_set_dt(&amp;led, led_state);
+    printf(&quot;LED state: %s\n&quot;, led_state ? &quot;ON&quot; : &quot;OFF&quot;);
+    k_msleep(SLEEP_TIME_MS);
+  }
+}
+</code></pre>
+<p>การเปิดใช้งานวงจร <strong>USB-CDC (Communications Device Class)</strong> บนชิป <strong>RP2040</strong>
+เพื่อใช้งาน <strong>UART-Serial / Console</strong> โดยใช้ <strong>Zephyr Device Driver</strong> ชื่อว่า <code>zephyr,cdc-acm-uart</code> และกำหนดให้รองรับการใช้งาน <code>zephyr,console</code> สำหรับคำสั่ง <code>printk()</code> 
+สามารถทำได้โดยการแก้ไขไฟล์ <code>proj.conf</code> และ <code>app.overlay</code> ตามตัวอย่างด้านล่างนี้</p>
+<p><strong>File</strong>: <code>proj.conf</code></p>
+<pre><code class="language-text">CONFIG_GPIO=y
+CONFIG_SERIAL=y
+CONFIG_CONSOLE=y
+CONFIG_UART_CONSOLE=y
+CONFIG_UART_LINE_CTRL=y
+CONFIG_USB_DEVICE_STACK=y
+CONFIG_USB_DEVICE_PRODUCT=&quot;RPi Pico USB Serial Console&quot;
+CONFIG_USB_DEVICE_VID=0x2e8a
+CONFIG_USB_DEVICE_PID=0x000a
+CONFIG_USB_CDC_ACM=y
+CONFIG_UART_CONSOLE=y
+</code></pre>
+<p><strong>File</strong>: <code>app.overlay</code></p>
+<pre><code class="language-text">/ {
+    chosen {
+        zephyr,console = &amp;cdc_acm_uart0;
+    };
+
+    aliases {
+        led0 = &amp;led0;
+        sw0 = &amp;button0;
+    };
+
+    buttons {
+        compatible = &quot;gpio-keys&quot;;    
+        button0: button_0 {
+            gpios = &lt;&amp;gpio0 24 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)&gt;;
+            label = &quot;User button&quot;;
+        };
+    };
+
+    leds {
+        compatible = &quot;gpio-leds&quot;;
+        led0: led_0 {
+            gpios = &lt;&amp;gpio0 25 GPIO_ACTIVE_HIGH&gt;;
+            label = &quot;LED 0&quot;;
+        };
+    };
+};
+
+&amp;zephyr_udc0 {
+    cdc_acm_uart0: cdc_acm_uart0 {
+        compatible = &quot;zephyr,cdc-acm-uart&quot;;
+        label = &quot;CDC_ACM_0&quot;;
+    };
+};
+</code></pre>
+<p><img alt="" src="rp2040_usb_cdc_serial_console.jpg" /></p>
+<p>รูป: ตัวอย่างการรับข้อความจากบอร์ด <strong>RP2040</strong> ผ่านทาง <strong>USB-CDC</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led">&#9655; การอ่านค่าจากปุ่มกดและใช้เป็นค่าเอาต์พุตสำหรับ <strong>LED</strong><a class="headerlink" href="#led" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้สาธิตการอ่านค่าจากปุ่มกดด้วยวิธีวนซ้ำ (<strong>Polling Loop</strong>) 
+โดยเลือกใช้ขา <strong>GPIO-24</strong> ซึ่งทำงานแบบ <strong>Active-low</strong>
+ค่าอินพุตที่อ่านได้ในแต่ละครั้ง จะถูกนำไปใช้กำหนดสถานะของ <strong>LED</strong>
+ซึ่งตรงกับขา <strong>GPIO-25 (Active-High)</strong></p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+#include &lt;zephyr/kernel.h&gt;
+#include &lt;zephyr/usb/usb_device.h&gt;
+#include &lt;zephyr/drivers/uart.h&gt;
+
+// Check if the overlay exists for CDC UART console
+BUILD_ASSERT(DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console),
+                                zephyr_cdc_acm_uart),
+             &quot;Console device is not ACM CDC UART device&quot;);
+
+#define LED0_NODE DT_ALIAS(led0)
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+#define SW_NODE DT_ALIAS(sw0)
+static const struct gpio_dt_spec sw = GPIO_DT_SPEC_GET(SW_NODE, gpios);
+
+// Configure the console output (USB Serial).
+const struct device *usb_dev = DEVICE_DT_GET(DT_NODELABEL(cdc_acm_uart0));
+//const struct device *usb_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+
+void main(void) {
+  // Check if USB can be initialized.
+  if (usb_enable(NULL) != 0) {
+    return;
+  }
+  // Wait for a console connection, if the DTR flag was set to activate USB.
+  uint32_t dtr = 0;
+  while (!dtr) {
+    uart_line_ctrl_get(usb_dev, UART_LINE_CTRL_DTR, &amp;dtr);
+    k_sleep(K_MSEC(100));
+  }
+  if (!gpio_is_ready_dt(&amp;led)) {
+    return;
+  }
+  if (gpio_pin_configure_dt(&amp;led, GPIO_OUTPUT_ACTIVE) != 0) {
+    return;
+  }
+  if (!gpio_is_ready_dt(&amp;sw)) {
+    printk(&quot;GPIO device is not ready: %s\n&quot;, sw.port-&gt;name);
+    return;
+  }
+  if (gpio_pin_configure_dt(&amp;sw, GPIO_INPUT) != 0) {
+    printk(&quot;GPIO device config failed: %s\n&quot;, sw.port-&gt;name);
+    return;
+  }
+  (void)gpio_pin_set_dt(&amp;led, 0); // Turn off the LED
+  k_msleep(10);
+  while (1) {
+    int value = gpio_pin_get_dt(&amp;sw); // Read button input
+    if (value &gt;= 0) { 
+      (void)gpio_pin_set_dt(&amp;led, value); // Update LED state
+      printf(&quot;LED state: %s\n&quot;, value ? &quot;ON&quot; : &quot;OFF&quot;);
+    }
+    k_msleep(100);
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; กล่าวสรุป<a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการสร้างโปรเจกต์ใหม่ใน <strong>VS Code IDE + Zephyr IDE Extension</strong>
+(ทดลองกับระบบปฏิบัติการ <strong>Windows 11</strong>)
+ได้ทดลองเขียนโค้ดร่วมกับ <strong>Zephyr RTOS</strong> ในเบื้องต้น
+และมีตัวอย่างโค้ดที่สามารถนำไปทดลองใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>RP2040</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2024-12-14 | Last Updated: 2024-12-15</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/zephyr/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>แนะนำ Zephyr Real-Time Operating System (RTOS) - IoT Engineering Education</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#zephyr-real-time-operating-system-rtos" class="nav-link">แนะนำ Zephyr Real-Time Operating System (RTOS)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#zephyr-rtos" class="nav-link">&#9655; Zephyr RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#zephyr-rtos_1" class="nav-link">&#9655;แนวทางและหัวข้อการเรียนรู้สำหรับ Zephyr RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#zephyr-rtos_2" class="nav-link">&#9655; การเลือกบอร์ดไมโครคอนโทรลเลอร์สำหรับ Zephyr RTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zephyr-real-time-operating-system-rtos">แนะนำ Zephyr Real-Time Operating System (RTOS)<a class="headerlink" href="#zephyr-real-time-operating-system-rtos" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="zephyr-rtos">&#9655; <strong>Zephyr RTOS</strong><a class="headerlink" href="#zephyr-rtos" title="Permanent link">#</a></h2>
+<p><a href="https://zephyrproject.org/"><strong>Zephyr</strong></a> (ออกเสียงว่า "เซฟเฟอร์" <em>ZEF-er</em>)
+เป็นระบบปฏิบัติการเรียลไทม์ (<strong>Real-Time Operating System: RTOS</strong>)
+และเป็นซอฟต์แวร์ประเภทโอเพนซอร์สที่ถูกพัฒนาขึ้นเพื่อรองรับการใช้งานสำหรับระบบสมองกลฝังตัว (<strong>Embedded Systems</strong>) 
+และอุปกรณ์ประเภท <strong>Internet of Things (IoT)</strong> ซึ่งมีทรัพยากรในระดับฮาร์ดแวร์ที่ค่อนข้างจำกัด</p>
+<p><strong>ประวัติความเป็นมา</strong></p>
+<ul>
+<li><strong>Zephyr RTOS</strong> มีจุดเริ่มต้นมาจากระบบปฏิบัติการเรียลไทม์ที่มีชื่อว่า <strong>Virtuoso RTOS</strong> 
+ซึ่งพัฒนาโดยบริษัทในเบลเยียม </li>
+<li>ต่อมาในปี 2011 ระบบนี้ถูกซื้อกิจการโดยบริษัท <strong>Wind River Systems</strong>
+และได้เปลี่ยนชื่อเป็น <strong>Rocket RTOS</strong> </li>
+<li>ในปี 2015 ระบบถูกเผยแพร่เป็นโอเพนซอร์ส และในปี 2016 ได้เข้าร่วมเป็นโครงการหนึ่งของ <strong>Linux Foundation</strong> ภายใต้ชื่อใหม่คือ <strong>Zephyr</strong> และนับเป็นจุดเริ่มต้นที่เป็นทางการของโครงการ <strong>Zephyr RTOS</strong>​</li>
+<li>ในขณะที่เขียนบทความนี้ เวอร์ชันล่าสุดของ <strong>Zephyr RTOS</strong> คือ <strong>v4.0.0</strong></li>
+</ul>
+<p><img alt="" src="zephyr_ecosystem.jpg" /></p>
+<p>รูป: <strong>Zephyr Ecosystem</strong> (Source: zephyr.org)</p>
+<p>จุดเด่นของ <strong>Zephyr RTOS</strong>  ที่พอจะสรุปมาเป็นตัวอย่าง มีดังนี้</p>
+<ul>
+<li>เป็นซอฟต์แวร์ประเภทโอเพนซอร์ส (<strong>Apache 2.0 license</strong>)</li>
+<li>รองรับสถาปัตยกรรมของซีพียูที่หลากหลาย เช่น <strong>ARM</strong>, <strong>x86</strong>, <strong>RISC-V</strong>, <strong>MIPS</strong>, <strong>Xtensa</strong> และอื่น ๆ 
+และบอร์ดไมโครคอนโทรลเลอร์หลายร้อยรายการ (สามารถค้นดูรายการได้จาก <a href="https://docs.zephyrproject.org/latest/boards/index.html">"<strong>Supported Boards and Shields</strong>"</a>)</li>
+<li>รองรับการทำงานของซีพียูแบบแกนเดียวและหลายแกน (<strong>Multi-core system support</strong>)</li>
+<li>มีผู้สนับสนุนหลักจากบริษัทใหญ่ เช่น <strong>Intel</strong>, <strong>Nordic Semiconductor</strong>, <strong>NXP</strong> และอื่น ๆ</li>
+<li>มีการพัฒนาอย่างต่อเนื่อง เช่น ดูจากจำนวนผู้มีส่วนร่วมและจำนวน <strong>Git Commits</strong> ในแต่ละเดือน</li>
+<li>มีการดูแลซอฟต์แวร์และสนับสนุนในระยะยาว ในรูปแบบของ <strong>Long Term Support (LTS)</strong></li>
+<li>รองรับการทำงานของ <strong>Secure boot</strong> เช่น <strong>MCUboot secure bootloader</strong></li>
+</ul>
+<p><strong>Zephyr RTOS</strong> มีไลบรารีที่ครอบคลุมการทำงานหลากหลาย เช่น:</p>
+<ul>
+<li>การเชื่อมต่อเครือข่าย:<ul>
+<li><strong>Bluetooth 5.0+ &amp; BLE</strong></li>
+<li><strong>Wi-Fi / Ethernet (IPv4/IPv6 stack)</strong></li>
+<li><strong>CANbus</strong></li>
+</ul>
+</li>
+<li>โปรโตคอลสำหรับงาน <strong>IoT</strong>:<ul>
+<li><strong>CoAP</strong> &amp; <strong>MQTT</strong></li>
+<li><strong>IEEE 802.15.4 / OpenThread</strong> &amp; <strong>6LoWPAN</strong></li>
+<li><strong>LoRa</strong></li>
+</ul>
+</li>
+<li>การรองรับ <strong>USB 2.0 และ USB-C</strong></li>
+<li>การอัปเกรดเฟิร์มแวร์แบบ <strong>OTA (Over-the-Air upgrade)</strong></li>
+<li>การรองรับ <strong>Secure Boot</strong>: เช่น <strong>MCUboot secure bootloader</strong></li>
+</ul>
+<p><img alt="" src="zephyr_architecture.jpg" /></p>
+<p>รูป: <strong>Zephyr Architecture</strong> (Source: zephyr.org)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="zephyr-rtos_1">&#9655;แนวทางและหัวข้อการเรียนรู้สำหรับ <strong>Zephyr RTOS</strong><a class="headerlink" href="#zephyr-rtos_1" title="Permanent link">#</a></h2>
+<p>สำหรับผู้ที่สนใจ ก็มีตัวอย่างหัวข้อที่สำคัญมานำเสนอ
+และเป็นแนวทางสำหรับการเริ่มต้นศึกษาและใช้งาน  <strong>Zephyr RTOS</strong> ดังนี้ </p>
+<ul>
+<li>การติดตั้งและใช้งานซอฟต์แวร์ อย่างเช่น <strong>West</strong>, <strong>CMake</strong> และ <strong>Zephyr SDK</strong></li>
+<li>การตั้งค่าใช้งานด้วย <strong>Kconfig</strong> และ <strong>Devicetree / device tree overlay</strong> สำหรับ  <strong>Zephyr RTOS project</strong></li>
+<li>หลักการทำงานของ <strong>Zephyr Kernel &amp; Kernel Services</strong> </li>
+<li>การเขียนโปรแกรมแบบ <strong>Multi-threading</strong> ด้วย <strong>Zephyr Kernel</strong></li>
+<li>การจำแนกประเภทของ "เธรด" <ul>
+<li>เธรดของระบบ (<strong>System Threads</strong>) เช่น <strong>Main Thread</strong> และ <strong>Idle Thread</strong></li>
+<li>การสร้าง <strong>User Threads</strong></li>
+</ul>
+</li>
+<li>การกำหนดคุณสมบัติของ <strong>Threads</strong> เช่น <strong>Thread Stack Size</strong> และ <strong>Thread Priority</strong></li>
+<li>สถานะการทำงานของเธรด (<strong>Thread States</strong>) และการควบคุมหรือเปลี่ยนสถานะของเธรด</li>
+<li>การสื่อสารกันระหว่างเธรด (<strong>Inter-Thread Synchronization &amp; Communication</strong>) เช่น<ul>
+<li><strong>Semaphores</strong></li>
+<li><strong>Mutexes</strong></li>
+<li><strong>SpinLocks</strong></li>
+<li><strong>Critical Sections</strong></li>
+<li><strong>Events / Event Bits</strong></li>
+<li><strong>Message Queues</strong></li>
+<li><strong>Mailboxes</strong></li>
+<li><strong>Pipes</strong></li>
+</ul>
+</li>
+<li>การจัดการหน่วยความจำ (<strong>Memory Management</strong>)</li>
+<li>การจัดการอินเทอร์รัพท์ (<strong>Interrupt Handling</strong>)</li>
+<li>การจัดการเวลาของระบบและการใช้งาน <strong>Software Timers</strong></li>
+<li>การจัดการและการประหยัดพลังงาน  (<strong>Low Power Management</strong>)</li>
+</ul>
+<hr />
+<h2 id="zephyr-rtos_2">&#9655; การเลือกบอร์ดไมโครคอนโทรลเลอร์สำหรับ <strong>Zephyr RTOS</strong><a class="headerlink" href="#zephyr-rtos_2" title="Permanent link">#</a></h2>
+<p>สำหรับผู้เริ่มต้นการเลือกบอร์ดไมโครคอนโทรลเลอร์สำหรับการนำมาทดลองและใช้งานร่วมกับ
+<strong>Zephyr RTOS</strong> ก็เป็นอีกหนึ่งประเด็นที่สำคัญ  ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ที่มีราคาไม่แพง และนำมาใช้ได้ เช่น</p>
+<ul>
+<li><strong>Raspberry Pi Pico / Pico-W (RP2040)</strong></li>
+<li><strong>Micro:bit v1 (nRF51822) &amp; v2 (nRF52833)</strong></li>
+<li><strong>ESP32 Boards (Espressif ESP32 SoC)</strong></li>
+<li><strong>STM32 Nucleo Boards</strong></li>
+</ul>
+<p>หากเลือกใช้บอร์ด <strong>ESP32</strong> ก็มีซอฟต์แวร์อย่างเช่น <strong>Wokwi</strong> ให้ทดลองเขียนโค้ดในเบื้องต้น
+และสามารถจำลองการทำงานของโปรแกรมเสมือนจริงได้
+โดยใช้เว็บเบราว์เซอร์และยังไม่ต้องติดตั้งซอฟต์แวร์ของ <strong>Zephyr</strong> ในเครื่องคอมพิวเตอร์ของผู้ใช้</p>
+<p><img alt="" src="wokwi_esp32_zephyr_blink.jpg" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ด <strong>Zephyr-ESP32</strong> และจำลองการทำงานด้วย <strong>Wokwi</strong></p>
+<p>ตัวอย่างโค้ดสำหรับ <strong>ESP32</strong> ซึ่งสาธิตการสร้าง "เธรด" เพื่อทำให้ <strong>LED</strong> กระพริบด้วยอัตราคงที่</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;zephyr/kernel.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+
+// Use the led0 alias for the onboard LED
+#define LED0_NODE DT_ALIAS(led0)
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+#define SLEEP_TIME_MS     (1000)
+#define THREAD_STACK_SIZE (512)
+#define THREAD_PRIORITY   (5)
+
+void led_blink_func(void *, void *, void *);
+
+K_THREAD_DEFINE(led_blink_tid, THREAD_STACK_SIZE,
+                led_blink_func, NULL, NULL, NULL,
+                THREAD_PRIORITY, 0, 0);
+
+void main(void) {  
+  printk(&quot;Zephyr OS on %s\n&quot;, CONFIG_SOC);
+  while(1) {
+    k_sleep(K_FOREVER); // The main thread sleeps forever
+  }
+}
+
+void led_blink_func(void *p1, void *p2, void *p3) {
+  int value, state = 0; 
+  if (gpio_pin_configure_dt(&amp;led, GPIO_OUTPUT_ACTIVE) &lt; 0) {
+    return;
+  }
+  for(;;) {
+    (void) gpio_pin_set_dt(&amp;led, state^= 1);
+    printk(&quot;LED toggle: %d\n&quot;, state );
+    k_msleep(SLEEP_TIME_MS);
+  }
+}
+</code></pre>
+<p>ซอฟต์แวร์อีกตัวเลือกหนึ่งที่แนะนำให้ใช้งานคือ <strong>VS Code IDE</strong> + <strong>Zephyr Extension Pack</strong></p>
+<p><img alt="" src="zephyr_ide/zephyr_ide-1.jpg" /></p>
+<p>รูป: <strong>VS Code IDE + Zephyr Extension Pack</strong></p>
+<p><img alt="" src="zephyr_ide/zephyr_pico-6.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>VS Code IDE + Zephyr</strong> สำหรับบอร์ด <strong>Raspberry Pi Pico (RP2040)</strong></p>
+<p><img alt="" src="zephyr_ide/esp32_zephyr_ide.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <strong>VS Code IDE + Zephyr</strong> สำหรับบอร์ด <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอเนื้อหาในเบื้องต้นเกี่ยวกับระบบปฏิบัติการเวลาจริง ที่มีชื่อว่า <strong>Zephyr RTOS</strong>
+ซึ่งถือว่าเป็นตัวเลือกที่น่าสนใจ และเป็นอันดับต้น ๆ สำหรับระบบปฏิบัติการ <strong>RTOS</strong> ที่เป็น <strong>Open Source</strong></p>
+<p><strong>แหล่งข้อมูลอ้างอิงและศึกษาเพิ่มเติม</strong></p>
+<ul>
+<li><a href="https://docs.zephyrproject.org/latest/index.html"><strong>Zephyr Documentation</strong></a></li>
+<li><a href="https://docs.zephyrproject.org/latest/zephyr.pdf"><strong>Zephyr Documentation (PDF)</strong></a></li>
+<li><a href="https://github.com/zephyrproject-rtos/zephyr"><strong>Git Repository for the Zephyr Project</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-12-14 | Last Updated: 2024-12-14</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
