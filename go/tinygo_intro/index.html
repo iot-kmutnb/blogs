@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/go/tinygo_intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนะนำการใช้งาน TinyGo สำหรับการเขียนโปรแกรมไมโครคอนโทรลเลอร์ - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tinygo" class="nav-link">แนะนำการใช้งาน TinyGo สำหรับการเขียนโปรแกรมไมโครคอนโทรลเลอร์</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#go" class="nav-link">&#9655; แนะนำภาษา Go</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#tinygo_1" class="nav-link">&#9655; แนะนำ TinyGo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#go-tinygo-windows-10-11" class="nav-link">&#9655; การติดตั้ง Go และ TinyGo สำหรับ Windows 10 / 11</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tinygo">แนะนำการใช้งาน TinyGo สำหรับการเขียนโปรแกรมไมโครคอนโทรลเลอร์<a class="headerlink" href="#tinygo" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Go / TinyGo</em>, <em>Microcontroller Programming</em>, <em>Go-based Software Development</em></p>
+<hr />
+<h2 id="go">&#9655; แนะนำภาษา <strong>Go</strong><a class="headerlink" href="#go" title="Permanent link">#</a></h2>
+<p><a href="https://github.com/golang/go"><strong>Go</strong></a> หรือที่รู้จักในชื่อ <strong>Golang</strong> เป็นภาษาคอมพิวเตอร์ที่กำลังได้รับความนิยม
+และพัฒนาโดย <strong>Google</strong> และมีซอฟต์แวร์แบบโอเพ่นซอร์ส เช่น <strong>Go Compiler</strong> และมี <strong>TinyGo</strong> ที่สามารถนำไปใช้คอมไพล์โค้ดสำหรับบอร์ดไมโครคอนโทรลเลอร์ หรือแปลงให้เป็นโค้ด <strong>Web Assembly (WASM)</strong> ได้</p>
+<p><strong>Go/TinyGo</strong> สามารถนำไปใช้ในการเรียนรู้และพัฒนาทักษะการเขียนโค้ดในบริบทของการสร้างระบบซอฟต์แวร์ที่มี
+องค์ประกอบหลายส่วน เช่น ระบบ IoT หรือระบบควบคุมอัตโนมัติที่ทำงานร่วมกับเซนเซอร์และฮาร์ดแวร์จริง
+โครงสร้างของระบบอาจเแบ่งออกได้เป็น 4 ส่วน ดังนี้</p>
+<ol>
+<li><strong>Web App (Frontend)</strong><ul>
+<li>ส่วนนี้เป็นการใช้ <strong>WebAssembly (WASM)</strong> ที่คอมไพล์จากโค้ด Go (ผ่าน TinyGo) ร่วมกับ <strong>JavaScript + HTML5/CSS</strong> สำหรับสร้างอินเทอร์เฟซ เพื่อสร้าง <strong>Web Application</strong> แบบ <strong>Interactive</strong></li>
+<li>ตัวอย่างการใช้งาน เช่น การแสดงข้อมูลเซนเซอร์แบบเรียลไทม์ หรือการส่งคำสั่งควบคุมไมโครคอนโทรลเลอร์ </li>
+</ul>
+</li>
+<li><strong>Go (Server Backend)</strong><ul>
+<li>ส่วนนี้ทำหน้าที่เป็นตัวกลางเชื่อมต่อระหว่าง <strong>WebApp</strong> และ <strong>MCU</strong></li>
+<li>มีการเชื่อมต่อด้วยรูปแบบต่าง ๆ เช่น <strong>WebSocket</strong> (สำหรับส่งข้อมูลแบบเรียลไทม์ระหว่าง <strong>WebApp</strong> และ <strong>Backend</strong>) 
+การเชื่อมต่อด้วย ** Serial/USB<strong> หรือผ่าน </strong>WiFi/BLE** กับบอร์ดไมโครคอนโทรลเลอร์ </li>
+</ul>
+</li>
+<li><strong>TinyGo (MCU with WiFi/Internet Connectivity)</strong><ul>
+<li>การเขียนโปรแกรมสำหรับไมโครคอนโทรลเลอร์ เช่น การอ่านค่าจากโมดูลเซนเซอร์ การเชื่อมต่อระบบเครือข่าย เป็นต้น</li>
+</ul>
+</li>
+<li><strong>GUI Desktop App</strong><ul>
+<li>การพัฒนาซอฟต์แวร์เชิงกราฟิกที่เป็นส่วนเชื่อมต่อกับผู้ใช้ อาจประยุกต์ใช้ <strong>GUI Framework</strong>
+สำหรับภาษา <strong>Go</strong> อย่างเช่น <a href="https://fyne.io/"><strong>Fyne</strong></a></li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="tinygo_1">&#9655; แนะนำ <strong>TinyGo</strong><a class="headerlink" href="#tinygo_1" title="Permanent link">#</a></h2>
+<p><a href="https://tinygo.org"><strong>TinyGo</strong></a> เป็นคอมไพเลอร์สำหรับภาษา <strong>Go</strong> (ใช้ซอฟต์แวร์ <strong>Open Source</strong> ที่เรียกว่า <strong>LLVM</strong>) เพื่อรองรับการทำงานบนไมโครคอนโทรลเลอร์ (<strong>MCUs</strong>) และยังสามารถแปลงให้เป็นโค้ดเพื่อใช้งานกับ <strong>WebAssembly (WASM)</strong> ได้ด้วย (เหมาะสำหรับการสร้างเว็บแอปพลิเคชัน)</p>
+<p><a href="https://github.com/tinygo-org/tinygo/releases/tag/v0.1"><strong>TinyGo Initial Release</strong></a> ซึ่งถือว่าเป็นเวอร์ชัน <strong>v0.1</strong> ได้ถูกเผยแพร่บน <strong>GitHub</strong> ในเดือนกุมภาพันธ์ ค.ศ. 2019 โดย <a href="https://aykevl.nl/"><strong>Ayke van Laethem</strong></a> นักพํฒนาซอฟต์แวร์ชาวเนเธอร์แลนด์</p>
+<p>แม้ <strong>TinyGo</strong> จะไม่รองรับฟีเจอร์ทั้งหมดของภาษา <strong>Go</strong> รวมถึงไลบรารี่อาจมีใช้ได้ไม่ครบ
+(ดูรายการแพ็กเกจที่เป็น <a href="https://tinygo.org/docs/reference/lang-support/stdlib/"><strong>Go Standard Libraries</strong></a>)
+แต่ก็มีฟังก์ชันการทำงานสำหรับการควบคุมและใช้งานวงจรภายในพื้นฐานของ <strong>MCU</strong> และมี 
+<strong>TinyGo Packages</strong> ซึ่งเป็นไลบรารีสำหรับการเขียนโค้ดเพื่อใช้งานโมดูลอิเล็กทรอนิกส์เช่น เซนเซอร์หลายประเภท</p>
+<p>บนหน้าเว็บไซต์ เช่น <a href="https://go.dev/play/">"<strong>Go Playground</strong>"</a>  ผู้ใช้สามารถทดลองเขียนโค้ดและรันโปรแกรมได้
+และสำหรับ <strong>TinyGo</strong> ก็มีเช่นกัน เรียกว่า <a href="https://play.tinygo.org/">"<strong>TinyGo Playground</strong>"</a>
+ผู้ใช้สามารถลองรันโค้ดตัวอย่าง และเลือกใช้กับบอร์ดไมโครคอนโทรลเลอร์ตัวอย่างได้</p>
+<p><img alt="" src="tinygo_playground_pico-1.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งาน <a href="https://play.tinygo.org/"><strong>TinyGo Playground</strong></a> สำหรับบอร์ด <strong>Pico</strong></p>
+<p>แพ็กเกจที่สำคัญสำหรับของ <strong>TinyGo</strong> สำหรับการเขียนโปรแกรมไมโครคอนโทรลเลอร์คือ
+<code>machine</code> โดยเกี่ยวข้องกับการใช้งานวงจรต่าง ๆ ภายในชิป เช่น
+<strong>GPIO</strong>, <strong>ADC</strong>, <strong>UART</strong>, <strong>SPI</strong>, <strong>I2C</strong>, <strong>PWM</strong>, <strong>USB</strong> เป็นต้น 
+และมีรายละเอียดแตกต่างกันไปขึ้นอยู่กับบอร์ดไมโครคอนโทรลเลอร์ที่เลือกใช้ </p>
+<p>การเขียนโค้ดด้วยภาษา <strong>Go</strong> และใช้งานวงจรต่าง ๆ ของไมโครคอนโทรลเลอร์ รวมถึงการใช้งานร่วมกับโมดูลอิเล็กทรอนิกส์ประเภทต่าง ๆ ก็มีตัวช่วย กล่าวคือ มีไลบรารีให้เลือกใช้งาน และผู้ใช้สามารถดูได้จาก</p>
+<ul>
+<li><a href="https://github.com/tinygo-org/drivers">github.com/tinygo-org/drivers</a></li>
+<li><a href="https://github.com/tinygo-org/drivers/tree/release/examples">github.com/tinygo-org/drivers/examples</a></li>
+</ul>
+<p><img alt="" src="tinygo_drivers_examples.jpg" /></p>
+<p>รูป: <a href="https://github.com/tinygo-org/drivers/tree/release/examples">github.com/tinygo-org/drivers/examples</a></p>
+<p>&nbsp;</p>
+<p>ตัวอย่างบอร์ดที่ใช้ชิป <strong>RP2040</strong></p>
+<ul>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/pico/">machine/pico/</a></li>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/waveshare-rp2040-zero/">machine/waveshare-rp2040-zero/</a></li>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/xiao-rp2040/">machine/xiao-rp2040/</a></li>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/nano-rp2040/">machine/nano-rp2040/</a></li>
+</ul>
+<p><strong>TinyGo v0.35.0+</strong> รองรับ บอร์ดที่ใช้ชิป <strong>RaspberryPi RP2350</strong> เช่น  <strong>Pico2</strong></p>
+<p>ตัวอย่างบอร์ดที่ใช้ชิป <strong>nRF52840</strong></p>
+<ul>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/nicenano/">machine/nicenano/</a></li>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/nrf52840-mdk-usb-dongle/">machine/nrf52840-mdk-usb-dongle/</a></li>
+</ul>
+<p>อีกแพ็กเกจหนึ่งที่เกี่ยวข้องกับการทำงานของเฟิร์มแวร์ที่ได้จากโค้ด <strong>TinyGo</strong> คือ <code>runtime</code> 
+เริ่มต้นตั้งแต่การตั้งค่าของฮาร์ดแวร์หลังจากการรีเซต (<strong>System Initialization</strong>) การจัดการหน่วยความจำ
+เช่น <strong>Stack</strong> และ <strong>Heap</strong> การจัดการอินเทอร์รัพท์ของไมโครคอนโทรลเลอร์ 
+การทำงานของฟังก์ชัน <code>main</code> และฟังก์ชัน <strong>Goroutine</strong> (ถ้ามี) เป็นต้น</p>
+<ul>
+<li><a href="https://tinygo.org/docs/reference/microcontrollers/machine/">tinygo.org/docs/reference/microcontrollers/machine/</a></li>
+<li><a href="https://tinygo.org/docs/reference/machine/">tinygo.org/docs/reference/machine/</a></li>
+<li><a href="https://pkg.go.dev/github.com/tinygo-org/tinygo/src/machine">pkg.go.dev/github.com/tinygo-org/tinygo/src/machine</a></li>
+<li><a href="https://github.com/tinygo-org/tinygo/tree/release/src/machine">github.com/tinygo-org/tinygo/tree/release/src/machine</a></li>
+<li><a href="https://github.com/tinygo-org/tinygo/tree/release/src/runtime">github.com/tinygo-org/tinygo/tree/release/src/runtime</a></li>
+</ul>
+<p><strong>TinyGo</strong> สามารถทำงานได้กับไมโครคอนโทรลเลอร์หลายประเภท เช่น ชิปที่ใช้ซีพียูตระกูล <strong>32-bit ARM Cortex-M</strong>
+(เช่น <strong>nRF528xx</strong>, <strong>RP2040</strong>, <strong>ATSAMD21/51</strong>)</p>
+<p><strong>TinyGo</strong> รองรับชิปไมโครคอนโทรลเลอร์รุ่นอื่นด้วย เช่น <strong>STM32</strong>, <strong>ESP32 / ESP32-C3</strong> 
+แต่ระดับการสนับสนุนอาจแตกต่างกันไป เช่น ยังไม่สามารถใช้ <strong>WiFi/BLE</strong> ภายในชิป <strong>ESP32</strong>
+หากจะใช้ <strong>WiFi</strong> ก็แนะนำให้ใช้บอร์ด <strong>Raspberry Pi Pico-W</strong> และมีไลบารี
+<a href="https://github.com/soypat/cyw43439"><code>cyw43439</code></a> ให้ใช้งาน (ดูตัวอย่างการใช้งาน
+<a href="https://github.com/soypat/cyw43439/tree/main/examples"><code>cyw43439-examples</code></a>)</p>
+<p>รายการบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ได้กับ <strong>TinyGo</strong> สามารถดูได้จาก:</p>
+<p>&#x2192; <a href="https://github.com/tinygo-org/tinygo/tree/release/targets/">github.com/tinygo-org/tinygo/tree/release/targets</a></p>
+<p>Sample of JSON files: </p>
+<ul>
+<li><a href="https://github.com/tinygo-org/tinygo/blob/release/targets/microbit.json">microbit.json</a></li>
+<li><a href="https://github.com/tinygo-org/tinygo/blob/release/targets/microbit-v2.json">microbit-v2.json</a> </li>
+<li><a href="https://github.com/tinygo-org/tinygo/blob/release/targets/nano-33-ble.json">nano-33-ble.json</a> </li>
+<li><a href="https://github.com/tinygo-org/tinygo/blob/release/targets/pico.json">pico.json</a> </li>
+<li><a href="https://github.com/tinygo-org/tinygo/blob/release/targets/pico-w.json">pico-w.json</a></li>
+<li><a href="https://github.com/tinygo-org/tinygo/blob/release/targets/pico2.json">pico2.json</a></li>
+</ul>
+<hr />
+<h2 id="go-tinygo-windows-10-11">&#9655; <strong>การติดตั้ง Go และ TinyGo สำหรับ Windows 10 / 11</strong><a class="headerlink" href="#go-tinygo-windows-10-11" title="Permanent link">#</a></h2>
+<p><strong>TinyGo Compiler</strong> สามารถติดตั้งและใช้งานได้กับระบบปฏิบัติการ
+<strong>Windows</strong>, <strong>Linux</strong> และ <strong>macOS</strong></p>
+<p>อ้างอิงตามขั้นตอนการติดตั้ง <a href="https://tinygo.org/getting-started/install/windows/">"<strong>Quick install Guide for TinyGo on Windows</strong>"</a> เริ่มต้นด้วยเปิดใช้งานโปรแกรม <strong>Windows PowerShell</strong></p>
+<p>แล้วทำคำสั่งทีละบรรทัดดังนี้ เพื่อทำการติดตั้งโปรแกรมที่มีชื่อว่า
+<code>Scoop</code> ซึ่งจะใช้ติดตั้งโปรแกรม <strong>Go</strong> และ <strong>TinyGo</strong> สำหรับการใช้งานแบบ <strong>Command Line</strong>
+ร่วมกับระบบปฏิบัติการ <strong>Windows</strong></p>
+<pre><code class="language-text">Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+</code></pre>
+<p>จากนั้นทำคำสั่งต่อไปนี้ เพื่อติดตั้ง <strong>Go</strong> และ <strong>TinyGo</strong> และตรวจสอบเวอร์ชันของโปรแกรมเมื่อได้ติดตั้งสำเร็จแล้ว</p>
+<pre><code class="language-text">scoop install go
+
+scoop install tinygo
+
+go version
+
+tinygo version
+
+scoop update go
+
+scoop update tinygo
+</code></pre>
+<p><img alt="" src="scoop_go_tinygo_install.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งสำหรับ <code>scoop</code></p>
+<p><img alt="" src="win_go_tinygo.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งเพื่อตรวจสอบดูเวอร์ชันของโปรแกรม <code>go</code> และ <code>tinygo</code></p>
+<p>&nbsp;</p>
+<p>ถัดไปให้ทำคำสั่งต่อไป เพื่อตั้งค่าให้เป็น <strong>Full Control</strong> สำหรับไดเรกทอรี <code>AppData\LocalTemp</code> ของผู้ใช้ </p>
+<pre><code class="language-text">$tempPath = &quot;$env:USERPROFILE\AppData\Local\Temp&quot;
+
+icacls $tempPath /grant &quot;$($env:USERNAME):(F)&quot; /t /c
+</code></pre>
+<p>แนะนำให้ติดตั้งและใช้งานโปรแกรม <a href="https://code.visualstudio.com/docs/setup/windows"><strong>VS Code IDE on Windows</strong></a> เพื่อใช้งานการเขียนโค้ด</p>
+<p>เปิดใช้งานและติดตั้ง <strong>VS Code Extension Packs</strong> สำหรับ <strong>Go</strong> และ <strong>TinyGo</strong> ตามลำดับ</p>
+<p><img alt="" src="vscode_go_ext.jpg" /></p>
+<p>รูป: การติดตั้ง <strong>Go Extension Pack</strong></p>
+<p><img alt="" src="vscode_tinygo_install.jpg" /></p>
+<p>รูป: การติดตั้ง <strong>TinyGo Extension Pack</strong></p>
+<p>&nbsp;</p>
+<p>สร้างไดเรกทอรีใหม่สำหรับทดลองเขียนโค้ด <strong>Go / Tinygo</strong> แล้วเปิดด้วย <strong>VS Code IDE</strong>
+จากนั้นให้สร้างไฟล์ <code>main.go</code> เพิ่มไว้ในโปรเจกต์ และเพิ่มโค้ดตามตัวอย่างต่อไปนี้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    println(&quot;TinyGo on Pico-RP2040 Board&quot;)
+    // Configure the on-board LED pin (typically GPIO 25 for RP2040)
+    led := machine.LED
+    led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+    for { // an endless loop
+        led.High()              // Turn the LED on
+        time.Sleep(time.Second) // Wait for 1 second
+        led.Low()               // Turn the LED off
+        time.Sleep(time.Second) // Wait for 1 second
+    }
+}
+</code></pre>
+<p>ทำคำสั่งใน <strong>Terminal</strong> ภายใน <strong>VS Code IDE</strong> เพื่อสร้างโปรเจกต์ใหม่โดยใช้ชื่อ <code>main</code>
+ซึ่งจะมีการสร้างไฟล์ <code>go.mod</code> เพิ่มไว้ในโปรเจกต์</p>
+<pre><code class="language-text">go mod init main
+</code></pre>
+<p>ทำคำสั่งต่อไปนี้ เพื่อติดตั้งโมดูลเพิ่มเติมสำหรับ <strong>TinyGo</strong> และจำเป็นต้องใช้สำหรับโค้ดตัวอย่าง </p>
+<pre><code class="language-text">go mod tidy
+</code></pre>
+<p><img alt="" src="tinygo_go_mod.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>go mod init main</code> และ <code>go mod tidy</code></p>
+<p>ให้คลิกชื่อ <code>pico</code> ที่อยู่ในแถบด้านล่าง เพื่อเลือกใช้หรือตั้งค่า <strong>Target Board</strong>
+เช่น เลือก <code>pico</code> เป็นบอร์ดไมโครคอนโทรลเลอร์ที่ต้องการใช้งาน</p>
+<p><img alt="" src="tinygo_pico_target.jpg" /></p>
+<p>รูป: การเลือกบอร์ดไมโครคอนโทรลเลอร์ <code>pico</code></p>
+<p>ทำคำสั่งต่อไปนี้ เพื่อลองทำขั้นตอน <strong>Build</strong> โดยแปลงซอร์สโค้ด 
+ให้เป็นไฟล์เฟิร์มแวร์สำหรับนำไปใช้กับบอร์ดไมโครคอนโทรลเลอร์</p>
+<pre><code class="language-text">tinygo clean
+
+tinygo build -target=pico -o -size=short .
+</code></pre>
+<p>ผลจากการทำคำสั่งจะได้ไฟล์ <code>.elf</code> (<em> Executable and Linkable Format</em>) 
+แต่ยังไม่สามารถนำไปใช้กับบอร์ด <strong>Pico</strong> ได้โดยตรง แต่จะต้องสร้างไฟล์ <code>.uf2</code> (<em>USB Flashing Format</em>)
+เป็นเอาต์พุตด้วย โดยทำคำสั่งต่อไปนี้</p>
+<pre><code class="language-text">tinygo build -target=pico -o pico_demo.uf2 .
+</code></pre>
+<p>คำสั่ง <code>tinygo build</code> หมายถึง การคอมไพล์ซอร์สโค้ด ซึ่งมีการกำหนดค่าต่อไปนี้</p>
+<ul>
+<li><code>-target=pico</code> หมายถึง คอมไพล์โค้ดสำหรับบอร์ด <strong>Pico</strong></li>
+<li><code>-size=short</code> หมายถึง แสดงขนาดของหน่วยความจำ <strong>Flash</strong> และ <strong>SRAM</strong> ที่จะต้องใช้สำหรับโปรแกรมการทำงานของโปรแกรม <code>.elf</code></li>
+</ul>
+<p><img alt="" src="tinygo_pico_build_flash.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>tinygo build</code> และ <code>tinygo flash</code></p>
+<p>ตรวจสอบให้แน่ใจก่อนว่า บอร์ด <strong>Pico</strong> อยู่ในโหมดการทำงาน <strong>UF2 Boot</strong> 
+(กดปุ่ม <strong>BOOT</strong> ค้างไว้ แล้วเสียสาย <strong>USB</strong> กับพอร์ตของคอมพิวเตอร์)
+ซึ่งจะมองเห็น <strong>USB Flash Drive</strong> (<code>RPI-RP2</code>) ของบอร์ดดังกล่าว 
+จากนั้นจึงทำคำสั่ง <code>tinygo flash -target=pico</code></p>
+<p>ข้อสังเกต: ถ้าในโค้ด มีการใช้คำสั่ง <code>println()</code> เพื่อส่งข้อความจากบอร์ด <strong>Pico / RP2040</strong>
+ผ่านทาง <strong>USB-CDC</strong> มายังคอมพิวเตอร์ผู้ใช้ และหลังจากอัปโหลดไฟล์เฟิร์มแวร์ไปยังบอร์ดได้แล้ว
+ครั้งถัดไป ผู้ใช้สามารถทำคำสั่ง  <code>tinygo flash -target=pico</code> ได้โดยไม่จำเป็นต้องทำให้บอร์ดเข้าสู่โหมด <strong>UF2 Boot</strong> ก่อนอัปโหลด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการติดตั้งและใช้งาน <strong>Go</strong> และ <strong>TinyGo</strong> ร่วมกับ <strong>VS Code IDE</strong>
+สำหรับคอมพิวเตอร์ของผู้ใช้ระบบปฏิบัติการ <strong>Windows 10/11</strong> และทดลองเขียนโค้ดสำหรับบอร์ดไมโครคอนโทรลเลอร์
+<strong>Raspberry Pi Pico</strong> หรือบอร์ดตัวเลือกอื่นที่ใช้ชิป <strong>RP2040</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-12-20 | Last Updated: 2024-12-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
