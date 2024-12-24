@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/go/tinygo_vs_freertos_pico/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมแบบ Multi-Tasking: TinyGo Goroutines vs. FreeRTOS - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#multi-tasking-tinygo-goroutines-vs-freertos" class="nav-link">การเขียนโปรแกรมแบบ Multi-Tasking: TinyGo Goroutines vs. FreeRTOS</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#multi-tasking" class="nav-link">&#9655; การเขียนโปรแกรมแบบ Multi-tasking</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#tinygo" class="nav-link">&#9655; การเขียนโปรแกรมสำหรับ TinyGo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#freertos-binary-semaphores" class="nav-link">&#9655; การเขียนโปรแกรม FreeRTOS: Binary Semaphores</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#freertos-queues" class="nav-link">&#9655; การเขียนโปรแกรม FreeRTOS: Queues</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#freertos-task-notification" class="nav-link">&#9655; การเขียนโปรแกรม FreeRTOS: Task Notification</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="multi-tasking-tinygo-goroutines-vs-freertos">การเขียนโปรแกรมแบบ Multi-Tasking: TinyGo Goroutines vs. FreeRTOS<a class="headerlink" href="#multi-tasking-tinygo-goroutines-vs-freertos" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Go / TinyGo</em>, <em>Microcontroller Programming</em>, <em>Raspberry Pico</em>, <em>RP2040</em>, <em>FreeRTOS</em>, <em>Arduino Core for RP2040</em></p>
+<hr />
+<h2 id="multi-tasking">&#9655; การเขียนโปรแกรมแบบ <strong>Multi-tasking</strong><a class="headerlink" href="#multi-tasking" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ดแบบ "มัลติทาสก์" (<strong>Multi-Tasking</strong>) 
+โดยใช้ <strong>Goroutines</strong> และ <strong>Channels</strong> ในภาษา <strong>Go</strong>
+และคอมไพล์โค้ดด้วย <strong>TinyGo Compiler</strong> (ใช้เวอร์ชัน <strong>v0.35.0</strong>) เพื่อนำมาเปรียบเทียบกับการเขียนโค้ด <strong>Arduino Sketch</strong>
+โดยใช้ <strong>FreeRTOS</strong> สำหรับชิปไมโครคอนโทรลเลอร์ <strong>RP2040</strong> </p>
+<p>เราจะใช้รูปแบบการทำงานของโปรแกรมสำหรับไมโครคอนโทรลเลอร์ดังนี้ มีการทำงานแบ่งออกเป็น 2 งานย่อย 
+หรือ ทาสก์ (<strong>Tasks</strong>) ที่มีความสำคัญเท่ากัน แต่ละทาสก์ทำหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong>
+ที่ใช้เป็นเอาต์พุตของชิป <strong>RP2040</strong> โดยไม่มีการหน่วงเวลา
+ออสซิลโลสโคปแบบดิจิทัล จะถูกนำมาใช้วัดสัญญาณเอาต์พุตที่ขา <strong>GPIO</strong> เพื่อวิเคราะห์พฤติกรรมการทำงานของโปรแกรมในฮาร์ดแวร์จริง</p>
+<p>การทำงานแบบ <strong>Multi-tasking</strong> สำหรับภาษา <strong>Go</strong> จะใช้ฟังก์ชันประเภทที่เรียกว่า <strong>Goroutines</strong>
+แต่ถ้าเป็นการเขียนโค้ดด้วย <a href="https://github.com/earlephilhower/arduino-pico"><strong>Arduino Core for RP2040</strong></a>
+(ทดลองใช้เวอร์ชัน <strong>v4.3.0</strong>) เช่น สำหรับ <strong>RP2040</strong> ก็อาจจะใช้ <a href="https://github.com/earlephilhower/arduino-pico/tree/master/libraries/FreeRTOS"><strong>FreeRTOS port for RP2040</strong></a>
+ซึ่งเป็นระบบปฏิบัติการเวลาจริง (<strong>RTOS: Real-Time Operating System</strong>) หรือ อาจเรียกว่า <strong>Real-Time Kernel</strong>
+และเป็นซอฟต์แวร์ประเภท <strong>Open Source</strong> ด้วย</p>
+<p><img alt="" src="model.jpg" /></p>
+<p>รูป: โมเดลการทำงานแบบมัลติทาสก์สำหรับการทดสอบโดยใช้ <strong>TinyGo Goroutines + Go Channels</strong></p>
+<p><img alt="" src="model_bin_sem.jpg" /></p>
+<p>รูป: โมเดลการทำงานแบบมัลติทาสก์สำหรับการทดสอบโดยใช้ <strong>FreeRTOS Tasks + Binary Semaphores</strong></p>
+<hr />
+<h2 id="tinygo">&#9655; การเขียนโปรแกรมสำหรับ <strong>TinyGo</strong><a class="headerlink" href="#tinygo" title="Permanent link">#</a></h2>
+<p>เริ่มต้นด้วยโค้ดตัวอย่างสำหรับ <strong>TinyGo</strong> โดยเลือกใช้ขา <code>GPIO15</code> และ <code>GPIO14</code> เป็นขาเอาต์พุต และอ้างอิงโดยใช้ชื่อตัวแปรเป็น
+<code>A</code> และ <code>B</code> ตามลำดับ มีการสร้างฟังก์ชัน <code>toggleLED(...)</code> เพื่อใช้เป็นฟังก์ชัน Goroutine</p>
+<p><code>func toggleLED(led machine.Pin, chanIn, chanOut chan bool)</code></p>
+<ul>
+<li><code>led</code> มีชนิดข้อมูลเป็น <code>machine.Pin</code> และเป็นขา <strong>GPIO</strong> ที่จะใช้เป็นเอาต์พุต</li>
+<li><code>chanIn</code> และ <code>chanOut</code> เป็น <strong>Go Channel</strong> ใช้เป็นช่องทางสำหรับอ่าน (ช่องสัญญาณเข้า) 
+และช่องทางสำหรับเขียน (ข่องสัญญาณออก) ข้อมูลแบบ <code>bool</code> ตามลำดับ</li>
+</ul>
+<p>ในฟังก์ชัน <code>toggleLED()</code> มีการใช้คำสั่ง <code>for { ... }</code> ภายในมีการใช้คำสั่งแรก <code>&lt;-chanIn</code>
+เพื่อรออ่านค่าแบบ <code>bool</code> จากช่อง <code>chanIn</code>
+ถ้ายังไม่มีข้อมูล การฟังก์ชันนี้จะถูกหยุดไว้ชั่วคราวจนกว่าจะได้ระบข้อมูลเข้ามา 
+แต่ถ้าได้รับข้อมูลแล้วจึงสลับสถานะของลอจิกที่ขาเอาต์พุต และส่งข้อมูล <code>true</code> ไปออกทาง <code>chanOut</code> 
+การส่งข้อมูลออกทาง <code>chanOut</code> จะทำให้ฟังก์ชัน <strong>Goroutine</strong> ถัดไปที่รอรับข้อมูลอยู่ เปลี่ยนสถานะเป็นพร้อมทำงาน</p>
+<pre><code class="language-go">  for {
+      &lt;-chanIn            // Wait for the next token
+      led.Set(!led.Get()) // Toggle the LED output
+      chanOut &lt;- true     // Send a token
+  }
+</code></pre>
+<p>การทำงานของฟังก์ชัน <code>toggleLED()</code> จะต้องอ่านข้อมูลจาก <code>chanIn</code> ถ้าไม่มีข้อมูลเข้ามา จะต้องรอ
+และเมื่ออ่านข้อมูลได้หนึ่งครั้งแล้ว จึงจะสลับสถานะลอจิกของขา <code>led</code> หนึ่งครั้ง แล้วจึงเขียนข้อมูลไปยัง <code>chanOut</code></p>
+<p>คำสั่งต่อไปนี้เป็นการสร้างช่องสัญญาณ <strong>Go Channel</strong> จำนวน 2 ช่อง ดังนี้</p>
+<pre><code class="language-go">  chan1 := make(chan bool)
+  chan2 := make(chan bool)
+</code></pre>
+<p>การเรียกฟังก์ชัน <code>toggleLED()</code> เพื่อใช้งานแบบ <strong>Goroutine</strong> จะมีคำว่า <code>go</code> นำหน้า ดังนี้</p>
+<pre><code class="language-go">  go toggleLED(A, chan1, chan2)
+  go toggleLED(B, chan2, chan1)
+</code></pre>
+<p>ฟังก์ชันแรกใช้กับขา <code>A</code> อ่านข้อมูลจาก <code>chan1</code> และเขียนข้อมูลไปยัง <code>chan2</code>
+ในขณะที่ ฟังก์ชันที่สองใช้กับขา <code>B</code> อ่านข้อมูลจาก <code>chan2</code> และเขียนข้อมูลไปยัง <code>chan1</code></p>
+<p>เริ่มต้นจะมีการเขียนข้อมูลไปยัง <code>chan1</code> ดังนั้นฟังก์ชัน <strong>Goroutine</strong> หมายเลข 1 สำหรับขา <code>A</code> จะเริ่มทำงานก่อน</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+var (
+    A = machine.Pin(15) // LED 1 on GPIO 15
+    B = machine.Pin(14) // LED 2 on GPIO 14
+)
+
+func toggleLED(led machine.Pin, chanIn, chanOut chan bool) {
+    for {
+        &lt;-chanIn            // Wait for the next token
+        led.Set(!led.Get()) // Toggle the LED output
+        chanOut &lt;- true     // Send a token
+    }
+}
+
+func main() {
+    println(&quot;TinyGo RP2040 Demo...&quot;)
+    time.Sleep(time.Second)
+    println(&quot;CPU freq. (MHz):&quot;, machine.CPUFrequency()/1e6) // 125MHz
+
+    // Initialize the LED pins
+    A.Configure(machine.PinConfig{Mode: machine.PinOutput})
+    B.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
+    // Create two channels for goroutine synchronization
+    chan1 := make(chan bool) 
+    chan2 := make(chan bool)
+
+    // Start the goroutines to toggle LEDs
+    go toggleLED(A, chan1, chan2)  // Goroutine (1) for pin A
+    go toggleLED(B, chan2, chan1) // Goroutine (2) for pin B
+
+    // Initial communication to start the first LED
+    chan1 &lt;- true // Send the first token
+    select {}     // Wait forever
+}
+</code></pre>
+<p><img alt="" src="tinygo_vscode.jpg" /></p>
+<p>รูป: ตัวอย่างการเขียนโค้ดโดยใช้ <strong>VS Code IDE + TinyGo Compiler</strong></p>
+<p>ตัวอย่างรูปคลื่นสัญญาณ 2 ช่อง จากขา <code>GPIO15</code> และ <code>GPIO14</code> ที่วัดได้ด้วยออสซิลโลสโคป เป็นดังนี้</p>
+<p><img alt="" src="gocoroutine_waveform.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ได้จากการทำงานของ <strong>Goroutines</strong></p>
+<p>จากรูปจะเห็นได้ว่า เมื่อสัญญาณแรกมีการเปลี่ยนสถานะลอจิกหนึ่งครั้ง ถัดไปสัญญาณที่สองเกิดการเปลี่ยนสถานะลอจิกหนึ่งครั้ง
+โดยมีระยะเวลาห่างกันประมาณ 4 ไมโครวินาที การทำงานของ <strong>TinyGo Runtime</strong>
+จะเป็นตัวจัดลำดับการทำงานของ <strong>Goroutines</strong> ให้สลับการทำงาน</p>
+<hr />
+<h2 id="freertos-binary-semaphores">&#9655; การเขียนโปรแกรม <strong>FreeRTOS: Binary Semaphores</strong><a class="headerlink" href="#freertos-binary-semaphores" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการเขียนโค้ดด้วย <strong>Arduino Core for RP2040</strong> ซึ่งจะมีการสร้าง <strong>FreeRTOS Tasks</strong> จำนวน 2 ทาสก์ 
+ที่มีความสำคัญเท่ากัน และการสื่อสารกันระหว่างทาสก์ จะใช้วิธีที่เรียกว่า <strong>Binary Semaphores</strong>
+และจะใช้เพื่อสื่อสารจากทากส์หนึ่งไปยังอีกทาสก์หนึ่งในแต่ละทิศทาง และมีทาสก์แรกที่ถูกสร้างก่อน เป็นฝ่ายเริ่มต้นทำงานก่อน</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &quot;FreeRTOS.h&quot;
+#include &quot;task.h&quot;
+#include &quot;semphr.h&quot;
+
+// LED Pins
+#define LED1_PIN 15
+#define LED2_PIN 14
+
+// FreeRTOS Semaphore Handles for synchronization
+SemaphoreHandle_t semaphore1, semaphore2;
+
+// Struct to hold LED pin and semaphore handles
+struct TaskParams {
+  int ledPin;
+  SemaphoreHandle_t semIn, semOut;
+};
+
+// Task to toggle an LED
+void toggleLED(void *pvParameters) {
+  // Cast the parameter back to a pointer to TaskParams
+  TaskParams *p = (TaskParams *)pvParameters;
+  int ledPin = p-&gt;ledPin;
+  for (;;) {
+    // Wait for the semaphore
+    if (xSemaphoreTake(p-&gt;semIn, portMAX_DELAY) == pdTRUE) {
+      digitalWrite(ledPin, !digitalRead(ledPin)); // Toggle the LED
+      xSemaphoreGive(p-&gt;semOut); // Give the semaphore to the next task
+    }
+  }
+}
+
+void setup() {
+  // Initialize LED pins
+  pinMode(LED1_PIN, OUTPUT);
+  pinMode(LED2_PIN, OUTPUT);
+
+  // Create the binary semaphores
+  semaphore1 = xSemaphoreCreateBinary();
+  semaphore2 = xSemaphoreCreateBinary();
+
+  // Define struct instances for task parameters
+  TaskParams params1 = {LED1_PIN, semaphore1, semaphore2};
+  TaskParams params2 = {LED2_PIN, semaphore2, semaphore1};
+
+  // Create FreeRTOS tasks with struct as the argument
+  xTaskCreate(toggleLED, &quot;Toggle LED1&quot;, 256, (void *)&amp;params1, 1, NULL);
+  xTaskCreate(toggleLED, &quot;Toggle LED2&quot;, 256, (void *)&amp;params2, 1, NULL);
+  xSemaphoreGive(semaphore1);
+
+  vTaskStartScheduler(); // Start the FreeRTOS scheduler
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="arduino_freertos_bin_sem.jpg" /></p>
+<p>รูป: การเขียนโค้ดด้วย <strong>Arduino IDE</strong> และตัวอย่างโค้ดที่ใช้ <strong>FreeRTOS Binary Semaphores</strong></p>
+<p>ตัวอย่างรูปคลื่นสัญญาณ 2 ช่อง จากขา <code>GPIO15</code> และ <code>GPIO14</code> ที่วัดได้ด้วยออสซิลโลสโคป เป็นดังนี้</p>
+<p><img alt="" src="freertos_binsem_waveform.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ได้จากการทำงานของ <strong>FreeRTOS Tasks</strong></p>
+<p>จะเห็นได้ว่า รูปคลื่นสัญญาณทั้งสองคล้ายกับกรณีของ <strong>TinyGo</strong> กล่าวคือ 
+เมื่อสัญญาณแรกมีการเปลี่ยนสถานะลอจิกหนึ่งครั้ง ก็จะสลับไปเกิดการเปลี่ยนสถานะลอจิกหนึ่งครั้งในสัญญาณที่สอง
+แต่ให้สังเกตว่า ระยะเวลาจากขอบขึ้นของสัญญาณแรกไปยังขอบขาขึ้นของสัญญาณที่สอง จะใช้เวลามากกว่ากรณีของ <strong>TinyGo</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="freertos-queues">&#9655; การเขียนโปรแกรม <strong>FreeRTOS: Queues</strong><a class="headerlink" href="#freertos-queues" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการเปลี่ยนจาก <strong>Binary Semaphores</strong> มาเป็น <strong>FreeRTOS Queues</strong>
+เพื่อใช้เป็นช่องทางการอ่านและเขียนข้อมูล คล้ายกับกรณีของ <strong>TinyGo</strong> ที่มีการใช้ <strong>Go Channels</strong>
+อ่านข้อมูลเข้าและส่งข้อมูลออกแยกกัน</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &quot;FreeRTOS.h&quot;
+#include &quot;task.h&quot;
+#include &quot;queue.h&quot; 
+
+// LED Pins
+#define LED1_PIN 15
+#define LED2_PIN 14
+
+// FreeRTOS Queue Handles for communication between tasks
+QueueHandle_t queue1, queue2;
+
+// Struct to hold LED pin and queue handles
+struct TaskParams {
+  int ledPin;
+  QueueHandle_t queueIn, queueOut;
+};
+
+// Task to toggle an LED
+void toggleLED(void *pvParameters) {
+  // Cast the parameter back to a pointer to TaskParams
+  TaskParams *p = (TaskParams *)pvParameters;
+  bool token;
+  int ledPin = p-&gt;ledPin;
+  for (;;) {
+    if (xQueueReceive(p-&gt;queueIn, &amp;token, portMAX_DELAY)==pdTRUE) {
+      digitalWrite(ledPin, !digitalRead(ledPin)); // Toggle the LED      
+      xQueueSend(p-&gt;queueOut, &amp;token, portMAX_DELAY);
+    }
+  }
+}
+
+void setup() {
+  // Initialize LED pins
+  pinMode(LED1_PIN, OUTPUT);
+  pinMode(LED2_PIN, OUTPUT);
+
+  // Create the queues for inter-task communication
+  queue1 = xQueueCreate(1, sizeof(bool));
+  queue2 = xQueueCreate(1, sizeof(bool));
+
+  // Define struct instances for task parameters
+  TaskParams params1 = {LED1_PIN, queue1, queue2};
+  TaskParams params2 = {LED2_PIN, queue2, queue1};
+
+  // Create FreeRTOS tasks with struct as the argument
+  xTaskCreate(toggleLED, &quot;Toggle LED1&quot;, 256, (void *)&amp;params1, 1, NULL);
+  xTaskCreate(toggleLED, &quot;Toggle LED2&quot;, 256, (void *)&amp;params2, 1, NULL);
+
+  bool startToken = true;
+  xQueueSend(queue1, &amp;startToken, portMAX_DELAY); // Send the start token
+
+  vTaskStartScheduler(); // Start the FreeRTOS scheduler
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="arduino_freertos_queue.jpg" /></p>
+<p>รูป: การเขียนโค้ดด้วย <strong>Arduino IDE</strong> และตัวอย่างโค้ดที่ใช้ <strong>FreeRTOS Queues</strong> </p>
+<p>ตัวอย่างรูปคลื่นสัญญาณ 2 ช่อง จากขา <code>GPIO15</code> และ <code>GPIO14</code> ที่วัดได้ด้วยออสซิลโลสโคป เป็นดังนี้</p>
+<p><img alt="" src="freertos_queue_waveform.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ได้จากการทำงานของ <strong>FreeRTOS Tasks</strong></p>
+<hr />
+<h2 id="freertos-task-notification">&#9655; การเขียนโปรแกรม <strong>FreeRTOS: Task Notification</strong><a class="headerlink" href="#freertos-task-notification" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการใช้วิธีที่เรียกว่า <strong>Task Notification</strong> ที่รองรับการใช้งานโดย <strong>FreeRTOS Kernel</strong>
+สำหรับการสื่อสารกันระหว่างทาสก์ และมีตัวอย่างการเขียนโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &quot;FreeRTOS.h&quot;
+#include &quot;task.h&quot;
+
+// LED Pins
+#define LED1_PIN 15
+#define LED2_PIN 14
+
+// Struct to hold LED pin and task handle
+struct TaskParams {
+  int ledPin;
+  TaskHandle_t nextTask; // Handle of the next task to notify
+};
+
+// Task handles
+TaskHandle_t task1Handle, task2Handle;
+
+// Task to toggle an LED
+void toggleLED(void *pvParameters) {
+  TaskParams *p = (TaskParams *)pvParameters;
+  int ledPin = p-&gt;ledPin;
+  for (;;) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait for a notification
+    digitalWrite(ledPin, !digitalRead(ledPin)); // Toggle the LED
+    xTaskNotifyGive(p-&gt;nextTask); // Notify the next task
+  }
+}
+
+void setup() {
+  // Initialize LED pins
+  pinMode(LED1_PIN, OUTPUT);
+  pinMode(LED2_PIN, OUTPUT);
+
+  // Define struct instances for task parameters
+  TaskParams params1 = {LED1_PIN, NULL};
+  TaskParams params2 = {LED2_PIN, NULL};
+
+  // Create FreeRTOS tasks with struct as the argument
+  xTaskCreate(toggleLED, &quot;Toggle LED1&quot;, 256, (void *)&amp;params1, 1, &amp;task1Handle);
+  xTaskCreate(toggleLED, &quot;Toggle LED2&quot;, 256, (void *)&amp;params2, 1, &amp;task2Handle);
+
+  // Set the `nextTask` handles in the parameters
+  params1.nextTask = task2Handle;
+  params2.nextTask = task1Handle;
+
+  xTaskNotifyGive(task1Handle); // Notify the first task
+
+  vTaskStartScheduler(); // Start FreeRTOS scheduler
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="arduino_freertos_task_notify.jpg" /></p>
+<p>รูป: การเขียนโค้ดด้วย <strong>Arduino IDE</strong> และตัวอย่างโค้ดที่ใช้ <strong>FreeRTOS Task Notification</strong></p>
+<p>ตัวอย่างรูปคลื่นสัญญาณ 2 ช่อง จากขา <code>GPIO15</code> และ <code>GPIO14</code> ที่วัดได้ด้วยออสซิลโลสโคป เป็นดังนี้</p>
+<p><img alt="" src="freertos_notify_wavefom.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตที่ได้จากการทำงานของ <strong>FreeRTOS Tasks</strong></p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด <strong>TinyGo</strong> เปรียบเทียบกับการเขียนโค้ดด้วย <strong>Arduino Sketch</strong>
+โดยใช้ <strong>Arduino Core for RP2040 + FreeRTOS Kernel</strong> เพื่อสาธิตการสร้างและทำงานแบบมัลติทาสก์
+(<strong>Multi-tasking</strong>)</p>
+<p>การใช้ <strong>Goroutines</strong> (หรือจะเรียกว่า <strong>Co-routines</strong>) สามารถนำมาใช้ในการเขียนโค้ดแบบ <strong>Multi-tasking</strong>
+แต่ก็มีข้อดีและข้อเสียแตกต่างจากการใช้ <strong>FreeRTOS (Preemptive Scheduling)</strong> เช่น การทำงานของ <strong>Goroutine</strong>
+จะทำต่อเนื่องจนกว่า จะถึงคำสั่งที่จำเป็นต้องหยุดรอเงื่อนไข หรือรอเวลา จึงจะมีการเปลี่ยนการทำงานไปยัง <strong>Goroutine</strong>
+ในลำดับถัดไป แต่ละฟังก์ชันที่ทำงานแบบ <strong>Goroutine</strong> ทำงานเป็นหนึ่งทาสก์ และทาสก์เหล่านี้มีระดับความสำคัญเท่ากัน การทำงานของ <strong>Goroutine</strong> จะคล้ายกับการทำงานในระบบที่มีการจัดลำดับการทำงานแบบ <strong>Co-operative Scheduling</strong></p>
+<p>จากโค้ดตัวอย่างและการวัดสัญญาณเอาต์พุตจริง จะเห็นได้ว่า โค้ดภาษา <strong>Go</strong> ที่ใช้ <strong>Goroutines</strong>
+จะสร้างสัญญาณเอาต์พุตที่มีความถี่ได้สูงกว่า การเขียนโค้ดด้วย <strong>Arduino Sketch</strong> และใช้ <strong>FreeRTOS Kernel</strong></p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2024-12-23 | Last Updated: 2024-12-23</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2024 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
