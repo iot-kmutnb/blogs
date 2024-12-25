@@ -133,15 +133,12 @@
 โดยใช้ <strong>Goroutines</strong> และ <strong>Channels</strong> ในภาษา <strong>Go</strong>
 และคอมไพล์โค้ดด้วย <strong>TinyGo Compiler</strong> (ใช้เวอร์ชัน <strong>v0.35.0</strong>) เพื่อนำมาเปรียบเทียบกับการเขียนโค้ด <strong>Arduino Sketch</strong>
 โดยใช้ <strong>FreeRTOS</strong> สำหรับชิปไมโครคอนโทรลเลอร์ <strong>RP2040</strong> </p>
-<p>เราจะใช้รูปแบบการทำงานของโปรแกรมสำหรับไมโครคอนโทรลเลอร์ดังนี้ มีการทำงานแบ่งออกเป็น 2 งานย่อย 
-หรือ ทาสก์ (<strong>Tasks</strong>) ที่มีความสำคัญเท่ากัน แต่ละทาสก์ทำหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong>
-ที่ใช้เป็นเอาต์พุตของชิป <strong>RP2040</strong> โดยไม่มีการหน่วงเวลา
-ออสซิลโลสโคปแบบดิจิทัล จะถูกนำมาใช้วัดสัญญาณเอาต์พุตที่ขา <strong>GPIO</strong> เพื่อวิเคราะห์พฤติกรรมการทำงานของโปรแกรมในฮาร์ดแวร์จริง</p>
-<p>การทำงานแบบ <strong>Multi-tasking</strong> สำหรับภาษา <strong>Go</strong> จะใช้ฟังก์ชันประเภทที่เรียกว่า <strong>Goroutines</strong>
-แต่ถ้าเป็นการเขียนโค้ดด้วย <a href="https://github.com/earlephilhower/arduino-pico"><strong>Arduino Core for RP2040</strong></a>
-(ทดลองใช้เวอร์ชัน <strong>v4.3.0</strong>) เช่น สำหรับ <strong>RP2040</strong> ก็อาจจะใช้ <a href="https://github.com/earlephilhower/arduino-pico/tree/master/libraries/FreeRTOS"><strong>FreeRTOS port for RP2040</strong></a>
-ซึ่งเป็นระบบปฏิบัติการเวลาจริง (<strong>RTOS: Real-Time Operating System</strong>) หรือ อาจเรียกว่า <strong>Real-Time Kernel</strong>
-และเป็นซอฟต์แวร์ประเภท <strong>Open Source</strong> ด้วย</p>
+<p>เราจะใช้รูปแบบการทำงานของโปรแกรมสำหรับไมโครคอนโทรลเลอร์ โดยแบ่งออกเป็น 2 งานย่อย หรือที่เรียกว่า <strong>ทาสก์ (Tasks)</strong>
+ซึ่งมีความสำคัญเท่ากัน ทั้งสองทาสก์มีหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong> ที่ทำหน้าที่เป็นเอาต์พุตของชิป <strong>RP2040</strong> 
+โดยไม่มีการหน่วงเวลา อุปกรณ์ออสซิลโลสโคปแบบดิจิทัลจะถูกนำมาใช้เพื่อวัดสัญญาณเอาต์พุตที่ขา <strong>GPIO</strong>
+และใช้ในการวิเคราะห์พฤติกรรมการทำงานของโปรแกรมบนฮาร์ดแวร์จริง</p>
+<p>การทำงานแบบ <strong>Multi-tasking</strong> สำหรับภาษา <strong>Go</strong> ใช้ฟังก์ชันประเภทที่เรียกว่า <strong>Goroutines</strong> อย่างไรก็ตาม
+หากเขียนโค้ดด้วย <a href="https://github.com/earlephilhower/arduino-pico"><strong>Arduino Core for RP2040</strong></a> (ทดลองใช้เวอร์ชัน <strong>v4.3.0</strong>) ก็อาจใช้ <a href="https://github.com/earlephilhower/arduino-pico/tree/master/libraries/FreeRTOS"><strong>FreeRTOS port for RP2040</strong></a> ซึ่งเป็นระบบปฏิบัติการเวลาจริง (<strong>RTOS: Real-Time Operating System</strong>) หรือที่เรียกว่า <strong>Real-Time Kernel</strong> โดยนำมาสร้างและใช้งานสิ่งที่เรียกว่า <strong>FreeRTOS Tasks</strong></p>
 <p><img alt="" src="model.jpg" /></p>
 <p>รูป: โมเดลการทำงานแบบมัลติทาสก์สำหรับการทดสอบโดยใช้ <strong>TinyGo Goroutines + Go Channels</strong></p>
 <p><img alt="" src="model_bin_sem.jpg" /></p>
@@ -331,7 +328,11 @@ void toggleLED(void *pvParameters) {
   int ledPin = p-&gt;ledPin;
   for (;;) {
     if (xQueueReceive(p-&gt;queueIn, &amp;token, portMAX_DELAY)==pdTRUE) {
-      digitalWrite(ledPin, !digitalRead(ledPin)); // Toggle the LED      
+#if 0
+      digitalWrite(ledPin, !digitalRead(ledPin)); // Toggle the LED 
+#else
+      gpio_put(ledPin,!gpio_get(ledPin)); // Toggle the LED
+#endif
       xQueueSend(p-&gt;queueOut, &amp;token, portMAX_DELAY);
     }
   }
@@ -339,8 +340,15 @@ void toggleLED(void *pvParameters) {
 
 void setup() {
   // Initialize LED pins
+#if 0  
   pinMode(LED1_PIN, OUTPUT);
   pinMode(LED2_PIN, OUTPUT);
+#else
+  gpio_init(LED1_PIN);
+  gpio_set_dir(LED1_PIN, GPIO_OUT);
+  gpio_init(LED2_PIN);
+  gpio_set_dir(LED2_PIN, GPIO_OUT);
+#endif
 
   // Create the queues for inter-task communication
   queue1 = xQueueCreate(1, sizeof(bool));
@@ -435,15 +443,17 @@ void loop() {
 <p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ด <strong>TinyGo</strong> เปรียบเทียบกับการเขียนโค้ดด้วย <strong>Arduino Sketch</strong>
 โดยใช้ <strong>Arduino Core for RP2040 + FreeRTOS Kernel</strong> เพื่อสาธิตการสร้างและทำงานแบบมัลติทาสก์
 (<strong>Multi-tasking</strong>)</p>
-<p>การใช้ <strong>Goroutines</strong> (หรือจะเรียกว่า <strong>Co-routines</strong>) สามารถนำมาใช้ในการเขียนโค้ดแบบ <strong>Multi-tasking</strong>
-แต่ก็มีข้อดีและข้อเสียแตกต่างจากการใช้ <strong>FreeRTOS (Preemptive Scheduling)</strong> เช่น การทำงานของ <strong>Goroutine</strong>
-จะทำต่อเนื่องจนกว่า จะถึงคำสั่งที่จำเป็นต้องหยุดรอเงื่อนไข หรือรอเวลา จึงจะมีการเปลี่ยนการทำงานไปยัง <strong>Goroutine</strong>
-ในลำดับถัดไป แต่ละฟังก์ชันที่ทำงานแบบ <strong>Goroutine</strong> ทำงานเป็นหนึ่งทาสก์ และทาสก์เหล่านี้มีระดับความสำคัญเท่ากัน การทำงานของ <strong>Goroutine</strong> จะคล้ายกับการทำงานในระบบที่มีการจัดลำดับการทำงานแบบ <strong>Co-operative Scheduling</strong></p>
+<p><strong>Goroutines</strong> ในภาษา <strong>Go</strong> สามารถนำมาใช้ในการเขียนโค้ดแบบ <strong>Multi-tasking</strong> ได้สำหรับไมโครคอนโทรลเลอร์
+แต่ก็มีข้อดีและข้อเสียแตกต่างจากการใช้ <strong>FreeRTOS</strong> เช่น การทำงานของ <strong>Goroutine</strong>
+จะทำต่อเนื่องจนกว่าจะถึงคำสั่งที่จำเป็นต้องหยุดรอเงื่อนไข หรือ รอเวลา เช่น <code>time.Sleep()</code> จึงจะมีการเปลี่ยนการทำงานไปยัง <strong>Goroutine</strong> ในลำดับถัดไปที่พร้อมจะทำงานต่อ แต่ละฟังก์ชัน <strong>Goroutine</strong> ทำงานเป็นหนึ่งทาสก์
+และทาสก์เหล่านี้มีระดับความสำคัญเท่ากัน ซึ่งจะแตกต่างจากการทำงานของระบบที่ใช้ <strong>Preemptive Scheduling</strong>
+ในระบบประเภทนี้ ทาสก์สามารถมีระดับความสำคัญแตกต่างกันได้ ทาสก์ที่มีความสำคัญสูงกว่าและพร้อมที่จะทำงาน 
+จะแทรกแซงการทำงานของทาสก์ที่กำลังทำงานในขณะนั้นและมีความสำคัญต่ำกว่าได้</p>
 <p>จากโค้ดตัวอย่างและการวัดสัญญาณเอาต์พุตจริง จะเห็นได้ว่า โค้ดภาษา <strong>Go</strong> ที่ใช้ <strong>Goroutines</strong>
-จะสร้างสัญญาณเอาต์พุตที่มีความถี่ได้สูงกว่า การเขียนโค้ดด้วย <strong>Arduino Sketch</strong> และใช้ <strong>FreeRTOS Kernel</strong></p>
+จะสร้างสัญญาณเอาต์พุตที่มีความถี่ได้สูงกว่า การเขียนโค้ดด้วย <strong>Arduino Sketch</strong> และใช้ <strong>FreeRTOS Tasks</strong></p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2024-12-23 | Last Updated: 2024-12-23</p></div>
+<p>Created: 2024-12-23 | Last Updated: 2024-12-24</p></div>
             </div>
         </div>
 
