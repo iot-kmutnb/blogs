@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/go/tinygo_pico_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนะนำการใช้งาน TinyGo สำหรับบอร์ด Raspberry Pico (ตอนที่ 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tinygo-raspberry-pico-2" class="nav-link">แนะนำการใช้งาน TinyGo สำหรับบอร์ด Raspberry Pico (ตอนที่ 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#tinygo-vs-arduino-cc" class="nav-link">&#9655; TinyGo vs. Arduino C/C++</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#1-led-blink" class="nav-link">&#9655; ตัวอย่างที่ 1: LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#2-push-button-led-toggle" class="nav-link">&#9655; ตัวอย่างที่ 2: Push Button + LED Toggle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#3-periodic-led-toggle" class="nav-link">&#9655; ตัวอย่างที่ 3: Periodic LED Toggle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#4-pwm-led-dimming" class="nav-link">&#9655; ตัวอย่างที่ 4: PWM LED Dimming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#5-i2c-device-scan" class="nav-link">&#9655; ตัวอย่างที่ 5: I2C Device Scan</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#6-sht31-i2c-sensor-reading" class="nav-link">&#9655; ตัวอย่างที่ 6: SHT31 I2C Sensor Reading</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tinygo-raspberry-pico-2">แนะนำการใช้งาน TinyGo สำหรับบอร์ด Raspberry Pico (ตอนที่ 2)<a class="headerlink" href="#tinygo-raspberry-pico-2" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Go / TinyGo</em>, <em>Microcontroller Programming</em>, <em>Raspberry Pico</em>, <em>RP2040</em>, <em>Arduino</em></p>
+<hr />
+<h2 id="tinygo-vs-arduino-cc">&#9655; <strong>TinyGo vs. Arduino C/C++</strong><a class="headerlink" href="#tinygo-vs-arduino-cc" title="Permanent link">#</a></h2>
+<p>บทความในตอนที่ 2 จะนำเสนอการเปรียบเทียบรูปแบบการเขียนโค้ดด้วยภาษา <a href="https://github.com/tinygo-org/tinygo"><strong>Go / TinyGo</strong></a> (ทดลองใช้เวอร์ชัน <a href="https://github.com/tinygo-org/tinygo/releases/tag/v0.35.0"><strong>v0.35.0</strong></a>)
+และโค้ดที่เขียนด้วย <strong>Arduino C/C++</strong> โดยใช้ <a href="https://github.com/earlephilhower/arduino-pico"><strong>Arduino Core for RP2040</strong></a>
+(ลองใช้เวอร์ชัน <a href="https://github.com/earlephilhower/arduino-pico/releases/tag/4.4.1"><strong>v4.4.1</strong></a>)
+ดังนั้นอาจช่วยให้ผู้อ่านที่เคยใช้งาน หรือคุ้นเคยกับการเขียนโค้ดด้วย <strong>Arduino Sketch</strong> มาบ้างแล้ว
+เห็นความแตกต่างระหว่างทั้งสองภาษาได้ง่ายขึ้น</p>
+<p><img alt="" src="arduino_ide_pico.jpg" /></p>
+<p>รูป: <strong>Arduino IDE + Arduino Core for RP2040</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-led-blink">&#9655; <strong>ตัวอย่างที่ 1: LED Blink</strong><a class="headerlink" href="#1-led-blink" title="Permanent link">#</a></h2>
+<p>ตัวอย่างแรกสาธิตการเขียนโค้ดเพื่อทำให้ <strong>LED</strong> ที่ขา <strong>GP25</strong> ของบอร์ด <strong>Pico RP2040</strong> กระพริบ
+โดยเขียนค่าเอาต์พุตและสลับค่าลอจิกทุก ๆ 100 มิลลิวินาที และใช้วิธีหน่วงเวลาก่อนทำคำสั่งถัดไป
+การเขียนโค้ดด้วย <strong>Arduino Sketch</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial); // Wait for the Serial port to open
+  Serial.println(&quot;Arduino on Pico-RP2040 Board&quot;);
+  pinMode(LED_BUILTIN, OUTPUT);
+}
+
+void loop() {
+  int state = !digitalRead(LED_BUILTIN);
+  digitalWrite(LED_BUILTIN, state);
+  Serial.println( String(&quot;LED: &quot;) + state );
+  delay(100);
+}
+</code></pre>
+<p>ข้อสังเกต: การทำคำสั่ง <code>while (!Serial);</code> จะส่งผลให้โปรแกรมหยุดรอก่อนจนกว่าผู้ใช้จะเปิดใช้งาน
+<strong>USB-CDC / Serial</strong> ของบอร์ด เช่น เปิดพอร์ตของบอร์ด โดยใช้ <strong>Arduino Serial</strong> หลังจากโปรแกรมในฮาร์ดแวร์เริ่มทำงาน</p>
+<p>ถ้าเขียนโค้ดสำหรับ <strong>TinyGo</strong> ก็มีตัวอย่างดังต่อไปนี้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+func main() {
+   for { // Wait until the USB-CDC is open.
+        if machine.USBCDC.DTR() {
+              break
+        }
+    time.Sleep(10 * time.Millisecond)
+    }
+    println(&quot;TinyGo on Pico-RP2040 Board&quot;)
+    led := machine.LED // or machine.GP25
+    led.Configure( machine.PinConfig{Mode: machine.PinOutput} )
+    for { // an endless loop
+        state := !led.Get() // Toggle the state
+        println( &quot;LED:&quot;, state ) // Send output string to serial
+        led.Set( state )  // Update the LED output
+        time.Sleep( 100*time.Millisecond ) // Wait for 0.1 sec
+    }
+}
+</code></pre>
+<p><code>machine.LED</code> มีชนิดข้อมูลเป็น <code>machine.Pin</code> และเป็นส่วนหนึ่งของแพ็กเกจ 
+<a href="https://tinygo.org/docs/reference/machine/"><code>machine</code></a>
+ของ <strong>TinyGo</strong>  ขา <strong>GPIO</strong> ดังกล่าว หมายถึง <strong>Onboard LED</strong> ของบอร์ด <strong>Pico</strong></p>
+<p>การส่งข้อความผ่าน <strong>Serial</strong> จะใช้คำสั่ง <code>println()</code> หรือ ใช้คำสั่งของแพ็กเกจ <code>fmt</code>
+เช่น <code>fmt.Println(...)</code> และ <code>fmt.Printf(...)</code>  ก็ได้</p>
+<p>โค้ดต่อไปนี้ ทำหน้าที่ตรวจสอบดูว่า มีการเปิดพอร์ต <strong>USB-CDC</strong> หรือไม่ 
+โดยอ่านค่าสัญญาณ <code>DTR</code> ถ้ายังมีค่าเป็น <code>false</code> ก็ให้รอก่อนทำคำสั่ง <code>println()</code> ถัดไป</p>
+<pre><code class="language-go">   for { // Wait until the USB-CDC is open.
+        if machine.USBCDC.DTR() {
+       break
+        }
+    time.Sleep(10 * time.Millisecond)
+    }
+</code></pre>
+<p>คำสั่งของแพ็กเกจ <code>machine</code> สำหรับ <strong>TinyGo</strong> ที่เกี่ยวข้องกับ <strong>GPIO</strong> เช่น</p>
+<ul>
+<li><code>func (p Pin) Configure( config PinConfig )</code> ตั้งค่าใช้งาน โดยกำหนดทิศทางของ <strong>GPIO</strong></li>
+<li><code>func (p Pin) Get() bool</code> อ่านค่าของขา <strong>GPIO</strong> ได้เป็นค่าบูลีน</li>
+<li><code>func (p Pin) Set( state bool )</code> เขียนค่าบูลีนให้กับขา <strong>GPIO</strong></li>
+</ul>
+<p>และคำสั่งสำหรับหน่วงเวลา เช่น</p>
+<ul>
+<li><code>func time.Sleep( duration time.Duration )</code> หน่วงเวลาไว้ก่อนทำคำสั่งลำดับถัดไป</li>
+</ul>
+<p>คำสั่งของ <a href="https://github.com/arduino/ArduinoCore-API/"><strong>Arduino Core API</strong></a> </p>
+<ul>
+<li><code>void pinMode( pin_size_t pinNumber, PinMode pinMode )</code>  ใช้กำหนดทิศทางของขา <strong>GPIO</strong> </li>
+<li><code>void digitalWrite( pin_size_t pinNumber, PinStatus status )</code> ใช้สำหรับกำหนดค่าลอจิกให้ขา <strong>GPIO</strong></li>
+<li><code>PinStatus digitalRead( pin_size_t pinNumber )</code>  ใช้สำหรับอ่านค่าลอจิกที่ขา <strong>GPIO</strong></li>
+</ul>
+<p>และคำสั่งสำหรับหน่วงเวลา เช่น</p>
+<ul>
+<li><code>void delay( unsigned long )</code> หน่วงเวลาไว้ หน่วยเป็นมิลลิวินาที</li>
+<li><code>void delayMicroseconds( unsigned int us )</code> หน่วงเวลาไว้ หน่วยเป็นไมโครวินาที</li>
+</ul>
+<p>&nbsp;</p>
+<p>การทำให้ <strong>LED</strong> กระพริบ ใช้วิธีการหน่วงเวลาไว้ก่อนสลับค่าลอจิกให้ขา <strong>GPIO</strong>
+แต่ถ้าจะใช้วิธีตรวจสอบระยะเวลาที่ผ่านไป และดูว่าถึงเวลาที่จะต้องสลับสถานะลอจิกหรือไม่ ก็เขียนโค้ดสำหรับ <strong>Arduino</strong> ได้ดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+uint32_t lastTime = 0;  // Store the last toggle time
+uint32_t intervalMsec = 100;  // Toggle interval in milliseconds
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);  // Wait for the Serial port to open
+  pinMode( LED_BUILTIN, OUTPUT );
+  Serial.println( &quot;Arduino LED Blink&quot; );
+}
+
+void loop() {
+  uint32_t now = millis();  // Get the current time in milliseconds
+  if (now - lastTime &gt;= intervalMsec) { // Check time difference
+    // Toggle the LED
+    int state = !digitalRead(LED_BUILTIN);
+    digitalWrite(LED_BUILTIN, state);  // Set the LED state
+    // Update the last time for LED toggle
+    lastTime = now;
+    Serial.println( String(&quot;LED state: &quot;) + state );
+  }
+}
+</code></pre>
+<p>แต่ถ้าเขียนโค้ด <strong>TinyGo</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    println(&quot;TinyGo LED Blink&quot;)
+    // Initialize the onboard LED
+    led := machine.LED
+    led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
+    // Set the toggle interval (100 msec)
+    intervalMsec := time.Millisecond * 100
+    lastTime := time.Now()
+
+    for {
+        now := time.Now() // Get the current time
+        // Check if the time difference exceeds the toggle interval
+        if now.Sub(lastTime) &gt;= intervalMsec {
+            led.Set(!led.Get()) // Toggle the LED
+            lastTime = now      // Update the last time for LED toggle
+        }
+    }
+}
+</code></pre>
+<p>คำสั่งของ <strong>TinyGo</strong> ในแพ็กเกจ <code>time</code> สำหรับการอ่านค่าเวลา เช่น</p>
+<ul>
+<li><code>func Now() Time</code> อ่านค่าเวลาปัจจุบัน</li>
+<li><code>func (t Time ) Sub(u Time) time.Duration</code> หาผลต่างของเวลาปัจจุบันกับเวลาในอดีต</li>
+</ul>
+<p>คำสั่งของ <strong>Arduino Core API</strong> สำหรับการอ่านค่าเวลา เช่น</p>
+<ul>
+<li><code>unsigned long millis( void )</code> อ่านค่าเวลาของระบบ หน่วยเป็นมิลลิวินาที</li>
+<li><code>unsigned long micros( void )</code> อ่านค่าเวลาของระบบ หน่วยเป็นไมโครวินาที</li>
+</ul>
+<hr />
+<h2 id="2-push-button-led-toggle">&#9655; <strong>ตัวอย่างที่ 2: Push Button + LED Toggle</strong><a class="headerlink" href="#2-push-button-led-toggle" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> เพื่อคอยตรวจสอบดูว่า มีการกดปุ่มหรือไม่
+(ต่อวงจรปุ่มกดแบบ <strong>Active-Low</strong> ที่ขา <strong>GP22</strong>)
+เช่น ดูว่าเกิดเหตุการณ์ขอบขาลง (<strong>Falling Edge</strong>) ของสัญญาณอินพุตจากปุ่มกดหรือไม่ 
+และการตรวจสอบนี้ ใช้วิธีเปิดการใช้งานอินเทอร์รัพท์ภายนอก (<strong>External Interrupt</strong>)
+เมื่อมีการกดปุ่มแล้วปล่อยในแต่ละครั้ง ให้สลับสถานะลอจิกของ <strong>LED</strong> (ตรงกับขา <strong>GP25</strong>)</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+const int ledPin = LED_BUILTIN;   // Onboard LED (GPIO 25 on most RP2040 boards)
+const int btnPin = 22;            // Button (GPIO 22 in this case)
+bool ledState = false;            // LED state
+volatile bool clicked = false;
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);  // Wait for the Serial port to initialize
+  pinMode(ledPin, OUTPUT);
+  pinMode(btnPin, INPUT_PULLUP); // Enabled internal pullup
+  Serial.println(&quot;Arduino LED Toggle with Button&quot;);
+  attachInterrupt( btnPin, []() { // Callback function
+    if (digitalRead(btnPin) == LOW) {
+      clicked = true;
+    }
+  }, FALLING );
+}
+
+void loop() {
+  if ( clicked ) {
+    clicked = false;
+    ledState = !ledState;             // Toggle LED state
+    digitalWrite( ledPin, ledState ); // Update the LED state
+    Serial.println( String(&quot;LED: &quot;) + ledState );
+  }
+  delay(5);
+}
+</code></pre>
+<p>การเขียนโค้ดด้วย <strong>TinyGo</strong> เพื่อคอยตรวจสอบเหตุการณ์ของสัญญาณที่ขาอินพุตจากวงจรปุ่มกดได้เช่นกัน
+ตามตัวอย่างต่อไปนี้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+var (
+    led     = machine.GPIO25 // for LED output
+    btn     = machine.GPIO22 // for active-low button
+    clicked = false
+)
+
+func main() {
+    // Configure the onboard LED as output
+    led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+    // Configure button as input with pull-up
+    btn.Configure(machine.PinConfig{Mode: machine.PinInputPullup})
+
+    // Set up an interrupt on the button pin
+    btn.SetInterrupt(machine.PinFalling, func(pin machine.Pin) { // Callback
+        if !pin.Get() {
+            clicked = true
+        }
+    })
+    ledState := false
+    for { // endless loop
+        if clicked {
+            clicked = false
+            ledState = !ledState
+            println(&quot;LED:&quot;, ledState)
+        }
+        time.Sleep(5 * time.Millisecond)
+    }
+}
+</code></pre>
+<p>คำสั่งของ <strong>Arduino API</strong> ที่เกี่ยวข้องกับอินเทอร์รัพท์ เช่น</p>
+<ul>
+<li><code>void attachInterrupt( pin_size_t interruptNumber, voidFuncPtr callback, PinStatus mode )</code>
+เปิดใช้งานอินเทอร์รัพท์ ตามหมายเลขอินเทอร์รัพท์ของขาที่เกี่ยวข้อง และระบุฟังก์ชันที่ใช้เป็น <strong>Callback</strong></li>
+<li><code>void detachInterrupt( pin_size_t interruptNumber )</code> ปิดหรือยกเลิกการใช้งานอินเทอร์รัพท์</li>
+</ul>
+<p>คำสั่งของ <strong>TinyGo</strong> ในแพ็กเกจ <code>machine</code> ที่เกี่ยวข้องกับอินเทอร์รัพท์ เช่น</p>
+<ul>
+<li><code>func (p Pin) SetInterrupt( change PinChange, callback func(Pin) ) error</code>
+โดยมีค่า <code>PinChange</code> เลือกใช้ได้ 3 กรณี  คือ <code>PinRising</code>, <code>PinFalling</code> และ <code>PinToggle</code></li>
+</ul>
+<hr />
+<h2 id="3-periodic-led-toggle">&#9655; <strong>ตัวอย่างที่ 3: Periodic LED Toggle</strong><a class="headerlink" href="#3-periodic-led-toggle" title="Permanent link">#</a></h2>
+<p>การทำให้ <strong>LED</strong> กระพริบด้วยอัตราคงที่ ถือว่าเป็นการทำงานที่เกิดขึ้นซ้ำ และมีระยะเวลาห่างในแต่ละครั้งเท่า ๆ กัน
+ดังนั้น ในการเขียนโค้ด ก็ใช้วิธีการทำงานของวงจรตัวนับ หรือ <strong>Timer</strong> ได้ และให้เรียกฟังก์ชัน <strong>Callback</strong>
+ที่ต้องการตามระยะเวลาที่กำหนดไว้</p>
+<p>หากจะลองใช้ฟังก์ชัน <code>add_repeating_timer_ms()</code> ของ <strong>Pico C/C++ SDK</strong>
+(ไฟล์ <a href="https://github.com/raspberrypi/pico-sdk/blob/master/src/common/pico_time/include/pico/time.h"><code>pico/time.h</code></a>) ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &lt;pico/time.h&gt;
+
+const int ledPin = LED_BUILTIN; // Onboard LED (GPIO 25 on most RP2040 boards)
+bool ledState = false;          // LED state
+struct repeating_timer timer;   // Repeating timer provided by Pico C/C++ SDK
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);  // Wait for the Serial port to initialize
+  pinMode(ledPin, OUTPUT);
+  add_repeating_timer_ms(500, [](struct repeating_timer *timer) { // Callback
+     ledState = !ledState;
+     digitalWrite( ledPin, ledState );
+     Serial.println( String(&quot;LED: &quot;) + ledState );
+     return true;
+  }, NULL, &amp;timer);
+}
+
+void loop() {
+  delay(10);
+}
+</code></pre>
+<p>หรือจะใช้ <a href="https://github.com/earlephilhower/arduino-pico/tree/master/libraries/Ticker"><code>Ticker.h</code></a>
+ของ <strong>Arduino Core for RP2040</strong> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &lt;Ticker.h&gt; // for Ticker
+
+const int ledPin = LED_BUILTIN;  // Onboard LED (GPIO 25 on most RP2040 boards)
+bool ledState = false;           // LED state
+Ticker ticker;                   // Ticker
+uint64_t savedTime = 0;          // Used to save the last toggle time
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);  // Wait for the Serial port to open
+  pinMode(ledPin, OUTPUT);
+
+  ticker.attach_ms(500, []() {
+     uint64_t now = time_us_64(); // Read current time (64-bit int)
+     ledState = !ledState;  // Toggle the LED state
+     digitalWrite( ledPin, ledState );  // Update the LED output
+     Serial.print( String(&quot;LED: &quot;) + ledState );
+     uint32_t td = (uint32_t)(now - savedTime)/1000;
+     Serial.println( String(&quot;, interval_msec: &quot;) + td );
+     savedTime = now; // Update the last toggle time
+  });
+}
+
+void loop() {
+  delay(10);
+}
+</code></pre>
+<p>ลองเปรียบเทียบกับการเขียนโค้ดสำหรับ <strong>TinyGo</strong>
+โดยใช้คำสั่ง <code>func NewTicker( d Duration ) *Ticker</code>
+ ตามตัวอย่างต่อไปนี้ เพื่อเรียกฟังก์ชัน <strong>Callback</strong> ให้ทำงานตามระยะเวลาที่กำหนดไว้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+var (
+    led = machine.GPIO25 // for LED output
+)
+
+func ledToggle(ticker *time.Ticker) {
+    savedTime := time.Now()
+    bool2int := func(b bool) int {
+        return map[bool]int{true: 1, false: 0}[b]
+    }
+    for range ticker.C { // Wait for a signal from the time ticker.
+        now := time.Now() // Get current time
+        led.Set(!led.Get()) // Toggle the LED state
+        td := int32(now.Sub(savedTime).Milliseconds()) // Time difference
+        fmt.Printf(&quot;LED: %v, interval_ms: %v\n&quot;,
+            bool2int(led.Get()), td)
+        savedTime = now // Update last toggle time
+    }
+}
+
+func main() {
+    // Configure the onboard LED
+    led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+    // Create a ticker with 500ms interval
+    ticker := time.NewTicker(500 * time.Millisecond)
+    go ledToggle(ticker) // Start a goroutine
+    select {}            // Block the main function
+}
+</code></pre>
+<p><img alt="" src="arduino_pico_ticker.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ด <strong>Arduino</strong></p>
+<p><img alt="" src="tinygo_pico_ticker.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ด <strong>TinyGo</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-pwm-led-dimming">&#9655; <strong>ตัวอย่างที่ 4: PWM LED Dimming</strong><a class="headerlink" href="#4-pwm-led-dimming" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino</strong> เพื่อสร้างสัญญาณ <strong>PWM (Pulse Width Modulation)</strong>
+และปรับค่า <strong>Duty Cycle</strong> เพิ่มขึ้นและลดลงตามลำดับ ในช่วง <strong>0% .. 100%</strong>
+และสัญญาณเอาต์พุตนี้จะนำไปใช้กับวงจร <strong>LED</strong> ซึ่งจะเห็นว่า ความสว่างของ <strong>LED</strong> จะเพิ่มขึ้นและลดลงตามค่า <strong>Duty Cycle</strong></p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+#define PWM_PIN 25 // GPIO25 for PWM output
+#define FREQ_HZ 500 // Desired PWM Frequency in Hz
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial); // Wait for USB-CDC to open
+  Serial.println(&quot;Arduino RP2040 PWM Demo using analogWrite...&quot;);
+  analogWriteRange(255); // 8-bit PWM
+  analogWriteFreq(FREQ_HZ); // Set PWM output frequency
+}
+
+void loop() {
+  int value = 0;
+  // Ramp up and down the PWM duty cycle
+  for (int i = 0; i &lt; 200; i++) {
+    if (i &gt; 100) {
+      value = 200 - i; // Ramp down
+    } else {
+      value = i; // Ramp up
+    }
+    // Map the value (0...100) to analogWrite range (0..255)
+    int dutyCycle = map(value, 0, 100, 0, 255);
+    analogWrite( PWM_PIN, dutyCycle );  // Set PWM duty cycle
+    delay(10);
+  }
+}
+</code></pre>
+<p>คำสั่งของ <strong>Arduino API</strong> ที่เกี่ยวข้องกับสัญญาณ <strong>PWM</strong> ตามที่ปรากฎในไฟล์ <a href="https://github.com/earlephilhower/arduino-pico/blob/master/cores/rp2040/Arduino.h"><code>Arduino.h</code></a> เช่น</p>
+<ul>
+<li><code>void analogWriteRange( uint32_t range )</code> กำหนดช่วงค่าเอาต์พุต ให้สัญญาณ <strong>PWM</strong></li>
+<li><code>void analogWriteResolution( int resolution )</code> กำหนดความละเอียด (จำนวนบิต)</li>
+<li><code>void analogWriteFreq( uint32_t freq )</code> กำหนดค่าความถี่ของสัญญาณ <strong>PWM</strong></li>
+<li><code>void analogWrite( pin_size_t pin, int value )</code> เขียนค่าเอาต์พุตสำหรับสัญญาณ <strong>PWM</strong></li>
+</ul>
+<p>ลองเปรียบเทียบกับการเขียนโค้ดสำหรับ <strong>TinyGo</strong> ดังต่อไปนี้
+หากใช้ขา <strong>GPIO25</strong> จะต้องเลือกใช้ <strong>PWM Group 4</strong></p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+const FREQ_HZ = 500                       // PWM Frequency
+const PWM_PERIOD uint64 = (1e9 / FREQ_HZ) // in nanoseconds
+
+var (
+    pwmPin = machine.GPIO25 // Use GPIO25 pin for PWM output.
+    pwm    = machine.PWM4   // Pin 25 corresponds to PWM Group 4.
+)
+
+func pwmInit() (channel uint8, top uint32) {
+    // Configure the PWM with the given period.
+    pwm.Configure(machine.PWMConfig{
+        Period: PWM_PERIOD,
+    })
+    // Create a PWM channel
+    channel, err := pwm.Channel(pwmPin)
+    if err != nil {
+        return 0, 0 // error
+    }
+    top = pwm.Top() // Get the PWM top value
+    return channel, top
+}
+
+func main() {
+    println(&quot;TinyGo RP2040 PWM Demo...&quot;)
+    time.Sleep(1 * time.Second)
+    pwmChannel, pwmTop := pwmInit() // Initialize PWM output
+    println(&quot;PWM Channel   :&quot;, pwmChannel)
+    println(&quot;PWM top value :&quot;, pwmTop)
+    if pwmChannel &lt; 1 {
+        panic(&quot;PWM creation failed!&quot;)
+    }
+
+    for {
+        value := 0
+        for i := 0; i &lt; 200; i++ {
+            if i &gt; 100 {
+                value = 200 - i
+            } else {
+                value = i
+            }
+            // Set PWM duty cycle (0% … 100%)
+            pwm.Set(pwmChannel, uint32(value)*pwmTop/100)
+            time.Sleep(time.Millisecond * 10)
+        }
+    }
+}
+</code></pre>
+<p>ชิป <strong>RP2040</strong> มีการแบ่งวงจรภายในสำหรับสร้างสัญญาณ <strong>PWM</strong> แบ่งได้เป็น 8 ชุด (<strong>PWM Groups 0..7</strong>)
+แต่ละชุดมี 2 ช่องสัญญาณ (<strong>PWM Channel</strong>) แบ่งเป็น <strong>A=0</strong> หรือ <strong>B=1</strong> และหนึ่งช่องต่อหนึ่งขา</p>
+<p>คำสั่งของแพ็กเกจ <code>machine</code> สำหรับ <strong>TinyGo RP2040</strong> ที่เกี่ยวข้องกับ <strong>PWM Group</strong> เช่น</p>
+<ul>
+<li><code>func (pwm *pwmGroup) Configure( config PWMConfig ) error</code> ตั้งค่าและเปิดใช้งานสำหรับ <strong>PWM Group</strong> ที่ระบุ</li>
+<li><code>func (pwm *pwmGroup) Channel( pin Pin ) (channel uint8, err error)</code> อ่านหมายเลขช่องสัญญาณ (<strong>A</strong> หรือ <strong>B</strong>) ของขา</li>
+<li><code>func (pwm *pwmGroup) Set( channel uint8, value uint32 )</code> กำหนดค่าเอาต์พุตของสัญญาณ <strong>PWM</strong> ตามหมายเลขช่องสัญญาณ</li>
+<li><code>func (pwm *pwmGroup) SetPeriod( period uint64 ) error</code>  กำหนดคาบเวลาสำหรับสัญญาณ <strong>PWM</strong></li>
+<li><code>func (pwm *pwmGroup) Top() uint32</code> อ่านค่าสูงสุดของตัวนับสำหรับสัญญาณ <strong>PWM</strong></li>
+</ul>
+<hr />
+<h2 id="5-i2c-device-scan">&#9655; <strong>ตัวอย่างที่ 5: I2C Device Scan</strong><a class="headerlink" href="#5-i2c-device-scan" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการตรวจสอบดูว่า มีอุปกรณ์เชื่อมต่อกับบัส <strong>I2C</strong> ของบอร์ด  <strong>Pico RP2040</strong> หรือไม่
+(<strong>I2C Device Scan</strong>) และเลือกใช้ขา <strong>GP12</strong> และ <strong>GP13</strong> สำหรับขา <strong>SDA0</strong> และ <strong>SCL0</strong>
+ของ <strong>I2C0</strong></p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &lt;Wire.h&gt;
+
+// Pin definitions
+#define SDA_PIN 12
+#define SCL_PIN 13
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);
+  Serial.println(&quot;Scanning for I2C devices...&quot;);
+  // Initialize the I2C bus
+  Wire.setSDA(SDA_PIN); // Set the SDA pin
+  Wire.setSCL(SCL_PIN); // Set the SCL pin
+  Wire.setClock(100000); // Set the I2C speed (100kHz)
+  Wire.begin(); // Start I2C
+}
+
+void loop() {
+  Serial.println(&quot;Scanning I2C Devices...&quot;);
+  int nDevices = 0;
+  for (uint8_t addr = 1; addr &lt; 127; addr++) {
+    Wire.beginTransmission(addr);
+    uint8_t error = Wire.endTransmission();
+    if (error == 0) {
+      Serial.printf(&quot;I2C device found at address: 0x%02X !\n&quot;, addr);
+      nDevices++;
+    }
+    delay(10); // Small delay between address scans
+  }
+  if (nDevices == 0) {
+    Serial.println(&quot;No I2C devices found&quot;);
+  }
+  Serial.println(&quot;Scan complete.\n&quot;);
+  delay(5000); // Wait 5 seconds before rescanning
+}
+</code></pre>
+<p>ตัวอย่างโค้ดสำหรับ <strong>TinyGo</strong> มีดังนี้</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;machine&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    waitForSerial()
+    println(&quot;Scanning for I2C devices...&quot;)
+    _ = NewI2C()
+    for {
+        wbuf, rbuf := []byte{}, []byte{0} //  Write and read buffer
+        nDevices := 0
+        println(&quot;Scanning I2C Devices...&quot;)
+        for addr := uint16(1); addr &lt; 127; addr++ {
+            // Try read a byte from the current address
+            if err := machine.I2C0.Tx(addr, wbuf, rbuf); err == nil {
+                fmt.Printf(&quot;I2C device found at address: %#02x !\n&quot;, addr)
+                nDevices++
+            }
+            time.Sleep(10 * time.Millisecond)
+        }
+        if nDevices == 0 {
+            println(&quot;No I2C devices found\r\n&quot;)
+        }
+        println(&quot;Scan complete.&quot;)
+        time.Sleep(5 * time.Second) // Wait 5 seconds before rescanning
+    }
+}
+
+func NewI2C() (i2c *machine.I2C) {
+    i2c = machine.I2C0 // select I2C0 bus
+    err := i2c.Configure(machine.I2CConfig{
+        SCL:       machine.GP13,
+        SDA:       machine.GP12,
+        Frequency: 100 * machine.KHz,
+    })
+    if err != nil {
+        println(&quot;Could not configure I2C:&quot;, err)
+        return nil
+    }
+    return i2c
+}
+
+func waitForSerial() {
+    for { // Wait until the USB-CDC is open.
+        if machine.USBCDC.DTR() {
+            break
+        }
+        time.Sleep(10 * time.Millisecond)
+    }
+}
+</code></pre>
+<p><img alt="" src="tinygo_pico_i2c_scan.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ด <strong>TinyGo</strong> (ตรวจพบอุปกรณ์ที่มีหมายเลข <code>0x40</code>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="6-sht31-i2c-sensor-reading">&#9655; <strong>ตัวอย่างที่ 6: SHT31 I2C Sensor Reading</strong><a class="headerlink" href="#6-sht31-i2c-sensor-reading" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการอ่านค่าจากโมดูลเซนเซอร์ <strong>SHT31</strong> (แอดเดรส <code>0x44</code>) สำหรับวัดค่าอุณหภูมิและความชื้นสัมพัทธ์
+โดยเชื่อมต่อกับบัส <strong>I2C</strong> และเลือกใช้ขา <strong>GP12</strong> และ <strong>GP13</strong> สำหรับขา <strong>SDA0</strong> และ <strong>SCL0</strong>
+ของ <strong>I2C0</strong></p>
+<p>การเขียนโค้ด <strong>Arduino Sketch</strong> ทำได้ง่าย โดยใช้ไลบรารี
+<a href="https://github.com/adafruit/Adafruit_SHT31"><code>Adafruit_SHT31</code></a> ของ <strong>Adafruit</strong> ดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &lt;Wire.h&gt;
+
+#include &lt;Adafruit_SHT31.h&gt;
+// https://github.com/adafruit/Adafruit_SHT31
+
+// Pin definitions
+#define SDA_PIN 12
+#define SCL_PIN 13
+
+// Create an SHT31 object
+Adafruit_SHT31 sht31 = Adafruit_SHT31();
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(115200);
+  while(!Serial);
+  Serial.println(&quot;SHT3x I2C Sensor Reading&quot;);
+
+  // Initialize the I2C bus
+  Wire.setSDA(SDA_PIN); // Set the SDA pin
+  Wire.setSCL(SCL_PIN); // Set the SCL pin
+  Wire.setClock(400000); // Set the I2C speed (400kHz)
+  Wire.begin(); // Start I2C
+
+  // Initialize the SHT31 sensor
+  if (!sht31.begin(0x44)) { // 0x44 is the default I2C address for SHT31
+    Serial.println(&quot;Could not find SHT31 sensor!&quot;);
+    while (1) { delay(10); } // Stop execution if sensor is not found
+  }
+}
+
+void loop() {
+  // Read temperature and humidity from the sensor
+  float temp = sht31.readTemperature();
+  float humidity = sht31.readHumidity();
+  // Check if readings are valid
+  if (!isnan(temp) &amp;&amp; !isnan(humidity)) {
+    // Print temperature and humidity
+    Serial.printf(&quot;Temperature: %.2f °C\n&quot;, temp);
+    Serial.printf(&quot;Humidity   : %.2f %%RH\n&quot;, humidity);
+  } else {
+    Serial.println(&quot;Failed to read from SHT31 sensor&quot;);
+  }
+  delay(2000); // Wait 2 seconds before the next reading
+}
+</code></pre>
+<p>ลองเปรียบเทียบการเขียนโค้ดสำหรับ <strong>TinyGo</strong> ซึ่งก็ทำได้ง่ายโดยใช้ไลบรารีสำหรับโมดูล <strong>SHT31</strong>:
+<a href="tinygo.org/x/drivers/sht3x"><code>tinygo.org/x/drivers/sht3x</code></a></p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;machine&quot;
+    &quot;time&quot;
+
+    &quot;tinygo.org/x/drivers/sht3x&quot;
+)
+
+func main() {
+    println(&quot;SHT3x I2C Sensor Reading&quot;)
+    // Configure I2C0
+    machine.I2C0.Configure(machine.I2CConfig{
+        Frequency: 0.4 * machine.MHz,
+        SCL:       machine.GPIO13, // Set SCL pin
+        SDA:       machine.GPIO12, // Set SDA pin
+    })
+    // Initialize AHT20/AHT21 sensor
+    sensor := sht3x.New(machine.I2C0)
+    for {
+        temp, humidity, _ := sensor.ReadTemperatureHumidity()
+        t := fmt.Sprintf(&quot;%.2f&quot;, float32(temp)/1000)
+        h := fmt.Sprintf(&quot;%.2f&quot;, float32(humidity)/100)
+        println(&quot;temp.   :&quot;, t, &quot;C&quot;)
+        println(&quot;humidity:&quot;, h, &quot;%RH&quot;)
+        time.Sleep(2 * time.Second) // Wait before reading again
+    }
+}
+</code></pre>
+<p><img alt="" src="tinygo_pico_sht3x.jpg" /></p>
+<p>รูป: การสาธิตการทำงานของโค้ด <strong>TinyGo</strong> เพื่ออ่านค่าจากโมดูลเซนเซอร์ <strong>SHT31</strong></p>
+<p><img alt="" src="pico_i2c_sht3x.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรบนเบรดบอร์ดเพื่อสาธิตการใช้งานบอร์ด <strong>RP2040</strong> (Pico-compatible)
+กับโมดูล <strong>SHT31 Digital Temperature &amp; Humidity Sensor</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดเพื่อเปรียบเทียบระหว่าง <strong>TinyGo</strong> และ <strong>Arduino Sketch</strong>
+สำหรับชิป <strong>RP2040 SoC</strong>  และทดลองใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico</strong>
+เช่น การใช้งานขา <strong>GPIO</strong> สำหรับ <strong>Digital I/O</strong> การเรียกฟังก์ชันซ้ำตามคาบเวลาที่กำหนดไว้
+การสร้างสัญญาณ <strong>PWM</strong> และการเชื่อมต่อกับอุปกรณ์อื่นด้วยบัส <strong>I2C</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-01-06 | Last Updated: 2025-01-07</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
