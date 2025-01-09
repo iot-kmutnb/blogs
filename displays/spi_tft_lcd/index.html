@@ -212,7 +212,7 @@
 <p>ตัวอย่างโค้ดต่อไปนี้สาธิตการเขียนโปรแกรมด้วย <strong>Arduino-ESP32</strong> ร่วมกับไลบรารีของบริษัท <strong>Adafruit</strong>
 เพื่อใช้งานโมดูล <strong>TFT LCD</strong> ที่มีการเชื่อมต่อด้วย <strong>VSPI</strong> แบ่งเป็น 2 กรณีคือ
 โมดูลที่ใช้ชิปควบคุม <code>ST7789</code> และ <code>ILI9341</code> อย่างใดอย่างหนึ่ง</p>
-<pre><code>// Date: 2022-12-26
+<pre><code class="language-c++">// Date: 2022-12-26
 // Demo board: WeMos Lolin32 Lite
 
 #include &quot;SPI.h&quot;
@@ -311,7 +311,7 @@ void loop() {
 <p><img alt="" src="arduino_tft_espi_lib-1.png" /></p>
 <p>รูป: การติดตั้งไลบรารี <code>TFT_eSPI</code> สำหรับ  <strong>Arduino</strong></p>
 <p>โค้ดตัวอย่างมีดังนี้ (แสดงข้อความหนึ่งบรรทัดตรงกลางจอภาพ)</p>
-<pre><code>#include &lt;SPI.h&gt;
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
 #include &lt;TFT_eSPI.h&gt;
 
 TFT_eSPI tft = TFT_eSPI();
@@ -357,9 +357,143 @@ void loop() {
 -DTFT_DC=2
 -DTFT_RST=4
 -DTFT_BL=-1
+-DTOUCH_CS=-1
 -DLOAD_GLCD=1 
 -DSPI_FREQUENCY=24000000 
 </code></pre>
+<p>แต่ถ้าจะลองใช้กับโมดูล <strong>ST7789 IPS TFT LCD (240x280)</strong> ก็มีตัวอย่างโค้ดสำหรับทดลองใช้ดังนี้</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;TFT_eSPI.h&gt;
+
+// 1.69&quot; Inch IPS TFT LCD, 240x280 Pixels, ST7789v3 Driver, 3.3V
+
+TFT_eSPI tft = TFT_eSPI();
+
+void setup(void) {
+  Serial.begin(115200); 
+  delay(1000);
+  esp32Info();
+  initTFT();
+  drawTFT();
+}
+
+void loop() {
+  delay(10);
+}
+
+void initTFT() {
+  tft.init();  
+  tft.setRotation(0);
+  Serial.printf( &quot;W x H = %d x %d pixels\n&quot;, tft.width(), tft.height() );
+  tft.fillScreen(TFT_BLACK); // Fill screen with black color
+}
+
+void drawCenterText( int y, const char *text) {
+  // Get the width of the text in pixels
+  int16_t text_width = tft.textWidth(text);
+  // Draw the text on the display
+  int x = (tft.width() - text_width)/2;
+  tft.drawString( text, x, y );
+}
+
+void drawTFT() {
+  tft.setFreeFont(&amp;FreeSans12pt7b);
+  // Draw a white rectangle frame
+  tft.drawRect(10, 10, tft.width()-20, tft.height()-20, TFT_WHITE); 
+  // Set the text alignment to top-left
+  tft.setTextDatum(TL_DATUM);
+  // Set text color to green
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  int y = 60;
+  drawCenterText(y, &quot;Arduino-ESP32&quot;);
+  y+= 40;
+  drawCenterText(y, &quot;TFT_eSPI&quot;);
+  y+= 40;
+  drawCenterText(y, &quot;IPS 1.69\&quot;&quot;);
+  y+= 40;
+  drawCenterText(y, &quot;ST7789v3&quot;);
+  y+= 40;
+  drawCenterText(y, &quot;240 x 280&quot;);
+}
+
+void esp32Info() {
+  Serial.printf( &quot;Arduino ESP32 Core v%u.%u.%u\n&quot;,
+     ESP_ARDUINO_VERSION_MAJOR, 
+     ESP_ARDUINO_VERSION_MINOR, 
+     ESP_ARDUINO_VERSION_PATCH );
+
+  Serial.printf(&quot;Espressif IDF: %s\n&quot;, ESP.getSdkVersion() );
+  Serial.printf(&quot;Chip Revision %d\n&quot;,  ESP.getChipRevision() );
+  Serial.printf(&quot;Cpu Freq. %lu MHz\n&quot;, ESP.getCpuFreqMHz() );
+  Serial.printf(&quot;Heap (total/free): %lu / %lu bytes\n&quot;, 
+         ESP.getHeapSize(), ESP.getFreeHeap());
+  Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  Serial.printf(&quot;Flash Size: %lu MB, Flash Speed: %lu MHz\n&quot;,
+         ESP.getFlashChipSize()/(1024*1024UL), 
+         ESP.getFlashChipSpeed()/(uint32_t) 1e6 );
+
+  // more info...
+  Serial.printf(&quot;Espressif chip model: %s\n&quot;,
+         ESP.getChipModel() );
+  Serial.printf(&quot;Number of CPU Cores: %d\n&quot;, 
+         ESP.getChipCores() );
+  String str;
+  switch(ESP.getFlashChipMode()) {
+     case FM_QIO:  str = &quot;QIO&quot;;  break;
+     case FM_QOUT: str = &quot;QOUT&quot;; break;
+     case FM_DIO:  str = &quot;DIO&quot;;  break;
+     case FM_DOUT: str = &quot;DOUT&quot;; break;
+     default:      str = &quot;Unknown&quot;; break;
+  }
+  Serial.printf(&quot;Flash model: %s\n&quot;, str.c_str() );
+  Serial.println(&quot;=========================================\n&quot;);
+}
+</code></pre>
+<p>และการตั้งค่าใช้งานในไฟล์ <code>build_opt.h</code> มีดังนี้</p>
+<pre><code class="language-text">-DUSER_SETUP_LOADED=1
+-DST7789_DRIVER
+-DTFT_WIDTH=240
+-DTFT_HEIGHT=280
+-DTFT_MOSI=23
+-DTFT_SCLK=18
+-DTFT_CS=15
+-DTFT_DC=2
+-DTFT_RST=4
+-DTFT_BL=-1
+-DTOUCH_CS=-1
+-DLOAD_GLCD=1
+-DLOAD_GFXFF=1
+-DSPI_FREQUENCY=24000000 
+</code></pre>
+<p><img alt="" src="wemos_lolin32_lite_st7789.jpg" /></p>
+<p>รูป: การทดลองต่อวงจรบนเบรดบอร์ด</p>
+<p><img alt="" src="arduino_esp32_st7789.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้จากบอร์ดทดลอง</p>
+<p>ถ้าจะลองใช้กับบอร์ด <strong>TTGO T-Display v1.1, ST7789, 135 x 240 pixels, 1.14"</strong>
+ก็มีตัวอย่างไฟล์ <code>build_opt.h</code> ดังนี้</p>
+<pre><code class="language-text">-DUSER_SETUP_LOADED=1
+-DST7789_DRIVER=1
+-DTFT_SDA_READ
+-DTFT_WIDTH=135
+-DTFT_HEIGHT=240
+-DCGRAM_OFFSET
+-DTFT_MOSI=19
+-DTFT_SCLK=18
+-DTFT_CS=5
+-DTFT_DC=16
+-DTFT_RST=23
+-DTFT_BL=4
+-DTFT_BACKLIGHT_ON=1
+-DTOUCH_CS=-1
+-DLOAD_GLCD=1
+-DLOAD_GFXFF=1
+-DSPI_FREQUENCY=40000000   
+-DSPI_READ_FREQUENCY=6000000
+</code></pre>
+<p><img alt="" src="ttgo_demo-1.jpg" /></p>
+<p><img alt="" src="ttgo_demo-2.jpg" /></p>
+<p>รูป: ตัวอย่างการทดลองโดยใช้บอร์ด <strong>TTGO Display v1.1</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="esp32-ili9341-tft-lcd">&#9655; การจำลองการทำงานของบอร์ด <strong>ESP32</strong> และโมดูล <strong>ILI9341 TFT LCD</strong><a class="headerlink" href="#esp32-ili9341-tft-lcd" title="Permanent link">#</a></h2>
@@ -376,9 +510,9 @@ Adafruit ST7735 and ST7789 Library
 TFT_eSPI
 </code></pre>
 <p><img alt="" src="wokwi_esp32_ili9341_demo-1.png" /></p>
-<p>รูป:  ตัวอย่างการจำลองการทำงาน (ใช้ไลบรารี <code>Adafruit_ILI9341</code> ในการเขียนโค้ด)</p>
+<p>รูป: ตัวอย่างการจำลองการทำงาน (ใช้ไลบรารี <code>Adafruit_ILI9341</code> ในการเขียนโค้ด)</p>
 <p><img alt="" src="wokwi_esp32_tft_espi_ili9341-1.png" /></p>
-<p>รูป:  ตัวอย่างการจำลองการทำงาน (ใช้ไลบรารี <code>TFT_eSPI</code> ในการเขียนโค้ด)</p>
+<p>รูป: ตัวอย่างการจำลองการทำงาน (ใช้ไลบรารี <code>TFT_eSPI</code> ในการเขียนโค้ด)</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -391,7 +525,7 @@ TFT_eSPI
 </ul>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2022-12-25 | Last Updated: 2022-12-29</p></div>
+<p>Created: 2022-12-25 | Last Updated: 2025-01-08</p></div>
             </div>
         </div>
 

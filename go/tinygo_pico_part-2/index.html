@@ -154,20 +154,20 @@
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial); // Wait for the Serial port to open
+  while (!Serial) { delay(10); } // Wait for the Serial port to open
   Serial.println(&quot;Arduino on Pico-RP2040 Board&quot;);
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
   int state = !digitalRead(LED_BUILTIN);
-  digitalWrite(LED_BUILTIN, state);
+  digitalWrite( LED_BUILTIN, state );
   Serial.println( String(&quot;LED: &quot;) + state );
   delay(100);
 }
 </code></pre>
-<p>ข้อสังเกต: การทำคำสั่ง <code>while (!Serial);</code> จะส่งผลให้โปรแกรมหยุดรอก่อนจนกว่าผู้ใช้จะเปิดใช้งาน
-<strong>USB-CDC / Serial</strong> ของบอร์ด เช่น เปิดพอร์ตของบอร์ด โดยใช้ <strong>Arduino Serial</strong> หลังจากโปรแกรมในฮาร์ดแวร์เริ่มทำงาน</p>
+<p>ข้อสังเกต: การทำคำสั่ง <code>while (!Serial) { delay(10); }</code> จะส่งผลให้โปรแกรมหยุดรอก่อนจนกว่าผู้ใช้จะเปิดใช้งาน
+<strong>USB-CDC / Serial</strong> ของบอร์ด เช่น เปิดพอร์ตโดยใช้ <strong>Arduino Serial Monitor</strong> หลังจากโปรแกรมในฮาร์ดแวร์เริ่มทำงาน</p>
 <p>ถ้าเขียนโค้ดสำหรับ <strong>TinyGo</strong> ก็มีตัวอย่างดังต่อไปนี้</p>
 <pre><code class="language-go">package main
 
@@ -177,11 +177,11 @@ import (
 )
 
 func main() {
-   for { // Wait until the USB-CDC is open.
+    for { // Wait until the USB-CDC is open.
         if machine.USBCDC.DTR() {
               break
         }
-    time.Sleep(10 * time.Millisecond)
+        time.Sleep(10 * time.Millisecond)
     }
     println(&quot;TinyGo on Pico-RP2040 Board&quot;)
     led := machine.LED // or machine.GP25
@@ -202,11 +202,11 @@ func main() {
 <p>โค้ดต่อไปนี้ ทำหน้าที่ตรวจสอบดูว่า มีการเปิดพอร์ต <strong>USB-CDC</strong> หรือไม่ 
 โดยอ่านค่าสัญญาณ <code>DTR</code> ถ้ายังมีค่าเป็น <code>false</code> ก็ให้รอก่อนทำคำสั่ง <code>println()</code> ถัดไป</p>
 <pre><code class="language-go">   for { // Wait until the USB-CDC is open.
-        if machine.USBCDC.DTR() {
-       break
-        }
-    time.Sleep(10 * time.Millisecond)
-    }
+      if machine.USBCDC.DTR() {
+      break
+      }
+      time.Sleep(10 * time.Millisecond)
+   }
 </code></pre>
 <p>คำสั่งของแพ็กเกจ <code>machine</code> สำหรับ <strong>TinyGo</strong> ที่เกี่ยวข้องกับ <strong>GPIO</strong> เช่น</p>
 <ul>
@@ -787,7 +787,7 @@ func main() {
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอตัวอย่างการเขียนโค้ดเพื่อเปรียบเทียบระหว่าง <strong>TinyGo</strong> และ <strong>Arduino Sketch</strong>
-สำหรับชิป <strong>RP2040 SoC</strong>  และทดลองใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico</strong>
+สำหรับชิป <strong>RP2040 SoC</strong> และทดลองใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>Raspberry Pi Pico</strong>
 เช่น การใช้งานขา <strong>GPIO</strong> สำหรับ <strong>Digital I/O</strong> การเรียกฟังก์ชันซ้ำตามคาบเวลาที่กำหนดไว้
 การสร้างสัญญาณ <strong>PWM</strong> และการเชื่อมต่อกับอุปกรณ์อื่นด้วยบัส <strong>I2C</strong> เป็นต้น</p>
 <p>&nbsp;</p>
