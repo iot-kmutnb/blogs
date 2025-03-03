@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/rms/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การหาค่า RMS สำหรับสัญญาณไฟฟ้า - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#rms" class="nav-link">การหาค่า RMS สำหรับสัญญาณไฟฟ้า</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#root-mean-square" class="nav-link">&#9655; นิยามสำหรับค่า Root Mean Square</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rms-pure-sine-wave" class="nav-link">&#9655; การหาค่า RMS ของสัญญาณรูปคลื่นไซน์ (Pure Sine Wave)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-rms-sine-wave" class="nav-link">&#9655; การเขียนโค้ด Python หาค่า RMS ของสัญญาณไซน์ (Sine Wave)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rms-resistive-load" class="nav-link">&#9655; RMS กับโหลดไฟฟ้าของตัวต้านทาน (Resistive Load)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rms-reactive-load" class="nav-link">&#9655; RMS กับโหลดไฟฟ้าเชิงซ้อน (Reactive Load)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rms-square-wave" class="nav-link">&#9655; RMS สำหรับสัญญาณรูปคลื่นสี่เหลี่ยม (Square Wave)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rms_1" class="nav-link">&#9655; RMS สำหรับสัญญาณคาบรูปแบบอื่น</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="rms">การหาค่า RMS สำหรับสัญญาณไฟฟ้า<a class="headerlink" href="#rms" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง การหาค่า <strong>RMS (Root Mean Square)</strong> ของสัญญาณไฟฟ้าแบบมีคาบเวลา
+และมีตัวอย่างการเขียนโค้ดภาษา <strong>Python</strong> เพื่อช่วยในการคำนวณค่า <strong>RMS</strong> และแสดงผลรูปคลื่นสัญญาณพื้นฐานทางไฟฟ้า</p>
+<p><strong>Keywords:</strong> <em>Root Mean Square (RMS)</em>, <em>Python</em>, <em>NumPy</em>, <em>SymPy</em></p>
+<ul>
+<li><a href="#root-mean-square">นิยามสำหรับค่า <strong>Root Mean Square</strong></a></li>
+<li><a href="#rms-pure-sine-wave">การหาค่า <strong>RMS</strong> ของสัญญาณรูปคลื่นไซน์ (<strong>Pure Sine Wave</strong>)</a></li>
+<li><a href="#python-rms-sine-wave">การเขียนโค้ด <strong>Python</strong> หาค่า <strong>RMS</strong> ของสัญญาณไซน์ (<strong>Sine Wave</strong>)</a></li>
+<li><a href="#rms-resistive-load"><strong>RMS</strong> กับโหลดไฟฟ้าของตัวต้านทาน (<strong>Resistive Load</strong>)</a></li>
+<li><a href="#rms-reactive-load"><strong>RMS</strong> กับโหลดไฟฟ้าเชิงซ้อน (<strong>Reactive Load</strong>)</a></li>
+<li><a href="#rms-square-wave"><strong>RMS</strong> สำหรับสัญญาณรูปคลื่นสี่เหลี่ยม (<strong>Square Wave</strong>)</a></li>
+<li><a href="#rms_1"><strong>RMS</strong> สำหรับสัญญาณคาบรูปแบบอื่น</a></li>
+</ul>
+<hr />
+<h2 id="root-mean-square">&#9655; นิยามสำหรับค่า Root Mean Square<a class="headerlink" href="#root-mean-square" title="Permanent link">#</a></h2>
+<p><strong>RMS</strong> (<em>Root Mean Square</em>) หรือ "รูท-มีน-สแควร์ " หมายถึง 
+รากที่สองของค่าเฉลี่ยของกำลังสองของสัญญาณในทางไฟฟ้า และสามารถใช้กับสัญญาณที่เป็นแรงดันไฟฟ้า และกระแสไฟฟ้าก็ได้
+<strong>RMS</strong> มักนำมาใช้กับสัญญาณไฟฟ้า <strong>AC</strong> และใช้เพื่อหาค่าที่แสดงถึงพลังงานไฟฟ้าของสัญญาณ <strong>AC</strong> 
+ให้เทียบเท่ากับไฟฟ้ากระแสตรง <strong>DC</strong> ได้</p>
+<p>ในทางคณิตศาสตร์ ถ้า <script type="math/tex">x(t)</script> เป็นฟังก์ชันที่เปลี่ยนแปลงตามเวลา หรือ ค่าของฟังก์ชันขึ้นกับตัวแปรอิสระเวลา
+มีค่าเป็นจำนวนจริง และกำหนดให้ <script type="math/tex">x(t)</script> เป็นฟังก์ชันที่มีคาบ กล่าวคือ <script type="math/tex">x(t+T) = x(t), T > 0</script> สำหรับเวลา <script type="math/tex">t</script> ใด ๆ การหาค่า <strong>RMS</strong> ของ <script type="math/tex">x(t)</script> ก็มีนิยามดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   \text{RMS} = \sqrt{\frac{1}{T} \int_0^T x^2(t) \, dt}
+</script>
+</p>
+<p>ซึ่งจะเห็นได้ว่า จะต้องมีการคำนวณตามลำดับดังนี้</p>
+<ol>
+<li>นำฟังก์ชัน <script type="math/tex">x(t)</script> ไปยกกำลังสองก่อน ได้เป็น <script type="math/tex">x^2(t)</script>
+</li>
+<li>อินทิเกรต <script type="math/tex">x^2(t)</script> ที่ได้จากขั้นตอนที่ 1 ในช่วงเวลา <script type="math/tex">t \in [0,T]</script> หรือ หนึ่งคาบเวลา (ในทางไฟฟ้าคือ พลังงานที่ใช้ในหนึ่งคาบเวลา)</li>
+<li>นำผลลัพธ์ที่ได้จากขั้นตอนที่ 2 ซึ่งจะได้เป็นค่าคงที่และมีค่าเป็นบวก ไปหารด้วยคาบเวลา <script type="math/tex">T</script> ซึ่งจะได้ค่าเฉลี่ย (ในทางไฟฟ้าคือ กำลังไฟฟ้าเฉลี่ยต่อหนึ่งคาบเวลา)</li>
+<li>คำนวณหารากที่สองของค่าเฉลี่ยที่ได้จากขั้นตอนที่ 3</li>
+</ol>
+<p>หากใช้วิธีการคำนวณเชิงตัวเลข (<strong>Numerical Computation</strong>)
+ก็อาจเปลี่ยนจากการหาอินทิเกรต เป็นการหาผลรวมเชิงประมาณค่า  (<strong>Summation Approximation</strong>) ดังต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \text{RMS} &\approx \sqrt{ \frac{1}{T} \sum_{n=0}^{N-1} x^2(n\Delta t) \Delta t} \\
+    &\approx \sqrt{ \frac{1}{N} \sum_{n=0}^{N-1} (x[n])^2}, \;\; \Delta t = \frac{T}{N}
+\end{align}</script>
+โดยที่ </p>
+<ul>
+<li>
+<script type="math/tex">N</script> คือ จำนวนเต็มบวก เพื่อแบ่งช่วงย่อยเท่า ๆ กันในหนึ่งคาบเวลา <script type="math/tex">T</script>
+</li>
+<li>
+<script type="math/tex">\Delta t = T/N</script> คือ ความกว้างของแต่ละช่วงเวลา</li>
+<li>
+<script type="math/tex">x(n\Delta t)</script> หรือใช้สัญลักษณ์ <script type="math/tex">x[n]</script> หมายถึง ค่าของสัญญาณ (<strong>Sampled Value</strong>) 
+ณ จุดที่เวลา <script type="math/tex">t = n \Delta t, n=0,1,2,...,(N-1)</script>
+</li>
+<li>
+<script type="math/tex">(x[n])^2</script> หมายถึง การนำค่า <script type="math/tex">x[n]</script> มายกกำลังสอง</li>
+</ul>
+<p>สมมุติว่า กำหนดให้ <script type="math/tex">x(t) = p(t)</script> ซึ่งเป็นกำลังไฟฟ้าที่เกิดขึ้นกับโหลดไฟฟ้า <strong>AC</strong> ในขณะเวลา <script type="math/tex">t</script>
+ลองมาดูรูปกราฟตัวอย่างของ <script type="math/tex">p(t)</script> และ <script type="math/tex">(p(t))^2</script> และการอินทิเกรต เพื่อนำไปสู่การคำนวณค่า <strong>RMS</strong> ของกำลังไฟฟ้า</p>
+<p><img alt="" src="integral_approx.jpg" /></p>
+<p>รูป: ตัวอย่างกราฟสำหรับ <script type="math/tex">p(t)</script> ของกำลังไฟฟ้า <strong>AC</strong> การอินทิเกรต (การหาพื้นที่ใต้กราฟ)
+ในหนึ่งคาบเวลาของฟังก์ชัน <script type="math/tex">(p(t))^2</script> และการประมาณค่าของการอินทิเกรต โดยหาผลรวมจากแท่งสี่เหลี่ยมของแต่ละช่วงย่อย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rms-pure-sine-wave">&#9655; การหาค่า RMS ของสัญญาณรูปคลื่นไซน์ (Pure Sine Wave)<a class="headerlink" href="#rms-pure-sine-wave" title="Permanent link">#</a></h2>
+<p>ยกตัวอย่างฟังก์ชันหรือสัญญาณไฟฟ้าแบบไซน์บริสุทธิ์ (<strong>Pure Sine</strong>) ตามรูปแบบของฟังก์ชัน <script type="math/tex">x(t) = A sin(\omega t)</script>,
+<script type="math/tex">\omega = 2\pi/T = 2\pi f, A > 0</script> คือ แอมพลิจูด และ <script type="math/tex">T > 0</script> คือ คาบเวลา</p>
+<p>คำนวณค่า <strong>RMS</strong> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ \text{RMS}
+   &= \sqrt{\frac{1}{T} \int_0^T x^2(t) \, dt} \\
+   &= \sqrt{\frac{1}{T} \int_0^T [A sin(\omega t)]^2 \, dt} \\
+   &= \sqrt{\frac{A^2}{T} \int_0^T \frac{1}{2}[1 - cos(2\omega t)] \, dt} \\
+   &= \sqrt{\frac{A^2}{T} \frac{1}{2} \big[t - \frac{sin(2\omega t)}{2\omega}\big]_{0}^{T}} \\
+   &= \sqrt{\frac{A^2}{T} \frac{T}{2}} \\
+   &= \frac{A}{\sqrt{2}} \approx 0.7071 = \frac{\sqrt{2}}{2} A 
+\end{align}</script>
+</p>
+<p>ดังนั้นสำหรับสัญญาณรูปคลื่นไซน์ ค่า <strong>RMS</strong> ของสัญญาณคำนวณได้จากค่าแอมพลิจูดหารด้วย <script type="math/tex">\sqrt{2}</script>
+หรือ แอมพลิจูด คูณด้วยค่าประมาณ <script type="math/tex">0.7071</script>
+</p>
+<p>ค่าที่แสดงบนระบบไฟฟ้า เช่น <strong>220V</strong> ในบ้าน เป็น ค่า <strong>RMS</strong> ไม่ใช่ค่าสูงสุด ค่าแอมพลิจูด หรือ "พีค"  (แรงดันไฟฟ้าสูงสุด)
+ก็คือ <script type="math/tex">220V / 0.7071 \approx 311V\,(peak)</script>
+</p>
+<p>ถ้าสัญญาณไซน์ มีค่า <strong>DC Offset</strong> ไม่เป็นศูนย์ จะคำนวณ ค่า <strong>RMS</strong> อย่างไร?</p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) = A_0 + A sin(\omega t) 
+</script>
+โดยที่ <script type="math/tex">A_0</script> คือ ค่า <strong>DC Offset</strong></p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  X_{rms} &= \sqrt{\frac{1}{T} \int_0^T x^2(t) \,dt} \\
+  &= \sqrt{\frac{1}{T} \int_0^T \big[A_0 + A sin(\omega t)\big]^2 \,dt} \\
+  &= \sqrt{\frac{1}{T} \int_0^T \big[A_0^2 +2 A_0 A sin(\omega t) +A^2 sin^2(\omega t)\big] \,dt}\\
+  &= \sqrt{\frac{1}{T} \big[A_0^2 T + \frac{A^2 T}{2}\big]} \\
+  &= \sqrt{ A_0^2 + \frac{A^2}{2}}
+\end{align}</script>
+</p>
+<pre><code class="language-python">import sympy as sp
+
+t = sp.Symbol('t', real=True) 
+A_0, A, omega = sp.symbols('A_0 A omega', positive=True) 
+T = 2 * sp.pi / omega # Define the period
+x_t = A_0 + A * sp.sin(omega * t) # Define the signal
+integral = sp.integrate(x_t**2, (t, 0, T))
+integral = sp.simplify(integral, rational=True, expand=True)
+rms = sp.sqrt(integral/T)
+print(rms)
+# Output:
+# sqrt(A**2/2 + A_0**2)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-rms-sine-wave">&#9655; การเขียนโค้ด Python หาค่า RMS ของสัญญาณไซน์ (Sine Wave)<a class="headerlink" href="#python-rms-sine-wave" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Python</strong>  เพื่อคำนวณหาค่า <strong>RMS</strong> ของสัญญาณ <script type="math/tex">x(t) = A sin(\omega t)</script>
+โดยใช้ <strong>SymPy Package</strong>:</p>
+<pre><code class="language-python">import sympy as sp
+
+# Define symbolic variables
+A, T, t = sp.symbols('A T t', real=True, positive=True)
+# Define the angular frequency
+omega = 2 * sp.pi / T
+# Define the signal x(t)
+x_t = A * sp.sin(omega * t)
+# Compute RMS using symbolic method
+rms_expr = sp.sqrt((1 / T) * sp.integrate(x_t**2, (t, 0, T)))
+# Simplify the expression
+rms_simplified = sp.simplify(rms_expr)
+print(&quot;RMS = &quot;, rms_simplified)
+## RMS = sqrt(2)*A/2
+</code></pre>
+<p>หากจะลองคำนวณโดยใช้วิธีเชิงตัวเลข โดยใช้ <strong>NumPy Package</strong> คำนวณหาผลรวมตามสูตร:</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \text{RMS} &\approx \sqrt{ \frac{1}{N} \sum_{n=0}^{N-1} x[n]^2}
+\end{align}</script>
+</p>
+<p>ก็มีตัวอย่างโค้ดดังนี้ โดยมีการเปรียบเทียบค่า <code>N</code> หรือจำนวนการแบ่งช่วงย่อย เช่น <code>100</code>, <code>500</code>
+ไปจนถึง <code>5000</code></p>
+<pre><code class="language-python">import numpy as np
+
+# Approximate RMS using NumPy
+f = 50     # Set the frequency in Hz
+T = 1 / f  # Set the period in second
+omega = 2 * np.pi * f # Define the angular frequency
+
+print( f&quot;RMS (exact)   = A * {np.sqrt(2)/2:.6f}&quot; )
+for N in [100, 500, 2000, 5000]: # Use different numbers of sample points
+    # Compute the sample points
+    ts = np.linspace(0, T, N)
+    # Compute the samples of the signal
+    x_t = np.sin(omega * ts) 
+    # Compute RMS (approx.)
+    rms_approx = np.sqrt( np.sum(x_t**2) / N ) 
+    print( f&quot;N = {N:4d}, RMS = A * {rms_approx:.6f}&quot; )
+
+# Output
+# RMS (exact)   = A * 0.707107
+# N =  100, RMS = A * 0.703562
+# N =  500, RMS = A * 0.706399
+# N = 2000, RMS = A * 0.706930
+# N = 5000, RMS = A * 0.707036
+</code></pre>
+<p>แม้ว่าการเพิ่มค่าของ <code>N</code> ให้มากขึ้นตามลำดับ จะทำให้ ค่า <strong>RMS</strong> ใกล้เคียงค่าที่ถูกต้องมากขึ้น แต่ก็ยังไม่ใช่วิธีที่ดี
+ลองมาเปรียบเทียบวิธีกาารคำนวณเชิงตัวเลขอีกวิธีหนึ่ง โดยใช้การประมาณค่าอินทิกรัล (<strong>Numerical Integration</strong>)</p>
+<p>วิธีการหนึ่งที่สามารถนำมาใช้ได้ ชื่อว่า <strong>Simpson's 3/8 Rule</strong>  หากจะคำนวณค่าประมาณของอินทิกรัล <script type="math/tex">I</script>
+ของฟังก์ชัน <script type="math/tex">f(t)</script> ในช่วง <script type="math/tex">t \in [a,b]</script>
+</p>
+<p>
+<script type="math/tex; mode=display">
+   I = \int_{a}^{b} f(t) dt
+</script>
+และคำนวณโดยแบ่งเป็นช่วงย่อย <script type="math/tex">h = (b-a)/N</script> และ <script type="math/tex">N</script> เป็นจำนวนเต็มบวก หารด้วย 3 ลงตัว</p>
+<p>ตามวิธีการของ <strong>Simpson's 3/8 Rule</strong> ก็จะคำนวณค่าประมาณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  I \approx \frac{3}{8}h \Big[ f[0]
+  + 3\sum_{i=1, ...\\i\,mod\,3 \neq 0}\!\!\! f[i]
+  + 2\sum_{i=3, ...\\i\,mod\,3 = 0}\!\!\! f[i]
+  + f[N] \Big]
+</script>
+ซึ่งมี <script type="math/tex">f[i]</script> คือ ค่าของฟังก์ชันที่ตำแหน่ง <script type="math/tex">t = a + i\cdot h</script>:</p>
+<ul>
+<li>
+<script type="math/tex">i=0</script>: <script type="math/tex">f[0] = f(a)</script>
+</li>
+<li>
+<script type="math/tex">i=N</script>: <script type="math/tex">f[N] = f(b)</script>
+</li>
+</ul>
+<p>ดังนั้นการคำนวณค่าประมาณ <strong>RMS</strong> สำหรับสัญญาณรูปไซน์ <script type="math/tex">x(t)</script>
+มีตัวอย่างการเขียนโค้ดดังนี้</p>
+<pre><code class="language-python">import numpy as np
+
+# Approximate RMS using NumPy
+f = 50     # Set the frequency in Hz
+T = 1 / f  # Set the period in second
+omega = 2 * np.pi * f # Define the angular frequency
+
+# Apply Simpson's 3/8 rule
+for N in [9, 30, 300]: #  N must be a multiple of 3
+    h   = T / N
+    ts  = np.linspace(0, T, N + 1) # time points
+    x_t = np.sin(omega*ts)         # sample values
+    f   = x_t ** 2                 # squared values
+    # Compute integral using Simpson's 3/8 rule
+    approx_integral = (3 * h / 8) * (
+        f[0] 
+        + 3 * np.sum( f[1:N:3] + f[2:N:3] )
+        + 2 * np.sum( f[3:N:3] )
+        + f[N]
+    )
+    rms_approx = np.sqrt( approx_integral / T )
+    print( f&quot;N = {N:3d}, RMS: A * {rms_approx:.6f}&quot; )
+
+# Output
+# N =   9, RMS: A * 0.707107
+# N =  30, RMS: A * 0.707107
+# N = 300, RMS: A * 0.707107
+</code></pre>
+<p>จากเอาต์พุต จะเห็นได้ว่า การแบ่งจำนวนช่วงย่อยในหนึ่งคาบเวลา หากใช้ค่า<code>N</code> ไม่มาก
+(เป็นเลขจำนวนเต็มบวกและหาร 3 ลงตัว) ก็จะได้ค่า <strong>RMS</strong> ใกล้เคียงกับค่าที่ถูกต้อง</p>
+<p>ในการคำนวณตามวิธีการของ <strong>Simpson's 3/8 Rule</strong><br />
+ก็อาจใช้วิธีเรียกใช้ฟังก์ชันที่มีอยู่ใน <strong>SciPy Package</strong> แล้วก็ได้ ตามตัวอย่างต่อไปนี้</p>
+<pre><code class="language-python">import numpy as np
+from scipy.integrate import simpson
+
+# Approximate RMS using NumPy
+f = 50  # Set the frequency in Hz
+T = 1 / f  # Set the period in second
+omega = 2 * np.pi * f # Define the angular frequency
+
+# &quot;N must be a multiple of 3 for Simpson's 3/8 rule.&quot;
+for N in [9, 30, 300]:
+    ts  = np.linspace(0, T, N + 1)  # time points
+    x_t = np.sin(omega*ts)          # sample values
+    f   = x_t ** 2                  # squared values
+    integral_approx = simpson( f, ts )  # Use SciPy's Simpson integration
+    rms_approx = np.sqrt( integral_approx / T )
+    print( f&quot;N = {N:3d}, RMS: A * {rms_approx:.6f}&quot; )
+
+# Output
+# N =   9, RMS: A * 0.711564
+# N =  30, RMS: A * 0.707107
+# N = 300, RMS: A * 0.707107
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rms-resistive-load">&#9655; RMS กับโหลดไฟฟ้าของตัวต้านทาน (Resistive Load)<a class="headerlink" href="#rms-resistive-load" title="Permanent link">#</a></h2>
+<p>ในทางไฟฟ้า หากพิจารณาโหลดไฟฟ้าเป็นตัวต้านทาน (<strong>Resistive Load</strong>) 
+ที่มีความสัมพันธ์ระหว่างแรงดันไฟฟ้าและกระแสไฟฟ้าตามกฎของโอห์ม
+และให้ <script type="math/tex">x(t)</script> เป็นแรงดันไฟฟ้า <script type="math/tex">v(t)</script> ที่ตกคร่อมที่ตัวต้านทาน <script type="math/tex">R</script>
+หรือ เป็นกระแสไฟฟ้าที่ไหลผ่านตัวต้านทาน <script type="math/tex">R</script> (ความต้านทานคงที่) 
+กำลังไฟฟ้าที่เกิดขึ้นกับตัวต้านทาน ในขณะเวลาใด จะได้เป็น</p>
+<p>
+<script type="math/tex; mode=display">
+    p(t) = v(t) \cdot i(t) = \frac{v^2(t)}{R} = i^2(t) \cdot R
+</script>
+</p>
+<p>ดังนั้น ถ้าต้องการหากำลังไฟฟ้าเฉลี่ย หรือคำนวณจากพลังงานไฟฟ้าที่ใช้ไปในช่วงเวลา <script type="math/tex">t = 0..T</script> (หนึ่งคาบเวลา)
+ก็คำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  P &= \frac{1}{T} \int_{0}^{T} \frac{v^2(t)}{R} \, dt  \\
+    &= \frac{1}{R} \cdot \Big(\frac{1}{T} \int_{0}^{T} v^2(t) \, dt\Big) \\
+    &= \frac{1}{R} \cdot V^2_{rms} 
+\end{align}</script>
+และ
+<script type="math/tex; mode=display">\begin{align}
+  P &= \frac{1}{T} \int_{0}^{T} i^2(t) \cdot R \, dt \\
+    &= R \cdot \Big( \frac{1}{T} \int_{0}^{T} i^2(t) \, dt\Big) \\
+    &= R \cdot I^2_{rms}
+\end{align}</script>
+</p>
+<p>สังเกตว่าส่วนที่อยู่ในวงเล็บคือ ค่าเฉลี่ยกำลังสองของแรงดันไฟฟ้า หรือ กระแสไฟฟ้า ตามลำดับ
+ดังนั้นอาจสรุปได้ว่า กำลังไฟฟ้าที่เกิดขึ้นกับตัวต้านทานเกี่ยวข้องกับค่า <strong>RMS</strong> ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  P_{resistive} = V_{rms} \cdot I_{rms}
+</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rms-reactive-load">&#9655; RMS กับโหลดไฟฟ้าเชิงซ้อน (Reactive Load)<a class="headerlink" href="#rms-reactive-load" title="Permanent link">#</a></h2>
+<p>แต่หากว่า โหลดไฟฟ้ามีลักษณะหรือคุณสมบัติแบบตัวเก็บประจุ (<strong>C</strong>) หรือตัวเหนี่ยวนำ (<strong>L</strong>) 
+หรือ เรียกว่า "โหลดเชิงซ้อน" (<strong>Reactive Load</strong>)
+และใช้กับไฟฟ้า <strong>AC</strong> ที่เป็นรูปคลื่นไซน์เท่านั้น และมีความถี่คงที่ เช่น <strong>50Hz</strong>
+การคำนวณ ก็จะแตกต่างจากกรณีของตัวต้านทาน และจะต้องพิจารณา
+"ตัวประกอบกำลัง" (<strong>Power Factor, PF</strong>) ด้วย</p>
+<p>กำหนดให้ <script type="math/tex">v(t)</script> มีหน่วยเป็น <strong>V</strong>) และ <script type="math/tex">i(t)</script> มีหน่วยเป็น <strong>A</strong>
+เป็นไปตามฟังก์ชันรูปคลื่นไซน์ มีความถี่เท่ากัน แต่มีค่าเฟสต่างกันได้
+<script type="math/tex; mode=display">
+   v(t) = V_m sin(\omega t) \\
+   i(t) = I_m sin(\omega t + \theta)
+</script>
+โดยที่</p>
+<ul>
+<li>
+<script type="math/tex">\omega = 2\pi/T = 2\pi f</script> เป็นความถี่เชิงมุม (คงที่)</li>
+<li>
+<script type="math/tex">\theta</script> คือ มุมเฟสระหว่างแรงดันและกระแสไฟฟ้าที่เกิดขึ้นกับตัวโหลดไฟฟ้า</li>
+<li>
+<script type="math/tex">V_m</script> คือ แอมพลิจูดของแรงดันไฟฟ้า</li>
+<li>
+<script type="math/tex">I_m</script> คือ แอมพลิจูดของกระแสไฟฟ้า</li>
+</ul>
+<p>ตัวอย่างโค้ด <strong>Python</strong> สำหรับการแสดงรูปคลื่นสัญญาณ <strong>AC</strong>
+สำหรับแรงดันไฟฟ้า <script type="math/tex">v(t)</script> กระแสไฟฟ้า <script type="math/tex">i(t)</script> และกำลังไฟฟ้า <script type="math/tex">p(t)</script>
+</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants
+f = 50  # Frequency in Hz
+T = 1 / f  # Period
+phi = np.deg2rad(30)  # Phase shift in radians
+
+# Time array for two periods
+T_total = 2 * T # Total time for two periods
+num_points = 1000  # Number of points for smooth plotting
+t = np.linspace(0, T_total, num_points)
+
+# Voltage and current waveforms
+Vm = 1.0 # Amplitude for voltage [V]
+Im = 1.0 # Amplitude for current [A]
+v_t = Vm * np.sin(2 * np.pi * f * t)
+i_t = Im * np.sin(2 * np.pi * f * t + phi)
+p_t = v_t * i_t  # Instantaneous power
+
+# Create subplots
+fig, axs = plt.subplots(2, 1, figsize=(10, 6))
+
+# First subplot: Voltage, Current, and Instantaneous Power
+axs[0].plot(t, v_t, label='$v(t) = sin(2\pi f\, t)$', color='b')
+axs[0].plot(t, i_t, label='$i(t) = sin(2\pi f\, t + 30°)$', color='r')
+axs[0].set_xlabel('Time (s)')
+axs[0].set_ylabel('Amplitude')
+axs[0].set_title('Voltage, Current, and Instantaneous Power')
+axs[0].legend(loc='upper right')
+axs[0].grid()
+
+# Second subplot: Instantaneous Power
+axs[1].plot(t, p_t, label='$p(t)$', color='purple')
+axs[1].fill_between(t, p_t, where=(t &lt;= 2*T), color='purple', alpha=0.3)
+axs[1].set_xlabel('Time (s)')
+axs[1].set_ylabel('Amplitude')
+axs[1].set_title('Instantaneous Power $p(t)$')
+axs[1].legend()
+axs[1].grid()
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+<p><img alt="" src="ac_power.jpg" /></p>
+<p>รูป: ตัวอย่างการแสดงรูปคลื่นสัญญาณ (สำหรับเวลาในช่วง <script type="math/tex">t \in [0,2T]</script> หรือ 2 คาบเวลา)</p>
+<p>กำลังไฟฟ้าในเวลาใด ๆ <script type="math/tex">p(t)</script> (<strong>Instantaneous Power</strong>) คำนวณได้จาก</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+ p(t) 
+   &= v(t) \cdot i(t) \\
+   &= V_m sin(\omega t) \cdot I_m sin(\omega t + \theta) \\
+   &= V_m I_m sin(\omega t) sin(\omega t + \theta) \\
+\end{align}</script>
+</p>
+<p>หากใช้สูตร</p>
+<p>
+<script type="math/tex; mode=display">
+  sin(A) sin(B) = \frac{1}{2}[cos(A-B) - cos(A+B)]
+</script>
+</p>
+<p>ก็เขียนสมการสำหรับ <script type="math/tex">p(t)</script> ได้เป็น</p>
+<p>
+<script type="math/tex; mode=display">
+   p(t) = \frac{V_m I_m}{2}[cos(-\theta) - cos(2\omega t + \theta)] 
+</script>
+</p>
+<p>และกำลังไฟฟ้าเฉลี่ย ก็หาได้จาก</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+   P_{reactive} &= \frac{1}{T} \int_{0}^{T} p(t) \, dt 
+        = \frac{1}{T} \int_{0}^{T} v(t) \cdot i(t) \, dt \\
+     &= \frac{ V_m I_m}{2}\Big[ \frac{1}{T} \int_{0}^{T}[cos(\theta) - cos(2\omega t + \theta) ]\,dt \Big] \\
+     &= \frac{V_m I_m}{2} \,\frac{cos(\theta) T + 0}{T} \\
+     &= \frac{V_m}{\sqrt{2}} \frac{I_m}{\sqrt{2}}\, cos(\theta) \\
+     &= V_{rms}\, I_{rms}\, cos(\theta)
+\end{align}</script>
+</p>
+<p>และ <script type="math/tex">cos(\theta)</script> ก็คือ ค่าตัวประกอบกำลัง (<strong>Power Factor</strong>) </p>
+<p>ในกรณีที่โหลดไฟฟ้าเป็นตัวต้านทาน (<strong>Resistive Load</strong>) แรงดันและกระแสไฟฟ้ามีมุมเฟสที่ต่างกันเป็น <script type="math/tex">0^\circ</script> ดังนั้น
+ค่าตัวประกอบกำลัง จะมีค่าเป็น <script type="math/tex">cos(0) = 1</script>
+</p>
+<p>ลองเปรียบเทียบกับการเขียนโค้ดโดยใช้ <strong>SymPy Package</strong> ดังนี้</p>
+<pre><code class="language-python">import sympy as sp
+
+# Define symbols
+t, T, V_m, I_m, theta = sp.symbols('t T V_m I_m theta', 
+                                   real=True, positive=True)
+omega = 2 * sp.pi / T  # Angular frequency
+# Define voltage and current functions
+v_t = V_m * sp.sin(omega * t)
+i_t = I_m * sp.sin(omega * t + theta)
+p_t = v_t * i_t  # Instantaneous power
+# Compute average power over one period
+P_avg = (1 / T) * sp.integrate(p_t, (t, 0, T))
+# Display the result
+print( &quot;p(t) =&quot;, sp.simplify(p_t) ) # Instantaneous Power
+print( &quot;P =&quot;, sp.simplify(P_avg) )  # Average Power
+# Output
+# p(t) = I_m*V_m*(cos(theta) - cos(theta + 4*pi*t/T))/2
+# P = I_m*V_m*cos(theta)/2
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rms-square-wave">&#9655; RMS สำหรับสัญญาณรูปคลื่นสี่เหลี่ยม (Square Wave)<a class="headerlink" href="#rms-square-wave" title="Permanent link">#</a></h2>
+<p>กำหนด <script type="math/tex">x(t)</script> เป็นสัญญาณที่มีคาบเวลา <script type="math/tex">T</script> และในหนึ่งคาบมีการแบ่งค่าออกเป็น 2 ช่วง ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) = \begin{cases}
+    V_{max}, \; 0 \leq t < D\cdot T \\
+    V_{min}, \; D\cdot T \leq t < T
+ \end{cases}
+</script>
+โดยที่ <script type="math/tex">0 \leq D < 1</script> ก็คือ ค่า <strong>Duty Cycle</strong> ของสัญญาณ</p>
+<p>การจำแนกประเภทของสัญญาณสี่เหลี่ยม:</p>
+<ul>
+<li><strong>Unipolar square wave</strong>: <script type="math/tex">V_{max} = A, V_{min} = 0</script>
+</li>
+<li><strong>Bipolar square wave</strong>: <script type="math/tex">V_{max} = A, V_{min} = -A</script>
+</li>
+</ul>
+<p>ตัวอย่างการเขียนโค้ด <strong>Python</strong>  เพื่อคำนวณค่า <strong>RMS</strong> และแสดงรูปกราฟ มีดังนี้</p>
+<pre><code class="language-python">import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define symbolic variables
+t, A, T, D = sp.symbols('t A T D', real=True, positive=True)
+
+# Define square wave function explicitly
+def compute_rms_square(T, D, Vmax, Vmin):
+    x_t = sp.Piecewise((Vmax, t % T &lt; D * T), (Vmin, True))
+    # Compute RMS by integrating over one period
+    integral = sp.integrate( Vmax**2, (t, 0, D*T) ) \
+             + sp.integrate( Vmin**2, (t, D*T, T) ) 
+    # Compute RMS
+    x_rms = sp.sqrt((1/T) * integral).simplify()
+    return x_rms
+
+# Compute RMS values
+rms_unipolar = compute_rms_square(T, D, A, 0)
+print(f&quot;RMS of a square wave (unipolar): {rms_unipolar}&quot;)
+rms_bipolar = compute_rms_square(T, D, A, -A)
+print(f&quot;RMS of a square wave (bipolar): {rms_bipolar}&quot;)
+
+# Define numerical values for plotting
+A_val, T_val, D_val = 1.0, 1.0, 0.5
+N = 1000
+ts = [0, 4*T_val]
+t_vals = np.linspace(ts[0], ts[1] , N)
+
+# Generate square wave functions
+x_unipolar = np.where((t_vals % T_val) &lt; (D_val * T_val), A_val, 0)
+x_bipolar  = np.where((t_vals % T_val) &lt; (D_val * T_val), A_val, -A_val)
+
+# Compute RMS values numerically
+rms_unipolar_val = float(rms_unipolar.subs({A: A_val, T: T_val, D: D_val}))
+rms_bipolar_val = float(rms_bipolar.subs({A: A_val, T: T_val, D: D_val}))
+
+# Plot subplots
+fig, axs = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+# Plot Unipolar Square Wave
+axs[0].plot(t_vals, x_unipolar, label=&quot;Unipolar Square Wave&quot;, color='b')
+axs[0].axhline(y=rms_unipolar_val, color='r',
+               linestyle='--', label=f'RMS = {rms_unipolar_val:.4f}')
+axs[0].set_ylabel(&quot;Amplitude&quot;)
+axs[0].set_title(&quot;Unipolar Square Wave and RMS&quot;)
+axs[0].legend()
+axs[0].grid()
+
+# Plot Bipolar Square Wave
+axs[1].plot(t_vals, x_bipolar, label=&quot;Bipolar Square Wave&quot;, color='g')
+axs[1].axhline(y=rms_bipolar_val, color='r', 
+               linestyle='--', label=f'RMS = {rms_bipolar_val:.4f}')
+axs[1].set_xlabel(&quot;Time (t)&quot;)
+axs[1].set_ylabel(&quot;Amplitude&quot;)
+axs[1].set_title(&quot;Bipolar Square Wave and RMS&quot;)
+axs[1].legend()
+axs[1].grid()
+
+plt.tight_layout()
+plt.show()
+# Output:
+# RMS of a square wave (unipolar): A*sqrt(D)
+# RMS of a square wave (bipolar): A
+</code></pre>
+<p><img alt="" src="square_rms.jpg" /></p>
+<p>รูป: การแสดงคลื่นสัญญาณ <strong>Square</strong> โดยใช้ค่าพารามิเตอร์  <code>A=1.0</code>, <code>T=1.0</code>, <code>D=0.5</code></p>
+<p>สังเกตได้ว่า ในกรณีของสัญญาณสี่เหลี่ยมที่เป็น <strong>Unipolar Square Wave</strong> มีค่าอยู่สองระดับคือ
+<strong>0</strong> และ <strong>A</strong> หากมีค่า <strong>Duty Cycle = 50%</strong> หรือ <strong>D=1/2</strong>
+จะได้ค่า <strong>RMS</strong> เท่ากับ <script type="math/tex">\approx 0.7071 A</script> ซึ่งตรงกับค่า <strong>RMS</strong> ของสัญญาณไซน์ที่มีแอมพลิจูด <script type="math/tex">A</script>
+</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rms_1">&#9655; RMS สำหรับสัญญาณคาบรูปแบบอื่น<a class="headerlink" href="#rms_1" title="Permanent link">#</a></h2>
+<p>1) สัญญาณเรียงกระแสแบบเต็มคลื่น <strong>Full-Wave Rectified Sine</strong>:</p>
+<p>
+<script type="math/tex; mode=display">
+   x(t) = |A sin(\omega t)|, \; \omega = 2 \pi / T
+</script>
+</p>
+<p>สัญญาณนี้ มีคาบเท่ากับ <script type="math/tex">T/2</script> และค่า <strong>RMS</strong> ของสัญญาณ สามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \text{RMS} 
+  &= \sqrt{ \frac{1}{(T/2)} \int_{0}^{T/2} \! A^2 sin^2(\omega t)\,dt}\\
+  &= \sqrt{ \frac{2A^2}{T} \int_{0}^{T/2}  \! \frac{1}{2}\big[1 - cos(2\omega t)\big]\,dt}\\
+  &= \sqrt{ \frac{2A^2}{T} \frac{1}{2} \big[t - \frac{sin(2\omega t)}{2\omega}\big]_{0}^{T/2}}\\
+  &= \sqrt{ \frac{2A^2}{T} \frac{T}{4} }\\
+  &= \frac{A}{\sqrt{2}}
+\end{align}</script>
+</p>
+<p><img alt="" src="full_wave_rectified_sine.jpg" /></p>
+<p>รูป: สัญญาณ <strong>Full-Wave Rectified Wave</strong></p>
+<p>&nbsp;</p>
+<p>2) สัญญาณเรียงกระแสแบบครึ่งคลื่น <strong>Half-wave Rectified Sine Wave</strong></p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) = \begin{cases}
+   | A sin(\omega t) |, \; 0 \leq t \mod T < T/2 \\
+   0, \; \mbox{otherwise} 
+\end{cases}
+</script>
+สัญญาณนี้ มีคาบเท่ากับ <script type="math/tex">T</script> และค่า <strong>RMS</strong> ของสัญญาณ สามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \text{RMS} 
+  &= \sqrt{ \frac{1}{T} \int_{0}^{T/2} \! A^2 sin^2(\omega t)\,dt}\\
+  &= \sqrt{ \frac{A^2}{T} \int_{0}^{T/2} \! \frac{1}{2}\big[1 - cos(2\omega t)\big]\,dt}\\
+  &= \sqrt{ \frac{A^2}{T} \frac{1}{2} \big[t - \frac{sin(2\omega t)}{2\omega}\big]_{0}^{T/2}}\\
+  &= \sqrt{ \frac{A^2}{T} \frac{T}{4} }\\
+  &= \frac{A}{2}
+\end{align}</script>
+</p>
+<p><img alt="" src="half_wave_rectified_sine.jpg" /></p>
+<p>รูป: สัญญาณ <strong>Half-Wave Rectified Sine</strong></p>
+<p>&nbsp;</p>
+<p>3) สัญญาณฟันเลื่อย <strong>Sawtooth Wave</strong></p>
+<p>
+<script type="math/tex; mode=display">
+ x(t) = \begin{cases}
+     \frac{A}{T} t, \; 0 \leq t < T \\
+     x(t \mod T), \; \mbox{otherwise}
+\end{cases}
+</script>
+สัญญาณนี้ มีคาบเท่ากับ <script type="math/tex">T</script> และค่า <strong>RMS</strong> ของสัญญาณ สามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \text{RMS} 
+  &= \sqrt{ \frac{1}{T} \int_{0}^{T} \! \big(\frac{A}{T}t \big)^2\,dt}\\
+  &= \sqrt{ \frac{1}{T} \frac{A^2}{T^2} \big[ \frac{t^3}{3}\big]_{0}^{T} }\\
+  &= \frac{A}{\sqrt{3}}
+\end{align}</script>
+</p>
+<p><img alt="" src="sawtooth_wave.jpg" /></p>
+<p>รูป: สัญญาณ <strong>Sawtooth Wave</strong></p>
+<p>&nbsp;</p>
+<p>4) สัญญาณคลื่นสามเหลี่ยม <strong>Triangular Wave</strong></p>
+<p>
+<script type="math/tex; mode=display">
+  x(t) =
+  \begin{cases}
+   \frac{2 A}{T} t,      & 0 \leq t\mod T < \frac{T}{2} \\
+   \frac{2 A}{T} (T - t), & \frac{T}{2} \leq t\mod T < T
+\end{cases}
+</script>
+สัญญาณนี้ มีคาบเท่ากับ <script type="math/tex">T</script> และค่า <strong>RMS</strong> ของสัญญาณ สามารถคำนวณได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \text{RMS}
+  &= \sqrt{ \frac{1}{T} \int_{0}^{T/2} \frac{4 A^2}{T^2} t^2\,dt 
+          + \frac{1}{T} \int_{T/2}^{T} \frac{4 A^2}{T^2} (T - t)^2 }\,dt \\
+  &= \sqrt{ \frac{4 A^2}{T^3} \big[\frac{t^3}{3}]_{0}^{T/2} 
+          + \frac{4 A^2}{T^3} \big[-\frac{(T - t)^3}{3}\big]_{T/2}^{T} } \\
+  &= \sqrt{ \frac{4 A^2}{T^3} \frac{T^3}{3\cdot 8} 
+          + \frac{4 A^2}{T^3} \frac{(T^3}{3\cdot 8} } \\
+  &= \sqrt{ \frac{A^2}{3} } \\
+  &= \frac{A}{\sqrt{3}} \\
+\end{align}</script>
+</p>
+<p><img alt="" src="triangular_wave.jpg" /></p>
+<p>รูป: สัญญาณ <strong>Triangular Wave</strong></p>
+<p><strong>Python Code</strong> สำหรับการแสดงรูปคลื่นสัญญาณ</p>
+<ul>
+<li><a href="full_wave_rectified_sine.py"><code>full_wave_rectified_sine.py</code></a></li>
+<li><a href="half_wave_rectified_sine.py"><code>half_wave_rectified_sine.py</code></a></li>
+<li><a href="sawtooth_wave.py"><code>sawtooth_wave.py</code></a></li>
+<li><a href="triangular_wave.py"><code>triangular_wave.py</code></a></li>
+</ul>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p><strong>RMS</strong> หรือ ค่ารากที่สองของค่าเฉลี่ยกำลังสอง เป็นค่าที่สำคัญในการวิเคราะห์สัญญาณไฟฟ้า
+โดยเฉพาะในกรณีไฟฟ้ากระแสสลับ (<strong>AC</strong>) มัลติมิเตอร์ดิจิทัลแบบ <strong>True-RMS</strong> ที่ใช้วัดแรงดันและกระแส <strong>AC</strong>
+มักแสดงผลในรูปของ <strong>RMS</strong> เพราะเป็นค่าที่แสดงถึงพลังงานที่แท้จริงของสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-03-01 | Last Updated: 2025-03-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
