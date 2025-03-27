@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/dsp/python_audio/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการเขียนโค้ด Python เพื่ออ่านข้อมูลเสียงจากไมโครโฟน - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#python" class="nav-link">ตัวอย่างการเขียนโค้ด Python เพื่ออ่านข้อมูลเสียงจากไมโครโฟน</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#pyaudio" class="nav-link">&#9655; การทดลองใช้ไลบรารี PyAudio</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การแสดงรูปคลื่นสัญญาณเสียงในโดเมนเวลา</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; การแสดงรูปคลื่นสัญญาณเสียงในโดเมนเวลาและความถี่</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#wav" class="nav-link">&#9655; การแสดงรูปคลื่นสัญญาณเสียงและบันทึกข้อมูลลงไฟล์ .wav</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#udp" class="nav-link">&#9655; การสื่อสารข้อมูลเสียงระหว่างคอมพิวเตอร์ด้วยโพรโตคอล UDP</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="python">ตัวอย่างการเขียนโค้ด Python เพื่ออ่านข้อมูลเสียงจากไมโครโฟน<a class="headerlink" href="#python" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="pyaudio">&#9655; <strong>การทดลองใช้ไลบรารี PyAudio</strong><a class="headerlink" href="#pyaudio" title="Permanent link">#</a></h2>
+<p>โค้ด <strong>Python</strong> ต่อไปนี้สาธิตการใช้คำสั่งหรือฟังก์ชันของ <a href="https://pypi.org/project/PyAudio/"><strong>PyAudio</strong></a>
+โดยให้แสดงรายการของอุปกรณ์อินพุตในระบบ เช่น อินพุตจากไมโครโฟน (<strong>Microphone</strong>) 
+ซึ่งอาจจะเป็น <strong>Built-in Microphone</strong> หรือ <strong>USB Microphone</strong> หรือ <strong>Bluetooth Microphone</strong> ก็ได้</p>
+<p>ก่อนทดลองใช้โค้ดตัวอย่าง  แนะนำใช้ <strong>VS Code IDE</strong> และติดตั้ง
+<a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python"><strong>Python Extension for Visual Studio Code (by Microsoft)</strong></a>
+และให้สร้างไดเรกทอรีใหม่ และสร้าง <strong>Python Virtual Environment</strong> เพื่อติดตั้งแพ็คเกจต่าง ๆ ที่จะต้องใช้ต่อไปนี้</p>
+<pre><code class="language-text">$ pip3 install pyaudio matplotlib numpy
+</code></pre>
+<p>ในกรณีที่ใช้ระบบปฏิบัติการ <strong>Ubuntu</strong> (เช่น <strong>22.04</strong>)
+จะต้องมีการติดตั้งไลบรารีสำหรับ <strong>Linux</strong> ดังนี้ ก่อนติดตั้ง <strong>PyAudio</strong></p>
+<pre><code class="language-text">$ sudo apt install portaudio19-dev
+</code></pre>
+<p>ในบทความนี้ ได้ลองใช้ <strong>PyAudio</strong> เวอร์ชัน <strong>v0.2.14</strong> ร่วมกับ <strong>Python 3.10.10</strong>
+และทดลองเปิดใช้งานไมโครโฟนของระบบที่มีการตั้งค่าตัวเลือกไว้เป็น <strong>default</strong></p>
+<ul>
+<li>มีการตั้งค่าอัตราในการชักตัวอย่าง (<strong>Sample Rate</strong>) ให้เท่ากับ <strong>16kHz</strong></li>
+<li>เลือกช่องสัญญาณเสียงแบบ <strong>Mono</strong> ไม่ใช่ <strong>Stereo</strong> ข้อมูลที่ได้จะเป็นเลขจำนวนเต็มขนาด 16 บิต
+(<code>int16</code>) </li>
+<li>อ่านข้อมูลมาเก็บไว้ในบัฟเฟอร์ที่มีความจุ (<strong>Buffer Length</strong>) เท่ากับ  1024
+ข้อมูลเหล่านี้จะถูกแปลงให้เป็นอาร์เรย์ของข้อมูลแบบ <code>np.int16</code> ด้วย <strong>NumPy Array</strong></li>
+</ul>
+<pre><code>import pyaudio
+import numpy as np
+
+# Create PyAudio instance
+p = pyaudio.PyAudio()
+
+# List all available devices and print them
+default_device_index = None
+device_count = p.get_device_count()
+print(&quot;\n\nInput device list: &quot;)
+for i in range(device_count):
+    device_info = p.get_device_info_by_index(i)
+    print( f&quot;- Device {i}: {device_info['name']}&quot;, 
+           f&quot;Input Channels: {device_info['maxInputChannels']}&quot; )
+    if device_info['name'] == 'default':
+        default_device_index = i
+
+# Audio stream parameters
+FORMAT      = pyaudio.paInt16  # 16-bit audio format
+CHANNELS    = 1                # Mono audio
+SAMPLE_RATE = 16000            # Sample rate (16kHz)
+BUF_LEN     = 1024             # Number of frames per buffer
+GAIN        = 2.0              # Amplification gain factor
+
+# Try to open the selected input device
+# Open an audio stream for reading (microphone input)
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=SAMPLE_RATE,
+                input=True,
+                input_device_index=default_device_index,                
+                frames_per_buffer=BUF_LEN)
+
+if stream:
+    print(&quot;Try to read audo samples...&quot;)
+    audio_data = np.frombuffer(stream.read(BUF_LEN), dtype=np.int16)
+    print( audio_data )
+    stream.close()
+
+print( 'Done' )
+</code></pre>
+<p><img alt="" src="vscode_pyaudio-1.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้ <strong>VS Code IDE</strong> และรันโค้ดตัวอย่าง</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การแสดงรูปคลื่นสัญญาณเสียงในโดเมนเวลา</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดถัดไป สาธิตการอ่านข้อมูลเสียง ชุดละ 1024 ตัวเลขมีขนาด 16 บิต แล้วนำมาแสดงผลเป็นรูปกราฟสัญญาณเสียงตามลำดับ
+โดยใช้คำสั่งของ <strong>matplotlib</strong> และใช้ <strong>TkInter</strong> สำหรับส่วนแสดงผลเชิงกราฟสำหรับการทำงานของ <strong>Python</strong>
+ข้อมูลเสียงและกราฟ จะถูกอัปเดทและแสดงผลทุก ๆ 20 มิลลิวินาที</p>
+<pre><code>import warnings
+warnings.filterwarnings(&quot;ignore&quot;) # Suppress all warnings
+
+import sys
+import pyaudio
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
+
+# Audio stream parameters
+FORMAT      = pyaudio.paInt16  # 16-bit audio format
+CHANNELS    = 1                # Mono audio
+SAMPLE_RATE = 16000            # Sample rate (16kHz)
+BUF_LEN     = 1024             # Number of frames per buffer
+GAIN        = 4.0              # Amplification gain factor
+
+# Create PyAudio instance
+p = pyaudio.PyAudio()
+
+# Open an audio stream for reading (microphone input)
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=SAMPLE_RATE,
+                input=True,
+                input_device_index=None,
+                frames_per_buffer=BUF_LEN)
+
+# Set the value range (16-bit audio samples): y_min and y_max
+value_range = [-2**15, 2**15]  
+
+# Create a subplot
+fig, ax = plt.subplots(figsize=(10, 6))
+x = np.arange(0, BUF_LEN)
+line, = ax.plot(x, np.random.rand(BUF_LEN))
+ax.set_ylim(value_range[0], value_range[1])
+ax.set_xlim(0, BUF_LEN)
+ax.grid(True, linestyle='--', color='gray', linewidth=0.5)
+ax.set_xlabel(&quot;Sample Index&quot;)  # X-axis label
+ax.set_ylabel(&quot;Amplitude&quot;)  # Y-axis label
+
+# Set up the Tkinter window
+root = tk.Tk()
+root.title(&quot;Real-Time Audio Waveform&quot;)
+#root.geometry(&quot;1024x576&quot;)
+
+# Embed Matplotlib figure into Tkinter window using FigureCanvasTkAgg
+canvas = FigureCanvasTkAgg(fig, master=root)  
+canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+def on_close():
+    sys.exit()
+
+# Update function for real-time visualization
+def update_plot():
+    try:
+        samples = stream.read(BUF_LEN, exception_on_overflow=False)
+        audio_data =  GAIN * np.frombuffer(samples, dtype=np.int16)
+        audio_data = np.clip(audio_data, value_range[0], value_range[1])
+        # Update time-domain plot
+        line.set_ydata(audio_data)
+
+        # Update draw canvas
+        canvas.draw()
+        root.after(20, update_plot)  # Schedule next update
+    except KeyboardInterrupt as e:
+        on_close()
+
+root.protocol(&quot;WM_DELETE_WINDOW&quot;, on_close)
+
+try:
+    update_plot()  # Start the real-time plotting
+    root.mainloop()  # Start the Tkinter main loop
+except KeyboardInterrupt:
+    root.quit()
+    root.destroy()
+</code></pre>
+<p><img alt="" src="vscode_pyaudio-2.jpg" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณเสียงโดยใช้โค้ดตัวอย่าง</p>
+<hr />
+<h2 id="_2">&#9655; <strong>การแสดงรูปคลื่นสัญญาณเสียงในโดเมนเวลาและความถี่</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการแสดงรูปคลื่นสัญญาณที่มีการเปลี่ยนแปลงในเชิงเวลา
+และแสดงสเปกตรัมเชิงความถี่ของสัญญาณ โดยใช้การแปลงแบบ <strong>FFT (Fast-Fourier Transform)</strong></p>
+<pre><code class="language-python">import warnings
+warnings.filterwarnings(&quot;ignore&quot;)  # Suppress all warnings
+
+import sys
+import pyaudio
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
+
+# Audio stream parameters
+FORMAT = pyaudio.paInt16  # 16-bit audio format
+CHANNELS = 1  # Mono audio
+SAMPLE_RATE = 16000  # Sample rate (16kHz)
+BUF_LEN = 1024  # Number of frames per buffer
+GAIN = 4.0  # Amplification gain factor
+
+# Create PyAudio instance
+p = pyaudio.PyAudio()
+
+# Open an audio stream for reading (microphone input)
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=SAMPLE_RATE,
+                input=True,
+                input_device_index=None,
+                frames_per_buffer=BUF_LEN)
+
+# Set the value range (16-bit audio samples): y_min and y_max
+value_range = [-2**15, 2**15]  
+
+# Create figure and subplots
+fig, (ax_time, ax_freq) = plt.subplots(2, 1, figsize=(10, 8))
+x_time = np.arange(0, BUF_LEN)
+line_time, = ax_time.plot(x_time, np.random.rand(BUF_LEN))
+ax_time.set_ylim(value_range[0], value_range[1])
+ax_time.set_xlim(0, BUF_LEN)
+ax_time.grid(True, linestyle='--', color='gray', linewidth=0.5)
+ax_time.set_xlabel(&quot;Sample Index&quot;)
+ax_time.set_ylabel(&quot;Amplitude&quot;)
+ax_time.set_title(&quot;Time-Domain Waveform&quot;)
+
+# FFT-based spectrum
+x_freq = np.fft.rfftfreq(BUF_LEN, d=1.0/SAMPLE_RATE)
+line_freq, = ax_freq.plot(x_freq, np.zeros_like(x_freq))
+ax_freq.set_xlim(0, SAMPLE_RATE / 2)
+ax_freq.set_ylim(0, 1)
+ax_freq.grid(True, linestyle='--', color='gray', linewidth=0.5)
+ax_freq.set_xlabel(&quot;Frequency (Hz)&quot;)
+ax_freq.set_ylabel(&quot;Magnitude&quot;)
+ax_freq.set_title(&quot;Frequency-Domain Spectrum&quot;)
+
+# Set up the Tkinter window
+root = tk.Tk()
+root.title(&quot;Real-Time Audio Visualization&quot;)
+
+# Embed Matplotlib figure into Tkinter window
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+def on_close():
+    sys.exit()
+
+def update_plot():
+    try:
+        samples = stream.read(BUF_LEN, exception_on_overflow=False)
+        audio_data = GAIN * np.frombuffer(samples, dtype=np.int16)
+        audio_data = np.clip(audio_data, value_range[0], value_range[1])        
+        # Update time-domain plot
+        line_time.set_ydata(audio_data)
+
+        # Compute and update frequency-domain plot (FFT)
+        fft_data = np.abs(np.fft.rfft(audio_data)) / BUF_LEN
+        line_freq.set_ydata(fft_data)
+        ax_freq.set_ylim(0, np.max(fft_data) * 1.1)
+
+        # Update draw canvas
+        canvas.draw()
+        root.after(20, update_plot)  # Schedule next update
+    except KeyboardInterrupt as e:
+        on_close()
+
+root.protocol(&quot;WM_DELETE_WINDOW&quot;, on_close)
+
+try:
+    update_plot()
+    root.mainloop()
+except KeyboardInterrupt:
+    root.quit()
+    root.destroy()
+finally:
+    on_close()
+</code></pre>
+<p><img alt="" src="vscode_pyaudio-3.jpg" /></p>
+<p>รูป: การแสดงรูปคลื่นสัญญาณเสียงในโดเมนเวลาและความถี่ (ทดลองใช้สัญญาณเสียงทดสอบ ความถี่ <strong>1kHz</strong>
+ซึ่งจะเห็นได้ว่า สเปกตรัมจะมีขนาดสูงสุดตรงความถี่ดังกล่าว)</p>
+<hr />
+<h2 id="wav">&#9655; <strong>การแสดงรูปคลื่นสัญญาณเสียงและบันทึกข้อมูลลงไฟล์ .wav</strong><a class="headerlink" href="#wav" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับการอ่านข้อมูลเสียงและแสดงรูปคลื่นสัญญาณ ผู้ใช้สามารถกดปุ่มเริ่มบันทึกข้อมูลเสียง
+(<strong>Start</strong>) และหยุดการบันทึกเสียง (<strong>Stop</strong>) แต่จะบันทึกเสียงไม่เกิน 5 วินาที
+หรือ จะกดปุ่มรีเซต (<strong>Reset</strong>) เพื่อเคลียร์ข้อมูลในบัฟเฟอร์  หากกดปุ่ม <strong>Save</strong> ก็จะได้ไฟล์เอาต์พุต
+เป็นไฟล์ <strong>.wav</strong> (ชื่อ <code>sound.wav</code>)</p>
+<pre><code class="language-python">import sys
+import time
+import pyaudio
+import wave
+import numpy as np
+import tkinter as tk
+from tkinter import ttk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import threading
+
+#####################################################################
+# Constants
+FORMAT = pyaudio.paInt16  # 16-bit audio format
+CHANNELS = 1              # Mono audio
+SAMPLE_RATE = 16000       # Sample rate (16kHz)
+BUF_LEN = 1024            # Number of frames per buffer
+GAIN = 5.0
+AMPLITUDE_RANGE = [-2**15, 2**15]  # For 16-bit audio samples
+
+#####################################################################
+
+# Matplotlib figure and axis setup for waveform visualization
+fig, ax = plt.subplots(figsize=(9,3))
+x = np.arange(0, BUF_LEN)
+line, = ax.plot(x, np.random.rand(BUF_LEN))
+ax.set_ylim(AMPLITUDE_RANGE[0], AMPLITUDE_RANGE[1])
+ax.set_xlim(0, BUF_LEN)
+ax.grid(True, linestyle='--', color='gray', linewidth=0.5)
+
+#####################################################################
+# PyAudio settings
+
+p = pyaudio.PyAudio()
+audio_data = []
+duration = 5  # 5 seconds
+stop_time = time.time() + 1e6
+stop_recording = False
+
+# Open the audio stream
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=SAMPLE_RATE,
+                input=True,
+                frames_per_buffer=BUF_LEN)
+
+#####################################################################
+# Tk callback functions
+
+# Audio start/stop/reset/save functions
+def start_cb():
+    global audio_data, stop_recording, stop_time, duration
+    stop_recording = False
+    stop_time = time.time() + duration
+    audio_data = [] # Clear saved audio data
+    print(&quot;Start&quot;)
+
+def stop_cb():
+    global stop_recording
+    stop_recording = True
+    print(&quot;Stop&quot;)
+
+def reset_cb():
+    global audio_data, stop_recording
+    stop_recording = False
+    audio_data = []  # Clear audio data
+    line.set_ydata(np.random.rand(BUF_LEN))
+    canvas.draw()
+    print(&quot;Reset&quot;)
+
+def save_cb():
+    global audio_data
+    print(&quot;Save&quot;)
+    if not audio_data:
+        print(&quot;No audio data to save.&quot;)
+        return
+    # Flatten audio data
+    audio_data_flat = np.concatenate(audio_data)
+    # Save audio data as a .wav file
+    filename = &quot;sound.wav&quot;
+    with wave.open(filename, 'wb') as wf:
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(SAMPLE_RATE)
+        wf.writeframes(audio_data_flat.tobytes())    
+    print(f&quot;Saved audio data to: {filename}&quot;)
+
+#####################################################################
+# Tkinter setup
+root = tk.Tk()
+root.title(&quot;Audio Recorder&quot;)
+
+# Embed Matplotlib figure into Tkinter window using FigureCanvasTkAgg
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack(padx=10, pady=10, fill=&quot;both&quot;, expand=True)
+
+# Frame for the controls (buttons and duration input)
+control_frame = ttk.Frame(root)
+control_frame.pack(fill=&quot;y&quot;, padx=20, pady=20) 
+
+# Start, Stop, Reset, Save Buttons
+start_button = ttk.Button(control_frame, text=&quot;Start&quot;, command=start_cb)
+start_button.pack(side=&quot;left&quot;, padx=10, pady=5)
+
+stop_button = ttk.Button(control_frame, text=&quot;Stop&quot;, command=stop_recording)
+stop_button.pack(side=&quot;left&quot;, padx=10, pady=5)
+
+reset_button = ttk.Button(control_frame, text=&quot;Reset&quot;, command=reset_cb)
+reset_button.pack(side=&quot;left&quot;, padx=10, pady=5)
+
+save_button = ttk.Button(control_frame, text=&quot;Save&quot;, command=save_cb)
+save_button.pack(side=&quot;left&quot;, padx=10, pady=5)
+
+# Update the waveform plot
+def update_waveform(audio_chunk):
+    line.set_ydata(audio_chunk)
+    canvas.draw()
+
+# Continuous audio visualization
+def visualize_audio():
+    global stream, audio_data, duration, stop_recording
+    max_len = SAMPLE_RATE*duration
+    while True:
+        audio_chunk = np.frombuffer(stream.read(BUF_LEN), dtype=np.int16)
+        if time.time() &gt;= stop_time:
+            stop_recording = True
+        if not stop_recording:
+            audio_data.append(audio_chunk)
+            while len(audio_data) &gt; max_len:
+                audio_data.pop(0)
+        # Update the waveform
+        update_waveform(audio_chunk)
+        time.sleep(0.01)
+
+# Start the visualization thread (before the GUI loop)
+threading.Thread(target=visualize_audio, daemon=True).start()
+
+def on_close():
+    sys.exit()
+
+root.protocol(&quot;WM_DELETE_WINDOW&quot;, on_close)
+
+try:
+    # Start Tkinter main loop
+    root.mainloop()
+except KeyboardInterrupt:
+    root.quit()
+    root.destroy()
+finally:
+    on_close()
+</code></pre>
+<p><img alt="" src="vscode_pyaudio-4.jpg" /></p>
+<p>รูป: ตัวอย่างการทำงานของโค้ด</p>
+<hr />
+<h2 id="udp">&#9655; <strong>การสื่อสารข้อมูลเสียงระหว่างคอมพิวเตอร์ด้วยโพรโตคอล UDP</strong><a class="headerlink" href="#udp" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการเขียนโค้ด  โดยแบ่งการทำงานออกเป็น 2 ส่วน  และมีสถาปัตยกรรมการทำงานแบบ
+<strong>Server-Client Model</strong>  และสื่อสารข้อมูลกันผ่านระบบเครือข่ายได้ ด้วยโพรโตคอลที่เรียกว่า
+<strong>UDP (User Datagram Protocol)</strong> </p>
+<ul>
+<li>ส่วนแรกทำหน้าที่เป็น <strong>UDP Server</strong> อ่านข้อมูลเสียงจากไมโครโฟน โดยใช้ <strong>PyAudio</strong>
+และรอให้มีการเชื่อมต่อเข้ามาโดย <strong>UDP Receiver</strong> เพื่อส่งข้อมูลเสียงกลับไป</li>
+<li>ส่วนที่สองทำหน้าที่เป็น <strong>UDP Client</strong> คอยรับข้อมูลจาก <strong>UDP Server</strong>
+เพื่อนำข้อมูลดังกล่าวมาแสดงรูปคลื่นสัญญาณเสียง</li>
+</ul>
+<p>ในโค้ดตัวอย่างได้เลือกใช้พอร์ตหมายเลข <code>5005</code> สำหรับการสื่อสารข้อมูลด้วย <strong>UDP</strong>
+จำนวนข้อมูลในแต่ละครั้งของการอ่านและส่งข้อมูลคือ <strong>1024</strong> และใช้อัตราการชักตัวอย่าง <strong>Sample Rate</strong>
+เท่ากับ <strong>16kHz</strong> เป็นตัวอย่าง</p>
+<p>โค้ด: <code>audio_udp_server.py</code></p>
+<pre><code class="language-python">import warnings
+import time
+import socket
+import pyaudio
+import numpy as np
+
+warnings.filterwarnings(&quot;ignore&quot;)  # Suppress all warnings
+
+# Audio stream parameters
+FORMAT = pyaudio.paInt16  # 16-bit audio format
+CHANNELS = 1  # Mono audio
+SAMPLE_RATE = 16000  # Sample rate (16kHz)
+BUF_LEN = 1024  # Number of frames per buffer
+GAIN = 4.0  # Amplification gain factor
+
+# UDP server parameters
+UDP_IP = &quot;0.0.0.0&quot;  # Listen on all available interfaces
+UDP_PORT = 5005  # Port number
+
+# Create PyAudio instance
+p = pyaudio.PyAudio()
+
+# Open an audio stream for reading (microphone input)
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=SAMPLE_RATE,
+                input=True,
+                frames_per_buffer=BUF_LEN)
+
+# Create UDP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind((UDP_IP, UDP_PORT))
+
+print(f&quot;UDP server listening on {UDP_IP}:{UDP_PORT}&quot;)
+
+try:
+    while True:
+        data = None
+        try:
+            # Wait for a client request
+            data, addr = sock.recvfrom(1024)  # Buffer size is 1024 bytes
+        except ConnectionResetError:
+            pass
+        if data:
+            print(f&quot;Received request from {addr}&quot;)
+            samples = stream.read(BUF_LEN, exception_on_overflow=False)
+            sock.sendto(samples, addr)  # Send audio data to client
+except KeyboardInterrupt:
+    print(&quot;Server shutting down...&quot;)
+finally:
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+    sock.close()
+</code></pre>
+<p>โค้ด: <code>audio_udp_client.py</code></p>
+<pre><code class="language-python">import sys
+import socket
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import struct
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# Audio stream parameters
+FORMAT      = pyaudio.paInt16  # 16-bit audio format
+CHANNELS    = 1  # Mono audio
+SAMPLE_RATE = 16000  # Sample rate (16kHz)
+BUF_LEN     = 1024  # Number of frames per buffer
+GAIN        = 4.0  # Amplification gain factor
+
+# Create UDP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.settimeout(1.0)
+
+# Send initial request to server
+sock.sendto(b&quot;START&quot;, (SERVER_IP, SERVER_PORT))
+
+# Initialize Tkinter window
+root = tk.Tk()
+root.title(&quot;Real-time Audio Waveform&quot;)
+
+# Create Matplotlib figure
+fig, ax = plt.subplots(figsize=(10, 6))
+x = np.arange(BUF_LEN)
+y = np.zeros(BUF_LEN)
+line, = ax.plot(x, y, lw=2)
+ax.set_ylim(-32768, 32767)
+ax.set_xlim(0, BUF_LEN)
+ax.set_xlabel(&quot;Sample Index&quot;)
+ax.set_ylabel(&quot;Amplitude&quot;)
+ax.set_title(&quot;Live Audio Waveform&quot;)
+
+# Embed Matplotlib in Tkinter
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+def on_close():
+    sys.exit()
+
+def update_plot(frame):
+    try:
+        sock.sendto(b&quot;REQ&quot;, (SERVER_IP, SERVER_PORT))  # Request new data
+        data, _ = sock.recvfrom(BUF_LEN * SAMPLE_WIDTH)  # Receive data
+        samples = np.array(struct.unpack(f&quot;{BUF_LEN}{FORMAT}&quot;, data))
+        line.set_ydata(samples)
+    except socket.timeout:
+        pass
+    except ConnectionResetError:
+        print(&quot;UDP server connection failed!&quot;)
+        on_close()
+    except KeyboardInterrupt:
+        on_close()
+    return line,
+
+# Animate the plot
+ani = animation.FuncAnimation(fig, update_plot, 
+                              interval=20, blit=True, save_count=1)
+
+root.protocol(&quot;WM_DELETE_WINDOW&quot;, on_close)
+
+try:
+    # Start Tkinter main loop
+    root.mainloop()
+except KeyboardInterrupt:
+    root.quit()
+    root.destroy()
+    on_close()
+
+</code></pre>
+<p>ในการทดลอง ให้รันโค้ด <code>audio_udp_server.py</code> และ <code>audio_udp_client.py</code>
+เพื่อให้ทั้งสองโปรแกรมทำงานพร้อม ๆ กัน ในเครื่องคอมพิวเตอร์เดียวกัน
+แต่ถ้ารันโปรแกรมต่างเครื่องคอมพิวเตอร์กัน จะต้องมีการระบุหมายเลข <strong>IP</strong> ให้ถูกต้องด้วย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอโค้ดตัวอย่างในภาษา <strong>Python</strong>
+เพื่อสาธิตการใช้งาน <strong>PyAudio</strong> ในเบื้องต้น เพื่ออ่านข้อมูลเสียงจากไมโครโฟน
+มีการนำข้อมูลที่อ่านได้มาแสดงรูปคลื่นสัญญาณในเชิงเวลา และสเปกตรัมเชิงความถี่ด้วยการคำนวณตามวิธีการที่เรียกว่า
+<strong>FFT (Fast Fourier Transform)</strong> มีตัวอย่างการเขียนโค้ดเพื่อบันทึกข้อมูลเสียงให้เป็นไฟล์ <strong>.wav</strong>
+และยังมีตัวอย่างการรับส่งข้อมูลเสียงผ่านเครือข่ายด้วย <strong>UDP (User Datagram Protocol)</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-03-26 | Last Updated: 2025-03-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
