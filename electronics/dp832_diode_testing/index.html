@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/dp832_diode_testing/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบไดโอด - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#rigol-dp832-dc-supply" class="nav-link">การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบไดโอด</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การทดสอบไดโอด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; การทดสอบไดโอด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-curve-fitting" class="nav-link">&#9655; การเขียนโปรแกรม Python เพื่อทดสอบไดโอด และทำขั้นตอน Curve Fitting</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-cubic-spine-interpolation" class="nav-link">&#9655; การเขียนโปรแกรม Python เพื่อทดสอบไดโอด และทำขั้นตอน Cubic Spine Interpolation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="rigol-dp832-dc-supply">การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบไดโอด<a class="headerlink" href="#rigol-dp832-dc-supply" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Rigol DP832</em>, <em>Programmable DC Power Supply</em>,
+<em>Python</em>, <em>LXI</em>, <em>SCPI</em>, <em>Diode Testing</em>, <em>V-I Curve Tracing</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การทดสอบไดโอด</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ในการศึกษาหลักการทำงานของไดโอด (<strong>Diode</strong>) โดยอาศัยการทดสอบและวัดปริมาณทางไฟฟ้า ก็ตัวอย่าง เช่น
+การหาความสัมพันธ์ระหว่างแรงดันไฟฟ้าและกระแสไฟฟ้าของไดโอด (<strong>Diode V-I Curve</strong>)
+ซึ่งจำเป็นต้องใช้แหล่งจ่ายแรงดันไฟฟ้า <strong>DC</strong> ที่สามารถปรับค่าระดับแรงดันไฟฟ้าได้ 
+โดยในบทความนี้จะกล่าวถึงแนวทางการใช้ <strong>Rigol DP832 DC Power Supply</strong>
+สำหรับทำ <strong>DC Voltage Sweeping</strong> เพื่อตรวจสอบพฤติกรรมของไดโอด
+และการตั้งค่าจำกัดกระแส เพื่อป้องกันความเสียหายแก่ไดโอด</p>
+<p>หากใช้อุปกรณ์ <strong>DC Power Supply</strong> ที่โปรแกรมไม่ได้ ผู้ใช้จำเป็นต้องปรับค่าแรงดันเอาต์พุต โดยใช้มือหมุน
+หรือกดปุ่มค่าตัวเลขเองทีละค่า และจดค่าตัวเลขกระแสไฟฟ้าที่วัดได้
+ซึ่งจะใช้เวลามากกว่า การเขียนโปรแกรมควบคุมอุปกรณ์โดยอัตโนมัติ</p>
+<p><strong>อุปกรณ์ที่ใช้</strong></p>
+<ul>
+<li><strong>Programmable DC Power Supply: Rigol DP832 / DP832A</strong></li>
+<li>ไดโอดที่ต้องการทดสอบ เช่น <ul>
+<li><strong>1N4148 (Standard Silicon Diode)</strong></li>
+<li><strong>1N4001 / 1N4007 (High-Power Standard Diode)</strong></li>
+<li><strong>1N5817 / 1N5819</strong> </li>
+<li><strong>LEDs</strong></li>
+</ul>
+</li>
+<li>มัลติมิเตอร์ (สำหรับวัดปริมาณทางไฟฟ้า เปรียบเทียบกับค่าที่แสดงโดยอุปกรณ์ <strong>DC Power Supply</strong>)</li>
+<li>สายวัดและขั้วต่อ</li>
+</ul>
+<hr />
+<h2 id="_2">&#9655; <strong>การทดสอบไดโอด</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>แนวทางการทดสอบและการตั้งค่า <strong>Rigol DP832</strong> มีดังนี้</p>
+<ul>
+<li>เลือกใช้ช่องเอาต์พุต เช่น <strong>CH1</strong></li>
+<li>กำหนดช่วงแรงดันไฟฟ้าที่ต้องการทดสอบ ซึ่งขึ้นอยู่กับอุปกรณ์ไดโอดที่ได้เลือกมาทดสอบ
+และความละเอียดในการปรับเพิ่มแรงดันไฟฟ้าจากต่ำสุดไปยังสูงสุดทีละค่า</li>
+<li>ตั้งค่ากระแสจำกัด (<strong>Current Limit</strong>) และเปิดใช้งานโหมดป้องกันกระแสเกินสำหรับช่องเอาต์พุตที่เลือกใช้<ul>
+<li>ไดโอดทั่วไป (<strong>Standard Diode 1N4148</strong>): ไม่ควรเกิน <strong>100mA</strong></li>
+<li>ไดโอดกำลังสูง  (<strong>High-Poewr Diode 1N4007</strong>): ไม่ควรเกิน <strong>1000mA</strong></li>
+<li>ไดโอดเปล่งแสงทั่วไป (<strong>LED</strong>): ไม่ควรเกิน <strong>20mA</strong></li>
+<li>ไดโอดเปล่งแสงกำลังสูง (<strong>High-Power LED</strong>): ไม่ควรเกิน <strong>300mA (1W LED)</strong> และ <strong>700mA (3W LED)</strong></li>
+</ul>
+</li>
+<li>ป้อนแรงดันไฟฟ้าให้ไดโอด เป็นการป้อนแรงดันแบบไบอัสตรง (<strong>Forward Voltage</strong>)
+โดยต่อขั้วบวกกับขาแอโนด (<strong>A</strong>) และต่อขั้วลบกับขาคาโธด (<strong>K</strong>)</li>
+<li>ให้ตั้งค่าจำกัดกระแส (<strong>Current Limit</strong>) บน <strong>DP832</strong> เพื่อป้องกันกระแสเกินพิกัด</li>
+</ul>
+<p>ในแนะนำให้ศึกษาจากเอกสาร <strong>Datasheet</strong> ของผู้ผลิต เพื่อตรวจสอบช่วงแรงดันบัสอัสตรง และพิกัดกระแสของไดโอด หรือ <strong>LED</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-curve-fitting">&#9655; <strong>การเขียนโปรแกรม Python เพื่อทดสอบไดโอด และทำขั้นตอน Curve Fitting</strong><a class="headerlink" href="#python-curve-fitting" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรมด้วยภาษา <strong>Python</strong> เพื่อต่อกับอุปกรณ์ <strong>DP832 DC Supply</strong>
+มีสองช่องทางที่แนะนำให้เลือกใช้ ได้แก่</p>
+<ul>
+<li><strong>USB</strong>: เชื่อมต่อผ่านพอร์ต <strong>USB</strong> และเขียนโค้ดโดยใช้ไลบรารี <code>pyvisa</code> และ <code>pyvisa-py</code></li>
+<li><strong>LXI</strong>: เชื่อมต่อผ่านพอร์ต <strong>RJ45 / LXI</strong> และเขียนโค้ดโดยใช้ไลบรารี <code>python-vxi11</code></li>
+</ul>
+<p>แนะนำให้ศึกษาบทความ: <a href="../python_dp832/">"การเขียนโปรแกรม <strong>Python</strong> สำหรับ <strong>Rigol DP832 Programmable DC Power Supply</strong>"</a></p>
+<p>สำหรับ <strong>Ubuntu Linux</strong> ให้คำสั่งต่อไปนี้ เพื่อติดตั้งไลบรารีที่จำเป็นต้องใช้</p>
+<pre><code class="language-bash">$ sudo apt install libusb-1.0-0-dev
+$ pip3 install pyvisa pyvisa-py
+$ pip3 install python-vxi11
+$ pip3 install numpy scipy matplotlib
+</code></pre>
+<p>ในการประมวลผลข้อมูลที่ได้จากการทดลอง มีการนำมาทำขั้นตอน  <strong>Curve Fitting</strong> และวาดรูปกราฟ
+โดยได้เลือกใช้ไลบรารีสำหรับ <strong>Python</strong> ได้แก่  <code>matplotlib</code>, <code>numpy</code> (v1.25.0) และ <code>scipy</code> (v1.15.0)</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ดสาธิต มีดังนี้</p>
+<pre><code class="language-python">import vxi11
+import sys
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+IP_ADDR = &quot;10.42.0.182&quot; # Set the IP address of the DP832 device
+
+# Connect to the instrument
+try:
+    print( f&quot;Connecting to DP832 at {IP_ADDR}, default port 5555.&quot; )
+    instr = vxi11.Instrument(&quot;10.42.0.182&quot;)
+except OSError as ex:
+    print('Device connection over LXI failed!')
+    sys.exit()
+
+######################################################################
+
+# Functions to control the instrument
+def enableOutput(channel, enable):
+    if enable:
+        state = 'ON'
+    else:
+        state = 'OFF'
+    instr.write(f&quot;:OUTP CH{channel},{state}&quot;)
+
+def setVoltage(channel, volt):
+    instr.write(f&quot;:SOUR{channel}:VOLT:LEV {volt:.3f}&quot;)
+
+def getVoltage(channel):
+    return float(instr.ask(f&quot;:SOUR{channel}:VOLT?&quot;).strip())
+
+def setCurrentLimit(channel, current):
+    # Clear Current Protection
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:CLE&quot;)
+    # Set Current Level for OCP
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:LEV {current:.3f}&quot;)
+    # Enable OCP
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:STAT ON&quot;)
+    state = instr.ask(f&quot;:SOUR{channel}:CURR:PROT:STAT?&quot;).strip()
+    current = float(instr.ask(f&quot;:SOUR{channel}:CURR:PROT:LEV?&quot;).strip())
+    print( f&quot;OCP: {state}, Current Limit {current:.3f}A&quot; )
+
+def getCurrent(channel):
+    return float(instr.ask(f&quot;:MEAS:CURR? CH{channel}&quot;).strip())
+
+def getTriggerState(channel):
+    return instr.ask(f&quot;:SOUR{channel}:CURR:PROT:TRIP?&quot;).strip()
+
+def voltageSweep(channel, v_start, v_end, v_step, current_limit, delay=1.0):
+    setCurrentLimit( channel, current_limit ) # Set current limit for OCP
+    setVoltage( channel, 0.0 )                # Set output voltage to 0V
+    enableOutput( channel, True )             # Enable output
+
+    voltages = []
+    currents = []
+    voltage = v_start
+    while voltage &lt;= v_end:
+        setVoltage( channel, voltage )
+        time.sleep( delay )
+        volt = getVoltage( channel )
+        current = getCurrent(channel)
+        if getTriggerState(channel) == 'YES':
+            print( 'OCP triggered...' )
+            break
+        voltages.append(volt)
+        currents.append(current)        
+        print(f&quot;V: {volt:.3f}V, I: {current:.3f}A&quot;)
+        if current &gt;= 0.5:
+            v_incr = v_step/4  # quarter step
+        elif current &gt;= 0.1:
+            v_incr = v_step/2  # half step
+        else:
+            v_incr = v_step    # full step
+        voltage += max(v_incr,0.001)
+
+    setVoltage( channel, 0.0 )  # Set output voltage to 0V
+    enableOutput(channel, False) # Disable output
+    print(&quot;Voltage sweep complete.&quot;)
+    return voltages, currents
+
+# Perform DC voltage sweep to test a diode.
+print(&quot;DC sweep for diode testing...&quot;)
+voltages, currents = voltageSweep( 1, 0.0, 1.0, 0.04, current_limit=1.0 ) 
+
+######################################################################
+
+# Perform curve fitting
+print( &quot;Performing curve fitting and plot the data&quot; )
+try:
+    diode_eq = lambda v, Is, n, kT_q=0.025: Is * (np.exp(v/(n*kT_q)) - 1)
+    xdata, ydata =  np.array(voltages), np.array(currents)
+    guess_params = [1e-9, 1.8]  # Initial guess: Is = 1nA, n = 1.8
+    popt, _ = curve_fit(diode_eq, xdata, ydata, p0=guess_params)
+    fit_currents = diode_eq(np.array(voltages), *popt)
+    print(f&quot;Fitted parameters: Is={popt[0]:.3e}, n={popt[1]:.3f}&quot;)
+except RuntimeError:
+    print(&quot;Curve fitting failed!&quot;)
+    fit_currents = currents  # Use measured data
+
+# Plot V-I curve
+fig = plt.figure( figsize=(10,6) )
+fig.canvas.manager.set_window_title(&quot;DC Sweep Demo&quot;)
+plt.plot(voltages, currents, 'o',color='#0000ff',label='Measured Data')
+plt.plot(voltages, fit_currents, '-',color='#00aaff',label='Curve Fit')
+plt.xlabel(&quot;Voltage (V)&quot;)
+plt.ylabel(&quot;Current (A)&quot;)
+plt.title(&quot;V-I Curve with Curve Fitting - 1N4001 Diode Testing&quot;)
+plt.legend()
+plt.grid()
+plt.savefig(&quot;plot.png&quot;, dpi=300, bbox_inches='tight')
+plt.show()
+</code></pre>
+<p>ในตัวอย่างนี้ จะเห็นได้ว่า มีการนำชุดข้อมูลที่วัดได้สำหรับแรงดันไฟฟ้า (<strong>V</strong>) และกระแสไฟฟ้า (<strong>I</strong>) ของไดโอด
+มาผ่านขั้นตอนที่เรียกว่า <strong>Curve Fitting</strong> และสร้างเส้นโค้งที่เหมาะสมที่สุด เพื่ออธิบายความสัมพันธ์ระหว่าง <strong>V</strong> กับ <strong>I</strong></p>
+<p>ในการทำ <strong>Curve Fitting</strong> จะต้องมีการกำหนดรูปแบบของฟังก์ชัน อาจเป็น สมการเส้นตรง ฟังก์ชันเอกซ์โปเนนเชียล หรืออื่น ๆ ในโค้ดตัวอย่างได้มีการใช้ฟังก์ชัน <code>curve_fit()</code> ของไลบรารี <code>scipy.optimize</code> และมีการกำหนดรูปแบบของสมการสำหรับไดโอด
+(<code>diode_eq</code>) จากรูปกราฟ จะเห็นได้ว่า เส้นโค้งที่ได้ ไม่จำเป็นต้องวิ่งผ่านจุดข้อมูลจากการทดลอง</p>
+<p><img alt="" src="1n4001_diode_curve_fitting.jpg" /></p>
+<p>รูป: ตัวอย่างรูปกราฟที่ได้จากการทดสอบไดโอด <strong>1N4001</strong></p>
+<p><img alt="" src="1n5817_diode_curve_fitting.jpg" /></p>
+<p>รูป: ตัวอย่างรูปกราฟที่ได้จากการทดสอบไดโอด <strong>1N5817</strong></p>
+<p>จากรูปกราฟจะเห็นได้ว่า ไดโอด <strong>1N4001</strong> มีค่า <strong>Forward Voltage (VF)</strong>
+ประมาณ <strong>0.9V @1A</strong> ในขณะที่ <strong>1N5817</strong> มีค่าต่ำกว่า อยู่ที่ประมาณ <strong>0.47V @1A</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-cubic-spine-interpolation">&#9655; <strong>การเขียนโปรแกรม Python เพื่อทดสอบไดโอด และทำขั้นตอน Cubic Spine Interpolation</strong><a class="headerlink" href="#python-cubic-spine-interpolation" title="Permanent link">#</a></h2>
+<p>อีกตัวอย่างหนึ่งเป็นการสาธิตการทดลอง <strong>DC Voltage Sweep</strong> กำหนดค่าแรงดันไฟฟ้าในช่วงที่ต้องการ
+และวัดกระแสไฟฟ้าของไดโอดที่ได้ ข้อมูลที่ได้จากการทดลอง จะถูกนำมาผ่านขั้นตอนที่เรียกว่า 
+<strong>Cubic Spine Interpolation</strong> (ซึ่งแตกต่างจากการทำขั้นตอน <strong>Curve Fitting</strong>)</p>
+<p><strong>Interpolation</strong> เป็นการประมาาณค่าวิธีหนึ่ง ใช้สร้างเส้นโค้งที่ราบเรียบ เพื่อให้ผ่านจุดข้อมูลที่กำหนดไว้ทั้งหมด
+คำว่า "<strong>Spline</strong>" หมายถึง การแบ่งช่วงย่อย ๆ แล้วหาฟังก์ชันสำหรับแต่ละช่วง ที่เป็นฟังก์ชันแบบพหุนาม (<strong>Polynomial Function</strong>) ในกรณีของ <strong>Cubic Spline Interpolation</strong> แต่ละช่วงจะใช้ฟังก์ชันพหุนามที่มีเลขชี้กำลังสูงสุดเป็น 3
+(<strong>Cubic Polynomial</strong>)
+ผลลัพธ์ที่ได้คือ การหาสมการที่สามารถสร้างเส้นโค้งราบเรียบที่ผ่านจุดข้อมูลทั้งหมด โดยยังคงความต่อเนื่องของเส้นโค้ง
+เพื่อให้เส้นโค้งที่ได้ดูเป็นธรรมชาติและไม่มีรอยหักหรือจุดไม่ต่อเนื่อง</p>
+<pre><code class="language-python">import vxi11
+import sys
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
+
+IP_ADDR = &quot;10.42.0.182&quot; # Set the IP address of the DP832 device
+
+# Connect to the instrument
+try:
+    print( f&quot;Connecting to DP832 at {IP_ADDR}, default port 5555.&quot; )
+    instr = vxi11.Instrument(&quot;10.42.0.182&quot;)
+except OSError as ex:
+    print('Device connection over LXI failed!')
+    sys.exit()
+
+######################################################################
+
+# Functions to control the instrument
+def enableOutput(channel, enable):
+    if enable:
+        state = 'ON'
+    else:
+        state = 'OFF'
+    instr.write(f&quot;:OUTP CH{channel},{state}&quot;)
+
+def setVoltage(channel, volt):
+    instr.write(f&quot;:SOUR{channel}:VOLT:LEV {volt:.3f}&quot;)
+
+def getVoltage(channel):
+    return float(instr.ask(f&quot;:SOUR{channel}:VOLT?&quot;).strip())
+
+def setCurrentLimit(channel, current):
+    # Clear Current Protection
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:CLE&quot;)
+    # Set Current Level for OCP
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:LEV {current:.3f}&quot;)
+    # Enable OCP
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:STAT ON&quot;)
+    state = instr.ask(f&quot;:SOUR{channel}:CURR:PROT:STAT?&quot;).strip()
+    current = float(instr.ask(f&quot;:SOUR{channel}:CURR:PROT:LEV?&quot;).strip())
+    print( f&quot;OCP: {state}, Current Limit {current:.3f}A&quot; )
+
+def getCurrent(channel):
+    return float(instr.ask(f&quot;:MEAS:CURR? CH{channel}&quot;).strip())
+
+def getTriggerState(channel):
+    return instr.ask(f&quot;:SOUR{channel}:CURR:PROT:TRIP?&quot;).strip()
+
+def voltageSweep(channel, v_start, v_end, v_step, current_limit, delay=1.0):
+    setCurrentLimit( channel, current_limit ) # Set current limit for OCP
+    setVoltage( channel, 0.0 )                # Set output voltage to 0V
+    enableOutput( channel, True )             # Enable output
+
+    voltages = []
+    currents = []
+    voltage = v_start
+    while voltage &lt;= v_end:
+        setVoltage( channel, voltage )
+        time.sleep( delay )
+        volt = getVoltage( channel )
+        current = getCurrent(channel)
+        if getTriggerState(channel) == 'YES':
+            print( 'OCP triggered...' )
+            break
+        voltages.append(volt)
+        currents.append(current)        
+        print(f&quot;V: {volt:.3f}V, I: {current:.3f}A&quot;)
+        if current &gt;= 0.5:
+            v_incr = v_step/4  # quarter step
+        elif current &gt;= 0.1:
+            v_incr = v_step/2  # half step
+        else:
+            v_incr = v_step    # full step
+        voltage += max(v_incr,0.001)
+
+    setVoltage( channel, 0.0 )  # Set output voltage to 0V
+    enableOutput(channel, False) # Disable output
+    print(&quot;Voltage sweep complete.&quot;)
+    return voltages, currents
+
+# Perform DC voltage sweep to test a diode.
+print(&quot;DC sweep for diode testing...&quot;)
+voltages, currents = voltageSweep( 1, 0.0, 1.0, 0.04, current_limit=1.0 ) 
+
+######################################################################
+
+# Perform Cubic Spline interpolation
+print( &quot;Performing curve fitting and plot the data&quot; )
+try:
+    # Perform cubic spline interpolation
+    cs = CubicSpline(voltages, currents)
+    # Generate more points for the fitted curve
+    npoints = 10*len(voltages)
+    fit_voltages = np.linspace(min(voltages), max(voltages), npoints) 
+    fit_currents = cs(fit_voltages)
+except RuntimeError:
+    print(&quot;Curve fitting failed!&quot;)
+    fit_currents = currents # Use measured data
+
+# Plot V-I curve
+fig = plt.figure( figsize=(10,6) )
+fig.canvas.manager.set_window_title(&quot;DC Sweep Demo&quot;)
+# Plot the measured data and fitted spline curve
+plt.plot(voltages, currents, 'o',color='#0000ff',label=&quot;Measured Data&quot;)
+plt.plot(fit_voltages, fit_currents, '-',color='#00aaff',label=&quot;Cubic Spline&quot;)
+plt.xlabel(&quot;Voltage (V)&quot;)
+plt.ylabel(&quot;Current (A)&quot;)
+plt.title(&quot;V-I Curve with Curve Fitting - 1N5817 Diode Testing&quot;)
+plt.legend()
+plt.grid()
+plt.savefig(&quot;plot.png&quot;, dpi=300, bbox_inches='tight')
+plt.show()
+</code></pre>
+<p><img alt="" src="1n5817_diode_curve_cubic_spline.jpg" /></p>
+<p>รูป: ตัวอย่างรูปกราฟที่ได้จากการทดสอบไดโอด <strong>1N5817</strong></p>
+<p>จากรูปกราฟ จะเห็นได้ว่า ไดโอด <strong>1N5817</strong> เริ่มมีกระแสไหล เมื่อมีแรงดันบัสอัสตรงประมาณ <strong>0.25V</strong>
+และประมาณ <strong>0.47V @1A</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการทดสอบไดโอด โดยใช้การเขียนโปรแกรมภาษา <strong>Python</strong> สำหรับ <strong>DC Power Supply</strong>
+โดยเลือกใช้ <strong>Rigol DP832</strong> และนำข้อมูลที่วัดได้มาแสดงรูปกราฟ ด้วยวิธี <strong>Curve Fitting</strong>
+และ <strong>Cubic Spline Interpolation</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-03-29 | Last Updated: 2025-03-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

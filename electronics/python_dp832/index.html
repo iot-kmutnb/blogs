@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/python_dp832/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Python สำหรับ Rigol DP832 Programmable DC Power Supply - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#python-rigol-dp832-programmable-dc-power-supply" class="nav-link">การเขียนโปรแกรม Python สำหรับ Rigol DP832 Programmable DC Power Supply</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#rigol-dp832" class="nav-link">&#9655; แนะนำอุปกรณ์ Rigol DP832</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-usb" class="nav-link">&#9655; การเขียนโปรแกรมด้วย Python เชื่อมต่อผ่าน USB</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-lan-ethernet" class="nav-link">&#9655; การเขียนโปรแกรมด้วย Python เชื่อมต่อผ่าน LAN / Ethernet</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การเขียนโปรแกรมเพื่อกำหนดค่าแรงดันเอาต์พุต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#1n400x" class="nav-link">&#9655; การเขียนโปรแกรมทดสอบไดโอด 1N400x</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="python-rigol-dp832-programmable-dc-power-supply">การเขียนโปรแกรม Python สำหรับ Rigol DP832 Programmable DC Power Supply<a class="headerlink" href="#python-rigol-dp832-programmable-dc-power-supply" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Rigol DP832</em>, <em>Programmable DC Power Supply</em>,
+<em>Python</em>, <em>LXI</em>, <em>SCPI</em></p>
+<hr />
+<h2 id="rigol-dp832">&#9655; <strong>แนะนำอุปกรณ์ Rigol DP832</strong><a class="headerlink" href="#rigol-dp832" title="Permanent link">#</a></h2>
+<p>อุปกรณ์ <strong>DP832</strong> ของบริษัท <strong>Rigol</strong> เป็นตัวอย่างอุปกรณ์ทางไฟฟ้า-อิเล็กทรอนิกส์
+เพื่อทดสอบและวัดปริมาณทางไฟฟ้า (<strong>Test &amp; Measurement Equipment</strong>)
+ที่จัดอยู่ในประเภท "แหล่งจ่ายแรงดันไฟ <strong>DC</strong>" ที่มีการควบคุมและรักษาระดับให้คงที่
+และสามารถตั้งค่าได้ผ่านการควบคุมจากคอมพิวเตอร์ของผู้ใช้ได้ ทำให้เหมาะสำหรับงานทดลองในห้องปฏิบัติการ 
+และงานทดสอบทางอุตสาหกรรม </p>
+<p><img alt="" src="dp832.jpg" /></p>
+<p>รูป: อุปกรณ์ <strong>DP832</strong> มุมมองด้านหน้า (Source: Rigol)</p>
+<p>อุปกรณ์รุ่นนี้จัดอยู่ในซีรีย์ <a href="https://int.rigol.com/products/DP_detail/DP800"><strong>DP800</strong></a> ของผลิตภัณฑ์ <a href="https://int.rigol.com/products/products/dc-power"><strong>Rigol Linear DC Supply</strong></a> 
+มีการจำหน่ายและใช้งานมามากกว่า 10 ปี และจำแนกเป็นรุ่นต่าง ๆ
+ตามจำนวนช่องเอาต์พุต (<strong>Output Channels</strong>) ระดับแรงดันไฟฟ้าและกระแสไฟฟ้าสูงสุดของแต่ละช่อง เป็นต้น</p>
+<p><strong>DP832 / DP832A</strong> มีเอาต์พุต 3 ช่อง</p>
+<ul>
+<li><strong>CH1: 30V / 3A</strong></li>
+<li><strong>CH2: 30V / 3A</strong></li>
+<li><strong>CH3:  5V / 3A</strong></li>
+</ul>
+<p>ความสามารถในการควบคุมเอาต์พุตสำหรับโหลด (<strong>Load Regulation</strong>) อยู่ในช่วง <strong>±(Output Percentage + Offset)</strong></p>
+<ul>
+<li><strong>Voltage</strong>: <strong>±(0.01% + 2mv)</strong></li>
+<li><strong>Current</strong>: <strong>±(0.01% + 250μA)</strong></li>
+</ul>
+<p>ผู้ใช้สามารถเปิดใช้งานฟังก์ชันป้องกันแรงดันหรือกระแสไฟฟ้าเกิน โดยสามารถตั้งค่าหรือโปรแกรมค่าในช่วงต่อไปนี้ได้</p>
+<ul>
+<li><strong>OVP (Over-Voltage Protection): 10mV .. 33V</strong></li>
+<li><strong>OCP (Over-Current Protection): 1mA .. 3.3A</strong></li>
+</ul>
+<p>ยกตัวอย่างการใช้งานในโหมด <strong>OCP</strong> ซึ่งจะมีการตั้งพิกัดกระแสสูงสุด ไม่ให้เกินค่าที่กำหนดไว้
+แล้วทดลองปรับเปลี่ยนค่าแรงดันไฟฟ้าเอาต์พุต เพื่อจ่ายให้โหลดที่นำมาทดสอบ</p>
+<p>รุ่น <strong>DP832A</strong> มีราคาสูงกว่า แต่มีคุณสมบัติบางประการที่ดีกว่า <strong>DP832</strong> เช่น</p>
+<ul>
+<li>ความละเอียดในการตั้งค่าหรือโปรแกรมค่า (<strong>Programming Resolution</strong>)<ul>
+<li><strong>DP832</strong>: 10mV / 1mA</li>
+<li><strong>DP832A</strong>: 1mV / 1mA</li>
+</ul>
+</li>
+<li>ความละเอียดในการแสดงค่าตัวเลข (<strong>Display Resolution</strong>)<ul>
+<li><strong>DP832</strong>: 10mV / 10mA</li>
+<li><strong>DP832A</strong>: 1mV / 1mA</li>
+</ul>
+</li>
+<li>รูปแบบการเชื่อมต่อ<ul>
+<li><strong>USB (Optional: LAN RS232, Digital IO)</strong></li>
+<li><strong>USB, LAN, RS232, Digital IO</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong>DP832 / DP832A</strong> สามารถสื่อสารกับคอมพิวเตอร์ เพื่อสั่งการและอ่านค่าการวัดผลได้ผ่านหลายช่องทาง ได้แก่:</p>
+<ul>
+<li><strong>USB</strong>: ใช้โปรโตคอล <a href="https://en.wikipedia.org/wiki/Virtual_instrument_software_architecture"><strong>VISA</strong></a>
+(<em>Virtual Instrument Software Architecture</em>)
+ซึ่งเป็น <strong>API</strong> หรือ ไลบรารีที่ใช้ในการสื่อสารกับเครื่องมือวัด และ <a href="https://en.wikipedia.org/wiki/Standard_Commands_for_Programmable_Instruments"><strong>SCPI</strong></a>
+(<em>Standard Commands for Programmable Instruments</em>) เป็นชุดคำสั่งมาตรฐาน
+(<strong>IEEE 488.1 / IEEE 488.2</strong>) ที่ใช้ในการควบคุมเครื่องมือวัด
+เช่น ออสซิลโลสโคป เครื่องกำเนิดสัญญาณ เป็นต้น </li>
+<li><strong>LAN</strong>: รองรับมาตรฐาน <a href="https://www.lxistandard.org/"><strong>LXI</strong></a>
+(<em>LAN eXtensions for Instrumentation</em>) ทำให้สามารถควบคุมผ่านเครือข่ายภายในและรองรับการเขียนโปรแกรมทางไกล</li>
+<li><strong>RS-232</strong>: รองรับพอร์ตอนุกรม</li>
+</ul>
+<p>ตัวอย่างการประยุกต์ใช้งานอุปกรณ์ประเภทนี้ ได้แก่</p>
+<ul>
+<li>การทดสอบวงจรอิเล็กทรอนิกส์ เช่น การตั้งค่าแรงดันไฟฟ้าและพิกัดกระแสไฟฟ้าสูงสุด สำหรับอุปกรณ์ที่ต้องการทดลอง </li>
+<li>ระบบทดสอบอัตโนมัติ (<strong>Automated Test Equipment: ATE</strong>) และเขียนโปรแกรมควบคุมด้วยภาษาคอมพิวเตอร์</li>
+<li>การทดสอบหาความสัมพันธ์แรงดันกับกระแสไฟฟ้าแบบอัตโนมัติ (<strong>Automated V-I Curve Tracing</strong>) เช่น สำหรับไดโอด หรือ <strong>LED</strong> และทรานซิสเตอร์ เป็นต้น</li>
+</ul>
+<p>การควบคุมหรือตั้งค่าใช้งาน <strong>DP832</strong> สามารถทำได้ โดยใช้ภาษาคอมพิวเตอร์ เช่น <strong>C/C++</strong>, <strong>Python</strong>, <strong>LabVIEW</strong> หรือ <strong>MATLAB</strong> โดยใช้คำสั่ง <strong>SCPI</strong> ซึ่งเป็นมาตรฐานที่ใช้กับอุปกรณ์วัดทางไฟฟ้าและอิเล็กทรอนิกส์
+แต่ในบทความนี้จะกล่าวถึง การใช้ภาษา <strong>Python</strong> เท่านั้น</p>
+<p><img alt="" src="dp832_screens.jpg" /></p>
+<p>รูป: ตัวอย่างหน้าจอแสดงผลในการตรวจสอบข้อมูลของอุปกรณ์ และการตั้งค่าเพื่อใช้งานผ่าน <strong>USB</strong> หรือ <strong>LAN</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-usb">&#9655; <strong>การเขียนโปรแกรมด้วย Python เชื่อมต่อผ่าน USB</strong><a class="headerlink" href="#python-usb" title="Permanent link">#</a></h2>
+<p>ในกรณีที่ใช้ <strong>Python</strong> ผู้ใช้สามารถใช้ไลบรารี <code>pyvisa</code> และ <code>pyvisa-py</code> (<strong>Pure Python Implementation of the VISA API</strong>) เพื่อความสะดวกในการเขียนโค้ด </p>
+<p>ทำคำสั่งต่อไปนี้ เพื่อติดตั้งแพ็คเกจ (ทดลองใช้กับระบบปฏิบัติการ <strong>Ubuntu 22.04</strong> และ <strong>PyVisa v1.14.1</strong>)</p>
+<pre><code class="language-bash">$ sudo apt install libusb-1.0-0-dev
+$ pip install pyvisa pyvisa-py
+</code></pre>
+<p>หากลองเชื่อมต่ออุปกรณ์ <strong>DP832</strong> ผ่านทางพอร์ต <strong>USB</strong> ก็ให้ลองทำคำสั่งต่อไปนี้ เพื่อดูว่า มีการเชื่อมต่อหรือไม่
+ซึ่งจะพบว่า มีอุปกรณ์ตรงกับ <strong>VID=0x1ab1 PID=0x0e11</strong></p>
+<pre><code class="language-text">$ lsusb | grep &quot;1ab1:0e11&quot;
+Bus 001 Device 048: ID 1ab1:0e11 Rigol Technologies DP800 Serials
+</code></pre>
+<p>ในกรณีที่ใช้ <strong>Linux</strong> ให้สร้างไฟล์สำหรับ <strong>UDEV Rules</strong>:
+<code>/etc/udev/rules.d/rigol-dp832.rules</code> ภายในไฟล์ มีข้อความหนึ่งบรรทัด ต่อไปนี้</p>
+<pre><code class="language-text">ATTRS{idVendor}==&quot;1ab1&quot;, ATTRS{idProduct}==&quot;0e11&quot;, MODE=&quot;0666&quot;
+</code></pre>
+<p>แล้วทำคำสั่งต่อไปนี้ เพื่อใช้งานไฟล์ดังกล่าว ซึ่งจะทำให้สามารถเข้าถึงอุปกรณ์ <strong>USB</strong> ของ <strong>DP832</strong>
+โดยไม่ต้องใช้สิทธิ์ <code>root</code></p>
+<pre><code class="language-bash">$ sudo udevadm control --reload-rules &amp;&amp; sudo udevadm trigger
+</code></pre>
+<p>&nbsp;</p>
+<p>โค้ดตัวอย่างต่อไปนี้ สาธิตใช้คำสั่งของ <strong>PyVisa</strong> เพื่อลองเชื่อมต่อกับอุปกรณ์ <strong>DP832</strong> ผ่านทางพอร์ต <strong>USB</strong>
+โดยจะอ่านค่า <strong>S/N (Serial Number)</strong> ของอุปกรณ์ <strong>DP832</strong> ที่เชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้</p>
+<pre><code class="language-python">import pyvisa
+
+# Print the version of pyvisa
+print(f&quot;Using PyVisa v{pyvisa.__version__}&quot;)
+
+# Initialize the VISA resource manager with pyvisa-py
+rm = pyvisa.ResourceManager('@py') 
+
+for res in rm.list_resources():
+    if res.startswith('USB'):
+        print( res )
+        SN = res.split(&quot;::&quot;)[3]
+        print( f&quot;SN found: \&quot;{SN}\&quot;&quot; )
+print('Done')
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุตที่ได้จากการทำงานของโค้ดตัวอย่าง มีดังนี้</p>
+<pre><code class="language-text">Using PyVisa v1.14.1
+USB0::6833::3601::DP8C204605012::0::INSTR
+SN found: &quot;DP8C204605012&quot;
+Done
+</code></pre>
+<p>&nbsp;</p>
+<p>หากพบว่า มีรายการอุปกรณ์ประเภท <strong>USB</strong> ที่รองรับการเชื่อมต่อด้วย <strong>VISA API</strong>
+ก็สามารถทำคำสั่ง ตามโค้ดตัวอย่างต่อไปนี้ได้ โดยใช้คำสั่งของ <strong>SCPI</strong> ที่มีชื่อว่า <code>*IDN?</code> (<strong>Identify</strong>)</p>
+<pre><code class="language-python">import pyvisa
+import sys
+
+SN = None   # Used to save the S/N string of the target DP832 device
+
+# Print the version of pyvisa
+print(f&quot;Using PyVisa v{pyvisa.__version__}&quot;)
+
+# Initialize the VISA resource manager with pyvisa-py
+rm = pyvisa.ResourceManager('@py') 
+
+for res in rm.list_resources():
+    if res.startswith('USB'):
+        print( res )
+        SN = res.split(&quot;::&quot;)[3]
+
+if not SN:
+    print( &quot;No DP832 device found&quot; )
+    sys.exit()
+
+resource = f&quot;USB0::0x1AB1::0x0E11::{SN}::INSTR&quot;
+print('opening resource: ' + resource)
+instr = rm.open_resource(resource)
+
+# Show the IDN of the USB device
+idn_str = instr.query(&quot;*IDN?&quot;)
+names = ['Vendor', 'Model', 'SN', 'FW']
+values = idn_str.strip().split(',')
+sysinfo = dict(zip(names, values))
+for key,value in sysinfo.items():
+    print( f&quot;{key}: {value}&quot; )
+
+print('Done')
+</code></pre>
+<p>คำสั่งที่สำคัญ เช่น</p>
+<ul>
+<li><code>pyvisa.ResourceManager('@py')</code>: สร้าง <strong>Resource Manager</strong> สำหรับจัดการอุปกรณ์ที่เชื่อมต่อ</li>
+<li><code>list_resources()</code>: ค้นหาอุปกรณ์ทั้งหมดที่เชื่อมต่อผ่าน <strong>USB</strong></li>
+<li><code>open_resource(...)</code>: เปิดการเชื่อมต่อไปยังอุปกรณ์ที่ระบุด้วย <strong>Serial Number (SN)</strong>
+ค่าที่ได้คืนมาเป็น <strong>PyVISA Instrument Object</strong> ซึ่งใช้สำหรับสื่อสารกับอุปกรณ์ที่เชื่อมต่อผ่าน <strong>VISA</strong> และใช้คำสั่ง เช่น<ul>
+<li><code>query(...)</code> ใช้สำหรับคำสั่งที่มีค่าตอบกลับ เช่น <code>query("*IDN?")</code> ส่งคำสั่งสอบถามข้อมูล <strong>IDN</strong> ของอุปกรณ์   </li>
+<li><code>write(...)</code> ใช้สำหรับตั้งค่าหรือสั่งงาน อุปกรณ์โดยไม่ต้องรอค่าตอบกลับ</li>
+</ul>
+</li>
+</ul>
+<p>ตัวอย่างข้อความเอาต์พุตมีดังนี้</p>
+<pre><code class="language-text">Using PyVisa v1.14.1
+USB0::6833::3601::DP8C204605012::0::INSTR
+opening resource: USB0::0x1AB1::0x0E11::DP8C204605012::INSTR
+Vendor: RIGOL TECHNOLOGIES
+Model: DP832
+SN: DP8C204605012
+FW: 00.01.19
+Done
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-lan-ethernet">&#9655; <strong>การเขียนโปรแกรมด้วย Python เชื่อมต่อผ่าน LAN / Ethernet</strong><a class="headerlink" href="#python-lan-ethernet" title="Permanent link">#</a></h2>
+<p>หากอุปกรณ์รองรับการสื่อสารด้วย <strong>LXI</strong> และเชื่อมต่อกับระบบเครือข่ายได้สาย โดยใช้สาย <strong>LAN / Ethernet</strong>
+ก็สามารถเขียนโค้ด <strong>Python</strong> โดยใช้แพ็คเกจ <a href="https://pypi.org/project/python-vxi11/"><code>python-vxi11</code></a>
+สำหรับอุปกรณ์ที่รองรับโพรโตคอล <strong>VXI-11 / LXI</strong> ดังนี้</p>
+<pre><code>$ pip3 install python-vxi11
+</code></pre>
+<p>การเชื่อมต่อกับ <strong>DP832 / DP832A</strong> ผ่านทางพอร์ต <strong>RJ45 / LXI</strong>
+จะต้องมีการตั้งค่าและเลือกการเชื่อมต่อแบบ <strong>LAN</strong> ก่อน</p>
+<ol>
+<li>ให้กดปุ่ม <strong>"Utility"</strong> </li>
+<li>กดปุ่ม <strong>M1</strong> เพื่อเลือกเมนู <strong>"I/O Config"</strong></li>
+<li>ตามด้วยปุ่ม <strong>M3</strong> เพื่อเลือก <strong>"LAN"</strong> </li>
+<li>แล้วกดปุ่ม <strong>M1</strong> เลือก <strong>"DHCP"</strong> เพื่อตั้งค่า <strong>IP Address</strong> โดยอัตโนมัติ
+(ในกรณีที่เชื่อมต่อเข้ากับเครือข่ายที่มีอุปกรณ์ทำหน้าที่เป็น <strong>DHCP Server</strong>)</li>
+</ol>
+<p>โค้ดตัวอย่างต่อไปนี้ สาธิตการเชื่อมต่อไปยังอุปกรณ์ ตามหมายเลข <strong>IP</strong> ของเครื่องในระบบเครือข่าย <strong>LAN</strong>
+(ในตัวอย่างนี้ อุปกรณ์จะได้รับการตั้งค่าเครือข่ายโดยอัตโนมัติ ตามรูปแบบของโพรโตคอล <strong>DHCP</strong>)
+เมื่อเชื่อมต่อได้ จะลองทำคำสั่ง <code>*IDN?</code> เพื่อตรวจสอบข้อมูลของอุปกรณ์</p>
+<pre><code class="language-python">import sys
+import vxi11
+import time
+
+IP_ADDR = &quot;10.42.0.182&quot; # Set the IP address of the DP832 device
+
+# Connect to the instrument
+try:
+    print( f&quot;Connecting to DP832 at {IP_ADDR}, default port 5555.&quot; )
+    instr = vxi11.Instrument( IP_ADDR )
+except OSError as ex:
+    print('Device connection over LXI failed!')
+    sys.exit()
+
+# Show the IDN of the USB device
+idn_str = instr.ask(&quot;*IDN?&quot;)
+names = ['Vendor', 'Model', 'SN', 'FW']
+values = idn_str.strip().split(',')
+sysinfo = dict(zip(names, values))
+for key, value in sysinfo.items():
+    print(f&quot;{key}: {value}&quot;)
+
+print('Done')
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>การเขียนโปรแกรมเพื่อกำหนดค่าแรงดันเอาต์พุต</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นโค้ดสาธิต การใช้คำสั่ง <strong>SCPI</strong> และใช้ไลบรารี <code>pyvisa</code> สำหรับ <strong>DP832</strong> ผ่านทางพอร์ต <strong>USB</strong>
+มีการใช้คำสั่งเพื่อตั้งค่าแรงดันไฟฟ้า สำหรับช่องเอาต์พุต 3 ช่อง ได้แก่ <strong>12.0V</strong>, <strong>5.0V</strong> และ <strong>3.3V</strong> ตามลำดับ
+เมื่อตั้งค่าแรงดันไฟฟ้าแล้ว จึงเปิดใช้งานช่องเอาต์พุต หน่วงเวลาไว้แล้วจึงปิดการจ่ายไฟเลี้ยงของแต่ละช่องเอาต์พุต</p>
+<pre><code class="language-python">import pyvisa
+import sys
+import time
+
+SN = None
+
+# Print the version of pyvisa
+print(f&quot;Using PyVisa v{pyvisa.__version__}&quot;)
+
+# Initialize the VISA resource manager with pyvisa-py
+rm = pyvisa.ResourceManager('@py') 
+
+for res in rm.list_resources():
+    if res.startswith('USB'):
+        print( res )
+        SN = res.split(&quot;::&quot;)[3]
+
+if not SN:
+    print( &quot;No DP832 device found&quot;)
+    sys.exit()
+
+##########################################################
+
+resource = f&quot;USB0::0x1AB1::0x0E11::{SN}::INSTR&quot;
+print('opening resource: ' + resource)
+instr = rm.open_resource(resource)
+
+volts = [12.0, 5.0, 3.3]
+num_channels = len(volts)
+for i in range(num_channels):
+    channel = i+1
+    print( f&quot;Set output voltage and enable CH{channel}.&quot; )
+    instr.write( f&quot;:SOUR{channel}:VOLT:LEV {volts[i]:.3f}&quot; )
+    instr.write( f&quot;:OUTP:STAT CH{channel}, ON&quot; )
+
+print(40*'-')
+
+time.sleep(5.0) # delay for 5 seconds
+
+for i in range(num_channels):
+    channel = i+1
+    volt = float(instr.query( f&quot;:SOURCE{channel}:VOLT?&quot;).strip())
+    state = instr.query( f&quot;:OUTP? CH{channel}&quot;).strip()
+    print( f&quot;CH{channel} [{state}]: output {volt:.3f}V&quot;)
+    if state == 'ON':
+        instr.write( f&quot;:SOUR{channel}:VOLT:LEV {0.0}&quot; )
+        print( f&quot;Disable output CH{channel}.&quot;)
+        instr.write(f&quot;:OUTP:STAT CH{channel}, OFF&quot;)
+
+print('Done')
+</code></pre>
+<p><img alt="" src="./python_dp832/pyvisa_dp832_demo-3.jpg" /></p>
+<p>รูป: ข้อความเอาต์พุตจากการทำงานของโค้ดตัวอย่าง (เชื่อมต่อด้วย <strong>USB</strong>)</p>
+<p>หากจะเปลี่ยนมาใช้ <strong>LXI</strong> (แทน <strong>USB</strong>) และใช้ไลบรารี <code>python-vxi11</code> ก็มีตัวอย่างดังนี้</p>
+<pre><code class="language-python">import vxi11
+import sys
+import time
+
+IP_ADDR = &quot;10.42.0.182&quot; # Set the IP address of the DP832 device
+
+# Connect to the instrument
+try:
+    print( f&quot;Connecting to DP832 at {IP_ADDR}, default port 5555.&quot; )
+    instr = vxi11.Instrument(&quot;10.42.0.182&quot;)
+except OSError as ex:
+    print('Device connection over LXI failed!')
+    sys.exit()
+
+##########################################################
+
+volts = [12.0, 5.0, 3.3]
+num_channels = len(volts)
+for i in range(num_channels):
+    channel = i+1
+    print( f&quot;Set output voltage and enable CH{channel}.&quot; )
+    instr.write( f&quot;:SOUR{channel}:VOLT:LEV {volts[i]:.3f}&quot; )
+    instr.write( f&quot;:OUTP:STAT CH{channel}, ON&quot; )
+
+print(40*'-')
+
+time.sleep(5.0) # delay for 5 seconds
+
+for i in range(num_channels):
+    channel = i+1
+    volt = float(instr.ask( f&quot;:SOURCE{channel}:VOLT?&quot;).strip())
+    state = instr.ask( f&quot;:OUTP? CH{channel}&quot;).strip()
+    print( f&quot;CH{channel} [{state}]: output {volt:.3f}V&quot;)
+    if state == 'ON':
+        instr.write( f&quot;:SOUR{channel}:VOLT:LEV {0.0}&quot; )
+        print( f&quot;Disable output CH{channel}.&quot;)
+        instr.write(f&quot;:OUTP:STAT CH{channel}, OFF&quot;)
+
+print('Done')
+</code></pre>
+<p><img alt="" src="lxi_dp832_demo.jpg" /></p>
+<p>รูป: ข้อความเอาต์พุตจากการทำงานของโค้ดตัวอย่าง (เชื่อมต่อด้วย <strong>LXI</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1n400x">&#9655; <strong>การเขียนโปรแกรมทดสอบไดโอด 1N400x</strong><a class="headerlink" href="#1n400x" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการตั้งค่าแรงดันไฟฟ้าเอาต์พุต  โดยเพิ่มขึ้นตามลำดับ หรือ <strong>DC Voltage Sweep</strong>
+เช่น เริ่มต้นจาก <strong>0V</strong> ไปจนถึง <strong>1V</strong> เพิ่มครั้งละ  <strong>0.05V</strong>  และมีการเปิดใช้งาน
+<strong>OCP</strong> ป้องกันกระแสที่จ่ายเกิน โดยตั้งค่าพิกัดสูงสุดไว้ที่ <strong>1A</strong> หากตรวจพบว่า มีกระแสถึงหรือเกิน <strong>1A</strong>
+ให้จบการทำงานของโปรแกรม</p>
+<p>การป้อนแรงดันไฟฟ้าบัสอัสตรงให้ไดโอด (<strong>Diode</strong>) ซึ่งในกรณีนี้ ไดโอดถูกนำมาทดสอบและใช้เป็นโหลดให้แหล่งจ่ายไฟ <strong>DC</strong> 
+ในช่วงแรก จะยังไม่มีกระแสไหล จนกว่าจะมีแรงดันไฟฟ้ามากพอ มากกว่าค่า
+<strong>Forward Voltage</strong> ของไดโอดที่ได้เลือกมาทดสอบ หลังจากนั้นแม้ว่า จะเพิ่มแรงดันไฟฟ้าทีละน้อยแต่ปริมาณกระแสจะเพิ่มขึ้นอย่างรวดเร็ว ดังนั้นจึงต้องมีการตั้งค่าพิกัดกระแสเอาไว้ เพื่อป้องกันกระแสเกิน</p>
+<pre><code class="language-python">import vxi11
+import sys
+import time
+
+IP_ADDR = &quot;10.42.0.182&quot; # Set the IP address of the DP832 device
+
+# Connect to the instrument
+try:
+    print( f&quot;Connecting to DP832 at {IP_ADDR}, default port 5555.&quot; )
+    instr = vxi11.Instrument(&quot;10.42.0.182&quot;)
+except OSError as ex:
+    print('Device connection over LXI failed!')
+    sys.exit()
+
+##########################################################
+
+# Functions to control the instrument
+def enableOutput(channel, enable):
+    if enable:
+        state = 'ON'
+    else:
+        state = 'OFF'
+    instr.write(f&quot;:OUTP CH{channel},{state}&quot;)
+
+def setVoltage(channel, volt):
+    instr.write(f&quot;:SOUR{channel}:VOLT:LEV {volt:.3f}&quot;)
+
+def getVoltage(channel):
+    return float(instr.ask(f&quot;:SOUR{channel}:VOLT?&quot;).strip())
+
+def setCurrentLimit(channel, current):
+    # Clear Current Protection
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:CLE&quot;)
+    # Set Current Level for OCP
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:LEV {current:.3f}&quot;)
+    # Enable OCP
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:STAT ON&quot;)
+    state = instr.ask(f&quot;:SOUR{channel}:CURR:PROT:STAT?&quot;).strip()
+    current = float(instr.ask(f&quot;:SOUR{channel}:CURR:PROT:LEV?&quot;).strip())
+    print( f&quot;OCP: {state}, Current Limit {current:.3f}A&quot; )
+
+def getCurrent(channel):
+    return float(instr.ask(f&quot;:MEAS:CURR? CH{channel}&quot;).strip())
+
+def getTriggerState(channel):
+    return instr.ask(f&quot;:SOUR{channel}:CURR:PROT:TRIP?&quot;).strip()
+
+def voltageSweep(channel, v_start, v_end, v_step, current_limit, delay=0.5):
+    setCurrentLimit( channel, current_limit ) # Set current limit for OCP
+    setVoltage( channel, 0.0 )                # Set output voltage to 0V
+    enableOutput( channel, True )             # Enable output
+
+    voltages = []
+    currents = []
+    voltage = v_start
+    while voltage &lt;= v_end:
+        setVoltage( channel, voltage )
+        time.sleep(delay) # add extra delay
+        volt = getVoltage( channel )
+        current = getCurrent( channel )
+        if getTriggerState(channel) == 'YES':
+            print( 'OCP triggered...' )
+            break
+        voltages.append(volt)
+        currents.append(current)
+        print(f&quot;V: {volt:.3f}V, I: {current:.3f}A&quot;)
+        voltage += v_step
+
+    setVoltage( channel, 0.0 )  # Set output voltage to 0V
+    enableOutput(channel, False) # Disable output
+    print(&quot;Voltage sweep complete.&quot;)
+    return voltages, currents
+
+# Perform DC voltage sweep to test a diode.
+print(&quot;DC sweep for diode testing...&quot;)
+voltageSweep( 1, 0.0, 1.0, 0.05, current_limit=1.0 )
+</code></pre>
+<p><img alt="" src="dp832_diode_test-1.jpg" /></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างโค้ดภาษา <strong>Python</strong> เพื่อทดลองใช้เชื่อมต่อกับอุปกรณ์ <strong>Rigol DP832</strong>
+โดยผ่านสองช่องทาง คือ พอร์ต <strong>USB</strong> และ <strong>Ethernet</strong> มีการใช้คำสั่งเพื่อตั้งค่าแรงดันไฟฟ้าสำหรับเอาต์พุต 
+ตามหมายเลขช่องเอาต์พุตที่เลือกใช้งาน (มีให้เลือกใช้ 3 ช่อง)
+และมีตัวอย่างการเขียนโปรแกรมปรับค่าแรงดันไฟฟ้าเอาต์พุตในช่วงที่กำหนด (<strong>DC Voltage Sweeping</strong>)</p>
+<p><strong>แหล่งข้อมูลเพื่อศึกษาเพิ่มเติม</strong></p>
+<ul>
+<li><a href="DP800_UserGuide_EN_2015.pdf"><strong>DP800 Series Programmable Linear DC Power Supply: User Guide</strong></a></li>
+<li><a href="DP800_ProgrammingGuide_EN_2015.pdf"><strong>DP800 Series Programmable Linear DC Power Supply: Programming Guide</strong></a></li>
+</ul>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../rigol_scope_lxi/">การใช้งานออสซิลโลสโคปและการเขียนโปรแกรมเชื่อมต่อ: <strong>RIGOL DS1054Z</strong></a></li>
+<li><a href="../dp832_diode_testing/">การโปรแกรม <strong>Rigol DP832 DC Supply</strong> เพื่อทดสอบไดโอด</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-03-27 | Last Updated: 2025-03-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
