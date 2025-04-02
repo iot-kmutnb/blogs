@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/dp832_mosfet_testing/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบทรานซิสเตอร์ MOSFET - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#rigol-dp832-dc-supply-mosfet" class="nav-link">การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบทรานซิสเตอร์ MOSFET</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การทดสอบและศึกษาคุณสมบัติของมอสเฟต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; การทดสอบและศึกษาคุณสมบัติของมอสเฟต</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="rigol-dp832-dc-supply-mosfet">การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบทรานซิสเตอร์ MOSFET<a class="headerlink" href="#rigol-dp832-dc-supply-mosfet" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Rigol DP832</em>, <em>Programmable DC Power Supply</em>,
+<em>Python</em>, <em>LXI</em>, <em>SCPI</em>, <em>MOSFET Testing</em>, <em>V-I Curve Tracing</em></p>
+<hr />
+<h2 id="_1">&#9655; <strong>การทดสอบและศึกษาคุณสมบัติของมอสเฟต</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ทรานซิสเตอร์ประเภท "มอสเฟต" เป็นอุปกรณ์อิเล็กทรอนิกส์พื้นฐานและมีการใช้งานแพร่หลาย
+จำแนกเป็นชนิดเอ็น (<strong>N-Channel MOSFET</strong>) และชนิดพี (<strong>P-Channel MOSFET</strong>)
+โดยทั่วไป มีขาของอุปกรณ์จำนวน 3 ขา ได้แก่ ขาเกต  (<strong>Gate</strong>) ขาเดรน (<strong>Drain</strong>) และขาซอร์ส (<strong>Source</strong>)
+แต่บางกรณี ก็อาจมีขาที่สี่คือ <strong>Body (Substrate, B)</strong> ซึ่งมักจะเชื่อมต่อกับขา <strong>Source</strong> ในการใช้งานทั่วไป
+ในบทความนี้ จะกล่าวถึงเฉพาะมอสเฟตชนิดเอ็นเท่านั้น </p>
+<p><img alt="" src="nmosfet_pinout.jpg" /></p>
+<p>รูป: ตัวถังและตำแหน่งขาของมอสเฟตชนิด <strong>N-Channel</strong></p>
+<p>มอสเฟตเป็นอุปกรณ์ที่ใช้แรงดันไฟฟ้าที่ขา <strong>G</strong> เพื่อควบคุมความสามารถในการนำไฟฟ้าระหว่างขา <strong>D</strong> และขา <strong>S</strong>
+ในกรณีที่เลือกใช้งานมอสเฟตชนิด <strong>N-Channel Enhancement MOSFET</strong> </p>
+<ul>
+<li>หาก <strong>Vgs &lt; Vth</strong> จะไม่มีกระแสไหลผ่านมอสเฟต (เรียกว่า <strong>Cutoff</strong>) </li>
+<li>หากแรงดันตกคร่อมระหว่างขา <strong>G</strong> กับ <strong>S</strong> หรือ <strong>Vgs</strong> มากกว่า <strong>Threshold Voltage</strong> (<strong>Vth</strong>) จะเริ่มมีกระแสไหลจาก <strong>D</strong> ไป <strong>S</strong> (เมื่อ <strong>Vds &gt; 0</strong>) และค่าความต้านทาน <strong>Rds</strong> จะลดลง ในกรณีที่มอสเฟตทำงานเต็มที่ ค่า <strong>Rds(ON)</strong> จะมีค่าต่ำมาก ช่วยให้มีกระแสไหลได้ดี</li>
+</ul>
+<p>ตัวอย่างมอสเฟตชนิดเอ็น เช่น</p>
+<ul>
+<li><a href="https://www.vishay.com/docs/70226/70226.pdf"><strong>Vishay 2N7000</strong></a>: 
+Vds(max)=60V, Vgs(max)=20V, Rds(on)=5Ω (max) @Vgs=10V,
+Id(max)= 0.2A, Vth=0.8V..3V, TO-92 Package</li>
+<li><a href="https://www.vishay.com/docs/91291/irfz44.pdf"><strong>Vishay IRFZ44 (Power MOSFET)</strong></a>:
+Vds(max)=60V, Vgs(max)=20V, Rds(on)=0.028Ω (max) @Vgs=10V, Id=60A, Vth=2V..4V, TO-220AB Package</li>
+<li><a href="https://www.vishay.com/docs/91300/irl540.pdf"><strong>Vishay IRL540 (Power MOSFET</strong></a>:
+Vds(max)=100V, Vgs(max)=10V, Rds(on)=0.077Ω (max) @Vgs=5V, Id(max)= 28A, Vth=1V..2V,  TO-220AB Package</li>
+<li><a href="https://www.infineon.com/dgdl/irl3705npbf.pdf?fileId=5546d462533600a40153565f31232534"><strong>Infineon IRL3705 (Power MOSFET)</strong></a>: 
+Vds(max)=55V, Vgs(max)=16V, Rds(on)=0.01Ω (max) @Vgs=10V, Id(max)= 89A, Vth=1V..2V, TO-220AB Package</li>
+</ul>
+<p>จากข้อมูลในเบื้องต้นเกี่ยวกับมอสเฟต ก็มีประเด็นในการพิจารณาในการเลือกใช้ เช่น</p>
+<ul>
+<li><strong>Vds(max)</strong>: แรงดันไฟฟ้าสูงสุดที่มอสเฟตทนได้ระหว่างขา <strong>D</strong> กับ <strong>S</strong></li>
+<li><strong>Vgs(max)</strong>: แรงดันไฟฟ้าสูงสุดที่ทนได้ระหว่างขา <strong>G</strong> กับ <strong>S</strong></li>
+<li><strong>Rds(on)</strong>: ค่าความต้านทาน <strong>D</strong> กับ <strong>S</strong>  เมื่อมอสเฟตอยู่ในสถานะ <strong>ON</strong> (<strong>ON-state Resistance</strong>)</li>
+<li><strong>Id(max)</strong>: ปริมาณกระแสสูงสุดที่ไหลผ่านมอสเฟตจากขา <strong>D</strong> ไปยัง <strong>S</strong> โดยไม่เกินความเสียหาย และขึ้นอยู่กับอุณหภูมิ และการระบายความร้อนด้วย</li>
+<li><strong>Vth (Threshold Voltage)</strong>: แรงดันระหว่างขา <strong>G</strong> และ <strong>S</strong>  หรือ <strong>Vgs</strong> ขั้นต่ำ ที่ทำให้มอสเฟต เริ่มนำกระแส</li>
+<li>ตัวถังที่ใช้งาน เช่น  <strong>TO-92</strong>  (ขนาดเล็ก กำลังต่ำ) และ <strong>TO-220AB</strong> (ขนาดใหญ่กว่าและระบายความร้อนได้ดี)</li>
+</ul>
+<p>พารามิเตอร์ต่าง ๆ ที่เกี่ยวข้องกับการทำงานของมอสเฟต สามารถศึกษาได้จากเอกสารของผู้ผลิต</p>
+<p>ในเอกสารของผู้ผลิต มักมีรูปกราฟแสดงความสัมพันธ์ระหว่างแรงดันไฟฟ้า <strong>Vds</strong> (แกนนอน) กับกระแสที่ไหลจาก <strong>D</strong> ไปยัง <strong>S</strong> หรือเรียกว่า <strong>Ids</strong> (แกนตั้ง) ซึ่งจะขึ้นอยู่กับ <strong>Vgs</strong> ที่ใช้งาน  </p>
+<p><img alt="" src="2n7000_curve_datasheet.jpg" /></p>
+<p>รูป: ตัวอย่างกราฟ <strong>Vds - Ids</strong> สำหรับ <strong>2N7000</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>การทดสอบและศึกษาคุณสมบัติของมอสเฟต</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างเขียนโค้ด <strong>Python</strong> เพื่อโปรแกรม <strong>Rigol DP832</strong> ผ่าน <strong>LXI</strong>
+แนะนำให้ผู้อ่านศึกษาแนวทางจากบทความต่อไปนี้</p>
+<ul>
+<li><a href="../python_dp832/"><strong>การเขียนโปรแกรม Python สำหรับ Rigol DP832 Programmable DC Power Supply</strong></a></li>
+</ul>
+<p>ในการใช้แหล่งจ่ายไฟ <strong>DC</strong> เพื่อทดสอบการทำงานของมอสเฟต จะใช้ช่องเอาต์พุต 2 ช่อง ได้แก่</p>
+<ul>
+<li><strong>CH1</strong>: เพื่อใช้กำหนดค่า <strong>Vgs</strong> (ในการทดลองให้ต่อตัวต้านทาน <strong>Pulldown</strong> ระหว่างขา <strong>G</strong> กับ <strong>S</strong> ด้วย)</li>
+<li><strong>CH2</strong>: เพื่อใช้กำหนดค่า <strong>Vds</strong> และวัดกระแส <strong>Ids</strong> และมีการตั้งค่าป้องกันกระแสเกิน
+(<strong>Over-Current Protection: OCP</strong>) ไว้ที่พิกัด <strong>1A</strong></li>
+</ul>
+<p>เอาต์พุตทั้งสองช่องต่อ <strong>Gnd</strong> ร่วมกันที่ขา <strong>S</strong> ของมอสเฟต แรงดัน <strong>Vgs</strong> จะถูกตั้งค่าให้คงที่ก่อน แล้วจึงมีการปรับแรงดันทีละระดับในช่วงที่กำหนดไว้ (<strong>DS Sweep</strong>) สำหรับ  <strong>Vds</strong> จากค่าต่ำสุดไปยังสูงสุด และมีการวัดกระแส <strong>Ids</strong> </p>
+<p>ในโค้ดตัวอย่าง มีการสร้างและเรียกใช้ฟังก์ชัน <code>mosfetTest()</code>
+ซึ่งจะต้องกำหนดค่า <strong>Vgs</strong> และช่วงของแรงดันสำหรับ <strong>Vds</strong>  สำหรับการทำ <strong>DC Sweep</strong>
+เมื่อฟังก์ชันทำงานเสร็จแล้ว จะได้รายการตัวเลขสำหรับแรงดัน <strong>Vds</strong> และกระแสไฟฟ้า  <strong>Ids</strong> เพื่อนำไปแสดงรูปกราฟ
+หากต้องการทดสอบซ้ำ แต่เปลี่ยนค่า <strong>Vgs</strong> ก็จะได้ชุดข้อมูล เพื่อนำไปแสดงรูปกราฟได้มากกว่าหนึ่งเส้น</p>
+<pre><code class="language-python">import vxi11
+import sys
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
+
+IP_ADDR = &quot;10.42.0.182&quot;  # Set the IP address of the DP832 device
+
+# Connect to the instrument
+try:
+    print(f&quot;Connecting to DP832 at {IP_ADDR}, default port 5555.&quot;)
+    instr = vxi11.Instrument(&quot;10.42.0.182&quot;)
+except OSError:
+    print('Device connection over LXI failed!')
+    sys.exit()
+
+######################################################################
+
+# Functions to control the instrument
+def enableOutput(channel, enable):
+    state = 'ON' if enable else 'OFF'
+    instr.write(f&quot;:OUTP CH{channel},{state}&quot;)
+
+def setVoltage(channel, volt):
+    instr.write(f&quot;:SOUR{channel}:VOLT:LEV {volt:.3f}&quot;)
+
+def getSetVoltage(channel):
+    return float(instr.ask(f&quot;:SOUR{channel}:VOLT?&quot;).strip())
+
+def getMeasuredVoltage(channel):
+    return float(instr.ask(f&quot;:MEAS:VOLT? CH{channel}&quot;).strip())
+
+def setCurrentLimit(channel, current):
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:CLE&quot;)  # Clear Current Protection
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:LEV {current:.3f}&quot;)  # Set Limit
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:STAT ON&quot;)  # Enable OCP
+    state = instr.ask(f&quot;:SOUR{channel}:CURR:PROT:STAT?&quot;).strip()
+    current = float(instr.ask(f&quot;:SOUR{channel}:CURR:PROT:LEV?&quot;).strip())
+    print(f&quot;OCP: {state}, Current Limit {current:.3f}A&quot;)
+
+def getMeasuredCurrent(channel):
+    return float(instr.ask(f&quot;:MEAS:CURR? CH{channel}&quot;).strip())
+
+def getTriggerState(channel):
+    return instr.ask(f&quot;:SOUR{channel}:CURR:PROT:TRIP?&quot;).strip()
+
+def mosfetTest(vgs, vds_sweep):
+    vgs_channel = 1
+    vds_channel = 2
+    setVoltage(vgs_channel, 0.0) 
+    setVoltage(vds_channel, 0.0) 
+    setCurrentLimit(vgs_channel, 0.1) # OCP CH1: 0.1A max.
+    setCurrentLimit(vds_channel, 2.0) # OCP CH2: 2.0A max.
+    enableOutput(vgs_channel, True) 
+    enableOutput(vds_channel, True) 
+
+    voltages = []
+    currents = []
+    setVoltage(vgs_channel, vgs) # Set Vgs
+    time.sleep(0.2)
+    volt = 0.0
+    for i in range(10):
+        volt = getMeasuredVoltage(vgs_channel)
+        if abs(vgs-volt) &lt;= 0.005:
+            break
+        time.sleep(0.2)
+    print(f&quot;Vgs: {volt:.3f}V (meas.) {vgs:.3f}V (set)&quot;)
+
+    vds_min, vds_max, vds_step = vds_sweep
+    print(f&quot;Vds: min={vds_min:.3f}V, max={vds_max:.3f}V, step={vds_step:.3f}V&quot;)
+
+    vds = vds_min
+    while vds &lt;= vds_max:
+        setVoltage(vds_channel, vds)
+        time.sleep(0.2)
+        volt = 0.0
+        for i in range(10):
+            volt = getMeasuredVoltage(vds_channel)
+            if abs(volt-vds) &lt;= 0.005:
+               break
+            time.sleep(0.1)
+
+        if getTriggerState(vds_channel) == 'YES':
+            print('OCP triggered...')
+            break
+
+        samples = [] # used to store current samples
+        for i in range(5):
+            samples.append( getMeasuredCurrent(vds_channel) )
+            time.sleep(0.2)
+        current = max(samples) # use the max values of the samples
+
+        print(f&quot;Id: {current:.3f}A (meas.)&quot;, 
+              f&quot;Vds: {volt:.3f}V (meas.), {vds:.3f}V (set)&quot;)
+        voltages.append(volt)
+        currents.append(current)        
+
+        # Adjust Vds stepping
+        if vds &gt;= 0.2:
+            step = int(2.5**int(vds/0.2)) * vds_step
+        else:
+            step = vds_step
+        vds += min(step,0.2)
+
+    # Reset voltages and disable output
+    setVoltage(vgs_channel, 0.0)
+    setVoltage(vds_channel, 0.0)
+    time.sleep(2.0)
+    enableOutput(vgs_channel, False)
+    enableOutput(vds_channel, False)
+    print(&quot;Voltage sweep complete.\n&quot;)
+
+    return voltages, currents, vgs  # Include Vgs in return for plotting
+
+# Function to plot results
+def plot_results(data, mosfet_name):
+
+    fig = plt.figure(figsize=(9, 6))
+    fig.canvas.manager.set_window_title(&quot;DP832 - MOSFET Testing&quot;)
+
+    for voltages, currents, vgs in data:
+        voltages = np.array(voltages)
+        currents = np.array(currents)
+
+        if len(voltages) &gt; 3:
+            cs = CubicSpline(voltages, currents) # Cubic spline interpolation
+            v_smooth = np.linspace(min(voltages), max(voltages), 100)
+            i_smooth = cs(v_smooth)
+        else:
+            v_smooth, i_smooth = voltages, currents # if not enough points
+
+        plt.plot(voltages, currents, 'o', ms=2.0, label=None)
+        plt.plot(v_smooth, i_smooth, '-', label=f&quot;Vgs={vgs}V&quot;)
+
+    plt.xlabel(&quot;Drain-Source Voltage (Vds) [V]&quot;)
+    plt.ylabel(&quot;Drain Current (Ids) [A]&quot;)
+    plt.title(f&quot;MOSFET ({mosfet_name}) I-V Characteristic Curves&quot;)
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+try:
+    mosfet_model = 'IRL3705'
+    vgs_params = [2.2, 2.3, 2.4, 2.5, 2.6]
+    # Sweep multiple Vgs values and collect data
+    data = []
+    for vgs in vgs_params: # Vgs parameters
+        voltages, currents, vgs = mosfetTest(vgs,vds_sweep=(0.0,2.5,0.05))
+        data.append((voltages, currents, vgs))
+    # Plot the results
+    plot_results(data, mosfet_model)
+except AssertionError as ex:
+    print(ex)
+except KeyboardInterrupt as ex:
+    print('Terminated by user')
+finally:
+    enableOutput(1, False)
+    enableOutput(2, False)
+    print('Done')
+</code></pre>
+<p><img alt="" src="dp832_mosfet_testing.jpg" /></p>
+<p>รูป: ตัวอย่างการทดสอบโดยใช้ <strong>Rigol DS832</strong></p>
+<p>ถัดไปเป็นรูปกราฟที่ได้จากการทดลองสำหรับมอสเฟต <strong>IRL3705</strong> และ <strong>IRL540N</strong> (ไอซีผลิตในประเทศจีน)</p>
+<p><img alt="" src="irl3705_curve.jpg" /></p>
+<p>รูป: ตัวอย่างกราฟสำหรับ <strong>IRL3705 N-Channel Power MOSFET</strong></p>
+<p><img alt="" src="irl540n_curve.jpg" /></p>
+<p>รูป: ตัวอย่างกราฟสำหรับ <strong>IRL540N N-Channel Power MOSFET</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการทดสอบทรานซิสเตอร์ประเภทมอสเฟตชนิดเอ็น (<strong>N-Channel MOSFET</strong>)
+โดยใช้การเขียนโปรแกรมภาษา <strong>Python</strong> สำหรับ <strong>Rigol DP832 DC Power Supply</strong>
+และนำข้อมูลที่วัดได้มาแสดงรูปกราฟแสดงความสัมพันธ์ระหว่าง <strong>Vds</strong> กับ <strong>Ids</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../python_dp832/"><strong>การเขียนโปรแกรม Python สำหรับ Rigol DP832 Programmable DC Power Supply</strong></a></li>
+<li><a href="../dp832_diode_testing/"><strong>การโปรแกรม Rigol DP832 DC Supply เพื่อทดสอบไดโอด</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-03-31 | Last Updated: 2025-04-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
