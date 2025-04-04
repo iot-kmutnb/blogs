@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/dps150_dc_supply/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรมควบคุม FNIRSI DPS-150 DC Supply ด้วยภาษา Python - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#fnirsi-dps-150-dc-supply-python" class="nav-link">การเขียนโปรแกรมควบคุม FNIRSI DPS-150 DC Supply ด้วยภาษา Python</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#fnirsi-dps-150-programmable-dc-switching-power-supply" class="nav-link">&#9655; FNIRSI DPS-150 Programmable DC Switching Power Supply</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การเขียนโปรแกรมควบคุมการทำงาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fnirsi-dps-150-dc-supply-python">การเขียนโปรแกรมควบคุม FNIRSI DPS-150 DC Supply ด้วยภาษา Python<a class="headerlink" href="#fnirsi-dps-150-dc-supply-python" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>FNIRSI DPS-150</em>, <em>Programmable DC Supply</em>,
+<em>Python</em>, <em>LED I-V Curve Tracing</em></p>
+<hr />
+<h2 id="fnirsi-dps-150-programmable-dc-switching-power-supply">&#9655; FNIRSI DPS-150 Programmable DC Switching Power Supply<a class="headerlink" href="#fnirsi-dps-150-programmable-dc-switching-power-supply" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโปรแกรมโดยใช้ภาษา <strong>Python</strong> เพื่อสื่อสารผ่านพอร์ตอนุกรม
+<strong>Serial</strong> เพื่อควบคุมการทำงานของอุปกรณ์ 
+<a href="https://www.fnirsi.com/products/dps-150"><strong>DPS-150</strong></a>
+ซึ่งเป็นแหล่งจ่ายไฟแบบ <strong>Regulated DC Switching</strong> มีเอาต์พุต 1 ช่อง
+ของบริษัท <strong>FNIRSI</strong> (เนอร์สิ) จากประเทศจีน</p>
+<p>คุณสมบัติของอุปกรณ์ <strong>DPS-150</strong>:</p>
+<ul>
+<li><strong>Input Supply</strong>:<ul>
+<li>PD / QC fast charger: USB Type Port</li>
+<li>Power bank: 5V / 2A, USB Type Port</li>
+<li>DC power adapters: 5V ~ 30V, DC Jack </li>
+</ul>
+</li>
+<li><strong>Input Voltage</strong>: DC 5.0V ~ 32V (Undervoltage lockout if below 5.0V)</li>
+<li><strong>Input Current</strong>: 100mA ~ 5A</li>
+<li><strong>Output Voltage</strong>: 0 ~ 30V (Resolution: 10mV)</li>
+<li><strong>Output Current</strong>: 0 ~ 5A (Resolution: 1mA)</li>
+<li><strong>Output Power</strong>: 150W (max.) (@30V / 5A)</li>
+<li><strong>Output Connector</strong>: 4mm Banana Jack</li>
+<li><strong>IPS Screen</strong>: 4-Digit, 2.8 Inch (320x240 pixels)</li>
+<li><strong>Protection</strong>:<ul>
+<li>Over-Voltage Protection (OVP)</li>
+<li>Over-Current Protection (OCP)</li>
+<li>Short Circuit Protection</li>
+<li>Reverse Output Protection</li>
+<li>Overtemperature Protection</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="dps-150.jpg" /></p>
+<p>รูป: อุปกรณ์ <strong>DPS-150</strong></p>
+<p>ผู้ใช้สามารถดาวน์โหลดและติดตั้งซอฟต์แวร์ของบริษัท <strong>Fnirsi</strong> เพื่อใช้งานกับ <strong>DPS-150</strong>
+สำหรับระบบปฏิบัติการ <strong>Windows</strong> และสามารถเชื่อมต่อกับอุปกรณ์ผ่านทางพอร์ต <strong>USB</strong> ได้ </p>
+<ul>
+<li><a href="https://www.fnirsi.com/pages/software-downloads">https://www.fnirsi.com/pages/software-downloads</a></li>
+</ul>
+<p><img alt="" src="dps-150_software.jpg" /></p>
+<p>รูป: ตัวอย่าง <strong>GUI</strong> ของโปรแกรมสำหรับอุปกรณ์ของ <strong>FNIRSI</strong></p>
+<p>ในการทดลองใช้งาน <strong>DSP-150</strong> ได้ใช้ <strong>100W GaN PD Fast Charger</strong> เป็นแหล่งจ่าย
+โดยจะสร้างแรงดันอินพุตได้ไม่เกิน 20V โดยประมาณ</p>
+<p>แม้ว่าทางบริษัทไม่ได้เปิดเผย <strong>API</strong> หรือ เอกสารเกี่ยวกับรูปแบบการสื่อสารข้อมูลกับอุปกรณ์
+แต่ก็มีนักพัฒนาได้เผยแพร่ตัวอย่างโค้ด เช่น <a href="https://github.com/cho45/fnirsi-dps-150"><code>cho45/fnirsi-dps-150</code></a> ซึ่งใช้ภาษา <strong>Nodejs</strong> ที่สามารถสื่อสารกับอุปกรณ์ได้ แต่ในบทความนี้ จะลองเขียนโค้ดด้วยภาษา <strong>Python</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; การเขียนโปรแกรมควบคุมการทำงาน<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p><strong>FNIRSI DPS-150</strong> เชื่อมต่อกับคอมพิวเตอร์ผู้ใช้ โดยใช้สาย <strong>Micro-USB</strong> ซึ่งจะมองเห็นเป็นพอร์ตอนุกรม
+(<strong>USB Serial Port</strong>) มีค่า <strong>Baudrate</strong> เท่ากับ <strong>115200</strong> </p>
+<p>การเขียนโค้ดด้วย <strong>Python</strong> ในบทความนี้ ได้ใช้ระบบปฏิบัติการ <strong>Ubuntu 22.04</strong> ในการทดสอบ
+ดังนั้นให้เชื่อมต่ออุปกรณ์กับเครื่องคอมพิวเตอร์ แล้วทำคำสั่ง <code>lsusb</code> เพื่อดูว่า สามารถมองเห็นอุปกรณ์
+<strong>Vendor ID (VID)</strong> และ <strong>Product ID (PID)</strong> ตรงกับ <code>0x2e3c:0x5740</code> หรือไม่ </p>
+<pre><code class="language-text">$ lsusb | grep &quot;2e3c:5740&quot;
+Bus 001 Device 077: ID 2e3c:5740 Artery AT32 Virtual Com Port
+</code></pre>
+<p>ชื่อพอร์ตที่ใช้งานคือ <code>/dev/ttyACM0</code></p>
+<p>ถัดไปให้ติดตั้งไลบรารีสำหรับ <strong>Python</strong> ต่อไปนี้ เพื่อใช้ในการทดลองเขียนโค้ด</p>
+<pre><code class="language-python">$ pip3 install pyserial matplotlib numpy scipy
+</code></pre>
+<p>ลองมาดูตัวอย่างการสร้างคลาส <code>DPS150</code> ในไฟล์ที่มีชื่อว่า <code>dps150.py</code>
+การควบคุมและตั้งค่าการใช้งานอุปกรณ์  <strong>DPS-150</strong> จะต้องมีการส่งชุดคำสั่งและข้อมูลไบต์
+โดยใช้คำสั่ง <code>sendCommand(...)</code> และมีการอ่านชุดข้อมูลไบต์ตอบกลับมา
+โดยใช้คำสั่ง <code>getResponse(...)</code> ซึ่งจะมีการอ่านข้อมูลไบต์ซ้ำหลายครั้ง
+เพื่อตรวจสอบและอัปเดตค่าและสถานะการทำงานของอุปกรณ์ และเก็บไว้ในตัวแปรภายในที่มีชื่อว่า <code>values</code> ดังนี้</p>
+<ul>
+<li><code>values[ 'set_voltage' ]</code> ค่าแรงดันเอาต์พุตที่กำหนดไว้ [V]</li>
+<li><code>values[ 'voltage_limit' ]</code> ค่าแรงดันไฟฟ้าเอาต์พุตสูงสุด [V] สำหรับ <strong>OVP</strong></li>
+<li><code>values[ 'current_limit' ]</code> ค่ากระแสไฟฟ้าเอาต์พุตสูงสุด [A] สำหรับ <strong>OCP</strong></li>
+<li><code>values[ 'voltage' ]</code> แรงดันไฟฟ้าเอาต์พุตที่วัดได้ [V]</li>
+<li><code>values[ 'current' ]</code>  กระแสไฟฟ้าเอาต์พุตที่วัดได้ [A]</li>
+<li><code>values[ 'power' ]</code> กำลังไฟฟ้าเอาต์พุตที่ได้ [W]</li>
+<li><code>values[ 'capacity' ]</code> ปริมาณประจุไฟฟ้าที่ได้จากการชาร์จแบตเตอรี่ [Ah] </li>
+<li><code>values[ 'energy' ]</code> พลังงานไฟฟ้าที่ใช้ไป [Wh]</li>
+<li><code>values[ 'temperature' ]</code> อุณหภูมิ</li>
+<li><code>values[ 'ctrl_mode' ]</code> สถานะของโหมดการป้องกัน <strong>OVP</strong> หรือ <strong>OCP</strong></li>
+</ul>
+<p><strong>File:</strong> <code>dps150.py</code></p>
+<pre><code class="language-python">import serial
+import struct
+
+class DPS150:
+
+    def __init__(self, port: str, baudrate: int=115200, timeout: float=0.2):
+         # Open the serial port
+        self.ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
+        # Reset the serial input buttfer
+        self.ser.reset_input_buffer()
+        self.values = {
+            'set_voltage': 0.0,
+            'voltage_limit': 0.0,
+            'current_limit': 0.0,
+            'voltage': 0.0,
+            'current': 0.0,
+            'power': 0.0,
+            'energy': 0.0,
+            'capacity': 0.0,
+            'temperature': 0.0,
+            'ctrl_mode': 'CV' # CV or CC mode
+        }
+        # Enable output message
+        self.sendCommand(0xC1, 0x00, bytes([0x01]))
+
+    @staticmethod
+    def checksum(data: bytes) -&gt; int:
+        &quot;&quot;&quot;Calculate checksum as the sum of all bytes modulo 256.&quot;&quot;&quot;
+        return sum(data) % 256
+
+    def sendCommand(self, command: int, data_type: int, data: bytes):
+        &quot;&quot;&quot;Send a command sequence to the DPS-150 power supply.&quot;&quot;&quot;
+        packet = bytearray([0xF1, command, data_type, len(data)]) + data
+        packet.append(self.checksum(packet[2:]))
+        self.ser.write(packet)
+        self.ser.flush()
+
+    def getResponse(self) -&gt; bytes:
+        &quot;&quot;&quot;Get and process data from the DPS-150 power supply.&quot;&quot;&quot;
+        while True:
+            start_byte = self.ser.read(1)
+            if start_byte and start_byte[0] == 0xF0:
+                break  
+
+        header = self.ser.read(3)
+        if len(header) &lt; 3:
+            print(&quot;Incomplete header&quot;)
+            return None
+
+        cmd, data_type, data_length = header
+        if cmd != 0xA1:
+            print(&quot;Invalid command byte!&quot;)
+            return None
+
+        # Read data bytes with checksum
+        data_checksum = self.ser.read(data_length + 1)
+        if len(data_checksum) &lt; data_length + 1:
+            print(&quot;Incomplete data and checksum&quot;)
+            return None
+
+        data, recv_checksum = data_checksum[:-1], data_checksum[-1]
+        if recv_checksum != self.checksum(header[1:] + data):
+            print(&quot;Invalid checksum&quot;)
+            return None
+
+        self.processData(data_type, data)
+        return start_byte + header + data_checksum
+
+    def processData(self, data_type: int, data: bytes):
+        &quot;&quot;&quot;Parse received data and update measurements.&quot;&quot;&quot;
+        if data_type == 0xC0:
+            self.values['set_voltage'] = struct.unpack('&lt;f', data[:4])[0]
+        elif data_type == 0xC3:
+            self.values.update({
+                'voltage': struct.unpack('&lt;f', data[:4])[0],
+                'current': struct.unpack('&lt;f', data[4:8])[0],
+                'power'  : struct.unpack('&lt;f', data[8:12])[0]
+            })
+        elif data_type == 0xDA:
+            self.values['energy'] = struct.unpack('&lt;f', data[:4])[0]
+        elif data_type == 0xD9:
+            self.values['capacity'] = struct.unpack('&lt;f', data[:4])[0]
+        elif data_type == 0xE2:
+            self.values['voltage_limit'] = struct.unpack('&lt;f', data[:4])[0]
+        elif data_type == 0xE3:
+            self.values['current_limit'] = struct.unpack('&lt;f', data[:4])[0]
+        elif data_type == 0xDD:
+            self.values['ctrl_mode'] = ['CC', 'CV'][int(data[0])]
+        elif data_type == 0xC4:
+            self.values['temperature'] = struct.unpack('&lt;f', data[:4])[0]
+
+    def setOutput(self, voltage: float, current: float=0.0):
+        &quot;&quot;&quot;Set the output voltage and current limit.&quot;&quot;&quot;
+        self.sendCommand(0xB1, 0xC1, struct.pack('&lt;f', voltage))
+        if current &gt; 0.0:
+            self.sendCommand(0xB1, 0xC2, struct.pack('&lt;f', current))
+
+    def enableOutput(self, enable: bool):
+        &quot;&quot;&quot;Enable or disable the power output.&quot;&quot;&quot;
+        self.sendCommand(0xB1, 0xDB, bytes([0x01 if enable else 0x00]))
+
+    def enableMetering(self, enable: bool):
+        &quot;&quot;&quot;Enable or disable metering.&quot;&quot;&quot;
+        self.sendCommand(0xB1, 0xD8, bytes([0x01 if enable else 0x00]))
+
+    def close(self):
+        # disable output message
+        self.sendCommand(0xC1, 0x00, bytes([0x00]))
+        &quot;&quot;&quot;Close the serial connection.&quot;&quot;&quot;
+        self.ser.flush()
+        self.ser.close()
+
+</code></pre>
+<p>ถัดไปเป็นตัวอย่างโค้ดที่ใช้ในการทดสอบ <strong>3W LED</strong> (กำลังสูง) โดยปรับแรงดันไฟฟ้าขึ้นจาก <code>0V</code>
+ไปจนถึง <code>3.3V</code> ถ้ากระแสที่ไหลผ่าน <strong>LED</strong> ไม่เกินพิกัดกระแสไฟฟ้าที่กำหนดไว้คือ <code>0.7A</code> </p>
+<p><strong>File:</strong> <code>dps150_led_test.py</code></p>
+<pre><code class="language-python">import time
+from dps150 import *
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
+
+def plotData( voltages, currents ):
+    # Perform Cubic Spline interpolation
+    print( &quot;Performing curve fitting and plot the data&quot; )
+    try:
+        # Perform cubic spline interpolation
+        cs = CubicSpline(voltages, currents)
+        # Generate more points for the fitted curve
+        npoints = 10*len(voltages)
+        fit_voltages = np.linspace(min(voltages), max(voltages), npoints) 
+        fit_currents = cs(fit_voltages)
+    except RuntimeError:
+        print(&quot;Curve fitting failed!&quot;)
+        fit_currents = currents # Use measured data
+
+    # Plot V-I curve
+    fig = plt.figure( figsize=(10,6) )
+    fig.canvas.manager.set_window_title(&quot;DC Sweep Demo&quot;)
+    # Plot the measured data and fitted spline curve
+    plt.plot(voltages, currents, 'o', ms=2.0, color='#0000ff')
+    plt.plot(fit_voltages, fit_currents, '-', color='#00aaff')
+    plt.xlabel(&quot;Voltage (V)&quot;)
+    plt.ylabel(&quot;Current (A)&quot;)
+    plt.title(&quot;V-I Curve: High-Power LED Testing&quot;)
+    plt.legend('',frameon=False)
+    plt.grid()
+    plt.savefig(&quot;plot.png&quot;, dpi=300, bbox_inches='tight')
+    plt.show()
+
+def main():
+    print(&quot;Connecting to DSP-150...&quot;)
+
+    # Open a serial connection to the DSP-150 device
+    dps = DPS150('/dev/ttyACM0')    
+    dps.enableOutput(False)
+    dps.enableMetering(True)
+    time.sleep(0.1)
+
+    V_START = 0.0       # [V] Set the start voltage
+    V_END   = 3.3       # [V] Set the end voltage for DC voltage sweep
+    current_limit = 0.7 # [A] Set the max. current (limit)
+
+    print( f&quot;Set output to 0.0V with current limit: {current_limit}A&quot;)    
+    dps.setOutput( voltage=0.0, current = current_limit )
+    time.sleep(0.1)
+    print( &quot;Enable output...&quot;)
+    dps.enableOutput(True)
+    time.sleep(0.1)
+
+    voltages = []
+    currents  = []
+    try:
+        prev_volt = -0.01
+        volt = V_START
+        current = 0
+        running = True
+        while running: # DC voltage sweep
+            dps.setOutput(volt) # Set output voltage
+            time.sleep(0.25)
+            for _ in range(8):
+                dps.getResponse()
+                if dps.values['ctrl_mode'] == 'CC':
+                    print(&quot;Current Limit...&quot;)
+                    running = False
+                    break
+                if dps.values['voltage'] &gt; prev_volt:
+                    prev_volt = dps.values['voltage']
+                    print(f&quot;V={prev_volt:.2f}V, &quot; 
+                          f&quot;I={dps.values['current']:.3f}A, &quot;
+                          f&quot;P={dps.values['power']:.2f}W, &quot;
+                          f&quot;Mode={dps.values['ctrl_mode']}&quot;)
+                    voltages.append( dps.values['voltage'] )
+                    current = dps.values['current']
+                    currents.append( current )
+                time.sleep(0.01)
+
+            if prev_volt &gt; 0 and prev_volt &gt; dps.values['voltage']:
+                running = False
+
+            if volt &lt; V_END/2:
+                volt += 0.2
+            elif current &gt; 0.001:
+                volt += 0.05
+            else:
+                volt += 0.1
+            time.sleep(0.1)
+
+        print(&quot;Disabling output...&quot;)
+        dps.enableOutput(False)
+
+        plotData( voltages, currents )
+
+    except KeyboardInterrupt:
+        print(&quot;Terminated...&quot;)
+
+    finally:
+        print(&quot;Disabling output...&quot;)
+        dps.enableOutput(False)
+        dps.setOutput(0, 0)
+        time.sleep(0.1)
+        dps.close()
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p><img alt="" src="3w_led_test-1.jpg" /></p>
+<p><img alt="" src="3w_led_test-2.jpg" /></p>
+<p>รูป: ตัวอย่างการทดสอบ <strong>3W LED</strong></p>
+<p><img alt="" src="3w_led_curve.jpg" /></p>
+<p>รูป: กราฟแสดงความสัมพันธ์ระหว่างกระแสและแรงดันไฟฟ้าของ <strong>3W LED</strong> ที่ได้จากการทดสอบ</p>
+<p>อีกตัวอย่างหนึ่งคือ การทดสอบแผง <strong>LED</strong> ที่มีการนำ <strong>LED</strong> แบบ <strong>SMD</strong>
+หลาย ๆ ตัว (50 ดวง) มาต่อขนานกัน ใช้กับแรงดันไฟฟ้าประมาณ <strong>3.2V-3.5V</strong></p>
+<p><img alt="" src="led_panel_test-1.jpg" /></p>
+<p><img alt="" src="led_panel_test-2.jpg" /></p>
+<p>รูป: ตัวอย่างการทดสอบ <strong>50-LED Panel</strong></p>
+<p><img alt="" src="solar_led_panel_curve.jpg" /></p>
+<p>รูป: กราฟแสดงความสัมพันธ์ระหว่างกระแสและแรงดันไฟฟ้าของ <strong>LED Panel</strong> ที่ได้จากการทดสอบ</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอโค้ด <strong>Python</strong> ที่สามารถใช้ในการควบคุมการทำงานและอ่านค่าปริมาณทางไฟฟ้าจากอุปกรณ์
+<strong>DPS-150 DC Supply</strong> และมีการสาธิตการทดสอบ <strong>LED</strong> โดยปรับค่าแรงดันไฟฟ้าในช่วงที่กำหนด
+หรือ <strong>DC Sweep</strong> และตั้งค่าพิกัดกระแสสูงสุด ข้อมูลที่จากการทดลองสามารถนำไปแสดงรูปกราฟได้โดยอัตโนมัติ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-04-03 | Last Updated: 2025-04-04</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -170,10 +170,12 @@ Vds(max)=55V, Vgs(max)=16V, Rds(on)=0.01Ω (max) @Vgs=10V, Id(max)= 89A, Vth=1V.
 <li><strong>CH2</strong>: เพื่อใช้กำหนดค่า <strong>Vds</strong> และวัดกระแส <strong>Ids</strong> และมีการตั้งค่าป้องกันกระแสเกิน
 (<strong>Over-Current Protection: OCP</strong>) ไว้ที่พิกัด <strong>1A</strong></li>
 </ul>
-<p>เอาต์พุตทั้งสองช่องต่อ <strong>Gnd</strong> ร่วมกันที่ขา <strong>S</strong> ของมอสเฟต แรงดัน <strong>Vgs</strong> จะถูกตั้งค่าให้คงที่ก่อน แล้วจึงมีการปรับแรงดันทีละระดับในช่วงที่กำหนดไว้ (<strong>DS Sweep</strong>) สำหรับ  <strong>Vds</strong> จากค่าต่ำสุดไปยังสูงสุด และมีการวัดกระแส <strong>Ids</strong> </p>
+<p>เอาต์พุตทั้งสองช่องต่อ <strong>Gnd</strong> ร่วมกันที่ขา <strong>S</strong> ของมอสเฟต แรงดัน <strong>Vgs</strong>
+จะถูกตั้งค่าให้คงที่ก่อน แล้วจึงมีการปรับแรงดันทีละระดับในช่วงที่กำหนดไว้ (<strong>DS Sweep</strong>)
+สำหรับ <strong>Vds</strong> จากค่าต่ำสุดไปยังสูงสุด และมีการวัดกระแส <strong>Ids</strong></p>
 <p>ในโค้ดตัวอย่าง มีการสร้างและเรียกใช้ฟังก์ชัน <code>mosfetTest()</code>
-ซึ่งจะต้องกำหนดค่า <strong>Vgs</strong> และช่วงของแรงดันสำหรับ <strong>Vds</strong>  สำหรับการทำ <strong>DC Sweep</strong>
-เมื่อฟังก์ชันทำงานเสร็จแล้ว จะได้รายการตัวเลขสำหรับแรงดัน <strong>Vds</strong> และกระแสไฟฟ้า  <strong>Ids</strong> เพื่อนำไปแสดงรูปกราฟ
+ซึ่งจะต้องกำหนดค่า <strong>Vgs</strong> และช่วงของแรงดันสำหรับ <strong>Vds</strong> สำหรับการทำ <strong>DC Sweep</strong>
+เมื่อฟังก์ชันทำงานเสร็จแล้ว จะได้รายการตัวเลขสำหรับแรงดัน <strong>Vds</strong> และกระแสไฟฟ้า <strong>Ids</strong> เพื่อนำไปแสดงรูปกราฟ
 หากต้องการทดสอบซ้ำ แต่เปลี่ยนค่า <strong>Vgs</strong> ก็จะได้ชุดข้อมูล เพื่อนำไปแสดงรูปกราฟได้มากกว่าหนึ่งเส้น</p>
 <pre><code class="language-python">import vxi11
 import sys
@@ -209,7 +211,7 @@ def getMeasuredVoltage(channel):
     return float(instr.ask(f&quot;:MEAS:VOLT? CH{channel}&quot;).strip())
 
 def setCurrentLimit(channel, current):
-    instr.write(f&quot;:SOUR{channel}:CURR:PROT:CLE&quot;)  # Clear Current Protection
+    instr.write(f&quot;:SOUR{channel}:CURR:PROT:CLE&quot;) # Clear Current Protection
     instr.write(f&quot;:SOUR{channel}:CURR:PROT:LEV {current:.3f}&quot;)  # Set Limit
     instr.write(f&quot;:SOUR{channel}:CURR:PROT:STAT ON&quot;)  # Enable OCP
     state = instr.ask(f&quot;:SOUR{channel}:CURR:PROT:STAT?&quot;).strip()
@@ -225,12 +227,12 @@ def getTriggerState(channel):
 def mosfetTest(vgs, vds_sweep):
     vgs_channel = 1
     vds_channel = 2
-    setVoltage(vgs_channel, 0.0) 
-    setVoltage(vds_channel, 0.0) 
+    setVoltage(vgs_channel, 0.0)
+    setVoltage(vds_channel, 0.0)
     setCurrentLimit(vgs_channel, 0.1) # OCP CH1: 0.1A max.
     setCurrentLimit(vds_channel, 2.0) # OCP CH2: 2.0A max.
-    enableOutput(vgs_channel, True) 
-    enableOutput(vds_channel, True) 
+    enableOutput(vgs_channel, True)
+    enableOutput(vds_channel, True)
 
     voltages = []
     currents = []
@@ -245,7 +247,7 @@ def mosfetTest(vgs, vds_sweep):
     print(f&quot;Vgs: {volt:.3f}V (meas.) {vgs:.3f}V (set)&quot;)
 
     vds_min, vds_max, vds_step = vds_sweep
-    print(f&quot;Vds: min={vds_min:.3f}V, max={vds_max:.3f}V, step={vds_step:.3f}V&quot;)
+    print(f&quot;Vds: min={vds_min:.3f}V, max={vds_max:.3f}V,step={vds_step:.3f}V&quot;)
 
     vds = vds_min
     while vds &lt;= vds_max:
@@ -288,7 +290,7 @@ def mosfetTest(vgs, vds_sweep):
     enableOutput(vds_channel, False)
     print(&quot;Voltage sweep complete.\n&quot;)
 
-    return voltages, currents, vgs  # Include Vgs in return for plotting
+    return voltages, currents, vgs # Include Vgs in return for plotting
 
 # Function to plot results
 def plot_results(data, mosfet_name):
@@ -338,11 +340,14 @@ finally:
 </code></pre>
 <p><img alt="" src="dp832_mosfet_testing.jpg" /></p>
 <p>รูป: ตัวอย่างการทดสอบโดยใช้ <strong>Rigol DS832</strong></p>
-<p>ถัดไปเป็นรูปกราฟที่ได้จากการทดลองสำหรับมอสเฟต <strong>IRL3705</strong> และ <strong>IRL540N</strong> (ไอซีผลิตในประเทศจีน)</p>
+<p>ถัดไปเป็นรูปกราฟที่ได้จากการทดลองสำหรับมอสเฟต <strong>IRL3705</strong>, <strong>IRL540N</strong>
+และ <strong>IRF3205</strong> (ไอซีผลิตในประเทศจีน)</p>
 <p><img alt="" src="irl3705_curve.jpg" /></p>
 <p>รูป: ตัวอย่างกราฟสำหรับ <strong>IRL3705 N-Channel Power MOSFET</strong></p>
 <p><img alt="" src="irl540n_curve.jpg" /></p>
 <p>รูป: ตัวอย่างกราฟสำหรับ <strong>IRL540N N-Channel Power MOSFET</strong></p>
+<p><img alt="" src="irf3205_curve.jpg" /></p>
+<p>รูป: ตัวอย่างกราฟสำหรับ <strong>IRF3205 N-Channel Power MOSFET</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
@@ -357,7 +362,7 @@ finally:
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-03-31 | Last Updated: 2025-04-01</p></div>
+<p>Created: 2025-03-31 | Last Updated: 2025-04-02</p></div>
             </div>
         </div>
 
