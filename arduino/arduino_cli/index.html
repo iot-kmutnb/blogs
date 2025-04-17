@@ -118,6 +118,14 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#windows-cmd" class="nav-link">&#9655; ตัวอย่างการเขียนสคริปต์สำหรับ Windows CMD</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#makefile" class="nav-link">&#9655; ตัวอย่างการเขียนสคริปต์สำหรับ Makefile</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -130,7 +138,7 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="arduino-cli">การใช้งาน Arduino CLI<a class="headerlink" href="#arduino-cli" title="Permanent link">#</a></h1>
-<p><strong>Keywords</strong>: <em>Arduino</em>, <em>Arduino CLI</em></p>
+<p><strong>Keywords</strong>: <em>Arduino</em>, <em>Arduino CLI</em>, <em>Arduino ESP32</em>, <em>Arduino RP2040</em></p>
 <hr />
 <h2 id="arduino-cli_1">&#9655; <strong>Arduino CLI</strong><a class="headerlink" href="#arduino-cli_1" title="Permanent link">#</a></h2>
 <p>บทความนี้นำเสนอตัวอย่างการใช้โปรแกรม <strong>Arduino CLI (Command-Line Interface)</strong>
@@ -151,7 +159,8 @@
 <a href="https://arduino.github.io/arduino-cli/latest/installation/"><code>https://arduino.github.io/arduino-cli/latest/installation/</code></a></p>
 <p>สำหรับผู้ใช้ <strong>Linux / Ubuntu</strong> มีขั้นตอนดังนี้ (ทดลองใช้ <strong>Arduino CLI</strong> เวอร์ชัน <strong>v0.30</strong>)</p>
 <pre><code class="language-bash"># Install from github
-$ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+$ curl -fsSL \
+  https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
 
 # Update the $PATH variable
 $ export PATH=&quot;$PATH:`pwd`/bin&quot;
@@ -186,7 +195,16 @@ $env:Path -split ';'
 <pre><code class="language-text"># Create a config file written to $HOME/.arduino15/arduino-cli.yaml
 $ arduino-cli config init
 </code></pre>
-<p>แต่ถ้าเป็น <strong>Windows</strong> จะได้ไฟล์  <code>"$($env:UserProfile)\AppData\Local\Arduino15\arduino-cli.yaml"</code></p>
+<p>แต่ถ้าเป็น <strong>Windows</strong> จะได้ไฟล์</p>
+<p><strong>Windows PowerShell</strong>:</p>
+<ul>
+<li><code>"$($env:UserProfile)\AppData\Local\Arduino15\arduino-cli.yaml"</code></li>
+<li><code>"$env:USERPROFILE\AppData\Local\Arduino15\arduino-cli.yaml"</code></li>
+</ul>
+<p>หรือ <strong>Windows Command Prompt (cmd.exe)</strong></p>
+<ul>
+<li><code>"%USERPROFILE%\AppData\Local\Arduino15\arduino-cli.yaml"</code></li>
+</ul>
 <p>เมื่อทำคำสั่งแล้ว จะได้ไฟล์ใหม่ที่มีชื่อว่า <code>arduino-cli.yaml</code> และลองแสดงตัวอย่างข้อความในไฟล์ดังกล่าว
 (แสดงเฉพาะสองบรรทัดแรก)</p>
 <pre><code class="language-text"># Show the first two lines of $HOME/.arduino15/arduino-cli.yaml
@@ -207,6 +225,13 @@ board_manager:
     - https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
 </code></pre>
 <p>บันทึกการเปลี่ยนแปลงลงไฟล์ โดยกด <code>Ctrl+o</code> กด <code>Enter</code> แล้วกด <code>Ctrl+x</code> เพื่อจบการทำงานของ <code>nano</code></p>
+<p>หรือจะทำคำสั่งต่อไปนี้ ก็ได้เช่นกัน</p>
+<pre><code class="language-text">$ arduino-cli config add board_manager.additional_urls \
+  https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+$ arduino-cli config add board_manager.additional_urls \
+  https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+</code></pre>
 <p>จากนั้นให้ทำคำสั่งต่อไปนี้ เพื่ออัปเดตไฟล์ <code>package_xxx_index.json</code> สำหรับ <strong>Ardino Cores</strong>
 (ไฟล์ที่เกี่ยวข้องจะถูกดาวน์โหลดมาจากอินเทอร์เน็ต ซึ่งดูได้จากข้อความเอาต์พุตเมื่อทำคำสั่ง)</p>
 <pre><code class="language-text"># Update the index files of Arduino cores
@@ -226,20 +251,13 @@ Downloading index: package_rp2040_index.json downloaded
 $ arduino-cli core search 
 
 ID                    Version   Name                                                             
-arduino:avr           1.8.6     Arduino AVR Boards                                               
-arduino:mbed_edge     3.5.4     Arduino Mbed OS Edge Boards                                      
-arduino:mbed_nano     3.5.4     Arduino Mbed OS Nano Boards                                      
-arduino:mbed_nicla    3.5.5     Arduino Mbed OS Nicla Boards                                     
-arduino:mbed_opta     3.5.4     Arduino Mbed OS Opta Boards                                      
-arduino:mbed_portenta 3.5.4     Arduino Mbed OS Portenta Boards                                  
-arduino:mbed_rp2040   3.5.4     Arduino Mbed OS RP2040 Boards                                    
-arduino:megaavr       1.8.8     Arduino megaAVR Boards                                           
-arduino:nrf52         1.0.2     Arduino nRF52 Boards                                             
-arduino:sam           1.6.12    Arduino SAM Boards (32-bits ARM Cortex-M3)                       
-arduino:samd          1.8.13    Arduino SAMD Boards (32-bits ARM Cortex-M0+)                     
-emoro:avr             3.2.2     EMORO 2560                                                       
-esp32:esp32           2.0.6     esp32                                                            
-esp8266:esp8266       3.1.1     esp8266                                                          
+arduino:avr           1.8.6     Arduino AVR Boards
+arduino:megaavr       1.8.8     Arduino megaAVR Boards
+arduino:sam           1.6.12    Arduino SAM Boards (32-bits ARM Cortex-M3)
+arduino:samd          1.8.13    Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+....                                       
+esp32:esp32           2.0.6     esp32
+esp8266:esp8266       3.1.1     esp8266
 ....
 </code></pre>
 <p><img alt="" src="arduino_cli_ubuntu-3.png" /></p>
@@ -266,7 +284,7 @@ esp32:esp32 2.0.6   esp32
 <p>ถ้าต้องการติดตั้ง <strong>Arduino Core</strong> และโปรแกรมต่าง ๆ ที่เกี่ยวข้อง
 ก็ให้ทำคำสั่ง <code>arduino-cli core install &lt;core&gt;</code>
 โดยที่ <code>&lt;core&gt;</code> หมายถึง ชื่อของ <strong>Arduino Core</strong></p>
-<p>ตัวอย่างการติดตั้งสำหรับบอร์ด  <strong>AVR</strong> มีดังนี้ (และตัวอย่างข้อความเอาต์พุตเมื่อทำคำสั่ง)</p>
+<p>ตัวอย่างการติดตั้งสำหรับบอร์ด <strong>AVR</strong> มีดังนี้ (และตัวอย่างข้อความเอาต์พุตเมื่อทำคำสั่ง)</p>
 <pre><code class="language-text"># Install Arduino cores for AVR and corresponding tool dependencies.
 $ arduino-cli core install arduino:avr
 
@@ -320,8 +338,6 @@ Arduino Mini                     arduino:avr:mini
 Arduino Nano                     arduino:avr:nano
 Arduino Pro or Pro Mini          arduino:avr:pro
 Arduino Uno                      arduino:avr:uno
-Arduino Uno Mini                 arduino:avr:unomini
-Arduino Uno WiFi                 arduino:avr:unowifi
 ...
 </code></pre>
 <pre><code class="language-text">$ arduino-cli board listall arduino:megaavr
@@ -338,14 +354,14 @@ Arduino Uno WiFi Rev2 arduino:megaavr:uno2018
 <p>&nbsp;</p>
 <hr />
 <h2 id="arduino-libraries">&#9655; <strong>การค้นหาและติดตั้ง Arduino Libraries</strong><a class="headerlink" href="#arduino-libraries" title="Permanent link">#</a></h2>
-<p>คำสั่งสำหรับค้นหาไลบรารี ตามชื่อที่ระบุ  สามารถทำได้ตามตัวอย่างดังนี้ เช่น ค้นหาและแสดงรายการที่มีชื่อเริ่มต้นด้วย
+<p>คำสั่งสำหรับค้นหาไลบรารี ตามชื่อที่ระบุ สามารถทำได้ตามตัวอย่างดังนี้ เช่น
+ค้นหาและแสดงรายการที่มีชื่อเริ่มต้นด้วย
 <code>Adafruit</code></p>
 <pre><code class="language-text">$ arduino-cli lib search --names | grep -P &quot;^Name: \&quot;Adafruit.+\&quot;&quot;
 
 Name: &quot;Adafruit 10DOF&quot;
 Name: &quot;Adafruit 9DOF&quot;
 Name: &quot;Adafruit ADS1X15&quot;
-Name: &quot;Adafruit ADT7410 Library&quot;
 Name: &quot;Adafruit ADXL343&quot;
 Name: &quot;Adafruit ADXL345&quot;
 Name: &quot;Adafruit ADXL375&quot;
@@ -442,13 +458,171 @@ arduino-cli upload -p COM6 `
   --input-dir $SKETCH_NAME/build $SKETCH_NAME
 </code></pre>
 <hr />
+<h2 id="windows-cmd">&#9655; <strong>ตัวอย่างการเขียนสคริปต์สำหรับ Windows CMD</strong><a class="headerlink" href="#windows-cmd" title="Permanent link">#</a></h2>
+<p>เราสามารถสร้างไฟล์ <code>build.bat</code> ไว้ในไดเรกทอรีของโปรเจกต์ของ <strong>Arduino Sketch</strong>
+แล้วทำคำสั่งต่อไปนี้ เพื่อคอมไพล์โค้ด อัปโหลดเฟิร์มแวร์ที่ได้ไปยังบอร์ดไมโครคอนโทรลเลอร์ และเชื่อมต่อกับบอร์ด</p>
+<ul>
+<li><code>build.bat compile</code> </li>
+<li><code>build.bat upload</code></li>
+<li><code>build.bat monitor</code></li>
+</ul>
+<p>หรือทำทั้งสามขั้นตอนตามลำดับ</p>
+<ul>
+<li><code>build.bat compile &amp;&amp; build.bat upload &amp;&amp; build.bat upload</code></li>
+</ul>
+<p>ตัวอย่างการเขียนสคริปต์ มีดังนี้</p>
+<p><strong>File</strong>: <code>build.bat</code></p>
+<pre><code class="language-text">@echo off
+setlocal
+
+:: Input argument
+set &quot;ACTION=%1&quot;
+
+:: Configuration
+set &quot;PROJECT=.&quot;
+set &quot;BUILD_PATH=build&quot;
+set &quot;BOARD=esp32:esp32:lolin32-lite&quot;
+set &quot;PORT=COM25&quot;
+set &quot;BAUD=115200&quot;
+
+:: Show usage if no argument given
+if &quot;%ACTION%&quot;==&quot;&quot; (
+    echo Usage: %~nx0 ^&lt;compile^|upload^|monitor^&gt;
+    exit /b 1
+)
+
+:: === Actions Dispatcher ===
+if /i &quot;%ACTION%&quot;==&quot;compile&quot; goto :do_compile
+if /i &quot;%ACTION%&quot;==&quot;upload&quot;  goto :do_upload
+if /i &quot;%ACTION%&quot;==&quot;monitor&quot; goto :do_monitor
+
+echo -------------------------------------------------
+echo Unknown action: &quot;%ACTION%&quot;
+echo Valid options: compile, upload, monitor
+exit /b 1
+
+:: === Compile Step ===
+:do_compile
+echo -------------------------------------------------
+echo [1] Compiling the Arduino sketch...
+arduino-cli compile ^
+    --verbose ^
+    --build-path &quot;%BUILD_PATH%&quot; ^
+    --fqbn &quot;%BOARD%&quot; ^
+    &quot;%PROJECT%&quot;
+exit /b %errorlevel%
+
+:: === Upload Step ===
+:do_upload
+echo -------------------------------------------------
+echo [2] Uploading firmware to target board...
+arduino-cli upload ^
+    -p &quot;%PORT%&quot; ^
+    --build-path &quot;%BUILD_PATH%&quot; ^
+    --fqbn &quot;%BOARD%&quot; ^
+    &quot;%PROJECT%&quot;
+exit /b %errorlevel%
+
+:: === Monitor Step ===
+:do_monitor
+echo -------------------------------------------------
+echo [3] Opening serial monitor
+echo Use the serial port=%PORT% and baud=%BAUD%...
+arduino-cli monitor ^
+    -p &quot;%PORT%&quot; ^
+    --config baudrate=%BAUD%
+exit /b
+</code></pre>
+<p>ในสคริปต์ตัวอย่าง มีการระบุชื่อบอร์ดที่ต้องใช้การคือ <code>esp32:esp32:lolin32-lite</code>
+และมีการระบุหมายเลขพอร์ตอนุกรมคือ <code>COM25</code> และตั้งค่ <strong>BAUD=115200</strong></p>
+<p>สคริปต์ตัวอย่างนี้ ได้ทดลองใช้กับ <code>arduino-cli</code> เวอร์ชัน <code>1.2.0</code></p>
+<hr />
+<h2 id="makefile">&#9655; <strong>ตัวอย่างการเขียนสคริปต์สำหรับ Makefile</strong><a class="headerlink" href="#makefile" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างสคริปต์ <code>Makefile</code> สำหรับการใช้งานกับคำสั่ง <code>make</code> ภายใต้ <strong>Ubuntu Linux</strong>
+โดยนำไปใส่ไว้ในไดเรกทอรีของ <strong>Arduino Sketch</strong> ที่ต้องการใช้งาน และทำคำสั่งต่อไปนี้</p>
+<ul>
+<li><code>make compile</code></li>
+<li><code>make upload</code></li>
+<li><code>make monitor</code></li>
+</ul>
+<p><strong>File:</strong> <a href="./Makefile"><code>Makefile</code></a></p>
+<pre><code class="language-text"># === Configurable Variables ===
+SKETCH_DIR  ?= $(shell pwd)
+SKETCH_NAME ?= $(notdir $(SKETCH_DIR))
+BOARD_FQBN  ?= esp32:esp32:esp32
+PORT        ?= /dev/ttyUSB0
+BAUD        ?= 115200
+
+# === Commands ===
+CLI := arduino-cli
+
+# === Sketch Info ===
+SKETCH_NAME := $(notdir $(SKETCH_DIR))
+BUILD_DIR   := $(SKETCH_DIR)/build
+
+# === Targets ===
+.PHONY: all create compile upload monitor clean
+
+all: compile upload
+
+create:
+    @echo &quot;Creating sketch in $(SKETCH_DIR)...&quot;
+    $(CLI) sketch new $(SKETCH_DIR)
+
+compile:
+    @echo &quot;Compiling sketch and source files in $(SKETCH_DIR)...&quot;
+    $(CLI) compile --verbose --fqbn $(BOARD_FQBN) \
+        --build-path $(BUILD_DIR) $(SKETCH_DIR)
+
+upload:
+    @echo &quot;Uploading to board on $(PORT)...&quot;
+    $(CLI) upload -p $(PORT) --fqbn $(BOARD_FQBN) \
+        --input-dir $(BUILD_DIR)
+
+monitor:
+    @echo &quot;Starting serial monitor on $(PORT)...&quot;
+    $(CLI) monitor -p $(PORT) -c baudrate=$(BAUD) \
+        --fqbn $(BOARD_FQBN)
+
+clean:
+    @echo &quot;Cleaning build directory...&quot;
+    rm -rf $(BUILD_DIR)
+</code></pre>
+<p>&nbsp;</p>
+<p>ถ้าใช้กับอุปกรณ์ เช่น  <strong>ESP32-C3</strong> หรือ <strong>ESP32-S3</strong> 
+และตั้งค่าตัวเลือกในการคอมไพล์ เช่น การเปิดใช้งาน <strong>USB-CDC</strong> ก็มีตัวอย่างคำสั่ง ดังนี้</p>
+<pre><code class="language-text">compile:
+    @echo &quot;Compiling sketch and source files in $(SKETCH_DIR)...&quot;
+    $(CLI) compile --verbose --fqbn $(BOARD_FQBN) --build-property \
+    &quot;build.extra_flags=-DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=1&quot; \
+    --build-path $(BUILD_DIR) $(SKETCH_DIR)
+</code></pre>
+<p>&nbsp;</p>
+<p>ในกรณีที่ใช้ <strong>WSL 2 / Ubuntu</strong> สำหรับระบบปฏิบัติการ <strong>Windows 10 / 11</strong>
+การเข้าถึงอุปกรณ์ <strong>USB</strong> จาก <strong>Ubuntu</strong> จะทำได้หลังจากได้ติดตั้งโปรแกรมที่เรียกว่า 
+<a href="https://github.com/dorssel/usbipd-win"><code>usbipd-win</code></a></p>
+<p>ดูรายละเอียดการติดตั้งและใช้งานได้จาก <a href="https://learn.microsoft.com/en-us/windows/wsl/connect-usb">"<strong>WSL - Connect USB devices</strong>"</a></p>
+<p><img alt="" src="usbipd-1.jpg" /></p>
+<p><img alt="" src="usbipd-2.jpg" /></p>
+<p><img alt="" src="usbipd-3.jpg" /></p>
+<p><img alt="" src="usbipd-4.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งสำหรับ <code>usbipd-win</code> สำหรับ <strong>Windows 11 (PowerShell in administrator mode)</strong></p>
+<p><img alt="" src="lsusb.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>lsusb</code> และ <code>dmesg</code> เพื่อตรวจสอบดูว่า สามารถมองเห็นบอร์ด <strong>ESP32</strong> ภายใต้ <strong>WSL 2 / Ubuntu</strong></p>
+<p><img alt="" src="make.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>make</code> เพื่ออัปโหลดไฟล์ <strong>Arduino Sketch</strong> ไปยังบอร์ด <strong>ESP32</strong></p>
+<p>ข้อสังเกต: การใช้ <strong>USB-CDC</strong> ของ <strong>ESP32C3 / ESP32S3</strong> เมื่อมีการอัปโหลดทุกครั้ง บอร์ดจะถูกรีเซต
+แล้วจะมองไม่เห็นอุปกรณ์ใน <strong>WSL 2 / Ubuntu</strong> ดังนั้นจะต้องทำคำสั่ง <code>usbipd attach --wsl --busid 4-4</code> ใน <strong>PowerShell</strong> อีกครั้งก่อน</p>
+<hr />
 <h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
-<p>บทความนี้นำเสนอ ตัวอย่างการใช้คำสั่งของ <strong>Arduino CLI</strong> ในเบื้องต้น สำหรับ <strong>Ubuntu Linux</strong>
-และ <strong>Windows PowerShell</strong> </p>
+<p>บทความนี้นำเสนอ ตัวอย่างการใช้คำสั่งของ <strong>Arduino CLI</strong> ในเบื้องต้น
+ซึ่งเป็นเครื่องมือแบบ <strong>Command Line Tools</strong> ที่ใช้ในการคอมไพล์โค้ดสำหรับ <strong>Arduino Sketch</strong>
+มีการสาธิตการทำคำสั่งสำหรับ <strong>Ubuntu Linux</strong> และ <strong>Windows PowerShell</strong> 
+มีตัวอย่างการเขียนสคริปต์สำหรับ <strong>Windows</strong> และ <strong>Ubuntu</strong> </p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2023-02-15 | Last Updated: 2023-02-20</p></div>
+<p>Created: 2023-02-15 | Last Updated: 2025-04-16</p></div>
             </div>
         </div>
 
