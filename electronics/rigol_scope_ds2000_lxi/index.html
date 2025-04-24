@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/rigol_scope_ds2000_lxi/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Python เชื่อมต่อ Rigol DS2072A (ผ่านเครือข่าย LAN) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#python-rigol-ds2072a-lan" class="nav-link">การเขียนโปรแกรม Python เชื่อมต่อ Rigol DS2072A (ผ่านเครือข่าย LAN)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#rigol-ds2072a" class="nav-link">&#9655; Rigol DS2072A</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ดภาษา Python</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="python-rigol-ds2072a-lan">การเขียนโปรแกรม Python เชื่อมต่อ Rigol DS2072A (ผ่านเครือข่าย LAN)<a class="headerlink" href="#python-rigol-ds2072a-lan" title="Permanent link">#</a></h1>
+<p>บทความนี้กล่าวถึง ตัวอย่างการตั้งค่าออสซิลโลสโคป <strong>RIGOL DS2072A</strong>
+เพื่อใช้งานผ่านระบบเครือข่าย <strong>Ethernet / LAN</strong>
+และเขียนโปรแกรมเชื่อมต่อโดยใช้โพรโทคอล <strong>TCP/IP</strong> ตามมาตรฐานของ <strong>LXI</strong></p>
+<p><strong>Keywords:</strong> <em>Rigol DS2072A</em>, <em>Digital Storage Oscilloscope</em>, 
+<em>LXI</em>, <em>Python Programming</em></p>
+<hr />
+<h2 id="rigol-ds2072a">&#9655; <strong>Rigol DS2072A</strong><a class="headerlink" href="#rigol-ds2072a" title="Permanent link">#</a></h2>
+<p>ในบทความนี้จะกล่าวถึงการเขียนโค้ด <strong>Python</strong> เพื่อเชื่อมต่อกับออสซิลโลสโคปของบริษัท 
+<strong>Rigol Technologies Inc.</strong> รุ่น  <strong>DS2072A</strong> 
+และการใช้งานในระบบเครือข่าย <strong>TCP/IP</strong> ผ่าน <strong>Ethernet/LAN</strong></p>
+<p>อุปกรณ์ <strong>DS2072A</strong> มี 2 ช่องสัญญาณอินพุต และเชื่อมต่อผ่านพอร์ต <strong>LAN</strong> ได้
+รองรับ <strong>LXI</strong> (<em>LAN eXtensions for Instrumentation</em>)
+ซึ่งเป็นมาตรฐานการสื่อสารผ่านเครือข่าย <strong>Ethernet</strong>
+สำหรับอุปกรณ์เครื่องมือวัด และพัฒนาโดยกลุ่ม <strong>LXI Consortium</strong></p>
+<p>คุณสมบัติเบื้องต้นของ <strong>Rigol DS2072A</strong> (ในปัจจุบันถือว่า อุปกรณ์รุ่นนี้ <em>เลิกจำหน่ายแล้ว</em>):</p>
+<ul>
+<li>ช่องสัญญาณอินพุต: 2 ช่อง (<strong>CH1</strong> และ <strong>CH2</strong>)</li>
+<li><strong>Analog Bandwidth</strong>: <strong>70 MHz</strong> (อัปเกรดได้ถึง <strong>300 MHz</strong>)</li>
+<li><strong>Sampling Rate</strong>: <strong>2 GSamples/s</strong>  (<em>Single-channel</em>) | <strong>1GSamples/s</strong> (<em>Dual-channel</em>)</li>
+<li><strong>Memory Depth (max.)</strong>: <strong>14 Megapoints</strong> (<em>Standard</em>) | <strong>56 Megapoints</strong> (<em>Upgraded</em>)</li>
+<li><strong>Display</strong>: <strong>8-inch TFT (800x480) WVGA</strong></li>
+<li><strong>Vertical Resolution</strong>: <strong>8-bit</strong></li>
+<li><strong>Interface</strong>: <strong>USB</strong> และ <strong>LAN (Ethernet)</strong></li>
+</ul>
+<p>การเตรียมการเชื่อมต่อผ่าน <strong>LAN</strong> มีขั้นตอนดังนี้</p>
+<ol>
+<li>เชื่อมต่อสาย <strong>LAN</strong> จาก <strong>Rigol DS2072A</strong> เข้ากับเครือข่ายเดียวกับคอมพิวเตอร์ของผู้ใช้</li>
+<li>ไปที่เมนู <strong>Utility &gt; I/O Setting &gt; LAN Config</strong> เพื่อดูหรือกำหนดค่า <strong>IP Address</strong> ของออสซิลโลสโคป</li>
+<li>ตรวจสอบว่า <strong>IP Address</strong> ของ <strong>DS2072A</strong> สามารถคำสั่ง <code>ping</code> ได้จากเครื่องคอมพิวเตอร์</li>
+</ol>
+<p><img alt="" src="rigol_info.jpg" /></p>
+<p>รูป: การตรวจสอบโมเดลของสโคป</p>
+<p><img alt="" src="rigol_lxi_setting.jpg" /></p>
+<p>รูป: การตรวจสอบการตั้งค่าสำหรับการเชื่อมต่อเครือข่าย</p>
+<p>การตั้งค่าการใช้งาน <strong>DS2072A</strong> โดยการส่งคำสั่งผ่าน <strong>LXI</strong> สามารถจำแนกตามฟังก์ชันการใช้งาน เช่น</p>
+<ul>
+<li>การกำหนดโหมดการควบคุมระหว่าง <strong>Local</strong> (ควบคุมจากปุ่มกดหน้าจอของเครื่อง) และ <strong>Remote</strong> (ควบคุมจากระยะไกลผ่านเครือข่าย)</li>
+<li>การตั้งค่าเชิงเวลา (<strong>Timebase</strong>) ได้แก่:<ul>
+<li>สเกลเชิงเวลา (<strong>Timescale</strong> หรือ <strong>Time/Div</strong>) เพื่อกำหนดความละเอียดของแกนเวลา เช่น <code>0.001s/div</code></li>
+<li>ออฟเซตเวลา (<strong>Time Offset</strong>) ซึ่งหมายถึงการเลื่อนศูนย์กลางของคลื่นสัญญาณบนหน้าจอ  ไปทางซ้ายหรือขวา</li>
+</ul>
+</li>
+<li>การตั้งค่าสำหรับแต่ละช่องสัญญาณอินพุต (CH1 และ CH2):<ul>
+<li>การเลือกค่า <strong>Probe Attenuation Factor</strong> ตามสายวัด (โพรบ) ที่ใช้งาน เช่น <code>1X</code> และ <code>10X</code></li>
+<li>การตั้งค่าแรงดันไฟฟ้า:<ul>
+<li><strong>Voltage Scale</strong> (แรงดันต่อหนึ่งช่องบนหน้าจอภาพ) เช่น <code>1V/div</code></li>
+<li><strong>Voltage Offset</strong> (ค่าออฟเซตจากระดับ <strong>GND</strong>) ซึ่งใช้เลื่อนระดับของคลื่นสัญญาณบนหน้าจอภาพ ขึ้นหรือลง</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>การตั้งค่าสำหรับทริกเกอร์ (<strong>Trigger Settings</strong>):<ul>
+<li><strong>Trigger Source</strong>: ช่องสัญญาณอินพุตที่ใช้สำหรับการทริกเกอร์ เช่น <code>CH1</code> และ <code>CH2</code></li>
+<li><strong>Trigger Mode</strong> (หรือที่เรียกว่า <strong>Sweep Mode</strong>): โหมดการจับสัญญาณ ได้แก่ <code>AUTO</code>, <code>NORMAL</code>, <code>SINGLE</code></li>
+<li><strong>Trigger Type</strong>: ประเภทของเงื่อนไขของทริกเกอร์ เช่น ขอบสัญญาณ (<strong>EDGE</strong>), ความกว้างของพัลส์ (<strong>PULSE</strong>), หรืออื่น ๆ</li>
+<li><strong>Trigger Slope</strong>: กำหนดเหตุการณ์ของทริกเกอร์บนขอบของสัญญาณ เช่น <code>RISING</code> (ขอบขาขึ้น) หรือ <code>FALLING</code> (ขอบขาลง)</li>
+</ul>
+</li>
+<li>การกำหนดขนาดของหน่วยความจำ (<strong>Memory Depth</strong>) สำหรับการจับและจัดเก็บข้อมูลของคลื่นสัญญาณ ซึ่งมีผลต่อความละเอียดของข้อมูลที่ได้ เช่น <code>14000</code>, <code>140000</code> และ <code>1400000</code> เป็นต้น หากเปิดใช้งานหนึ่งช่องอินพุต แต่ถ้าเปิดช่องสัญญาณอินพุตพร้อมกัน 2 ช่อง 
+ขนาดจะลดครึ่งหนึ่ง เป็น <code>7000</code>, <code>70000</code> และ <code>7000000</code> ตามลำดับ</li>
+</ul>
+<p>คำสั่งตามรูปแบบที่เรียกว่า <strong>SCPI</strong> และเกี่ยวข้องกับการตั้งค่าใช้งาน <strong>DS2072A</strong> สามารถศึกษาได้จากเอกสารต่อไปนี้:</p>
+<ul>
+<li><a href="ds2000a_programming_guide_en_2016.pdf"><strong>RIGOL Programming Guide: MSO2000A/DS2000A Series Digital Oscilloscope (2016)</strong></a></li>
+</ul>
+<hr />
+<h2 id="python">&#9655; ตัวอย่างการเขียนโค้ดภาษา <strong>Python</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>การเชื่อมต่อกับสโคปตามรูปแบบ <strong>LXI</strong> โดยใช้ภาษา <strong>Python</strong> ก็มีไลบรารี เช่น 
+<a href="https://pypi.org/project/python-vxi11/"><code>python-vxi11</code></a> ให้ใช้งาน
+ดังนั้นให้ทำคำสั่ง <code>pip</code> เพื่อติดตั้งไลบรารี </p>
+<pre><code class="language-text">$ pip install python-vxi11
+</code></pre>
+<p>ถัดไปเป็นตัวอย่างการสร้างคลาสในภาษา <strong>Python</strong> เพื่อนำไปใช้งานกับสโคป <strong>DS2072A</strong></p>
+<p><strong>File</strong>: <code>rigol_ds2000.py</code></p>
+<pre><code class="language-python">import time
+import vxi11
+import numpy as np
+
+class DS2072A:
+    def __init__(self, ip_addr):
+        self.ip_addr = ip_addr
+        self.instr = vxi11.Instrument(ip_addr)
+        self.instr.timeout = 1.0
+        self.set_mem_depth(7000)
+
+    def set_mem_depth(self, mem_depth):
+        # For dual channels:
+        self.mem_depth = mem_depth
+        self.write(f':ACQ:MDEP {mem_depth}')
+
+    def get_mem_depth(self):
+        self.mem_depth = int(self.read(':ACQ:MDEP?'))
+        return self.mem_depth
+
+    def close(self):
+        self.instr.close()
+
+    def write(self, cmd, dly=0.05):
+        self.instr.write(cmd)
+        time.sleep(dly)
+
+    def read(self, cmd, dly=0.1):
+        self.write(cmd, dly)
+        return self.instr.read().strip()
+
+    def read_raw(self, cmd, dly=0.1):
+        self.write(cmd, dly)
+        return self.instr.read_raw()
+
+    def get_idn(self):
+        return self.read('*IDN?').split(',')
+
+    def begin(self):
+        idn = self.get_idn()
+        if idn[1] != 'DS2302A':
+            print('Expected the model DS2302A')
+        self.remote()
+
+    def remote(self):
+        self.write('SYSTem:REMote')
+
+    def config_channel(self, chan, config):
+        if chan not in [1, 2]:
+            print('Invalid channel number')
+            return
+        self.write(f':CHAN{chan}:COUP {config[&quot;coupling&quot;]}')
+        self.write(f':CHAN{chan}:PROB {int(config[&quot;probe_ratio&quot;])}')
+        self.write(f':CHAN{chan}:SCAL {float(config[&quot;scale&quot;])}')
+        self.write(f':CHAN{chan}:OFFS {float(config[&quot;offset&quot;])}')
+        status = 'ON' if config['enabled'] else 'OFF'
+        self.write(f':CHAN{chan}:DISP {status}')
+
+    def config_timebase(self, config):
+        self.write(f':TIM:OFFS {config[&quot;offset&quot;]}')
+        self.write(f':TIM:SCAL {config[&quot;timescale&quot;]}')
+
+    def config_trigger(self, config):
+        self.write(f':TRIG:EDG:SOUR CHAN{config[&quot;chan&quot;]}')
+        mode = config[&quot;mode&quot;].upper()
+        self.write(f':TRIG:MODE {mode}')
+        if mode == 'EDGE':
+            self.write(f':TRIG:EDG:LEV {config[&quot;level&quot;]}')
+            self.write(f':TRIG:EDG:SLOP {config[&quot;slope&quot;]}')
+        self.write(f':TRIG:SWE {config[&quot;sweep&quot;]}')
+
+    def get_waveform_params(self):
+        preamble = self.read(':WAV:PRE?')
+        p = preamble.split(',')
+        if len(p) != 10:
+            print('Waveform preamble parse error!')
+            return None, None
+
+        npoints = int(p[2])
+        xinc, xorg, xref = float(p[4]), float(p[5]), float(p[6])
+        yinc, yorg, yref = float(p[7]), float(p[8]), float(p[9])
+        params = {
+            'npoints': npoints,
+            'xinc': xinc, 'xorg': xorg, 'xref': xref,
+            'yinc': yinc, 'yorg': yorg, 'yref': yref
+        }
+        return params
+
+    def get_waveform(self, chan=1, mode='RAW'):
+        mode = mode.upper()
+        if mode not in ['RAW', 'NORMAL']:
+            print( 'Expected mode: RAW or NORMAL')
+            return None, None
+
+        self.write(f':WAV:SOUR CHAN{chan}')
+        self.write(':WAV:FORM BYTE')
+
+        if mode == 'RAW':
+            self.write(':WAV:MODE RAW')
+            self.write(':WAV:STAR 1')
+            self.write(f':WAV:STOP {self.mem_depth}')
+        else:
+            self.write(':WAV:MODE NORM')
+            self.write(':WAV:POIN 1400')
+
+        self.write(':WAV:RES')
+        self.write(':WAV:BEG')
+
+        params = self.get_waveform_params()
+        yinc   = params['yinc']
+        yorg   = params['yorg']
+        yref   = params['yref']
+        xinc   = params['xinc']
+
+        if mode == 'RAW':
+            retries = 0
+            done = False
+            while True:
+                status, points = self.read(':WAV:STAT?').strip().split(',')
+                if status == 'IDLE':
+                    done = True
+                    break
+                else:
+                    retries += 1
+                    if retries &gt; 10:
+                        break
+                    print('Waiting for data reading..' )
+                    time.sleep(0.1)
+            if done:
+                rawdata = self.read_raw( ':WAV:DATA?', 0.2 )
+                self.write(':WAV:END') # stop waveform reading 
+                num_bytes = int( rawdata[2:11] )
+                rawdata = rawdata[11:-1]
+                data = np.frombuffer( rawdata, 'B' )
+                data = (data - yref - yorg) * yinc
+                npoints = len(data)
+                xmax   =  (npoints * xinc)
+                xstart = -xmax/2.0
+                xstop  =  xmax/2.0
+            else: 
+                print('Invalid or missing waveform data!')
+                return None, None
+        else: # Normal mode
+            rawdata = self.read_raw(':WAV:DATA?')
+            self.write(':WAV:END')
+
+            if rawdata and rawdata.startswith(b'#'):
+                header_len = int(rawdata[1:2])
+                byte_count = int(rawdata[2:2 + header_len])
+                wav_data = rawdata[2+header_len : 2+header_len+byte_count]
+                data = np.frombuffer(wav_data, dtype='B')
+                data = (data - yref - yorg) * yinc
+                npoints = len(data)
+                xstart = params['xref'] + params['xorg']
+                xstop = xstart + (npoints * xinc)
+            else:
+                print('Invalid or missing waveform data!')
+                return None, None
+
+        ts = np.linspace(xstart, xstop, num=npoints )
+        return ts, data
+
+    def show_settings(self):
+        mem_depth         = int(self.read(':ACQ:MDEP?'))        
+        sample_rate       = float(self.read(':ACQ:SRAT?'))
+        time_per_div      = float(self.read(':TIM:SCAL?'))
+        time_offset       = float(self.read(':TIM:OFFS?'))
+        ch1_volt_per_div  = float(self.read(':CHAN1:SCAL?'))
+        ch1_vert_offset   = float(self.read(':CHAN1:OFFS?'))
+        x_inc             = float(self.read(':WAV:XINC?'))
+        x_ref             = float(self.read(':WAV:XREF?'))
+        x_org             = float(self.read(':WAV:XOR?')) 
+        y_inc             = float(self.read(':WAV:YINC?'))
+        y_ref             = float(self.read(':WAV:YREF?'))
+        y_org             = float(self.read(':WAV:YOR?')) 
+
+        print( 'Memory Depth    : ', mem_depth )        
+        print( 'Sample Rate     : ', sample_rate/1e6, 'MHz' )
+        print( 'Time/Div        : ', time_per_div )
+        print( 'Time Offset     : ', time_offset )
+        print( 'Volt/Div CH1    : ', ch1_volt_per_div )
+        print( 'Volt Offset CH1 : ', ch1_vert_offset )
+        print( 'X increment     : ', x_inc )
+        print( 'X reference     : ', x_ref )
+        print( 'X offset        : ', x_org )
+        print( 'Y increment     : ', y_inc )
+        print( 'Y reference     : ', y_ref )
+        print( 'Y offset        : ', y_org )
+
+    def run(self):
+        self.write(':RUN')
+
+    def is_stopped(self):
+        return self.read('TRIG:STAT?') == 'STOP'
+
+    def stop(self):
+        self.write(':STOP')
+
+    def local(self):
+        self.write('SYST:LOC')
+</code></pre>
+<p>โค้ดต่อไปนี้สาธิต การใช้คลาส <code>DS2072A</code> เพื่อตั้งค่าการใช้งานออสซิลโลสโคป <strong>DS2072A</strong>
+และอ่านข้อมูลจากสโคป เพื่อนำมาแสดงรูปกราฟ จำนวน 2 ช่องสัญญาณ</p>
+<p><strong>File:</strong> <code>test_ds2072a.py</code></p>
+<pre><code class="language-python">import time
+import matplotlib.pyplot as plt
+from rigol_ds2000 import DS2072A
+
+def main():
+    # Connect to the RIGOL scope at the specified IPv4 address.    
+    scope = DS2072A('10.42.0.19')
+
+    try:
+        scope.begin()
+        # Set memory depth: 70,000 points
+        scope.set_mem_depth( 70000 ) 
+        # Configure the time base
+        scope.config_timebase({
+            'offset': 0.000, 'timescale': 5e-4,
+        })
+        # Configure the trigger        
+        scope.config_trigger({
+            'chan': 1, 'mode': 'EDGE', 'slope': 'NEG', 'level': 0.5, 
+            'sweep': 'NORMAL',
+        })
+        # Configure CH1 and CH2
+        cfg = {'enabled': True, 
+               'probe_ratio': 1.0, 'coupling': 'DC', 
+               'scale': 1.0, 'offset': 0.0 }
+        cfg1 = cfg.copy(); cfg1['offset'] = 1.0
+        cfg2 = cfg.copy(); cfg2['offset'] = -3.0
+        scope.config_channel(1, cfg1)
+        scope.config_channel(2, cfg2)
+
+        #scope.show_settings()
+
+        # Run the scope
+        scope.run()
+        time.sleep(2)
+        # Stop the scope
+        scope.stop()
+        # Read waveform data for CH1 in RAW mode
+        ts, ch1_data = scope.get_waveform(1, mode='RAW')
+        # Read waveform data for CH2 in RAW mode
+        _, ch2_data = scope.get_waveform(2, mode='RAW')
+
+        if (ts[-1] &lt; 1e-3):
+            ts = ts * 1e6
+            ts_unit = &quot;usec&quot;
+        elif (ts[-1] &lt; 1.0):
+            ts = ts * 1e3
+            ts_unit = &quot;msec&quot;
+        else:
+            ts_unit = &quot;sec&quot;
+
+        npoints = len(ch1_data)
+        plt.figure(figsize=(7,4))
+        plt.plot(ts, ch1_data, ts, ch2_data)
+        plt.title(f'Waveform Plot (#samples = {npoints})')
+        plt.xlabel(f'Time [{ts_unit}]')
+        plt.ylabel('Voltage [V]')
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig('plot.png', dpi=200)
+        plt.show()
+
+        scope.run()
+        scope.local()
+        print('Done.')
+    finally:
+        scope.close()
+
+if __name__ == '__main__':
+    main()
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปเป็นตัวอย่างคลื่นสัญญาณ (<strong>Waveform</strong>) แสดงผลบนหน้าจอภาพของสโคป
+ซึ่งจะเห็นได้ว่า ช่องสัญญาณ <code>CH1</code> และ <code>CH2</code> ใช้สัญญาณทดสอบเหมือนกัน
+และมีการตั้งค่าช่องสัญญาณเหมือนกัน เช่น <strong>1V / Div</strong> และ <strong>500usec / Div</strong>
+แต่ต่างกันที่การตั้งค่าออฟเซตของแรงดันไฟฟ้าสำหรับการแสดงผลบนหน้าจอภาพ
+(<code>CH1</code> เลื่อนขึ้นไปอยู่ที่ระดับ <strong>+1V</strong> และ  <code>CH2</code> เลื่อนลงไปอยู่ที่ระดับ <strong>-3V</strong>)</p>
+<p>สัญญาณทดสอบเป็นคลื่นพัลส์ที่มีความถี่ <strong>1kHz</strong> หรือ คาบเท่ากับ <strong>1000usec</strong> หรือ <strong>1msec</strong>
+มีระดับแรงดันไฟฟ้าอยู่ระหว่าง <strong>0V</strong> กับ <strong>3V</strong></p>
+<p><img alt="" src="rigol_waveform_capture.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่บันทึกเป็นไฟล์ .png  ใน <strong>USB Flash Device</strong> 
+ซึ่งได้จากการกดปุ่ม <strong>Quick Print</strong> ของสโคป </p>
+<p><img alt="" src="rigol_waveform_python.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่แสดงผลโดยการทำงานของโค้ด <strong>Python</strong>
+(มีจำนวนข้อมูล 70,000 ตัวเลข สำหรับแต่ละช่องสัญญาณ)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการใช้งาน <strong>RIGOL DS2072A</strong> ออสซิลโลสโคปแบบดิจิทัล 
+ที่รองรับการควบคุมผ่านเครือข่าย <strong>LAN</strong> ด้วยมาตรฐาน <strong>LXI</strong> โดยใช้ภาษา <strong>Python</strong> 
+ในการส่งคำสั่ง <strong>SCPI</strong> เพื่อกำหนดค่าต่าง ๆ เช่น <strong>Trigger</strong>, <strong>Timebase</strong> และ แรงดันไฟฟ้า ของแต่ละช่องสัญญาณ
+โค้ดตัวอย่างแสดงให้เห็นว่า ผู้ใช้สามารถควบคุมการตั้งค่าและดึงข้อมูลสำหรับ <strong>Waveform</strong>
+จากทั้ง 2 ช่องสัญญาณของออสซิลโลสโคป เพื่อนำไปแสดงผลหรือวิเคราะห์บนคอมพิวเตอร์ได้อย่างสะดวกและแม่นยำ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-04-23 | Last Updated: 2025-04-23</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
