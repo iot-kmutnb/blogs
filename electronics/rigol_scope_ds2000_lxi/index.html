@@ -102,6 +102,18 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-ds2072a" class="nav-link">&#9655; ตัวอย่างการสร้างคลาสในภาษา Python เพื่อใช้งานกับ DS2072A</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#gui" class="nav-link">&#9655; ตัวอย่างการสร้าง GUI สำหรับควบคุมการใช้งานสโคป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#web-app" class="nav-link">&#9655; ตัวอย่างการสร้าง Web App</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
               <ul class="nav flex-column">
               </ul>
@@ -186,23 +198,56 @@
 ดังนั้นให้ทำคำสั่ง <code>pip</code> เพื่อติดตั้งไลบรารี </p>
 <pre><code class="language-text">$ pip install python-vxi11
 </code></pre>
+<p>เริ่มต้นด้วยโค้ดตัวอย่าง เพื่อลองเชื่อมต่อกับสโคป โดยจะต้องระบุหมายเลข <strong>IP</strong> ของสโคปที่กำลังเชื่อมต่อกับระบบเครือข่าย
+โค้ดตัวอย่างนี้สาธิตการอ่านข้อมูลเกี่ยวกับสโคป เช่น โมเดล และหมายเลขเครื่อง โดยใช้คำสั่ง <code>*IDN?</code></p>
+<p><strong>File</strong>: <code>rigol_lxi_idn.py</code></p>
+<pre><code class="language-python">import time
+import vxi11
+
+IP_ADDR = '10.42.0.19'
+
+instr = vxi11.Instrument(IP_ADDR)
+instr.timeout = 1.0 # Change timeout to 1.0 second
+
+try:
+    instr.write('*IDN?')
+    time.sleep(0.1)
+    result = instr.read().strip()
+    values = result.split(',')
+    if len(values) &gt;= 3:
+        print( f'Vendor : {values[0]}')
+        print( f'Model  : {values[1]}')
+        print( f'S/N    : {values[2]}')
+except OSError as ex:
+    print( f'Cannot connect to the device at IP: {IP_ADDR}' )
+instr.close()
+</code></pre>
+<p>ตัวอย่างข้อความเอาต์พุต</p>
+<pre><code class="language-text">Vendor : RIGOL TECHNOLOGIES
+Model  : DS2302A
+S/N    : DS2D154700781
+</code></pre>
+<hr />
+<h2 id="python-ds2072a">&#9655; ตัวอย่างการสร้างคลาสในภาษา <strong>Python</strong> เพื่อใช้งานกับ <strong>DS2072A</strong><a class="headerlink" href="#python-ds2072a" title="Permanent link">#</a></h2>
 <p>ถัดไปเป็นตัวอย่างการสร้างคลาสในภาษา <strong>Python</strong> เพื่อนำไปใช้งานกับสโคป <strong>DS2072A</strong></p>
 <p><strong>File</strong>: <code>rigol_ds2000.py</code></p>
 <pre><code class="language-python">import time
 import vxi11
 import numpy as np
 
-class DS2072A:
+class DS2000A:
     def __init__(self, ip_addr):
         self.ip_addr = ip_addr
         self.instr = vxi11.Instrument(ip_addr)
         self.instr.timeout = 1.0
+        self.remote()
+        self.run()
         self.set_mem_depth(7000)
 
     def set_mem_depth(self, mem_depth):
-        # For dual channels:
-        self.mem_depth = mem_depth
+        # Memory depth (dual-channel): 7000 | 70000 
         self.write(f':ACQ:MDEP {mem_depth}')
+        _ = self.get_mem_depth()
 
     def get_mem_depth(self):
         self.mem_depth = int(self.read(':ACQ:MDEP?'))
@@ -259,7 +304,9 @@ class DS2072A:
             self.write(f':TRIG:EDG:SLOP {config[&quot;slope&quot;]}')
         self.write(f':TRIG:SWE {config[&quot;sweep&quot;]}')
 
-    def get_waveform_params(self):
+    def get_waveform_params(self, chan=1):
+        self.write( f':WAV:SOUR CHAN{chan}' )
+        # Get waveform preamble information
         preamble = self.read(':WAV:PRE?')
         p = preamble.split(',')
         if len(p) != 10:
@@ -296,9 +343,8 @@ class DS2072A:
         self.write(':WAV:RES')
         self.write(':WAV:BEG')
 
-        params = self.get_waveform_params()
+        params = self.get_waveform_params(chan)
         yinc   = params['yinc']
-        yorg   = params['yorg']
         yref   = params['yref']
         xinc   = params['xinc']
 
@@ -312,34 +358,33 @@ class DS2072A:
                     break
                 else:
                     retries += 1
-                    if retries &gt; 10:
+                    if retries &gt; 20:
                         break
                     print('Waiting for data reading..' )
-                    time.sleep(0.1)
+                    time.sleep(0.5)
             if done:
-                rawdata = self.read_raw( ':WAV:DATA?', 0.2 )
+                rawdata = self.read_raw(':WAV:DATA?', 0.2)
                 self.write(':WAV:END') # stop waveform reading 
                 num_bytes = int( rawdata[2:11] )
                 rawdata = rawdata[11:-1]
                 data = np.frombuffer( rawdata, 'B' )
-                data = (data - yref - yorg) * yinc
+                data = (data - yref) * yinc
                 npoints = len(data)
-                xmax   =  (npoints * xinc)
-                xstart = -xmax/2.0
-                xstop  =  xmax/2.0
+                xstart = -(npoints/2) * xinc
+                xstop  =  (npoints/2) * xinc
             else: 
                 print('Invalid or missing waveform data!')
                 return None, None
+
         else: # Normal mode
             rawdata = self.read_raw(':WAV:DATA?')
             self.write(':WAV:END')
-
             if rawdata and rawdata.startswith(b'#'):
                 header_len = int(rawdata[1:2])
                 byte_count = int(rawdata[2:2 + header_len])
                 wav_data = rawdata[2+header_len : 2+header_len+byte_count]
                 data = np.frombuffer(wav_data, dtype='B')
-                data = (data - yref - yorg) * yinc
+                data = (data - yref) * yinc
                 npoints = len(data)
                 xstart = params['xref'] + params['xorg']
                 xstop = xstart + (npoints * xinc)
@@ -347,7 +392,7 @@ class DS2072A:
                 print('Invalid or missing waveform data!')
                 return None, None
 
-        ts = np.linspace(xstart, xstop, num=npoints )
+        ts = np.linspace(xstart, xstop, num=npoints, endpoint=False )
         return ts, data
 
     def show_settings(self):
@@ -357,12 +402,8 @@ class DS2072A:
         time_offset       = float(self.read(':TIM:OFFS?'))
         ch1_volt_per_div  = float(self.read(':CHAN1:SCAL?'))
         ch1_vert_offset   = float(self.read(':CHAN1:OFFS?'))
-        x_inc             = float(self.read(':WAV:XINC?'))
-        x_ref             = float(self.read(':WAV:XREF?'))
-        x_org             = float(self.read(':WAV:XOR?')) 
-        y_inc             = float(self.read(':WAV:YINC?'))
-        y_ref             = float(self.read(':WAV:YREF?'))
-        y_org             = float(self.read(':WAV:YOR?')) 
+        ch2_volt_per_div  = float(self.read(':CHAN2:SCAL?'))
+        ch2_vert_offset   = float(self.read(':CHAN2:OFFS?'))
 
         print( 'Memory Depth    : ', mem_depth )        
         print( 'Sample Rate     : ', sample_rate/1e6, 'MHz' )
@@ -370,12 +411,8 @@ class DS2072A:
         print( 'Time Offset     : ', time_offset )
         print( 'Volt/Div CH1    : ', ch1_volt_per_div )
         print( 'Volt Offset CH1 : ', ch1_vert_offset )
-        print( 'X increment     : ', x_inc )
-        print( 'X reference     : ', x_ref )
-        print( 'X offset        : ', x_org )
-        print( 'Y increment     : ', y_inc )
-        print( 'Y reference     : ', y_ref )
-        print( 'Y offset        : ', y_org )
+        print( 'Volt/Div CH2    : ', ch2_volt_per_div )
+        print( 'Volt Offset CH2 : ', ch2_vert_offset )
 
     def run(self):
         self.write(':RUN')
@@ -390,19 +427,20 @@ class DS2072A:
         self.write('SYST:LOC')
 </code></pre>
 <p>โค้ดต่อไปนี้สาธิต การใช้คลาส <code>DS2072A</code> เพื่อตั้งค่าการใช้งานออสซิลโลสโคป <strong>DS2072A</strong>
-และอ่านข้อมูลจากสโคป เพื่อนำมาแสดงรูปกราฟ จำนวน 2 ช่องสัญญาณ</p>
+และอ่านข้อมูลจากสโคป เพื่อนำมาแสดงรูปกราฟ จำนวน 2 ช่องสัญญาณพร้อมกัน</p>
 <p><strong>File:</strong> <code>test_ds2072a.py</code></p>
-<pre><code class="language-python">import time
+<pre><code class="language-python"># Date: 2025-04-24
+import time
 import matplotlib.pyplot as plt
-from rigol_ds2000 import DS2072A
+from rigol_ds2000 import DS2000A
 
 def main():
     # Connect to the RIGOL scope at the specified IPv4 address.    
-    scope = DS2072A('10.42.0.19')
+    scope = DS2000A('10.42.0.19')
 
     try:
         scope.begin()
-        # Set memory depth: 70,000 points
+        # Set memory depth
         scope.set_mem_depth( 70000 ) 
         # Configure the time base
         scope.config_timebase({
@@ -417,22 +455,23 @@ def main():
         cfg = {'enabled': True, 
                'probe_ratio': 1.0, 'coupling': 'DC', 
                'scale': 1.0, 'offset': 0.0 }
-        cfg1 = cfg.copy(); cfg1['offset'] = 1.0
+        cfg1 = cfg.copy(); cfg1['offset'] =  1.0
         cfg2 = cfg.copy(); cfg2['offset'] = -3.0
         scope.config_channel(1, cfg1)
         scope.config_channel(2, cfg2)
 
-        #scope.show_settings()
+        scope.show_settings()
 
         # Run the scope
         scope.run()
         time.sleep(2)
         # Stop the scope
         scope.stop()
-        # Read waveform data for CH1 in RAW mode
-        ts, ch1_data = scope.get_waveform(1, mode='RAW')
-        # Read waveform data for CH2 in RAW mode
-        _, ch2_data = scope.get_waveform(2, mode='RAW')
+        mode = 'RAW' # use RAW mode for waveform data
+        # Read waveform data for CH1        
+        ts, ch1_data = scope.get_waveform(1, mode)
+        # Read waveform data for CH2
+        _, ch2_data = scope.get_waveform(2, mode)
 
         if (ts[-1] &lt; 1e-3):
             ts = ts * 1e6
@@ -452,12 +491,12 @@ def main():
         plt.grid(True)
         plt.tight_layout()
         plt.savefig('plot.png', dpi=200)
-        plt.show()
+        plt.show()        
+        print('Done.')
 
+    finally:
         scope.run()
         scope.local()
-        print('Done.')
-    finally:
         scope.close()
 
 if __name__ == '__main__':
@@ -472,23 +511,300 @@ if __name__ == '__main__':
 <p>สัญญาณทดสอบเป็นคลื่นพัลส์ที่มีความถี่ <strong>1kHz</strong> หรือ คาบเท่ากับ <strong>1000usec</strong> หรือ <strong>1msec</strong>
 มีระดับแรงดันไฟฟ้าอยู่ระหว่าง <strong>0V</strong> กับ <strong>3V</strong></p>
 <p><img alt="" src="rigol_waveform_capture.jpg" /></p>
-<p>รูป: ตัวอย่างคลื่นสัญญาณที่บันทึกเป็นไฟล์ .png  ใน <strong>USB Flash Device</strong> 
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณที่บันทึกเป็นไฟล์ .png  ใน <strong>USB Flash Device</strong> 
 ซึ่งได้จากการกดปุ่ม <strong>Quick Print</strong> ของสโคป </p>
 <p><img alt="" src="rigol_waveform_python.jpg" /></p>
-<p>รูป: ตัวอย่างคลื่นสัญญาณที่แสดงผลโดยการทำงานของโค้ด <strong>Python</strong>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณที่แสดงผลโดยการทำงานของโค้ด <strong>Python</strong>
 (มีจำนวนข้อมูล 70,000 ตัวเลข สำหรับแต่ละช่องสัญญาณ)</p>
+<p>&nbsp;</p>
+<p>อีกกรณีหนึ่งเป็นตัวอย่างการเปิดใช้ช่องสัญญาณ <code>CH1</code> เพียงช่องเดียว 
+ตั้งค่าสำหรับเงื่อนไขทริกเกอร์เป็นขอบขาขึ้น มีการตั้งค่าสเกลเวลา (<strong>Time/Div</strong>)
+เท่ากับ <strong>100usec</strong> ต่อหนึ่งช่อง สโคปจะปรับอัตราสุ่มสัญญาณ (<strong>Sample Rate</strong>)
+เป็น <strong>100.0MHz</strong></p>
+<p><img alt="" src="rigol_waveform_capture_140000.jpg" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณหนึ่งช่อง</p>
+<p><img alt="" src="python_capture_140000.jpg" /></p>
+<p>รูป: ตัวอย่างรูปคลื่นสัญญาณหนึ่งช่อง (จำนวนข้อมูล 140,000) ซึ่งได้จากการทำงานของโค้ด <strong>Python</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="gui">&#9655; ตัวอย่างการสร้าง <strong>GUI</strong> สำหรับควบคุมการใช้งานสโคป<a class="headerlink" href="#gui" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ดโดยใช้ <strong>Python Tk</strong> เพื่อใช้งานแบบ <strong>GUI</strong> ในลักษณะเป็น <strong>Control Panel</strong>
+เพื่อให้ผู้ใช้ตั้งค่าการใช้งานสโคปได้ง่ายขึ้น </p>
+<p><strong>File</strong>: <code>rigol_control_panel.py</code> </p>
+<pre><code class="language-python">import tkinter as tk
+from tkinter import ttk, messagebox
+from functools import partial
+from rigol_ds2000 import DS2000A
+
+DEFAULT_IP = '10.42.0.19'
+
+class ScopeControlPanel:
+    def __init__(self, root):
+        self.root = root
+        self.root.title(&quot;Rigol DS2072A Control Panel&quot;)
+        self.scope = None
+
+        # Configure root grid weights for resizing
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(1, weight=1)
+        for i in range(5):
+            self.root.rowconfigure(i, weight=1)
+        self.create_connection_block()
+        self.create_timebase_block()
+        self.create_channel_block()
+        self.create_trigger_block()
+
+    def create_connection_block(self):
+        frame = ttk.Frame(self.root)
+        frame.grid(row=0, column=0, columnspan=2, 
+                   sticky='ew', padx=10, pady=10)
+        frame.columnconfigure(0, weight=1)
+
+        self.ip_entry = ttk.Entry(frame)
+        self.ip_entry.insert(0, DEFAULT_IP)
+        self.ip_entry.grid(row=0, column=0, 
+                           sticky='ew', padx=(0, 10))
+        self.connect_btn = ttk.Button(frame, text=&quot;Connect&quot;, 
+                                      command=self.connect)
+        self.connect_btn.grid(row=0, column=1)
+
+    def connect(self):
+        ip = self.ip_entry.get()
+        try:
+            self.scope = DS2000A(ip)
+            self.scope.begin()
+            messagebox.showinfo(&quot;Connection&quot;, f&quot;Connected to {ip}&quot;)
+        except Exception as e:
+            messagebox.showerror(&quot;Connection Failed&quot;, str(e))
+
+    def create_timebase_block(self):
+        frame = ttk.LabelFrame(self.root, text=&quot;Time Base&quot;)
+        frame.grid(row=1, column=0, columnspan=2, 
+                   sticky='ew', padx=10, pady=5)
+        frame.columnconfigure((0, 1), weight=1)
+
+        time_div_label = ttk.Label(frame, text=&quot;Scale (s/div):&quot;)
+        time_div_label.grid(row=0, column=0, sticky='e', padx=5, pady=2)
+        self.time_scale = ttk.Entry(frame)
+        self.time_scale.insert(0, &quot;0.001&quot;)
+        self.time_scale.grid(row=0, column=1, sticky='ew', padx=5, pady=2)
+
+        time_offset_label = ttk.Label(frame, text=&quot;Offset (s):&quot;)
+        time_offset_label.grid(row=1, column=0, sticky='e', padx=5, pady=2)
+        self.time_offset = ttk.Entry(frame)
+        self.time_offset.insert(0, &quot;0&quot;)
+        self.time_offset.grid(row=1, column=1, sticky='ew', padx=5, pady=2)
+
+        apply_btn = ttk.Button(frame, text=&quot;Apply&quot;, command=self.set_timebase)
+        apply_btn.grid(row=2, column=0, columnspan=2, pady=5)
+
+    def create_channel_block(self):
+        for ch in [1, 2]:
+            frame = ttk.LabelFrame(self.root, text=f&quot;Channel {ch}&quot;)
+            frame.grid(row=2, column=ch - 1, sticky='nsew', padx=10, pady=5)
+            for i in range(2):
+                frame.columnconfigure(i, weight=1)
+
+            setattr(self, f'ch{ch}_enabled', tk.BooleanVar(value=True))
+            check_btn = ttk.Checkbutton(frame, text=&quot;Enabled&quot;, 
+                                        variable=getattr(self,f'ch{ch}_enabled'))
+            check_btn.grid(row=0, column=0, columnspan=2, sticky='w', pady=(0,5))
+
+            self.create_labeled_entry(frame, &quot;Coupling&quot;, &quot;DC&quot;, 
+                                      row=1, col=0, var_name=f'ch{ch}_coupling')
+            self.create_labeled_entry(frame, &quot;Scale (V/div)&quot;, &quot;0.5&quot;, 
+                                      row=2, col=0, var_name=f'ch{ch}_scale')
+            self.create_labeled_entry(frame, &quot;Offset (V)&quot;, &quot;0&quot;, 
+                                      row=3, col=0, var_name=f'ch{ch}_offset')
+            self.create_labeled_entry(frame, &quot;Probe Ratio&quot;, &quot;1&quot;, 
+                                      row=4, col=0, var_name=f'ch{ch}_probe')
+
+            apply_btn =  ttk.Button(frame, text=&quot;Apply&quot;, 
+                                    command=partial(self.set_channel, ch))
+            apply_btn.grid(row=5, column=0, columnspan=2, pady=5)
+
+    def create_trigger_block(self):
+        frame = ttk.LabelFrame(self.root, text=&quot;Trigger&quot;)
+        frame.grid(row=3, column=0, columnspan=2, sticky='ew', padx=10, pady=5)
+        frame.columnconfigure((0, 1), weight=1)
+
+        self.create_labeled_entry(frame, &quot;Channel (1/2)&quot;, &quot;1&quot;, 
+                                  row=0, col=0, var_name='trig_chan')
+        self.create_labeled_entry(frame, &quot;Mode&quot;, &quot;EDGE&quot;, 
+                                  row=1, col=0, var_name='trig_mode')
+        self.create_labeled_entry(frame, &quot;Level (V)&quot;, &quot;0&quot;, 
+                                  row=2, col=0, var_name='trig_level')
+        self.create_labeled_entry(frame, &quot;Slope (POS/NEG)&quot;, &quot;POS&quot;, 
+                                  row=3, col=0, var_name='trig_slope')
+        self.create_labeled_entry(frame, &quot;Sweep (AUTO/NORM/SING)&quot;, &quot;AUTO&quot;, 
+                                  row=4, col=0, var_name='trig_sweep')
+
+        apply_btn = ttk.Button(frame, text=&quot;Apply&quot;, command=self.set_trigger)
+        apply_btn.grid(row=5, column=0, columnspan=2, pady=5)
+
+    def create_labeled_entry(self, frame, label, default, row, col, var_name):
+        label = ttk.Label(frame, text=label + &quot;:&quot;)
+        label.grid(row=row, column=col, sticky='e', padx=5, pady=2)
+        entry = ttk.Entry(frame)
+        entry.insert(0, default)
+        entry.grid(row=row, column=col + 1, sticky='ew', padx=5, pady=2)
+        setattr(self, var_name, entry)
+
+    def set_timebase(self):
+        if not self.scope:
+            return
+        config = {
+            'timescale': float(self.time_scale.get()),
+            'offset': float(self.time_offset.get())
+        }
+        self.scope.config_timebase(config)
+
+    def set_channel(self, ch):
+        if not self.scope:
+            return
+        config = {
+            'enabled': getattr(self, f'ch{ch}_enabled').get(),
+            'coupling': getattr(self, f'ch{ch}_coupling').get(),
+            'scale': float(getattr(self, f'ch{ch}_scale').get()),
+            'offset': float(getattr(self, f'ch{ch}_offset').get()),
+            'probe_ratio': float(getattr(self, f'ch{ch}_probe').get())
+        }
+        self.scope.config_channel(ch, config)
+
+    def set_trigger(self):
+        if not self.scope:
+            return
+        config = {
+            'chan': int(self.trig_chan.get()),
+            'mode': self.trig_mode.get(),
+            'level': float(self.trig_level.get()),
+            'slope': self.trig_slope.get(),
+            'sweep': self.trig_sweep.get()
+        }
+        self.scope.config_trigger(config)
+
+if __name__ == &quot;__main__&quot;:
+    root = tk.Tk()
+    root.geometry(&quot;560x680&quot;)
+    app = ScopeControlPanel(root)
+    root.mainloop()
+</code></pre>
+<p><img alt="" src="rigol_tk_gui.jpg" /></p>
+<p>รูป: ตัวอย่างการใช้งานในรูปแบบ <strong>GUI</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="web-app">&#9655; ตัวอย่างการสร้าง <strong>Web App</strong><a class="headerlink" href="#web-app" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการสร้างแอปพลิเคชันอย่างง่าย เพื่อเชื่อมต่อกับสโคป
+เพื่อตั้งค่าใช้งานและอ่านข้อมูลคลื่นสัญญาณ เพื่อนำไปแสดงรูปกราฟบนหน้าเว็บ โดยได้ลองใช้ 
+<a href="https://github.com/plotly/dash"><strong>Plotly Dash</strong></a>
+ซึ่งเป็นเฟรมเวิร์กแบบโอเพ่นซอร์สที่ใช้สร้างเว็บแอปพลิเคชันเชิงโต้ตอบ (<strong>Interactive Web Apps</strong>) 
+เขียนโค้ดด้วยภาษา <strong>Python</strong> และใช้ <strong>Plotly.js</strong> <strong>React.js</strong> และ <strong>Flask Web Framework</strong>
+ในการพัฒนา ผู้ที่สนใจสามารถศึกษารายละเอียดและตัวอย่างการใช้งานได้จาก: <a href="https://dash.plotly.com/"><strong>Dash Python User Guide</strong></a></p>
+<p>ในการใช้งาน <strong>Plotly Dash</strong> จะต้องทำคำสั่งติดตั้งไลบรารีก่อน</p>
+<pre><code class="language-text">$ pip install dash plotly
+</code></pre>
+<p><strong>File</strong>: <code>rigol_web_plot.py</code></p>
+<pre><code class="language-python">import time
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
+import plotly.graph_objects as go
+from rigol_ds2000 import DS2000A
+
+scope = None 
+
+def init_scope():
+    global scope
+    scope = DS2000A('10.42.0.19')
+    scope.begin()
+    scope.set_mem_depth(2 * 700000)
+    scope.config_timebase({'offset': 0.000, 'timescale': 1e-3})
+    scope.config_trigger(
+        {'chan': 1, 'sweep': 'AUTO',
+         'mode': 'EDGE', 'slope': 'POS', 'level': 1.5})
+    cfg = {'enabled': True, 'probe_ratio': 1.0,
+           'coupling': 'DC', 'scale': 1.0, 'offset': 0.0}
+    scope.config_channel(1, cfg)
+    scope.config_channel(2, {**cfg, 'enabled': False})
+
+def capture_waveform():
+    scope.run()
+    time.sleep(1)
+    scope.stop()
+    ts, data = scope.get_waveform(1, 'RAW')
+    if ts[-1] &lt; 1e-3:
+        ts = ts * 1e6
+        ts_unit = &quot;μs&quot;
+    elif ts[-1] &lt; 1.0:
+        ts = ts * 1e3
+        ts_unit = &quot;ms&quot;
+    else:
+        ts_unit = &quot;s&quot;
+    return ts, data, ts_unit 
+
+# Dash app layout
+app = dash.Dash('Rigol Scope Waveform Visualization with Python - Dash')
+app.layout = html.Div([
+    html.H2(&quot;Rigol DS2000A Waveform Viewer&quot;,
+            style={'textAlign': 'center'}),
+    dcc.Graph(id='waveform-plot'),
+    html.Div([
+        html.Button(&quot;Capture Waveform&quot;, id='capture-button', n_clicks=0)
+    ], style={'textAlign': 'center', 'padding': '10px'})
+])
+
+@app.callback(
+    Output('waveform-plot', 'figure'),
+    Input('capture-button', 'n_clicks')
+)
+def update_graph(n_clicks):
+    ts, data, ts_unit = capture_waveform()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=ts, y=data, mode='lines', name='CH1'))
+    fig.update_layout(
+        title=f'Waveform Plot (#samples = {len(data)})',
+        xaxis_title=f'Time {ts_unit}',
+        yaxis_title='Voltage [V]',
+        template='plotly_white',
+        height=500,
+        dragmode='zoom',           # Enable zoom tool
+        xaxis=dict(
+            fixedrange=False       # Allow zoom on x-axis (time)
+        ),
+        yaxis=dict(
+            fixedrange=True        # Lock zoom on y-axis (voltage)
+        )
+    )
+    return fig
+
+if __name__ == '__main__':
+    try:
+        init_scope()
+        app.run(debug=False)
+    finally:
+        if scope:
+            scope.local()
+            scope.close()
+</code></pre>
+<p>เมื่อรันโค้ดตัวอย่างได้สำเร็จ ให้เปิดเว็บเบราว์เซอร์ ไปยัง  <code>http://127.0.0.1:8050/</code> และมีตัวอย่างหน้าเว็บดังนี้</p>
+<p><img alt="" src="dash_plotly_web.jpg" /></p>
+<p>รูป: ตัวอย่าง <strong>GUI App</strong> สร้างโดยใช้ <strong>Python Ploty Dash</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอแนวทางการใช้งาน <strong>RIGOL DS2072A</strong> ออสซิลโลสโคปแบบดิจิทัล 
-ที่รองรับการควบคุมผ่านเครือข่าย <strong>LAN</strong> ด้วยมาตรฐาน <strong>LXI</strong> โดยใช้ภาษา <strong>Python</strong> 
-ในการส่งคำสั่ง <strong>SCPI</strong> เพื่อกำหนดค่าต่าง ๆ เช่น <strong>Trigger</strong>, <strong>Timebase</strong> และ แรงดันไฟฟ้า ของแต่ละช่องสัญญาณ
-โค้ดตัวอย่างแสดงให้เห็นว่า ผู้ใช้สามารถควบคุมการตั้งค่าและดึงข้อมูลสำหรับ <strong>Waveform</strong>
-จากทั้ง 2 ช่องสัญญาณของออสซิลโลสโคป เพื่อนำไปแสดงผลหรือวิเคราะห์บนคอมพิวเตอร์ได้อย่างสะดวกและแม่นยำ</p>
+ที่รองรับการควบคุมผ่านเครือข่าย <strong>LAN</strong> ด้วยมาตรฐาน <strong>LXI</strong>
+โดยใช้ภาษา <strong>Python</strong> ในการเขียนโค้ด
+มีการสาธิตการใช้คำสั่งในรูปแบบที่เรียกว่า <strong>SCPI</strong> เพื่อกำหนดค่าต่าง ๆ ให้กับสโคป 
+เช่น <strong>Trigger</strong>, <strong>Time/Div</strong> และ <strong>Volt/Div</strong>ของแต่ละช่องสัญญาณ</p>
+<p>โค้ดตัวอย่างแสดงให้เห็นว่า ผู้ใช้สามารถควบคุมการตั้งค่าและดึงข้อมูลสำหรับ <strong>Waveform</strong>
+จากทั้ง 2 ช่องสัญญาณของออสซิลโลสโคป เพื่อนำไปแสดงผลหรือวิเคราะห์บนคอมพิวเตอร์ได้อย่างสะดวก
+นอกจากนั้นแล้ว ยังมีตัวอย่างที่สาธิตการสร้าง <strong>GUI App</strong> และ <strong>Web App</strong> สำหรับการตั้งค่าใช้งานสโคป
+และการแสดงรูปคลื่นสัญญาณในเบื้องต้น</p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-04-23 | Last Updated: 2025-04-23</p></div>
+<p>Created: 2025-04-23 | Last Updated: 2025-04-24</p></div>
             </div>
         </div>
 
