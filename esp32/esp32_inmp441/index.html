@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_inmp441/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การอ่านข้อมูลเสียงจากโมดูลเซนเซอร์ INMP441 ด้วย ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#inmp441-esp32" class="nav-link">การอ่านข้อมูลเสียงจากโมดูลเซนเซอร์ INMP441 ด้วย ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#inmp441-omnidirectional-mems-microphone-sensor" class="nav-link">&#9655; INMP441 Omnidirectional MEMS Microphone Sensor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino" class="nav-link">&#9655; การเขียนโค้ดด้วย Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#inmp4411-wi-fi" class="nav-link">&#9655; การอ่านข้อมูลจาก INMP4411 และส่งข้อมูลผ่านเครือข่าย Wi-Fi</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="inmp441-esp32">การอ่านข้อมูลเสียงจากโมดูลเซนเซอร์ INMP441 ด้วย ESP32<a class="headerlink" href="#inmp441-esp32" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="inmp441-omnidirectional-mems-microphone-sensor">&#9655; <strong>INMP441 Omnidirectional MEMS Microphone Sensor</strong><a class="headerlink" href="#inmp441-omnidirectional-mems-microphone-sensor" title="Permanent link">#</a></h2>
+<p>​<a href="../esp32_inmp441/inmp441_datasheet_2015.pdf"><strong>INMP441</strong></a>
+เป็นโมดูลเซนเซอร์ชนิดดิจิทัลของบริษัท <strong>Invensense</strong> สำหรับการใช้งานไมโครโฟนเสียงแบบดิจิทัลที่มีคุณภาพสูง
+ใช้พลังงานต่ำและมีราคาไม่แพง จัดอยู่ในประเภทที่เรียกว่า <strong>MEMS (Micro-Electro-Mechanical Systems)</strong> 
+โดยมีเอาต์พุตแบบ <strong>I2S (Inter-IC Sound)</strong> </p>
+<p><img alt="" src="inmp441_i2s_mems_mic.jpg" /></p>
+<p>รูป: โมดูล <strong>INMP441</strong> ที่ได้นำมาใช้งาน และองค์ประกอบภายในชิป <strong>INMP441</strong></p>
+<p>จากรูปจะเห็นได้ว่า ตัวอุปกรณ์เซนเซอร์ <strong>INMP441</strong> มีขนาดเล็ก มีรูเล็ก ๆ เปิดไว้รับเสียง (<strong>Sound Hole</strong>)
+ดังนั้นในการนำมาใช้งานจึงใช้โมดูลประเภท <strong>Breakout</strong> สามารถบัดกรีขาได้ง่าย และใช้งานได้กับเบรดบอร์ดได้สะดวก
+<strong>INMP441</strong> รับเสียงหรือตอบสนองต่อความถี่ได้ดี (<strong>Frequency Response</strong>) ในช่วง <strong>60Hz - 15kHz</strong></p>
+<p>ภายในชิป <strong>INMP441</strong> ประกอบด้วยเซ็นเซอร์ <strong>MEMS</strong> ซึ่งแปลงพลังงานจากเสียงให้เป็นพลังงานไฟฟ้า 
+วงจรปรับสัญญาณแอนะล็อก (<strong>Signal Conditioning</strong>) ตัวแปลงสัญญาณอนาล็อกเป็นดิจิทัล (<strong>Sigma-Delta ADC</strong>)
+ตัวกรองสัญญาณเพื่อจำกัดความถี่ (<strong>Anti-aliasing Filters</strong>) และอินเทอร์เฟซ <strong>I2S</strong> แบบ 24 บิต
+ข้อมูลเอาต์พุตมีขนาด 24 บิต (เป็นแบบ <strong>2's complement</strong>) ดังนั้นค่าสูงสุดที่เป็นบวก
+(ค่าสเกลดิจิทัลเต็มสเกล) คือ <script type="math/tex">2^{23}-1 = 8,388,607</script>
+</p>
+<p><strong>dBFS (Decibels Full Scale)</strong> เป็นหน่วยที่ใช้วัดระดับสัญญาณเสียงในระบบดิจิทัล 
+เปรียบเทียบกับ "ค่าสูงสุด" ที่ระบบสามารถแสดงได้</p>
+<ul>
+<li>ค่า <strong>0 dBFS</strong> หมายถึงระดับเสียงที่ "ดังสุด" ที่ระบบสามารถบันทึกหรือส่งออกได้โดยไม่เกิดการเพี้ยน
+หรือที่เรียกว่า "คลิป" (<strong>Clipping</strong>)</li>
+<li>ค่าที่เป็นลบ หมายถึงสัญญาณที่เบากว่าระดับสูงสุด</li>
+</ul>
+<p>ความไวของไมโครโฟน (<strong>Sensitivity</strong>) เป็นตัวระบุว่า ไมโครโฟนสามารถ "จับเสียง" ได้ดีแค่ไหนเมื่อใช้กับเสียงทดสอบ
+สำหรับ <strong>INMP441</strong> ความไวอยู่ที่ระดับ <strong>-26 dBFS</strong> เมื่อใช้กับเสียงทดสอบความถี่ <strong>1 kHz</strong>
+และมีเสียงดังที่ระดับ <strong>94 dB SPL</strong> (<strong>Sound Pressure Level</strong>) ซึ่งเสียงระดับดังพอ ๆ กับเครื่องดูดฝุ่นขณะทำงาน
+เมื่อได้รับเสียงอินพุตดังกล่าว ไมโครโฟนจะให้ค่าเอาต์พุตที่มีค่าแอมพลิจูดสูงสุด (<strong>Peak Amplitude</strong>)
+เท่ากับ <script type="math/tex">420,426</script> ซึ่งคำนวณได้จาก <script type="math/tex">(2^{23}-1) \times 10^{-26/20}</script>
+</p>
+<p>โมดูล <strong>INMP441</strong> มีขาดังนี้:</p>
+<ul>
+<li><code>VDD</code>: แรงดันไฟเลี้ยงในช่วง <strong>1.62V - 3.63V</strong> โดยทั่วไปก็ใช้ <strong>+3.3V</strong> (ใช้กระแสไฟฟ้าสูงสุดไม่เกิน <strong>2.5mA</strong>)</li>
+<li><code>SCK</code> (<em>Serial Clock</em>): สัญญาณนาฬิกาสำหรับอินเทอร์เฟซ <strong>I2S</strong> (ความถี่สูงสุดไม่เกิน <strong>3.2MHz</strong>)</li>
+<li><code>SD</code> (<em>Serial Data</em>): เอาต์พุตข้อมูลเสียงแบบดิจิทัล</li>
+<li><code>WS</code> (<em>Word Select</em>): สัญญาณเลือกคำข้อมูลสำหรับ <strong>I2S</strong></li>
+<li><code>L/R</code> (<em>Left/Right</em>): เลือกช่องเสียงซ้ายหรือขวา ('0' = Left channel, '1' = Right channel)</li>
+<li><code>CHIPEN</code> (<em>Chip Enable</em>): ขาควบคุมการทำงาน  ('0' = disabled / power-down, '1' = enabled)</li>
+<li><code>GND</code>: กราวด์ของระบบ</li>
+</ul>
+<p><img alt="" src="inmp441_stereo.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อใช้งานโมดูล <strong>INMP441</strong> จำนวน 2 ตัวพร้อมกัน สำหรับเสียงแบบ <strong>Stereo</strong>
+โมดูลด้านซ้ายสำหรับช่องสัญญาณ <strong>Left Channel</strong> (L/R = 0)
+และโมดูลด้านขวาสำหรับช่องสัญญาณ <strong>Right Channel</strong> (L/R = 1) ตามลำดับ</p>
+<p><img alt="" src="inmp441_i2s_data_sequence.jpg" /></p>
+<p>รูป: ลำดับการส่งบิตข้อมูลตามจังหวะของสัญญาณ <strong>SCK</strong> โดยแบ่งเป็น 3 กรณี ตามรูปแบบการใช้งาน
+คือ <strong>Stereo</strong> และ <strong>Mono Left-Channel</strong> หรือ <strong>Mono Right-Channel</strong></p>
+<p>จากรูปสัญญาณจะเห็นได้ว่า หนึ่งคาบของสัญญาณ <strong>WS (Word Select)</strong> จะมีจำนวนไซเคิลของ
+<strong>SCK</strong> เท่ากับ 64 แบ่งเป็นช่วงของข้อมูลสำหรับช่องสัญญาณซ้าย 32
+(เมื่อสัญญาณ <strong>WS</strong>='0') และตามด้วยช่องสัญญาณขวา 32 ครั้ง (เมื่อสัญญาณ <strong>WS</strong>='1') </p>
+<p>โมดูล <strong>INMP441</strong> ให้เอาต์พุตแบบ <strong>Mono</strong> โดยจะต้องเลือกว่า จะใช้สำหรับช่องซ้ายหรือขวา
+แต่ถ้าต้องการให้เป็น <strong>Stereo</strong> จะต้องใช้โมดูล 2 ตัว ทำงานคู่กัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino">&#9655; การเขียนโค้ดด้วย <strong>Arduino</strong><a class="headerlink" href="#arduino" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ดด้วย <strong>Arduino</strong> โดยใช้ <strong>Arduino-ESP32 Core</strong>
+(ทดลองใช้กับเวอร์ชัน <strong>3.2.0</strong>)
+และได้นำมาทดสอบกับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong> และ <strong>ESP32-S3</strong></p>
+<ul>
+<li><a href="../esp32-wemos_lolin/"><strong>WeMos Lolin32 Lite Board</strong></a>:
+ESP-WROOM-32 module (4MB Flash) and CP2104 USB-to-Serial chip</li>
+<li><a href="https://github.com/vcc-gnd/YD-ESP32-S3"><strong>YD-ESP32-S3 N16R8 Board</strong></a>:
+ESP32-S3-WROOM-1 module (16MB Flash / 8MB PSRAM, Octal-SPI), CH343P USB-to-Serial chip</li>
+</ul>
+<p>ชิป <strong>ESP32 / ESP32/S3</strong> ทำงานแบบ <strong>Dual-Core</strong> (<strong>240MHz CPU clock</strong>)
+และมีวงจร <strong>I2S Peripheral</strong> อยู่ภายใน จำนวน 2 ชุด  (<code>I2S_NUM_0</code> 
+และ <code>I2S_NUM_1</code>) ให้เลือกใช้งานได้ และเลือกขา <strong>GPIO</strong> ได้อิสระ จำนวน 3 ขา
+สำหรับขาสัญญาณ <code>SCK</code>, <code>WS</code> และ <code>SD</code> (เป็นสัญญาณเอาต์พุตจาก <strong>ESP32</strong> ไปยัง <strong>INMP441</strong>)
+และการใช้งานวงจร <strong>I2S</strong> ก็มีไลบรารี <code>ESP_I2S</code> ให้ใช้งานได้สะดวก</p>
+<p>การใช้ขา <strong>GPIO</strong> สำหรับเชื่อมต่อกับ <strong>INMP441</strong> ได้ตั้งค่าการใช้งานดังนี้</p>
+<ul>
+<li><strong>YD-ESP32-S3 N16R8</strong>:<ul>
+<li><code>#define I2S_WS   (GPIO_NUM_40)</code></li>
+<li><code>#define I2S_SD   (GPIO_NUM_41)</code></li>
+<li><code>#define I2S_SCK  (GPIO_NUM_42)</code></li>
+</ul>
+</li>
+<li><strong>WeMos Lolin32 Lite</strong>:<ul>
+<li><code>#define I2S_WS   (GPIO_NUM_15)</code></li>
+<li><code>#define I2S_SD   (GPIO_NUM_13)</code></li>
+<li><code>#define I2S_SCK  (GPIO_NUM_2)</code></li>
+</ul>
+</li>
+</ul>
+<p>การทำงานของโค้ดตัวอย่างมีดังนี้ </p>
+<ul>
+<li>มี 2 กรณี คือ การใช้งานโมดูล <strong>INMP441</strong> ที่ต่อวงจรใช้งานจริง หรือ
+ยังไม่ใช้โมดูลเซนเซอร์ และลองใช้ข้อมูลรูปคลื่นสัญญาณไซน์ในการทดสอบ</li>
+<li>ในกรณีที่ใช้โมดูล <strong>INMP441</strong> (ใช้ช่องสัญญาณด้านซ้าย <strong>L/R</strong>=<code>0</code>)  ก็ต้องมีการตั้งค่าใช้งานก่อน <ul>
+<li>เลือกใช้ขาสัญญาณ <code>I2S_WS</code>, <code>I2S_SD</code>, <code>I2S_SCK</code> ตามที่กำหนดไว้</li>
+<li>ตั้งค่าอัตราการชักตัวอย่าง (<strong>Sample Rate</strong>): <code>SAMPLE_FREQ</code> เช่น <code>16000</code> (16kHz)</li>
+<li>กำหนดจำนวนข้อมูลในการอ่านจากโมดูลเสียงเพื่อนำมาเก็บในบัฟเฟอร์: <code>BUF_LEN</code> เช่น <code>512</code> โดยข้อมูลแต่ละตัวมีขนาด 16 บิต (<strong>16-bit Integer</strong>)</li>
+<li>ถ้าต้องการข้อมูลครั้งละ <strong>512</strong> ตัวอย่าง ที่อัตรา <strong>16kHz</strong> จะมีความยาวเสียงเท่ากับ <strong>32 msec</strong>
+(<script type="math/tex">512 \cdot 1000/16000</script>)</li>
+</ul>
+</li>
+<li>ใช้การทำงานแบบ "มัลติทาสก์" (<strong>Multi-tasking</strong>) ด้วย<strong> FreeRTOS</strong> เพื่อแยกภารกิจ 2 ส่วนออกจากกัน ได้แก่:</li>
+<li><strong>I2S Task</strong>: ทำงานโดยใช้ <strong>CPU Core 0</strong> และอ่านข้อมูลเสียงจากโมดูลเซนเซอร์โดยใช้วงจร <strong>I2S</strong> เมื่อได้ข้อมูลในบัฟเฟอร์แล้ว จึงนำไปใส่ลงใน <strong>FreeRTOS Queue</strong></li>
+<li><strong>Serial Task</strong>: ทำงานโดยใช้ <strong>CPU Core 1</strong> และอ่านข้อมูลเสียงจาก <strong>FreeRTOS Queue</strong> แล้วส่งออกทาง <strong>Serial</strong> เพื่อส่งต่อไปยัง <strong>Arduino Serial Plotter</strong> และดูค่าตัวอย่างเสียงหรือคลื่นสัญญาณเสียงที่ได้แบบเรียลไทม์</li>
+<li>มีการส่งข้อมูลออกไปยังคอมพิวเตอร์ โดยใช้ <strong>USB-to-Serial</strong><ul>
+<li>ส่งออกทาง <strong>Serial</strong> ที่เชื่อมต่อกับชิป <strong>USB-to-Serial</strong> (เช่น <strong>CH340P</strong> หรือ <strong>CP2104</strong>)</li>
+<li>ส่งออกทาง <strong>USB-CDC</strong> (เฉพาะกรณีที่ใช้ชิป <strong>ESP32-S3</strong>)</li>
+</ul>
+</li>
+</ul>
+<p>คำสั่งที่สำคัญและเกี่ยวข้องกับการใช้งาน <strong>I2S</strong> ของ <strong>ESP32</strong></p>
+<ul>
+<li><code>I2SClass i2s</code>: สร้างออบเจกต์ <code>i2s</code> จากคลาส <strong>I2SClass</strong> ซึ่งเป็นคลาสที่จัดการอินเทอร์เฟซ <strong>I2S</strong> ของ <strong>ESP32</strong></li>
+<li><code>i2s.setPins(...)</code>: ใช้สำหรับกำหนดพินที่ใช้ในอินเทอร์เฟซ <strong>I2S</strong></li>
+<li><code>i2s.begin(...)</code>: เริ่มต้นใช้งาน <strong>I2S Peripheral</strong></li>
+<li><code>i2s.configureRX(...)</code>: ใช้กำหนดการทำงานของช่องรับ (<strong>RX</strong>) การใช้หน่วยความจำสำหรับ <strong>DMA</strong>
+มีการรับเฟรมข้อมูลขนาด 32 บิต แล้วแปลงให้เป็นข้อมูล 16 บิต โดยอัตโนมัติ</li>
+<li><code>i2s.readBytes(...)</code>: อ่านข้อมูลจาก <strong>I2S Peripheral</strong> ที่กำลังรับข้อมูลอยู่ ตามจำนวนที่ต้องการ</li>
+</ul>
+<p><strong>File</strong>: <code>esp32_inmp441_serial.ino</code></p>
+<pre><code class="language-c++">/////////////////////////////////////////////////////////////////////////////
+// Arduino ESP32 Core : v3.2.0
+// Espressif ESP-IDF  : v5.4-690-gd4aa25a38e-dirty
+/////////////////////////////////////////////////////////////////////////////
+
+#include &lt;Arduino.h&gt;
+#include &lt;ESP_I2S.h&gt; // Use the ESP_I2S library
+
+#if ESP_ARDUINO_VERSION &lt; ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#error &quot;Please use Arduino ESP32 Core v3.0.0 or higher...&quot;
+#endif
+
+// Uncomment the following line to use the INMP441 I2S Microphone
+#define USE_I2S_MEMS_MIC
+
+#define I2S_PORT (I2S_NUM_0)  // The I2S peripheral to use
+
+// Three GPIO pins are required for the I/O signals (WS, SD, SCK) 
+// of the I2S MEMS Microphone (Mono).
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+// YD-ESP32-S3 N16R8 Board
+#define BAUDRATE (2000000)
+#define LED_ON   (1)
+#define LED_PIN  (GPIO_NUM_48 + SOC_GPIO_PIN_COUNT) // Onboard RGB LED
+#define I2S_WS   (GPIO_NUM_40)   // Word Select (WS)
+#define I2S_SD   (GPIO_NUM_41)   // Serial Data (SD)
+#define I2S_SCK  (GPIO_NUM_42)   // Serial Clock (SCLK)
+
+#elif defined(CONFIG_IDF_TARGET_ESP32)
+// WeMos Lolin32 Lite Board
+#define BAUDRATE (921600)
+#define LED_ON   (0)
+#define LED_PIN  (GPIO_NUM_22)   // Onboard LED
+#define I2S_WS   (GPIO_NUM_15)   // Word Select (WS)
+#define I2S_SD   (GPIO_NUM_13)   // Serial Data (SD)
+#define I2S_SCK  (GPIO_NUM_2)    // Serial Clock (SCLK)
+#else
+#error &quot;Not supported!!!&quot;
+#endif
+
+#define LED_OFF      (!LED_ON)
+#define SAMPLE_FREQ  (16000)   // Sampling rate
+#define BUF_LEN      (512)     // Buffer length
+
+I2SClass i2s;                  // Instance of the I2S class
+int16_t buf[BUF_LEN];          // Buffer to store samples
+QueueHandle_t sampleQueue = NULL;  // FreeRTOS queue
+
+// Two FreeRTOS tasks
+void i2sTask(void *param);
+void serialTask(void *param);
+
+void i2sInit() {
+  int success;
+  // Set up the pins used for audio input
+  i2s.setPins( I2S_SCK, I2S_WS, -1, I2S_SD );
+  // Start the operation of the I2S peripheral, using I2S standard mode
+  success = i2s.begin( I2S_MODE_STD, SAMPLE_FREQ, I2S_DATA_BIT_WIDTH_32BIT,
+                       I2S_SLOT_MODE_MONO, I2S_STD_SLOT_LEFT );
+  if (!success) {
+    Serial.println(&quot;Failed to initialize I2S bus!&quot;);
+  }
+
+  success = i2s.configureRX( SAMPLE_FREQ, I2S_DATA_BIT_WIDTH_32BIT,
+                             I2S_SLOT_MODE_MONO, I2S_RX_TRANSFORM_32_TO_16 );
+  if (!success) {
+    Serial.println(&quot;Failed to configure I2S RX transformation!&quot;);
+  }
+}
+
+void setup() {
+  Serial.begin(BAUDRATE);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LED_ON);
+  delay(2000);
+  while(!Serial) { delay(1); }
+  Serial.println(&quot;\n\n\n&quot;);
+  Serial.flush();
+  Serial.println(&quot;ESP32 + I2S MEMS Microphone Demo...&quot;);
+  digitalWrite(LED_PIN, LED_OFF);
+
+  show_esp32_info();
+
+  Serial.println(&quot;Wait for any character from Serial before proceeding..&quot;);
+  Serial.flush();
+  while (!Serial.available()) {
+    delay(1);
+  }
+
+#ifdef USE_I2S_MEMS_MIC
+  i2sInit(); // Initialize the I2S peripheral
+#endif
+
+  // Create a FreeRTOS queue
+  sampleQueue = xQueueCreate(2 * BUF_LEN, sizeof(int16_t));
+  if (!sampleQueue) {
+    Serial.println(&quot;Failed to create a FreeRTOS queue!&quot;);
+  }
+  // Create two FreeRTOS tasks
+  xTaskCreatePinnedToCore(i2sTask, &quot;I2S Task&quot;, 8192 /*stack size*/, 
+                          NULL, 2 /*task priority*/, NULL, 1 /*CPU core*/);
+  xTaskCreatePinnedToCore(serialTask, &quot;Serial Task&quot;, 4096 /*stack size*/,
+                          NULL, 1 /*task priority*/, NULL, 0 /*CPU core*/);
+}
+
+void loop() {
+  // empty
+}
+
+void i2sTask(void *param) {
+  uint32_t num_samples;
+  while (true) {
+    digitalWrite(LED_PIN, LED_ON); // Turn on the LED
+
+#ifdef USE_I2S_MEMS_MIC // Use the I2S MEMS microphone device
+    num_samples = i2s.readBytes((char *)buf, sizeof(buf)) / 2;
+#else // Use sinewave data
+    num_samples = BUF_LEN;
+    for ( int i=0; i &lt; BUF_LEN; i++) {
+      buf[i] = 10000*sin(2*PI*i/32);
+    }
+    delay(50);
+#endif
+
+    if (sampleQueue != NULL &amp;&amp; num_samples &gt; 0) {
+      for (uint32_t i = 0; i &lt; num_samples; i++) {
+        xQueueSend(sampleQueue, &amp;buf[i], portMAX_DELAY);
+      }
+    }
+    digitalWrite(LED_PIN, LED_OFF); // Turn off the LED
+    taskYIELD();
+  }
+}
+
+void serialTask(void *param) {
+  int16_t sample;
+  while (true) {
+    xQueueReceive( sampleQueue, &amp;sample, portMAX_DELAY );
+    Serial.println( sample );
+    Serial.flush();
+  }
+}
+
+void show_esp32_info() {
+  Serial.println(&quot;=========================================&quot;);
+  Serial.printf(&quot;Arduino ESP32 Core v%u.%u.%u\n&quot;,
+     ESP_ARDUINO_VERSION_MAJOR, 
+     ESP_ARDUINO_VERSION_MINOR, 
+     ESP_ARDUINO_VERSION_PATCH );
+
+  Serial.printf(&quot;Espressif IDF: %s\n&quot;, ESP.getSdkVersion() );
+  Serial.printf(&quot;Chip Revision %d\n&quot;,  ESP.getChipRevision() );
+  Serial.printf(&quot;Cpu Freq. %lu MHz\n&quot;, ESP.getCpuFreqMHz() );
+  Serial.printf(&quot;Heap (total/free): %lu / %lu bytes\n&quot;, 
+         ESP.getHeapSize(), ESP.getFreeHeap());
+  Serial.printf(&quot;PSRAM (toal/free): %lu / %lu bytes\n&quot;, 
+         ESP.getPsramSize(), ESP.getFreePsram());
+  Serial.printf(&quot;Flash Size: %lu MB, Flash Speed: %lu MHz\n&quot;,
+         ESP.getFlashChipSize()/(1024*1024UL), 
+         ESP.getFlashChipSpeed()/(uint32_t) 1e6 );
+
+  // more info...
+  Serial.printf(&quot;Espressif chip model: %s\n&quot;,
+         ESP.getChipModel() );
+  Serial.printf(&quot;Number of CPU Cores: %d\n&quot;, 
+         ESP.getChipCores() );
+  String str;
+  switch(ESP.getFlashChipMode()) {
+     case FM_QIO:  str = &quot;QIO&quot;;  break;
+     case FM_QOUT: str = &quot;QOUT&quot;; break;
+     case FM_DIO:  str = &quot;DIO&quot;;  break;
+     case FM_DOUT: str = &quot;DOUT&quot;; break;
+     default:      str = &quot;Unknown&quot;; break;
+  }
+  Serial.printf(&quot;Flash model: %s\n&quot;, str.c_str() );
+  Serial.println(&quot;=========================================\n&quot;);
+  Serial.flush();
+}
+</code></pre>
+<p><img alt="" src="yd_esp32s3_ch340_port.jpg" /></p>
+<p>รูป: การเชื่อมต่อพอร์ต <strong>USB Type-C</strong> โดยผ่านทางชิป <strong>USB-to-Serial CH340</strong> ไปยัง <strong>ESP32-S3 (Hardware Serial)</strong></p>
+<p><img alt="" src="yd_esp32s3_usb_cdc_port.jpg" /></p>
+<p>รูป:  การเชื่อมต่อพอร์ต <strong>USB Type-C</strong> โดยผ่านทางขา <strong>D+/D-</strong> ของ <strong>ESP32-S3 (USB CDC)</strong> </p>
+<p><img alt="" src="esp32s3_ch340_output.jpg" /></p>
+<p>รูป: การทดสอบโดยใช้ <strong>ESP32-S3</strong> ส่งข้อมูลรูปคลื่นไซน์ ส่งออกทาง <strong>Hardware Serial</strong> ตั้งค่า <strong>Baud=2000000</strong></p>
+<p><img alt="" src="esp32s3_ch340_sine_wave.jpg" /></p>
+<p>รูป: แสดงข้อมูลที่ได้รับจาก <strong>ESP32-S3 (CH340)</strong> โดยใช้ <strong>Arduino Serial Plotter</strong> ซึ่งจะได้รูปคลื่นไซน์
+และมีแอมพลิจูด อยู่ในช่วง <strong>+/-10,000</strong></p>
+<p><img alt="" src="esp32s3_ch340_mic_wave.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณเสียงที่อ่านได้จากโมดูล <strong>INMP441</strong> โดยใช้สัญญาณเสียงความถี่คงถี่ประมาณ <strong>1kHz</strong></p>
+<p>หากลองเปลี่ยนไปใช้ <strong>USB-CDC</strong> แทนที่การส่งข้อมูลออกทาง <strong>USB-to-Serial Chip</strong>
+จะเห็นได้ว่า จากข้อมูลเสียงทดสอบรูปคลื่นไซน์ที่ได้รับ มีบางช่วงเวลาผิดเพี้ยนไปจากที่ควรจะเป็น</p>
+<p><img alt="" src="esp32s3_usb_cdc_output.jpg" /></p>
+<p>รูป: การทดลองส่งข้อมูลรูปคลื่นไซน์จาก <strong>ESP32-S3</strong> โดยใช้ <strong>USB-CDC</strong></p>
+<p><img alt="" src="esp32s3_usb_cdc_mic_wave.jpg" /></p>
+<p>รูป: แสดงข้อมูลที่ได้รับจาก <strong>ESP32-S3 (USB-CDC)</strong>
+โดยใช้ <strong>Arduino Serial Plotter</strong> ตั้งค่า <strong>Baud=2000000</strong></p>
+<p>ดังนั้นจึงสรุปว่า ควรส่งข้อมูลออกทาง <strong>USB-to-Serial Chip</strong>
+แทนที่จะใช้ช่องทาง <strong>USB-CDC</strong> ของ <strong>ESP32-S3</strong></p>
+<p>การส่งข้อมูลผ่าน <strong>USB-to-Serial</strong> ไปยังคอมพิวเตอร์ของผู้ใช้ และใช้ <strong>Arduino Serial Plotter</strong>
+รับค่าและแสดงรูปคลื่นสัญญาณ แต่ก็เป็นเครื่องมือที่ช่วยในการตรวจสอบการทำงานของระบบในเบื้องต้น
+เมื่อข้อมูลถูกส่งมายังคอมพิวเตอร์ของผู้ใช้ ก็มีแนวทางการพัฒาต่อไป
+เช่น การนำข้อมูลไปบันทึกลงไฟล์ <strong>.wav</strong> หรือแสดงรูปคลื่นสัญญาณก็ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="inmp4411-wi-fi">&#9655; การอ่านข้อมูลจาก <strong>INMP4411</strong> และส่งข้อมูลผ่านเครือข่าย <strong>Wi-Fi</strong><a class="headerlink" href="#inmp4411-wi-fi" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>ESP32 / ESP32-S3</strong> สามารถเชื่อมต่อกับ <strong>Wi-Fi Access Point</strong> ได้
+ดังนั้นถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> เพื่ออ่านข้อมูลเสียงจาก <strong>INMP441</strong>
+เมื่อมีการเชื่อมต่อจากเครื่องคอมพิวเตอร์ของผู้ใช้ ผ่านระบบ <strong>Wi-Fi</strong></p>
+<p>โค้ดตัวอย่างนี้ จะต้องมีไฟล์ <code>secrets.h</code> สำหรับตั้งค่าการเชื่อมต่อกับ <strong>Wi-Fi</strong></p>
+<pre><code class="language-c++">#define WIFI_SSID &quot;YOUR_WIFI_SSID&quot;
+#define WIFI_PASS &quot;YOUR_WIFI_PASSWD&quot;
+</code></pre>
+<p>บอร์ด <strong>ESP32</strong> จะทำหน้าที่เป็น <strong>TCP Server</strong> และรอคอยการติดต่อเข้ามาจาก <strong>TCP Client</strong>
+โดยได้เลือกใช้หมายเลขพอร์ต <code>9000</code> และเมื่อมี <strong>TCP Client</strong> เชื่อมต่อเข้ามา <strong>ESP32</strong> จะส่งข้อความแรกเป็น
+<code>ready</code> เพื่อส่งสัญญาณว่า พร้อมที่จะส่งข้อมูลเสียงกลับไป จากนั้นจึงจะเป็นชุดข้อมูลเสียง</p>
+<p>ในโค้ดตัวอย่างนี้ การส่งข้อมูลเสียงผ่าน <strong>Socket Stream</strong> จะส่งครั้งละ 512 ข้อมูล ที่มีขนาด 16 บิต
+ดังนั้นจึงส่งข้อมูลคราวละ 1024 ไบต์ และจะส่งข้อมูลชุดถัดไป เรื่อย ๆ หาก <strong>Client</strong> ยังมีการเชื่อมต่ออยู่</p>
+<p><strong>File</strong>: <code>esp32_inmp441_tcp_server.ino</code></p>
+<pre><code class="language-c++">/////////////////////////////////////////////////////////////////////////
+// Arduino ESP32 Core v3.2.0
+// Board: WeMos Lolin32 Lite or VCC GND Studio YD-ESP32-S3
+// I2S MEMS Microphone: INMP441 (3.3V)
+// L/R pin is connected to GND (use the left channel).
+/////////////////////////////////////////////////////////////////////////
+
+#include &lt;Arduino.h&gt;
+#include &lt;ESP_I2S.h&gt; // Use the ESP_I2S library
+#include &lt;WiFi.h&gt;
+#include &quot;secrets.h&quot; // Define WIFI_SSID and WIFI_PASS
+
+#define I2S_PORT (I2S_NUM_0)  // The I2S peripheral to use
+
+// Three GPIO pins are required for the I/O signals (WS, SD, SCK) 
+// of the I2S MEMS Microphone (Mono).
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+// YD-ESP32-S3 N16R8 Board
+#define LED_ON   (1)
+#define LED_PIN  (GPIO_NUM_48 + SOC_GPIO_PIN_COUNT) // Onboard RGB LED
+#define I2S_WS   (GPIO_NUM_40)   // Word Select (WS)
+#define I2S_SD   (GPIO_NUM_41)   // Serial Data (SD)
+#define I2S_SCK  (GPIO_NUM_42)   // Serial Clock (SCLK)
+
+#elif defined(CONFIG_IDF_TARGET_ESP32)
+// WeMos Lolin32 Lite Board
+#define LED_ON   (0)
+#define LED_PIN  (GPIO_NUM_22)   // Onboard LED
+#define I2S_WS   (GPIO_NUM_15)   // Word Select (WS)
+#define I2S_SD   (GPIO_NUM_13)   // Serial Data (SD)
+#define I2S_SCK  (GPIO_NUM_2)    // Serial Clock (SCLK)
+#else
+#error &quot;Not supported!!!&quot;
+#endif
+
+#define LED_OFF        (!LED_ON)
+#define SAMPLE_RATE    (16000)
+#define BUF_LEN        (512)
+#define SERVER_PORT    (9000)
+
+I2SClass i2s;
+int16_t i2s_buf[ BUF_LEN ];
+WiFiServer server( SERVER_PORT );
+
+void initWiFi() {
+  Serial.println(&quot;\nConnecting WiFi...\n&quot;);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite( LED_PIN, !digitalRead( LED_PIN) );
+    delay(200);
+    Serial.println(&quot;.&quot;);
+  }
+  digitalWrite( LED_PIN, LED_OFF );
+  Serial.println(&quot;\nConnected to WiFi&quot;);
+  Serial.print(&quot;IP Address: &quot;);
+  Serial.println(WiFi.localIP()); // Show the IP address 
+  Serial.printf(&quot;Starting a TCP server on port %d\n&quot;, SERVER_PORT );
+  server.begin();
+}
+
+void initI2S() {
+  i2s_data_bit_width_t i2s_bitwidth = I2S_DATA_BIT_WIDTH_32BIT;
+  i2s_mode_t           i2s_mode = I2S_MODE_STD;
+  i2s_slot_mode_t      i2s_slot = I2S_SLOT_MODE_MONO;
+  int8_t               i2s_slot_mask = I2S_STD_SLOT_LEFT;
+  i2s_rx_transform_t   i2s_rx_transform = I2S_RX_TRANSFORM_32_TO_16;
+
+  // Set up the pins used for audio input
+  i2s.setPins(I2S_SCK, I2S_WS, -1, I2S_SD);
+  // Initialize the I2S bus in standard mode with transformation to 16-bit
+  if (!i2s.begin(i2s_mode, SAMPLE_RATE, i2s_bitwidth, 
+                 i2s_slot, i2s_slot_mask)) 
+  {
+    Serial.println(&quot;Failed to initialize I2S bus!&quot;);
+    return;
+  }
+  // Configure the I2S receiver to transform 32-bit data to 16-bit data
+  if (!i2s.configureRX(SAMPLE_RATE, i2s_bitwidth, 
+                      i2s_slot, i2s_rx_transform)) 
+  {
+    Serial.println(&quot;Failed to configure I2S RX transformation!&quot;);
+    return;
+  }
+  Serial.println(&quot;I2S bus initialized and configured.&quot;);
+}
+
+void setup() {
+  pinMode( LED_PIN, OUTPUT );
+  digitalWrite( LED_PIN, LED_OFF );
+
+  Serial.begin(115200);
+  delay(1000);
+  while (!Serial) { delay(1); }
+  Serial.println(&quot;ESP32 + INMP441 I2S MEMS Mic + UDP Server\n&quot;);
+  Serial.flush();
+
+  initWiFi(); // Initialize WiFi
+  initI2S();  // Initialize I2S Peripheral
+}
+
+void loop() {
+  WiFiClient client = server.available(); 
+  if (client) { // There is a UDP client.
+    client.println(&quot;ready&quot;); // Send &quot;ready&quot; message to the TCP client
+    digitalWrite( LED_PIN, LED_ON );
+    while (client.connected()) {
+      // Blocking call: read audio samples into the bufffer
+      size_t bytes_read = i2s.readBytes((char*)i2s_buf, sizeof(i2s_buf));
+      if (bytes_read &gt; 0) { // Send the 16-bit data over WiFi
+        client.write((const char *)i2s_buf, bytes_read);
+      } else {
+        yield();
+      }
+    }
+    digitalWrite( LED_PIN, LED_OFF );
+  }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>หากต้องการจะทดลองเลือกใช้รูปแบบการสื่อสารด้วยวิธี <strong>TCP</strong> หรือ <strong>UDP</strong> ก็มีแนวทางการแก้ไขโค้ดใหม่ดังนี้
+หากมีการประกาศ <code>#define USE_UDP</code> ก็จะเลือกใช้วิธี <strong>UDP</strong> แต่ถ้าไม่ใช่ ก็ให้ใช้วิธี <strong>TCP</strong></p>
+<p><strong>File</strong>: <code>esp32_inmp441_tcp_udp_server.ino</code></p>
+<pre><code class="language-c++">/////////////////////////////////////////////////////////////////////////
+// Arduino ESP32 Core v3.2.0
+// Board: WeMos Lolin32 Lite or VCC GND Studio YD-ESP32-S3
+// I2S MEMS Microphone: INMP441 (3.3V)
+// L/R pin is connected to GND (use the left channel).
+/////////////////////////////////////////////////////////////////////////
+
+#include &lt;Arduino.h&gt;
+#include &lt;ESP_I2S.h&gt;     // Use the ESP_I2S library
+#include &lt;WiFi.h&gt;
+#include &quot;secrets.h&quot;     // Define WIFI_SSID and WIFI_PASS
+
+#define I2S_PORT (I2S_NUM_0)  // The I2S peripheral to use
+#define SAMPLE_RATE    (16000)
+#define BUF_LEN        (512)
+#define SERVER_PORT    (9000)
+
+// Uncomment the line below to use UDP instead of TCP
+#define USE_UDP
+
+#ifdef USE_UDP
+#include &lt;WiFiUdp.h&gt;
+WiFiUDP udp;
+#else
+WiFiServer server(SERVER_PORT);
+#endif
+
+// Three GPIO pins are required for the I/O signals (WS, SD, SCK) 
+// of the I2S MEMS Microphone (Mono).
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+// YD-ESP32-S3 N16R8 Board
+#define LED_ON   (1)
+#define LED_PIN  (GPIO_NUM_48 + SOC_GPIO_PIN_COUNT) // Onboard RGB LED
+#define I2S_WS   (GPIO_NUM_40)
+#define I2S_SD   (GPIO_NUM_41)
+#define I2S_SCK  (GPIO_NUM_42)
+
+#elif defined(CONFIG_IDF_TARGET_ESP32)
+// WeMos Lolin32 Lite Board
+#define LED_ON   (0)
+#define LED_PIN  (GPIO_NUM_22)
+#define I2S_WS   (GPIO_NUM_15)
+#define I2S_SD   (GPIO_NUM_13)
+#define I2S_SCK  (GPIO_NUM_2)
+#else
+#error &quot;Not supported!!!&quot;
+#endif
+
+#define LED_OFF (!LED_ON)
+
+I2SClass i2s;
+int16_t i2s_buf[BUF_LEN];
+
+void initWiFi() {
+  Serial.println(&quot;\nConnecting WiFi...\n&quot;);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(200);
+    Serial.print(&quot;.&quot;);
+  }
+  digitalWrite(LED_PIN, LED_OFF);
+  Serial.println(&quot;\nConnected to WiFi&quot;);
+  Serial.print(&quot;IP Address: &quot;);
+  Serial.println(WiFi.localIP());
+#ifdef USE_UDP
+  Serial.printf(&quot;Starting a UDP server on port %d\n&quot;, SERVER_PORT);
+  udp.begin(SERVER_PORT);
+#else
+  Serial.printf(&quot;Starting a TCP server on port %d\n&quot;, SERVER_PORT);
+  server.begin();
+#endif
+}
+
+void initI2S() {
+  i2s_data_bit_width_t i2s_bitwidth = I2S_DATA_BIT_WIDTH_32BIT;
+  i2s_mode_t           i2s_mode = I2S_MODE_STD;
+  i2s_slot_mode_t      i2s_slot = I2S_SLOT_MODE_MONO;
+  int8_t               i2s_slot_mask = I2S_STD_SLOT_LEFT;
+  i2s_rx_transform_t   i2s_rx_transform = I2S_RX_TRANSFORM_32_TO_16;
+
+  i2s.setPins(I2S_SCK, I2S_WS, -1, I2S_SD);
+  if (!i2s.begin(i2s_mode, SAMPLE_RATE, i2s_bitwidth, i2s_slot, i2s_slot_mask)) {
+    Serial.println(&quot;Failed to initialize I2S bus!&quot;);
+    return;
+  }
+  if (!i2s.configureRX(SAMPLE_RATE, i2s_bitwidth, i2s_slot, i2s_rx_transform)) {
+    Serial.println(&quot;Failed to configure I2S RX transformation!&quot;);
+    return;
+  }
+  Serial.println(&quot;I2S bus initialized and configured.&quot;);
+}
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LED_OFF);
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;ESP32 + INMP441 I2S MEMS Mic + WiFi Streaming\n&quot;);
+  initWiFi();
+  initI2S();
+}
+
+#ifdef USE_UDP
+IPAddress remoteIP;
+uint16_t remotePort;
+#endif
+
+void loop() {
+#ifdef USE_UDP
+  static bool sampling = false;
+  int packetSize = udp.parsePacket();
+  if (packetSize) { // Check for incoming UDP packet
+    char sbuf[16] = {0};
+    udp.read(sbuf, sizeof(sbuf)); // Read the incoming data
+    remoteIP   = udp.remoteIP();
+    remotePort = udp.remotePort();
+    Serial.printf(&quot;Received UDP packet '%s' from %s:%d\n&quot;, 
+                  sbuf, remoteIP.toString().c_str(), remotePort);
+    sampling = !sampling;
+  }
+  if (sampling) {
+    digitalWrite(LED_PIN, LED_ON);
+    size_t bytes_read = i2s.readBytes((char*)i2s_buf, sizeof(i2s_buf));
+    if (bytes_read &gt; 0) {
+      udp.beginPacket(remoteIP, remotePort);
+      udp.write((uint8_t*)i2s_buf, bytes_read);
+      udp.endPacket();
+    }
+    digitalWrite(LED_PIN, LED_OFF);
+  }
+#else
+  WiFiClient client = server.available();
+  if (client) {
+    client.println(&quot;ready&quot;);
+    digitalWrite(LED_PIN, LED_ON);
+    while (client.connected()) {
+      size_t bytes_read = i2s.readBytes((char*)i2s_buf, sizeof(i2s_buf));
+      if (bytes_read &gt; 0) {
+        client.write((const char*)i2s_buf, bytes_read);
+      } else {
+        yield();
+      }
+    }
+    digitalWrite(LED_PIN, LED_OFF);
+  }
+#endif
+}
+</code></pre>
+<p>ในการรับข้อมูลเสียงจากบอร์ด <strong>ESP32</strong> ก็ใช้วิธีเขียนโค้ดด้วยภาษา <strong>Python</strong>
+เพื่อรับข้อมูลด้วยวิธี <strong>TCP</strong> หรือ <strong>UDP</strong> และนำข้อมูลที่ได้มาบันทึกลงไฟล์เสียง <strong>.wav</strong>
+ตามความยาวเสียงที่ต้องการ เช่น 1 วินาที และการบันทึกเสียงจะเริ่มขึ้น โดยมีเงื่อนไขของทริกเกอร์ เช่น
+เมื่อแอมพลิจูดของเสียง มีระดับสูงกว่าค่า <code>TRIGGER_THRESHOLD</code> ที่กำหนดไว้</p>
+<p>การตั้งค่า <strong>Sample Rate</strong> ชนิดข้อมูล จำนวนข้อมูลที่ถูกส่งมาในแต่ละครั้ง และวิธีการรับส่งข้อมูลผ่านเครือข่าย
+จะต้องตรงกับที่ใช้สำหรับ <strong>ESP32</strong> และจะต้องตั้งค่า <strong>IP Address</strong> ของ <strong>ESP32</strong>
+ที่เชื่อมต่อเครือข่ายเดียวกันในระบบ <strong>Wi-Fi</strong> ให้ถูกต้องด้วย</p>
+<p>ในการรันโค้ด <strong>Python</strong> ให้สร้าง <strong>Python Virtual Environment</strong> แล้วทำคำสั่งติดตั้งไลบรารีที่จำเป็นต้องใช้ ดังนี้</p>
+<pre><code class="language-text">$ pip3 install matplotlib numpy scipy
+</code></pre>
+<p><strong>File</strong>: <code>audio_tcp_udp_client.py</code></p>
+<pre><code class="language-python">import time
+import socket
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import spectrogram
+from scipy.io import wavfile
+from collections import deque
+
+USE_UDP = True                # Select to use UDP or TCP
+SERVER_IP = '192.168.100.73'  # Replace with ESP32 IP
+SERVER_PORT = 9000
+SAMPLE_RATE = 16000
+BUF_LEN  = 512
+DURATION = 1
+TRIGGER_THRESHOLD   = 500
+PRE_TRIGGER_PERCENT = 25
+
+def wait_for_ready_signal(sock):
+    print(&quot;Waiting for ready status from ESP32...&quot;)
+    while True:
+        data = sock.recv(1024).decode('utf-8')
+        if 'ready' in data:
+            print(&quot;ESP32 is ready.&quot;)
+            break
+
+def rms(samples):
+    return np.sqrt(np.mean(samples.astype(np.float32)**2))
+
+def listen_and_record(sock, fname=&quot;audio.wav&quot;, 
+                              threshold=TRIGGER_THRESHOLD, 
+                              duration=DURATION):
+    total_samples = int(SAMPLE_RATE * duration)
+    pre_trigger = int(total_samples * PRE_TRIGGER_PERCENT/100)
+    pre_buffer = deque(maxlen=pre_trigger)
+    audio_buffer = []
+
+    sample_idx = 0
+    triggered = False
+
+    print(f&quot;Listening... (trigger threshold = {threshold},&quot;,
+          f&quot;pre-roll = {pre_trigger} samples)&quot;)
+
+    while True:
+        try:
+            if USE_UDP:
+                data, _ = sock.recvfrom(BUF_LEN * 2)
+            else:
+                data = sock.recv(BUF_LEN * 2)
+            if not data:
+                continue
+
+            samples = np.frombuffer(data, dtype=np.int16)
+            if sample_idx == 0 and len(samples) &gt;= 2:
+                samples = samples[2:]
+
+            level = rms(samples)
+            print(f&quot;RMS level: {int(level)}&quot;, end='\r')
+
+            if not triggered:
+                pre_buffer.extend(samples)
+                if level &gt; threshold:
+                    print(f&quot;\nLoud sound detected! Starting recording...&quot;)
+                    triggered = True
+                    audio_buffer = list(pre_buffer) + list(samples)
+                    sample_idx = len(audio_buffer)
+            else:
+                audio_buffer.extend(samples)
+                sample_idx += len(samples)
+                if sample_idx &gt;= total_samples:
+                    break
+        except Exception as e:
+            print(f&quot;\nError: {e}&quot;)
+            break
+
+    audio_array = np.array(audio_buffer[:total_samples], dtype=np.int16)
+    wavfile.write(fname, SAMPLE_RATE, audio_array)
+    print(f&quot;\nSaved: {fname}&quot;)
+    return audio_array
+
+def plot_audio_data(audio_data):
+    t_start, t_stop = 0, len(audio_data)/SAMPLE_RATE
+    time_axis = np.linspace(t_start, t_stop, num=len(audio_data))
+    plt.figure(figsize=(10, 8))
+    plt.subplot(2, 1, 1)
+    plt.plot(time_axis, audio_data)
+    plt.title('Time Series Data')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Amplitude')
+
+    plt.subplot(2, 1, 2)
+    f, t, Sxx = spectrogram(audio_data, SAMPLE_RATE)
+    plt.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud')
+    plt.title('Spectrogram')
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [s]')
+    plt.colorbar(label='Intensity [dB]')
+    plt.tight_layout()
+    plt.show()
+
+# ========== MAIN ==========
+try:
+    if USE_UDP:
+        print(&quot;Using UDP mode...&quot;)
+        udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        udp_sock.settimeout(5.0)
+        # Send start trigger
+        udp_sock.sendto(b'start', (SERVER_IP, SERVER_PORT)) 
+        audio_data = listen_and_record(udp_sock, fname=&quot;audio_udp.wav&quot;)
+        # Send stop trigger
+        udp_sock.sendto(b'stop', (SERVER_IP, SERVER_PORT)) 
+        udp_sock.close()
+    else:
+        print(&quot;Using TCP mode...&quot;)
+        tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        tcp_sock.connect((SERVER_IP, SERVER_PORT))
+        wait_for_ready_signal(tcp_sock)
+        audio_data = listen_and_record(tcp_sock, fname=&quot;audio_tcp.wav&quot;)
+        tcp_sock.close()
+
+    plot_audio_data(audio_data)
+
+except KeyboardInterrupt:
+    print('Terminated by user')
+except Exception as ex:
+    print(f&quot;Exception: {ex}&quot;)
+</code></pre>
+<p><img alt="" src="hello_wave_spectrogram.jpg" /></p>
+<p>รูป: ตัวอย่างการแสดงข้อมูลเสียงเป็นคลื่นสัญญาณที่มีความยาว 1 วินาที และ "สเปกโตรแกรม" (<strong>Spectrogram</strong>)
+ซึ่งได้จากเสียงพูดคำว่า <a href="hello.wav"><code>hello</code></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการใช้งานโมดูลเซนเซอร์เสียง <strong>INMP441</strong> ซึ่งนำมาใช้กับ <strong>ESP32 / ESP32-S3</strong>
+เชื่อมต่อด้วยอินเทอร์เฟส <strong>I2S</strong> ส่งข้อมูลไปยังคอมพิวเตอร์ผู้ใช้ผ่านทาง <strong>Serial</strong> แล้วนำมาแสดงรูปคลื่นสัญญาณ
+(<strong>Audio Waveform</strong>) หรือจะใช้วิธีเชื่อมต่อผ่าน <strong>Wi-Fi</strong>  ด้วยวิธี <strong>TCP / UDP</strong> ก็ได้เช่นกัน
+โดยเขียนโค้ดภาษา <strong>Python</strong> เพื่อเชื่อมต่อกับบอร์ด <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2025-04-25 | Last Updated: 2025-04-26</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

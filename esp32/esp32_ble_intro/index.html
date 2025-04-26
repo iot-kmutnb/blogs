@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_ble_intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการเขียนโปรแกรมด้วย Arduino สำหรับใช้งาน ESP32 - Bluetooth LE - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-esp32-bluetooth-le" class="nav-link">ตัวอย่างการเขียนโปรแกรมด้วย Arduino สำหรับใช้งาน ESP32 - Bluetooth LE</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#bluetooth-le" class="nav-link">&#9655; Bluetooth LE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble" class="nav-link">&#9655; หลักการทำงานของ BLE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-scan" class="nav-link">&#9655; ตัวอย่างการตรวจหาอุปกรณ์ (BLE Scan)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-esp32-ble-sensor" class="nav-link">&#9655; ตัวอย่างโค้ด Arduino ESP32: BLE Sensor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-esp32-ble-client" class="nav-link">&#9655; การเขียนโค้ด Arduino: ESP32 BLE Client</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-bleak" class="nav-link">&#9655; การเขียนโค้ด Python โดยใช้ไลบรารี bleak</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-bluetoothctl" class="nav-link">&#9655; การกรองหาอุปกรณ์ BLE ด้วยคำสั่ง bluetoothctl</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-esp32-bluetooth-le">ตัวอย่างการเขียนโปรแกรมด้วย <strong>Arduino</strong> สำหรับใช้งาน <strong>ESP32 - Bluetooth LE</strong><a class="headerlink" href="#arduino-esp32-bluetooth-le" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="bluetooth-le">&#9655; <strong>Bluetooth LE</strong><a class="headerlink" href="#bluetooth-le" title="Permanent link">#</a></h2>
+<p>ในปัจจุบันการใช้งาน <strong>Bluetooth Low Energy (BLE)</strong> เป็นที่นิยมอย่างแพร่หลาย
+<strong>BLE</strong> เป็นโพรโทคอลย่อยภายใต้มาตรฐาน <strong>Bluetooth</strong> ซึ่งดูแลโดยองค์กรที่เรียกว่า <strong>Bluetooth SIG</strong>
+เปิดตัวครั้งแรกใน <strong>Bluetooth 4.0</strong> เมื่อปีค.ศ. <strong>2009</strong> ถัดจากเวอร์ชันก่อนหน้าคือ
+<strong>Bluetooth Classic 1.0 – v.0</strong></p>
+<p><strong>BLE</strong> สามารถสื่อสารข้อมูลไร้สายระยะใกล้ ในย่านความถี่ <strong>2.4GHz</strong> 
+ด้วยอัตราการรับส่งข้อมูล (<strong>Data Transfer Rate</strong>) สูงสุด 
+<strong>1 Mbps</strong> (<strong>Bluetooth 4.0</strong>) และ <strong>2 Mbps</strong> (<strong>Bluetooth 5.0</strong>) 
+ออกแบบมาสำหรับการสื่อสารที่ใช้พลังงานต่ำ 
+เหมาะกับอุปกรณ์ที่ใช้แบตเตอรี่ขนาดเล็ก เช่น เซนเซอร์ อุปกรณ์สุขภาพ และสมาร์ทวอทช์ เป็นต้น
+ดังนั้นการเรียนรู้และทดลองใช้งาน <strong>BLE</strong> จึงเป็นหัวข้อสำคัญอีกหัวข้อหนึ่งเกี่ยวกับระบบสมองกลฝังตัว (<strong>Embedded Systems</strong>) 
+และ <strong>Internet of Things (IoT)</strong></p>
+<ul>
+<li><strong>Bluetooth 5</strong>: เป็นเวอร์ชันที่พัฒนาต่อจาก <strong>Bluetooth 4.0 - 4.2</strong>
+รองรับทั้ง <strong>Classic Bluetooth</strong> และ <strong>Bluetooth Low Energy (BLE)</strong><ul>
+<li><strong>Bluetooth 5.0</strong> (2016)</li>
+<li><strong>Bluetooth 5.1</strong> (2019)</li>
+<li><strong>Bluetooth 5.2</strong> (2020)</li>
+<li><strong>Bluetooth 5.3</strong> (2021)</li>
+<li><strong>Bluetooth 5.4</strong> (2023)</li>
+</ul>
+</li>
+<li><strong>Bluetooth Mesh Networking</strong>: ทำงานอยู่บนพื้นฐานของ <strong>BLE</strong> 
+แต่เพิ่มความสามารถในการส่งข้อมูลต่อระหว่างอุปกรณ์ (<strong>Multi-hop Communication</strong>)</li>
+</ul>
+<p>ชิปจากบริษัท <strong>Espressif</strong> หลายรุ่น เช่น <strong>ESP32</strong>, <strong>ESP32-S3</strong>, <strong>ESP32-C3</strong>, <strong>ESP32-C6</strong>
+รองรับการสื่อสารข้อมูลไร้สายผ่านโปรโตคอลต่าง ๆ นอกเหนือจาก <strong>Wi-Fi</strong> ที่ทำงานบนย่านความถี่ <strong>2.4GHz</strong> ได้แก่
+เช่น <strong>BLE</strong>, <strong>Zigbee</strong> และ <strong>Thread</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble">&#9655; หลักการทำงานของ <strong>BLE</strong><a class="headerlink" href="#ble" title="Permanent link">#</a></h2>
+<p><strong>BLE (Bluetooth Low Energy)</strong> มีแนวคิดสำคัญในการสื่อสารข้อมูลดังนี้:</p>
+<ul>
+<li>การจำแนกประเภทของอุปกรณ์ หรือ บทบาททางกายภาพของอุปกรณ์:<ul>
+<li><strong>Peripheral</strong>: อุปกรณ์ที่ให้บริการ</li>
+<li><strong>Central</strong>: อุปกรณ์ที่เชื่อมต่อเข้าไปยัง <strong>Peripheral</strong> เพื่อใช้บริการตามที่ประกาศไว้</li>
+</ul>
+</li>
+<li>บทบาทในการสื่อสารข้อมูลผ่าน <strong>GATT</strong><ul>
+<li><strong>Server</strong>: อุปกรณ์ที่มีข้อมูลและบริการให้ใช้งาน</li>
+<li><strong>Client</strong>: อุปกรณ์ที่ร้องขอบริการจาก <strong>Server</strong></li>
+</ul>
+</li>
+<li>มีการกำหนด <strong>BLE Profiles</strong> และบริการ <strong>Services</strong> โดย <strong>Bluetooth SIG</strong> เช่น<ul>
+<li><strong>Heart Rate Profile</strong> และ <strong>Heart Rate Service</strong>
+  ใช้กับอุปกรณ์ เช่น อุปกรณ์วัดชีพจร สายรัดสุขภาพ (<strong>Fitness Band</strong>) เป็นต้น</li>
+</ul>
+</li>
+<li>การใช้งาน <strong>GATT (Generic Attribute Profile)</strong>:<ul>
+<li>เป็นโปรโตคอลสำคัญที่ใช้ใน <strong>BLE</strong> เพื่อกำหนดรูปแบบการแลกเปลี่ยนข้อมูลระหว่างอุปกรณ์
+  โดยเฉพาะในระบบที่มีการทำงานแบบ <strong>Client</strong> และ <strong>Server</strong></li>
+<li>การแลกเปลี่ยนข้อมูลจะเกิดขึ้นตามรูปแบบที่กำหนดไว้โดย <strong>GATT</strong> โดยที่ใช้ส่งข้อมูลกับระหว่างอุปกรณ์
+  เป็นข้อมูล "ขนาดสั้น" เรียกว่า <strong>Attributes</strong></li>
+<li>ข้อมูลจะถูกจัดกลุ่มเป็น <strong>Service</strong> และ <strong>Characteristic</strong></li>
+</ul>
+</li>
+<li><strong>Service</strong><ul>
+<li>เป็นชุดของข้อมูลหรือฟังก์ชันที่อุปกรณ์ <strong>BLE</strong> ให้บริการ เช่น
+<strong>Heart Rate Service</strong>, <strong>Environmental Sensing</strong> ตามมาตรฐาน (กำหนดโดย <strong>Bluetooth SIG</strong>) 
+หรือ <strong>Custom Service</strong> (กำหนดหรือสร้างขึ้นเองโดยนักพัฒนา)</li>
+</ul>
+</li>
+<li><strong>Characteristic</strong><ul>
+<li>อยู่ภายใต้ <strong>Service</strong> แต่ละ <strong>Characteristic</strong> จะมีคุณสมบัติ (<strong>Properties</strong>) ที่ระบุการเข้าถึงข้อมูลแต่ละตัว
+  และมีหน่วยข้อมูล (<strong>Value</strong>) ที่สามารถเขียนหรืออ่านได้</li>
+</ul>
+</li>
+<li>ประเภทการเข้าถึงข้อมูลใน <strong>Characteristic</strong><ul>
+<li><strong>Read</strong>: อ่านค่าได้</li>
+<li><strong>Write</strong>: เขียนค่าใหม่ได้</li>
+<li><strong>Notify</strong>: แจ้งเตือน <strong>Client</strong> เมื่อค่ามีการเปลี่ยนแปลง</li>
+<li><strong>Indicate</strong>: เหมือน <strong>Notify</strong> แต่ต้องการการยืนยันจาก <strong>Client</strong></li>
+</ul>
+</li>
+<li><strong>UUID (Universally Unique Identifier)</strong><ul>
+<li>ใช้ระบุ <strong>Service</strong> และ <strong>Characteristic</strong></li>
+<li>โดยทั่วไป มีขนาด 128 บิต หรือ 16 ไบต์ หรือ จะระบุเป็น 16 บิต เช่น <code>0x2A6E</code> (เป็นแบบย่อ หากใช้ตามมาตรฐานที่กำหนดไว้แล้ว
+และจะถูกแปลงเป็น 128 บิต โดยอัตโนมัติ)</li>
+<li>ตัวอย่าง <strong>128-bit UUID</strong> เช่น <code>00002a37-0000-1000-8000-00805f9b34fb</code></li>
+<li><strong>UUID</strong> มาตรฐานถูกกำหนดโดย <strong>Bluetooth SIG (Special Interest Group)</strong></li>
+<li><strong>Service UUID</strong>: ระบุประเภทของบริการ</li>
+<li><strong>Characteristic UUID</strong>: ระบุคุณสมบัติย่อยภายใน <strong>Service</strong> </li>
+</ul>
+</li>
+<li>การโฆษณา (<strong>Advertising</strong>):<ul>
+<li>อุปกรณ์ <strong>Peripheral</strong> จะส่งข้อมูลโฆษณา (<strong>Broadcast</strong>) เพื่อให้ <strong>Central</strong> เห็นและเชื่อมต่อได้</li>
+</ul>
+</li>
+<li>ข้อจำกัดของ <strong>BLE</strong><ul>
+<li>ไม่เหมาะกับการสตรีมข้อมูลปริมาณมาก เช่น วิดีโอ เสียง</li>
+<li>ข้อมูลที่ส่งผ่าน <strong>Characteristic</strong> มีขนาดจำกัด</li>
+</ul>
+</li>
+<li>การจับคู่กับอุปกรณ์ (<strong>BLE Pairing</strong>) แต่ไม่จำเป็นต้องทำสำหรับอุปกรณ์ <strong>BLE</strong> มีหลายวิธี โดยมีระดับความปลอดภัยต่างกัน เช่น<ul>
+<li>ไม่ต้องใส่รหัส (<strong>Just Works</strong>)</li>
+<li>ต้องใส่รหัส เช่น 6 หลัก (<strong>Passkey Entry</strong>)</li>
+<li>ทั้งสองฝั่งแสดงรหัสเดียวกันที่ได้จากการสุ่ม และผู้ใช้ยืนยันว่าเหมือนกัน (<strong>Numeric Comparison</strong>)</li>
+</ul>
+</li>
+</ul>
+<p>ตัวอย่าง <strong>Service UUID</strong> สำหรับอุปกรณ์ประเภท <strong>BLE Environmental Sensing</strong>:</p>
+<ul>
+<li><strong>UUID (16-bit)</strong>: <code>0x181A</code> (<strong>Environmental Sensing</strong>)</li>
+<li>ตัวอย่าง <strong>Characteristic UUIDs</strong> (16 บิต) ภายใต้ <strong>Service</strong> นี้<ul>
+<li><strong>Temperature</strong> (<code>0x2A6E</code>): อุณหภูมิ หน่วยเป็นองศาเซลเซียส (°C) </li>
+<li><strong>Humidity</strong> (<code>0x2A6F</code>): ความชื้นสัมพัทธ์ หน่วยเป็นเปอร์เซ็นต์ (%)</li>
+<li><strong>Pressure</strong> (<code>0x2A6D</code>): ความดันบรรยากาศ หน่วยเป็น <strong>Pascal (Pa)</strong></li>
+<li><strong>UV Index</strong> (<code>0x2A76</code>): ดัชนีรังสี <strong>UV</strong></li>
+<li><strong>Wind Speed</strong> (<code>0x2A70</code>): ความเร็วลม หน่วยเป็น เมตร/วินาที</li>
+</ul>
+</li>
+</ul>
+<p>หากเป็นอุปกรณ์สมาร์ทโฟน เช่น <strong>Android</strong> ก็แนะนำให้ลองติดตั้งและใช้งาน <strong>nRF Connect</strong> ของบริษัท <strong>Nordic Semiconductor</strong> ผู้ใช้สามารถสแกนหาอุปกรณ์ <strong>BLE</strong> รอบ ๆ และลองเชื่อมต่อกับอุปกรณ์เหล่านั้นได้</p>
+<hr />
+<h2 id="ble-scan">&#9655; ตัวอย่างการตรวจหาอุปกรณ์ (<strong>BLE Scan</strong>)<a class="headerlink" href="#ble-scan" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับ <strong>ESP32</strong> สำหรับตรวจสอบว่า มีอุปกรณ์ <strong>BLE</strong> อยู่บริเวณรอบ ๆ หรือไม่ โดยใช้ไลบรารี
+<a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/BLE/src/"><code>BLE</code></a>
+ที่รวมอยู่ใน <strong>Arduino-esp32 core</strong> แล้ว และมีการนำเข้าไฟล์ <strong>C Header</strong> สำหรับไลบรารี ดังนี้</p>
+<ul>
+<li><code>&lt;BLEDevice.h&gt;</code></li>
+<li><code>&lt;BLEServer.h&gt;</code></li>
+<li><code>&lt;BLEUtils.h&gt;</code> </li>
+<li><code>&lt;BLEScan.h&gt;</code></li>
+<li><code>&lt;BLEAdvertisedDevice.h&gt;</code></li>
+<li><code>&lt;BLESecurity.h&gt;</code></li>
+</ul>
+<p><strong>File</strong>: <code>esp32_ble_scan.ino</code></p>
+<pre><code class="language-c++">// BLE Scanner Example for ESP32 (Arduino-ESP32 core v3.0.0+)
+// BLE: https://github.com/espressif/arduino-esp32/blob/master/libraries/BLE/
+
+#include &lt;BLEDevice.h&gt;
+#include &lt;BLEUtils.h&gt;
+#include &lt;BLEScan.h&gt;
+#include &lt;BLEAdvertisedDevice.h&gt;
+
+int scanTime = 5; // BLE scan time (in seconds)
+BLEScan* pBLEScan;
+
+class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+
+  void onResult(BLEAdvertisedDevice advertisedDevice) {
+    // Show the BLE address
+    Serial.printf(&quot;BLE Address: %s\n&quot;,
+                  advertisedDevice.getAddress().toString().c_str());
+    // Show device name if available
+    if (advertisedDevice.haveName()) {
+      Serial.printf(&quot;- Device Name: '%s'\n&quot;,
+                    advertisedDevice.getName().c_str());
+    }
+    // Show the RSSI value (received signal strength indicator) if available
+    if (advertisedDevice.haveRSSI()) {
+      Serial.printf(&quot;- RSSI: %d\n&quot;, advertisedDevice.getRSSI() );
+    }
+    // Show the Tx power if available
+    if (advertisedDevice.haveTXPower()) {
+      Serial.printf(&quot;- Tx power: %d\n&quot;, advertisedDevice.getTXPower() );
+    }
+  }
+};
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;Starting ESP32 BLE Scanner...&quot;);
+
+  BLEDevice::init(&quot;&quot;); // Initialize the BLE device
+  pBLEScan = BLEDevice::getScan(); // Get the BLE scanner
+  // Set the AdvertisedDevice Callback
+  pBLEScan-&gt;setAdvertisedDeviceCallbacks( 
+               new MyAdvertisedDeviceCallbacks() );
+  pBLEScan-&gt;setActiveScan(true); // Use active scan
+  pBLEScan-&gt;setInterval(100); // Scan interval 100*0.625ms
+  pBLEScan-&gt;setWindow(99); // Scan window 99*0.625ms (less than scan interval)
+}
+
+void loop() {
+  Serial.printf( &quot;Scanning for BLE devices (%d sec)...\n&quot;, scanTime);
+  // Start BLE scan (blocking call, waits until the scan completes)
+  BLEScanResults *results = pBLEScan-&gt;start(scanTime, false);
+  Serial.println( &quot;Scan completed.\n\n&quot; );
+  // Show the total number of BLE devices found after the BLE scan process
+  int deviceCount = results-&gt;getCount();
+  Serial.printf( &quot;BLE devices found: %d\n\n&quot;, deviceCount );
+  // Clear the BLE scan results
+  pBLEScan-&gt;clearResults();
+  delay( 10000 );
+}
+</code></pre>
+<p>โค้ดตัวอย่างนี้ มีการสร้างคลาส (<strong>Class</strong>) ชื่อ <code>MyAdvertisedDeviceCallbacks</code>
+แบบกำหนดเองและสืบทอดมาจากคลาส <code>BLEAdvertisedDeviceCallbacks</code>
+และเมื่อนำไปใช้ จะต้องมีการทำคำสั่งต่อไปนี้ก่อน</p>
+<p><code>pBLEScan-&gt;setAdvertisedDeviceCallbacks( new MyAdvertisedDeviceCallbacks() );</code></p>
+<p>โดยที่ <code>pBLEScan</code> คือ ตัวแปรที่เก็บอ็อบเจกต์ของ <code>BLEScan</code> (ใช้ในการสแกน <strong>BLE</strong>)</p>
+<p>ภายในคลาส มีการสร้างฟังก์ชันสมาชิก <code>onResult(...)</code> ทำหน้าที่เป็น <strong>Callback Function</strong>
+ซึ่งจะถูกเรียกใช้เมื่อมีการสแกนพบอุปกรณ์ <strong>BLE</strong> แต่ละตัว ดังนั้นจึงสามารถดูข้อมูลของอุปกรณ์ที่พบได้
+(<code>advertisedDevice</code>) เช่น</p>
+<ul>
+<li>แสดงหมายเลข <strong>BLE Address</strong> ของอุปกรณ์: <code>advertisedDevice.getAddress()</code></li>
+<li>แสดงชื่ออุปกรณ์: <code>advertisedDevice.getName()</code> (ถ้ามี)</li>
+<li>แสดงค่า <strong>RSSI</strong> ของสัญญาณ: <code>advertisedDevice.getRSSI()</code></li>
+</ul>
+<p>หากต้องการสแกนหาอุปกรณ์ <strong>BLE</strong> ให้ทำซ้ำไปเรื่อย ๆ และมีการบันทึกและอัปเดตรายการอุปกรณ์ที่ตรวจพบ
+ตามจำนวนสูงสุดที่กำหนดไว้ (<code>MAX_DEVICES</code>) ก็มีแนวทางดังนี้</p>
+<p><strong>File</strong>: <code>esp32_ble_scan_list.ino</code></p>
+<pre><code class="language-c++">#include &lt;BLEDevice.h&gt;
+#include &lt;BLEScan.h&gt;
+#include &lt;BLEAdvertisedDevice.h&gt;
+#include &lt;vector&gt;
+#include &lt;memory&gt;
+#include &lt;algorithm&gt;
+
+#define MAX_DEVICES  (30)
+
+typedef struct {
+  BLEAddress addr;
+  int minRSSI;
+  int maxRSSI;
+} ble_dev_info_t;
+
+std::vector&lt;std::shared_ptr&lt;ble_dev_info_t&gt;&gt; deviceList;
+
+int scanTime = 5; // Scan interval in seconds
+BLEScan* pBLEScan;
+
+void updateDeviceList(BLEAdvertisedDevice&amp; foundDev) {
+  BLEAddress addr = foundDev.getAddress();
+  int rssi = foundDev.getRSSI();
+
+  // Check if device already exists
+  for (auto&amp; dev: deviceList) {
+    if (dev-&gt;addr.equals(addr)) {
+      if (rssi &lt; dev-&gt;minRSSI) { dev-&gt;minRSSI = rssi; }
+      if (rssi &gt; dev-&gt;maxRSSI) { dev-&gt;maxRSSI = rssi; }
+      return;
+    }
+  }
+  // Not found: insert if space
+  if (deviceList.size() &lt; MAX_DEVICES) {
+    auto newDev = std::make_shared&lt;ble_dev_info_t&gt;(ble_dev_info_t{addr,rssi,rssi});
+    deviceList.push_back(newDev);
+  } else {
+    // Replace weakest if new one is stronger
+    auto weakest = std::min_element(deviceList.begin(), deviceList.end(),
+      [](const std::shared_ptr&lt;ble_dev_info_t&gt;&amp; a, 
+         const std::shared_ptr&lt;ble_dev_info_t&gt;&amp; b) 
+      {
+        int a_rssi_avg = (a-&gt;minRSSI + a-&gt;maxRSSI) / 2;
+        int b_rssi_avg = (b-&gt;minRSSI + b-&gt;maxRSSI) / 2;
+        return a_rssi_avg &gt; b_rssi_avg;
+      });
+
+    int weakest_rssi = ((*weakest)-&gt;minRSSI + (*weakest)-&gt;maxRSSI) / 2;
+    if (rssi &gt; weakest_rssi) {
+      *weakest = std::make_shared&lt;ble_dev_info_t&gt;(ble_dev_info_t{addr,rssi,rssi});
+    }
+  }
+  // Optional: sort by strongest avg. RSSI
+  std::sort(deviceList.begin(), deviceList.end(),
+    [](const std::shared_ptr&lt;ble_dev_info_t&gt;&amp; a, 
+       const std::shared_ptr&lt;ble_dev_info_t&gt;&amp; b) 
+    {
+      int a_rssi_avg = (a-&gt;minRSSI + a-&gt;maxRSSI) / 2;
+      int b_rssi_avg = (b-&gt;minRSSI + b-&gt;maxRSSI) / 2;
+      return a_rssi_avg &gt; b_rssi_avg; // Stronger first
+    });
+}
+
+class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
+  void onResult(BLEAdvertisedDevice advertisedDevice) override {
+    updateDeviceList(advertisedDevice);
+  }
+};
+
+void printDeviceList() {
+  Serial.println(&quot;----------------------------------------&quot;);
+  Serial.println(&quot;   BLE Address          | RSSI [min,max]&quot;);
+  Serial.println(&quot;----------------------------------------&quot;);
+  int idx = 1;
+  for (const auto&amp; dev : deviceList) {
+    String ble_addr_str = dev-&gt;addr.toString();
+    ble_addr_str.toUpperCase();
+    Serial.printf(&quot;%2d) '%s' | %d, %d\n&quot;,
+                  idx++, ble_addr_str.c_str(),
+                  dev-&gt;minRSSI, dev-&gt;maxRSSI);
+  }  
+  Serial.println(&quot;----------------------------------------&quot;);
+}
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) delay(1);
+  Serial.println(&quot;Starting BLE scan...&quot;);
+
+  BLEDevice::init(&quot;&quot;);
+  pBLEScan = BLEDevice::getScan();
+  pBLEScan-&gt;setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+  pBLEScan-&gt;setActiveScan(true);
+  pBLEScan-&gt;setInterval(100);
+  pBLEScan-&gt;setWindow(99);
+}
+
+void loop() {
+  Serial.printf( &quot;Scanning for BLE devices (%d sec)...\n&quot;, scanTime);
+  // Start BLE scan (blocking call, waits until the scan completes)
+  pBLEScan-&gt;start(scanTime, false);
+  Serial.println(&quot;Scan done....\n&quot;);
+  printDeviceList();
+  delay(5000);
+}
+</code></pre>
+<p><img alt="" src="esp32_ble_scan.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความจากการทำงานแสดงของ <strong>ESP32</strong> ที่ให้เห็นรายการอุปกรณ์ <strong>BLE</strong> ที่ตรวจพบ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32-ble-sensor">&#9655; ตัวอย่างโค้ด <strong>Arduino ESP32: BLE Sensor</strong><a class="headerlink" href="#arduino-esp32-ble-sensor" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นโค้ดสาธิตการใช้อุปกรณ์ <strong>ESP32</strong> ให้ทำหน้าที่เป็น <strong>BLE Peripheral / Server</strong>
+โดยจำลองสถานการณ์ให้อุปกรณ์ดังกล่าว สามารถอ่านค่าจากเซนเซอร์สิ่งแวดล้อม
+เช่น วัดค่าอุณหภูมิ (<strong>Air Temperature</strong>) ความชื้นสัมพัทธ์ในอากาศ (<strong>Relative Humidity</strong>)
+และความดันบรรยากาศ (<strong>Barometric Pressure</strong>) เป็นต้น และให้อุปกรณ์ <strong>BLE Central / Client</strong>
+เข้ามาเชื่อมต่อเพื่ออ่านข้อมูลดังกล่าวได้ ด้วยวิธี <strong>Notify</strong> เมื่อมีการอัปเดตค่าจากอุปกรณ์เซนเซอร์</p>
+<p><strong>File</strong>: <code>esp32_env_sensor.ino</code></p>
+<pre><code class="language-c++">// ESP32 BLE Environmental Sensor (Server / Peripheral)
+
+#include &lt;BLEDevice.h&gt;
+#include &lt;BLEServer.h&gt;
+#include &lt;BLEUtils.h&gt;
+#include &lt;BLE2902.h&gt;
+
+// UUIDs for Environmental Sensing
+#define SERVICE_UUID    0x181A // Environmental sensing
+#define CHAR_UUID_TEMP  0x2A6E // Temperature Characteristic
+#define CHAR_UUID_HUMID 0x2A6F // Hunmidity Characteristic
+#define CHAR_UUID_PRESS 0x2A6D // Barometric Pressure Characteristic
+
+BLEServer* pServer = NULL;
+BLECharacteristic *pTemperatureCharacteristic;
+BLECharacteristic *pHumidityCharacteristic;
+BLECharacteristic *pPressureCharacteristic;
+
+bool advertising = false;
+bool connected = false;
+
+// Set initial sensor values (for simulation purpose)
+float temperature = 30.0;   // deg.C
+float humidity    = 60.0;   // %RH
+float pressure    = 1010.0; // hPa
+
+class MyServerCallbacks : public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
+    connected = true;    
+    Serial.println(&quot;Client connected&quot;);
+    advertising = false;
+    BLEDevice::getAdvertising()-&gt;stop();
+  }
+  void onDisconnect(BLEServer* pServer) {
+    connected = false;
+    Serial.println(&quot;Client disconnected&quot;);
+  }
+};
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;Starting ESP32 BLE Environmental Sensor&quot;);
+
+  // Init the BLE device and specify the device name
+  BLEDevice::init(&quot;ESP32 BLE Demo&quot;);
+
+  // Set TX power to +9dBm (max.)
+  BLEDevice::setPower(ESP_PWR_LVL_P9); // +9 dBm
+
+  // Create a BLE server 
+  pServer = BLEDevice::createServer();   
+  // Set the user-defined BLE server callback object
+  pServer-&gt;setCallbacks(new MyServerCallbacks());  
+  // Create service  
+  BLEService *pService = 
+      pServer-&gt;createService( BLEUUID((uint16_t)SERVICE_UUID) );
+  // Create GATT services
+  BLECharacteristic *pCharacteristic;
+
+  // 1) Create temperature characteristic
+  pCharacteristic = pService-&gt;createCharacteristic(
+                                BLEUUID((uint16_t)CHAR_UUID_TEMP),
+                                BLECharacteristic::PROPERTY_READ | 
+                                BLECharacteristic::PROPERTY_NOTIFY);
+  pCharacteristic-&gt;addDescriptor(new BLE2902());
+  pTemperatureCharacteristic = pCharacteristic;
+
+  // 2) Create humidity characteristic
+  pCharacteristic = pService-&gt;createCharacteristic(
+                              BLEUUID((uint16_t)CHAR_UUID_HUMID),
+                              BLECharacteristic::PROPERTY_READ | 
+                              BLECharacteristic::PROPERTY_NOTIFY);
+  pCharacteristic-&gt;addDescriptor(new BLE2902());  
+  pHumidityCharacteristic = pCharacteristic;
+
+  // 3) Create pressure characteristic
+  pCharacteristic = pService-&gt;createCharacteristic(
+                              BLEUUID((uint16_t)CHAR_UUID_PRESS),
+                              BLECharacteristic::PROPERTY_READ | 
+                              BLECharacteristic::PROPERTY_NOTIFY);
+  pCharacteristic-&gt;addDescriptor(new BLE2902());
+  pPressureCharacteristic = pCharacteristic;
+
+  // Start BLE service
+  pService-&gt;start();
+
+  // Start service advertising
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising-&gt;addServiceUUID(BLEUUID((uint16_t)SERVICE_UUID));
+  pAdvertising-&gt;setScanResponse(true);
+  pAdvertising-&gt;setMinPreferred(0x06);
+  pAdvertising-&gt;setMinPreferred(0x12);
+  pAdvertising-&gt;start();
+  advertising = true;
+  Serial.println(&quot;BLE device is advertising...&quot;);
+}
+
+static int32_t randomInt(int32_t min, int32_t max ) {
+  int32_t value = esp_random() % (max-min+1) + min;
+  return value;
+}
+
+void loop() {
+  // Simulate envronmental sensor updates
+  temperature += (randomInt(-2,2)   * 0.1);
+  humidity    += (randomInt(-10,10) * 0.1);
+  pressure    += (randomInt(-5,5)   * 0.1);
+
+  // Clamp values
+  temperature = constrain(temperature, 25.0, 40.0); // deg.C
+  humidity    = constrain(humidity, 45.0, 90.0);    // %
+  pressure    = constrain(pressure, 990.0, 1010.0); // hPa
+
+  int16_t temp   = (int16_t)(temperature*100);  // 0.01 deg.C 
+  int16_t humid  = (int16_t)(humidity*100);     // 0.01 % 
+  uint32_t press = (uint32_t)(pressure*100*10); // 0.1 Pa 
+
+  if (connected) {
+    // Update the values
+    pTemperatureCharacteristic-&gt;setValue( (uint8_t *)&amp;temp, sizeof(temp) );
+    pHumidityCharacteristic-&gt;setValue( (uint8_t *)&amp;humid, sizeof(humid) );
+    pPressureCharacteristic-&gt;setValue( (uint8_t *)&amp;press, sizeof(press) );
+    // Notify the value changes
+    pTemperatureCharacteristic-&gt;notify();
+    pHumidityCharacteristic-&gt;notify();
+    pPressureCharacteristic-&gt;notify();
+  } 
+  else {
+    if (!advertising) {
+      advertising = true;
+      // Restart advertising so the server is discoverable again
+      BLEDevice::getAdvertising()-&gt;start();
+      Serial.println(&quot;Advertising restarted&quot;);
+    }
+  }
+
+  Serial.printf(&quot;Temperature: %.2f °C, &quot;, temperature);
+  Serial.printf(&quot;Humidity: %.2f %%RH, &quot;, humidity);
+  Serial.printf(&quot;Pressure: %.1f hPa\n&quot;, pressure);
+  delay(1000); // Send update every 1 sec
+}
+</code></pre>
+<p><img alt="" src="arduino_ble_server.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากการทำงานของ <strong>ESP32</strong></p>
+<p>ผู้ใช้สามารถติดตั้งแอพพลิเคชัน <strong>nRF Connect</strong> ในสมาร์ทโฟน และลองเชื่อมต่อกับอุปกรณ์ <strong>ESP32 BLE</strong></p>
+<p><img alt="" src="nf_connect_app.jpg" /></p>
+<p>รูป: การใช้ <strong>nRF Connect App</strong> บนสมาร์ทโฟน <strong>Android</strong> เชื่อมต่อกับอุปกรณ์ <strong>ESP32 BLE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32-ble-client">&#9655; การเขียนโค้ด <strong>Arduino: ESP32 BLE Client</strong><a class="headerlink" href="#arduino-esp32-ble-client" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> โดยใช้บอร์ด <strong>ESP32</strong> อีกบอร์ดหนึ่ง
+ให้ทำหน้าที่เป็น <strong>BLE Client</strong> เพื่อสแกนหาอุปกรณ์ <strong>ESP32 BLE Peripheral</strong>
+ตามหมายเลขแอดเดรสที่กำหนดไว้ แล้วเชื่อมต่อเพื่อรับการแจ้งเตือน เมื่อมีการอัปเดตค่าเซนเซอร์</p>
+<pre><code class="language-c++">// ESP32 BLE Client (Central)
+#include &lt;BLEDevice.h&gt;
+#include &lt;BLEUtils.h&gt;
+#include &lt;BLEScan.h&gt;
+#include &lt;BLEClient.h&gt;
+#include &lt;BLE2902.h&gt;
+#include &lt;BLEAdvertisedDevice.h&gt;
+
+// Service UUID and Characteristic UUIDs provided by the BLE server
+#define SERVICE_UUID    BLEUUID((uint16_t)0x181A)
+#define CHAR_UUID_TEMP  BLEUUID((uint16_t)0x2A6E)
+#define CHAR_UUID_HUMID BLEUUID((uint16_t)0x2A6F)
+#define CHAR_UUID_PRESS BLEUUID((uint16_t)0x2A6D)
+
+static BLEAddress *sensorAddress;
+static boolean doConnect = false;
+static boolean connected = false;
+
+BLEClient* pClient;
+BLERemoteCharacteristic* pTempChar;
+BLERemoteCharacteristic* pHumidChar;
+BLERemoteCharacteristic* pPressChar;
+
+void notifyCallback(
+  BLERemoteCharacteristic* pCharacteristic,
+  uint8_t* pData, size_t length, bool isNotify)
+{
+  if (pCharacteristic-&gt;getUUID().equals(CHAR_UUID_TEMP)) {
+    int16_t tempRaw = *(int16_t*)pData;
+    Serial.printf(&quot;Temperature: %.2f °C\n&quot;, tempRaw / 100.0);
+  } 
+  else if (pCharacteristic-&gt;getUUID().equals(CHAR_UUID_HUMID)) {
+    int16_t humidRaw = *(int16_t*)pData;
+    Serial.printf(&quot;Humidity: %.2f %%\n&quot;, humidRaw / 100.0);
+  } 
+  else if (pCharacteristic-&gt;getUUID().equals(CHAR_UUID_PRESS)) {
+    uint32_t pressRaw = *(uint32_t*)pData;
+    Serial.printf(&quot;Pressure: %.1f hPa\n&quot;, pressRaw / 1000.0);
+  }
+}
+
+class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+
+  void onResult(BLEAdvertisedDevice advertisedDevice) {
+    sensorAddress = new BLEAddress(advertisedDevice.getAddress());
+    Serial.printf(&quot;BLE MAC: %s\n&quot;, sensorAddress-&gt;toString().c_str()); 
+
+    if (advertisedDevice.haveServiceUUID() &amp;&amp; 
+       advertisedDevice.isAdvertisingService(SERVICE_UUID)) 
+    {
+      Serial.println(&quot;Found a BLE environmental sensor!&quot;);
+      sensorAddress = new BLEAddress(advertisedDevice.getAddress());
+      advertisedDevice.getScan()-&gt;stop(); // Stop BLE scanning
+      doConnect = true;
+    }
+  }
+};
+
+bool connectToServer() {
+  pClient = BLEDevice::createClient();
+  Serial.println(&quot;Connecting to server...&quot;);
+
+  if (!pClient-&gt;connect(*sensorAddress)) {
+    Serial.println(&quot;Failed to connect.&quot;);
+    return false;
+  }
+
+  BLERemoteService* pService = pClient-&gt;getService(SERVICE_UUID);
+  if (pService == nullptr) {
+    Serial.println(&quot;Service not found.&quot;);
+    return false;
+  }
+  pTempChar  = pService-&gt;getCharacteristic(CHAR_UUID_TEMP);
+  pHumidChar = pService-&gt;getCharacteristic(CHAR_UUID_HUMID);
+  pPressChar = pService-&gt;getCharacteristic(CHAR_UUID_PRESS);
+
+  if (pTempChar &amp;&amp; pTempChar-&gt;canNotify()) {
+    pTempChar-&gt;registerForNotify(notifyCallback);
+  }
+  if (pHumidChar &amp;&amp; pHumidChar-&gt;canNotify()) {
+    pHumidChar-&gt;registerForNotify(notifyCallback);
+  }
+  if (pPressChar &amp;&amp; pPressChar-&gt;canNotify()) {
+    pPressChar-&gt;registerForNotify(notifyCallback);
+  }
+  return true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;Starting ESP32 BLE Client&quot;);
+
+  BLEDevice::init(&quot;&quot;);
+  BLEScan* pBLEScan = BLEDevice::getScan();
+  pBLEScan-&gt;setAdvertisedDeviceCallbacks(
+              new MyAdvertisedDeviceCallbacks() );
+  pBLEScan-&gt;setInterval(1349);
+  pBLEScan-&gt;setWindow(449);   
+  pBLEScan-&gt;setActiveScan(true); // Send a scan request to devices found
+  pBLEScan-&gt;start(60, false); // Start scanning for 60 sec without blocking
+}
+
+void loop() { 
+  if (doConnect &amp;&amp; !connected) {
+    if (connectToServer()) {
+      connected = true;
+      Serial.println(&quot;Connected to sensor!&quot;);
+    } else {
+      Serial.println(&quot;Failed to connect, retrying...&quot;);
+      Serial.println(&quot;Restart BLE scan&quot;);
+      // Restart BLE scan, non-blocking
+      BLEDevice::getScan()-&gt;stop();
+      BLEDevice::getScan()-&gt;start(0, false);
+      connected = false;
+    }
+    doConnect = false;
+  } 
+  delay(1000);
+}
+</code></pre>
+<p><img alt="" src="esp32_ble_client.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตที่ได้จากการทำงานของ <strong>ESP32 BLE Client</strong>
+ซึ่งแสดงให้เห็นว่า สามารถเชื่อมต่อกับอุปกรณ์ <strong>ESP32 BLE Peripheral (Server)</strong> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-bleak">&#9655; การเขียนโค้ด <strong>Python</strong> โดยใช้ไลบรารี <code>bleak</code><a class="headerlink" href="#python-bleak" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการเขียนโค้ดด้วยภาษา <strong>Python</strong> โดยได้เลือกใช้ไลบรารี
+<a href="https://github.com/hbldh/bleak"><code>bleak</code></a> เพื่อตรวจสอบหาอุปกรณ์ <strong>BLE</strong></p>
+<p>ให้สร้าง <strong>Python Virtual Environment</strong> แล้วติดตั้งไลบรารี <code>bleak</code> ด้วยคำสั่งดังนี้</p>
+<pre><code class="language-text">$ pip install bleak 
+</code></pre>
+<p>โค้ดต่อไปนี้ ใช้สำหรับการค้นหาอุปกรณ์ <strong>BLE</strong> ที่อยู่รอบ ๆ เมื่อตรวจพบอุปกรณ์ ก็จะเลือกหนึ่งอุปกรณ์
+ที่มีค่า <strong>RSSI</strong> สูงสุด ซึ่งจะเป็นอุปกรณ์ที่อยู่ใกล้ ๆ กับคอมพิวเตอร์ของผู้ใช้
+แล้วแสดงข้อมูลเกี่ยวกับอุปกรณ์ เช่น <strong>Service UUID</strong> เป็นต้น</p>
+<p><strong>File</strong>: <code>bleak_ble_scan.py</code></p>
+<pre><code class="language-python">import asyncio
+from bleak import BleakScanner, BleakClient # use bleak v0.22.x
+
+async def main():
+    # Discover devices with advertisement data
+    results = await BleakScanner.discover(return_adv=True)
+    if not results:
+        print(&quot;No BLE devices found.&quot;)
+        return
+
+    # Show all found devices
+    for i, (addr, (dev, adv_data)) in enumerate(results.items()):
+        print(f&quot;[{i+1}] MAC: {addr} RSSI: {adv_data.rssi}&quot;)
+
+    # Pick device with highest RSSI
+    dev_addr, (_,adv_data) = max(results.items(), key=lambda item: item[1][1].rssi)
+    print(f&quot;\nConnecting to device: {dev_addr} (RSSI: {adv_data.rssi})\n&quot;)
+
+    # Connect and list services
+    async with BleakClient(dev_addr) as client:
+        if client.is_connected:
+            print(f&quot;Connected to MAC: {dev_addr}, &quot;,
+                  f&quot;name: '{adv_data.local_name}', &quot;, 
+                  f&quot;tx_power: {adv_data.tx_power}&quot;) 
+            services = client.services
+            for service in services: # show service UUIDs
+                print(f&quot;Service UUID: {service.uuid}&quot;)
+
+asyncio.run(main())
+</code></pre>
+<p>เมื่อสามารถสแกนหาอุปกรณ์ <strong>BLE</strong> ได้แล้ว โค้ดตัวอย่างถัดไป สาธิตการค้นหาอุปกรณ์
+และเมื่อพบว่า มีอุปกรณ์ที่มี <strong>Service UUID</strong> (<code>0x181A</code>) ตรงตามที่กำหนดไว้
+ก็ให้เชื่อมต่อและอ่านข้อมูลจากอุปกรณ์ดังกล่าว
+ในตัวอย่างนี้ได้ใช้บอร์ด <strong>ESP32</strong> ทำหน้าที่เป็นอุปกรณ์ <strong>BLE Peripheral</strong>
+ที่ให้ข้อมูลเป็นค่าตัวเลขจากเซนเซอร์สิ่งแวดล้อม (<strong>Environmental Sensor</strong>)</p>
+<p><strong>File</strong>: <code>bleak_ble_client.py</code></p>
+<pre><code class="language-python">from bleak import BleakClient
+import asyncio
+
+# Specify the target BLE MAC address of the ESP32 board
+TARGET_BLE_ADDR = &quot;7C:DF:A1:FD:D9:15&quot; 
+
+# Service UUID and Characteristic UUIDs to be used
+SERVICE_UUID = &quot;0000181a-0000-1000-8000-00805f9b34fb&quot;
+TEMP_UUID    = &quot;00002a6e-0000-1000-8000-00805f9b34fb&quot;
+HUMIDITY_UUID = &quot;00002a6f-0000-1000-8000-00805f9b34fb&quot;
+PRESSURE_UUID = &quot;00002a6d-0000-1000-8000-00805f9b34fb&quot;
+
+def bytes2int(data):
+    if data is None or len(data) &lt; 2:
+        return 0  # หรือ raise Exception
+    return int.from_bytes(data, byteorder='little', signed=True)
+
+async def readSensorValues(client: BleakClient):
+    try:
+        data_raw = await asyncio.wait_for(
+                        client.read_gatt_char(TEMP_UUID), timeout=1.0)
+        temp = bytes2int(data_raw) / 100.0
+
+        data_raw = await asyncio.wait_for(
+                        client.read_gatt_char(HUMIDITY_UUID), timeout=1.0)
+        humidity = bytes2int(data_raw) / 100.0
+
+        data_raw = await asyncio.wait_for(
+                        client.read_gatt_char(PRESSURE_UUID), timeout=1.0)
+        pressure =  bytes2int(data_raw) / 10.0
+
+        print(f&quot;Temperature: {temp:.2f} °C&quot;)
+        print(f&quot;Humidity:    {humidity:.2f} %&quot;)
+        print(f&quot;Pressure:    {pressure / 100:.2f} hPa\n&quot;)
+
+    except asyncio.TimeoutError:
+        print('Read timeout.')
+
+async def main():
+    service_found = False
+    async with BleakClient(TARGET_BLE_ADDR, timeout=4.0) as client:
+        # Wait until the client is connected
+        if client.is_connected:
+            print(&quot;Connected to BLE device.&quot;)
+            services = client.services
+            print(&quot;Services discovered:&quot;)
+            for service in client.services:
+                print(f&quot; • UUID: {service.uuid} ({service.description})&quot;)
+                if service.uuid == SERVICE_UUID:
+                    print(f&quot;   - Environmental Sensing service found.&quot;)
+                    service_found = True
+                    break
+
+            if not service_found:
+                print('No service UUID found')
+                return
+
+            service = client.services.get_service(SERVICE_UUID)
+            if not service:
+                print(&quot;Environmental Sensing service not found.&quot;)
+                return
+            print(60*'-')
+
+            print(f&quot;Service: {service.uuid} ({service.description})&quot;)
+            for char in service.characteristics:
+                print(f&quot; • Characteristic UUID: {char.uuid}&quot;)
+                print(f&quot;   - Properties: {char.properties}&quot;)
+            print(60*'-')
+
+            # Read values multiple times
+            for i in range(10):
+                await readSensorValues(client)
+                await asyncio.sleep(1.0) 
+        else:
+            print(&quot;Failed to connect to BLE device.&quot;)
+
+# Run the main function
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print('Terminated by user...')
+except Exception as e:
+    print(f&quot;Failed to connect or communicate: {e}&quot;)
+finally:
+    print('Done...')
+</code></pre>
+<p><img alt="" src="bleak_ble_client.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตจากการทำงานของโค้ด <strong>Python</strong>
+(ทดลองใช้กับ <strong>Python 3</strong> ในระบบปฏิบัติการ <strong>Windows 11</strong>)
+ซึ่งสามารถเชื่อมต่อและรับค่าจาก <strong>BLE ESP32 Device</strong> ได้สำเร็จ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-bluetoothctl">&#9655; การกรองหาอุปกรณ์ <strong>BLE</strong> ด้วยคำสั่ง <code>bluetoothctl</code><a class="headerlink" href="#ble-bluetoothctl" title="Permanent link">#</a></h2>
+<p>การกรองหาอุปกรณ์ (<strong>Device Filtering</strong>) อาจใช้วิธีตรวจสอบชื่ออุปกรณ์ หรือตรวจสอบ <strong>BLE Address</strong>
+และสามารถใช้คำสั่ง เช่น <code>bluetoothctl</code> สำหรับ <strong>Ubuntu / x86_64</strong> 
+หรือ <strong>Raspbian-OS / Raspberry Pi</strong> เพื่อทดลองสแกนหาอุปกรณ์ <strong>BLE</strong>
+ทดลองจับคู่อุปกรณ์ (<strong>Pairing</strong>) การเชื่อมต่อ (<strong>Connecting</strong>) และ
+การเชื่อถืออุปกรณ์ (<strong>Trusting</strong>) เพื่อให้ระบบจำไว้และเชื่อมต่ออัตโนมัติในอนาคต เป็นต้น</p>
+<p>ดังนั้นหากมีอุปกรณ์ <strong>ESP32</strong> ที่ถูกโปรแกรมให้ทำหน้าที่เป็นอุปกรณ์ <strong>BLE Peripheral</strong>
+ก็สามารถใช้คำสั่ง <code>bluetoothctl</code> เพื่อทดลองเชื่อมต่อกับอุปกรณ์ดังกล่าวได้</p>
+<p>ตัวอย่างคำสั่งของ <code>bluetoothctl</code> ที่มีการใช้งาน เช่น</p>
+<table>
+<thead>
+<tr>
+<th>คำสั่ง</th>
+<th>คำอธิบาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>power on</td>
+<td>เปิดการทำงานของอะแดปเตอร์ <strong>Bluetooth</strong> เช่น <code>hci0</code></td>
+</tr>
+<tr>
+<td>agent on</td>
+<td>เปิด <strong>agent</strong> สำหรับการจับคู่หรือใส่รหัส <strong>PIN / passkey</strong></td>
+</tr>
+<tr>
+<td>list</td>
+<td>แสดงรายการของอะแดปเตอร์ <strong>Bluetooth</strong> ที่มีอยู่ในเครื่อง</td>
+</tr>
+<tr>
+<td>scan on</td>
+<td>เริ่มต้นการค้นหาอุปกรณ์ <strong>Bluetooth</strong> รอบ ๆ</td>
+</tr>
+<tr>
+<td>scan off</td>
+<td>หยุดการค้นหาอุปกรณ์ <strong>Bluetooth</strong></td>
+</tr>
+<tr>
+<td>info [MAC]</td>
+<td>แสดงรายละเอียดของอุปกรณ์ที่ระบุด้วย <strong>MAC address</strong></td>
+</tr>
+<tr>
+<td>connect [MAC]</td>
+<td>เชื่อมต่อกับอุปกรณ์ <strong>Bluetooth</strong> ตามที่อยู่ <strong>MAC</strong></td>
+</tr>
+<tr>
+<td>devices</td>
+<td>แสดงอุปกรณ์ทั้งหมดที่เคยถูกค้นพบหรือจับคู่</td>
+</tr>
+<tr>
+<td>pair [MAC]</td>
+<td>จับคู่กับอุปกรณ์ <strong>Bluetooth</strong></td>
+</tr>
+<tr>
+<td>trust [MAC]</td>
+<td>ตั้งให้อุปกรณ์ตามหมายเลขแอดเดรส เป็นที่เชื่อถือ เพื่อให้เชื่อมต่ออัตโนมัติได้ในอนาคต</td>
+</tr>
+<tr>
+<td>remove [MAC]</td>
+<td>ลบอุปกรณ์ตามหมายเลขแอดเดรสที่เคยจับคู่ไว้ ออกไป</td>
+</tr>
+<tr>
+<td>quit</td>
+<td>ออกจากโปรแกรม <code>bluetoothctl</code></td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>ตัวอย่างการใช้คำสั่ง เป็นไปตามข้อความดังต่อไปนี้ (ใช้บอร์ด <strong>Raspberry Pi 4</strong> สำหรับการสาธิต)</p>
+<pre><code class="language-text">$ bluetoothctl
+
+[bluetooth]# power on
+
+[bluetooth]# agent on
+
+[bluetooth]# list
+
+[bluetooth]# scan on
+
+[bluetooth]# scan off
+
+[bluetooth]# info 7C:DF:A1:FD:D9:15
+
+[bluetooth]# connect 7C:DF:A1:FD:D9:15
+
+[bluetooth]# devices 
+
+[bluetooth]# info 7C:DF:A1:FD:D9:15
+
+[bluetooth]# quit
+</code></pre>
+<p><img alt="" src="bluetoothctl_output-1.jpg" /></p>
+<p><img alt="" src="bluetoothctl_output-2.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>bluetoothctl</code> โดยใช้บอร์ด <strong>Raspberry Pi 4</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+เพื่อใช้งานเป็นอุปกรณ์ <strong>BLE Peripheral</strong> จำลองการทำงานของเซนเซอร์วัดค่าสิ่งแวดล้อม เช่น อุณหภูมิ ความชื้นสัมพัทธ์ และความดันบรรยากาศ อีกทั้งสามารถเชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้ผ่านโค้ด <strong>Python</strong> โดยใช้ไลบรารี <code>bleak</code></p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2025-04-25 | Last Updated: 2025-04-26</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
