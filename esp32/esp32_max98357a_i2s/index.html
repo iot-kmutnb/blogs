@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_max98357a_i2s/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูลขยายเสียง MAX9835A ร่วมกับ ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#max9835a-esp32" class="nav-link">การใช้งานโมดูลขยายเสียง MAX9835A ร่วมกับ ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#max9835a" class="nav-link">&#9655; โมดูลขยายเสียง MAX9835A</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-esp32-udp-server" class="nav-link">&#9655; ตัวอย่างโค้ด Arduino ESP32: UDP Server</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-udp-client" class="nav-link">&#9655; ตัวอย่างโค้ด Python: UDP Client</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="max9835a-esp32">การใช้งานโมดูลขยายเสียง MAX9835A ร่วมกับ ESP32<a class="headerlink" href="#max9835a-esp32" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="max9835a">&#9655; โมดูลขยายเสียง <strong>MAX9835A</strong><a class="headerlink" href="#max9835a" title="Permanent link">#</a></h2>
+<p>คุณสมบัติของโมดูล <strong>MAX98357A</strong>:</p>
+<ul>
+<li><strong>MAX98357A</strong> (<a href="max98357a_datasheet.pdf"><strong>Datasheet</strong></a>) เป็นชิป <strong>Digital-to-Analog Converter (DAC) + Power Amplifier</strong></li>
+<li>ใช้แรงดันไฟเลี้ยงได้ในช่วง <strong>2.5V - 5.5V</strong></li>
+<li>มีประสิทธิภาพการทำงานสูงถึง <strong>92%</strong> (<strong>Efficiency</strong>) </li>
+<li>ใช้กับลำโพงที่มีค่าอิมพีแดนซ์ <strong>4Ω</strong> หรือ <strong>8Ω</strong></li>
+<li>สามารถจ่ายกำลังขับสูงสุด <strong>3.2W</strong> ให้กับลำโพง <strong>4Ω</strong> เมื่อใช้ไฟเลี้ยง <strong>5V</strong></li>
+<li>รองรับการเลือกแชนแนลเสียง:<ul>
+<li>รับข้อมูลเสียงแค่ช่อง <strong>Left</strong> หรือ <strong>Right</strong> ได้</li>
+<li>เลือกให้รวมเสียงทั้งสองช่องเป็นค่าเฉลี่ย <strong>(Left + Right)/2</strong> สำหรับใช้งาน <strong>Mono</strong></li>
+</ul>
+</li>
+<li>รับข้อมูลเสียงผ่านอินเทอร์เฟซ <strong>I2S</strong> </li>
+<li>ไม่ต้องใช้สัญญาณ <strong>MCLK</strong></li>
+<li>รองรับอัตราการชักตัวอย่างเสียง <strong>Sample Rate: 8kHz~96kHz</strong> </li>
+<li>ภายในมีวงจร <strong>Class D Amplifier</strong> ทำงานแบบ <strong>Switching</strong> พร้อมฟิลเตอร์กรองภายใน</li>
+<li>มีระบบ <strong>Pop and Click Suppression</strong> ลดเสียงดังตอนเปิด/ปิด</li>
+<li>มีขา <strong>GAIN</strong> สำหรับเลือกระดับการขยายเสียงได้: <strong>9dB</strong> (default)</li>
+</ul>
+<p><img alt="" src="block_diagram.jpg" /></p>
+<p>รูป: บล็อกไดอะแกรมแสดงองค์ประกอบที่สำคัญของชิป <strong>MAX98357A</strong></p>
+<p><img alt="" src="max98357a_modules.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>MAX98357A</strong></p>
+<p><img alt="" src="schematic_example.jpg" /></p>
+<p>รูป: ตัวอย่างผังวงจรของโมดูล <strong>MAX98357A</strong></p>
+<p><img alt="" src="waveforms.jpg" /></p>
+<p>รูป: การเลื่อนบิตข้อมูลในโหมดต่าง ๆ ของชิป  <strong>MAX98357A</strong> ด้วยอินเทอร์เฟซ
+<strong>I2S</strong> (กรณีที่ใช้ข้อมูลขนาด16 บิต)</p>
+<p>ขาของโมดูล  <strong>MAX98357A I2S</strong> </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ขา</th>
+<th style="text-align: left;">คำอธิบาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>LRC</strong></td>
+<td style="text-align: left;">Left Right Clock</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>BCLK</strong></td>
+<td style="text-align: left;">Bit Clock Input</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>DIN</strong></td>
+<td style="text-align: left;">Digital Data Input</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GAIN</strong></td>
+<td style="text-align: left;">Gain Select (VDD = 6dB, GND = 12dB)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>/SD_MODE</strong></td>
+<td style="text-align: left;">Shutdown (Active-low, &lt; 0.16V) &amp; Mode Selection</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GND</strong></td>
+<td style="text-align: left;">Supply Ground</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>VIN</strong></td>
+<td style="text-align: left;">Supply Voltage</td>
+</tr>
+</tbody>
+</table>
+<p>ขา <code>GAIN</code> สามารถต่อตัวต้านทานไปยัง <code>GND</code> เพื่อกำหนดอัตราขยาย:</p>
+<ul>
+<li><strong>15dB</strong>: ต่อตัวต้านทาน <strong>100kΩ</strong> ระหว่างขา <code>GAIN</code> กับ  <code>GND</code></li>
+<li><strong>12dB</strong>: ขา <code>GAIN</code> ต่อไปยัง <code>GND</code></li>
+<li><strong>9dB</strong>: <strong>N.C.</strong> (<strong>Default</strong>)</li>
+<li><strong>6dB</strong>: ขา <code>GAIN</code>ต่อไปยัง <code>VCC</code></li>
+<li><strong>3dB</strong>: ต่อตัวต้านทาน <strong>100kΩ</strong> ไปยัง <code>VCC</code></li>
+</ul>
+<p>ขา <code>\SD_MODE</code> มีการต่อตัวต้านทาน <strong>Pull-up</strong> ไปยัง <strong>VCC</strong>
+(และภายในชิป มีตัวต้านทานแบบ <strong>Pull-down</strong> <strong>100kΩ</strong>)
+ดังนั้นแรงดันไฟฟ้าที่ขานี้จึงเป็นสัญญาณแอนะล็อก และนำไปใช้เปรียบเทียบกับแรงดันไฟฟ้าภายใน
+เพื่อเลือกโหมดเอาต์พุตจาก 3 กรณี</p>
+<ul>
+<li>ตัวต้านทานที่มีค่าน้อย หรือ ต่อตรงกับ <strong>VCC</strong>
+(วัดแรงดันได้มากกว่า <strong>1.4V</strong>): <strong>Left Mode</strong> ใช้ข้อมูลเฉพาะช่องซ้ายเป็นเอาต์พุต</li>
+<li>ตัวต้านทานที่มีค่ากลาง เช่น <strong>330KΩ</strong>
+(วัดแรงดันได้มากกว่า <strong>0.77V</strong> แต่น้อยกว่า <strong>1.4V</strong>): <strong>Right Mode</strong> ใช้ข้อมูลเฉพาะช่องขวาเป็นเอาต์พุต</li>
+<li>ตัวต้านทานที่มีค่ามาก เช่น <strong>680KΩ</strong> หรือมากกว่า
+(วัดแรงดันได้มากกว่า <strong>0.16V</strong> แต่น้อยกว่า <strong>0.7V</strong>): <strong>(L+R)/2 Mode</strong> ใช้ข้อมูลทั้งสองช่องมาเป็นค่าเฉลี่ยสำหรับเอาต์พุต</li>
+</ul>
+<p>โมดูลที่ได้นำมาใช้งาน มีการต่อตัวต้านทาน <code>105</code> หรือ <strong>1MΩ</strong>  ดังนั้นจึงเป็นการใช้เอาต์พุตผสม
+<strong>(L+R)/2</strong> แต่ถ้ามีการต่อขา <code>\SD_MODE</code> เข้ากับ <strong>GND</strong> (ลอจิก <strong>LOW</strong> และแรงดันต่ำกว่า <strong>0.16V</strong>) จะเข้าสู่โหมด <strong>Shutdown</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32-udp-server">&#9655; ตัวอย่างโค้ด <strong>Arduino ESP32: UDP Server</strong><a class="headerlink" href="#arduino-esp32-udp-server" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างต่อไปนี้ จะทำให้ <strong>ESP32</strong> คอยรับข้อมูลเสียงจากเครือข่าย  <strong>Wi-Fi</strong> ในรูปแบบ <strong>UDP</strong>
+ซึ่งในกรณีนี้ <strong>ESP32</strong> จะทำหน้าที่เป็น <strong>UDP Server</strong> (ตั้งค่าหมายเลขพอร์ตไว้ที่ <code>9000</code>)
+หลังจากที่เชื่อมต่อกับ <strong>Wi-Fi Access Point</strong> ได้แล้ว</p>
+<p>เมื่อได้รับ <strong>UDP</strong> แต่ละครั้ง ซึ่งภายในมีข้อมูล จำนวน 512 ตัวเลข ขนาด 16 บิต (<strong>16-bit int</strong>)
+ก็จะส่ง <strong>UDP</strong> ที่มีข้อความ <code>ACK</code> (<em>Acknowledgement</em>) กลับไปหาต้นทาง
+เพื่อยืนยันว่ารับแพ็กเก็ตแล้ว</p>
+<p>จากนั้นส่งข้อมูลเสียงที่ได้รับ ไปเล่นผ่าน <strong>I2S</strong> เป็นเอาต์พุตออกลำโพงที่ต่อกับโมดูลขยายเสียง 
+<strong>MAX98357A</strong> (หรือโมดูล I2S DAC อื่นๆ)</p>
+<p>ในตัวอย่างนี้มีการใช้ <strong>FreeRTOS</strong> ในการแยกงานเป็น 2 งานย่อย (<strong>Tasks</strong>) เพื่อทำงานไปพร้อมๆ กัน (<strong>Multitasking</strong>) มีการใช้งาน <strong>FreeRTOS Queue</strong> เพื่อใช้เป็นบัฟเฟอร์เก็บข้อมูลเสียง
+และสื่อสารข้อมูลกันระหว่างทาสก์ทั้งสอง</p>
+<ul>
+<li><code>task_udp_receive</code>:<ul>
+<li>ทำหน้าที่รอรับ <strong>UDP Packet</strong> ซึ่งมีขนาด <strong>512 samples × 2 bytes = 1024 bytes</strong></li>
+<li>ข้อมูลเสียงได้จากการชักตัวอย่างที่อัตรา (<strong>Sample Rate</strong>) เท่ากับ <strong>16kHz</strong></li>
+<li>เมื่อรับข้อมูลครบตามจำนวนไบต์จะนำข้อมูลใส่ <strong>FreeRTOS Queue</strong> เพื่อส่งให้อีกทาสก์หนึ่งประมวลผลต่อไป</li>
+<li>ส่ง <strong>ACK</strong> กลับไปยังผู้ส่งทันที ในรูปแบบของ <strong>UDP Packet</strong></li>
+</ul>
+</li>
+<li><code>task_i2s_write</code>:<ul>
+<li>ดึงข้อมูลเสียงจาก <strong>FreeRTOS Queue</strong></li>
+<li>ขยายสัญญาณ (เพิ่ม <strong>gain</strong>) และจำกัดค่าแอมพลิจูด ให้อยู่ในช่วงที่ <strong>16-bit signed int</strong> รองรับ</li>
+<li>ส่งข้อมูลไปยัง <strong>I2S DAC</strong></li>
+</ul>
+</li>
+</ul>
+<p>การใช้งาน <strong>I2S Peripheral</strong> ของ <strong>ESP32</strong> (มีให้เลือกใช้ 2 ชุด) ในกรณีนี้จะใช้สำหรับเอาต์พุต ก็ทำได้ง่าย
+โดยใช้คำสั่งของไลบรารี <a href="https://github.com/espressif/arduino-esp32/tree/master/libraries/ESP_I2S"><code>ESP_I2S</code></a> และจะต้องตั้งค่า เพื่อเลือกใช้ขา <strong>GPIO</strong>
+สำหรับ <code>BCLK</code>, <code>LRC</code> และ <code>DIN</code> เพื่อนำไปใช้กับโมดูล <strong>MAX9835A</strong> ตามที่ต้องวงจรใช้งานจริง
+การตั้งค่า <strong>I2S</strong> ก็เลือกใช้โหมดมาตรฐาน (<strong>Standard</strong>) มีความละเอียด 16 บิต โหมดโมโน (<strong>Mono</strong>)</p>
+<p>ในตัวอย่างนี้ได้เลือกขา <strong>GPIO</strong> ของ <strong>ESP32</strong> ดังนี้</p>
+<ul>
+<li><code>LRC_PIN</code>: <strong>GPIO 25</strong></li>
+<li><code>DIN_PIN</code>: <strong>GPIO 26</strong></li>
+<li><code>BCLK_PIN</code>: <strong>GPIO 27</strong></li>
+</ul>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &lt;ESP_I2S.h&gt;
+#include &lt;WiFi.h&gt;
+#include &lt;WiFiUdp.h&gt;
+#include &quot;secrets.h&quot; // Define WIFI_SSID and WIFI_PASSWD
+
+#if ESP_ARDUINO_VERSION &lt; ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#error &quot;Please use Arduino ESP32 Core v3.0.0 or higher...&quot;
+#endif
+
+#define LED_PIN  (5)   // Onboard LED pin
+#define LED_ON   (0)   // Active-low LED 
+#define LED_OFF  (!LED_ON)
+
+// MAX98357A I2S Audio Amplifier (3.3V supply) connected to a speaker (5W / 8Ω)
+#define LRC_PIN  (25)
+#define DIN_PIN  (26)
+#define BCLK_PIN (27)
+
+const int queue_size  = 8;
+const int SAMPLE_RATE = 16000;  // sample rate in Hz
+const int NUM_SAMPLES = 512;
+const int SERVER_PORT = 9000;
+
+// Create a queue handle
+QueueHandle_t sample_queue;
+
+WiFiUDP  udp;
+I2SClass i2s_out;
+
+// Struct to hold one chunk of samples
+typedef struct {
+  int16_t samples[NUM_SAMPLES];
+} audio_chunk_t;
+
+// WiFi connection
+void connect_wifi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWD);
+  Serial.print(&quot;Connecting to WiFi&quot;);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100);
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    Serial.print(&quot;.&quot;);
+  }
+  digitalWrite(LED_PIN, LED_OFF);
+  Serial.println();
+  Serial.print(&quot;Connected IP: &quot;);
+  Serial.println(WiFi.localIP());
+}
+
+// FreeRTOS task for UDP Receiving
+void task_udp_receive(void *parameter) {
+  for (;;) {
+    int packetSize = udp.parsePacket();
+    if (packetSize == (NUM_SAMPLES * sizeof(int16_t))) {
+      audio_chunk_t chunk;
+      int len = udp.read((char*)chunk.samples, sizeof(chunk.samples));
+      if (len == sizeof(chunk.samples)) {
+        if (xQueueSend(sample_queue, &amp;chunk, 100) != pdTRUE) {
+          Serial.println(&quot;Queue full, dropping audio packet!&quot;);
+        }
+        else {
+          udp.beginPacket(udp.remoteIP(), udp.remotePort());
+          udp.write((const uint8_t *)&quot;ACK&quot;, 3); // Send &quot;ACK&quot; (3 bytes)
+          udp.endPacket();
+        }
+      }
+    }
+    delay(1);
+  }
+}
+
+// FreeRTOS Task for Audio I2S Output
+void task_i2s_write(void *parameter) {
+  audio_chunk_t chunk;
+  for (;;) {
+    // Wait for a chunk from queue
+    if (xQueueReceive(sample_queue, &amp;chunk, portMAX_DELAY) == pdTRUE) {
+      float gain = 1.2f; // Amplification (gain &gt; 1.0)
+      for (int i = 0; i &lt; NUM_SAMPLES; i++) {
+        int32_t temp = chunk.samples[i] * gain; // Apply gain
+        // Clamp the amplitude
+        if (temp &gt; 32767)  temp = +32767;
+        if (temp &lt; -32768) temp = -32768;
+        chunk.samples[i] = (int16_t)temp;
+      }
+      // Output to I2S
+      i2s_out.write((const uint8_t *)chunk.samples, sizeof(chunk.samples));
+    }
+    delay(1);
+  }
+}
+
+void init_i2s_out() {
+  // Initialize I2S
+  i2s_out.setPins(BCLK_PIN, LRC_PIN, DIN_PIN, -1, -1);
+  bool success = i2s_out.begin(I2S_MODE_STD, SAMPLE_RATE,
+                               I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO);
+  if (!success) {
+    Serial.println(&quot;Failed to initialize I2S!&quot;);
+    while (true);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LED_OFF);
+  Serial.println(&quot;\n\nESP32 I2S DAC + WiFi UDP Server + FreeRTOS Demo...&quot;);
+  Serial.flush();
+
+  // Initialize I2S
+  init_i2s_out();
+
+  // Connect WiFi
+  connect_wifi();
+
+  // Start UDP server
+  udp.begin(SERVER_PORT);
+  Serial.printf(&quot;Listening on UDP port %d\n&quot;, SERVER_PORT);
+
+  // Create a FreeRTOS queue
+  sample_queue = xQueueCreate(queue_size, sizeof(audio_chunk_t));
+  if (sample_queue == NULL) {
+    Serial.println(&quot;Failed to create queue!&quot;);
+    while (true);
+  }
+
+  // Create two FreeRTOS tasks running on different CPU cores
+  xTaskCreatePinnedToCore(task_udp_receive, &quot;UDP Receive&quot;, 4096 /*stack size*/,
+                          NULL, 1 /*task priority*/, NULL, 0 /*CPU core id*/);
+  xTaskCreatePinnedToCore(task_i2s_write, &quot;I2S Write&quot;, 8192 /*stack size*/, 
+                          NULL, 2 /*task priority*/, NULL, 1 /*CPU core id*/);
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="esp32_i2s_amp_speaker.jpg" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ที่ได้นำมาทดลองใช้งาน</p>
+<p>ข้อมูลเสียงที่ถูกส่งออกทาง <strong>I2S</strong> ที่ขา <code>DIN</code> แต่ละตัว มีขนาด 16 บิต (<strong>MSB First</strong>)
+มีเฉพาะสำหรับช่องซ้าย (<code>LRC</code> = <code>0</code>( และเป็น <code>0</code> ทั้งหมดสำหรับช่องขวา (<code>LRC</code> = <code>1</code>)</p>
+<p>หนึ่งคาบสัญญาณ <code>LRC</code> เท่ากับ 32 บิต และมีความถี่เท่ากับ <strong>16kHz</strong>
+ดังนั้นสัญญาณ <code>BCLK</code> มีความถี่เท่ากับ <strong>512kHz</strong> (= <script type="math/tex">32 \cdot 16kHz</script>)</p>
+<p><img alt="" src="scope_waveform-1.jpg" /></p>
+<p>รูป: ตัวอย่างการวัดคลื่นสัญญาณ ช่อง <strong>CH1</strong> และ <strong>CH2</strong> (ซ้าย: สัญญาณ <code>BCLK</code> และ <code>DIN</code>, ขวา:  <code>LRC</code> และ <code>BCLK</code>)</p>
+<p><img alt="" src="scope_waveform-2.jpg" /></p>
+<p>รูป: ตัวอย่างการวัดคลื่นสัญญาณ ช่อง <strong>CH1</strong> และ <strong>CH2</strong> (สัญญาณ <code>LRC</code> และ <code>DIN</code>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-udp-client">&#9655; ตัวอย่างโค้ด <strong>Python: UDP Client</strong><a class="headerlink" href="#python-udp-client" title="Permanent link">#</a></h2>
+<p>ลองมาดูตัวอย่างโค้ด <strong>Python</strong> ที่ทำหน้าที่เป็น <strong>UDP Client</strong> เชื่อมต่อผ่านเครือข่ายไปยัง
+<strong>ESP32</strong> และส่งข้อมูลเสียงในรูปแบบ <strong>UDP Packet</strong> ข้อมูลเสียงจะได้จากไฟล์ <strong>.mp3</strong>
+โดยใช้ไลบรารี <code>pydub</code> ในการอ่านข้อมูลจากไฟล์ ซึ่งต้องเรียกใช้โปรแกรมภายนอกที่มีชื่อว่า <code>ffmpeg</code> (ต้องติดตั้งโปรแกรมนี้เพิ่มด้วย)</p>
+<p>โค้ดตัวอย่างนี้ จะอ่านข้อมูลจากไฟล์เสียงต้นฉบับมีนามสกุล <strong>.mp3</strong> และต้องแปลงให้อยู่ในรูปแบบที่ตรงกับ 
+<strong>ESP32</strong> ที่คาดหวัง ได้แก่ <strong>Mono 16-bit PCM, 16kHz</strong>
+ข้อมูลเสียงจะถูกส่งไปทีละชุด ๆ ละ 512 ตัวอย่าง (<strong>Samples</strong>) หรือ 1024 ไบต์ ต่อแพ็กเก็ต</p>
+<pre><code class="language-python"># $ pip install pydub numpy
+# Ubuntu: sudo apt install ffmpeg
+# Windows: install ffmpeg and add to PATH
+
+import socket
+import time
+from pydub import AudioSegment
+from pydub.playback import play
+import numpy as np
+
+MP3_FILENAME = &quot;song.mp3&quot; # &lt;-- specify the MP3 filename
+UDP_SERVER_IP = '192.168.100.115'  # &lt;-- replace with your ESP32 IP
+UDP_SERVER_PORT = 9000   # UDP server port
+SAMPLE_RATE = 16000      # audio sample rate
+CHUNK_SIZE = 512         # number of samples per chunk
+
+# Load and decode the MP3
+song = AudioSegment.from_file(MP3_FILENAME, format=&quot;mp3&quot;)
+# Convert to required format: mono, 16kHz, 16-bit PCM
+song = song.set_channels(1) # Use mono channel
+song = song.set_frame_rate(SAMPLE_RATE) # Set sample rate
+song = song.set_sample_width(2) # Convert to 16-bit samples
+
+# Play the song locally
+#play(song)
+
+# Prepare audio data
+audio_data = np.array(song.get_array_of_samples(), dtype=np.int16)
+print(f&quot;Decoded MP3 song: {len(audio_data)} samples&quot;)
+
+scale_factor = 0.2
+audio_data = audio_data * scale_factor
+audio_data = np.clip(audio_data, -32768, 32767).astype(np.int16)
+
+# Create UDP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.settimeout(0.05)  # Set UDP socket timeout
+
+def send_audio():
+    print( f&quot;Start sending to ESP32...&quot; )
+    idx = 0 # Reset sample index
+    total_samples = len(audio_data)
+    retry_count = 0
+    while idx &lt; total_samples:
+        end_idx = idx + CHUNK_SIZE
+        chunk = audio_data[idx:end_idx]
+        # If last chunk is small, pad with zeros
+        if len(chunk) &lt; CHUNK_SIZE:
+            chunk = np.pad(chunk, (0, CHUNK_SIZE - len(chunk)), 'constant')
+        # Send audio chunk
+        remote_server = (UDP_SERVER_IP, UDP_SERVER_PORT)
+        sock.sendto(chunk.tobytes(), remote_server)
+        try:
+            # Wait for ACK
+            data, addr = sock.recvfrom(16)  # Buffer size max. 16 bytes
+            if data == b'ACK':
+                # Correct ACK received
+                idx += CHUNK_SIZE
+                retry_count = 0
+                time.sleep(0.005)  # Small sleep to avoid flooding
+            else:
+                print(f&quot;Unexpected response: {data}&quot;)
+        except socket.timeout:
+            retry_count += 1
+            if retry_count &gt; 100:
+                break
+            time.sleep(0.01)
+            print(&quot;ACK timeout! Resending same chunk...&quot;)
+
+    print(&quot;Finished sending audio.&quot;)
+
+try:
+    send_audio()
+except KeyboardInterrupt:
+    print(&quot;\nTerminated...&quot;)
+finally:
+    sock.close()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการทดลองใช้งานโมดูลขยายเสียงที่ใช้ชิป <strong>MAX9835A</strong>
+และเชื่อมต่อด้วยอินเทอร์เฟซ <strong>I2S</strong> และได้ทดลองเขียนโค้ด <strong>Arduino</strong>
+สำหรับบอร์ด <strong>ESP32</strong> เชื่อมต่อผ่าน <strong>Wi-Fi</strong> ได้ และเขียนโค้ด <strong>Python</strong>
+เพื่อส่งข้อมูลเสียงในไฟล์ <strong>.mp3</strong> จากคอมพิวเตอร์ของผู้ใช้ ไปยังบอร์ด <strong>ESP32</strong>
+และสร้างสัญญาณเสียงเอาต์พุตออกทางลำโพงเสียง</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2025-04-27 | Last Updated: 2025-04-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

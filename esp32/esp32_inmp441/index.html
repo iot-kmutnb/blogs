@@ -218,7 +218,7 @@ ESP32-S3-WROOM-1 module (16MB Flash / 8MB PSRAM, Octal-SPI), CH343P USB-to-Seria
 <li><strong>I2S Task</strong>: ทำงานโดยใช้ <strong>CPU Core 0</strong> และอ่านข้อมูลเสียงจากโมดูลเซนเซอร์โดยใช้วงจร <strong>I2S</strong> เมื่อได้ข้อมูลในบัฟเฟอร์แล้ว จึงนำไปใส่ลงใน <strong>FreeRTOS Queue</strong></li>
 <li><strong>Serial Task</strong>: ทำงานโดยใช้ <strong>CPU Core 1</strong> และอ่านข้อมูลเสียงจาก <strong>FreeRTOS Queue</strong> แล้วส่งออกทาง <strong>Serial</strong> เพื่อส่งต่อไปยัง <strong>Arduino Serial Plotter</strong> และดูค่าตัวอย่างเสียงหรือคลื่นสัญญาณเสียงที่ได้แบบเรียลไทม์</li>
 <li>มีการส่งข้อมูลออกไปยังคอมพิวเตอร์ โดยใช้ <strong>USB-to-Serial</strong><ul>
-<li>ส่งออกทาง <strong>Serial</strong> ที่เชื่อมต่อกับชิป <strong>USB-to-Serial</strong> (เช่น <strong>CH340P</strong> หรือ <strong>CP2104</strong>)</li>
+<li>ส่งออกทาง <strong>Serial</strong> ที่เชื่อมต่อกับชิป <strong>USB-to-Serial</strong> (เช่น <strong>CH343P</strong> หรือ <strong>CP2104</strong>)</li>
 <li>ส่งออกทาง <strong>USB-CDC</strong> (เฉพาะกรณีที่ใช้ชิป <strong>ESP32-S3</strong>)</li>
 </ul>
 </li>
@@ -248,8 +248,6 @@ ESP32-S3-WROOM-1 module (16MB Flash / 8MB PSRAM, Octal-SPI), CH343P USB-to-Seria
 // Uncomment the following line to use the INMP441 I2S Microphone
 #define USE_I2S_MEMS_MIC
 
-#define I2S_PORT (I2S_NUM_0)  // The I2S peripheral to use
-
 // Three GPIO pins are required for the I/O signals (WS, SD, SCK) 
 // of the I2S MEMS Microphone (Mono).
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
@@ -277,7 +275,7 @@ ESP32-S3-WROOM-1 module (16MB Flash / 8MB PSRAM, Octal-SPI), CH343P USB-to-Seria
 #define SAMPLE_FREQ  (16000)   // Sampling rate
 #define BUF_LEN      (512)     // Buffer length
 
-I2SClass i2s;                  // Instance of the I2S class
+I2SClass i2s_in;               // Instance of the I2S class
 int16_t buf[BUF_LEN];          // Buffer to store samples
 QueueHandle_t sampleQueue = NULL;  // FreeRTOS queue
 
@@ -288,16 +286,16 @@ void serialTask(void *param);
 void i2sInit() {
   int success;
   // Set up the pins used for audio input
-  i2s.setPins( I2S_SCK, I2S_WS, -1, I2S_SD );
+  i2s_in.setPins( I2S_SCK, I2S_WS, -1, I2S_SD );
   // Start the operation of the I2S peripheral, using I2S standard mode
-  success = i2s.begin( I2S_MODE_STD, SAMPLE_FREQ, I2S_DATA_BIT_WIDTH_32BIT,
-                       I2S_SLOT_MODE_MONO, I2S_STD_SLOT_LEFT );
+  success = i2s_in.begin( I2S_MODE_STD, SAMPLE_FREQ, I2S_DATA_BIT_WIDTH_32BIT,
+                          I2S_SLOT_MODE_MONO, I2S_STD_SLOT_LEFT );
   if (!success) {
     Serial.println(&quot;Failed to initialize I2S bus!&quot;);
   }
 
-  success = i2s.configureRX( SAMPLE_FREQ, I2S_DATA_BIT_WIDTH_32BIT,
-                             I2S_SLOT_MODE_MONO, I2S_RX_TRANSFORM_32_TO_16 );
+  success = i2s_in.configureRX( SAMPLE_FREQ, I2S_DATA_BIT_WIDTH_32BIT,
+                                I2S_SLOT_MODE_MONO, I2S_RX_TRANSFORM_32_TO_16 );
   if (!success) {
     Serial.println(&quot;Failed to configure I2S RX transformation!&quot;);
   }
@@ -348,7 +346,7 @@ void i2sTask(void *param) {
     digitalWrite(LED_PIN, LED_ON); // Turn on the LED
 
 #ifdef USE_I2S_MEMS_MIC // Use the I2S MEMS microphone device
-    num_samples = i2s.readBytes((char *)buf, sizeof(buf)) / 2;
+    num_samples = i2s_in.readBytes((char *)buf, sizeof(buf)) / 2;
 #else // Use sinewave data
     num_samples = BUF_LEN;
     for ( int i=0; i &lt; BUF_LEN; i++) {
@@ -413,13 +411,13 @@ void show_esp32_info() {
 }
 </code></pre>
 <p><img alt="" src="yd_esp32s3_ch340_port.jpg" /></p>
-<p>รูป: การเชื่อมต่อพอร์ต <strong>USB Type-C</strong> โดยผ่านทางชิป <strong>USB-to-Serial CH340</strong> ไปยัง <strong>ESP32-S3 (Hardware Serial)</strong></p>
+<p>รูป: การเชื่อมต่อพอร์ต <strong>USB Type-C</strong> โดยผ่านทางชิป <strong>USB-to-Serial CH343P</strong> ไปยัง <strong>ESP32-S3 (Hardware Serial)</strong></p>
 <p><img alt="" src="yd_esp32s3_usb_cdc_port.jpg" /></p>
 <p>รูป:  การเชื่อมต่อพอร์ต <strong>USB Type-C</strong> โดยผ่านทางขา <strong>D+/D-</strong> ของ <strong>ESP32-S3 (USB CDC)</strong> </p>
 <p><img alt="" src="esp32s3_ch340_output.jpg" /></p>
 <p>รูป: การทดสอบโดยใช้ <strong>ESP32-S3</strong> ส่งข้อมูลรูปคลื่นไซน์ ส่งออกทาง <strong>Hardware Serial</strong> ตั้งค่า <strong>Baud=2000000</strong></p>
 <p><img alt="" src="esp32s3_ch340_sine_wave.jpg" /></p>
-<p>รูป: แสดงข้อมูลที่ได้รับจาก <strong>ESP32-S3 (CH340)</strong> โดยใช้ <strong>Arduino Serial Plotter</strong> ซึ่งจะได้รูปคลื่นไซน์
+<p>รูป: แสดงข้อมูลที่ได้รับจาก <strong>ESP32-S3 (CH343P)</strong> โดยใช้ <strong>Arduino Serial Plotter</strong> ซึ่งจะได้รูปคลื่นไซน์
 และมีแอมพลิจูด อยู่ในช่วง <strong>+/-10,000</strong></p>
 <p><img alt="" src="esp32s3_ch340_mic_wave.jpg" /></p>
 <p>รูป: ตัวอย่างคลื่นสัญญาณเสียงที่อ่านได้จากโมดูล <strong>INMP441</strong> โดยใช้สัญญาณเสียงความถี่คงถี่ประมาณ <strong>1kHz</strong></p>
@@ -464,8 +462,6 @@ void show_esp32_info() {
 #include &lt;WiFi.h&gt;
 #include &quot;secrets.h&quot; // Define WIFI_SSID and WIFI_PASS
 
-#define I2S_PORT (I2S_NUM_0)  // The I2S peripheral to use
-
 // Three GPIO pins are required for the I/O signals (WS, SD, SCK) 
 // of the I2S MEMS Microphone (Mono).
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
@@ -492,7 +488,7 @@ void show_esp32_info() {
 #define BUF_LEN        (512)
 #define SERVER_PORT    (9000)
 
-I2SClass i2s;
+I2SClass i2s_in;
 int16_t i2s_buf[ BUF_LEN ];
 WiFiServer server( SERVER_PORT );
 
@@ -520,17 +516,17 @@ void initI2S() {
   i2s_rx_transform_t   i2s_rx_transform = I2S_RX_TRANSFORM_32_TO_16;
 
   // Set up the pins used for audio input
-  i2s.setPins(I2S_SCK, I2S_WS, -1, I2S_SD);
+  i2s_in.setPins(I2S_SCK, I2S_WS, -1, I2S_SD);
   // Initialize the I2S bus in standard mode with transformation to 16-bit
-  if (!i2s.begin(i2s_mode, SAMPLE_RATE, i2s_bitwidth, 
-                 i2s_slot, i2s_slot_mask)) 
+  if (!i2s_in.begin(i2s_mode, SAMPLE_RATE, i2s_bitwidth, 
+                    i2s_slot, i2s_slot_mask)) 
   {
     Serial.println(&quot;Failed to initialize I2S bus!&quot;);
     return;
   }
   // Configure the I2S receiver to transform 32-bit data to 16-bit data
-  if (!i2s.configureRX(SAMPLE_RATE, i2s_bitwidth, 
-                      i2s_slot, i2s_rx_transform)) 
+  if (!i2s_in.configureRX(SAMPLE_RATE, i2s_bitwidth, 
+                          i2s_slot, i2s_rx_transform)) 
   {
     Serial.println(&quot;Failed to configure I2S RX transformation!&quot;);
     return;
@@ -559,7 +555,7 @@ void loop() {
     digitalWrite( LED_PIN, LED_ON );
     while (client.connected()) {
       // Blocking call: read audio samples into the bufffer
-      size_t bytes_read = i2s.readBytes((char*)i2s_buf, sizeof(i2s_buf));
+      size_t bytes_read = i2s_in.readBytes((char*)i2s_buf, sizeof(i2s_buf));
       if (bytes_read &gt; 0) { // Send the 16-bit data over WiFi
         client.write((const char *)i2s_buf, bytes_read);
       } else {
@@ -624,7 +620,7 @@ WiFiServer server(SERVER_PORT);
 
 #define LED_OFF (!LED_ON)
 
-I2SClass i2s;
+I2SClass i2s_in;
 int16_t i2s_buf[BUF_LEN];
 
 void initWiFi() {
@@ -655,12 +651,12 @@ void initI2S() {
   int8_t               i2s_slot_mask = I2S_STD_SLOT_LEFT;
   i2s_rx_transform_t   i2s_rx_transform = I2S_RX_TRANSFORM_32_TO_16;
 
-  i2s.setPins(I2S_SCK, I2S_WS, -1, I2S_SD);
-  if (!i2s.begin(i2s_mode, SAMPLE_RATE, i2s_bitwidth, i2s_slot, i2s_slot_mask)) {
+  i2s_in.setPins(I2S_SCK, I2S_WS, -1, I2S_SD);
+  if (!i2s_in.begin(i2s_mode, SAMPLE_RATE, i2s_bitwidth, i2s_slot, i2s_slot_mask)) {
     Serial.println(&quot;Failed to initialize I2S bus!&quot;);
     return;
   }
-  if (!i2s.configureRX(SAMPLE_RATE, i2s_bitwidth, i2s_slot, i2s_rx_transform)) {
+  if (!i2s_in.configureRX(SAMPLE_RATE, i2s_bitwidth, i2s_slot, i2s_rx_transform)) {
     Serial.println(&quot;Failed to configure I2S RX transformation!&quot;);
     return;
   }
@@ -697,7 +693,7 @@ void loop() {
   }
   if (sampling) {
     digitalWrite(LED_PIN, LED_ON);
-    size_t bytes_read = i2s.readBytes((char*)i2s_buf, sizeof(i2s_buf));
+    size_t bytes_read = i2s_in.readBytes((char*)i2s_buf, sizeof(i2s_buf));
     if (bytes_read &gt; 0) {
       udp.beginPacket(remoteIP, remotePort);
       udp.write((uint8_t*)i2s_buf, bytes_read);
@@ -867,13 +863,13 @@ except Exception as ex:
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
 <p>บทความนี้ได้นำเสนอตัวอย่างการใช้งานโมดูลเซนเซอร์เสียง <strong>INMP441</strong> ซึ่งนำมาใช้กับ <strong>ESP32 / ESP32-S3</strong>
-เชื่อมต่อด้วยอินเทอร์เฟส <strong>I2S</strong> ส่งข้อมูลไปยังคอมพิวเตอร์ผู้ใช้ผ่านทาง <strong>Serial</strong> แล้วนำมาแสดงรูปคลื่นสัญญาณ
+เชื่อมต่อด้วยอินเทอร์เฟซ <strong>I2S</strong> ส่งข้อมูลไปยังคอมพิวเตอร์ผู้ใช้ผ่านทาง <strong>Serial</strong> แล้วนำมาแสดงรูปคลื่นสัญญาณ
 (<strong>Audio Waveform</strong>) หรือจะใช้วิธีเชื่อมต่อผ่าน <strong>Wi-Fi</strong>  ด้วยวิธี <strong>TCP / UDP</strong> ก็ได้เช่นกัน
 โดยเขียนโค้ดภาษา <strong>Python</strong> เพื่อเชื่อมต่อกับบอร์ด <strong>ESP32</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2025-04-25 | Last Updated: 2025-04-26</p></div>
+<p>Created: 2025-04-25 | Last Updated: 2025-04-27</p></div>
             </div>
         </div>
 
