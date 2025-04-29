@@ -160,8 +160,8 @@
 </ul>
 <p><img alt="" src="inmp441_stereo.jpg" /></p>
 <p>รูป: ตัวอย่างการต่อใช้งานโมดูล <strong>INMP441</strong> จำนวน 2 ตัวพร้อมกัน สำหรับเสียงแบบ <strong>Stereo</strong>
-โมดูลด้านซ้ายสำหรับช่องสัญญาณ <strong>Left Channel</strong> (L/R = 0)
-และโมดูลด้านขวาสำหรับช่องสัญญาณ <strong>Right Channel</strong> (L/R = 1) ตามลำดับ</p>
+โมดูลด้านซ้ายสำหรับช่องสัญญาณ <strong>Left Channel</strong> (<strong>L/R = 0</strong>)
+และโมดูลด้านขวาสำหรับช่องสัญญาณ <strong>Right Channel</strong> (<strong>L/R = 1</strong>) ตามลำดับ</p>
 <p><img alt="" src="inmp441_i2s_data_sequence.jpg" /></p>
 <p>รูป: ลำดับการส่งบิตข้อมูลตามจังหวะของสัญญาณ <strong>SCK</strong> โดยแบ่งเป็น 3 กรณี ตามรูปแบบการใช้งาน
 คือ <strong>Stereo</strong> และ <strong>Mono Left-Channel</strong> หรือ <strong>Mono Right-Channel</strong></p>
@@ -210,8 +210,8 @@ ESP32-S3-WROOM-1 module (16MB Flash / 8MB PSRAM, Octal-SPI), CH343P USB-to-Seria
 <li>เลือกใช้ขาสัญญาณ <code>I2S_WS</code>, <code>I2S_SD</code>, <code>I2S_SCK</code> ตามที่กำหนดไว้</li>
 <li>ตั้งค่าอัตราการชักตัวอย่าง (<strong>Sample Rate</strong>): <code>SAMPLE_FREQ</code> เช่น <code>16000</code> (16kHz)</li>
 <li>กำหนดจำนวนข้อมูลในการอ่านจากโมดูลเสียงเพื่อนำมาเก็บในบัฟเฟอร์: <code>BUF_LEN</code> เช่น <code>512</code> โดยข้อมูลแต่ละตัวมีขนาด 16 บิต (<strong>16-bit Integer</strong>)</li>
-<li>ถ้าต้องการข้อมูลครั้งละ <strong>512</strong> ตัวอย่าง ที่อัตรา <strong>16kHz</strong> จะมีความยาวเสียงเท่ากับ <strong>32 msec</strong>
-(<script type="math/tex">512 \cdot 1000/16000</script>)</li>
+<li>ถ้าต้องการข้อมูลครั้งละ <strong>512</strong> ตัวอย่าง และอัตราการชักตัวอย่าง <strong>16kHz</strong> จะมีช่วงระยะเวลาเท่ากับ <strong>32 msec</strong>
+(<script type="math/tex">512 \times 1000/16000</script>) ในการบันทึกเสียง</li>
 </ul>
 </li>
 <li>ใช้การทำงานแบบ "มัลติทาสก์" (<strong>Multi-tasking</strong>) ด้วย<strong> FreeRTOS</strong> เพื่อแยกภารกิจ 2 ส่วนออกจากกัน ได้แก่:</li>
@@ -352,7 +352,7 @@ void i2sTask(void *param) {
     for ( int i=0; i &lt; BUF_LEN; i++) {
       buf[i] = 10000*sin(2*PI*i/32);
     }
-    delay(50);
+    delay(40);
 #endif
 
     if (sampleQueue != NULL &amp;&amp; num_samples &gt; 0) {
@@ -367,10 +367,15 @@ void i2sTask(void *param) {
 
 void serialTask(void *param) {
   int16_t sample;
+  uint32_t count = 0;
   while (true) {
     xQueueReceive( sampleQueue, &amp;sample, portMAX_DELAY );
     Serial.println( sample );
     Serial.flush();
+    count = (count+1) % 64;
+    if (count == 0) {
+      delay(1);
+    }    
   }
 }
 
@@ -434,6 +439,16 @@ void show_esp32_info() {
 รับค่าและแสดงรูปคลื่นสัญญาณ แต่ก็เป็นเครื่องมือที่ช่วยในการตรวจสอบการทำงานของระบบในเบื้องต้น
 เมื่อข้อมูลถูกส่งมายังคอมพิวเตอร์ของผู้ใช้ ก็มีแนวทางการพัฒาต่อไป
 เช่น การนำข้อมูลไปบันทึกลงไฟล์ <strong>.wav</strong> หรือแสดงรูปคลื่นสัญญาณก็ได้</p>
+<p>&nbsp;</p>
+<p>การวัดสัญญาณของ <strong>I2S</strong> โดยใช้ออสซิลโลสโคป มีตัวอย่างรูปคลื่นสัญญาณดังนี้</p>
+<p><img alt="" src="waveform_i2s_ws_sd.jpg" /></p>
+<p>รูป: การวัดสัญญาณช่อง <strong>CH1</strong> และ <strong>CH2</strong> (<code>WS</code> และ <code>SD</code> ตามลำดับ)</p>
+<p><img alt="" src="waveform_i2s_sclk_sd.jpg" /></p>
+<p>รูป: การวัดสัญญาณช่อง <strong>CH1</strong> และ <strong>CH2</strong> (<code>SCK</code> และ <code>SD</code> ตามลำดับ)</p>
+<p>จากรูปคลื่นสัญญาณที่วัดได้ สัญญาณ <code>WS</code> มีความถี่เท่ากับ <strong>16kHz</strong> หรือมีคาบเท่ากับ <strong>62.5us</strong> และช่วงที่ <code>WS=0</code>
+จะมีข้อมูลบิตสำหรับสัญญาณเสียงช่องซ้าย แต่ถ้า <code>WS=1</code> ข้อมูลบิตจะเป็นศูนย์สำหรับสัญญาณเสียงช่องขวา</p>
+<p>สัญญาณ <code>SCK</code> มีความถี่เท่ากับ <strong>1.024MHz</strong> (<script type="math/tex">= 2 \times 32\, cycles \times 16\, kHz</script>)
+และข้อมูลบิตจะเปลี่ยนลอจิกได้เมื่อเกิดขอบขาลงของสัญญาณ <code>SCK</code></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="inmp4411-wi-fi">&#9655; การอ่านข้อมูลจาก <strong>INMP4411</strong> และส่งข้อมูลผ่านเครือข่าย <strong>Wi-Fi</strong><a class="headerlink" href="#inmp4411-wi-fi" title="Permanent link">#</a></h2>
@@ -869,7 +884,7 @@ except Exception as ex:
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2025-04-25 | Last Updated: 2025-04-27</p></div>
+<p>Created: 2025-04-25 | Last Updated: 2025-04-30</p></div>
             </div>
         </div>
 
