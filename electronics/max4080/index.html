@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/max4080/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การใช้งานโมดูล MAX4080 Current Sensor - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#max4080-current-sensor" class="nav-link">การใช้งานโมดูล MAX4080 Current Sensor</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#max4080max4081" class="nav-link">&#9655; คุณสมบัติหลักของไอซี MAX4080/MAX4081</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#max4080-max4081-8" class="nav-link">&#9655; ขาไอซี MAX4080 / MAX4081 (8 ขา)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#max4080" class="nav-link">&#9655; โมดูล MAX4080</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การทดลองวัดกระแสโดยใช้ตัวต้านทานเป็นโหลด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="max4080-current-sensor">การใช้งานโมดูล MAX4080 Current Sensor<a class="headerlink" href="#max4080-current-sensor" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Current Sense Amplifier IC</em>, <em>Current-to-Voltage Converter</em>, <em>High-Side Current Sensing</em>*</p>
+<hr />
+<h2 id="max4080max4081">&#9655; คุณสมบัติหลักของไอซี <strong>MAX4080/MAX4081</strong><a class="headerlink" href="#max4080max4081" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>MAX4080/MAX4081</strong> (<a href="maxim_max4080_4081.pdf"><strong>Datasheet</strong></a>) เป็นไอซีวัดกระแส <strong>DC</strong> และให้เอาต์พุตเป็นแรงดันไฟฟ้า (สัญญาณแอนะล็อก)</li>
+<li>ผลิตโดยบริษัท <strong>Maxim Integrated / Analog Devices Inc. (ADI)</strong></li>
+<li>ใช้วัดปริมาณกระแสไฟฟ้า <strong>DC</strong> ที่ไหลผ่านตัวต้านทานสำหรับวัดกระแส (<strong>Sense Resistor:</strong> <strong>R_SENSE</strong>)
+ที่ไหลจากแหล่งจ่าย (<strong>High-Sense Current Sense</strong>) ไปยังโหลดไฟฟ้า-อิเล็กทรอนิกส์ </li>
+<li>แบ่งเป็น 2 รุ่น ได้แก่ <strong>MAX4080</strong> และ <strong>MAX4081</strong>:<ul>
+<li><strong>MAX4080</strong>: วัดกระแสที่ไหลได้ในทิศทางเดียว (<strong>Unidirectional</strong>) และให้แรงดันเอาต์พุตเป็นบวกเท่านั้น</li>
+<li><strong>MAX4081</strong>: วัดกระแสที่ไหลได้สองทิศทาง (<strong>Bidirectional</strong>) มีขาอินพุตสำหรับแรงดันอ้างอิง (<strong>Reference Input A &amp; B</strong>) และให้แรงดันเอาต์พุตเป็นบวกและลบได้</li>
+</ul>
+</li>
+<li>มีตัวเลือกจำแนกตามอัตราขยายคงที่ (<strong>Fixed Gain: Av</strong>) และ <strong>Full-Scale Sense Voltage</strong> (<strong>V_SENSE max.</strong>):<ul>
+<li><strong>MAX408xF</strong>:  <strong>5V/V, 500mV</strong></li>
+<li><strong>MAX408xT</strong>: <strong>20V/V, 250mV</strong> </li>
+<li><strong>MAX408xS</strong>: <strong>60V/V, 100mV</strong></li>
+</ul>
+</li>
+<li>แรงดันเอาต์พุตที่ได้คือ <strong>V_OUT</strong> แปรผันตรงกับแรงดัน <strong>V_SENSE</strong><ul>
+<li><strong>V_SENSE</strong> (<strong>Sense Voltage</strong>) คือ แรงดันตกคร่อมที่ตัวต้านทาน <strong>R_SENSE</strong> เมื่อมีกระแสไหล</li>
+<li>อัตราขขยาย (<strong>Av</strong> หรือ <strong>Gain</strong>) หมายถึง อัตราส่วนของแรงดันเอาต์พุต <strong>VOUT</strong> ต่อแรงดัน <strong>V_SENSE</strong></li>
+</ul>
+</li>
+<li>แรงดันไฟเลี้ยง (<strong>Input Voltage Supply</strong>): <strong>4.5V ~ 76V</strong> </li>
+<li>ความแม่น (<strong>Full-Scale Accuracy</strong>): <strong>±0.1%</strong> (<em>typical</em>)</li>
+<li>แบนด์วิดท์สำหรับสัญญาณแอนะล็อก-เอาต์พุต (<strong>Bandwidth</strong>): <strong>250kHz</strong></li>
+<li>แรงดันออฟเซตอินพุต: <strong>100μV (0.1mV)</strong> (<em>typical</em>)<ul>
+<li>แรงดันเอาต์พุตไม่เป็นศูนย์แม้ว่าแรงดันผลต่างอินพุตเป็นศูนย์</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="max4080-max4081-8">&#9655; ขาไอซี <strong>MAX4080 / MAX4081</strong> (8 ขา)<a class="headerlink" href="#max4080-max4081-8" title="Permanent link">#</a></h2>
+<ul>
+<li>Pin 1: <strong>RS+</strong> ขาอินพุตกระแส (ฝั่งแรงดันสูงของ <strong>R_SENSE</strong>)</li>
+<li>Pin 2: <strong>VCC</strong> แรงดันไฟเลี้ยง</li>
+<li>Pin 3: <strong>NC</strong> ไม่ได้ใช้งาน (<em>Not Connected</em>)</li>
+<li>Pin 4: <strong>GND</strong> กราวด์ระบบ</li>
+<li>Pin 5: <strong>OUT</strong> ขาเอาต์พุตแรงดันแอนะล็อก</li>
+<li>Pin 6: <strong>REF1A</strong> ขาแรงดันอ้างอิง (เฉพาะ <strong>MAX4081</strong>)</li>
+<li>Pin 7: <strong>REF1B</strong> ขาแรงดันอ้างอิง (เฉพาะ <strong>MAX4081</strong>)</li>
+<li>Pin 8: <strong>RS-</strong> ขาอินพุตกระแส (ฝั่งแรงดันต่ำของ <strong>R_SENSE</strong>)</li>
+</ul>
+<p>การต่อใช้งานขา <strong>REF1A / REF1B</strong> (เฉพาะ <strong>MAX4081</strong>)</p>
+<ul>
+<li>โดยทั่วไป ขา <strong>REF1A</strong> และ <strong>REF1B</strong> ของ <strong>MAX4081</strong> จะต่อเข้าด้วยกันกับแรงดันไฟฟ้าคงที่ภายนอก
+และแรงดันอ้างอิงที่ได้สำหรับเอาต์พุต คือ <strong>(VREF1A+VREF1B)/2</strong>
+เช่น ถ้าต่อกับ <strong>+5V</strong> ทั้งสองขา จะได้แรงดันอ้างอิง <strong>+2.5V</strong></li>
+<li>แรงดันอ้างอิงสำหรับเอาต์พุตใช้เป็นค่ากลาง (<strong>Offset</strong>) ของสัญญาณเอาต์พุต <strong>VOUT</strong>
+ทำให้สามารถวัดกระแสสองทิศทางได้</li>
+<li>แรงดันเอาต์พุต <strong>VOUT</strong> จะได้เท่ากับแรงดันอ้างอิง ถ้ากระแสที่ไหลเท่ากับศูนย์</li>
+<li>ถ้ากระแสไม่เป็นศูนย์ และไหลจากขา<strong>RS+</strong> ไปยัง <strong>RS-</strong> แรงดันจะเพิ่มขึ้นจากแรงดันอ้างอิง </li>
+<li>ถ้ากระแสไหลจากขา <strong>RS-</strong> ไปยัง <strong>RS+</strong> แรงดันจะลดลงจากแรงดันอ้างอิง</li>
+<li>เหมาะสำหรับการนำไปต่อกับอินพุตของ <strong>ADC</strong> ที่ต้องการแรงดันอินพุตในช่วงที่เป็นบวกเท่านั้น
+เช่น <strong>0~5V</strong> ก็ใช้แรงดันอ้างอิง <strong>2.5V</strong></li>
+<li>แต่ถ้าต่อเข้ากับ <strong>GND</strong> (แรงดันอ้างอิงเป็น 0) เช่น ถ้าไม่ต้องการวัดกระแสย้อนกลับ
+จะให้ผลเหมือนกับการทำงานของไอซี <strong>MAX4080</strong> ซึ่งไม่มีขา <strong>REF1A / REF1B</strong></li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="max4080_4081.jpg" /></p>
+<p>รูป: ขาของไอซี <strong>MAX4080/4081</strong> และบล็อกไดอะแกรมของวงจรภายใน</p>
+<p>บล็อกไดอะแกรมของไอซีแสดงให้เป็นองค์ประกอบของวงจรที่สำคัญ และความแตกต่างระหว่าง <strong>MAX4080</strong>
+และ <strong>MAX4081</strong></p>
+<ul>
+<li>กระแสจากโหลดไหลผ่านตัวต้านทานเซนส์ <strong>R_SENSE</strong> ทำให้เกิดแรงดันตกคร่อม <strong>V_SENSE</strong>
+ระหว่าง <strong>RS+</strong> และ <strong>RS-</strong></li>
+<li>วงจรออปแอมป์ <strong>A1</strong> ควบคุมทรานซิสเตอร์ <strong>Q1</strong> ให้มีกระแสไหลกระแสตามแรงดันตกคร่อมดังกล่าว</li>
+<li>กระแสที่ไหลผ่าน <strong>Q1</strong> จะนำไปใช้กับวงจร <strong>Current Mirror</strong>
+ซึ่งจะได้กระแสที่มีปริมาณเท่ากันมายัง <strong>IA2</strong> และกระแส <strong>IA2</strong> ก็ไหลผ่านตัวต้านทานเพื่อสร้างแรงดัน</li>
+<li>วงจร <strong>A2</strong> และ <strong>A3</strong> ทำหน้าที่เป็นบัฟเฟอร์และขยายแรงดันตามลำดับ เพื่อสร้างแรงดันเอาต์พุต</li>
+</ul>
+<p>วงจรภายในของ <strong>MAX4081</strong> นั้นแตกต่างจากกรณีของ <strong>MAX4080</strong>
+เนื่องจากรองรับการไหลของกระแสได้ทั้งสองทิศทาง และมีการเพิ่มแรงดันอ้างอิงสำหรับแรงดันเอาต์พุต</p>
+<p><img alt="" src="max4080_use_case.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรใช้งานสำหรับไอซี <strong>MAX4080</strong></p>
+<p>จากตารางการใช้งานไอซี <strong>MAX4080</strong> ถ้าเลือกใช้ไอซีที่มีอัตราขยาย <strong>60</strong> มีช่วงแรงดัน
+<strong>V_SENSE</strong> ไม่เกิน <strong>100mV</strong> และใช้ตัวต้านทาน <strong>100mΩ</strong>
+หากมีกระแสไหลสูงสุด <strong>1000mA</strong> จะได้แรงดัน <strong>V_SENSE = 0.1V</strong> และเมื่อคูณกับอัตราขยาย
+จะได้เอาต์พุต <strong>VOUT = 0.1V x 60 = 6V</strong> ในกรณีนี้ จะต้องเลือกใช้แรงดัน <strong>VCC</strong> สูงกว่า <strong>6V</strong></p>
+<p>แต่ถ้าใช้แรงดันไฟเลี้ยง <strong>VCC = +5V</strong> หรือ <strong>+3.3V</strong> กระแสสำหรับโหลด ก็จะต้องลดลง
+เพื่อให้แรงดันเอาต์พุตไม่เกิน <strong>VCC</strong> และให้เหมาะสมกับการนำไปใช้กับวงจร <strong>ADC</strong> เป็นต้น</p>
+<p><img alt="" src="max4080_table.jpg" /></p>
+<p>รูป: ตารางการใช้งาน <strong>MAX4080</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="max4080">&#9655; โมดูล <strong>MAX4080</strong><a class="headerlink" href="#max4080" title="Permanent link">#</a></h2>
+<p>การใช้ไอซี <strong>MAX4080</strong> อาจจะไม่สะดวกในการต่อวงจรใช้งาน เช่น การต่อวงจรทดลองบนเบรดบอร์ด
+และดังนั้นก็แนะนำให้ใช้โมดูล <strong>MAX4080 Breakout</strong> เช่น โมดูล <strong>CJMCU-408</strong> จากประเทศจีน</p>
+<ul>
+<li>ใช้ไอซี <strong>MAX4080SASA</strong></li>
+<li>ใช้ตัวต้านทาน <strong>R_SENSE</strong>: <code>R100</code> หรือ <strong>0.1Ω</strong> (<strong>±1%, 2W, 2512</strong>)</li>
+</ul>
+<p><img alt="" src="cjmcu_408.jpg" /></p>
+<p><img alt="" src="max4080_module.jpg" /></p>
+<p>รูป: ตัวอย่างโมดูล <strong>MAX4080 Breakout</strong></p>
+<hr />
+<h2 id="_1">&#9655; การทดลองวัดกระแสโดยใช้ตัวต้านทานเป็นโหลด<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการทดลองใช้งานโมดูล <strong>MAX4080</strong> โดยใช้ตัวต้านทาน <strong>100Ω</strong> เป็นโหลดไฟฟ้า
+และมีการต่อวงจรทดลองดังนี้</p>
+<ul>
+<li>วัดค่าความต้านทานที่ใช้เป็นโหลดด้วยมัลติมิเตอร์ได้  <strong>99.3Ω</strong></li>
+<li>ใช้แหล่งจ่ายแรงดันไฟฟ้าคงที่ <strong>VIN = 5.2V</strong> และต่อผ่านไดโอด <strong>Schottky</strong>
+ไปยังขา <strong>VCC</strong> ของโมดูล <strong>MAX4080</strong>  และขา <strong>GND</strong> ของโมดูล <strong>MAX4080</strong> กับ <strong>GND</strong> ของแหล่งจ่าย</li>
+<li>ต่อขา <strong>RS+</strong> เข้ากับ <strong>VCC</strong> ของ  <strong>MAX4080</strong></li>
+<li>ต่อขาด้านหนึ่งของตัวต้านทานกับขา <strong>RS-</strong> ของ <strong>MAX4080</strong>  และขาอีกด้านหนึ่งไปยัง <strong>GND</strong> ของแหล่งจ่าย</li>
+<li>วัดแรงดันที่ขา <strong>RS-</strong> หรือ แรงดันตกคร่อมที่ตัวต้านทานได้ <strong>4.703V</strong>
+ดังนั้นจึงคำนวณปริมาณกระแสที่ไหลได้เท่ากับ <strong>4.703V / 99.3 Ohm = 47.36mA</strong></li>
+<li>วัดแรงดัน <strong>V_SENSE</strong> ได้เท่ากับ <strong>4.61mV</strong> เมื่อนำไปคูณกับค่า <strong>Gain = 60</strong>
+จะได้ <strong>4.61mV x 60 = 276.6mV</strong> และวัดแรงดันเอาต์พุตที่ขา <strong>VOUT</strong> ด้วยมัลติมิเตอร์
+ได้เท่ากับ <strong>276.6mV</strong></li>
+</ul>
+<p><img alt="" src="max4080_100ohm_test.jpg" /></p>
+<p>รูป: การต่อวงจรทดลอง</p>
+<p>โดยทั่วไปแล้ว หากกระแสไฟฟามีการเปลี่ยนแปลงปริมาณค่อนข้างช้า ก็สามารถใช้มัลติมิเตอร์วัดแรงดันเอาต์พุตได้
+แต่ถ้าปริมาณกระแสเปลี่ยนแปลงอย่างรวดเร็วในเชิงเวลา ก็จะต้องใช้วิธี เช่น การต่อเข้ากับ <strong>ADC (Analog-to-Digital Converter</strong> อ่านและบันทึกค่าด้วย <strong>MCU</strong> หรือ จะใช้ออสซิลโลสโคปดูการเปลี่ยนแปลงเชิงเวลาของสัญญาณเอาต์พุต เป็นต้น</p>
+<p><img alt="" src="scope_vout_measurement.jpg" /></p>
+<p>รูป: การวัดแรงดันเอาต์พุตด้วยออสซิลโลสโคป (วัดค่าเฉลี่ยของสัญญาณเอาต์พุตได้ <strong>279mV</strong>)</p>
+<p><img alt="" src="measurement_rapid_change.jpg" /></p>
+<p>รูป: ตัวอย่างการวัดสัญญาณเอาต์พุตโดยใช้ <strong>MAX4080</strong> ในกรณีที่มีการเปลี่ยนแปลงของกระแสโหลดอย่างรวดเร็ว</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอข้อมูลและการใช้งานของไอซีและโมดูล <strong>MAX4080/4081</strong>
+พร้อมตัวอย่างการทดลองวัดปริมาณกระแสไฟฟ้าโดยใช้ตัวต้านทานเป็นโหลดไฟฟ้า
+โมดูลนี้สามารถนำไปประยุกต์ใช้ในการวิเคราะห์การใช้กระแสไฟฟ้า
+โดยใช้การวัดกระแสแบบ <strong>High-Side</strong> (การวัดฝั่ง <strong>VCC</strong>) 
+รวมถึงการตรวจสอบการใช้พลังงานของอุปกรณ์อิเล็กทรอนิกส์ต่าง ๆ ได้
+โดยให้เอาต์พุตเป็นสัญญาณแอนะล็อกที่แปรผันตามกระแสที่ไหลผ่านโหลด</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-04-30 | Last Updated: 2025-05-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
