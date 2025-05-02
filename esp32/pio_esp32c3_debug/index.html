@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/pio_esp32c3_debug/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโค้ด Arduino และดีบักการทำงานของชิป Espressif ESP32-C3 ด้วย PIO Debug / USB-JTAG - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-espressif-esp32-c3-pio-debug-usb-jtag" class="nav-link">การเขียนโค้ด Arduino และดีบักการทำงานของชิป Espressif ESP32-C3 ด้วย PIO Debug / USB-JTAG</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#espressif-esp32-c3-soc" class="nav-link">&#9655; Espressif ESP32-C3 SoC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-sketch-esp32-c3-platformio" class="nav-link">&#9655; ขั้นตอนการพัฒนาโค้ด Arduino Sketch สำหรับ ESP32-C3 ด้วย PlatformIO</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-espressif-esp32-c3-pio-debug-usb-jtag">การเขียนโค้ด Arduino และดีบักการทำงานของชิป Espressif ESP32-C3 ด้วย PIO Debug / USB-JTAG<a class="headerlink" href="#arduino-espressif-esp32-c3-pio-debug-usb-jtag" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="espressif-esp32-c3-soc">&#9655; <strong>Espressif ESP32-C3 SoC</strong><a class="headerlink" href="#espressif-esp32-c3-soc" title="Permanent link">#</a></h2>
+<p>ชิป <strong>ESP32-C3</strong> ของบริษัท <strong>Espressif</strong> เป็นชิปประเภท <strong>SoC</strong>
+ที่รองรับการเชื่อมต่อแบบไร้สายทั้ง <strong>Wi-Fi</strong> และ <strong>Bluetooth Low Energy (BLE)</strong>
+ภายในประกอบด้วยซีพียูสถาปัตยกรรม <strong>32-bit RISC-V</strong> (<em>RV32IMC ISA</em>)</p>
+<p>บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32-C3</strong> มีราคาไม่แพง และสามารถเขียนโค้ดด้วยภาษา <strong>C/C++</strong>
+โดยใช้ตัวเลือกต่อไปนี้ได้</p>
+<ul>
+<li><strong>Arduino IDE + Arduino ESP32 Core</strong></li>
+<li><strong>VS Code IDE + PlatformIO extension</strong></li>
+<li><strong>VS Code IDE + Espressif ESP-IDF extension</strong></li>
+</ul>
+<p>ชิปหลายรุ่นของ <strong>Espressif</strong> เช่น <strong>ESP32-C3</strong>, <strong>ESP32-S2</strong>,
+<strong>ESP32-S3</strong> และ <strong>ESP32-C6</strong> รองรับการเชื่อมต่อผ่าน <strong>USB</strong> โดยตรง
+โดยสามารถสื่อสารข้อมูลในรูปแบบ <strong>USB-CDC (Serial)</strong> และบางรุ่นยังมีวงจร <strong>USB-to-JTAG</strong>
+สำหรับใช้อัปโหลดเฟิร์มแวร์และการดีบักระดับฮาร์ดแวร์ของซีพียูผ่าน <strong>JTAG Interface</strong></p>
+<p>บทความนี้นำเสนอแนวทางการใช้งานซอฟต์แวร์ <strong>VS Code IDE</strong>
+ร่วมกับ <strong>PlatformIO extension</strong> (ทดลองใช้งานบนระบบปฏิบัติการ <strong>Linux</strong>)
+พร้อมตัวอย่างโค้ด <strong>Arduino Sketch</strong> สำหรับสาธิตการอัปโหลดและดีบักการทำงานของโปรแกรมบนชิป <strong>ESP32-C3</strong></p>
+<p>แนะนำให้ผู้อ่านได้ติดตั้งโปรแกรม <strong>VS Code IDE</strong> และ <strong>PlatformIO (PIO)</strong> ตามลำดับก่อน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch-esp32-c3-platformio">&#9655; ขั้นตอนการพัฒนาโค้ด Arduino Sketch สำหรับ ESP32-C3 ด้วย PlatformIO<a class="headerlink" href="#arduino-sketch-esp32-c3-platformio" title="Permanent link">#</a></h2>
+<p>ขั้นตอนการดำเนินการมีดังนี้</p>
+<ol>
+<li>สร้างโปรเจกต์ใหม่: เปิด <strong>VS Code</strong> แล้วไปที่เมนู <strong>“PIO Home” → “New Project”</strong>
+จากนั้นตั้งชื่อโปรเจกต์, เลือกไดเรกทอรีเก็บโปรเจกต์, เลือกบอร์ดที่ใช้ชิป <strong>ESP32-C3</strong>
+และเลือก <strong>Arduino</strong> เป็น <strong>Framework</strong></li>
+<li>ทดลองใช้โค้ดตัวอย่าง <strong>Arduino Sketch</strong>: เขียนหรือวางโค้ด <strong>Arduino</strong> ที่ต้องการลงในไฟล์ 
+<code>src/main.cpp</code> ซึ่งเป็นไฟล์หลักของโปรเจกต์</li>
+<li>แก้ไขไฟล์ <code>platformio.ini</code>: ปรับแต่งคอนฟิก เช่น เพิ่มการตั้งค่าพอร์ต
+ความเร็วอัปโหลด หรือเปิดการดีบัก ตามตัวอย่างที่ให้</li>
+<li>คอมไพล์โปรเจกต์ (<strong>Build</strong>): ใช้คำสั่ง <strong>“Build”</strong> จากเมนูของ <strong>PlatformIO</strong>
+เพื่อตรวจสอบว่าโค้ดสามารถคอมไพล์ได้โดยไม่มีข้อผิดพลาด</li>
+<li>เชื่อมต่อบอร์ด <strong>ESP32-C3</strong>: ต่อบอร์ดเข้ากับคอมพิวเตอร์ผ่านสาย <strong>USB</strong></li>
+<li>อัปโหลดเฟิร์มแวร์: ใช้คำสั่ง <strong>“Upload”</strong> เพื่ออัปโหลดเฟิร์มแวร์ไปยังบอร์ด <strong>ESP32-C3</strong> ผ่านพอร์ต <strong>USB</strong></li>
+<li>ดีบักโค้ด (<strong>PIO Debug</strong>): เริ่มขั้นตอนดีบักด้วยคำสั่ง <strong>“Start Debugging”</strong>
+สามารถกำหนดตำแหน่ง <strong>Breakpoints</strong> ในโค้ด แล้วรันโปรแกรมแบบควบคุมการทำงานทีละขั้น</li>
+</ol>
+<p><img alt="" src="pio-1.jpg" /></p>
+<p>รูป: การสร้างโปรเจกต์ใหม่สำหรับ <strong>PIO</strong></p>
+<p><img alt="" src="pio-2.jpg" /></p>
+<p>รูป: ตัวอย่างโค้ดในไฟล์ <code>src/main.cpp</code> ของโปรเจกต์</p>
+<p>ตัวอย่างไฟล์ <code>main.cpp</code></p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+// Define the GPIO pin connected to the LED
+#define LED_PIN  8
+
+// Variable to hold the current LED state (0 or 1)
+int led_value = 0;
+
+void setup() {
+   // Set the LED pin as an output
+   pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  // Declare a static counter to track the number of loop iterations
+  static int count = 0;
+
+  // Increment the counter on each loop iteration
+  count++;
+
+  // Toggle the LED state using bitwise XOR
+  led_value ^= 1;
+
+  // Set the LED pin to the current state
+  digitalWrite(LED_PIN, led_value);
+
+  // Wait for 100 milliseconds
+  delay(100);
+}
+</code></pre>
+<p>ตัวอย่างการตั้งค่าใช้งานสำหรับไฟล์ <code>platformio.ini</code></p>
+<pre><code class="language-text">[env:seeed_xiao_esp32c3]
+platform = platform-espressif32
+framework = arduino
+board = seeed_xiao_esp32c3
+build_flags =
+  -D CONFIG_USB_CDC_ENABLED=1
+  -D ARDUINO_USB_MODE=1
+  -D ARDUINO_USB_CDC_ON_BOOT=1
+monitor_speed = 115200
+upload_protocol = esp-builtin
+upload_port = /dev/ttyACM0
+debug_tool = esp-builtin
+build_type = debug
+debug_build_flags = -O0 -g -ggdb
+debug_init_break = tbreak setup
+</code></pre>
+<p>คำอธิบาย</p>
+<ul>
+<li><code>platform = platform-espressif32</code>
+ระบุว่าต้องการใช้แพลตฟอร์มสำหรับบอร์ดตระกูล <strong>ESP32</strong> ซึ่งจะติดตั้ง <strong>Toolchain</strong> และไลบรารี ที่จำเป็นโดยอัตโนมัติ
+(เช่น ดาวน์โหลดและติดตั้งไว้ภายใต้ไดเรกทอรี <code>$HOME/.platformio/packages/</code> สำหรับ <strong>Linux</strong>)</li>
+<li><code>framework = arduino</code>
+กำหนดให้เขียนโปรแกรมโดยใช้ <strong>Arduino Framework</strong></li>
+<li><code>board = seeed_xiao_esp32c3</code>
+ระบุชื่อบอร์ดตามที่ <strong>PlatformIO</strong> รองรับ เพื่อใช้คอนฟิกค่าพินและค่าพารามิเตอร์ต่างๆ โดยอัตโนมัติ</li>
+<li><code>build_flags</code> เป็นการกำหนด <strong>Flags</strong> สำหรับการคอมไพล์ เช่น การตั้งค่าเพื่อเปิดใช้งาน <strong>USB CDC</strong>
+สำหรับ <strong>ESP32-C3</strong></li>
+<li><code>monitor_speed = 115200</code>
+ตั้งค่า <strong>Baudrate</strong> ของ <strong>Serial Monitor</strong> ให้ตรงกับที่ใช้ในโค้ด</li>
+<li><code>upload_protocol = esp-builtin</code>
+ใช้โปรโตคอลอัปโหลดที่มากับชิป <strong>ESP32-C3</strong> โดยตรงผ่าน <strong>USB</strong> ซึ่งรองรับ <strong>USB-JTAG</strong></li>
+<li><code>upload_port = /dev/ttyACM0</code>
+ระบุชื่อพอร์ต USB ที่เชื่อมต่อกับ <strong>ESP32-C3</strong> ซึ่งอาจเปลี่ยนแปลงไปตามระบบปฏิบัติการ (ตัวอย่างสำหรับ <strong>Linux</strong>)</li>
+<li><code>debug_tool = esp-builtin</code>
+ใช้ <strong>USB-JTAG</strong> ที่ฝังอยู่ภายใน <strong>ESP32-C3</strong> สำหรับการดีบัก</li>
+<li><code>build_type = debug</code>
+ระบุว่าให้สร้างโปรเจกต์ในโหมดสำหรับการดีบัก (แทน <strong>Release</strong>)</li>
+<li><code>debug_build_flags = -O0 -g -ggdb</code> เป็นการกำหนด <strong>Flags</strong> สำหรับการคอมไพล์เพื่อดีบัก
+ปิดการ <strong>Optimize</strong> และเปิดข้อมูลดีบักเต็มรูปแบบ เพื่อให้สามารถดูตัวแปร และทำงานของ <strong>Stack</strong> ได้ครบถ้วน</li>
+<li><code>debug_init_break = tbreak setup</code>
+ตั้ง <strong>Breakpoint</strong> ให้หยุดการทำงานที่จุดเริ่มต้นของฟังก์ชัน <code>setup()</code> ซึ่งช่วยให้วิเคราะห์การทำงานเริ่มต้นได้ง่าย</li>
+</ul>
+<p>ข้อสังเกต:</p>
+<ul>
+<li>หากต้องการระบุเวอร์ชันของ <strong>Platform ESP32 Framework</strong> ที่ต้องการ ก็ให้ตั้งค่าสำหรับ
+<code>platform</code> โดยระบุ <strong>URL</strong> ตามตัวอย่างต่อไปนี้</li>
+</ul>
+<p><code>https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip</code></p>
+<p>ใน <strong>Linux</strong> สามารถทำคำสั่งต่อไปนี้ เพื่อตรวจสอบดูว่า มองเห็นอุปกรณ์ <strong>ESP32-C3</strong> และพร้อมใช้งานหรือไม่</p>
+<pre><code class="language-text">$ lsusb | grep Espressif
+Bus 001 Device 006: ID 303a:1001 Espressif USB JTAG/serial debug unit
+</code></pre>
+<p>จากข้อความตัวอย่างเอาต์พุต จะเห็นว่า มีรายการอุปกรณ์ของ <strong>Espressif</strong> (<strong>VID:PID</strong> = <code>303a:1001</code>)</p>
+<p>&nbsp;</p>
+<p><img alt="" src="pio-3.jpg" /></p>
+<p>รูป: ทำขั้นตอน <strong>Build</strong> เพื่อคอมไพล์โค้ดในโปรเจกต์</p>
+<p>เมื่อมีการอัปโหลดโค้ดไปยังบอร์ด <strong>ESP32-C3</strong> และเริ่มขึ้นตอนดีบักได้แล้ว
+ให้สังเกตดูข้อความต่าง ๆ ในหน้าต่าง <strong>Debug Console</strong></p>
+<p><img alt="" src="pio-4.jpg" /></p>
+<p>รูป: เริ่มขั้นตอน <strong>PIO Debug</strong> และคลิกดู <strong>Debug Console</strong></p>
+<p><img alt="" src="pio-5.jpg" /></p>
+<p>รูป: การหยุดการทำงานของซีพียูชั่วคราวตามตำแหน่งของ <strong>BREAKPOINTS</strong> ที่ได้กำหนดไว้ในโค้ด</p>
+<p><img alt="" src="pio-6.jpg" /></p>
+<p>รูป: ดูการเปลี่ยนแปลงและค่าของตัวแปรในโค้ด ซึ่งได้กำหนดไว้ในรายการของ <strong>WATCH</strong></p>
+<p>&nbsp;</p>
+<p>หากจะลองเขียนโค้ดโดยใช้ <strong>FreeRTOS Tasks</strong> ก็มีตัวอย่างโค้ดดังนี้</p>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+
+#define LED_PIN 8
+
+// Task handles 
+TaskHandle_t blinkTaskHandle = NULL;
+TaskHandle_t printTaskHandle = NULL;
+
+// Blink Task
+void blinkTask(void *pvParameters) {
+  int led_state = 0;
+  pinMode(LED_PIN, OUTPUT);
+  while (true) {
+    led_state ^= 1;
+    digitalWrite(LED_PIN, led_state);
+    vTaskDelay(pdMS_TO_TICKS(100)); // 100 ms
+  }
+}
+
+// Serial Print Task (USB CDC)
+void printTask(void *pvParameters) {
+  while (!Serial) {
+    vTaskDelay(pdMS_TO_TICKS(100)); // Wait for Serial to be ready
+  }
+
+  int counter = 0;
+  while (true) {
+    Serial.printf(&quot;counter: %lu\n&quot;, ++counter );
+    vTaskDelay(pdMS_TO_TICKS(1000)); // 1 second
+  }
+}
+
+void setup() {
+  Serial.begin();  // Start USB CDC
+  // Create two FreeRTOS tasks
+  xTaskCreate(blinkTask, &quot;Blink Task&quot;, 1024, NULL, 1, &amp;blinkTaskHandle);
+  xTaskCreate(printTask, &quot;Print Task&quot;, 2048, NULL, 1, &amp;printTaskHandle);
+}
+
+void loop() {
+  // Nothing here 
+}
+</code></pre>
+<p><img alt="" src="pio-7.jpg" /></p>
+<p>รูป: ทำขั้นตอนอัปโหลด และเริ่มต้น <strong>PIO Debug</strong></p>
+<p><img alt="" src="pio-9.jpg" /></p>
+<p>รูป: เปิดใช้งาน <strong>Serial Monitor</strong> เพื่อรับข้อความจาก <strong>USB-CDC (Serial)</strong> ที่ถูกส่งมาจากบอร์ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอ การใช้งานซอฟต์แวร์ <strong>VS Code IDE</strong>
+ร่วมกับ <strong>PlatformIO extension</strong> ในเบื้องต้น แม้ว่าจะได้ทดลองใช้งานกับระบบปฏิบัติการ <strong>Linux</strong>
+แต่ก็มีแนวทางเดียวกันสำหรับ <strong>Windows 10 &amp; 11</strong>
+ได้เรียนรู้ขั้นตอนการสาธิตการอัปโหลดและดีบักการทำงานของโปรแกรมบนชิป <strong>ESP32-C3</strong> และเขียนโค้ดตัวอย่างในรูปแบบ <strong>Arduino Sketch</strong> และมีการใช้ <strong>FreeRTOS</strong> ในเบื้องต้น</p>
+<p>แนะนำบทความภาษาไทยที่เกี่ยวข้องให้ศึกษาเพิ่มเติม</p>
+<ul>
+<li><a href="https://www.espressif.com/sites/default/files/documentation/ESP32-C3%20Wireless%20Adventure.pdf"><strong>eBook: "ESP32-C3 Wireless Adventure - A Comprehensive Guide to IoT"</strong></a> (<a href="https://github.com/espressif/esp32-c3-book-en"><strong>Github repo</strong></a>)</li>
+<li><a href="https://iot-kmutnb.github.io/blogs/arduino/vscode_pio_arduino/">"การใช้งาน <strong>VS Code IDE</strong> + <strong>PlatformIO Extension</strong> สำหรับการเขียนโค้ด <strong>Arduino</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp32_vscode_pio/">"การใช้งาน <strong>PlatformIO</strong> ร่วมกับ <strong>VS Code IDE</strong> สำหรับบอร์ด <strong>ESP32</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/linux_pio_esp32/">"การใช้งาน <strong>PlatformIO (PIO) Core</strong> สำหรับ <strong>WSL2 Ubuntu</strong> ในเบื้องต้น"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp-idf_linux_wsl/">"การติดตั้งและใช้งาน <strong>ESP-IDF</strong> สำหรับ <strong>WSL / Ubuntu</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp-idf_vscode/">"การใช้งาน <strong>VS Code IDE + Espresssif IDF Extension</strong> สำหรับ <strong>Windows</strong>"</a></li>
+<li><a href="https://iot-kmutnb.github.io/blogs/esp32/esp32-c6_esp-idf/">"การใช้งาน <strong>ESP-IDF (WSL2 / Ubuntu)</strong> สำหรับ <strong>ESP32-C6</strong>"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2025-05-02 | Last Updated: 2025-05-02</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
