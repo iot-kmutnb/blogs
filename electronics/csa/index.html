@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/csa/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเลือกใช้ไอซีประเภท Current-Sense Amplifier (CSA) สำหรับการวัดกระแสในวงจรไฟฟ้า-อิเล็กทรอนิกส์ - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#current-sense-amplifier-csa-" class="nav-link">การเลือกใช้ไอซีประเภท Current-Sense Amplifier (CSA) สำหรับการวัดกระแสในวงจรไฟฟ้า-อิเล็กทรอนิกส์</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#current-measurement" class="nav-link">&#9655; การวัดกระแส (Current Measurement)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#current-sense-amplifiers-csa" class="nav-link">&#9655; วงจรตรวจจับสัญญาณและขยายกระแส (Current-Sense Amplifiers: CSA)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#csa-current-sense-monitor" class="nav-link">&#9655; แนวทางการเลือกใช้ไอซี CSA - Current Sense Monitor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#csa" class="nav-link">&#9655; พารามิเตอร์ทางไฟฟ้าที่สำคัญสำหรับ CSA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#current-monitor-ic" class="nav-link">&#9655; ตัวอย่างไอซีวัดกระแส (Current Monitor IC)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#differential-amplifier" class="nav-link">&#9655; แนวทางการสร้าง Differential Amplifier ด้วยออปแอมป์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="current-sense-amplifier-csa-">การเลือกใช้ไอซีประเภท Current-Sense Amplifier (CSA) สำหรับการวัดกระแสในวงจรไฟฟ้า-อิเล็กทรอนิกส์<a class="headerlink" href="#current-sense-amplifier-csa-" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Current-Sense Amplifier</em>, <em>Current Shunt Monitor</em>, <em>Differential Amplifier</em></p>
+<ul>
+<li><a href="#current-measurement">การวัดกระแส (<strong>Current Measurement</strong>)</a></li>
+<li><a href="#current-sense-amplifiers-csa">วงจรตรวจจับสัญญาณและขยายกระแส (<strong>Current-Sense Amplifiers: CSA</strong>)</a></li>
+<li><a href="#csa-current-sense-monitor">แนวทางการเลือกใช้ไอซี <strong>CSA - Current Sense Monitor</strong></a></li>
+<li><a href="#csa">พารามิเตอร์ทางไฟฟ้าที่สำคัญสำหรับ <strong>CSA</strong></a></li>
+<li><a href="#current-monitor-ic">ตัวอย่างไอซีสำหรับการวัดกระแส (<strong>Current Monitor IC</strong>)</a></li>
+<li><a href="#differential-amplifier">แนวทางการสร้าง Differential <strong>Amplifier</strong> ด้วยออปแอมป์</a></li>
+</ul>
+<hr />
+<h2 id="current-measurement">&#9655; การวัดกระแส (<strong>Current Measurement</strong>)<a class="headerlink" href="#current-measurement" title="Permanent link">#</a></h2>
+<p>การวัดกระแสไฟฟ้าในวงจร มีหลายวิธี ได้แก่</p>
+<ul>
+<li>การวัดโดยใช้หลักการของสนามแม่เหล็กไฟฟ้า (<strong>Magnetic Field</strong>): ใช้เซนเซอร์แบบ <strong>Hall Effect</strong> ซึ่งให้เอาต์พุตเป็นแรงดันไฟฟ้าที่แปรผันตามปริมาณกระแสไฟฟ้าที่ไหลผ่านขดลวดหรือสายไฟ</li>
+<li>การวัดโดยตรงในวงจร (<strong>Direct Current Sensing</strong>) โดยวัดแรงดันตกคร่อมตัวต้านทาน: เป็นการวัดแรงดันตกคร่อมที่เกิดขึ้นบนตัวต้านทานที่มีกระแสไหลผ่าน ซึ่งเรียกว่า <strong>Current-Sense Resistor</strong> หรือ <strong>Shunt Resistor</strong>  <ul>
+<li>วิธีนี้ต้องใช้วงจรที่สามารถแปลงแรงดันไฟฟ้าอินพุตแบบ <strong>Differential</strong> (ซึ่งเป็นแรงดันตกคร่อมที่ตัวต้านทาน) ให้เป็นแรงดันไฟฟ้า-เอาต์พุต และใช้วงจรที่เรียกว่า <a href="https://en.wikipedia.org/wiki/Current_sense_amplifier"><strong>Current-Sense Amplifier (CSA)</strong></a></li>
+<li>แรงดันเอาต์พุตสามารถนำไปใช้งานร่วมกับวงจรอื่น เช่น <strong>ADC (Analog-to-Digital Converter)</strong></li>
+<li>หากกระแสไฟฟ้ามีค่าต่ำมาก ต้องใช้วงจรขยายสัญญาณ เพื่อให้แรงดันอยู่ในช่วงที่เหมาะสมสำหรับการประมวลผล</li>
+<li>หากกระแสไฟฟ้ามีปริมาณมาก ควรเลือกตัวต้านทานที่มีค่าความต้านทานต่ำ เพื่อลดการสูญเสียพลังงานในรูปของความร้อน
+(การสูญเสียพลังงานคิดจากสูตร: <script type="math/tex">P = I^2 \times R</script>)</li>
+</ul>
+</li>
+</ul>
+<p>วัตถุประสงค์ของการตรวจจับและวัดกระแสไฟฟ้าในวงจรอิเล็กทรอนิกส์</p>
+<ul>
+<li>เพื่อทราบปริมาณกระแสที่ไหลผ่านโหลด ซึ่งหากกระแสมีค่ามากเกินไป อาจทำให้เกิดความร้อนสูงหรือความเสียหายต่อวงจรไฟฟ้า </li>
+<li>เพื่อประเมินระดับการใช้พลังงานของอุปกรณ์อิเล็กทรอนิกส์ เช่น สำหรับอุปกรณ์ที่ใช้งานแบบ <strong>Low-Power Applications</strong></li>
+</ul>
+<hr />
+<h2 id="current-sense-amplifiers-csa">&#9655; วงจรตรวจจับสัญญาณและขยายกระแส (<strong>Current-Sense Amplifiers: CSA</strong>)<a class="headerlink" href="#current-sense-amplifiers-csa" title="Permanent link">#</a></h2>
+<ul>
+<li>การวัดปริมาณกระแสไฟฟ้าโดยตรง โดยใช้ตัวต้านทานที่มีค่าความต้านทานต่ำ มักอาศัยวงจรที่เรียกว่า 
+<strong>Current-Sense Amplifiers</strong> (<strong>CSA</strong>)
+เพื่อทำหน้าที่ขยายแรงดันตกคร่อมที่เกิดขึ้นบนตัวต้านทานซึ่งอยู่ในระดับที่ต่ำมาก
+และทำให้ได้สัญญาณเอาต์พุตในช่วงกระแสหรือแรงดันที่ต้องการ</li>
+<li>วงจรพื้นฐานของ <strong>CSA</strong> ประกอบด้วย "ตัวขยายสัญญาณแบบต่างศักย์" หรือ เรียกว่า
+วงจรขยายสัญญาณแบบ "ดิฟเฟอเรนเชียล" (<strong>Differential Amplifier</strong>)
+ซึ่งมีหลักการทำงานคล้ายคลึงกับวงจรภายในของ <strong>Operational Amplifier</strong> (<strong>Op-Amp</strong>)
+โดยเน้นการตรวจจับและขยายความต่างศักย์ระหว่างขาอินพุตสองขา</li>
+<li>จุดประสงค์หลักคือ การวัดแรงดันตกคร่อมที่เกิดขึ้นบนตัวต้านทานตรวจจับกระแส (<script type="math/tex">R_{SHUNT}</script>)
+ซึ่งมีค่าความต้านทานต่ำมาก เช่น <strong>0.1Ω</strong> หรือ <strong>0.05Ω</strong> เป็นต้น</li>
+<li>เมื่อมีกระแสไฟฟ้า (ใช้สัญลักษณ์ <script type="math/tex">I_{SENSE}</script> หรือ <script type="math/tex">I_{LOAD}</script>)
+ไหลผ่าน <script type="math/tex">R_{SHUNT}</script> ไปยังโหลด จะเกิดแรงดันตกคร่อมที่สองขาของตัวต้านทาน
+โดยใช้สัญลักษณ์ <script type="math/tex">V_{IN+}</script> และ <script type="math/tex">V_{IN-}</script> เป็นแรงดันที่ปลายทั้งสองของตัวต้านทาน ตามลำดับ<ul>
+<li>ผลต่างแรงดันคือ <script type="math/tex">V_{SENSE} = V_{IN+} - V_{IN-}</script> และ <strong>CSA</strong> ทำหน้าที่ขยายผลต่างแรงดันนี้
+เพื่อให้ได้แรงดันเอาต์พุตที่สามารถนำไปใช้งานได้ เช่น อินพุตของ <strong>ADC</strong> หรือไมโครคอนโทรลเลอร์</li>
+<li>วงจร <strong>Differential Amplifier</strong> สามารถสร้างได้โดยใช้ไอซี <strong>Op-Amp</strong>
+หรือ <strong>Instrumentation Amplifier</strong> เป็นพื้นฐาน ซึ่งเป็นวงจรที่มีค่า <strong>Common-Mode Rejection Ratio</strong> สูงมาก</li>
+<li>ไอซีประเภท <strong>CSA</strong> ถูกใช้อย่างแพร่หลายในระบบจัดการพลังงาน เช่น การวัดกระแสโหลด และ การตรวจสอบการชาร์จแบตเตอรี่ เป็นต้น</li>
+</ul>
+</li>
+</ul>
+<p>ตำแหน่งของตัวต้านทานตรวจจับกระแส (<strong>Current-Sense Configuration</strong>) แบ่งเป็น 3 กรณี ได้แก่:</p>
+<ul>
+<li><strong>Low-Side Current Sensing:</strong><ul>
+<li>เป็นการต่อตัวต้านทานตรวจวัดกระแส ระหว่างโหลดกับกราวด์ </li>
+<li>ข้อดี: วงจรอ่านสัญญาณมีระดับแรงดันต่ำและง่ายต่อการออกแบบวงจร</li>
+<li>ข้อเสีย: กราวด์ของโหลดไม่ได้ต่อตรงกับกราวด์ของระบบ</li>
+</ul>
+</li>
+<li><strong>High-Side current sensing:</strong>  <ul>
+<li>เป็นการต่อตัวต้านทานตรวจวัดกระแส ระหว่างแหล่งจ่ายแรงดันกับโหลด ต้องใช้ <strong>CSA</strong> ที่มีความสามารถในการรับช่วงแรงดันอินพุตแบบ <strong>Common-Mode Voltage</strong> ได้สูง  </li>
+<li>ข้อดี: กราวด์ของโหลดต่อตรงกับกราวด์ของระบบ</li>
+<li>ข้อเสีย: วงจรมีความซับซ้อนมากกว่าและต้องใช้ไอซีที่รองรับแรงดันโหมดร่วม (<strong>Common-Mode Voltage</strong>) ระดับสูง</li>
+</ul>
+</li>
+<li><strong>In-Line Current Sensing:</strong><ul>
+<li>เป็นการต่อตัวต้านทานตรวจวัดกระแสแบบอนุกรมในสายไฟ</li>
+<li>โดยมักใช้ในระบบที่มีสายไฟแยกหลายเส้น เช่น มอเตอร์สามเฟส</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="csa_high_side_vs_low_side.jpg" /></p>
+<p>รูป: การวัดกระแสโดยวงจร <strong>CSA</strong> แบบ <strong>Low-Side</strong> (ซ้าย) และ <strong>High-Side</strong> (ขวา)</p>
+<p>ในปัจจุบันมีหลายบริษัทที่ผลิตและจำหน่ายไอซีประเภท <strong>Current-Sensor Monitor</strong> เช่น</p>
+<ul>
+<li><strong>Linear Technology / Maxim / Analog Devices Inc. (ADI)</strong></li>
+<li><strong>Texas Instruments (TI)</strong></li>
+<li><strong>STMicroelectronics</strong></li>
+<li><strong>Renesas Electronics</strong></li>
+<li><strong>ROHM Semiconductor</strong></li>
+<li><strong>Microchip Technology</strong></li>
+<li><strong>ONsemi</strong></li>
+<li><strong>Infineon</strong></li>
+<li><strong>Silergy</strong></li>
+<li><strong>SGMICRO</strong></li>
+</ul>
+<p><img alt="" src="max437x_high_side.jpg" /></p>
+<p>รูป: ไอซี <strong>MAX437x</strong> สำหรับการวัดกระแสแบบ <strong>High-Side</strong>
+(Image Source: Maxim / Analog Devices)</p>
+<p><img alt="" src="tsc101_high_side.jpg" /></p>
+<p>รูป: ไอซี <strong>TSC101</strong> สำหรับการวัดกระแสแบบ <strong>High-Side</strong>
+(Image Source: STMicrolectronics)</p>
+<p><img alt="" src="ina120_high_side.jpg" /></p>
+<p>รูป: ไอซี <strong>INA210</strong> สำหรับการวัดกระแสแบบ <strong>High-Side</strong>
+(Image Source: Texas Instruments)</p>
+<p><img alt="" src="ina181_interfacing.jpg" /></p>
+<p>รูป: ไอซี <strong>INA181</strong> สำหรับการวัดกระแสแบบ <strong>Low-Side</strong>
+(Image Source: Texas Instruments)</p>
+<p><img alt="" src="ina226_interfacing.jpg" /></p>
+<p>รูป: ไอซี <strong>INA226</strong> เชื่อมต่อด้วยบัส <strong>I2C</strong>
+(Image Source: Texas Instruments)</p>
+<p><img alt="" src="isl28006_low_side_high_side.jpg" /></p>
+<p>รูป: ไอซี <strong>ISL28006</strong> ที่สามารถใช้วัดกระแสได้ทั้งแบบ <strong>Low-Side</strong> หรือ <strong>High-Side</strong>
+(Image Source: Renesas Electronics)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="csa-current-sense-monitor">&#9655; แนวทางการเลือกใช้ไอซี <strong>CSA - Current Sense Monitor</strong><a class="headerlink" href="#csa-current-sense-monitor" title="Permanent link">#</a></h2>
+<ul>
+<li>รูปแบบหรือตำแหน่งการต่อตัวต้านทานตรวจวัดกระแส (<strong>Measurement Topology</strong>): มี 3 กรณีหลัก ดังนี้<ul>
+<li><strong>High-side Measurement:</strong> การต่อตัวต้านทานตรวจวัดกระแส ระหว่างแหล่งจ่ายไฟและโหลด ซึ่งช่วยให้สามารถตรวจจับกระแสที่ไหลเข้าสู่โหลดได้ทั้งหมด ข้อดีคือสามารถตรวจจับกระแสทั้งหมดที่ไหลเข้าโหลด แต่ต้องใช้ไอซีที่สามารถทนต่อแรงดัน <strong>Common-Mode</strong> สูงได้</li>
+<li><strong>Low-side Measurement:</strong> การต่อตัวต้านทานตรวจวัดกระแส ระหว่างโหลดและกราวด์ ซึ่งเป็นวิธีที่ง่ายและราคาถูกกว่าในการออกแบบ</li>
+<li><strong>In-Line Measurement:</strong> การต่อตัวต้านทานตรวจวัดกระแส ในสายที่เชื่อมต่อระหว่างแหล่งจ่ายไฟและโหลด ซึ่งเหมาะสำหรับการตรวจวัดกระแสในวงจรที่ไม่ต้องการแยกแหล่งจ่ายไฟออกจากกัน</li>
+</ul>
+</li>
+<li>ทิศทางการไหลของกระแส (<strong>Current Flow Direction</strong>): สามารถจำแนกได้เป็น 2 กรณีตามทิศทางของการไหลของกระแส:<ul>
+<li><strong>Unidirectional Current</strong> วัดกระแสที่ไหลในทิศทางเดียว เช่น การวัดกระแสที่ไหลจากแหล่งจ่ายไฟไปยังโหลด</li>
+<li><strong>Bidirectional Current</strong> วัดกระแสที่สามารถไหลได้ทั้งสองทิศทาง เช่น การวัดกระแสที่อาจไหลย้อนกลับจากโหลดไปยังแหล่งจ่ายไฟ</li>
+</ul>
+</li>
+<li>ประเภทของสัญญาณเอาต์พุต (<strong>Output Type</strong>): สามารถมีเอาต์พุตหลายประเภท ขึ้นอยู่กับการใช้งาน:<ul>
+<li><strong>เอาต์พุตแบบแอนะล็อก:</strong><ul>
+<li><strong>Current Output</strong> เอาต์พุตเป็นกระแสที่แปรผันตามกระแสที่ไหลผ่านตัวต้านทานตรวจจับกระแส
+และในการใช้งานไอซีที่มีเอาต์พุตแบบนี้ จะต้องกับตัวต้านทานที่ขาเอาต์พุตไปยังกราวด์</li>
+<li><strong>Voltage Output</strong> เอาต์พุตเป็นแรงดันไฟฟ้าที่แปรผันตามแรงดันตกคร่อมที่ตัวต้านทานตรวจจับกระแส โดยทั่วไปจะเป็นเอาต์พุตแบบมีบัฟเฟอร์ และมีเอาต์พุต-อิมพีแดนซ์ต่ำ</li>
+<li>ยกตัวอย่าง: ไอซี <strong>MAX4173</strong> เป็นแบบ <strong>Voltage Output</strong> แต่ <strong>MAX4172</strong> เป็นแบบ <strong>Current Output</strong></li>
+<li>อาจมีขาอินพุตสำหรับปิดการใช้งานขาเอาต์พุต (<strong>Output Enable Pin</strong>) เพื่อประหยัดพลังงาน หากไม่ได้ใช้งานตลอดเวลา</li>
+<li>ในกรณีที่ให้แรงดันเอาต์พุต สามารถจำแนกออกเป็น 2 ตัวเลือก: <strong>Single-ended</strong> (เอาต์พุตอ้างอิงกับกราวด์) ซึ่งเป็นประเภทที่พบเห็นได้บ่อย และ <strong>Differential Output</strong> (เอาต์พุตเป็นแรงดันสองขั้ว <strong>VOUT+</strong> และ <strong>VOUT-</strong>) ซึ่งเหมาะกับการส่งสัญญาณระยะไกลหรือลดสัญญาณรบกวน</li>
+</ul>
+</li>
+<li><strong>เอาต์พุตแบบดิจิทัล:</strong><ul>
+<li>มีวงจร <strong>ADC</strong> รวมอยู่ในไอซี เพื่อแปลงสัญญาณแอนะล็อกให้เป็นดิจิทัล</li>
+<li>ใช้วิธีสื่อสารข้อมูลผ่านบัส เช่น <strong>I2C</strong></li>
+<li>อาจมีขาดิจิทัลเอาต์พุตสำหรับฟังก์ชันพิเศษ เช่น การเปรียบเทียบและแจ้งเตือน
+เมื่อกระแสสูงเกินกว่าระดับที่กำหนดไว้ (<strong>Over-Current Detection &amp; Alert</strong>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>สำหรับไอซีที่ทำงานแบบดิจิทัล ก็มีประเด็นที่ควรพิจารณาต่อไปนี้<ul>
+<li>รูปแบบการสื่อสารข้อมูลและโหมดการทำงานด้วยบัส <strong>I2C</strong>
+เช่น ความถี่สูงสุดของสัญญาณ <strong>Serial Clock</strong> การตั้งค่าแอดเดรสของอุปกรณ์</li>
+<li>ความละเอียด หรือ จำนวนบิต (<strong>ADC Resolution</strong>) ของข้อมูลที่ได้</li>
+<li>อัตราการแปลงสัญญาณแอนะล็อกเป็นข้อมูลดิจิทัล (<strong>Samples / sec</strong>)</li>
+</ul>
+</li>
+<li>การตั้งค่าอัตราขยายแรงดันตกคร่อมที่ขั้วอินพุต (<strong>Gain Setting / Selection</strong>): สามารถทำได้หลายวิธี:<ul>
+<li><strong>External Resistors</strong> ใช้ตัวต้านทานภายนอก  เพื่อกำหนดค่า <strong>Gain</strong> ตามที่ต้องการและอยู่ในช่วงที่เหมาะสม</li>
+<li><strong>Internal Resistors</strong> ใช้ตัวต้านทานภายใน ซึ่งมีความแม่นยำสูง ความคลาดเคลื่อนต่ำ (<strong>Low-Drift</strong>) และตั้งค่ามาจากโรงงาน<ul>
+<li>แบบอัตราขยายคงที่ (<strong>Fixed Gain</strong>) บางบริษัทจะมีไอซีรุ่นย่อย ให้เลือกใช้ตามค่า <strong>Gain</strong></li>
+<li>แบบโปรแกรมเลือกค่าได้ (<strong>Programmable Gain</strong>) ซึ่งมีการตั้งค่าขยายแรงดันในตัวโดยไม่ต้องใช้ตัวต้านทานภายนอก</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ขาแรงดันอ้างอิงสำหรับแรงดันเอาต์พุต (<strong>Reference Voltage Pin</strong>: <script type="math/tex">V_{REF}</script>)<ul>
+<li>ใช้ปรับระดับแรงดันศูนย์กลางเอาต์พุต (<strong>Mid-Range Voltage</strong>) หรือ กำหนดช่วงแรงดันเอาต์พุตได้ ในกรณีที่วัดกระแสได้ทั้งสองทิศทาง</li>
+<li>ยกตัวอย่างเช่น <script type="math/tex">V_{OUT} = A_V \times I_{LOAD} \times R_{SHUNT} + V_{REF}</script>
+</li>
+</ul>
+</li>
+<li>จำนวนช่องสัญญาณ<ul>
+<li>โดยทั่วไปจะมีช่องสัญญาณเอาต์พุต และหนึ่งคู่สัญญาณอินพุต (<strong>Single-Channel</strong>)</li>
+<li>ไอซีบางรุ่น มีมากกว่าหนึ่งช่องสัญญาณ เช่น <strong>Dual-Channel</strong> หรือ <strong>Quad-Channel</strong> เป็นต้น</li>
+</ul>
+</li>
+<li>ตัวถัง (<strong>IC Package</strong>) ขาแรงดันไฟเลี้ยง และขาสัญญาณ (<strong>I/O Pins</strong>)<ul>
+<li>เช่น <strong>SOT23-6</strong> หรือ <strong>SO-8</strong> เป็นต้น</li>
+</ul>
+</li>
+<li>ความเสถียรต่อการเปลี่ยนแปลงของอุณหภูมิแวดล้อม<ul>
+<li>ควรเลือกอุปกรณ์ที่มี <strong>Low Offset Drift</strong> และ <strong>Low Gain Drift</strong>
+เพื่อให้ค่ากระแสที่วัดได้มีความแม่นยำในช่วงอุณหภูมิกว้าง</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="csa">&#9655; พารามิเตอร์ทางไฟฟ้าที่สำคัญสำหรับ <strong>CSA</strong><a class="headerlink" href="#csa" title="Permanent link">#</a></h2>
+<p>ในการเลือกใช้งาน <strong>CSA</strong> ควรทำความเข้าใจพารามิเตอร์ทางไฟฟ้าต่อไปนี้ ซึ่งมักพบได้บ่อยเกี่ยวกับไอซีสำหรับสัญญาณแอนะล็อก:</p>
+<ul>
+<li>ข่วงแรงดันไฟเลี้ยง (<strong>Supply Voltage</strong>: <script type="math/tex">V_S</script> หรือ <script type="math/tex">V_{CC}</script>) สำหรับการทำงานของไอซีและวงจรภายใน:<ul>
+<li>เช่น <strong>+2.7V ~ +5.5V</strong> หรือ <strong>+2.7V ~ +36V</strong> เป็นต้น</li>
+<li>ถ้าต้องการใช้งานแบบ <strong>Low-Power</strong> ก็อาจรองรับแรงดันไฟเลี้ยงในระดับต่ำ (ต่ำกว่า <strong>3V</strong>)
+เช่น <strong>+3.0V</strong>, <strong>+2.7V</strong> หรือต่ำกว่า เป็นต้น</li>
+<li>ไอซีบางรุ่น ไม่มีขาแรงดันไฟเลี้ยง <script type="math/tex">V_S</script> แต่ใช้ขา <strong>VIN+</strong> สำหรับเป็นแรงดันไฟเลี้ยงภายใน</li>
+</ul>
+</li>
+<li>ปริมาณการใช้กระแส (<strong>Supply Current</strong>: <script type="math/tex">I_S</script>)<ul>
+<li>สำหรับการทำงานในลักษณะ <strong>Low-Power</strong> ค่า <script type="math/tex">I_S</script> ควรอยู่ในระดับต่ำ เช่น ในช่วง <strong>10μA - 100μA</strong></li>
+<li>บางกรณีก็ระบุเป็นพารามิเตอร์ <strong>Quiescent Current</strong> (<script type="math/tex">I_Q</script>) มีหน่วยวัดเป็น <strong>μA</strong>
+โดยมีเงื่อนไขในการทดสอบคือ <script type="math/tex">V_{SENSE} = 0mV</script>
+</li>
+</ul>
+</li>
+<li>ช่วงแรงดันโหมดร่วม (<strong>Common-Mode Voltage Range</strong>: <script type="math/tex">V_{CM}</script>):<ul>
+<li>แบ่งเป็น2 กรณี: รองรับช่วงแรงดันเฉพาะช่วงที่เป็นบวกเท่านั้น หรือ รองรับช่วงแรงดันที่เป็นลบด้วย</li>
+<li>ช่วงแรงดันอินพุตโหมดร่วม (<strong>Common-Mode</strong>) ส่งผลต่อความแม่นในการขยายสัญญาณเอาต์พุต โดยเฉพาะอย่างยิ่งสำหรับการวัดแบบ <strong>High-side</strong></li>
+<li>โดยทั่วไป ไอซี <strong>CSA</strong> สำหรับ <strong>High-Side Sensing</strong>  สามารถรองรับแรงดัน <strong>Common-Mode</strong> ได้สูงกว่าแรงดันไฟเลี้ยง บางรุ่นมีช่วง <script type="math/tex">V_{CM}</script> ได้สูงถึง <strong>30V</strong>, <strong>80V</strong> หรือ <strong>100V</strong></li>
+</ul>
+</li>
+<li>อัตราขยายแบบเต็มสเกล (<strong>Full-Scale Gain</strong>) และความแม่นของการขยาย (<strong>Gain Accuracy</strong>):<ul>
+<li>อัตราการขยายเต็มสเกลของแรงดันตกคร่อมที่ขั้วอินพุต ซึ่งเป็นตัวระบุความสามารถในการขยายสัญญาณแอนะล็อกอินพุต ให้มีขนาดที่เหมาะสมกับการใช้งานที่ต้องการ</li>
+<li><strong>Full-Scale Gain</strong> หมายถึงค่าอัตราขยาย ที่ใช้กับสัญญาณอินพุตสูงสุดที่ยังอยู่ในช่วงเชิงเส้นของวงจรขยายสัญญาณ</li>
+<li><strong>Gain Accuracy</strong> มักแสดงเป็นตัวเลข <strong>%</strong> เช่น <strong>±0.5%</strong> หรือ <strong>±0.1%</strong> (ดีกว่า) ซึ่งส่งผลโดยตรงต่อความแม่นของการวัดกระแสหรือแรงดัน และก็ขึ้นอยู่กับปัจจัยแวดล้อม อย่างเช่น อุณหภูมิ</li>
+<li>เอาต์พุตที่เป็นแรงดันไฟฟ้า: <script type="math/tex">V_{OUT} = V_{SENSE} \times A_V</script> และ <script type="math/tex">A_V</script> = <strong>Voltage Gain</strong> มีหน่วยเป็น <strong>V/V</strong></li>
+<li>เอาต์พุตที่เป็นกระแสไฟฟ้า: <script type="math/tex">I_{OUT} = V_{SENSE} \times G_m</script> และ <script type="math/tex">G_m</script> = <strong>Transconductance</strong> ("ทรานส์คอนดักแตนซ์") มีหน่วยเป็น <strong>µA/V</strong> หรือ <strong>mA/V</strong> และเรียกวงจรประเภทนี้ว่า <strong>Trans-conductance Amplifer</strong></li>
+<li>หากเอาต์พุตเป็นกระแสไฟฟ้า ก็สามารถแปลงเป็นแรงดันไฟฟ้าได้ โดยการต่อกับตัวต้านทาน <script type="math/tex">R_L</script> เชื่อมต่อระหว่างขาเอาต์พุตกับกราวด์ของวงจร:
+   <script type="math/tex">V_{OUT} = I_{OUT} \times R_L = V_{SENSE} \times G_m \times R_L</script>
+</li>
+</ul>
+</li>
+<li>การเลือกอัตราขยาย (<strong>Gain Selection</strong>)<ul>
+<li>เลือกตามไอซีสมาชิกในซีรีย์ของไอซี ซึ่งมีค่าอัตราขยายคงที่ แตกต่างกันตามค่าตัวต้านทานที่ใช้</li>
+<li>บางรุ่นโปรแกรมเลือกค่าได้ เช่น ผ่านทางบัส <strong>I2C</strong></li>
+</ul>
+</li>
+<li>แรงดันอินพุตออฟเซต หรือ แรงดันออฟเซตที่ขาอินพุต (<strong>Input Offset Voltage</strong>: <script type="math/tex">V_{OS}</script>):<ul>
+<li>ค่าแรงดันผิดพลาดที่เกิดขึ้นแม้ไม่มีแรงดันต่างระหว่างขสอินพุต และส่งผลต่อความแม่นยำในการวัดกระแสที่ต่ำ</li>
+<li>ในวงจรขยายเชิงอุดมคติ แรงดันออฟเซตระหว่างขาอินพุตบวกและลบจะเป็นศูนย์โวลต์ (0V)
+  เมื่อมีแรงดันที่เหมือนกันป้อนเข้าสู่ขาอินพุต จะไม่สร้างแรงดันเอาต์พุตใด ๆ</li>
+<li>ในวงจรจริง แรงดันออฟเซตนี้ทำให้เกิดแรงดันเอาต์พุตแม้ไม่มีความต่างแรงดันระหว่างขาอินพุต
+    แรงดันออฟเซตนี้จะถูกคูณด้วยอัตราขยาย และส่งผลโดยตรงต่อแรงดันเอาต์พุต</li>
+<li>อธิบายโดยใช้สมการต่อไปนี้: <script type="math/tex">V_{OUT} = A_V \times (I_S \times R_S + V_{OS})</script>
+</li>
+<li>ค่า <script type="math/tex">V_{OS}</script> ควรอยู่ในระดับต่ำมาก อยู่ในระดับไมโครโวลต์ (µV) เช่น <strong>10µV ~ 100µV</strong> หรือต่ำกว่า</li>
+<li>แรงดันออฟเซตที่ขาอินพุตมีแนวโน้มเปลี่ยนแปลงตามอุณหภูมิ เรียกการเปลี่ยนแปลงนี้ว่า 
+  "อัตราการลอยตามอุณหภูมิ" (<strong>Temperature Drift</strong>)"</li>
+</ul>
+</li>
+<li>ช่วงแรงดันอินพุตสูงสุดสำหรับการตรวจจับกระแส (<strong>Max. Sense Voltage</strong>)
+เช่น <strong>100mV</strong> หรือ <strong>250mV</strong> เป็นต้น</li>
+<li>กระแสไบแอส-อินพุต (<strong>Input Bias Current</strong>: <script type="math/tex">I_{B+}</script> และ <script type="math/tex">I_{B-}</script>):<ul>
+<li>กระแสไฟฟ้าที่ไหลเข้าสู่ หรือ ออกจากขั้วอินพุต <strong>IN+</strong> และ <strong>IN-</strong> ของวงจร ทิศทางขึ้นอยู่กับการทำงานและการต่อวงจรภายนอก</li>
+<li>คำนวณได้จากค่าเฉลี่ย: <script type="math/tex">I_B = (I_{B+} + I_{B-})/2</script>
+</li>
+<li>กระแสไฟฟ้าขนาดเล็กมาก (ในระดับนาโนแอมป์ถึงไมโครแอมป์) ที่ไหลเข้าหรือออกจากขาอินพุต (<strong>IN+</strong> และ <strong>IN−</strong>) ของวงจร <strong>CSA</strong></li>
+</ul>
+</li>
+<li>กระแสออฟเซตอินพุต (<strong>Input Offset Current</strong>: <script type="math/tex">I_{OS}</script>):<ul>
+<li>กระแสที่เกิดจากความแตกต่างของกระแสไบแอสระหว่างขาอินพุตบวกและลบ</li>
+<li>
+<script type="math/tex">I_{OS} = (I_{B+} - I_{B-})</script>
+</li>
+<li>ค่านี้บ่งบอกถึงความไม่สมดุลของการไหลของกระแสในอุปกรณ์ และอาจส่งผลต่อแรงดันอินพุตออฟเซตของวงจรด้วย</li>
+</ul>
+</li>
+<li>อัตราการปฏิเสธสัญญาณโหมดร่วม (<strong>Common-Mode Rejection Ratio: CMRR</strong>):  <ul>
+<li>วงจร <strong>CSA</strong> ทำหน้าที่ขยายสัญญาณโหมดต่าง และขจัดสัญญาณโหมดร่วมออก</li>
+<li><strong>CMRR</strong> เป็นตัวบ่งชี้ความสามารถในการกรองสัญญาณโหมดร่วม
+หรือตัดส่วนที่มีความเหมือนกันในสัญญาณอินพุตทั้งสองออกจากเอาต์พุต</li>
+<li>หากมีค่า <strong>CMRR</strong> อยู่ในระดับสูง จะช่วยให้สามารถแยกสัญญาณผลต่างออกจากสัญญาณโหมดร่วมได้ดี</li>
+<li><strong>CMRR</strong> คำนวณได้จาก อัตราขยายโหมดผลต่าง (<script type="math/tex">A_{D}</script>) และ อัตราขยายโหมดร่วม (<script type="math/tex">A_{CM}</script>):<ul>
+<li><strong>CMRR</strong> = <script type="math/tex">20\cdot log_{10} (A_{D}/ A_{CM})</script>
+</li>
+<li>เช่น  <script type="math/tex">A_{D}=10</script> และ <script type="math/tex">A_{CM}=0.001</script> จะได้ <strong>CMRR = 80dB</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>แบนด์วิดท์ (<strong>Bandwidth</strong>): <ul>
+<li>มักระบุเป็นค่าความถี่ <script type="math/tex">f_{-3dB}</script> ซึ่งหมายถึง ความถี่ (<strong>Hz</strong>) ที่ทำให้ค่า <strong>Gain</strong> ลดลงจากค่าสูงสุดลงมา <strong>3dB</strong>"
+(หรือลดลงเหลือประมาณ <strong>0.707</strong> เท่าของค่าสูงสุด)</li>
+<li>ช่วงความถี่ที่ <strong>CSA</strong> สามารถตอบสนองได้ดี ซึ่งมีผลต่อการวัดกระแสในสัญญาณที่มีความถี่สูง หรือมีการเปลี่ยนแปลงอย่างรวดเร็ว</li>
+<li>สัญญาณอินพุตที่มีความถี่สูงจะส่งผลต่ออัตราขยายที่ลดลง แบนด์วิดท์ของวงจร <strong>CSA</strong> มีผลอย่างมากต่อการตรวจจับกระแสที่มีการเปลี่ยนแปลงอย่างรวดเร็ว </li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="current-monitor-ic">&#9655; ตัวอย่างไอซีวัดกระแส (<strong>Current Monitor IC</strong>)<a class="headerlink" href="#current-monitor-ic" title="Permanent link">#</a></h2>
+<p>ไอซีที่ได้เลือกมานำเสนอเป็นตัวอย่างต่อไปนี้ มีโมดูลในลักษณะ <strong>Breakout Board</strong> ให้เลือกใช้และสะดวกต่อการใช้งาน
+เนื่องจากตัวถังของไอซี มีขนาดเล็กและเป็นแบบ <strong>SMD</strong> แนวทางในการเปรียบเทียบ ได้แก่</p>
+<ul>
+<li>การวัดกระแส: วัดแบบ <strong>high-side</strong> เท่านั้น หรือ ได้ทั้ง  <strong>high-side</strong> และ <strong>low-side</strong></li>
+<li>ทิศทางของกระแส: ได้ทิศทางเดียว (<strong>uni-directional</strong>) หรือ ได้ทั้งสองทิศทาง (<strong>bidirectional</strong>)</li>
+<li>เอาต์พุต: แรงดันไฟฟ้า หรือ กระแสไฟฟ้า หรือทำงานแบบดิจิทัล</li>
+<li>ช่วงแรงดัน <strong>Common-Mode</strong> และการใช้แรงดันไฟเลี้ยงแยกกันแบบอิสระ</li>
+<li>สำหรับการทำงานแบบดิจิทัล<ul>
+<li>ตัวเลือกสำหรับความละเอียดของ <strong>ADC</strong> ช่วงจำนวนบิตที่เลือกใช้ได้ ความเร็วในการแปลงข้อมูลของ <strong>ADC</strong></li>
+<li>ความละเอียดของข้อมูลต่อ 1 LSB สำหรับปริมาณทางไฟฟ้าที่วัดได้ เช่น กระแส และ แรงดัน </li>
+<li>รูปแบบโปรแกรมเพื่อเขียนหรืออ่านค่าในรีจิสเตอร์ได้ และเชื่อมต่อด้วยบัส <strong>I2C</strong></li>
+<li>ปริมาณทางไฟฟ้าที่วัดได้ นอกจากการวัดกระแส (เรียกว่า <strong>Shunt Current</strong>) เช่น แรงดันไฟฟ้าได้ด้วย (เรียกว่า <strong>Bus Voltage</strong>) และนำไปคำนวณเป็นกำลังไฟฟ้า(<strong>Power</strong>)</li>
+</ul>
+</li>
+<li>ข้อสังเกต: <ul>
+<li>ไอซีบางรุ่น ได้รวมตัวต้านทาน <strong>Current Sense Resistor</strong> ไว้ภายในแล้ว</li>
+<li>ไอซีบางรุ่น ทำงานแบบดิจิทัล สามารถตั้งค่าอัตราขยาย (<strong>Programmable Gain</strong>)
+   และเลือกช่วงแรงดันอินพุต <strong>V_SENSE</strong> ได้ รวมถึงความสามารถในการตั้งค่าปรับแก้ตัวเลข (<strong>Calibration</strong>)</li>
+</ul>
+</li>
+<li>ตัวอย่างพารามิเตอร์สำหรับการเลือกใช้ไอซี <strong>CSA</strong>:<ul>
+<li><strong>Low input offset volage</strong>: &lt;100μV</li>
+<li><strong>Low gain error</strong>: &lt;0.5%</li>
+<li><strong>Wide input common mode range</strong>: &gt;30V</li>
+<li><strong>Low supply current</strong>: &lt;100μA</li>
+<li><strong>High CMRR</strong>: &gt;100dB</li>
+</ul>
+</li>
+</ul>
+<p><a href="https://www.analog.com/media/en/technical-documentation/data-sheets/max4080-max4081.pdf"><strong>MAX4080 (Maxim / ADI)</strong></a></p>
+<ul>
+<li><strong>Current sensing</strong>: high-side, uni-directional</li>
+<li><strong>Output type</strong>: buffered voltage output (analog)</li>
+<li><strong>Output impedance</strong>: 0.1Ω</li>
+<li><strong>Supply voltage (V_S)</strong>: 4.5V ~ 76V</li>
+<li><strong>Common-mode voltage (V_CM)</strong>: 4.5V ~ 76V </li>
+<li><strong>Quiescent current (I_Q)</strong>: 190μA (max)</li>
+<li><strong>Input offset voltage (V_OS)</strong>: ±100μV (typ.)</li>
+<li><strong>Gain accuracy</strong>: ±1.0% (max) </li>
+<li><strong>Sense voltage (max)</strong>: 100mV (F), 250mV (T), 1000mV (S)</li>
+<li><strong>Fixed gain (A_V)</strong>: 5V/V (F), 20V/V (T), 60V/V (S)</li>
+<li><strong>Common-mode rejection ration (CMRR)</strong>: 124dB (typ.)</li>
+<li><strong>Bandwidth (BW)</strong>: 250kHz (typ.)</li>
+</ul>
+<p><a href="https://www.ti.com/lit/ds/symlink/ina169.pdf"><strong>INA169 (TI)</strong></a></p>
+<ul>
+<li><strong>Current sensing</strong>: high-side, uni-directional</li>
+<li><strong>Output type</strong>: current output (analog)</li>
+<li><strong>V_S</strong>: 2.7V ~ 60V</li>
+<li><strong>V_CM</strong>: 2.7V ~ 60V</li>
+<li><strong>I_Q</strong>: 60μA (typ.), 125µA (max)</li>
+<li><strong>V_OS</strong>: ±200μV (typ.), ±1mV (max)</li>
+<li><strong>Gain accuracy</strong>: ±0.5% (typ.)</li>
+<li><strong>Sense voltage (max)</strong>: 100mV (typ.), 500mV (max)</li>
+<li><strong>Transconductance</strong>: 1mA/V (typ.)</li>
+<li><strong>External resistor for output</strong>: R_L</li>
+<li><strong>Voltage output</strong>: V_O = (I_S x R_S / 1kΩ) x R_L</li>
+<li><strong>CMRR</strong>: 115 dB (typ.)</li>
+<li><strong>BW</strong>: 440kHz (typ.) (R_L=10kΩ)</li>
+<li><strong>IC Package</strong>: 5-Pin, SOT-23</li>
+</ul>
+<p><a href="https://www.ti.com/lit/ds/symlink/ina219.pdf"><strong>INA219B (TI)</strong></a></p>
+<ul>
+<li><strong>Current sensing</strong>: high-side, bidirectional</li>
+<li><strong>Output type</strong>: I2C (digital)</li>
+<li><strong>V_S</strong>: 3V ~ 5.5V</li>
+<li><strong>V_CM</strong>: 0V ~ 26V</li>
+<li><strong>V_OS</strong>: ±10μV (typ.) for PGA=/1</li>
+<li><strong>I_Q</strong>: 700μA (typ.)</li>
+<li><strong>Programmable gain</strong>: GPA = /1, /2, /4, /8</li>
+<li><strong>Sense voltage (max)</strong>: ±40mV (/1), ±80mV (/2), ±160mV (/4), ±320mV (/8) </li>
+<li><strong>Gain accuracy</strong>: ±0.5% (max)</li>
+<li><strong>CMRR</strong>: 120dB (typ.)</li>
+<li><strong>ADC resolution</strong>: 9 ~ 12 bits</li>
+<li><strong>ADC conversion</strong>: 586 μs (max) for 12 bits</li>
+<li><strong>Voltage measurement</strong>: time-multiplexing<ul>
+<li><strong>Shunt voltage</strong>: V_SHUNT = (V_IN+ - V_IN-)</li>
+<li><strong>Bus voltage</strong>: V_BUS = V_IN- (no VBUS pin)</li>
+</ul>
+</li>
+<li><strong>On-chip calculation</strong>:<ul>
+<li><strong>Current (I)</strong></li>
+<li><strong>Power (P)</strong></li>
+</ul>
+</li>
+<li><strong>Current measurement error</strong>: ±0.2% (typ.)</li>
+<li><strong>Bus voltage measurement error</strong>: ±0.2% (typ.)</li>
+<li><strong>I2C clock</strong>: <ul>
+<li><strong>Fast mode</strong>: 1kHz ~ 400kHz</li>
+<li><strong>High-speed mode</strong>: 1kHz ~ 2.56MHz </li>
+</ul>
+</li>
+<li><strong>I2C slave address</strong>: 0x40 (default: A0=A1=0)</li>
+<li><strong>I2C address pins</strong>: A0 and A1</li>
+<li><strong>IC package</strong>: 8-Pin SOT-23 and 8-Pin SOIC</li>
+</ul>
+<p><a href="https://www.ti.com/lit/ds/symlink/ina226.pdf"><strong>INA226 (TI)</strong></a></p>
+<ul>
+<li><strong>Current sensing</strong>: high-side, bidirectional</li>
+<li><strong>Output type</strong>: I2C (digital)</li>
+<li><strong>V_S</strong>: 2.7V ~ 5.5V</li>
+<li><strong>I_Q</strong>: 420μA (max)</li>
+<li><strong>V_CM</strong>: 0V ~ 36V</li>
+<li><strong>Shunt Voltage Offset</strong>: ±10μV (max)</li>
+<li><strong>Bus Voltag Offset</strong>: ±7.5mV (max)</li>
+<li><strong>Shunt voltage (max)</strong>: ±81.92mV (full-scale input range)</li>
+<li><strong>Bus voltage (max)</strong>: 36V</li>
+<li><strong>Fixed gain</strong></li>
+<li><strong>Gain accuracy</strong>: ±0.1% (max)</li>
+<li><strong>CMRR</strong>: 140dB (typ.)</li>
+<li><strong>ADC front-end</strong>: delta-sigma (ΔΣ)</li>
+<li><strong>ADC resolution</strong>: 9 ~ 16 bits<ul>
+<li><strong>ADC conversion</strong>: 9.068 ms (max) for 16 bits</li>
+</ul>
+</li>
+<li><strong>Voltage measurement</strong>: input voltage multiplexing<ul>
+<li><strong>Shunt voltage</strong>: V_SHUNT = (V_IN+ - V_IN-)</li>
+<li><strong>Bus voltage (single-ended)</strong>: via VBUS pin</li>
+</ul>
+</li>
+<li><strong>On-chip calculation</strong>:<ul>
+<li><strong>Current (I)</strong></li>
+<li><strong>Power (P)</strong></li>
+</ul>
+</li>
+<li><strong>I2C Clock</strong>: <ul>
+<li><strong>Fast mode</strong>: 1kHz ~ 400kHz</li>
+<li><strong>High-speed mode</strong>: 1kHz ~ 2.94MHz </li>
+</ul>
+</li>
+<li><strong>I2C slave address</strong>: 0x40 (default: A0=A1=0)</li>
+<li><strong>I2C address pins</strong>: A0 and A1</li>
+<li><strong>Alert function &amp; pin</strong></li>
+</ul>
+<p><a href="https://www.ti.com/lit/ds/symlink/ina228.pdf"><strong>INA228 (TI)</strong></a></p>
+<ul>
+<li><strong>Current sensing</strong>: high-side, low-side, bidirectional</li>
+<li><strong>V_S</strong>: 2.7V ~ 5.5V</li>
+<li><strong>I_Q</strong>: 750μA (max)</li>
+<li><strong>V_CM</strong>: –0.3V ~ +85V</li>
+<li><strong>Shunt voltage input range</strong>: Two selectable ADC range<ul>
+<li>163.84mV (ADCRANGE=0)</li>
+<li>40.96 mV (ADCRANGE=1)</li>
+</ul>
+</li>
+<li><strong>Shunt offset voltage</strong>: ±0.3µV (typ.)</li>
+<li><strong>VBUS offset voltage</strong> (via VBUS pin): ±1mV (typ.)</li>
+<li><strong>Shunt voltage gain error</strong>: ±0.05% (max)</li>
+<li><strong>VBUS voltage gain error</strong>: ±0.05% (max)</li>
+<li><strong>Voltage measurement</strong>: multiplexing<ul>
+<li><strong>Shunt voltage</strong>: V_SHUNT = (V_IN+ - V_IN-)</li>
+<li><strong>Bus voltage</strong>: V_BUS = V_IN+ (via VBUS pin)</li>
+</ul>
+</li>
+<li><strong>On-chip calculation</strong>:<ul>
+<li><strong>Current (I)</strong></li>
+<li><strong>Power (P)</strong></li>
+<li><strong>Energy (E)</strong></li>
+</ul>
+</li>
+<li><strong>ADC front-end</strong>: delta-sigma (ΔΣ)</li>
+<li><strong>ADC resolution</strong>: 9 ~ 20 bits</li>
+<li><strong>Alert function &amp; pin</strong></li>
+<li><strong>I2C Clock</strong>: <ul>
+<li><strong>Fast mode</strong>: 1kHz ~ 400kHz</li>
+<li><strong>High-speed mode</strong>: 1kHz ~ 2.94MHz </li>
+</ul>
+</li>
+<li><strong>I2C slave address</strong>: 0x40 (default: A0=A1=0)</li>
+<li><strong>I2C address pins</strong>: A0 and A1</li>
+<li><strong>Alert function &amp; pin</strong></li>
+<li><strong>IC package</strong>: 10-Pin VSSOP</li>
+</ul>
+<p><a href="https://www.ti.com/lit/ds/symlink/ina260.pdf"><strong>INA260 (TI)</strong></a></p>
+<ul>
+<li><strong>Current sensing</strong>: high-side, low-side, bidirectional</li>
+<li><strong>Output type</strong>: I2C (digital)</li>
+<li><strong>V_S</strong>: 2.7V ~ 5.5V</li>
+<li><strong>I_Q</strong>: 310 μA (typ.)</li>
+<li><strong>V_CM</strong>: 0V ~ 36V</li>
+<li><strong>Integrated current sense resistor</strong>: 2mΩ (±0.1%)</li>
+<li><strong>Total package resistance</strong>: 4.5mΩ (between the IN+ and IN- pins)</li>
+<li><strong>Sense current (max)</strong>: ±15A</li>
+<li><strong>Bus offset voltage</strong>: ±1.25mV (typ.)</li>
+<li><strong>Current sense offset</strong>: ±1.25mA (typ.)</li>
+<li><strong>System current sense gain error</strong>: 0.15% (max)</li>
+<li><strong>Bus voltage gain error</strong>: 0.1% (max)</li>
+<li><strong>CMRR</strong>: 150 µA/V (max)<ul>
+<li>2mΩ x 150µA/V = 0.3μV/V =&gt; CMRR = 130dB</li>
+</ul>
+</li>
+<li><strong>ADC resolution</strong>: 9 ~ 16 bits<ul>
+<li><strong>ADC conversion</strong>: 9.068 ms (max) for 16 bits</li>
+<li><strong>Current</strong>: 1.25 mA / 1LSB</li>
+<li><strong>Bus voltage</strong>: 1.25 mV / 1LSB</li>
+<li><strong>Power</strong>: 10 mW / 1LSB</li>
+</ul>
+</li>
+<li><strong>IC package</strong>: 16-Pin TSSOP </li>
+<li><strong>I2C slave address</strong>: 0x40 (default: A0=A1=0)</li>
+<li><strong>I2C address pins</strong>: A0 and A1</li>
+<li><strong>Alert function &amp; pin</strong></li>
+</ul>
+<p>ไอซี <strong>CSA</strong> บางรุ่น มีการใช้เทคนิคการออกแบบวงจรที่เรียกว่า <strong>Capacitively-Coupled Amplifier  (CCA)</strong> ตัวอย่างไอซีที่ใช้วงจรประเภทนี้ เช่น
+<a href="https://www.ti.com/lit/ds/symlink/ina186.pdf"><strong>TI INA186</strong></a>, <a href="https://www.ti.com/lit/ds/symlink/ina286.pdf"><strong>TI INA28x</strong></a> และ <a href="https://fscdn.rohm.com/en/products/databook/datasheet/ic/sensor/current_sensor/bd14210g-la-e.pdf"><strong>ROHM BD1421xG-LA</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="differential-amplifier">&#9655; แนวทางการสร้าง <strong>Differential Amplifier</strong> ด้วยออปแอมป์<a class="headerlink" href="#differential-amplifier" title="Permanent link">#</a></h2>
+<p>ในการเรียนรู้หลักการทำงานของวงจรขยายสัญญาณผลต่าง สามารถสร้างวงจรโดยใช้ออปแอมป์ 1 ตัว และตัวต้านทานอีก 4 ตัว 
+และนำมาศึกษา เช่น การวิเคราะห์วงจร การจำลองการทำงานของวงจร รวมถีงการทดลองจริงโดยการต่อวงจรบนเบรดบอร์ด</p>
+<p><img alt="" src="diff_amp.jpg" /></p>
+<p>รูป: แนวทางการสร้างวงจรขยายสัญญาณผลต่าง โดยใช้ไอซีออปแอมป์ และตัวต้านทาน 4 ตัว 
+โดยจำลองสถานการณ์การชาร์จแบตเตอรี่ โดยมีแบตเตอรี่เป็นโหลดไฟฟ้า และอุปกรณ์ชาร์จเป็นแหล่งจ่ายกระแส</p>
+<p><img alt="" src="diff_amp_block.jpg" /></p>
+<p>รูป: ไอซีที่มีวงจรขยายสัญญาณผลต่างและมีขา <strong>REF</strong> สำหรับ <strong>Reference Voltage</strong>
+(ถ้าไม่ใช้ ให้ต่อขา <strong>REF</strong> กับ <strong>GND</strong>)</p>
+<p>จากรูปตัวอย่าง วงจรนี้ประกอบด้วยออปแอมป์ 1 ตัว และตัวต้านทาน 4 ตัว ได้แก่ <script type="math/tex">R_1</script>, <script type="math/tex">R_2</script>, <script type="math/tex">R_3</script> และ <script type="math/tex">R_4</script>
+(โดยทั่วไปแล้ว ไอซีมักจะร่วมตัวต้านทานที่มีความแม่นยำสูงไว้ด้วยในตัวถัง)
+การต่อวงจรออปแอมป์ในลักษณะนี้ มักเรียกว่า <strong>Difference Amplifier (Subtractor) Circuit</strong>
+ซึ่งเป็นการหาผลต่าง และสามารถขยายสัญญาณผลต่างได้ด้วย เพื่อใช้เป็นเอาต์พุต</p>
+<p>ถัดไปเป็นการกำหนดสัญลักษณ์ต่อไปนี้ เพื่อใช้ในการวิเคราะห์วงจร</p>
+<ul>
+<li>
+<script type="math/tex">V_{IN+}</script> และ <script type="math/tex">V_{IN-}</script> แรงดันที่ปลายทั้งสองของตัวต้านทาน <script type="math/tex">R_{SENSE}</script>
+</li>
+<li>
+<script type="math/tex">V_+</script> และ <script type="math/tex">V_-</script> แรงดันที่ขา  <strong>Non-inverting (+)</strong> และ <strong>Inverting Input (-)</strong>
+ของออปแอมป์</li>
+<li>
+<script type="math/tex">V_{OUT}</script> แรงดันเอาต์พุตของออปแอมป์</li>
+</ul>
+<p>การต่อวงจรใช้งานออปแอมป์ มีลักษณะที่เรียกว่า <strong>Negative Feedback Configuration</strong>
+มีตัวต้านทาน <script type="math/tex">R_2</script> เชื่อมต่อระหว่างขา <strong>(-)</strong> และขาเอาต์พุต
+และจะทำให้ระบบเข้าสู่สภาวะสมดุล เมื่อ <script type="math/tex">V_+ \approx V_-</script>
+</p>
+<p>ดังนั้นในการวิเคราะห์วงจร จะให้เงื่อนไขต่อไปนี้ </p>
+<ul>
+<li>ให้กระแสไหล <script type="math/tex">I_{SENSE}</script> ผ่านตัวต้านทาน <script type="math/tex">R_{SENSE}</script> ไปยังโหลดในทิศทางเดียว 
+เกิดแรงดันตกคร่อม <script type="math/tex">V_{SENSE} \geq 0</script> ที่ตัวต้านทานดังกล่าว 
+และ <script type="math/tex">V_{IN+} \geq V_{IN-}</script>
+</li>
+<li>อินพุตอิมพีแดนซ์ (<strong>Input Impedance</strong>) ของออปแอมป์สูงมาก ๆ
+มีกระแสไหลเข้าที่ขา  <strong>(+)</strong> และ <strong>(-)</strong> น้อยมาก ๆ  ใกล้เคียงศูนย์
+ดังนั้นในการวิเคราะห์วงจร ไม่ต้องพิจารณากระแสที่ไหลเข้าขาออปแอมป์</li>
+<li>แรงดันที่ขา  <strong>(+)</strong> และ <strong>(-)</strong> ของออปแอมป์ ให้ถือว่า <script type="math/tex">V_+ = V_-</script> เท่ากัน 
+(เรียกว่า <strong>Virtual Short</strong>) และให้เท่ากับ <script type="math/tex">V_x</script>
+</li>
+<li>แรงดันไฟเลี้ยงของออปแอมป์ <script type="math/tex">V_{CC}</script> และ <script type="math/tex">V_{EE}</script> อยู่ในช่วงที่กว้างว่า แรงดันเอาต์พุต
+และแรงดันอินพุตอยู่ในช่วงแรงดัน <strong>Common-Mode</strong> ของออปแอมป์</li>
+</ul>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \frac{ V_{IN+} - V_+ }{R_3} &= \frac{ V_+ }{R_4} \\
+  \frac{ V_{IN-} - V_- }{R_1} &= \frac{ V_- - V_{OUT} }{R_2}\\
+\end{align}</script>
+</p>
+<p>เนื่องจาก  <script type="math/tex">V_+ = V_- = V_x</script> จึงเขียนสมการใหม่ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \frac{ V_{IN+} - V_x }{R_3} &= \frac{ V_x }{R_4} \\
+  \frac{ V_{IN-} - V_x }{R_1} &= \frac{ Vx - V_{OUT} }{R_2} \\
+   \frac{R_4}{ R_3+R_4 } \cdot V_{IN+}  &= V_+ = V_x \\
+\end{align}</script>
+</p>
+<p>จากสมการข้างต้น สามารถหาสมการที่แสดงความสัมพันธ์ระหว่างแรงดันอินพุตและเอาต์พุตได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  V_{OUT} &=
+    \Big(1+ \frac{R_2}{R_1}\Big) \cdot \frac{R_4}{R_3 + R_4} \cdot V_{IN+} 
+     - \Big(\frac{R_2}{R_1}\Big) \cdot V_{IN-} \\
+\end{align}</script>
+</p>
+<p><strong>Common-Mode Voltage</strong> (<script type="math/tex">V_{CM}</script>) และ <strong>Differential Voltage</strong> (<script type="math/tex">V_{D}</script>):</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+   V_{D} &= (V_{IN+} - V_{IN-}) \\
+   V_{CM} &= \frac{1}{2}(V_{IN+} + V_{IN-}) \\
+     V_{IN+} &= V_{CM} + \frac{ V_{D} }{2} \\
+     V_{IN-} &= V_{CM} - \frac{ V_{D} }{2} \\
+\end{align}</script>
+</p>
+<p>ดังนั้นสมการสำหรับ <script type="math/tex">V_{OUT}</script> ที่มีอินพุตเป็น <script type="math/tex">V_{D}</script> และ <script type="math/tex">V_{CM}</script> เขียนได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  V_{OUT} 
+  &= \Big(1+ \frac{R_2}{R_1}\Big) \cdot \frac{R_4}{R_3 + R_4} \cdot (V_{CM}
+     + \frac{ V_{D} }{2})
+     - \Big(\frac{R_2}{R_1}\Big) \cdot (V_{CM} - \frac{ V_{D} }{2}) \\
+  &= [(1+a)\cdot b - a] \cdot V_{CM} 
+   + \frac{1}{2}[(1+a)\cdot b + a]\cdot V_{D} \\
+ a &:= \frac{R_2}{R_1}, \; b := \frac{R_4}{R_3 + R_4} \\
+\end{align}</script>
+</p>
+<p>หรือเขียนให้อยู่ในรูปของการขยายสัญญาณในโหมดร่วม และโหมดต่าง และคำนวณหาค่า <strong>CMRR</strong>
+จากอัตราขยายของสัญญาณ <strong>Differential-Mode</strong> (<script type="math/tex">A_{D}</script>)
+และอัตราขยายของสัญญาณ <strong>Common-Mode</strong> (<script type="math/tex">A_{CM}</script>)</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  V_{OUT} &= A_{CM} \cdot V_{CM} + A_{D} \cdot V_{D} \\
+   A_{CM} &:= \big[(1+a)\cdot b - a\big] \\
+   A_{D} &:= \frac{1}{2}\big[(1+a)\cdot b + a\big] \\
+  \frac{A_{D}}{A_{CM}} &= 
+   \Big(\frac{1}{2}\Big)\Big( \frac{ b + \frac{a}{1+a} }{ b - \frac{a}{1+a} } \Big) \\
+   &= \Big(\frac{1}{2}\Big) \frac{
+    \Big( \frac{R_4}{R_3+R_4} + \frac{R_2}{R_1+R_2} \Big) }{
+    \Big( \frac{R_4}{R_3+R_4} - \frac{R_2}{R_1+R_2} \Big) } \\
+  CMRR &= 20 \cdot \log_{10} \big( \frac{A_{D}}{A_{CM}} \big) \;\;\; \mbox{[dB]}\\
+\end{align}</script>
+</p>
+<p>ถ้าเลือกค่าความต้านทานตามเงื่อนไข <strong><em>Matched Resistor Ratio</em></strong>: </p>
+<p>
+<script type="math/tex; mode=display"> G := \frac{R_2}{R_1} = \frac{R_4}{R_3} </script>
+<script type="math/tex; mode=display"> \Rightarrow \; A_{D} = G, A_{CM} = 0, \;\; CMRR \rightarrow \infty </script>
+</p>
+<p>จะได้สมการสำหรับแรงดันเอาต์พุต</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  V_{OUT} 
+    &= G \cdot( V_{IN+} -\cdot V_{IN-}) = G \cdot V_{D} \\
+    &= \frac{R_2}{R_1} \cdot (V_{IN+} - V_{IN-}) \\
+    &= \frac{R_2}{R_1} \cdot R_{SENSE} \cdot I_{SENSE} \\
+    &= A_V \cdot I_{SENSE}, \;\; A_V := \frac{R_2}{R_1} \cdot R_{SENSE} \\
+\end{align}</script>
+</p>
+<p>ซึ่งจะเห็นได้ว่า แรงดันเอาต์พุต เกิดจากการขยายสัญญาณผลต่างของแรงดันอินพุต โดยอัตราขยายคงที่
+ซึ่งกำหนดโดยค่าของตัวต้านทาน หรือเขียนให้อยู่ในรูปความสัมพันธ์ระหว่างกระแสอินพุตและแรงดันเอาต์พุตได้เช่นกัน</p>
+<p>อย่างไรก็ตาม ในทางปฏิบัติ ค่าตัวต้านทานอาจความคลาดเคลื่อน
+และส่งผลต่อสัญญาณเอาต์พุต โดยเฉพาะในกรณีที่ต้องการวัดสัญญาณที่มีค่าน้อย ๆ ในช่วงมิลลิโวลต์</p>
+<p>ถ้าให้ <script type="math/tex">G = R_2/R_1</script> และ <script type="math/tex">R_4/R_3 = G'</script> โดยที่ <script type="math/tex">G - G' = \epsilon</script> (<strong>Mismatched Resistor Ratio</strong>)</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+  \frac{A_{D}}{A_{CM}} 
+  &= \Big(\frac{1}{2}\Big) 
+    \frac{ \Big( \frac{1}{1+G'} + \frac{1}{1+G} \Big) }{ 
+           \Big( \frac{1}{1+G'} - \frac{1}{1+G} \Big) } \\
+  &= \Big(\frac{1}{2}\Big) 
+    \frac{ (1 + G) + (1 + G') }{ (1 + G) - (1 + G') } \\
+  &\approx \Big(\frac{1}{2}\Big) 
+    \Big(\frac{ 2 + 2\cdot G}{ \epsilon }\Big) \\
+\end{align}</script>
+</p>
+<p>จะคำนวณหาค่า
+<strong>CMRR</strong> ที่เกิดจากความคลาดเคลื่อนของค่าความต้านทาน ดังนี้
+<script type="math/tex; mode=display">\begin{align}
+  \mbox{CMRR} &\approx 20 \cdot log_{10} 
+    \big( \frac{1 + G}{\epsilon} \big) 
+\end{align}</script>
+</p>
+<p>ยกตัวอย่างเช่น ถ้า <script type="math/tex">G=10</script> และ <script type="math/tex">\epsilon = 0.01</script> (ความคลาดเคลื่อน <strong>+/-0.1%</strong>) จะได้ค่า <strong>CMRR = 60.83 dB</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอเนื้อหาเกี่ยวกับแนวทางการเลือกใช้งานไอซีประเภท <strong>Current-Sense Amplifiers (CSA)</strong>
+เพื่อนำมาใช้ในการวัดกระแสไฟฟ้าในวงจรอิเล็กทรอนิกส์ ซึ่งจะเป็นประโยชน์ต่อการนำไปใช้ศึกษาและวิเคราะห์การใช้พลังงานของวงจร
+หรืออุปกรณ์อิเล็กทรอนิกส์</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-05-09 | Last Updated: 2025-05-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
