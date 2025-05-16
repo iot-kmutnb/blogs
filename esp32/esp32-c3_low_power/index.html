@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32-c3_low_power/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทำงานของชิป ESP32-C3 ในโหมดประหยัดพลังงาน - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#esp32-c3" class="nav-link">การทำงานของชิป ESP32-C3 ในโหมดประหยัดพลังงาน</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#esp32-c3_1" class="nav-link">&#9655; โหมดการประหยัดพลังงานสำหรับ ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#espressif-soc" class="nav-link">&#9655; ตัวช่วยประมวลผลแบบประหยัดพลังงานภายในชิป Espressif SoC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#light-sleep-deep-sleep-esp32-c3" class="nav-link">&#9655; การเปรียบเทียบระหว่างโหมด Light Sleep และ Deep Sleep สำหรับ ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#deep-sleep-arduino-sketch" class="nav-link">&#9655; ตัวอย่างโค้ดสาธิตการใช้ Deep-Sleep สำหรับ Arduino Sketch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#deep-sleep-esp-idf" class="nav-link">&#9655; ตัวอย่างโค้ดสาธิตการใช้ Deep-Sleep และใช้ซอฟต์แวร์ ESP-IDF</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-c3">การทำงานของชิป ESP32-C3 ในโหมดประหยัดพลังงาน<a class="headerlink" href="#esp32-c3" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>EPS32-C3</em>, <em>Power Management</em>, 
+<em>Low-Power Modes</em>, <em>Deep-Sleep</em>, <em>Light-Sleep</em></p>
+<hr />
+<h2 id="esp32-c3_1">&#9655; โหมดการประหยัดพลังงานสำหรับ <strong>ESP32-C3</strong><a class="headerlink" href="#esp32-c3_1" title="Permanent link">#</a></h2>
+<p>การทำงานของ <strong>ESP32-C3</strong> (<em>32-bit, RISC-V-based MCU, 160MHz, 400KB of SRAM</em>) สามารถแบ่งได้เป็น 4 โหมดหลัก:</p>
+<ol>
+<li><strong>Active</strong><ul>
+<li>ทำงานในโหมดปรกติ: ซีพียู (<strong>CPU</strong>), <strong>Wi-Fi/BLE</strong> และวงจรต่าง ๆ ทำงานเต็มรูปแบบ</li>
+</ul>
+</li>
+<li><strong>Modem-Sleep</strong><ul>
+<li>ปิดการทำงานของวงจร <strong>RF Front-End</strong> สำหรับ <strong>Wi-Fi/BLE</strong> </li>
+<li>แต่การเชื่อมต่อสำหรับ <strong>WiFi/BLE</strong> ยังคงไว้  เช่น การเชื่อมต่อในโหมด 
+  <strong>Wi-Fi STA</strong> ไปยัง <strong>Wi-Fi Router/AP</strong> จะมีการปิดการทำงานของวงจร <strong>RF</strong>
+  แต่จะเปิดใช้งานใหม่เป็นระยะ ๆ เพื่อจัดการกับ <strong>Wi-Fi Beacon</strong> จาก <strong>WiFi Router/AP</strong></li>
+<li>มี 2 ระดับการประหยัดพลังงาน: <code>WIFI_PS_MIN_MODEM</code> และ <code>WIFI_PS_MAX_MODEM</code>
+        โดยใช้กับคำสั่ง <code>esp_wifi_set_ps(...)</code></li>
+</ul>
+</li>
+<li><strong>Light-Sleep</strong><ul>
+<li>มีสองรูปแบบคือ <strong>Manual Light-Sleep</strong> และ <strong>Automatic Ligh-Sleep</strong></li>
+<li>ปิดการทำงานของซีพียู วงจรแอนะล็อก (เช่น <code>RC_FAST_CLK</code>, <code>XTAL_CLK</code>, <code>PLL</code>)</li>
+<li>ปิดการทำงานของวงจร <strong>Wi-Fi/BLE</strong> ทั้งหมด (สำหรับ  <strong>Manual Light-Sleep</strong>)</li>
+<li>วงจรดิจิทัลบางส่วนยังทำงานอยู่ (บางวงจรสามารถเลือกได้ว่าจะให้ <strong>ON / OFF</strong>)</li>
+<li>ข้อมูลใน <strong>RAM</strong> ยังคงอยู่</li>
+<li>รองรับการปลุกด้วย <strong>Timer</strong>, <strong>GPIO</strong> หรือวงจร <strong>Peripheral</strong> บางตัว</li>
+<li><strong>Wakeup Sources</strong>:<ul>
+<li><strong>GPIO Wakeup</strong></li>
+<li><strong>RTC Timer Wakeup</strong></li>
+<li><strong>UART Wakeup</strong></li>
+<li><strong>Wi-Fi Wakeup</strong></li>
+</ul>
+</li>
+<li>ใช้คำสั่งเลือกใช้งาน <strong>Wakeup Sources</strong> เช่น<ul>
+<li><code>esp_sleep_enable_timer_wakeup(...)</code></li>
+<li><code>gpio_wakeup_enable(...)</code>, <code>esp_sleep_enable_gpio_wakeup()</code></li>
+</ul>
+</li>
+<li><code>esp_light_sleep_start()</code> เป็นคำสั่งเพื่อทำให้ชิปเข้าสู่โหมด <strong>Light-Sleep</strong>
+      แต่จะรอจนกว่าการทำงานของซีพียูจะเข้าสู่สภาวะ <strong>CPU Idle</strong> ก่อน</li>
+<li>ถ้าไม่มีช่วงเวลาที่เป็น <strong>CPU Idle</strong> หรือเกิดอินเทอร์รัพท์ (<strong>Interrupt</strong>) ต่อเนื่องมาก
+      อาจไม่สามารถเข้า <strong>Light-Sleep</strong> ได้</li>
+</ul>
+</li>
+<li><strong>Deep-Sleep</strong><ul>
+<li>ปิดการทำงานของซีพียู <strong>RAM</strong> และวงจรส่วนใหญ่ (แบ่งกลุ่มตาม <strong>Power Domains</strong>)  </li>
+<li>เปิดใช้งานเฉพาะวงจรในกลุ่ม <strong>RTC</strong> เช่น <strong>RTC Timer</strong>, 
+ <strong>RTC fast memory (8KB SRAM)</strong>, 
+ <strong>RTC GPIO</strong> (<strong>GPIO0-5</strong>) และวงจรของ 
+ <strong>PMU (Power Management Unit)</strong> เช่น 
+ <strong>Sleep / Wakeup Controllers</strong>, <strong>Low-power Clocks</strong> และ 
+ <strong>Low-Power Voltage Regulators</strong></li>
+<li>ใช้พลังงานน้อยที่สุด แต่มีระยะเวลาในการตื่นและเริ่มต้นทำงานใหม่นานกว่าโหมด <strong>Light-sleep</strong></li>
+<li>สามารถปลุกจาก <strong>Deep-sleep</strong> ด้วย <strong>RTC Timer</strong>
+ (ใช้กำหนดระยะเวลาพัก) หรือปลุกตามเงื่อนไขของ <strong>RTC GPIO Pin</strong></li>
+<li><strong>Wakeup Sources</strong><ul>
+<li><strong>GPIO Wakeup (RTC IO)</strong></li>
+<li><strong>RTC Timer Wakeup</strong></li>
+</ul>
+</li>
+<li>ใช้คำสั่งเลือกใช้งาน <strong>Wakeup Sources</strong> เช่น <ul>
+<li><code>esp_deep_sleep_enable_gpio_wakeup(...)</code></li>
+<li><code>esp_sleep_enable_timer_wakeup(...)</code></li>
+</ul>
+</li>
+<li><code>esp_deep_sleep_start()</code> เป็นคำสั่งเพื่อทำให้ชิปเข้าสู่โหมด <strong>Deep-Sleep</strong></li>
+</ul>
+</li>
+</ol>
+<p><img alt="" src="esp32c3_block_diagram.jpg" /></p>
+<p>รูป: <strong>ESP32-C3 Block Diagram</strong></p>
+<p>การทำงานในโหมด <strong>Automatic Light-sleep Mode</strong></p>
+<ul>
+<li><strong>ESP-IDF</strong> มีอีกโหมดที่เรียกว่า <strong>Automatic Light-sleep Mode</strong>
+เป็นโหมดประหยัดพลังงานที่ <strong>ESP-IDF</strong> จะจัดการให้ <strong>CPU</strong> เข้าสู่ <strong>Modem-Sleep</strong> และ <strong>Light-sleep</strong> 
+ตามลำดับโดยอัตโนมัติ ในช่วงที่ไม่มีงานต้องทำ (<strong>CPU Idle</strong>) </li>
+<li>ระบบ <strong>FreeRTOS</strong> จะต้องทำงานในโหมด <strong>Tickless Idle</strong>
+(จะไม่มีการตื่นตาม <strong>RTOS Tick</strong> เช่น ทุก ๆ <strong>1ms</strong>)
+เพื่อให้ <strong>Automatic Light-Sleep</strong> สามารถทำงานได้จริง</li>
+<li>ใน <strong>ESP-IDF Menuconfig</strong> จะต้องมีการตั้งค่าในหัวข้อ <strong>Power Management</strong> (<code>CONFIG_PM_ENABLE</code>)</li>
+<li>การทำงานบางช่วงของโปรแกรม สามารถปิดการเข้าสู่ <strong>Automatic Light-sleep</strong> ชั่วคราวได้
+โดยใช้วิธีที่เรียกว่า <strong>Power Management Lock</strong> และใช้คำสั่ง
+<code>esp_pm_lock_acquire(...)</code> และ <code>esp_pm_lock_release(...)</code></li>
+</ul>
+<p>การลดการใช้พลังงานของ <strong>ESP32-C3</strong> ยังมีอีกวิธีหนึ่งคือ การปรับลดความเร็วของสัญญาณ <strong>Clock</strong>
+(เรียกวิธีนี้ว่า <strong>Dynamic Frequency Scaling</strong>)
+เช่น การปรับลดความถี่ของวงจรที่เชื่อมต่อกับบัส <strong>APB</strong> (<em>Advanced Peripheral Bus</em>)
+และการปรับเลือกความถี่สำหรับซีพียู เช่น <strong>160MHz</strong> และ <strong>80MHz</strong> เป็นต้น</p>
+<p><img alt="" src="esp32c3_power_modes.jpg" /></p>
+<p><img alt="" src="esp32c3_low_power_modes.jpg" /></p>
+<p>รูป: โหมดการทำงานและการประหยัดพลังงานของ <strong>ESP32-C3</strong></p>
+<p><img alt="" src="esp32c3_power_domains.jpg" /></p>
+<p>รูป: การแบ่งกลุ่มวงจรภายในเพื่อการจัดการพลังงาน (<strong>Power Domains</strong>) ของ <strong>ESP32-C3</strong></p>
+<p>จากเอกสาร <strong>ESP32-C3 Datasheet</strong> มีข้อมูลเกี่ยวกับปริมาณการใช้กระแสไฟฟ้าในโหมดต่าง ๆ ดังนี้</p>
+<ul>
+<li><strong>Modem-sleep</strong>: (<strong>CPU Clock 160MHz</strong>)<ul>
+<li><strong>CPU running</strong>: 23mA ~ 28mA</li>
+<li><strong>CPU idle</strong>: 16mA ~ 21mA</li>
+</ul>
+</li>
+<li><strong>Light-sleep</strong>: 130µA (typ)</li>
+<li><strong>Deep-sleep mode</strong>: 5 µA (typ)</li>
+</ul>
+<p>ถ้าให้แรงดันไฟเลี้ยงคงที่ เช่น <strong>+3.3V</strong> และนำไปคูณกับปริมาณกระแสโดยเฉลี่ย ก็จะได้กำลังไฟฟ้าของชิป
+<strong>ESP32-C3</strong> แต่ละโหมด ซึ่งมีการใช้ปริมาณกระแส (กำลังไฟฟ้า) แตกต่างกัน </p>
+<p>การวัดและวิเคราะห์การใช้กระแสไฟฟ้าที่มีการเปลี่ยนแปลงอย่างรวดเร็วในเชิงเวลา และอาจอยู่ในระดับที่ต่ำ (nA, uA, mA) 
+โดยทั่วไปจะใช้เครื่องมือวัดโดยเฉพาะ (<strong>DC Power Analyzer Tools</strong>)
+ถ้าเป็นอุปกรณ์ที่มีความแม่นยำและประสิทธิภาพสูง ก็มักมีราคาสูง เช่น</p>
+<ul>
+<li><a href="https://www.joulescope.com/products/js220-joulescope-precision-energy-analyzer"><strong>Joulescope JS220: Precision Energy Analyzer</strong></a></li>
+<li><a href="https://www.qoitech.com/otii-arc-pro/"><strong>Qoitech Otii Arc Pro</strong></a></li>
+<li><a href="https://www.nordicsemi.com/Products/Development-hardware/Power-Profiler-Kit-2"><strong>Nordic Power Profiler Kit II</strong></a></li>
+</ul>
+<p>แต่ถ้าไม่ต้องการความแม่นยำสูง ก็อาจใช้วิธีอื่น เช่น การใช้โมดูลที่มีไอซีประเภท <strong>Current-Sense Amplifier</strong>
+ซึ่งทำหน้าที่แปลงกระแสที่ไหลผ่านตัวต้านทาน <strong>Shunt Resistor</strong> (ที่มีความต้านทานต่ำ เช่น 0.1Ω)
+ให้เป็นแรงดันเอาต์พุตโดยมีการขยายสัญญาณด้วย เพื่อนำไปตรวจสอบรูปคลื่นสัญญาณโดยใช้ออสซิลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="espressif-soc">&#9655; <strong>ตัวช่วยประมวลผลแบบประหยัดพลังงานภายในชิป Espressif SoC</strong><a class="headerlink" href="#espressif-soc" title="Permanent link">#</a></h2>
+<p>ชิป <strong>Espressif SoCs</strong> มีหลายรุ่น ภายในมีซีพียูแบบหนึ่งแกนหรือสองแกน (<strong>Single-Core &amp; Dual-Core</strong>)
+อาจแตกต่างกันไป เช่น <strong>Xtensa LX6 / LX7</strong> หรือ <strong>RISC-V 32-bit (RV32IMC)</strong> เป็นต้น
+นอกเหนือจากตัวประมวลผลดังกล่าว ยังมีตัวช่วยประมวลผลแบบประหยัดพลังงาน
+เรียกว่า <strong>Ultra Low Power (ULP) Coprocessors</strong> และมีการใช้งานดังนี้</p>
+<ol>
+<li>
+<p><strong>ULP-FSM (Finite State Machine) Coprocessor</strong>:</p>
+<ul>
+<li>มีอยู่ในชิป <strong>ESP32</strong>, <strong>ESP32-S2</strong>, <strong>ESP32-S3</strong></li>
+<li>เขียนโปรแกรมโดยผู้ใช้ได้ แต่ภาษาเป็นแบบ <strong>Assembly</strong></li>
+<li>มีรูปแบบการทำงานเหมือน <strong>Finite-State Machine (FSM)</strong> แต่มีชุดคำสั่งและจำนวนรีจิสเตอร์ค่อนข้างจำกัด</li>
+<li>สามารถเขียนโปรแกรมให้อ่านข้อมูลจากวงจร <strong>ADC</strong> หรือใช้งานขา <strong>GPIO</strong> ได้</li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/ulp_instruction_set.html"><strong>ULP Instruction Set Reference (ESP32)</strong></a></li>
+</ul>
+</li>
+<li>
+<p><strong>ULP-RISC-V</strong>:</p>
+<ul>
+<li>ใช้ซีพียู 32 บิต สถาปัตยกรรม <strong>RISC-V</strong> และมีอยู่ในชิป <strong>ESP32-S2</strong> และ <strong>ESP32-S3</strong></li>
+<li>เขียนโปรแกรมโดยผู้ใช้ได้และใช้ภาษา <strong>C</strong> ได้ โดยใช้ซอฟต์แวร์ <strong>Espressif ESP-IDF</strong></li>
+<li>ทำงานได้เมื่อชิปอยู่ในโหมด <strong>Deep Sleep</strong> และ <strong>Light Sleep</strong> และสามารถให้ปลุกการทำงานของซีพียูหลักได้</li>
+</ul>
+</li>
+<li>
+<p><strong>ULP Low-Power Core (LP-Core)</strong>:</p>
+<ul>
+<li>เหมือน <strong>ULP-RISC-V</strong> แต่มีการเพิ่มฟังก์ชันการทำงาน</li>
+<li>มีอยู่ในชิป <strong>ESP32-C6</strong></li>
+</ul>
+</li>
+</ol>
+<p>ประโยชน์หลักของ <strong>ULP Coprocessor</strong> คือ การทำหน้าที่ในช่วงที่ชิปเข้าสู่โหมดประหยัดพลังงาน
+ซีพียูหลักและวงจรส่วนใหญ่ภายในชิปหยุดการทำงานชั่วคราวหรือปิดการใช้งาน</p>
+<p>แต่ชิป <strong>ESP32-C2</strong>, <strong>ESP32-C3</strong>, <strong>ESP32-C5</strong> และ <strong>ESP32-H2</strong>
+ไม่มีตัวช่วยประมวลผลใด ๆ (ไม่มี <strong>ULP-FSM, ULP-RISC-V, ULP LP-Core</strong>)
+ดังนั้นจึงใช้วงจร <strong>RTC / PMU</strong> (<em>Power Management Unit</em>) เป็นตัวจัดการทำงานของชิป
+ในโหมด <strong>Light / Deep Sleep</strong></p>
+<p><strong>ESP32C3 Documentation</strong></p>
+<ul>
+<li><a href="https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf"><strong>ESP32-C3 Technincal Reference Manual</strong></a></li>
+<li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32c3/api-reference/system/sleep_modes.html"><strong>ESP32-C3 API: Sleep Modes</strong></a></li>
+<li><a href="https://www.espressif.com/sites/default/files/documentation/ESP32-C3%20Wireless%20Adventure.pdf"><strong>ESP32-C3 Wireless Adventure: A Comprehensive Guide to IoT</strong> (2023)</a></li>
+</ul>
+<hr />
+<h2 id="light-sleep-deep-sleep-esp32-c3">&#9655; การเปรียบเทียบระหว่างโหมด <strong>Light Sleep</strong> และ <strong>Deep Sleep</strong> สำหรับ <strong>ESP32-C3</strong><a class="headerlink" href="#light-sleep-deep-sleep-esp32-c3" title="Permanent link">#</a></h2>
+<p><strong>Light Sleep</strong>:</p>
+<ul>
+<li>เป็นโหมดประหยัดพลังงานที่ยังคงรักษาสถานะของระบบไว้เกือบทั้งหมด เช่น <strong>RAM</strong> ตัวแปรต่าง ๆ และการทำงานของวงจรภายในบางส่วน</li>
+<li>หลังจากตื่นขึ้นมา จะกลับมาทำงานต่อจากจุดเดิม ถัดจากตำแหน่งที่ทำคำสั่ง <code>esp_light_sleep_start()</code></li>
+<li>ข้อมูลในตัวแปรที่อยู่ใน <strong>RAM</strong> จะยังคงอยู่ครบ (ไม่ต้องประกาศใช้ <code>RTC_DATA_ATTR</code> สำหรับตัวแปร)</li>
+<li>สามารถตั้งเวลาปลุกด้วยคำสั่ง <code>esp_sleep_enable_timer_wakeup(...)</code> หรือปลุกด้วยสัญญาณจากขา <strong>GPIO</strong>
+หรือเมื่อมีการรับข้อมูลจาก <strong>UART</strong> หรือปลุกโดย <strong>Wi-Fi</strong> (<strong>WiFi Wakeup Event</strong>)</li>
+<li>เวลาปลุกและตื่นขึ้นทำงาน จะใช้เวลาไม่กี่ไมโครวินาที</li>
+<li>เหมาะสำหรับงานที่ต้องการปลุกบ่อย หรือประหยัดพลังงานแต่ยังต้องทำงานแบบทันที</li>
+</ul>
+<p><strong>Deep Sleep</strong>:</p>
+<ul>
+<li>เป็นโหมดประหยัดพลังงานสูงสุด โดยจะปิดเกือบทุกอย่าง ยกเว้นวงจร <strong>RTC</strong></li>
+<li>เมื่อตื่นขึ้นมา จะเริ่มโปรแกรมใหม่ทั้งหมด ดังนั้นในโค้ด <strong>Arduino Sketch</strong> จึงมีการทำคำสั่ง <code>setup()</code> เหมือนรีเซตบอร์ด</li>
+<li>ข้อมูลใน <strong>RAM</strong> ทั้งหมดจะถูกเคลียร์ ถ้าต้องการเก็บข้อมูลให้คงอยู่หลังการตื่นอีกครั้ง
+จะต้องประกาศใช้ตัวแปรแบบ <code>RTC_DATA_ATTR</code> หรือจัดเก็บไว้ใน <strong>Flash</strong></li>
+<li>ปลุกได้ด้วย <strong>RTC Timer</strong> หรือจากสัญญาณ <code>LOW</code> ที่ <strong>RTC GPIO</strong> (เฉพาะ <strong>GPIO 0–5</strong> เท่านั้น สำหรับ <strong>ESP32-C3</strong>)</li>
+<li>เหมาะกับการทำงานเป็นช่วง ๆ แต่ไม่บ่อย</li>
+<li>เวลาตื่นนานกว่า <strong>Light Sleep</strong> เนื่องจากต้องบูตระบบใหม่</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="deep-sleep-arduino-sketch">&#9655; ตัวอย่างโค้ดสาธิตการใช้ <strong>Deep-Sleep</strong> สำหรับ <strong>Arduino Sketch</strong><a class="headerlink" href="#deep-sleep-arduino-sketch" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดสำหรับ <strong>ESP32-C3</strong> ที่แสดงการเข้าสู่โหมด <strong>Deep Sleep</strong>
+โดยตั้งให้ตื่นขึ้นมาโดยอัตโนมัติหลังจากผ่านไป 100 มิลลิวินาที (100,000 ไมโครวินาที)
+ใช้คำสั่ง <code>esp_sleep_enable_timer_wakeup()</code> ซึ่งเป็นการกำหนดให้ <strong>RTC Timer</strong> เป็นตัวปลุกการตื่น</p>
+<p>ก่อนเข้าสู่ <strong>Deep Sleep</strong> ตัวโปรแกรมนี้ จะส่งพัลส์ออกทางขา <strong>GPIO-10</strong> โดยสลับสถานะ 
+<strong>HIGH → LOW → HIGH</strong> เว้นช่วงเวลาสั้น ๆ <strong>10 msec</strong> เพื่อใช้ในการสังเกตสัญญาณทางฮาร์ดแวร์
+เช่น ออสซิลโลสโคป หรือ <strong>Logic Analyzer</strong> ว่ามีการเริ่มทำงานก่อนเข้าสู่ <strong>Sleep</strong> จริงหรือไม่ 
+ส่วน <code>loop()</code> ว่างเปล่า เนื่องจากโค้ดนี้ทำงานเพียงครั้งเดียวใน <code>setup()</code> แล้วเข้าสู่ <strong>Deep Sleep</strong> ทันที</p>
+<pre><code class="language-cpp">// Example: esp32c3_deepsleep_timer_wakeup.ino
+
+#define PULSE_GPIO 10 // GPIO-10
+
+void setup() {
+   pinMode( PULSE_GPIO, OUTPUT );
+   // Toggle the GPIO pin to generate a pulse.
+   digitalWrite(PULSE_GPIO, 1);
+   delay(10);
+   digitalWrite(PULSE_GPIO, 0);
+   delay(10);
+   digitalWrite(PULSE_GPIO, 1);
+
+   // Configure the RTC timer to trigger a wakeup event
+   esp_sleep_enable_timer_wakeup(100000); // 100ms = 100000µs
+   // Enter deep sleep
+   esp_deep_sleep_start();
+}
+
+void loop() {
+   // empty
+}
+</code></pre>
+<p>การเขียนโค้ด <strong>Arduino Sketch</strong> เพื่อให้ทำงานในโหมด <strong>Deep-Sleep</strong>
+สามารถทำได้ง่าย โดยใช้คำสั่งต่อไปนี้</p>
+<ul>
+<li><code>esp_sleep_enable_timer_wakeup( uint64_t time_in_us )</code> เปิดใช้งานการวงจรปลุกจาก
+<strong>Sleep Mode</strong> โดยใช้วงจร <strong>RTC Timer</strong> โดยระบุระยะเวลามีหน่วยเป็นไมโครวินาที
+เช่น 100,000 ไมโครวินาที</li>
+<li><code>esp_deep_sleep_start()</code> ทำให้ซีพียูเข้าสู่โหมด <strong>Deep-Sleep</strong></li>
+</ul>
+<p>หากทดลองกับฮาร์ดแวร์จริง ก็สามารถใช้ออสซิลโลสโคปตรวจวัดสัญญาณเอาต์พุตที่ขา <strong>GPIO-10</strong>
+เพื่อดูสัญญาณ <strong>Pulse</strong> ที่เกิดขึ้นได้ </p>
+<hr />
+<h2 id="deep-sleep-esp-idf">&#9655; ตัวอย่างโค้ดสาธิตการใช้ <strong>Deep-Sleep</strong> และใช้ซอฟต์แวร์ <strong>ESP-IDF</strong><a class="headerlink" href="#deep-sleep-esp-idf" title="Permanent link">#</a></h2>
+<p>หากจะลองโค้ดตัวอย่างภาษา <strong>C</strong> ที่ใช้กับ <strong>ESP-IDF</strong> ก็มีตัวอย่างดังนี้</p>
+<p><strong>File:</strong> <code>main/esp32c3-deepsleep-demo.c</code></p>
+<pre><code class="language-cpp">#include &quot;freertos/FreeRTOS.h&quot;
+#include &quot;freertos/task.h&quot;
+
+#include &quot;driver/gpio.h&quot;
+#include &quot;esp_sleep.h&quot;
+#include &quot;esp_log.h&quot;
+#include &quot;esp_system.h&quot;
+
+#define PULSE_GPIO 10  // GPIO-10
+
+void app_main(void)
+{
+    // Log wakeup reason
+    esp_sleep_wakeup_cause_t reason = esp_sleep_get_wakeup_cause();
+    if (reason != ESP_SLEEP_WAKEUP_UNDEFINED) {
+        ESP_LOGI(&quot;WAKE&quot;, &quot;Wakeup from deep sleep (reason: %d)&quot;, reason);
+    } else {
+        ESP_LOGI(&quot;WAKE&quot;, &quot;Cold boot (power-on or reset)&quot;);
+    }
+
+    // Configure GPIO for pulse output
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL &lt;&lt; PULSE_GPIO),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config( &amp;io_conf );
+
+    // Generate pulse: High -&gt; Low -&gt; High with 10 ms delay
+    gpio_set_level( PULSE_GPIO, 1 );
+    vTaskDelay( pdMS_TO_TICKS(10) );
+    gpio_set_level( PULSE_GPIO, 0 );
+    vTaskDelay( pdMS_TO_TICKS(10) );
+    gpio_set_level( PULSE_GPIO, 1 );
+
+    // Set RTC wakeup timer: 100ms = 100000µs
+    esp_sleep_enable_timer_wakeup( 100000 );
+
+    ESP_LOGI(&quot;SLEEP&quot;, &quot;Entering deep sleep for 100 ms&quot;);
+    esp_deep_sleep_start();
+
+    // Execution will not reach here.
+}
+</code></pre>
+<p>การสร้างโปรเจกต์สำหรับ <strong>ESP-IDF</strong> (เช่น <strong>ESP32-C3</strong>) มีขั้นตอนพื้นฐานดังนี้ </p>
+<ul>
+<li>ผู้ใช้จะต้องดาวน์โหลดและติดตั้ง <strong>ESP-IDF (Espressif IoT Development Framework)</strong> ให้พร้อมใช้งานก่อน</li>
+<li>ตรวจสอบเวอร์ชันของ <strong>ESP-IDF</strong> (เช่น ใช้เวอร์ชัน <strong>v5.5</strong>): <code>idf.py --version</code></li>
+<li>สร้างโปรเจกต์ใหม่และไดเรกทอรีสำหรับโปรเจกต์ โดยใช้คำสั่ง <code>idf.py create-project</code> </li>
+<li>เข้าไปยังไดเรกทอรีของโปรเจกต์ ตั้งค่าเป้าหมายเป็น <code>esp32c3</code>: <code>idf.py set-target esp32c3</code></li>
+<li>ตั้งค่าคอนฟิกของโปรเจกต์ (ถ้าต้องการ): <code>idf.py menuconfig</code></li>
+<li>คอมไพล์โค้ดของโปรเจกต์: <code>idf.py build</code></li>
+<li>แฟลชโปรแกรมไปยังบอร์ด <strong>ESP32-C3</strong>: <code>idf.py -p /dev/ttyACM0 flash</code></li>
+</ul>
+<p>ขั้นตอนการติดตั้ง <strong>ESP-IDF</strong> (<strong>master branch</strong>)</p>
+<pre><code class="language-text">$ cd $HOME
+$ git clone --recursive https://github.com/espressif/esp-idf.git
+$ cd esp-idf
+$ ./install.sh esp32c3
+$ . ./export.sh
+$ idf.py --version
+</code></pre>
+<p>ขั้นตอนการสร้างโปรเจกต์ คอมไพล์โค้ด และอัปโหลดลงบอร์ดทดลอง</p>
+<pre><code class="language-text">$ idf.py create-project esp32c3-deepsleep-demo
+$ cd esp32c3-deepsleep-demo
+$ idf.py set-target esp32c3
+$ idf.py menuconfig
+$ idf.py build
+$ idf.py -p /dev/ttyACM0 flash
+</code></pre>
+<p>โครงสร้างไดเรกทอรีและไฟล์ภายในของโปรเจกต์</p>
+<pre><code class="language-text">~/esp/projects/esp32c3-deepsleep-demo$ tree -L 1
+.
+├── build
+├── CMakeLists.txt
+├── main
+├── sdkconfig
+└── sdkconfig.old
+
+3 directories, 3 files
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้อธิบายโหมดการทำงานที่ประหยัดพลังงานของ <strong>ESP32-C3</strong> โดยแต่ละโหมดมีลักษณะการทำงานและระดับการประหยัดพลังงานที่แตกต่างกัน ขึ้นอยู่กับการปิดการใช้งานวงจรภายในส่วนใดบ้าง  มีการเปรียบเทียบความแตกต่างระหว่าง <strong>Light-Sleep</strong>
+<strong>Deep-Sleep</strong> และมีตัวอย่างโค้ดสำหรับ <strong>Arduino</strong> และ <strong>ESP-IDF</strong> สาธิตการทำงานในโหมด <strong>Deep-Sleep</strong></p>
+<p>แนวทางในการศึกษาและทดลองปฏิบัติเพิ่มเติม ได้แก่ การวัดปริมาณกระแสไฟฟ้าเปรียบเทียบโหมดการทำงาน
+และช่วงเวลาในการตื่นขึ้นมาทำงานต่อ</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2025-05-15 | Last Updated: 2025-05-16</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
