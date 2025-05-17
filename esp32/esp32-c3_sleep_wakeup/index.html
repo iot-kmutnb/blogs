@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32-c3_sleep_wakeup/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม ESP32-C3 ด้วย Arduino ทำงานในโหมด Sleep / Wakeup และวิเคราะห์การใช้พลังงาน - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#esp32-c3-arduino-sleep-wakeup" class="nav-link">การเขียนโปรแกรม ESP32-C3 ด้วย Arduino ทำงานในโหมด Sleep / Wakeup และวิเคราะห์การใช้พลังงาน</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#esp32-c3" class="nav-link">&#9655; ESP32-C3 และโหมดการประหยัดพลังงาน</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#1-deep-sleep-rtc-timer-wakeup" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 1: Deep-Sleep + RTC Timer Wakeup</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#esp32-c3_1" class="nav-link">&#9655; การทดลองวัดกระแสของบอร์ด ESP32-C3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#2-light-sleep-rtc-timer-wakeup" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 2: Light-Sleep + RTC Timer Wakeup</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#3-light-sleep-rtc-timer-wakeup-periodic-wakeup" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 3: Light-Sleep + RTC Timer Wakeup (Periodic Wakeup)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#4-deep-sleep-gpio-rtc-timer-wakeup" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 4: Deep-Sleep + GPIO &amp; RTC Timer Wakeup</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#5-modem-sleep-wi-fi-sta" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 5: Modem-Sleep &amp; Wi-Fi STA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-c3-arduino-sleep-wakeup">การเขียนโปรแกรม <strong>ESP32-C3</strong> ด้วย <strong>Arduino</strong> ทำงานในโหมด <strong>Sleep / Wakeup</strong> และวิเคราะห์การใช้พลังงาน<a class="headerlink" href="#esp32-c3-arduino-sleep-wakeup" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>ESP32-C3</em>, <em>Low-Power Modes</em>, 
+<em>Deep-Sleep</em>, <em>Light-Sleep</em>, <em>Wakeup</em>, 
+<em>Power Consumption</em>, <em>Current-Shunt Monitor</em>, <em>Current Consumption</em></p>
+<hr />
+<h2 id="esp32-c3">&#9655;  <strong>ESP32-C3</strong> และโหมดการประหยัดพลังงาน<a class="headerlink" href="#esp32-c3" title="Permanent link">#</a></h2>
+<p>จากบทความ <a href="../esp32-c3_low_power/">"การทำงานของชิป <strong>ESP32-C3</strong> ในโหมดประหยัดพลังงาน"</a>
+ที่ได้นำเสนอการทำงานของชิป <strong>Espressif SoC</strong> ในโหมดประหยัดพลังงาน ได้แก่
+<strong>Modem-Sleep</strong>, <strong>Light-Sleep</strong> และ <strong>Deep-Sleep</strong></p>
+<p>ในบทความนี้จะนำเสนอตัวอย่างการเขียนโค้ด เพื่อทดสอบการทำงานของชิป <strong>ESP32-C3</strong>
+ในโหมดประหยัดพลังงาน และวัดปริมาณกระแสไฟฟ้าที่ใช้กับบอร์ดไมโครคอนโทรลเลอร์ในขณะที่ทำงาน
+โดยใช้โมดูล <strong>Current-Sense Amplifier (CSA) / Current-Shunt Monitor IC</strong> 
+เช่น <strong>MAX4080S</strong> </p>
+<p>โมดูล <a href="../../electronics/max4080/"><strong>MAX4080S</strong></a> ให้เอาต์พุตเป็นแรงดันไฟฟ้าหรือสัญญาณแอนะล็อก 
+แต่เนื่องจากปริมาณกระแสไฟฟ้าของไมโครคอนโทรลเลอร์ มีการเปลี่ยนแปลงเชิงเวลาอย่างรวดเร็ว
+จึงนำสัญญาณแรงดันเอาต์พุตนำไปใช้กับออสซิลโลสโคป เพื่อวัดสัญญาณและแสดงรูปคลื่นสัญญาณ</p>
+<p>การเขียนโค้ด จะใช้ <a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core (v3.3.x)</strong></a>
+เป็นหลัก เพื่อสะดวกในการทดลอง และเขียนโค้ดได้สั้นกว่าการเขียนโค้ด
+เพื่อนำไปใช้กับ <a href="https://github.com/espressif/esp-idf"><strong>Espressif ESP-IDF / Espressif IoT Development Framework</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-deep-sleep-rtc-timer-wakeup">&#9655; ตัวอย่างโค้ดที่ 1: <strong>Deep-Sleep + RTC Timer Wakeup</strong><a class="headerlink" href="#1-deep-sleep-rtc-timer-wakeup" title="Permanent link">#</a></h2>
+<p>ลองมาดูตัวอย่างแรก การทำให้ <strong>ESP32-C3</strong> เข้าสู่ <strong>Deep-Sleep</strong>
+และเว้นระยะเวลาคงที่ จากนั้นจึงถูกปลุกให้ตื่นขึ้นมาเริ่มต้นทำงานใหม่</p>
+<pre><code class="language-cpp">// Arduino Sketch: esp32c3_deepsleep_timer_wakeup.ino
+
+#define PULSE_GPIO 10 // GPIO-10
+
+void setup() {
+   pinMode( PULSE_GPIO, OUTPUT );
+   // Toggle the GPIO pin to generate a pulse.
+   digitalWrite(PULSE_GPIO, 1);
+   delay(10);
+   digitalWrite(PULSE_GPIO, 0);
+   delay(10);
+   digitalWrite(PULSE_GPIO, 1);
+
+   // Configure the RTC timer to trigger a wakeup event
+   esp_sleep_enable_timer_wakeup(100000); // 100ms = 100000µs
+   // Enter deep sleep
+   esp_deep_sleep_start();
+}
+
+void loop() {
+   // empty
+}
+</code></pre>
+<p>ในเชิงเปรียบเทียบ ก็มีตัวอย่างโค้ดสำหรับนำไปใช้กับ <strong>Espressif ESP-IDF</strong>
+(ทดลองใช้กับเวอร์ชัน <strong>v5.4.x</strong>)</p>
+<pre><code class="language-c">// File: main/esp32c3-deepsleep-demo.c
+
+#include &quot;freertos/FreeRTOS.h&quot;
+#include &quot;freertos/task.h&quot;
+
+#include &quot;driver/gpio.h&quot;
+#include &quot;esp_sleep.h&quot;
+#include &quot;esp_log.h&quot;
+#include &quot;esp_system.h&quot;
+
+#define PULSE_GPIO 10  // GPIO-10
+
+void app_main(void)
+{
+    // Log wakeup reason
+    esp_sleep_wakeup_cause_t reason = esp_sleep_get_wakeup_cause();
+    if (reason != ESP_SLEEP_WAKEUP_UNDEFINED) {
+        ESP_LOGI(&quot;WAKE&quot;, &quot;Wakeup from deep sleep (reason: %d)&quot;, reason);
+    } else {
+        ESP_LOGI(&quot;WAKE&quot;, &quot;Cold boot (power-on or reset)&quot;);
+    }
+
+    // Configure GPIO for pulse output
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL &lt;&lt; PULSE_GPIO),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config( &amp;io_conf );
+
+    // Generate pulse: High -&gt; Low -&gt; High with 10 ms delay
+    gpio_set_level( PULSE_GPIO, 1 );
+    vTaskDelay( pdMS_TO_TICKS(10) );
+    gpio_set_level( PULSE_GPIO, 0 );
+    vTaskDelay( pdMS_TO_TICKS(10) );
+    gpio_set_level( PULSE_GPIO, 1 );
+
+    // Set RTC wakeup timer: 100ms = 100000µs
+    esp_sleep_enable_timer_wakeup( 100000 );
+
+    ESP_LOGI(&quot;SLEEP&quot;, &quot;Entering deep sleep for 100 ms&quot;);
+    esp_deep_sleep_start();
+
+    // Execution will not reach here.
+}
+</code></pre>
+<p>โค้ดทั้งสองตัวอย่าง (ทั้งในรูปแบบ <strong>Arduino Sketch</strong> และ <strong>ESP-IDF</strong>) 
+มีเป้าหมายเพื่อสาธิตการทำงานของชิป <strong>ESP32-C3</strong> ในโหมด <strong>Deep-Sleep</strong> 
+โดยใช้ <strong>RTC Timer</strong> เป็นตัวปลุก (<strong>Wake-up Source</strong>) ให้กับซีพียู
+(<strong>RISC-V CPU Core</strong>)</p>
+<p>ขั้นตอนหลักในการทำงานของโค้ด มีดังนี้</p>
+<ol>
+<li>ตั้งค่า <strong>GPIO</strong> เพื่อส่งพัลส์ (<strong>Pulse</strong>) สั้น ๆ<ul>
+<li>ใช้ <strong>GPIO-10</strong> (<code>PULSE_GPIO</code>) เป็นเอาต์พุต</li>
+<li>สร้างพัลส์ลำดับ: <strong>High → Low → High</strong> โดยเว้นช่วงเวลา <strong>10ms</strong> ระหว่างแต่ละระดับ</li>
+<li>สัญญาณนี้สามารถใช้เพื่อตรวจสอบการตื่นของชิปด้วยออสซิลโลสโคป</li>
+</ul>
+</li>
+<li>ตั้งค่า <strong>Wakeup Timer</strong><ul>
+<li>ใช้ฟังก์ชัน <code>esp_sleep_enable_timer_wakeup(...)</code> เพื่อกำหนดให้ปลุกชิปหลังจาก 100,000 ไมโครวินาที</li>
+</ul>
+</li>
+<li>เข้าสู่โหมด <strong>Deep-Sleep</strong><ul>
+<li>เมื่อเรียก <code>esp_deep_sleep_start()</code> แล้ว <strong>CPU</strong> และส่วนอื่น ๆ จะปิดตัวลงเพื่อประหยัดพลังงาน</li>
+<li>เมื่อครบเวลา 100ms ชิปจะรีบูต และเริ่มการทำงานใหม่ที่ <code>setup()</code> (สำหรับ <strong>Arduino Sketch</strong>)
+หรือ <code>app_main()</code> (สำหรับ <strong>ESP-IDF</strong>)</li>
+</ul>
+</li>
+</ol>
+<p>โหมด <strong>Deep-Sleep</strong> ถือว่าเป็นโหมดที่ประหยัดพลังงานได้มากที่สุดใน <strong>ESP32-C3</strong>
+โดยจะตัดการทำงานของ <strong>RISC-V CPU</strong> หน่วยความจำภายใน และ <strong>Wi-Fi/BT</strong> ทั้งหมด
+เหลือเพียงวงจร <strong>RTC (Real-Time Clock)</strong> และ <strong>PMU (Power Management Unit)</strong>
+ที่ยังทำงานอยู่  ข้อดีคือใช้พลังงานต่ำมาก แต่ข้อเสียคือ ต้องใช้เวลามากขึ้นในการเริ่มต้นใหม่หลังจากตื่น
+เมื่อเทียบกับโหมด <strong>Light-Sleep</strong> ซึ่งไม่ต้องรีเซตระบบทั้งหมดและสามารถกลับมาทำงานได้เร็วกว่า</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="esp32-c3_1">&#9655; การทดลองวัดกระแสของบอร์ด <strong>ESP32-C3</strong><a class="headerlink" href="#esp32-c3_1" title="Permanent link">#</a></h2>
+<p>การทดลองวัดกระแสที่ใช้กับบอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32-C3</strong> มีแนวทางดังนี้</p>
+<ul>
+<li>เลือกใช้บอร์ด <strong>ESP32-C3</strong> ที่สามารถป้อนแรงดันไฟเลี้ยง <strong>VDC=+5V</strong> เข้าที่ขาของบอร์ดได้
+  และไม่ใช้แรงดันไฟเลี้ยง <strong>VBUS</strong> จากพอร์ต <strong>USB</strong> ในขณะที่ทดลองวัดกระแส</li>
+<li>การต่อแรงดันไฟเลี้ยงภายนอก (<strong>External Supply Voltage</strong>) แนะนำให้ต่อผ่าน
+  <strong>Schottky Diode</strong> (มีแรงดัน <strong>Forward Voltage</strong> ประมาณ <strong>0.2V</strong>)</li>
+<li>การเชื่อมต่อบอร์ดไมโครคอนโทรลเลอร์กับคอมพิวเตอร์ทางพอร์ต <strong>USB</strong> จะใช้เฉพาะการจ่ายไฟเลี้ยง
+  และอัปโหลดโปรแกรมไปยังบอร์ด <strong>ESP32-C3</strong> เท่านั้น
+  ดังนั้นเมื่อทำขั้นตอน <strong>Upload</strong> สำเร็จ ให้ถอดสาย <strong>USB</strong> ออก แล้วจึงจ่ายแรงดันไฟเลี้ยงจากภายนอก</li>
+<li>แรงดันไฟเลี้ยง <strong>VDC=+5V</strong> จะต้องต่อผ่านโมดูล <strong>Current-Shunt Monitor</strong>
+  เช่น ใช้โมดูล <strong>MAX4080S</strong> โดยจะต้องต่อแบบ <strong>High-Side</strong> และใช้ออสซิลโลสโคปวัดแรงดันเอาต์พุต
+  (แรงดันเอาต์พุตจะแปรผันตรงกับกระแสที่ไหล ซึ่งเป็นกระแสที่ใช้ในการทำงานของบอร์ด <strong>ESP32-C3</strong>)</li>
+</ul>
+<p>ในการทดลองวัดกระแส ได้เลือกใช้บอร์ด
+<a href="../esp32_c3_weact_studio/"><strong>Weact Studio ESP32-C3FH4 Mini Core</strong></a>:</p>
+<ul>
+<li>บอร์ดนี้ใช้แรงดันไฟเลี้ยงจากพอร์ต <strong>USB</strong> เรียกว่า <code>VBUS</code> และต่อผ่าน <strong>Schottky Diode (1N5819)</strong>
+ไปยัง <strong>VDD5V</strong> เพื่อใช้เป็นอินพุตของไอซีแปลงแรงดันเป็น <strong>3.3V</strong> 
+(<strong>MicroOne ME6211A33M3G</strong>, แรงดันอินพุตไม่เกิน <strong>6V</strong>, กระแสสูงสุด <strong>500mA</strong>)</li>
+<li>บอร์ดนี้มีขา <strong>VBAT</strong> ใช้ต่อกับแรงดันไฟเลี้ยงภายนอกได้ โดยได้ใส่ <strong>Schottky Diode (1N5819)</strong>
+ไว้ให้แล้ว เพื่อต่อไปยัง <strong>VDD5V</strong> ของบอร์ด</li>
+<li>บอร์ดนี้ไม่มีวงจร <strong>USB-Serial Bridge Chip</strong> และจะใช้วงจร <strong>USB</strong> ภายในของชิป 
+<strong>ESP32-C3</strong> ในโหมด <strong>USB-CDC (Serial)</strong> เพื่อการอัปโหลดโปรแกรม</li>
+<li>การอัปโหลดในแต่ละครั้ง ให้กดปุ่ม <strong>BOOT</strong> ค้างไว้ และกดปุ่ม <strong>RESET</strong> แล้วปล่อย เพื่อเข้าสู่โหมด <strong>Bootloader</strong></li>
+</ul>
+<p><img alt="" src="esp32c3_test.jpg" /></p>
+<p>รูป: ตัวอย่างอุปกรณ์ที่ได้นำมาต่อวงจรทดลอง (บอร์ด <strong>ESP32-C3</strong> และโมดูล <strong>GY-408 (MAX4080S)</strong>)</p>
+<p>ถัดไปเป็นตัวอย่างรูปคลื่นสัญญาณจากขา <strong>OUT</strong> ของโมดูล <strong>MAX4080S</strong>
+และใช้ออสซิลโลสโคป วัดสัญญาณ (<strong>RIGOL DS2072A</strong>) จำนวน 2 ช่อง</p>
+<ul>
+<li><strong>CH1</strong> สำหรับแรงดันเอาต์พุตจากขา <strong>OUT</strong>  ของโมดูล <strong>MAX4080S (GY-408)</strong></li>
+<li><strong>CH2</strong> สำหรับสัญญาณพัลส์จากขา <strong>GPIO</strong> ของ <strong>ESP32-C3</strong></li>
+</ul>
+<p><img alt="" src="deep_sleep_timer-1a.jpg" /></p>
+<p><img alt="" src="deep_sleep_timer-1b.jpg" /></p>
+<p>รูป: สัญญาณจากออสซิลโลสโคป เมื่อ <strong>ESP32-C3</strong> ทำงานสลับ <strong>Active / Deep-Sleep / Wakeup</strong></p>
+<p>จากรูปกราฟ จะเห็นได้ว่า สัญญาณ <strong>CH1</strong> เป็นแรงดันเอาต์พุตจากขา <strong>OUT</strong> ของ <strong>MAX4080S</strong>
+และไม่คงที่ ถ้ามีระดับยิ่งสูงขึ้น ก็แสดงว่า มีการใช้กระแสไฟฟ้ามากขึ้น (ให้ถือว่า แรงดันไฟเลี้ยงสำหรับบอร์ดนั้นคงที่)</p>
+<p>ในช่วง <strong>Deep-Sleep</strong> ซึ่งมีระยะเวลาประมาณ <strong>100 msec</strong> จะใช้ปริมาณกระแสเข้าใกล้ศูนย์
+(อาจใช้วิธีวัดด้วยมัลติมิเตอร์ หรือเครื่องมือวัดที่มีความแม่นยำในการวัดกระแสระดับ <strong>µA</strong>)
+และหลังจากถูกปลุกให้ตื่นด้วย <strong>RTC Timer</strong> ในแต่ละครั้ง ปริมาณกระแสจะเพิ่มขึ้น
+ในช่วงที่ <strong>CPU</strong> อยู่ในโหมด <strong>Active</strong> และช่วงท้ายจะเห็นว่าเกิดสัญญาณ <strong>Pulse</strong> ที่สัญญาณ <strong>CH2</strong>
+ก่อนที่จะเข้าสู่ <strong>Deep-Sleep</strong> อีกครั้ง</p>
+<p>ช่วงที่ <strong>CPU Active</strong> ตามการทำงานของโค้ดตัวอย่าง จะประมาณ <strong>300 msec</strong>
+และจะเห็นได้ว่า หลังจากถูกปลุก จะต้องใช้เวลาราว ๆ <strong>270~275 msec</strong> ก่อนจะเริ่มสร้างสัญญาณพัลส์ที่ขาเอาต์พุต (<strong>GPIO Toggle</strong>)</p>
+<p>สัญญาณ <strong>CH1</strong> มีค่า <strong>Volt/DIV</strong> เท่ากับ <strong>50 mV</strong>
+ดังนั้นจากรูปคลื่นสัญญาณ ในช่วงเวลาส่วนใหญ่ของ <strong>CPU Active</strong>
+แรงดันเอาต์พุตจะอยู่ในช่วง <strong>100mV ~ 150mV</strong> แต่ก็มีบางช่วงที่เกิน <strong>200 mV</strong></p>
+<p>หากจะคำนวณให้เป็นปริมาณกระแส ก็สามารถทำได้ โดยใช้สูตร:</p>
+<p>
+<script type="math/tex; mode=display">
+  V_{out}\,[mV] = G \cdot I\,[mA] + V_{offset}\, [mV] \\
+  I\,[mA] = \frac{ V_{out} - V_{offset}}{ G }
+</script>
+โดยที่ </p>
+<ul>
+<li>
+<script type="math/tex"> G </script> คือ อัตราการขยายเมื่อแปลงกระแสให้เป็นแรงดันไฟฟ้า
+  และสำหรับโมดูล <strong>GY-408 (MAX4080S)</strong> ที่ใช้ทดลอง จะเท่ากับ <strong>6 mA/mV</strong></li>
+<li>
+<script type="math/tex"> V_{\text{offset}} </script> เป็นค่าแรงดันออฟเซต ซึ่งอาจทำให้เกิดความคลาดเคลื่อนในการวัด</li>
+</ul>
+<p>ดังนั้นถ้าวัดแรงดันเอาต์พุตด้วยสโคปได้ในช่วง เช่น <strong>50mV ~ 150mV</strong>
+ก็สามารถคำนวณและประมาณค่าปริมาณกระแสที่ใช้ได้ในช่วง <strong>8.3mA ~ 25mA (+/-2mA)</strong></p>
+<p>จากข้อมูลในเอกสารของผู้ผลิต ชิป <strong>ESP32-C3 (CPU Clock 160MHz)</strong> จะใช้กระแส (โดยเฉลี่ย) ประมาณ</p>
+<ul>
+<li><strong>CPU Running</strong>: 23mA ~ 28mA</li>
+<li><strong>CPU Idle</strong>:  16mA ~ 21mA</li>
+<li><strong>Modem Sleep</strong>: 15mA ~ 20mA</li>
+</ul>
+<p>&nbsp;</p>
+<p><img alt="" src="deep_sleep_timer-1c.jpg" /></p>
+<p><img alt="" src="deep_sleep_timer-1d.jpg" /></p>
+<p><img alt="" src="deep_sleep_timer-1e.jpg" /></p>
+<p>รูป: สัญญาณจากออสซิลโลสโคป <strong>CH1: MAX4080S OUT Pin</strong> และ <strong>CH2: ESP32-C3 Pulse GPIO Pin</strong></p>
+<p>จากรูปคลื่นสัญญาณที่วัดได้ จะเห็นว่า ช่วงเวลาที่ทำขั้นตอนการสร้างพัลส์  <strong>High → Low → High</strong> 
+โดยเว้นช่วงเวลา <strong>10ms</strong> ระหว่างแต่ละระดับ แรงดันช่อง <strong>CH1</strong> วัดได้ประมาณ <strong>100mV  ~ 150mV</strong>
+หรือคำนวณเป็นกระแสที่ใช้ได้ประมาณ <strong>16.7mA ~ 25.0mA</strong></p>
+<p>ในโค้ดตัวอย่าง การคำสั่ง (เกือบ) สุดท้ายก่อนสั่งให้ระบบเข้าสู่โหมด <strong>Deep-Sleep</strong> คือ การเปลี่ยนให้ขา <strong>GPIO</strong>
+จาก <strong>LOW → HIGH</strong> แต่เมื่อเข้าสู่ <strong>Deep-Sleep</strong> แล้วสถานะลอจิกของขาเอาต์พุตดังกล่าว จะถูกเปลี่ยนเป็น <strong>LOW</strong>
+โดยอัตโนมัติ และถ้าดูจากคลื่นสัญญาณ ก็จะเห็นว่า ขั้นตอนเข้าสู่ <strong>Deep-Sleep</strong> จะใช้เวลาประมาณ <strong>4 ~ 5msec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-light-sleep-rtc-timer-wakeup">&#9655; ตัวอย่างโค้ดที่ 2: <strong>Light-Sleep + RTC Timer Wakeup</strong><a class="headerlink" href="#2-light-sleep-rtc-timer-wakeup" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Arduino</strong> เพื่อสาธิตการทำงานในโหมด <strong>Light-Sleep</strong> และปลุกโดย <strong>RTC Timer</strong></p>
+<pre><code class="language-cpp">#define PULSE_GPIO 10
+#define INTERVAL_US 100000UL
+
+void setup() {
+  pinMode( PULSE_GPIO, OUTPUT );
+}
+
+void loop() {
+  // Generate pulse
+  digitalWrite(PULSE_GPIO, 1);
+  delay(10);
+  digitalWrite(PULSE_GPIO, 0);
+  delay(10);
+  digitalWrite(PULSE_GPIO, 1);
+
+  // Configure the RTC timer to trigger a wakeup event
+  esp_sleep_enable_timer_wakeup( INTERVAL_US );
+  // Enter light sleep
+  esp_light_sleep_start(); 
+}
+</code></pre>
+<p>โค้ดนี้ทำให้ <strong>ESP32-C3</strong> ส่งพัลส์ออกทางขา <strong>GPIO-10</strong>
+และเข้าสู่ <strong>Light Sleep</strong> เพื่อประหยัดพลังงาน
+พร้อมควบคุมเวลาให้สม่ำเสมอในทุกๆ <strong>100 msec</strong> โดยมีหลักการดังนี้:</p>
+<ul>
+<li>กำหนด <code>PULSE_GPIO</code> (<strong>GPIO 10</strong>) เป็นขาส่งสัญญาณพัลส์ (<code>HIGH</code> → <code>LOW</code> → <code>HIGH</code>)
+เพื่อเก็บเวลาปลุกถัดไปในหน่วยไมโครวินาที และข้อมูลคงอยู่หลังจากเข้าสู่โหมด<strong>Light Sleep</strong> แต่ตื่นขึ้นมาอีกครั้ง</li>
+<li>ตั้งเวลาปลุกด้วย <code>esp_sleep_enable_timer_wakeup(...)</code></li>
+<li>เข้าสู่ <strong>Light Sleep</strong> ด้วย <code>esp_light_sleep_start()</code> แล้วทำซ้ำ</li>
+</ul>
+<p>จากรูปคลื่นสัญญาณ จะเห็นได้ว่า <strong>ESP32-C3</strong> เมื่อเข้าสู่โหมด <strong>Light-Sleep</strong>
+จะใช้กระแสน้อยมาก และเมื่อถูกปลุกขึ้นมา หลังจากเว้นระยะไว้ประมาณ <strong>100msec</strong> ก็สามารถตื่นและทำต่อได้อย่างรวดเร็ว</p>
+<p><img alt="" src="light_sleep-1.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณได้จากการวัดด้วยสโคป (การทำงานในโหมด <strong>Light-Sleep</strong>)</p>
+<p>&nbsp;</p>
+<p>ช่วงที่ตื่นขึ้นมาทำงานในแต่ละรอบ วัดแรงดันได้ประมาณ <strong>110mV</strong>
+หรือ คิดเป็นกระแสประมาณ <strong>18.3mA</strong></p>
+<hr />
+<h2 id="3-light-sleep-rtc-timer-wakeup-periodic-wakeup">&#9655; ตัวอย่างโค้ดที่ 3: <strong>Light-Sleep + RTC Timer Wakeup (Periodic Wakeup)</strong><a class="headerlink" href="#3-light-sleep-rtc-timer-wakeup-periodic-wakeup" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้คล้ายกับตัวอย่างที่แล้ว แต่มีการปรับเปลี่ยนเพื่อพยายามให้มีการปลุก <strong>CPU</strong>
+จากสถานะ <strong>Light-Sleep</strong> ด้วยอัตราคงที่ (<strong>Periodic Wakeup</strong>)</p>
+<pre><code class="language-cpp">#define PULSE_GPIO 10
+#define INTERVAL_USEC 100000UL // 100 ms
+
+int64_t next_wakeup_time_usec = 0;
+
+void setup() {
+  pinMode(PULSE_GPIO, OUTPUT);
+}
+
+void loop() {
+  // Generate a pulse
+  digitalWrite(PULSE_GPIO, 1);
+  delay(10);
+  digitalWrite(PULSE_GPIO, 0);
+  delay(10);
+  digitalWrite(PULSE_GPIO, 1);
+
+  int64_t now = esp_timer_get_time();
+  int64_t sleep_interval_usec;
+
+  // On first run
+  if (next_wakeup_time_usec == 0) {
+    next_wakeup_time_usec = now + INTERVAL_USEC;
+    sleep_interval_usec = INTERVAL_USEC;
+  } else {
+    // Advance to the next target time
+    next_wakeup_time_usec += INTERVAL_USEC;
+
+    // If we're late, skip ahead to a future aligned time
+    if (next_wakeup_time_usec &lt;= now) {
+      next_wakeup_time_usec = now + INTERVAL_USEC;
+    }
+    sleep_interval_usec = next_wakeup_time_usec - now;
+  }
+
+  // Configure the RTC timer to trigger a wakeup event
+  esp_sleep_enable_timer_wakeup(sleep_interval_usec);
+  // Enter light sleep
+  esp_light_sleep_start();
+}
+</code></pre>
+<p>โค้ดนี้ทำให้ <strong>ESP32-C3</strong> ส่งพัลส์ออกทางขา <strong>GPIO-10</strong>
+และเข้าสู่ <strong>Light Sleep</strong> เพื่อประหยัดพลังงาน 
+พร้อมควบคุมเวลาให้สม่ำเสมอในทุกๆ <strong>100 msec</strong> โดยมีหลักการดังนี้:</p>
+<ul>
+<li>ใช้ตัวแปรชื่อ <code>next_wakeup_time_usec</code> เพื่อเก็บเวลาปลุกถัดไปในหน่วยไมโครวินาที
+และข้อมูลคงอยู่หลังจากเข้าสู่โหมด<strong>Light Sleep</strong> แต่ตื่นขึ้นมาอีกครั้ง</li>
+<li>คำนวณระยะเวลาที่เหลือก่อนถึงเวลาปลุกครั้งถัดไป:</li>
+<li>หากยังไม่เคยกำหนด (ทำงานครั้งแรก) ให้ปลุกในอีก <strong>100ms</strong></li>
+<li>หากเคยกำหนดแล้ว ให้คำนวณระยะเวลาถึงเวลาเป้าหมายถัดไป</li>
+<li>หากเวลาปัจจุบันล่าช้ากว่าเป้าหมาย ให้ขยับเวลาเป้าหมายใหม่</li>
+<li>ตั้งเวลาปลุกด้วย <code>esp_sleep_enable_timer_wakeup(...)</code></li>
+<li>เข้าสู่ <strong>Light Sleep</strong> ด้วย <code>esp_light_sleep_start()</code> แล้วทำซ้ำ</li>
+</ul>
+<p><img alt="" src="light_sleep-2.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณได้จากการวัดด้วยสโคป (การทำงานในโหมด <strong>Light-Sleep</strong>)
+และมีการปรับชดเชย เพื่อให้การปลุกให้ตื่นเกิดขึ้นด้วยอัตราคงที่</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-deep-sleep-gpio-rtc-timer-wakeup">&#9655; ตัวอย่างโค้ดที่ 4: <strong>Deep-Sleep + GPIO &amp; RTC Timer Wakeup</strong><a class="headerlink" href="#4-deep-sleep-gpio-rtc-timer-wakeup" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการเลือกใช้ <strong>Wakeup Sources</strong> จาก <strong>GPIO</strong> และ <strong>RTC Timer</strong>
+สำหรับการปลุก <strong>CPU</strong> ให้ตื่นจากสถานะ <strong>Deep-Sleep</strong>
+และสำหรับ <strong>ESP32-C3</strong> ขาที่ใช้ในการปลุกได้ จะต้องเป็นขา <strong>RTC GPIO</strong>
+ซึ่งตรงกับขาหมายเลข <strong>GPIO-0 .. GPIO-5</strong></p>
+<pre><code class="language-cpp">// Define the GPIO used to output a pulse signal
+#define PULSE_GPIO 10 // GPIO-10
+
+// Define the GPIO used to wake up the ESP32-C3 from deep sleep
+// Note: Only GPIO0–5 are RTC capable on ESP32-C3 and usable for wakeup
+#define WAKEUP_GPIO 3 
+
+// Define the deep sleep interval in microseconds (100 msec)
+#define SLEEP_INTERVAL_USEC (100*1000UL)
+
+void setup() {
+   // Set the wakeup GPIO as input with internal pull-up resistor
+   pinMode(WAKEUP_GPIO, INPUT_PULLUP);
+
+   // Set the pulse output GPIO as output
+   pinMode(PULSE_GPIO, OUTPUT);
+
+   // Flag to determine whether to enter deep sleep
+   bool disable_deep_sleep = false;
+
+   // Check the reason for wakeup
+   esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+   if (wakeup_reason == ESP_SLEEP_WAKEUP_GPIO) {
+      // If wakeup was due to GPIO, skip entering deep sleep again
+      disable_deep_sleep = true;
+   } 
+
+   // Generate pulse sequence on PULSE_GPIO
+   digitalWrite(PULSE_GPIO, 1);
+   delay(10);
+   digitalWrite(PULSE_GPIO, 0);
+   delay(10);
+   digitalWrite(PULSE_GPIO, 1);
+
+   if (!disable_deep_sleep) {
+     // Enable timer-based wakeup after SLEEP_INTERVAL_USEC
+     esp_sleep_enable_timer_wakeup(SLEEP_INTERVAL_USEC);
+
+     // Create bitmask for the WAKEUP_GPIO pin
+     uint64_t gpio_mask = 1ULL &lt;&lt; WAKEUP_GPIO;
+
+     // Enable wake-up on WAKEUP_GPIO when it goes LOW
+     esp_deep_sleep_enable_gpio_wakeup(gpio_mask, ESP_GPIO_WAKEUP_GPIO_LOW);
+
+     // Enter deep sleep mode - execution stops here until next wakeup
+     esp_deep_sleep_start();
+   } 
+}
+
+void loop() {
+   // Toggle the pulse output pin every 50 ms
+   // (only runs after wakeup from GPIO)
+   digitalWrite(PULSE_GPIO, !digitalRead(PULSE_GPIO));
+   delay(50);
+}
+</code></pre>
+<p>โค้ดนี้ใช้กับบอร์ด <strong>ESP32-C3</strong> เพื่อสาธิตการทำงานดังต่อไปนี้</p>
+<ul>
+<li>ส่งสัญญาณพัลส์ออกทางขา <code>PULSE_GPIO</code> (<strong>GPIO-10</strong>) </li>
+<li>ทำให้ <strong>ESP32-C3</strong> เข้าสู่โหมด <strong>Deep Sleep</strong></li>
+<li>กำหนดให้ชิปสามารถตื่นขึ้นจาก <strong>Deep Sleep</strong> ได้ 2 วิธี:<ul>
+<li>จากการหมดเวลา (<strong>Built-in RTC Timer</strong>)</li>
+<li>จากสัญญาณลอจิก <code>LOW</code> ที่ขา <code>WAKEUP_GPIO</code> (เลือกใช้ขา <strong>GPIO 3</strong>)</li>
+</ul>
+</li>
+<li>ขา <code>WAKEUP_GPIO</code> ถูกตั้งค่าเป็น <code>INPUT_PULLUP</code> เพื่อรอรับสัญญาณ <code>LOW</code> จากภายนอก</li>
+<li>ขา <code>PULSE_GPIO</code> ถูกตั้งค่าเป็น <code>OUTPUT</code> สำหรับส่งสัญญาณพัลส์ออกไป</li>
+</ul>
+<p>คำสั่งสำคัญในการจัดการ <strong>Sleep/Wakeup</strong>:</p>
+<ul>
+<li>การเปิดใช้งาน <strong>Wakeup</strong> แบบตั้งเวลา:<br />
+  ใช้คำสั่ง <code>esp_sleep_enable_timer_wakeup(...)</code></li>
+<li>การเปิดใช้งาน <strong>Wakeup</strong> ด้วย <strong>GPIO</strong> แบบตรวจจับสถานะ <code>LOW</code>:<br />
+  ใช้คำสั่ง <code>esp_deep_sleep_enable_gpio_wakeup(...)</code></li>
+<li>การเริ่มเข้าสู่โหมด <strong>Deep Sleep</strong>:<br />
+  ใช้คำสั่ง <code>esp_deep_sleep_start()</code></li>
+<li>การตรวจสอบว่า ซีพียูตื่นขึ้นมาด้วยสาเหตุใด:
+   ใช้คำสั่ง <code>esp_sleep_get_wakeup_cause()</code></li>
+</ul>
+<p>จากโค้ดตัวอย่าง หากพบว่าเป็นการตื่นจาก <strong>GPIO</strong> (<code>ESP_SLEEP_WAKEUP_GPIO</code>)
+จะไม่เข้าสู่ <strong>Deep Sleep</strong> อีกครั้ง และจะเข้าสู่ฟังก์ชัน <code>loop()</code>
+เพื่อทำการ <strong>Toggle</strong> (สลับ <code>HIGH</code> / <code>LOW</code>) สัญญาณที่ <code>PULSE_GPIO</code> ทุก <strong>50ms</strong></p>
+<p><img alt="" src="deep_sleep_gpio_wakeup.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณที่วัดได้ด้วสโคป แสดงให้เห็นช่วงที่ถูกปลุกด้วย <strong>RTC Timer</strong>
+และถัดมาเป็นการปลุกด้วย <strong>RTC GPIO</strong> และไม่เข้าสู่โหมด <strong>Deep-Sleep</strong> อีกต่อไป
+(ใช้กระแสประมาณ <strong>18.3mA</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="5-modem-sleep-wi-fi-sta">&#9655; ตัวอย่างโค้ดที่ 5: <strong>Modem-Sleep &amp; Wi-Fi STA</strong><a class="headerlink" href="#5-modem-sleep-wi-fi-sta" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการขั้นตอนต่อไปนี้</p>
+<ul>
+<li>ทำให้ <strong>ESP32-C3</strong> ทำงานในโหมด <strong>Wi-Fi STA</strong></li>
+<li>เชื่อมต่อกับ <strong>Wi-Fi AP / Router</strong> ซึ่งต้องตั้งค่า <code>WIFI_SSID</code> และ <code>WIFI_PASSWD</code> ในไฟล์  <code>"secrets.h"</code></li>
+<li>เมื่อเชื่อมต่อ <strong>Wi-Fi</strong> ได้แล้ว จะตรวจสอบการเชื่อมต่อกับ <strong>Host</strong> ในอินเทอร์เน็ต
+เช่น <code>8.8.8.8</code> ด้วยวิธีการ <strong>Ping</strong> (ใช้ <strong>Arduino Library</strong> ที่มีชื่อว่า
+<code>ESPping</code> สำหรับการทำงานในส่วนนี้)</li>
+<li>เมื่อได้ทำขั้นตอน <strong>Ping</strong> ในครั้งแรกแล้วภายในฟังก์ชัน <code>setup()</code> จะทำคำสั่ง
+<code>WiFi.setSleep( WIFI_PS_MAX_MODEM )</code> เพื่อทำให้ <strong>ESP32-C3</strong>
+สามารถเข้าสู่โหมด <strong>Modem-Sleep</strong> ได้ หาก  <strong>CPU</strong> อยู่ในสภาวะ <strong>Idle</strong>
+ก่อนทำขั้นตอน <strong>Ping</strong> ในช่วงเวลาถัดไป (เช่น ทุก ๆ 5 วินาที โดยประมาณ)</li>
+</ul>
+<pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+#include &lt;WiFi.h&gt;
+#include &lt;ESPping.h&gt; // Use the ESPping library (v1.0.5)
+
+#include &quot;secrets.h&quot; // Define WIFI_SSID and WIFI_PASSWD
+
+static IPAddress PING_IP(8, 8, 8, 8); // The remote ip to ping
+
+#define PING_INTERVAL_MSEC (5000)
+#define PULSE_GPIO 10 // GPIO-10
+
+void connect_wifi() {
+  WiFi.setTxPower( WIFI_POWER_21dBm );
+  WiFi.mode( WIFI_STA );
+  WiFi.begin( WIFI_SSID, WIFI_PASSWD ); 
+  WiFi.setSleep(false);
+  WiFi.setAutoReconnect(true);
+
+  Serial.println(&quot;Connecting to WiFi...&quot;);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(200);
+    Serial.print(&quot;.&quot;);
+  }
+  Serial.println(&quot;\nConnected!&quot;);
+  Serial.print(&quot;IP address: &quot;);
+  Serial.println(WiFi.localIP());
+}
+
+bool ping( int count=3 ) {
+  bool success = Ping.ping(PING_IP, count );
+  if (success) {
+    float avg_time_ms = Ping.averageTime();
+    Serial.printf(&quot;Ping: %.1f msec\n&quot;, avg_time_ms );
+    digitalWrite(PULSE_GPIO, 1);
+    delay( (int)(avg_time_ms) );
+    digitalWrite(PULSE_GPIO, 0);
+  }
+  return success;
+}
+
+void setup() {
+  // Set the pulse output GPIO as output
+  pinMode(PULSE_GPIO, OUTPUT);
+  digitalWrite(PULSE_GPIO, 0);
+
+  Serial.begin(115200);
+  delay(100);
+  connect_wifi();
+
+  if (!ping()) {
+    String ip = PING_IP.toString();
+    Serial.printf(&quot;Ping failed! %s\n&quot;, ip.c_str() );
+  }
+
+  // Enter Modem-sleep mode / WIFI_PS_MAX_MODEM 
+  WiFi.setSleep( WIFI_PS_MAX_MODEM ); 
+}
+
+void loop() {
+  static unsigned long last_ping_ts = 0;
+  uint32_t now = millis();
+  if (now - last_ping_ts &gt; PING_INTERVAL_MSEC) {
+    last_ping_ts = now;
+    ping();
+  }
+}
+</code></pre>
+<p>ถัดไปเป็นตัวอย่างคลื่นสัญญาณซึ่งวัดด้วยสโคป 2 ช่อง มีดังนี้ ช่อง <strong>CH1</strong> คือ แรงดันเอาต์พุตจากโมดูล <strong>MAX4080S</strong>
+และ <strong>CH2</strong> คือ สัญญาณพัลส์จากขา <strong>GPIO</strong> ของ <strong>ESP32-C3</strong> สัญญาณพัลส์ช่วงที่เป็น <strong>HIGH</strong>
+แสดงว่า การทำขั้นตอน <strong>Ping</strong> ในแต่ละครั้ง สำเร็จแล้ว</p>
+<p><img alt="" src="modem_sleep-1.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณช่วงแรกหลังจากรีเซต (<strong>Power Reset</strong>) การทำงานของ <strong>ESP32-C3</strong> เพื่อเริ่มต้นการทำงาน</p>
+<p>ช่วงแรกของการเริ่มต้นทำงานหลังจาก <strong>Power Reset</strong> และจะเห็นได้ว่า (ในโค้ดตัวอย่าง มีเปิดใช้งาน <strong>WiFi</strong> ด้วย
+และวงจร <strong>RF</strong> ถือว่าเป็นส่วนที่ใช้กระแสมากที่สุดของชิป)
+จะเห็นได้ว่า มีบางช่วงแรงดันขึ้นถึงระดับประมาณ <strong>1150mV</strong> หรือคิดเป็นกระแส <strong>191.67mA</strong></p>
+<p><img alt="" src="modem_sleep-2.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณ เมื่อชิป <strong>ESP32-C3</strong> มีการทำงานในโหมด <strong>Modem-Sleep</strong></p>
+<p>จากรูปคลื่นสัญญาณ เมื่อมีการเข้าสู่โหมด <strong>Modem-Sleep</strong> จะเห็นได้ว่า บางช่วงเวลา
+วัดแรงดันได้ประมาณ <strong>200mV ~ 520mV</strong> หรือ คิดเป็นกระแสประมาณ <strong>33.3mA ~ 86.7mA</strong>
+ช่วงที่ใช้กระแสสูงนั้นเกิดขึ้นจากการทำงานของ <strong>Wi-Fi STA</strong> ที่ต้องเชื่อมต่อกับ <strong>WiFi AP / Router</strong> เป็นระยะ ๆ</p>
+<p><img alt="" src="modem_sleep-3.jpg" /></p>
+<p>รูป: ตัวอย่างคลื่นสัญญาณ เมื่อชิป <strong>ESP32-C3</strong> ไม่มีการทำงานในโหมด <strong>Modem-Sleep</strong></p>
+<p>จากรูปคลื่นสัญญาณ หากไม่มีการเข้าสู่โหมด <strong>Modem-Sleep</strong> (ไม่ได้เปิดใช้งานโหมดนี้)
+และมีการทำงานในโหมด <strong>WiFI-STA</strong> ด้วย
+จะวัดแรงดันได้ประมาณ <strong>500mV ~ 520mV</strong> หรือ คิดเป็นกระแสประมาณ <strong>83.3mA ~ 86.7mA</strong></p>
+<p>ดังนั้นจึงสรุปได้ว่า การเปิดใช้งานโหมด <strong>Modem-Sleep</strong> ชิป <strong>ESP32-C3</strong> ก็ช่วยลดการใช้กระแสได้เมื่อเปรียบเทียบกับการทำงาน
+ในโหมด <strong>CPU Active</strong> หรือไม่ได้เปิดใช้งานโหมด <strong>Modem-Sleep</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้มีตัวอย่างโค้ดเพื่อสาธิตการทำให้ชิป <strong>ESP32-C3</strong> เข้าสู่โหมดประหยัดพลังงาน
+พร้อมกับการวัดกระแสของวงจรโดยใช้โมดูล <strong>Current-Shunt Monitor – MAX4080S</strong>
+และตรวจสอบเอาต์พุตโดยใช้สโคปแบบดิจิทัล
+โค้ดตัวอย่างและการทดลองวัดสัญญาณ แสดงให้เห็นความแตกต่างของโหมดการทำงานต่าง ๆ ได้อย่างชัดเจน</p>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2025-05-17 | Last Updated: 2025-05-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

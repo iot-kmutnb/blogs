@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/max4080_test/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การทดลองวัดกระแสโดยใช้โมดูล Current Sense Amplifier - MAX4080S - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#current-sense-amplifier-max4080s" class="nav-link">การทดลองวัดกระแสโดยใช้โมดูล Current Sense Amplifier - MAX4080S</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#max4080" class="nav-link">&#9655; การทดลองใช้งานโมดูล MAX4080</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; ขั้นตอนการทดลอง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; ตัวอย่างการวิเคราะห์ผลการทดลอง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="current-sense-amplifier-max4080s">การทดลองวัดกระแสโดยใช้โมดูล Current Sense Amplifier - MAX4080S<a class="headerlink" href="#current-sense-amplifier-max4080s" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Current Sense Amplifier</em>, <em>MAX4080S</em>, <em>Linear Regression</em>, <em>Python</em></p>
+<hr />
+<h2 id="max4080">&#9655; การทดลองใช้งานโมดูล <strong>MAX4080</strong><a class="headerlink" href="#max4080" title="Permanent link">#</a></h2>
+<p>ไอซี <strong>MAX4080</strong> จัดอยู่ในประเภท <strong>Current Sense Amplifier CSA</strong>)
+เหมาะสำหรับการวัดกระแสที่ฝั่ง <strong>High-side</strong> (ระหว่างแหล่งจ่ายไฟและโหลด)
+และใช้สำหรับการวัดกระแสไฟฟ้าแบบ <strong>DC</strong> โดยใช้ตัวต้านทานที่มีค่าความต้านทานต่ำ (<strong>Shunt Resistor</strong>)
+ซึ่งไอซีจะทำหน้าที่แปลงแรงดันตกคร่อมที่ตัวต้านทานดังกล่าวให้เป็นแรงดันเอาต์พุต</p>
+<p><strong>วัตถุประสงค์</strong></p>
+<ul>
+<li>เพื่อศึกษาการทำงานของโมดูล <strong>MAX4080S</strong> ในการวัดแรงดันตกคร่อมที่ 
+<strong>Shunt Resistor</strong> <script type="math/tex">R_S = 0.1\Omega</script> และขยายเป็นแรงดันที่ขา <strong>OUT</strong></li>
+<li>เพื่อศึกษาความสัมพันธ์ระหว่างกระแสไฟฟ้าในโหลดกับแรงดันเอาต์พุตของโมดูล</li>
+<li>เพื่อวิเคราะห์ความเป็นเชิงเส้นของระบบวัดกระแสด้วยวิธี <strong>Linear Regression</strong></li>
+</ul>
+<p><strong>อุปกรณ์และเครื่องมือที่ใช้</strong></p>
+<table>
+<thead>
+<tr>
+<th>รายการ</th>
+<th>จำนวน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>โมดูล <strong>GY-408</strong> (<strong>MAX4080S</strong>)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>ตัวต้านทานโหลด (<script type="math/tex">R_L</script>) <strong>100Ω ±1%</strong></td>
+<td>1</td>
+</tr>
+<tr>
+<td>แหล่งจ่ายไฟ <strong>DC</strong> แบบปรับค่าได้</td>
+<td>1</td>
+</tr>
+<tr>
+<td>มัลติมิเตอร์ดิจิทัล (<strong>Digital Multimeter, DMM</strong>)</td>
+<td>2</td>
+</tr>
+<tr>
+<td>ออสซิลโลสโคปดิจิทัล (<strong>Digital Oscilloscope</strong>)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>สายวัด/สายจั๊มเปอร์</td>
+<td>ตามต้องการ</td>
+</tr>
+<tr>
+<td>เบรดบอร์ด หรือชุดทดลองไฟฟ้า</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>โมดูลที่ได้นำมาใช้ในการทดลองคื <strong>GY-408</strong> มีไอซี <strong>MAX4080S</strong>  (<strong>Gain = 60V/V</strong>)
+และมีตัวต้านทานสำหรับการวัดกระแส <strong>0.1Ω</strong> อยู่บนแผงวงจรแล้ว</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; ขั้นตอนการทดลอง<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<ol>
+<li>
+<p><strong>เตรียมวงจรการทดลอง</strong></p>
+<ul>
+<li>เชื่อมต่อแหล่งจ่ายไฟ <strong>DC</strong> (<script type="math/tex">V_S</script>) กับขา <script type="math/tex">V_{RS+}</script> ของโมดูล <strong>MAX4080S</strong>  และต่อ <strong>GND</strong> ร่วมกันกับวงจร</li>
+<li>เชื่อมต่อแรงดันไฟเลี้ยง <script type="math/tex">V_S</script> กับขา <strong>VCC</strong> เพื่อใช้เป็นแรงดันไฟเลี้ยงให้โมดูล <strong>MAX4080S</strong></li>
+<li>ใช้มัลติมิเตอร์ดิจิทัล วัดค่าความต้านทานของโหลด <script type="math/tex">R_L</script> แล้วจดบันทึกค่าไว้</li>
+<li>ต่อโหลด <script type="math/tex">R_L</script> ขนานกับวงจร โดยให้ปลายหนึ่งต่อกับขา <script type="math/tex">V_{RS-}</script> และอีกปลายต่อกับ <strong>GND</strong></li>
+<li>ต่อ <strong>DMM1</strong> วัดแรงดันตกคร่อมที่ <script type="math/tex">R_L</script> แรงดันตกคร่อม <script type="math/tex">V_L</script> ใช้ในการคำนวณกระแสโหลด 
+  เนื่องจากวงจรเป็นแบบอนุกรม <script type="math/tex">I_{LOAD} = I_{SHUNT} = V_L / R_L</script>
+</li>
+<li>เชื่อมต่อขา <strong>OUT</strong> ของโมดูลกับ <strong>DMM2</strong> และ <strong>Oscilloscope</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>การวัดค่าทางไฟฟ้า</strong></p>
+<ul>
+<li>ใช้ <strong>DMM1</strong> วัดแรงดันตกคร่อมที่โหลด (<script type="math/tex">V_L</script>)</li>
+<li>ใช้ <strong>DMM2</strong> และ <strong>Oscilloscope</strong> วัดแรงดันที่ขา <strong>OUT</strong> ของโมดูล</li>
+</ul>
+</li>
+<li>
+<p><strong>การปรับค่าแรงดันไฟเลี้ยง</strong></p>
+<ul>
+<li>ปรับแรงดันไฟเลี้ยง <script type="math/tex">V_S</script> ที่ป้อนให้กับโมดูลและวงจรตามค่าดังนี้:<br />
+<strong>5.0V ~ 8.0V</strong> (เพิ่มครั้งละ <strong>0.5V</strong>)</li>
+<li>สำหรับแต่ละค่า <script type="math/tex">V_S</script> ให้บันทึกข้อมูลดังนี้:<ul>
+<li>
+<script type="math/tex">V_L</script> (แรงดันตกคร่อมที่ <script type="math/tex">R_L</script>)</li>
+<li>
+<script type="math/tex">V_{OUT}</script> จาก <strong>DMM2</strong></li>
+<li>
+<script type="math/tex">V_{OUT}</script> จาก <strong>Oscilloscope</strong></li>
+<li>คำนวณกระแส <script type="math/tex">I_{LOAD} = V_L / R_L</script>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>การบันทึกข้อมูล</strong></p>
+<ul>
+<li>ใช้ตารางต่อไปนี้บันทึกค่าที่วัดได้:</li>
+</ul>
+</li>
+</ol>
+<p><img alt="" src="measurement_table.jpg" /></p>
+<p>รูป: ตารางสำหรับการบันทึกข้อมูลจากการทดลอง</p>
+<ol>
+<li><strong>การวิเคราะห์ข้อมูล</strong><ul>
+<li>สร้างกราฟแสดงความสัมพันธ์ระหว่าง <script type="math/tex">I_{LOAD}</script> (หรือ <script type="math/tex">I_L</script>) กับ <script type="math/tex">V_{OUT}</script> สำหรับแกนนอนและแกนตั้งตามลำดับ
+(สามารถเขียนโปรแกรม เช่น ใช้ภาษา <strong>Python</strong> ในการคำนวณและแสดงรูปกราฟได้)</li>
+<li>ใช้วิธี <strong>Linear Regression</strong>  (การถดถอยเชิงเส้น) ซึ่งเป็นเทคนิคทางคณิตศาสตร์และสถิติที่ใช้สำหรับ 
+      หาความสัมพันธ์เชิงเส้นระหว่างตัวแปรอิสระกับตัวแปรตาม 
+     และสามารถนำมาใช้กับอินพุต <script type="math/tex">I_{L}</script> และเอาต์พุต <script type="math/tex">V_{OUT}</script> ของโมดูล <strong>MAX4080S</strong></li>
+<li>เปรียบเทียบกับค่าอัตราขยาย (<strong>Gain</strong>) ของ <strong>MAX4080S</strong> ซึ่งควรประมาณ <strong>60V/V</strong>:
+ <script type="math/tex">V_{OUT}\,[mV] = I\,[mA] \times 0.1\,\Omega \times 60\,V/V = 6.0 \times I\,[mA]</script>
+</li>
+</ul>
+</li>
+</ol>
+<p>&nbsp;</p>
+<p>จากการนำข้อมูลจากการทดลองไปใช้ในขั้นตอน <strong>Linear Regression</strong> จะได้สมการในรูปแบบต่อไปนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  V_{OUT} = a \cdot I_L + b  \Rightarrow I_L = \frac{V_{OUT}\, - \, b}{a}
+</script>
+</p>
+<p>โดยที่:</p>
+<ul>
+<li>
+<script type="math/tex">a</script> = ความชันของเส้นตรง (<strong>Slope</strong>) ซึ่งจะต้องใกล้เคียงกับค่า <strong>Gain</strong></li>
+<li>
+<script type="math/tex">b</script> = ค่า <strong>Offset</strong> (<strong>Intercept</strong>)</li>
+</ul>
+<p>การใช้ <strong>Linear Regression</strong> จากการทดลองมีข้อดีหลายอย่าง เช่น 
+เปรียบเทียบค่าความชันที่ได้กับ <strong>Gain</strong> ที่ควรจะเป็น  และชดเชยแรงดัน <strong>Offset</strong> เป็นต้น</p>
+<p><img alt="" src="test_max4080.jpg" /></p>
+<p>รูป: ตัวอย่างการต่อวงจรทดลองโดยใช้โมดูล <strong>MAX4080S</strong></p>
+<p><img alt="" src="scope_measurement.jpg" /></p>
+<p>รูป:ตัวอย่างการวัดสัญญาณ (แรงดันไฟฟ้า <strong>DC</strong> ) ด้วยสโคป 
+สัญญาณช่อง <strong>CH1</strong> ได้จากขา <strong>OUT</strong> ของ <strong>MAX4080S</strong>
+และ <strong>CH2</strong> ได้จากแรงดันตกคร่อมที่ตัวต้านทาน <script type="math/tex">R_L\, (100 \Omega)</script> เทียบกับ <strong>GND</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; ตัวอย่างการวิเคราะห์ผลการทดลอง<a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>Python</strong> สำหรับการวิเคราะห์ข้อมูลจากการทดลอง</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import linregress
+
+R_L = 99.31  # measured resistance value of R_L in Ohm
+
+# Three data sets
+data_samples_set = [
+    # V_L [V] and V_OUT [mV] 
+    [  # Measurement with Scope
+    (4.979, 312),
+    (5.476, 343),
+    (5.973, 374),
+    (6.469, 405),
+    (6.966, 435),
+    (7.464, 462), 
+    (7.959, 493),
+    ], [  # Measurement with DMM2
+    (4.979, 303.5),
+    (5.476, 334.1),
+    (5.973, 364.0),
+    (6.469, 396.8),
+    (6.966, 426.6),
+    (7.464, 455.3), 
+    (7.959, 485.1),
+    ]
+]
+
+data_set_index = 0 # Set the data set index
+data_samples = data_samples_set[data_set_index]
+
+# Split into x (current in mA) and y (voltage in mV)
+V_L, V_OUT = zip(*data_samples)
+I_L = 1000 * np.array(V_L) / R_L  # load current in mA
+V_OUT = np.array(V_OUT)           # output voltage in mV
+
+# Compute linear regression
+a, b, r_value, p_value, std_err = linregress(I_L, V_OUT)
+
+# Print regression results
+print(f&quot;Linear Regression: V_out = a * I_load + b&quot;)
+print(f&quot;a (sensitivity) = {a:.4f} mV/mA&quot;)
+print(f&quot;b (offset)      = {b:.4f} mV&quot;)
+print(f&quot;R^2             = {r_value**2:.5f}&quot;)
+
+# Plotting
+plt.figure(figsize=(9, 5))
+plt.plot(I_L, V_OUT, 'o', label=f'Measured Data Set {data_set_index+1}')
+plt.plot(I_L, a * I_L + b, 'r-', 
+         label=f'Fit: $V_O$ [mV] = {a:.3f} * $I_L$ [mA] {b:+.3f} [mV]')
+plt.xlabel('Load Current $I_L$ [mA]')
+plt.ylabel('Output Voltage $V_{OUT}$ [mV]')
+plt.title('MAX4080: Output Voltage vs. Load Current')
+plt.grid(True)
+plt.legend(loc='upper left', bbox_to_anchor=(0.3, 0.95))
+plt.tight_layout()
+plt.show()
+</code></pre>
+<p><img alt="" src="data_plot.jpg" /></p>
+<p>รูป: ตัวอย่างการนำข้อมูลที่ได้จากการทดลองมาวิเคราะห์และแสดงรูปกราฟ
+เปรียบเทียบกราฟที่ได้จากการวัดด้วย  <strong>Scope (1)</strong> และ <strong>DMM (2)</strong> ตามลำดับ
+ทั้งสองกรณี ได้ความสัมพันธ์แบบเชิงเส้น และได้ความชันใกล้เคียง <strong>6.0 mV/mA</strong>  ตามที่เคยระบุไว้ 
+และมีขนาดของแรงดัน <strong>Offset</strong> สำหรับวิธีการวัด้วยสโคปมากกว่าวิธีการวัดด้วย <strong>DMM</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางและตัวอย่างการทดลองทางไฟฟ้าสำหรับการใช้งานไอซี
+<strong>MAX4080S</strong> (เลือกใช้โมดูล <strong>GY-408</strong>) และนำข้อมูลที่ได้จากการทดลองมาวิเคราะห์
+และแสดงรูปกราฟด้วยโค้ด <strong>Python</strong> ที่ให้ไว้เป็นตัวอย่าง และผลการทดลองก็เป็นไปตามทฤษฎี</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-05-17 | Last Updated: 2025-05-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

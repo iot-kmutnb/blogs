@@ -126,11 +126,11 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="esp32-c3">การทำงานของชิป ESP32-C3 ในโหมดประหยัดพลังงาน<a class="headerlink" href="#esp32-c3" title="Permanent link">#</a></h1>
-<p><strong>Keywords</strong>: <em>EPS32-C3</em>, <em>Power Management</em>, 
-<em>Low-Power Modes</em>, <em>Deep-Sleep</em>, <em>Light-Sleep</em></p>
+<p><strong>Keywords</strong>: <em>ESP32-C3</em>, <em>Power Management</em>, <em>Low-Power Modes</em>, <em>Deep-Sleep</em>, <em>Light-Sleep</em></p>
 <hr />
 <h2 id="esp32-c3_1">&#9655; โหมดการประหยัดพลังงานสำหรับ <strong>ESP32-C3</strong><a class="headerlink" href="#esp32-c3_1" title="Permanent link">#</a></h2>
-<p>การทำงานของ <strong>ESP32-C3</strong> (<em>32-bit, RISC-V-based MCU, 160MHz, 400KB of SRAM</em>) สามารถแบ่งได้เป็น 4 โหมดหลัก:</p>
+<p>การทำงานของ <strong>ESP32-C3</strong> (<em>32-bit, RISC-V-based MCU, 160MHz, 400KB of SRAM,
+2.4GHz WiFi/BLE</em>) สามารถแบ่งได้เป็น 4 โหมดหลัก:</p>
 <ol>
 <li><strong>Active</strong><ul>
 <li>ทำงานในโหมดปรกติ: ซีพียู (<strong>CPU</strong>), <strong>Wi-Fi/BLE</strong> และวงจรต่าง ๆ ทำงานเต็มรูปแบบ</li>
@@ -229,6 +229,8 @@
 <li><strong>Light-sleep</strong>: 130µA (typ)</li>
 <li><strong>Deep-sleep mode</strong>: 5 µA (typ)</li>
 </ul>
+<p><img alt="" src="esp32_c3_current_consumption.jpg" /></p>
+<p>รูป: ตารางข้อมูลการใช้กระแสสำหรับ <strong>ESP32-C3</strong> จากเอกสาร <strong>Datasheet</strong></p>
 <p>ถ้าให้แรงดันไฟเลี้ยงคงที่ เช่น <strong>+3.3V</strong> และนำไปคูณกับปริมาณกระแสโดยเฉลี่ย ก็จะได้กำลังไฟฟ้าของชิป
 <strong>ESP32-C3</strong> แต่ละโหมด ซึ่งมีการใช้ปริมาณกระแส (กำลังไฟฟ้า) แตกต่างกัน </p>
 <p>การวัดและวิเคราะห์การใช้กระแสไฟฟ้าที่มีการเปลี่ยนแปลงอย่างรวดเร็วในเชิงเวลา และอาจอยู่ในระดับที่ต่ำ (nA, uA, mA) 
@@ -263,15 +265,24 @@
 <li>
 <p><strong>ULP-RISC-V</strong>:</p>
 <ul>
-<li>ใช้ซีพียู 32 บิต สถาปัตยกรรม <strong>RISC-V</strong> และมีอยู่ในชิป <strong>ESP32-S2</strong> และ <strong>ESP32-S3</strong></li>
-<li>เขียนโปรแกรมโดยผู้ใช้ได้และใช้ภาษา <strong>C</strong> ได้ โดยใช้ซอฟต์แวร์ <strong>Espressif ESP-IDF</strong></li>
+<li>มีอยู่ในชิป <strong>ESP32-S2</strong> และ <strong>ESP32-S3</strong></li>
+<li>ใช้หน่วยประมวลผลแบบ <strong>RISC-V</strong> 32 บิต (<code>RV32IMC</code>)</li>
+<li>รองรับการคูณและหารด้วยฮาร์ดแวร์ และมีรูปแบบคำสั่งแบบย่อ (<strong>Compressed Instructions</strong>)</li>
+<li>ความถี่การทำงานอยู่ที่ <strong>17.5 MHz</strong> (<code>RTC_FAST_CLK</code>)</li>
+<li>เขียนโปรแกรมโดยผู้ใช้ได้และใช้ภาษา <strong>C</strong> และ <strong>Assembly</strong> ได้
+โดยใช้ซอฟต์แวร์ <strong>Espressif ESP-IDF</strong> ใช้เครื่องมือมาตรฐานของ <strong>GNU</strong> 
+เช่น <code>riscv-none-embed-gcc</code></li>
 <li>ทำงานได้เมื่อชิปอยู่ในโหมด <strong>Deep Sleep</strong> และ <strong>Light Sleep</strong> และสามารถให้ปลุกการทำงานของซีพียูหลักได้</li>
+<li>รองรับการเข้าถึงหน่วยความจำ <code>RTC_SLOW_MEM</code> รีจิสเตอร์ของ <code>RTC_CNTL</code>, <code>RTC_IO</code> และ <code>SAR-ADC</code></li>
+<li>เมื่อระบบเริ่มทำงาน โปรแกรม <code>ULP</code> จะถูกคัดลอกจาก <strong>Flash</strong> 
+  ไปยัง <strong>RTC SLOW Memory</strong> (ใช้เก็บทั้งโค้ดและข้อมูลของโปรแกรม <strong>ULP</strong>) แล้วจึงเริ่มทำงาน</li>
+<li>สำหรับ <strong>ESP32-S3</strong> มี <strong>RTC Memory</strong> ขนาด <strong>8KB (FAST) + 8KB (SLOW)</strong> </li>
 </ul>
 </li>
 <li>
 <p><strong>ULP Low-Power Core (LP-Core)</strong>:</p>
 <ul>
-<li>เหมือน <strong>ULP-RISC-V</strong> แต่มีการเพิ่มฟังก์ชันการทำงาน</li>
+<li>พัฒนาต่อยอดจาก <strong>ULP-RISC-V</strong> แต่มีการเพิ่มฟังก์ชันการทำงาน</li>
 <li>มีอยู่ในชิป <strong>ESP32-C6</strong></li>
 </ul>
 </li>
@@ -446,11 +457,17 @@ $ idf.py -p /dev/ttyACM0 flash
 <p>บทความนี้อธิบายโหมดการทำงานที่ประหยัดพลังงานของ <strong>ESP32-C3</strong> โดยแต่ละโหมดมีลักษณะการทำงานและระดับการประหยัดพลังงานที่แตกต่างกัน ขึ้นอยู่กับการปิดการใช้งานวงจรภายในส่วนใดบ้าง  มีการเปรียบเทียบความแตกต่างระหว่าง <strong>Light-Sleep</strong>
 <strong>Deep-Sleep</strong> และมีตัวอย่างโค้ดสำหรับ <strong>Arduino</strong> และ <strong>ESP-IDF</strong> สาธิตการทำงานในโหมด <strong>Deep-Sleep</strong></p>
 <p>แนวทางในการศึกษาและทดลองปฏิบัติเพิ่มเติม ได้แก่ การวัดปริมาณกระแสไฟฟ้าเปรียบเทียบโหมดการทำงาน
-และช่วงเวลาในการตื่นขึ้นมาทำงานต่อ</p>
+และช่วงเวลาในการตื่นขึ้นมาทำงานต่อ อาจจะใช้โมดูล <strong>Current-Sense Amplifier / Current Shunt
+Monitor</strong> เช่น <strong>MAX4080S</strong> เป็นต้น</p>
+<ul>
+<li><a href="../esp32-c3_sleep_wakeup/">"การเขียนโปรแกรม <strong>ESP32-C3</strong> ด้วย <strong>Arduino</strong> ทำงานในโหมด <strong>Sleep / Wakeup</strong> และวิเคราะห์การใช้พลังงาน"</a></li>
+<li><a href="../../electronics/max4080/">"แนะนำการใช้งานโมดูล <strong>MAX4080 Current Sensor</strong>"</a></li>
+<li><a href="../../electronics/max4080_test/">"การทดลองวัดกระแสโดยใช้โมดูล <strong>Current Sense Amplifier - MAX4080S</strong>"</a></li>
+</ul>
 <p>&nbsp;</p>
 <hr />
 <p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
-<p>Created: 2025-05-15 | Last Updated: 2025-05-16</p></div>
+<p>Created: 2025-05-15 | Last Updated: 2025-05-17</p></div>
             </div>
         </div>
 
