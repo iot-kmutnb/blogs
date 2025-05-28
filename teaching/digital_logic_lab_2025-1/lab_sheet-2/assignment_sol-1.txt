@@ -1,0 +1,85 @@
+-- Slide Switches (SW), Push buttons (KEY) and 6-digit 7-segment displays (HEX0..HEX5)
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+-- Define the entity "top"
+ENTITY top IS
+    PORT (
+        SW : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+        KEY : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        HEX0 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX1 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX2 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX3 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX4 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX5 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX6 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY top;
+
+ARCHITECTURE behave OF top IS
+
+    -- Function to decode a 4-bit BCD digit to a 7-segment pattern
+    FUNCTION DEC7SEG(d : INTEGER RANGE 0 TO 15) RETURN STD_LOGIC_VECTOR IS
+    BEGIN
+        CASE d IS
+            WHEN 0 => RETURN "11000000"; -- 0
+            WHEN 1 => RETURN "11111001"; -- 1
+            WHEN 2 => RETURN "10100100"; -- 2
+            WHEN 3 => RETURN "10110000"; -- 3
+            WHEN 4 => RETURN "10011001"; -- 4
+            WHEN 5 => RETURN "10010010"; -- 5
+            WHEN 6 => RETURN "10000010"; -- 6
+            WHEN 7 => RETURN "11111000"; -- 7
+            WHEN 8 => RETURN "10000000"; -- 8
+            WHEN 9 => RETURN "10010000"; -- 9
+            WHEN 10 => RETURN "10001000"; -- A
+            WHEN 11 => RETURN "10000011"; -- b
+            WHEN 12 => RETURN "11000110"; -- C
+            WHEN 13 => RETURN "10100001"; -- d
+            WHEN 14 => RETURN "10000110"; -- E
+            WHEN 15 => RETURN "10001110"; -- F
+            WHEN OTHERS => RETURN "11111111"; -- blank/off 
+        END CASE;
+    END FUNCTION;
+
+    SIGNAL d0, d1, d2, d3 : INTEGER RANGE 0 TO 9;
+    SIGNAL sw_value : INTEGER RANGE 0 TO 1023;
+
+BEGIN
+
+    sw_value <= TO_INTEGER(UNSIGNED(SW));
+    -- binary to BCD conversion
+    PROCESS (sw_value)
+        VARIABLE value : INTEGER;
+    BEGIN
+        value := sw_value;
+        d3 <= value / 1000;
+        value := value MOD 1000;
+        d2 <= value / 100;
+        value := value MOD 100;
+        d1 <= value / 10;
+        d0 <= value MOD 10;
+    END PROCESS;
+
+    PROCESS (KEY, d0, d1, d2, d3)
+    BEGIN
+        IF KEY /= "11" THEN
+            HEX0 <= DEC7SEG(TO_INTEGER(UNSIGNED(SW(3 DOWNTO 0))));
+            HEX1 <= DEC7SEG(TO_INTEGER(UNSIGNED(SW(7 DOWNTO 4))));
+            HEX2 <= DEC7SEG(TO_INTEGER(UNSIGNED("00" & SW(9 DOWNTO 8))));
+            HEX3 <= (OTHERS => '1');
+        ELSE
+            HEX0 <= DEC7SEG(d0); -- x1
+            HEX1 <= DEC7SEG(d1); -- x10
+            HEX2 <= DEC7SEG(d2); -- x100
+            HEX3 <= DEC7SEG(d3); -- x1000
+        END IF;
+    END PROCESS;
+
+    HEX4 <= (OTHERS => '1');
+    HEX5 <= (OTHERS => '1');
+
+END behave;

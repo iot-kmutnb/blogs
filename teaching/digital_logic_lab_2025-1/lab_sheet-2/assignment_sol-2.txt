@@ -1,0 +1,84 @@
+-- Slide Switches (SW), Push buttons (KEY) and 6-digit 7-segment displays (HEX0..HEX5)
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+-- Define the entity "top"
+ENTITY top IS
+    PORT (
+        SW : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+        KEY : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        HEX0 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX1 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX2 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX3 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX4 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX5 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX6 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY top;
+
+ARCHITECTURE dataflow OF top IS
+
+    FUNCTION DEC7SEG(d : INTEGER RANGE 0 TO 15) RETURN STD_LOGIC_VECTOR IS
+    BEGIN
+        CASE d IS
+            WHEN 0 => RETURN "11000000";
+            WHEN 1 => RETURN "11111001";
+            WHEN 2 => RETURN "10100100";
+            WHEN 3 => RETURN "10110000";
+            WHEN 4 => RETURN "10011001";
+            WHEN 5 => RETURN "10010010";
+            WHEN 6 => RETURN "10000010";
+            WHEN 7 => RETURN "11111000";
+            WHEN 8 => RETURN "10000000";
+            WHEN 9 => RETURN "10010000";
+            WHEN 10 => RETURN "10001000"; -- A
+            WHEN 11 => RETURN "10000011"; -- b
+            WHEN 12 => RETURN "11000110"; -- C
+            WHEN 13 => RETURN "10100001"; -- d
+            WHEN 14 => RETURN "10000110"; -- E
+            WHEN 15 => RETURN "10001110"; -- F
+            WHEN OTHERS => RETURN "11111111"; -- blank
+        END CASE;
+    END FUNCTION;
+
+    CONSTANT ONES : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '1');
+    -- BCD digits
+    SIGNAL d0, d1, d2, d3 : INTEGER RANGE 0 TO 9 := 0;
+    SIGNAL sw_int : INTEGER RANGE 0 TO 1023 := 0;
+    SIGNAL sel : STD_LOGIC;
+
+BEGIN
+
+    -- Convert switch input to integer
+    sw_int <= TO_INTEGER(UNSIGNED(SW));
+
+    -- BCD digit extraction
+    d3 <= sw_int / 1000;
+    d2 <= (sw_int MOD 1000) / 100;
+    d1 <= (sw_int MOD 100) / 10;
+    d0 <= sw_int MOD 10;
+
+    sel <= '1' WHEN KEY /= "11" ELSE
+        '0';
+    -- HEX display (raw binary)
+    HEX0 <= DEC7SEG(TO_INTEGER(UNSIGNED(SW(3 DOWNTO 0)))) WHEN sel = '1'
+        ELSE
+        DEC7SEG(d0);
+    HEX1 <= DEC7SEG(TO_INTEGER(UNSIGNED(SW(7 DOWNTO 4)))) WHEN sel = '1'
+        ELSE
+        DEC7SEG(d1);
+    HEX2 <= DEC7SEG(TO_INTEGER(UNSIGNED("00" & SW(9 DOWNTO 8)))) WHEN sel = '1'
+        ELSE
+        DEC7SEG(d2);
+    HEX3 <= ONES WHEN sel = '1' ELSE
+        DEC7SEG(d3);
+
+    -- Unused digits (blank)
+    HEX4 <= ONES;
+    HEX5 <= ONES;
+    HEX6 <= ONES;
+
+END dataflow;
