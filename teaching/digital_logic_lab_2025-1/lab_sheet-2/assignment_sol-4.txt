@@ -1,0 +1,149 @@
+-----------------------------------------------------------
+-- File: top.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY top IS
+    PORT (
+        SW   : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+        HEX0 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX1 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX2 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX3 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX4 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX5 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+    TYPE seg_array IS ARRAY(0 TO 5) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL segs : seg_array;
+    SIGNAL data : STD_LOGIC_VECTOR(23 DOWNTO 0);
+    SIGNAL cond : STD_LOGIC;
+
+    -- Component Declarations
+    COMPONENT rom16x24
+        PORT (
+            addr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            data : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT bcd2seg7
+        PORT (
+            bcd : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            seg7 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+        );
+    END COMPONENT;
+
+BEGIN
+
+    -- ROM access (only lower 4 bits of SW used)
+    u_rom : rom16x24
+    PORT MAP(
+        addr => SW(3 DOWNTO 0),
+        data => data
+    );
+
+    -- Generate 6 instances of bcd2seg7 decoders
+    gen_decoder : FOR i IN 0 TO 5 GENERATE
+        u_bcd2seg7 : bcd2seg7
+        PORT MAP(
+            bcd => data(4 * (i + 1) - 1 DOWNTO 4 * i),
+            seg7 => segs(i)
+        );
+    END GENERATE;
+
+    cond <= '1' WHEN SW(9 DOWNTO 4) = "000000" ELSE '0';
+
+    -- Assign outputs to HEX displays
+    HEX0 <= segs(0) WHEN cond = '1' ELSE  x"BF";
+    HEX1 <= segs(1) WHEN cond = '1' ELSE  x"BF";
+    HEX2 <= segs(2) WHEN cond = '1' ELSE  x"BF";
+    HEX3 <= segs(3) WHEN cond = '1' ELSE  x"BF";
+    HEX4 <= segs(4) WHEN cond = '1' ELSE  x"BF";
+    HEX5 <= segs(5) WHEN cond = '1' ELSE  x"BF";
+
+END ARCHITECTURE;
+
+-----------------------------------------------------------
+
+-- File: rom16x24.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY rom16x24 IS
+    PORT (
+        addr : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+        data : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE behavioral OF rom16x24 IS
+BEGIN
+    -- This VHDL code can be inferred as a ROM by synthesis tools.
+    PROCESS (addr)
+    BEGIN
+        CASE addr IS
+            WHEN "0000" => data <= x"000000";
+            WHEN "0001" => data <= x"111111";
+            WHEN "0010" => data <= x"222222";
+            WHEN "0011" => data <= x"333333";
+            WHEN "0100" => data <= x"444444";
+            WHEN "0101" => data <= x"555555";
+            WHEN "0110" => data <= x"666666";
+            WHEN "0111" => data <= x"777777";
+            WHEN "1000" => data <= x"888888";
+            WHEN "1001" => data <= x"999999";
+            WHEN "1010" => data <= x"AAAAAA";
+            WHEN "1011" => data <= x"BBBBBB";
+            WHEN "1100" => data <= x"CCCCCC";
+            WHEN "1101" => data <= x"DDDDDD";
+            WHEN "1110" => data <= x"EEEEEE";
+            WHEN "1111" => data <= x"FFFFFF";
+            WHEN OTHERS => NULL;
+        END CASE;
+    END PROCESS;
+END ARCHITECTURE;
+
+-----------------------------------------------------------
+
+-- File: bcd2seg7.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY bcd2seg7 IS
+    PORT (
+        bcd : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        seg7 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE dataflow OF bcd2seg7 IS
+BEGIN
+    WITH bcd SELECT
+        seg7 <= "11000000" WHEN "0000", -- 0
+        "11111001" WHEN "0001", -- 1
+        "10100100" WHEN "0010", -- 2
+        "10110000" WHEN "0011", -- 3
+        "10011001" WHEN "0100", -- 4
+        "10010010" WHEN "0101", -- 5
+        "10000010" WHEN "0110", -- 6
+        "11111000" WHEN "0111", -- 7
+        "10000000" WHEN "1000", -- 8
+        "10010000" WHEN "1001", -- 9
+        "10001000" WHEN "1010", -- A
+        "10000011" WHEN "1011", -- b
+        "11000110" WHEN "1100", -- C
+        "10100001" WHEN "1101", -- d
+        "10000110" WHEN "1110", -- E
+        "10001110" WHEN "1111", -- F
+        (OTHERS => '1') WHEN OTHERS;
+END ARCHITECTURE;
+
+-----------------------------------------------------------
+

@@ -162,6 +162,18 @@
             </li>
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#lab-4-rom-modeling-in-vhdl" class="nav-link">Lab 4: ROM Modeling in VHDL</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#objective_3" class="nav-link">Objective</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#lab-procedure_3" class="nav-link">Lab Procedure:</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -180,6 +192,7 @@
 </li>
 <li><a href="#lab-2-combinational-logic-circuits-using-push-buttons-and-7-segment-displays-as-io-devices"><strong>Lab 2: Combinational Logic Circuits Using Push Buttons, 7-Segment Displays as I/O Devices</strong></a></li>
 <li><a href="#lab-3-binary-to-gray-code-conversion-vhdl-simulation"><strong>Lab 3: Binary-to-Gray Code Conversion &amp; VHDL Simulation</strong></a></li>
+<li><a href="#lab-4-rom-modeling-in-vhdl"><strong>Lab 4: ROM Modeling in VHDL</strong></a></li>
 </ul>
 <hr />
 <h2 id="lab-1-combinational-logic-circuits-using-slide-switches-and-leds-as-io-devices"><strong>Lab 1: Combinational Logic Circuits Using Slide Switches and LEDs as I/O Devices</strong><a class="headerlink" href="#lab-1-combinational-logic-circuits-using-slide-switches-and-leds-as-io-devices" title="Permanent link">#</a></h2>
@@ -904,8 +917,7 @@ set_location_assignment PIN_A7 -to KEY[1]
 </ul>
 <p><img alt="" src="7seg_dec_511.jpg" /></p>
 <p><img alt="" src="7seg_hex_3ff.jpg" /></p>
-<p><strong>Figure:</strong>  Setting of the slide switches corresponding to
-<code>0511</code> (dec) and <code>1FF</code> (hex) </p>
+<p><strong>Figure:</strong> Setting of the slide switches corresponding to <code>0511</code> (dec) and <code>1FF</code> (hex). </p>
 <hr />
 <h2 id="lab-3-binary-to-gray-code-conversion-vhdl-simulation"><strong>Lab 3: Binary-to-Gray Code Conversion &amp; VHDL Simulation</strong><a class="headerlink" href="#lab-3-binary-to-gray-code-conversion-vhdl-simulation" title="Permanent link">#</a></h2>
 <h3 id="objective_2"><strong>Objective</strong><a class="headerlink" href="#objective_2" title="Permanent link">#</a></h3>
@@ -958,12 +970,120 @@ Boolean equations:</p>
 <li><code>SW = "0101011011"</code></li>
 </ul>
 </li>
+<li>Demonstrate your design to the lab instructor for validation.</li>
 </ul>
 </li>
 </ol>
 <hr />
+<h2 id="lab-4-rom-modeling-in-vhdl"><strong>Lab 4: ROM Modeling in VHDL</strong><a class="headerlink" href="#lab-4-rom-modeling-in-vhdl" title="Permanent link">#</a></h2>
+<h3 id="objective_3"><strong>Objective</strong><a class="headerlink" href="#objective_3" title="Permanent link">#</a></h3>
+<ul>
+<li>Learn how to model a ROM in VHDL.</li>
+<li>Learn how a ROM model in VHDL is implemented using FPGA resources.</li>
+</ul>
+<h3 id="lab-procedure_3"><strong>Lab Procedure:</strong><a class="headerlink" href="#lab-procedure_3" title="Permanent link">#</a></h3>
+<ol>
+<li>
+<p>Write a VHDL code for the following module:</p>
+<ul>
+<li>It uses the positions of the six slide switches (<strong>SW</strong>) as a 6-bit address input to a <strong>ROM</strong> or <strong>lookup table (LUT)</strong>.</li>
+<li>The ROM stores <strong>24-bit constants</strong>, where each constant encodes <strong>six 4-bit BCD values</strong>.</li>
+<li>The <strong>6 × 4-bit BCD outputs</strong> from the ROM are connected to <strong>six BCD-to-7-segment decoders</strong> (they can also be implemented as ROMs as shown in <code>bcd2seg7.vhd</code>).</li>
+<li>The outputs of the decoders drive a <strong>6-digit 7-segment display</strong>.</li>
+<li>The ROM must be implemented as a separate VHDL module (<code>rom16x24.vhd</code>) and instantiated in the top-level design.</li>
+<li>The ROM must be preloaded with specific values for the <strong>first 16 addresses</strong>, as provided below.</li>
+<li>For all remaining addresses, the ROM should return the value corresponding to
+<strong><code>"------"</code></strong> on the 7-segment display.</li>
+</ul>
+</li>
+<li>
+<p>Test your FPGA design using the <strong>DE10-Lite FPGA board</strong>:</p>
+<ul>
+<li>Compile and upload your design to the FPGA board.</li>
+<li>Use the slide switches to change the ROM address and observe the corresponding 7-segment display.</li>
+<li>Demonstrate your design to the lab instructor for validation.</li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-VHDL">-- File: rom16x24.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY rom16x24 IS
+    PORT (
+        addr : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+        data : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE behavioral OF rom16x24 IS
+BEGIN
+    -- This VHDL code can be inferred as a ROM by synthesis tools.
+    PROCESS (addr)
+    BEGIN
+        CASE addr IS
+            WHEN &quot;0000&quot; =&gt; data &lt;= x&quot;000000&quot;;
+            WHEN &quot;0001&quot; =&gt; data &lt;= x&quot;111111&quot;;
+            WHEN &quot;0010&quot; =&gt; data &lt;= x&quot;222222&quot;;
+            WHEN &quot;0011&quot; =&gt; data &lt;= x&quot;333333&quot;;
+            WHEN &quot;0100&quot; =&gt; data &lt;= x&quot;444444&quot;;
+            WHEN &quot;0101&quot; =&gt; data &lt;= x&quot;555555&quot;;
+            WHEN &quot;0110&quot; =&gt; data &lt;= x&quot;666666&quot;;
+            WHEN &quot;0111&quot; =&gt; data &lt;= x&quot;777777&quot;;
+            WHEN &quot;1000&quot; =&gt; data &lt;= x&quot;888888&quot;;
+            WHEN &quot;1001&quot; =&gt; data &lt;= x&quot;999999&quot;;
+            WHEN &quot;1010&quot; =&gt; data &lt;= x&quot;AAAAAA&quot;;
+            WHEN &quot;1011&quot; =&gt; data &lt;= x&quot;BBBBBB&quot;;
+            WHEN &quot;1100&quot; =&gt; data &lt;= x&quot;CCCCCC&quot;;
+            WHEN &quot;1101&quot; =&gt; data &lt;= x&quot;DDDDDD&quot;;
+            WHEN &quot;1110&quot; =&gt; data &lt;= x&quot;EEEEEE&quot;;
+            WHEN &quot;1111&quot; =&gt; data &lt;= x&quot;FFFFFF&quot;;
+            WHEN OTHERS =&gt; NULL;
+        END CASE;
+    END PROCESS;
+END ARCHITECTURE;
+</code></pre>
+<pre><code class="language-VHDL">-- File: bcd2seg7.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY bcd2seg7 IS
+    PORT (
+        bcd : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        seg7 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE dataflow OF bcd2seg7 IS
+BEGIN
+    WITH bcd SELECT
+        seg7 &lt;= &quot;11000000&quot; WHEN &quot;0000&quot;, -- 0
+        &quot;11111001&quot; WHEN &quot;0001&quot;, -- 1
+        &quot;10100100&quot; WHEN &quot;0010&quot;, -- 2
+        &quot;10110000&quot; WHEN &quot;0011&quot;, -- 3
+        &quot;10011001&quot; WHEN &quot;0100&quot;, -- 4
+        &quot;10010010&quot; WHEN &quot;0101&quot;, -- 5
+        &quot;10000010&quot; WHEN &quot;0110&quot;, -- 6
+        &quot;11111000&quot; WHEN &quot;0111&quot;, -- 7
+        &quot;10000000&quot; WHEN &quot;1000&quot;, -- 8
+        &quot;10010000&quot; WHEN &quot;1001&quot;, -- 9
+        &quot;10001000&quot; WHEN &quot;1010&quot;, -- A
+        &quot;10000011&quot; WHEN &quot;1011&quot;, -- b
+        &quot;11000110&quot; WHEN &quot;1100&quot;, -- C
+        &quot;10100001&quot; WHEN &quot;1101&quot;, -- d
+        &quot;10000110&quot; WHEN &quot;1110&quot;, -- E
+        &quot;10001110&quot; WHEN &quot;1111&quot;, -- F
+        (OTHERS =&gt; '1') WHEN OTHERS;
+END ARCHITECTURE;
+</code></pre>
+<p><img alt="" src="display_888888.jpg" /></p>
+<p><strong>Figure:</strong> Six-digit 7-segment display showing <code>888888</code>,
+corresponding to the address <code>0000001000</code> (bin) set by the slide switches.</p>
+<hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-05-27 | Last Updated: 2025-05-30</p></div>
+<p>Created: 2025-05-27 | Last Updated: 2025-05-31</p></div>
             </div>
         </div>
 

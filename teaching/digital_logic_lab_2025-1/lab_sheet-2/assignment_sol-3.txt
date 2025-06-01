@@ -1,0 +1,105 @@
+-- File: bin2gray.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY bin2gray IS
+    GENERIC (
+        N : INTEGER := 10 -- Default width, can be overridden
+    );
+    PORT (
+        SW   : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        LEDS : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE dataflow OF bin2gray IS
+    SIGNAL bin  : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+    SIGNAL gray : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+BEGIN
+    bin <= SW;
+    gray(N - 1) <= bin(N - 1);
+    gen_gray_i : FOR i IN 0 TO (N - 2) GENERATE
+        gray(i) <= bin(i + 1) XOR bin(i);
+    END GENERATE;
+    LEDS <= gray;
+END ARCHITECTURE;
+-------------------------------------------------------------------
+
+-- File: tb_bin2gray.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY tb_bin2gray IS
+END tb_bin2gray;
+
+ARCHITECTURE testbench OF tb_bin2gray IS
+
+    CONSTANT N    : INTEGER := 10;
+    SIGNAL t_SW   : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+    SIGNAL t_LEDS : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+
+    CONSTANT MAX_TESTS : INTEGER := 2 ** N;
+
+    FUNCTION slv_to_str(slv : STD_LOGIC_VECTOR) RETURN STRING IS
+        VARIABLE result : STRING(1 TO slv'length);
+    BEGIN
+        FOR i IN slv'RANGE LOOP
+            IF slv(i) = '1' THEN
+                result(i - slv'low + 1) := '1';
+            ELSE
+                result(i - slv'low + 1) := '0';
+            END IF;
+        END LOOP;
+        RETURN result;
+    END;
+
+BEGIN
+
+    -- Instantiate DUT
+    DUT : ENTITY work.bin2gray
+        GENERIC MAP(
+            N => N
+        )
+        PORT MAP(
+            SW => t_SW,
+            LEDS => t_LEDS
+        );
+
+    -- Stimulus process
+    INPUT_PROC : PROCESS
+        VARIABLE bin_val   : UNSIGNED(N - 1 DOWNTO 0);
+        VARIABLE gray_code : UNSIGNED(N - 1 DOWNTO 0);
+        VARIABLE err_count : INTEGER := 0;
+    BEGIN
+        FOR i IN 0 TO MAX_TESTS-1 LOOP
+            bin_val := TO_UNSIGNED(i, N);
+            t_SW <= STD_LOGIC_VECTOR(bin_val);
+            WAIT FOR 10 ns;
+
+            -- Compute expected Gray code
+            gray_code(N - 1) := bin_val(N - 1);
+            FOR j IN 0 TO N - 2 LOOP
+                gray_code(j) := bin_val(j + 1) XOR bin_val(j);
+            END LOOP;
+
+            -- Compare with DUT output
+            IF t_LEDS /= STD_LOGIC_VECTOR(gray_code) THEN
+                REPORT "Mismatch at input 0b" & INTEGER'image(i) &
+                    ": DUT = " & slv_to_str(t_LEDS) &
+                    ", expected = 0b" &
+                    slv_to_str(STD_LOGIC_VECTOR(gray_code))
+                    SEVERITY error;
+            END IF;
+        END LOOP;
+
+        WAIT; -- Stop simulation
+    END PROCESS;
+
+END testbench;
+
+-------------------------------------------------------------------
+
