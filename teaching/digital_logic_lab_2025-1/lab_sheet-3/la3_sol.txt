@@ -1,0 +1,76 @@
+-- File: d_latch.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY d_latch IS
+    PORT (
+        D  : IN  STD_LOGIC; -- Data input
+        EN : IN  STD_LOGIC; -- Enable input
+        Q  : OUT STD_LOGIC; -- Output Q
+        QB : OUT STD_LOGIC  -- Inverted output (Q-bar)
+    );
+END d_latch;
+
+ARCHITECTURE dataflow OF d_latch IS
+    SIGNAL q_int : STD_LOGIC := '0';
+BEGIN
+    q_int <= D WHEN EN = '1' ELSE q_int;
+    Q  <= q_int;
+    QB <= NOT q_int;
+END dataflow;
+
+------------------------------------------------------------------
+
+-- Lab Sheet 3: Solution Lab 2
+-- File: d_ff.vhd
+-- D Flip-Flop implementation using master-slave D-latch
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+-- Declare the d_latch component (same as in d_latch.vhd)
+ENTITY d_ff IS
+    PORT (
+        D   : IN  STD_LOGIC; -- Data input
+        CLK : IN  STD_LOGIC; -- Clock input
+        Q   : OUT STD_LOGIC; -- Output Q
+        QB  : OUT STD_LOGIC  -- Inverted output Q-bar
+    );
+END d_ff;
+
+ARCHITECTURE structural OF d_ff IS
+
+    COMPONENT d_latch
+        PORT (
+            D  : IN STD_LOGIC;
+            EN : IN STD_LOGIC;
+            Q  : OUT STD_LOGIC;
+            QB : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    SIGNAL qm : STD_LOGIC; -- Output of master latch
+
+BEGIN
+    -- Master D latch: enabled when CLK = '0'
+    master_latch : d_latch
+    PORT MAP(
+        D  => D,
+        EN => NOT CLK,
+        Q  => qm,
+        QB => OPEN
+    );
+
+    -- Slave D latch: enabled when CLK = '1'
+    slave_latch : d_latch
+    PORT MAP(
+        D  => qm,
+        EN => CLK,
+        Q  => Q,
+        QB => QB
+    );
+
+END structural;
+
+------------------------------------------------------------------

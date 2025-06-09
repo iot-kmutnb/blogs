@@ -1,0 +1,282 @@
+-- File: tick_gen.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY tick_gen IS
+    GENERIC (
+        BW : INTEGER := 16;
+        MAX_VALUE : INTEGER := 50000 - 1
+    );
+    PORT (
+        CLK : IN STD_LOGIC;
+        RST_N : IN STD_LOGIC;
+        TICK : OUT STD_LOGIC
+    );
+END tick_gen;
+
+ARCHITECTURE behavioral OF tick_gen IS
+    CONSTANT MAX_COUNT : unsigned(BW-1 DOWNTO 0) := to_unsigned(MAX_VALUE, BW);
+    SIGNAL counter : unsigned(BW-1 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL tick_reg : STD_LOGIC := '0';
+BEGIN
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            counter <= (OTHERS => '0');
+            tick_reg <= '0';
+        ELSIF rising_edge(CLK) THEN
+            IF counter = MAX_COUNT THEN
+                counter <= (OTHERS => '0');
+                tick_reg <= '1';
+            ELSE
+                counter <= counter + 1;
+                tick_reg <= '0';
+            END IF;
+        END IF;
+    END PROCESS;
+    TICK <= tick_reg;
+END behavioral;
+
+---
+
+-- File: updown_counter.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY updown_counter IS
+    GENERIC (
+        BW : INTEGER := 8
+    );
+    PORT (
+        CLK : IN STD_LOGIC;
+        RST_N : IN STD_LOGIC;
+        CE : IN STD_LOGIC;
+        UPDOWN : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        Q : OUT STD_LOGIC_VECTOR(BW-1 DOWNTO 0)
+    );
+END updown_counter;
+
+ARCHITECTURE behavioral OF updown_counter IS
+    SIGNAL counter : unsigned(BW-1 DOWNTO 0) := (OTHERS => '0');
+BEGIN
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            counter <= (OTHERS => '0');
+        ELSIF rising_edge(CLK) THEN
+            IF CE = '1' THEN
+                CASE UPDOWN IS
+                    WHEN "01" => -- count up
+                        counter <= counter + 1;
+                    WHEN "10" => -- count down
+                        counter <= counter - 1;
+                    WHEN OTHERS => -- no change
+                        NULL;
+                END CASE;
+            END IF;
+        END IF;
+    END PROCESS;
+    Q <= STD_LOGIC_VECTOR(counter);
+END behavioral;
+
+---
+
+-- File: counter.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY counter IS
+    PORT (
+        CLK_50MHZ : IN STD_LOGIC;
+        RST_N : IN STD_LOGIC;
+        UP_DOWN : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        LEDS : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+    );
+END counter;
+
+ARCHITECTURE structural OF counter IS
+    COMPONENT tick_gen IS
+        GENERIC (
+            BW : INTEGER;
+            MAX_VALUE : INTEGER
+        );
+        PORT (
+            CLK : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            TICK : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    COMPONENT updown_counter IS
+        GENERIC (
+            BW : INTEGER
+        );
+        PORT (
+            CLK : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            CE : IN STD_LOGIC;
+            UPDOWN : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+            Q : OUT STD_LOGIC_VECTOR(BW - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    SIGNAL tick : STD_LOGIC;
+    SIGNAL counter_out : STD_LOGIC_VECTOR(9 DOWNTO 0);
+
+BEGIN
+
+    -- Instantiate tick generator
+    TICK_GEN_inst : ENTITY work.tick_gen
+        GENERIC MAP(
+            BW => 20,
+            MAX_VALUE => 500000 - 1
+        )
+        PORT MAP(
+            CLK => CLK_50MHZ,
+            RST_N => RST_N,
+            TICK => tick
+        );
+
+    -- Instantiate up/down counter
+    COUNTER_inst : ENTITY work.updown_counter
+        GENERIC MAP(
+            BW => 10
+        )
+        PORT MAP(
+            CLK => CLK_50MHZ,
+            RST_N => RST_N,
+            CE => tick,
+            UPDOWN => UP_DOWN,
+            Q => counter_out
+        );
+    -- Output to LEDs
+    LEDS <= counter_out;
+END structural;
+
+---
+
+-- File: tb_counter.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY tb_counter IS
+END tb_counter;
+ARCHITECTURE behavior OF tb_counter IS
+    SIGNAL t_CLK_50MHZ  : STD_LOGIC := '0';
+    SIGNAL t_RST_N      : STD_LOGIC := '0';
+    SIGNAL t_UP_DOWN    : STD_LOGIC_VECTOR(1 DOWNTO 0) := "00";
+    SIGNAL t_LEDS       : STD_LOGIC_VECTOR(9 DOWNTO 0);
+    CONSTANT CLK_PERIOD : TIME := 20 ns;
+BEGIN
+    -- Instantiate the DUT
+    DUT : ENTITY work.counter
+        PORT MAP(
+            CLK_50MHZ => t_CLK_50MHZ,
+            RST_N => t_RST_N,
+            UP_DOWN => t_UP_DOWN,
+            LEDS => t_LEDS
+        );
+    -- Clock generation process
+    CLK_PROC : PROCESS
+    BEGIN
+        WHILE true LOOP
+            t_CLK_50MHZ <= '0';
+            WAIT FOR CLK_PERIOD / 2;
+            t_CLK_50MHZ <= '1';
+            WAIT FOR CLK_PERIOD / 2;
+        END LOOP;
+    END PROCESS;
+    -- Input stimulus process
+    INPUT_PROC : PROCESS
+    BEGIN
+        -- Initial reset
+        t_UP_DOWN <= "00";
+        t_RST_N <= '0';
+        WAIT FOR 100 ns;
+        -- Release reset
+        t_RST_N <= '1';
+        WAIT FOR 100 ns;
+        -- Test increment mode ("01")
+        t_UP_DOWN <= "01";
+        WAIT FOR 10 ms;
+        -- Hold value ("00")
+        t_UP_DOWN <= "00";
+        WAIT FOR 100 us;
+        -- Test decrement mode ("10")
+        t_UP_DOWN <= "10";
+        WAIT FOR 20 ms;
+        -- Reset again
+        t_RST_N <= '0';
+        WAIT FOR 50 ns;
+        t_RST_N <= '1';
+        WAIT FOR 10 ms;
+        -- Hold and finish
+        t_UP_DOWN <= "00";
+        WAIT FOR 10 ms;
+        -- End simulation
+        WAIT;
+    END PROCESS;
+END behavior;
+
+---
+
+# File: assignments.tcl
+
+
+#============================================================
+# CLOCK (MAX10_CLK1_50)
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLK_50MHZ
+set_location_assignment PIN_P11 -to CLK_50MHZ
+#============================================================
+# Push Buttons (KEY)
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to RST_N
+set_location_assignment PIN_B8 -to RST_N
+#============================================================
+# Slide Switches (SW)
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UP_DOWN[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UP_DOWN[1]
+set_location_assignment PIN_C10 -to UP_DOWN[0]
+set_location_assignment PIN_C11 -to UP_DOWN[1]
+#============================================================
+# LEDs
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[9]
+set_location_assignment PIN_A8  -to LEDS[0]
+set_location_assignment PIN_A9  -to LEDS[1]
+set_location_assignment PIN_A10 -to LEDS[2]
+set_location_assignment PIN_B10 -to LEDS[3]
+set_location_assignment PIN_D13 -to LEDS[4]
+set_location_assignment PIN_C13 -to LEDS[5]
+set_location_assignment PIN_E14 -to LEDS[6]
+set_location_assignment PIN_D14 -to LEDS[7]
+set_location_assignment PIN_A11 -to LEDS[8]
+set_location_assignment PIN_B11 -to LEDS[9]
+#============================================================
+
+---
+
+
+
+
+
+
+
