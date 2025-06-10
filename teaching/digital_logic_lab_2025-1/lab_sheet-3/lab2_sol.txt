@@ -1,0 +1,186 @@
+-- File: d_latch.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY d_latch IS
+    PORT (
+        D : IN STD_LOGIC; -- Data input
+        EN : IN STD_LOGIC; -- Enable input
+        Q : OUT STD_LOGIC; -- Output Q
+        QB : OUT STD_LOGIC -- Inverted output (Q-bar)
+    );
+END d_latch;
+
+ARCHITECTURE dataflow OF d_latch IS
+    SIGNAL q_int : STD_LOGIC := '0';
+BEGIN
+    q_int <= D WHEN EN = '1' ELSE
+        q_int;
+    Q <= q_int;
+    QB <= NOT q_int;
+END dataflow;
+
+---
+
+-- Lab Sheet 3: Solution Lab 2
+-- File: d_ff.vhd
+-- D Flip-Flop implementation using master-slave D-latch
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+-- Declare the d_latch component (same as in d_latch.vhd)
+ENTITY d_ff IS
+    PORT (
+        D   : IN STD_LOGIC; -- Data input
+        CLK : IN STD_LOGIC; -- Clock input
+        Q   : OUT STD_LOGIC; -- Output Q
+        QB  : OUT STD_LOGIC -- Inverted output Q-bar
+    );
+END d_ff;
+
+ARCHITECTURE structural OF d_ff IS
+
+    COMPONENT d_latch
+        PORT (
+            D  : IN STD_LOGIC;
+            EN : IN STD_LOGIC;
+            Q  : OUT STD_LOGIC;
+            QB : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    SIGNAL qm : STD_LOGIC; -- Output of master latch
+
+BEGIN
+    -- Master D latch: enabled when CLK = '0'
+    master_latch : d_latch
+    PORT MAP(
+        D  => D,
+        EN => NOT CLK,
+        Q  => qm,
+        QB => OPEN
+    );
+
+    -- Slave D latch: enabled when CLK = '1'
+    slave_latch : d_latch
+    PORT MAP(
+        D  => qm,
+        EN => CLK,
+        Q  => Q,
+        QB => QB
+    );
+
+END structural;
+
+---
+
+-- Lab Sheet 3: Solution Lab 2
+-- File: t_ff.vhd
+-- T Flip-Flop implemented using D Flip-Flop component
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY t_ff IS
+    PORT (
+        T : IN STD_LOGIC;
+        CLK : IN STD_LOGIC;
+        Q : OUT STD_LOGIC
+    );
+END t_ff;
+
+ARCHITECTURE structural OF t_ff IS
+
+    COMPONENT d_ff
+        PORT (
+            D : IN STD_LOGIC;
+            CLK : IN STD_LOGIC;
+            Q : OUT STD_LOGIC;
+            QB : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    SIGNAL q_int : STD_LOGIC := '0';
+    SIGNAL d_next : STD_LOGIC;
+
+BEGIN
+    -- D input is computed as Q XOR T
+    d_next <= q_int XOR T;
+
+    -- Instantiate D Flip-Flop
+    dff_inst : d_ff
+    PORT MAP(
+        D => d_next,
+        CLK => CLK,
+        Q => q_int,
+        QB => OPEN
+    );
+
+    Q <= q_int;
+
+END structural;
+
+--- 
+
+-- Lab Sheet 3: Solution Lab 2
+-- File: toggle_output.vhd
+-- Use multiple T flip-flops to divide clock and blink an LED
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY toggle_output IS
+    PORT (
+      SW  : IN  STD_LOGIC_VECTOR(0 DOWNTO 0); -- slide switch
+      CLK : IN  STD_LOGIC; -- 50MHz system clock
+      Q   : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    );
+END toggle_output;
+
+ARCHITECTURE structural OF toggle_output IS
+
+    COMPONENT t_ff
+        PORT (
+            T   : IN  STD_LOGIC;
+            CLK : IN  STD_LOGIC;
+            Q   : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    CONSTANT N : INTEGER := 6;  -- Number of TFFs used
+    SIGNAL q_int  : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+    SIGNAL t  : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+
+BEGIN
+
+    -- Assign T inputs combinationally outside generate block
+    t_logic_proc : PROCESS(t, q_int, SW)
+    BEGIN
+        t(0) <= SW(0);
+        FOR i IN 1 TO N - 1 LOOP
+           t(i) <= t(i-1) and q_int(i-1);
+        END LOOP;
+    END PROCESS;
+  
+    -- Instantiate T flip-flops with common clock
+    gen_tff : FOR i IN 0 TO N - 1 GENERATE
+        tff_inst : t_ff
+            PORT MAP (
+                T   => t(i),
+                CLK => CLK,
+                Q   => q_int(i)
+            );
+    END GENERATE;
+
+    -- Use the MSB as output
+    Q(0) <= q_int(N - 1);     -- non-inverting output (Q)
+    Q(1) <= not q_int(N - 1); -- inverting output (QB)
+
+END structural;
+
+---
+
+

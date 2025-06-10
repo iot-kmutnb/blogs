@@ -1,0 +1,347 @@
+-- File: tb_bit_seq_detect.vhd
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY tb_bit_seq_detect IS
+END tb_bit_seq_detect;
+
+ARCHITECTURE sim OF tb_bit_seq_detect IS
+    -- DUT Signals
+    SIGNAL t_CLK   : STD_LOGIC := '0';
+    SIGNAL t_RST_N : STD_LOGIC := '0';
+    SIGNAL t_ENA   : STD_LOGIC := '0';
+    SIGNAL t_DIN   : STD_LOGIC := '0';
+    SIGNAL t_MATCH : STD_LOGIC;
+
+    -- Clock period
+    CONSTANT CLK_PERIOD : TIME := 20 ns; -- 50 MHz
+
+    -- Sequence to test: 1 0 1 1 0 = MATCH
+    SIGNAL test_seq : STD_LOGIC_VECTOR(19 DOWNTO 0) := b"0101_1010_1111_0110_0100";
+
+    -- Component declaration
+    COMPONENT bit_seq_detect IS
+        PORT (
+            CLK   : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            ENA   : IN STD_LOGIC;
+            DIN   : IN STD_LOGIC;
+            MATCH : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+BEGIN
+
+    -- DUT instance
+    uut : ENTITY work.bit_seq_detect
+        PORT MAP(
+            CLK   => t_CLK,
+            RST_N => t_RST_N,
+            ENA   => t_ENA,
+            DIN   => t_DIN,
+            MATCH => t_MATCH
+        );
+
+    -- Clock generation
+    clk_proc : PROCESS
+    BEGIN
+        t_CLK <= '0';
+        WAIT FOR CLK_PERIOD / 2;
+        t_CLK <= '1';
+        WAIT FOR CLK_PERIOD / 2;
+    END PROCESS;
+    t_DIN <= test_seq(test_seq'left);
+
+    -- Stimulus process
+    stim_proc : PROCESS
+    BEGIN
+        -- Initial reset
+        t_RST_N <= '0';
+        t_ENA <= '0';
+        WAIT FOR 200 ns;
+        t_RST_N <= '1';
+        WAIT UNTIL rising_edge(t_CLK);
+
+        FOR i IN 0 TO test_seq'left LOOP
+            IF i >= 2 AND i <= 4 THEN
+                t_ENA <= '0';
+            ELSE
+                t_ENA <= '1';
+            END IF;
+            test_seq <= test_seq(test_seq'left - 1 DOWNTO 0) & '0';
+            WAIT UNTIL rising_edge(t_CLK);
+        END LOOP;
+
+        t_ENA <= '0';
+        WAIT FOR 5 * CLK_PERIOD;
+        REPORT "Simulation finished" SEVERITY note;
+        WAIT;
+    END PROCESS;
+
+END sim;
+
+-- $ ghdl -a bit_seq_detect.vhd tb_bit_seq_detect.vhd 
+-- $ ghdl -e tb_bit_seq_detect
+-- $ ghdl -r tb_bit_seq_detect --vcd=./wave.vcd --stop-time=1us
+
+---
+
+-- File: bit_seq_detect_test.vhd
+
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY bit_seq_detect_test IS
+    PORT (
+        CLK   : IN STD_LOGIC; -- 50 MHz clock
+        RST_N : IN STD_LOGIC; -- Asynchronous active-low reset
+        START : IN STD_LOGIC; -- Start trigger input
+        SW    : IN STD_LOGIC_VECTOR(9 DOWNTO 0); -- 10-bit slide switch input
+        LEDS  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0) -- 2-bit status LED output
+    );
+END bit_seq_detect_test;
+
+ARCHITECTURE rtl OF bit_seq_detect_test IS
+
+    -- Component declaration
+    COMPONENT bit_seq_detect IS
+        PORT (
+            CLK : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            ENA : IN STD_LOGIC;
+            DIN : IN STD_LOGIC;
+            MATCH : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    TYPE state_type IS (ST_IDLE, ST_LOAD, ST_SHIFT, ST_MATCH, ST_DONE);
+    SIGNAL state, next_state : state_type;
+    attribute enum_encoding : string;
+    -- specify FSM state encoding scheme: "one-hot", "sequential", "gray"
+    attribute enum_encoding of state_type : type is "one-hot";
+
+    SIGNAL shift_reg    : UNSIGNED(9 DOWNTO 0);
+    SIGNAL shift_end    : STD_LOGIC;
+    SIGNAL current_bit  : STD_LOGIC;
+    SIGNAL match_flag   : STD_LOGIC;
+    SIGNAL start_sync   : STD_LOGIC_VECTOR(1 DOWNTO 0) := (OTHERS => '1');
+    SIGNAL start_rising : STD_LOGIC;
+    SIGNAL ena_fsm      : STD_LOGIC := '0';
+    SIGNAL shift_cnt    : INTEGER RANGE 0 TO 10 := 0;
+
+BEGIN
+
+    -- Instance of bit_seq_detect
+    detector_inst : bit_seq_detect
+    PORT MAP(
+        CLK => CLK,
+        RST_N => RST_N,
+        ENA => ena_fsm,
+        DIN => current_bit,
+        MATCH => match_flag
+    );
+
+    -- START edge detector
+    start_detect_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            start_sync <= (OTHERS => '1');
+        ELSIF rising_edge(CLK) THEN
+            start_sync <= start_sync(0) & START;
+        END IF;
+    END PROCESS;
+
+    -- concurrent assignments
+    start_rising <= NOT start_sync(1) AND start_sync(0);
+    ena_fsm      <= '1' WHEN state = ST_SHIFT ELSE '0';
+    shift_end    <= '1' WHEN shift_cnt = 9 ELSE '0';
+    current_bit  <= shift_reg(9);
+
+    -- Shift register process
+    shift_reg_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            shift_reg <= (OTHERS => '0');
+        ELSIF rising_edge(CLK) THEN
+            IF state = ST_LOAD THEN
+                shift_reg <= unsigned(SW); -- load the switch value
+            ELSIF state = ST_SHIFT THEN -- shift left
+                shift_reg <= shift_reg(8 DOWNTO 0) & '0';
+            END IF;
+        END IF;
+    END PROCESS;
+
+    shift_cnt_proc: PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            shift_cnt <= 0;
+        ELSIF rising_edge(CLK) THEN
+            IF state = ST_LOAD THEN
+                shift_cnt <= 0;
+            ELSIF state = ST_SHIFT THEN
+                shift_cnt <= shift_cnt + 1;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    -- FSM state register
+    fsm_state_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            state <= ST_IDLE;
+        ELSIF rising_edge(CLK) THEN
+            state <= next_state;
+        END IF;
+    END PROCESS;
+
+    -- FSM next-state logic
+    next_state_proc : PROCESS (state, start_rising, match_flag, shift_end)
+    BEGIN
+        CASE state IS
+            WHEN ST_IDLE =>
+                IF start_rising = '1' THEN
+                    next_state <= ST_LOAD;
+                ELSE
+                    next_state <= ST_IDLE;
+                END IF;
+
+            WHEN ST_LOAD =>
+                next_state <= ST_SHIFT;
+
+            WHEN ST_SHIFT =>
+                IF match_flag = '1' THEN
+                    next_state <= ST_MATCH;
+                ELSIF shift_end = '1' THEN
+                    next_state <= ST_DONE;
+                ELSE
+                    next_state <= ST_SHIFT;
+                END IF;
+
+            WHEN ST_MATCH =>
+                next_state <= ST_IDLE;
+
+            WHEN ST_DONE =>
+                next_state <= ST_IDLE;
+
+            WHEN OTHERS =>
+                next_state <= ST_IDLE;
+        END CASE;
+    END PROCESS;
+
+    leds_update_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            LEDS <= (OTHERS => '0');
+        ELSIF rising_edge(CLK) THEN
+            IF state = ST_SHIFT THEN
+                LEDS(1) <= '0';
+                LEDS(0) <= '0';
+            ELSE
+                IF state = ST_MATCH THEN
+                    LEDS(1) <= '1';
+                END IF;
+                IF state = ST_DONE THEN
+                    LEDS(0) <= '1';
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+
+END rtl;
+
+---
+
+-- Solution
+-- File: bit_seq_detect.vhd
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY bit_seq_detect IS
+    PORT (
+        CLK   : IN STD_LOGIC; -- 50 MHz clock
+        RST_N : IN STD_LOGIC; -- Asynchronous active-low reset
+        ENA   : IN STD_LOGIC; -- Enable input (high active)
+        DIN   : IN STD_LOGIC; -- Bit data input
+        MATCH : OUT STD_LOGIC -- match status (high active)
+    );
+END bit_seq_detect;
+
+ARCHITECTURE behavioral OF bit_seq_detect IS
+    TYPE state_type IS (S_INIT, S1, S2, S3, S4, S_END);
+    SIGNAL state, next_state : state_type;
+    SIGNAL match_flag : STD_LOGIC := '0';
+BEGIN
+
+    -- Register logic: async reset, sync update
+    state_update_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            state <= S_INIT;
+        ELSIF rising_edge(CLK) THEN
+            IF ENA = '1' THEN
+                state <= next_state;
+            ELSE
+                state <= S_INIT;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    next_state_proc : PROCESS (state, DIN)
+    BEGIN
+        match_flag <= '0';
+        CASE state IS
+            WHEN S_INIT =>
+                IF DIN = '1' THEN
+                    next_state <= S1;
+                ELSE
+                    next_state <= S_INIT;
+                END IF;
+
+            WHEN S1 =>
+                IF DIN = '0' THEN
+                    next_state <= S2;
+                ELSE
+                    next_state <= S1; -- allow repeated '1'
+                END IF;
+
+            WHEN S2 =>
+                IF DIN = '1' THEN
+                    next_state <= S3;
+                ELSE
+                    next_state <= S_INIT;
+                END IF;
+
+            WHEN S3 =>
+                IF DIN = '1' THEN
+                    next_state <= S4;
+                ELSE
+                    next_state <= S2;
+                END IF;
+
+            WHEN S4 =>
+                IF DIN = '0' THEN
+                    next_state <= S_END;
+                ELSE
+                    next_state <= S1;
+                END IF;
+
+            WHEN S_END =>
+                next_state <= S_INIT;
+
+            WHEN OTHERS =>
+                next_state <= S_INIT;
+        END CASE;
+    END PROCESS;
+
+    MATCH <= '1' WHEN state = S_END ELSE '0';
+
+END behavioral;
+
+---
+
+

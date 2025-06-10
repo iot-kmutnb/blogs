@@ -1,0 +1,199 @@
+-- File: debounce.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY debounce IS
+    GENERIC (
+        COUNT_MAX : INTEGER := 500000 -- number of clock cycles
+    );
+    PORT (
+        CLK   : IN STD_LOGIC;
+        RST_N : IN STD_LOGIC;
+        D     : IN STD_LOGIC;
+        Q     : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF debounce IS
+
+    SIGNAL counter     : INTEGER RANGE 0 TO COUNT_MAX := 0;
+    SIGNAL sync_reg    : STD_LOGIC_VECTOR(1 DOWNTO 0) := (OTHERS => '1');
+    SIGNAL saved_logic : STD_LOGIC := '1';
+BEGIN
+
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            sync_reg <= (OTHERS => '1');
+            saved_logic <= '1';
+            counter <= 0;
+        ELSIF rising_edge(CLK) THEN
+            -- 2-stage synchronizer using D-type flip-flops
+            sync_reg <= sync_reg(0) & D;
+            IF sync_reg(1) /= saved_logic THEN
+                IF counter = COUNT_MAX THEN
+                    saved_logic <= sync_reg(1);
+                    counter <= 0;
+                ELSE
+                    counter <= counter + 1;
+                END IF;
+            ELSE
+                counter <= 0; -- reset counter
+            END IF;
+        END IF;
+    END PROCESS;
+
+    Q <= saved_logic;
+
+END ARCHITECTURE;
+
+---
+
+-- File: leds_shift_reg.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY leds_shift_reg IS
+    GENERIC (
+        BW : INTEGER := 10
+    );
+    PORT (
+        CLK_50MHZ : IN STD_LOGIC; -- 50MHz clock
+        RST_N : IN STD_LOGIC; -- Active-low reset
+        PB : IN STD_LOGIC; -- Active-low push button
+        SW : IN STD_LOGIC_VECTOR(BW - 1 DOWNTO 0);
+        LEDS : OUT STD_LOGIC_VECTOR(BW - 1 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE structural OF leds_shift_reg IS
+    SIGNAL button_input : STD_LOGIC := '0';
+    SIGNAL sync_reg : STD_LOGIC_VECTOR(1 DOWNTO 0) := "00";
+    SIGNAL shift_reg : STD_LOGIC_VECTOR(BW - 1 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL loaded : STD_LOGIC := '0';
+BEGIN
+    -- Instantiate debounce module
+    debounce_inst : ENTITY work.debounce
+        PORT MAP(
+            CLK => CLK_50MHZ,
+            RST_N => RST_N,
+            D => PB,
+            Q => button_input
+        );
+    input_sync_proc : PROCESS (CLK_50MHZ, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            sync_reg <= (OTHERS => '1');
+        ELSIF rising_edge(CLK_50MHZ) THEN
+            sync_reg <= sync_reg(0) & button_input;
+        END IF;
+    END PROCESS;
+    shift_reg_load_proc : PROCESS (CLK_50MHZ, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            loaded <= '0';
+        ELSIF rising_edge(CLK_50MHZ) THEN
+            loaded <= '1';
+        END IF;
+    END PROCESS;
+    -- Main shift register logic
+    shift_reg_proc : PROCESS (CLK_50MHZ, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            shift_reg <= (OTHERS => '0');
+        ELSIF rising_edge(CLK_50MHZ) THEN
+            IF loaded = '0' THEN
+                shift_reg <= (OTHERS => '0'); -- can be overwritten
+                IF unsigned(SW) = 0 THEN -- if all slide switches are 0s.
+                    shift_reg(0) <= '1';
+                ELSE
+                    shift_reg <= SW;
+                END IF;
+            ELSIF sync_reg = "01" THEN -- rising edge detected
+                shift_reg <= shift_reg(BW - 2 DOWNTO 0) & shift_reg(shift_reg'left);
+            END IF;
+        END IF;
+    END PROCESS;
+    LEDS <= shift_reg;
+END ARCHITECTURE;
+
+---
+
+## Synopsys timing constraints file (.sdc)
+
+# Create 50 MHz clock on the input pin CLK_50MHZ
+create_clock -name clk_50mhz -period 20.0 [get_ports {CLK_50MHZ}]
+# Set input delay for asynchronous inputs relative to clock (example: PB, SW, RST_N)
+set_input_delay -clock clk_50mhz 5.0 [get_ports {PB RST_N}]
+set_input_delay -clock clk_50mhz 5.0 [get_ports {SW[*]}]
+# Set output delay for synchronous outputs
+set_output_delay -clock clk_50mhz 5.0 [get_ports {LEDS[*]}]
+# Define false path on asynchronous reset
+set_false_path -from [get_ports RST_N]
+
+---
+
+
+#============================================================
+# CLOCK (MAX10_CLK1_50)
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLK_50MHZ
+set_location_assignment PIN_P11 -to CLK_50MHZ
+#============================================================
+# Push Buttons (KEY)
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to RST_N
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to PB
+set_location_assignment PIN_B8 -to RST_N
+set_location_assignment PIN_A7 -to PB
+#============================================================
+# LEDs
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDS[9]
+set_location_assignment PIN_A8  -to LEDS[0]
+set_location_assignment PIN_A9  -to LEDS[1]
+set_location_assignment PIN_A10 -to LEDS[2]
+set_location_assignment PIN_B10 -to LEDS[3]
+set_location_assignment PIN_D13 -to LEDS[4]
+set_location_assignment PIN_C13 -to LEDS[5]
+set_location_assignment PIN_E14 -to LEDS[6]
+set_location_assignment PIN_D14 -to LEDS[7]
+set_location_assignment PIN_A11 -to LEDS[8]
+set_location_assignment PIN_B11 -to LEDS[9]
+#============================================================
+# Slide Switches (SW)
+#============================================================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[9]
+set_location_assignment PIN_C10 -to SW[0]
+set_location_assignment PIN_C11 -to SW[1]
+set_location_assignment PIN_D12 -to SW[2]
+set_location_assignment PIN_C12 -to SW[3]
+set_location_assignment PIN_A12 -to SW[4]
+set_location_assignment PIN_B12 -to SW[5]
+set_location_assignment PIN_A13 -to SW[6]
+set_location_assignment PIN_A14 -to SW[7]
+set_location_assignment PIN_B14 -to SW[8]
+set_location_assignment PIN_F15 -to SW[9]
+#============================================================
+
+---
