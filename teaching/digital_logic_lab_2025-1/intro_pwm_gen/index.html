@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/digital_logic_lab_2025-1/intro_pwm_gen/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: PWM Signal Generation - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-pwm-signal-generation" class="nav-link">Tutorial: PWM Signal Generation</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#pwm-signal" class="nav-link">PWM Signal</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-implementation" class="nav-link">VHDL Implementation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-testbench" class="nav-link">VHDL Testbench</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#fpga-implementation" class="nav-link">FPGA Implementation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#coding-exercise" class="nav-link">Coding Exercise</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-pwm-signal-generation"><strong>Tutorial: PWM Signal Generation</strong><a class="headerlink" href="#tutorial-pwm-signal-generation" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="pwm-signal"><strong>PWM Signal</strong><a class="headerlink" href="#pwm-signal" title="Permanent link">#</a></h2>
+<p>To implement a <strong>PWM</strong> (<em>Pulse Width Modulation</em>) signal using FPGA logic,
+an <strong>up-counter</strong> is used, and its current count value is compared against a specified <strong>threshold</strong>. When the count is less than the threshold, the PWM output is set high; otherwise, it is set low. The counter’s bit width determines the <strong>PWM duty cycle resolution</strong>. For example, an 8-bit counter provides up to 256 discrete duty cycle steps (from 0 to 255).</p>
+<p><img alt="" src="pwm_duty_cycles.jpg" /></p>
+<p><strong>Figure:</strong> PWM signals with different duty cycles, ranging from 0% to 100%.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-implementation"><strong>VHDL Implementation</strong><a class="headerlink" href="#vhdl-implementation" title="Permanent link">#</a></h2>
+<p>To implement a PWM signal using FPGA logic, an <strong>up-counter</strong> is used, 
+and its current count value is compared against a specified threshold. 
+When the count is less than the threshold, 
+the PWM output is set high; otherwise, it is set low.</p>
+<p>The following is a VHDL model of a PWM signal generator.
+The duty cycle is updated once per PWM period based on the <code>DC</code> input.
+The duty cycle value (<code>DC</code>) is sampled and loaded into
+an internal register (<code>dc_reg</code>) at the start of each new PWM period.</p>
+<p>This VHDL entity defines three generics:</p>
+<ul>
+<li><code>CLK_HZ</code> : The frequency of the clock input (in Hz)</li>
+<li><code>CLK_DIV</code> : The clock division factor used to scale down the counter clock</li>
+<li><code>DC_WIDTH</code> : The bit width (resolution) of the PWM signal</li>
+</ul>
+<p>For example, if the clock input is <code>50MHz</code>, the clock divider is <code>50</code>, 
+and the PWM resolution is <code>10</code> bits, the PWM frequency can be calculated as:</p>
+<p>
+<script type="math/tex; mode=display">
+ f_{PWM} = \frac{ f_{CLK} }{ CLK\_DIV \cdot 2^{BW} }
+         = \frac{ 50\,\text{MHz} }{ 50 \cdot 2^{10} } = 976.56\,\text{Hz}
+</script>
+</p>
+<p>&nbsp;</p>
+<pre><code class="language-VHDL">-- File: pwm_gen.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY pwm_gen IS
+    GENERIC (
+        CLK_HZ   : INTEGER := 50000000; -- 50MHz input clock
+        CLK_DIV  : INTEGER := 50;       -- Clock divider (set for PWM freq.)
+        DC_WIDTH : INTEGER := 10        -- Duty cycle resolution
+    );
+    PORT (
+        CLK   : IN STD_LOGIC;           -- Clock input
+        RST_N : IN STD_LOGIC;           -- Asynch. active-low reset
+        DC    : IN STD_LOGIC_VECTOR(DC_WIDTH - 1 DOWNTO 0); -- Duty cycle (0–255)
+        OE    : IN STD_LOGIC := '1';    -- Output enable
+        PWM   : OUT STD_LOGIC           -- PWM output
+    );
+END pwm_gen;
+
+ARCHITECTURE behavioral OF pwm_gen IS
+    CONSTANT PWM_STEPS : INTEGER := 2 ** DC_WIDTH;
+
+    SIGNAL clk_div_cnt : INTEGER RANGE 0 TO CLK_DIV - 1 := 0;
+    SIGNAL clk_tick    : STD_LOGIC := '0';
+
+    SIGNAL pwm_step_cnt : unsigned(DC_WIDTH - 1 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL dc_reg  : unsigned(DC_WIDTH - 1 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL pwm_out : STD_LOGIC := '0';
+BEGIN
+
+    clk_div_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            clk_div_cnt &lt;= 0;
+            clk_tick &lt;= '0';
+        ELSIF rising_edge(CLK) THEN
+            IF clk_div_cnt = CLK_DIV - 1 THEN
+                clk_div_cnt &lt;= 0;
+                clk_tick &lt;= '1';
+            ELSE
+                clk_div_cnt &lt;= clk_div_cnt + 1;
+                clk_tick &lt;= '0';
+            END IF;
+        END IF;
+    END PROCESS;
+
+    pwm_counter_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            pwm_step_cnt &lt;= (OTHERS =&gt; '0');
+            dc_reg &lt;= (OTHERS =&gt; '0');
+        ELSIF rising_edge(CLK) THEN
+            IF clk_tick = '1' THEN
+                IF pwm_step_cnt = PWM_STEPS - 1 THEN
+                    pwm_step_cnt &lt;= (OTHERS =&gt; '0');
+                    dc_reg &lt;= unsigned(DC); -- load DC at start of PWM period
+                ELSE
+                    pwm_step_cnt &lt;= pwm_step_cnt + 1;
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    pwm_output_proc : PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            pwm_out &lt;= '0';
+        ELSIF rising_edge(CLK) THEN
+            IF dc_reg = to_unsigned(PWM_STEPS - 1, DC_WIDTH) THEN
+                pwm_out &lt;= '1'; -- 100% duty cycle
+            ELSIF dc_reg = to_unsigned(0, DC_WIDTH) THEN
+                pwm_out &lt;= '0'; -- 0% duty cycle
+            ELSIF pwm_step_cnt &lt; dc_reg THEN
+                pwm_out &lt;= '1';
+            ELSE
+                pwm_out &lt;= '0';
+            END IF;
+        END IF;
+    END PROCESS;
+
+    -- Output assignment
+    PWM &lt;= pwm_out WHEN OE = '1' ELSE '0';
+
+END behavioral;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-testbench"><strong>VHDL Testbench</strong><a class="headerlink" href="#vhdl-testbench" title="Permanent link">#</a></h2>
+<p>A <strong>VHDL testbench</strong> is also provided below.</p>
+<pre><code class="language-VHDL">-- File: tb_pwm_gen.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY tb_pwm_gen IS
+END tb_pwm_gen;
+
+ARCHITECTURE sim OF tb_pwm_gen IS
+    -- Constants for simulation
+    CONSTANT CLK_HZ     : INTEGER := 50000000;
+    CONSTANT CLK_PERIOD : TIME := 20 ns; -- 50 MHz clock
+    CONSTANT CLK_DIV    : INTEGER := 10;
+    CONSTANT DC_WIDTH   : INTEGER := 8;
+
+    SIGNAL value   : INTEGER := 0;
+
+    -- DUT Signals
+    SIGNAL t_CLK   : STD_LOGIC := '0';
+    SIGNAL t_RST_N : STD_LOGIC := '0';
+    SIGNAL t_DC    : STD_LOGIC_VECTOR(DC_WIDTH - 1 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL t_OE    : STD_LOGIC := '1';
+    SIGNAL t_PWM   : STD_LOGIC;
+
+    -- Component Declaration
+    COMPONENT pwm_gen
+        GENERIC (
+            CLK_HZ   : INTEGER := 50000000;
+            CLK_DIV  : INTEGER := 100;
+            DC_WIDTH : INTEGER := 8
+        );
+        PORT (
+            CLK   : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            DC    : IN STD_LOGIC_VECTOR(DC_WIDTH - 1 DOWNTO 0);
+            OE    : IN STD_LOGIC := '1';
+            PWM   : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+BEGIN
+    -- Instantiate the Unit Under Test (UUT)
+    uut : pwm_gen
+    GENERIC MAP(
+        CLK_HZ   =&gt; CLK_HZ,
+        CLK_DIV  =&gt; CLK_DIV,
+        DC_WIDTH =&gt; DC_WIDTH
+    )
+    PORT MAP(
+        CLK   =&gt; t_CLK,
+        RST_N =&gt; t_RST_N,
+        DC    =&gt; t_DC,
+        OE    =&gt; t_OE,
+        PWM   =&gt; t_PWM
+    );
+
+    -- Clock generation
+    clk_process : PROCESS
+    BEGIN
+        t_CLK &lt;= '0';
+        WAIT FOR CLK_PERIOD / 2;
+        t_CLK &lt;= '1';
+        WAIT FOR CLK_PERIOD / 2;
+    END PROCESS;
+
+    -- Stimulus process
+    stim_proc : PROCESS
+    BEGIN
+        t_RST_N &lt;= '0';
+        t_OE  &lt;= '0';
+        value &lt;= 0;
+        WAIT FOR 100 ns;
+        t_RST_N &lt;= '1';
+        WAIT FOR 200 ns;
+        t_OE  &lt;= '1';
+        value &lt;= 15;
+        WAIT FOR 200 us;
+        value &lt;= 63;
+        WAIT FOR 0.2 ms;
+        WAIT UNTIL t_PWM = '0';
+        t_OE  &lt;= '0';
+        WAIT FOR 0.2 ms;
+        t_OE  &lt;= '1';
+        value &lt;= 127;
+        WAIT FOR 0.2 ms;
+        value &lt;= 191;
+        WAIT FOR 0.5 ms;
+        value &lt;= 255;
+        WAIT;
+    END PROCESS;
+
+    t_DC &lt;= STD_LOGIC_VECTOR( to_unsigned(value, DC_WIDTH) );
+
+END sim;
+
+-- ghdl -a pwm_gen.vhd tb_pwm_gen.vhd &amp;&amp; ghdl -e tb_pwm_gen  
+-- ghdl -r tb_pwm_gen --vcd=waveform.vcd --stop-time=2s
+-- gtkwave waveform.vcd &amp;
+</code></pre>
+<p>When simulating the design using a VHDL testbench, the <strong>GHDL simulator</strong>
+produced the following waveforms:</p>
+<p><img alt="" src="pwm_sim.jpg" /></p>
+<p><strong>Figure:</strong> Simulation waveforms generated by GHDL for the PWM signal.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="fpga-implementation"><strong>FPGA Implementation</strong><a class="headerlink" href="#fpga-implementation" title="Permanent link">#</a></h2>
+<p>The following <strong>Tcl script</strong> is used to specify the FPGA pin assignments
+(for the MAX10 Lite FPGA board).</p>
+<pre><code class="language-Tcl">#============================================================
+# FPGA assignments
+#============================================================
+
+#set_global_assignment -name FAMILY &quot;MAX 10 FPGA&quot;
+#set_global_assignment -name DEVICE 10M50DAF484C7G
+
+#============================================================
+# CLOCK
+#============================================================
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_location_assignment PIN_P11 -to CLK
+
+#============================================================
+# Slide Switches
+#============================================================
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[8]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DC[9]
+set_location_assignment PIN_C10 -to DC[0]
+set_location_assignment PIN_C11 -to DC[1]
+set_location_assignment PIN_D12 -to DC[2]
+set_location_assignment PIN_C12 -to DC[3]
+set_location_assignment PIN_A12 -to DC[4]
+set_location_assignment PIN_B12 -to DC[5]
+set_location_assignment PIN_A13 -to DC[6]
+set_location_assignment PIN_A14 -to DC[7]
+set_location_assignment PIN_B14 -to DC[8]
+set_location_assignment PIN_F15 -to DC[9]
+
+#============================================================
+# PUSH BUTTONS
+#============================================================
+
+set_instance_assignment -name IO_STANDARD &quot;3.3 V SCHMITT TRIGGER&quot; -to RST_N
+set_instance_assignment -name IO_STANDARD &quot;3.3 V SCHMITT TRIGGER&quot; -to OE
+set_location_assignment PIN_B8 -to RST_N
+set_location_assignment PIN_A7 -to OE
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to PWM
+set_location_assignment PIN_AB20 -to PWM
+</code></pre>
+<p><img alt="" src="pwm_wave-1.jpg" /></p>
+<p><img alt="" src="pwm_wave-2.jpg" /></p>
+<p><strong>Figure:</strong> PWM output signals measured by a digital oscilloscope</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="coding-exercise"><strong>Coding Exercise</strong><a class="headerlink" href="#coding-exercise" title="Permanent link">#</a></h2>
+<ul>
+<li>Generate <strong>3 PWM signals</strong> (frequency approx. 500Hz) 
+  to drive 3 control pins of the RGB LED.</li>
+<li>Use 3 slide switches per color to set the duty cycle of the corresponding PWM signal.</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-06-15 | Last Updated: 2025-06-15</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
