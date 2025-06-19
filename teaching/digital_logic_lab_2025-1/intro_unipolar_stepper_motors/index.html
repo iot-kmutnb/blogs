@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/digital_logic_lab_2025-1/intro_unipolar_stepper_motors/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: Unipolar 4-Phase Stepper Motor Interfacing - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-unipolar-4-phase-stepper-motor-interfacing" class="nav-link">Tutorial: Unipolar 4-Phase Stepper Motor Interfacing</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#stepper-motors" class="nav-link">Stepper Motors</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#28byj-48-stepper-motor" class="nav-link">28BYJ-48 Stepper Motor</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#uln2003a" class="nav-link">ULN2003A</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#stepping-methods" class="nav-link">Stepping Methods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-coding-example-for-fpga" class="nav-link">VHDL Coding Example for FPGA</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-unipolar-4-phase-stepper-motor-interfacing"><strong>Tutorial: Unipolar 4-Phase Stepper Motor Interfacing</strong><a class="headerlink" href="#tutorial-unipolar-4-phase-stepper-motor-interfacing" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="stepper-motors"><strong>Stepper Motors</strong><a class="headerlink" href="#stepper-motors" title="Permanent link">#</a></h2>
+<p>Stepper motors are designed to move their rotor (the moving part) in fixed angular steps.<br />
+Coils inside the motor are used to generate magnetic fields.</p>
+<p>In a <strong>permanent magnet (PM) stepper motor</strong>, the rotor is the rotating part 
+and contains a permanent magnet (typically in the form of a cylindrical or 
+ring-shaped magnet). This magnet interacts with the electromagnetic fields 
+from the stator coils to produce precise steps of motion.</p>
+<p>When electricity flows through these coils in a specific order, each coil creates 
+a magnetic field. This magnetic field attracts the nearest rotor poles, 
+causing the motor to advance by one precise, fixed angular increment, 
+known as a <strong>step</strong>.</p>
+<p>There are two main types of stepper motors: <strong>bipolar</strong> and <strong>unipolar</strong>.</p>
+<ul>
+<li>In a <strong>unipolar stepper motor</strong>, there are two center-tapped coils, and 
+it typically has <strong>6 wires</strong> (4 wires for the separate coils/phases and 
+2 common wires for the supply voltage or VCC).<br />
+ICs such as the <strong>ULN2003</strong> can be used to drive unipolar stepper motors.</li>
+<li>In contrast, a <strong>bipolar stepper motor</strong> has two full coils, no center taps, 
+and <strong>4 wires</strong>. Bipolar stepper motors are commonly used in <strong>3D printers</strong>.</li>
+</ul>
+<p>In this tutorial, we will focus on a <strong>unipolar stepper motor</strong>, 
+specifically using the <strong>28BYJ-48</strong> as the motor and the <strong>ULN2003 driver module</strong> 
+to control its four phases.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="28byj-48-stepper-motor"><strong>28BYJ-48 Stepper Motor</strong><a class="headerlink" href="#28byj-48-stepper-motor" title="Permanent link">#</a></h2>
+<p>The <strong>28BYJ-48</strong> is a small stepper motor with a rated voltage of <strong>5V DC</strong>.<br />
+It rotates in <strong>32 steps per revolution</strong> (11.25° per step)) at the internal motor shaft.<br />
+The motor includes a built-in gearbox with a <strong>~64:1 reduction ratio</strong>,<br />
+resulting in <strong>32 × 64 = 2048 steps</strong> required for the <strong>output shaft</strong> to complete one full rotation.</p>
+<p><img alt="" src="28byj-48.jpg" /></p>
+<p><strong>Figure:</strong> 28BYJ-48 stepper motor</p>
+<p>The <strong>28BYJ-48</strong> motor has 5 wires:</p>
+<ul>
+<li>1: Blue wire (coil 4)</li>
+<li>2: Pink wire (coil 2)</li>
+<li>3: Yellow wire (coil 3)</li>
+<li>4: Orange wire (coil 1)</li>
+<li>5: Red wire for the common pin (VCC)</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="uln2003a"><strong>ULN2003A</strong><a class="headerlink" href="#uln2003a" title="Permanent link">#</a></h2>
+<p>The <strong>ULN2003(A)</strong> IC is a <strong>Darlington transistor array</strong>
+(with TTL and CMOS compatible inputs, 5V logic).
+It consists of <strong>seven NPN Darlington pairs</strong>, each capable of
+<strong>sinking up to 500mA</strong> at up to <strong>50V</strong>.
+Each NPN pair functions as an <strong>inverting buffer</strong>, 
+allowing the IC to drive inductive loads such as relays or motors.</p>
+<p><img alt="" src="uln2003a_info.jpg" /></p>
+<p><strong>Figure:</strong> ULN2003 IC</p>
+<p><strong>Datasheets</strong></p>
+<ul>
+<li><a href="https://www.st.com/resource/en/datasheet/uln2001.pdf">https://www.st.com/resource/en/datasheet/uln2001.pdf</a></li>
+<li><a href="https://www.ti.com/lit/ds/symlink/uln2003a.pdf">https://www.ti.com/lit/ds/symlink/uln2003a.pdf</a></li>
+</ul>
+<p>To drive a <strong>4-phase unipolar stepper motor</strong>,
+only the <strong>first four channels</strong> of the <strong>ULN2003</strong> are typically used.
+To simplify the wiring between the stepper motor and the <strong>ULN2003A</strong> IC,
+several <strong>ULN2003 driver modules</strong> are available on the market.
+These modules include a 5-pin socket for the motor wiring,
+4-pin connector for input signals, and <strong>on-board LEDs</strong> for
+<strong>four-phase indication</strong>, making it easier to observe the stepping sequence
+during motor operation.</p>
+<p>To interface the stepper motor driver module with the <strong>FPGA board (3.3V logic)</strong>,
+connect only four wires for the input signals <strong>IN1 to IN4</strong>
+(3.3 V logic level outputs from the FPGA) and <strong>GND</strong>.
+Use an <strong>external 5 V DC power supply</strong> for the stepper motor driver module
+(<strong>do not use the 5 V supply from the FPGA board!</strong>).</p>
+<p><img alt="" src="uln2003a_driver_module.jpg" /></p>
+<p><strong>Figure:</strong> ULN2003A-based 4-phase stepper motor driver module</p>
+<p>The module has a 5-pin connector:</p>
+<ul>
+<li>Pin 1: Red wire for the common pin (VCC)</li>
+<li>Pin 2: Orange wire (coil 1)</li>
+<li>Pin 3: Yellow wire (coil 3)</li>
+<li>Pin 4: Pink wire (coil 2)</li>
+<li>Pin 5: Blue wire (coil 4)</li>
+</ul>
+<p><img alt="" src="schematic.jpg" /></p>
+<p><strong>Figure:</strong> Example schematic of the ULN2003A-based stepper motor driver module.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="stepping-methods"><strong>Stepping Methods</strong><a class="headerlink" href="#stepping-methods" title="Permanent link">#</a></h2>
+<p>Different stepping methods affect a stepper motor's <strong>resolution</strong>,
+<strong>torque</strong>, and <strong>smoothness</strong>:</p>
+<ul>
+<li>
+<p><strong>Full-stepping (two-coil)</strong>:
+Two adjacent coils are energized at once, providing standard step resolution
+and higher torque. The rotor advances by one full step angle per sequence
+(before gear reduction).</p>
+</li>
+<li>
+<p><strong>Half-stepping</strong>:
+Alternates between energizing one and two coils, doubling the step count.
+This improves resolution and smoothness with moderate torque.</p>
+</li>
+<li>
+<p><strong>Microstepping</strong> (advanced):
+Coil currents are modulated (e.g., sinusoidally) to create finer steps
+between standard positions. This method offers ultra-smooth motion but requires
+a dedicated micro-stepping driver (not supported by ULN2003).</p>
+</li>
+</ul>
+<p><img alt="" src="stepping.jpg" /></p>
+<p><strong>Figure:</strong> Full-step vs. Half-step sequences</p>
+<p><strong>Step sequencing speed</strong> is the rate at which control signals are sent 
+to the motor and determines its <strong>rotation speed</strong>. Increasing the step rate 
+speeds up the motor, but may lead to <strong>missed steps</strong> or <strong>reduced torque</strong> 
+if it exceeds the motor's capability.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-coding-example-for-fpga"><strong>VHDL Coding Example for FPGA</strong><a class="headerlink" href="#vhdl-coding-example-for-fpga" title="Permanent link">#</a></h2>
+<p>This VHDL code implements a unipolar stepper motor controller using 
+an <strong>8-step half-stepping sequence</strong>, designed to drive a 4-phase stepper motor 
+via the <strong>ULN2003A</strong> driver module. </p>
+<p>The <code>stepper_motor_demo</code> entity takes a system clock (<code>CLK</code>), 
+an asynchronous reset (<code>RST_N</code>), and a direction input (<code>DIR</code>), and 
+outputs a 4-bit control signal (<code>Q</code>) to the motor driver.</p>
+<pre><code class="language-VHDL">-- File: stepper_motor_demo.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY stepper_motor_demo IS
+    GENERIC (
+        CLK_HZ : INTEGER := 50_000_000 -- Clock frequency in Hz
+    );
+    PORT (
+        CLK   : IN STD_LOGIC; -- System clock input
+        RST_N : IN STD_LOGIC; -- Async reset (active low)
+        DIR   : IN STD_LOGIC; -- Rotation direction (CW vs. CCW)
+        Q     : OUT STD_LOGIC_VECTOR(3 DOWNTO 0) -- Output to ULN2003: IN1..IN4 pins
+    );
+END stepper_motor_demo;
+
+ARCHITECTURE behavioral OF stepper_motor_demo IS
+
+    CONSTANT STEP_DELAY : INTEGER := CLK_HZ / 512;
+
+    SIGNAL counter    : INTEGER RANGE 0 TO STEP_DELAY := 0;
+    SIGNAL step_index : INTEGER RANGE 0 TO 7 := 0;
+    SIGNAL Q_reg      : STD_LOGIC_VECTOR(3 DOWNTO 0);
+
+BEGIN
+
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            counter &lt;= 0;
+            step_index &lt;= 0;
+            Q_reg &lt;= &quot;0000&quot;;
+
+        ELSIF rising_edge(CLK) THEN
+            IF counter = STEP_DELAY - 1 THEN
+                counter &lt;= 0;
+
+                IF DIR = '1' THEN
+                    IF step_index = 7 THEN
+                        step_index &lt;= 0;
+                    ELSE
+                        step_index &lt;= step_index + 1;
+                    END IF;
+                ELSE
+                    IF step_index = 0 THEN
+                        step_index &lt;= 7;
+                    ELSE
+                        step_index &lt;= step_index - 1;
+                    END IF;
+                END IF;
+
+                CASE step_index IS
+                    WHEN 0 =&gt;
+                        Q_reg &lt;= &quot;0001&quot;;
+                    WHEN 1 =&gt;
+                        Q_reg &lt;= &quot;0011&quot;;
+                    WHEN 2 =&gt;
+                        Q_reg &lt;= &quot;0010&quot;;
+                    WHEN 3 =&gt;
+                        Q_reg &lt;= &quot;0110&quot;;
+                    WHEN 4 =&gt;
+                        Q_reg &lt;= &quot;0100&quot;;
+                    WHEN 5 =&gt;
+                        Q_reg &lt;= &quot;1100&quot;;
+                    WHEN 6 =&gt;
+                        Q_reg &lt;= &quot;1000&quot;;
+                    WHEN 7 =&gt;
+                        Q_reg &lt;= &quot;1001&quot;;
+                    WHEN OTHERS =&gt;
+                        Q_reg &lt;= &quot;0000&quot;;
+                        step_index &lt;= 0;
+                END CASE;
+            ELSE
+                counter &lt;= counter + 1;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    Q &lt;= Q_reg;
+
+END behavioral;
+</code></pre>
+<p>&nbsp;</p>
+<p>The following Tcl script defines the pin assignments for the DE10-Lite FPGA board.</p>
+<pre><code class="language-tcl">#============================================================
+# FPGA assignments
+#============================================================
+
+#set_global_assignment -name FAMILY &quot;MAX 10 FPGA&quot;
+#set_global_assignment -name DEVICE 10M50DAF484C7G
+
+#============================================================
+# CLOCK
+#============================================================
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_location_assignment PIN_P11 -to CLK
+
+#============================================================
+# PUSH BUTTONS
+#============================================================
+
+set_instance_assignment -name IO_STANDARD &quot;3.3 V SCHMITT TRIGGER&quot; -to RST_N
+set_location_assignment PIN_B8 -to RST_N
+
+#============================================================
+# Slide Switches
+#============================================================
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DIR
+set_location_assignment PIN_C10 -to DIR
+
+#============================================================
+# GPIOs
+#============================================================
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to Q[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to Q[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to Q[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to Q[0]
+set_location_assignment PIN_AB19 -to Q[3]
+set_location_assignment PIN_AA19 -to Q[2]
+set_location_assignment PIN_Y19  -to Q[1]
+set_location_assignment PIN_AB20 -to Q[0]
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="fpga_stepper_motor_demo.jpg" /></p>
+<p><strong>Figure:</strong> DE10-Lite FPGA board driving a 4-phase stepper motor via a ULN2003A driver.</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-06-18 | Last Updated: 2025-06-18</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
