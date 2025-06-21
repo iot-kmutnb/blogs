@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/fpga/tang_nano_1k_demo/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการทดลองใช้งานบอร์ด Sipeed Tang Nano 1K โดยใช้ภาษา VHDL - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#sipeed-tang-nano-1k-vhdl" class="nav-link">ตัวอย่างการทดลองใช้งานบอร์ด Sipeed Tang Nano 1K โดยใช้ภาษา VHDL</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl" class="nav-link">&#9655; การออกแบบวงจรดิจิทัลด้วย VHDL สำหรับการฝึกปฏิบัติและเรียนรู้ด้วยตนเอง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#gowin-eda-educational" class="nav-link">&#9655; แนวทางการใช้งาน Gowin EDA (Educational)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="sipeed-tang-nano-1k-vhdl"><strong>ตัวอย่างการทดลองใช้งานบอร์ด Sipeed Tang Nano 1K โดยใช้ภาษา VHDL</strong><a class="headerlink" href="#sipeed-tang-nano-1k-vhdl" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Sipeed Tang Nano 1K</em>, <em>Gowin FPGA</em>, <em>VHDL Coding</em></p>
+<hr />
+<h2 id="vhdl">&#9655; <strong>การออกแบบวงจรดิจิทัลด้วย VHDL สำหรับการฝึกปฏิบัติและเรียนรู้ด้วยตนเอง</strong><a class="headerlink" href="#vhdl" title="Permanent link">#</a></h2>
+<p>การออกแบบวงจรดิจิทัลเพื่อนำไปใช้กับบอร์ด <strong>FPGA</strong> โดยทั่วไปแล้ว ก็จะใช้ภาษา <strong>HDL
+(Hardware Description Language)</strong> ในการเขียนโค้ด เพื่ออธิบายหรือกำหนดรูปแบบการทำงานของวงจร
+ภาษาที่นิยมใช้ก็ได้แก่ <strong>VHDL</strong> และ <strong>Verilog / SystemVerilog (SV)</strong></p>
+<p>บอร์ด <strong>FPGA</strong> ก็มีให้เลือกใช้งานหลายรูปแบบ และใช้ชิป <strong>FPGA</strong> จากผู้ผลิต เช่น
+<strong>Intel / Altera</strong>, <strong>AMD / Xilinx</strong> และ <strong>Lattice Semiconductor</strong>
+ชิป <strong>FPGA</strong> ของบริษัท <strong>Gowin Semiconductor</strong> จากประเทศจีน และบอร์ด <strong>Sipeed Tang</strong>
+ก็ถือว่าเป็นตัวเลือกที่น่าสนใจ เนื่องจากมีราคาไม่แพง เหมาะสำหรับผู้เริ่มต้นเรียนรู้</p>
+<p>ในส่วนของซอฟต์แวร์ <strong>FPGA EDA</strong> สำหรับชิป <strong>Gowin FPGA</strong> ก็มีซอฟต์แวร์
+<a href="https://www.gowinsemi.com/en/support/download_eda/"><strong>Gowin EDA IDE (Educational Version)</strong></a>
+ให้ใช้งานได้ฟรี หรือ จะใช้ซอฟต์แวร์แบบ <strong>Command Line</strong> 
+เช่น <strong>Yosys / Nextpnr / Apicula</strong> ซึ่งเป็นเครื่องมือโอเพนซอร์สสำหรับการออกแบบวงจรดิจิทัล และรองรับชิป
+<strong>FPGA</strong> หลายตระกูล</p>
+<p><img alt="" src="gowin_eda_edu.jpg" /></p>
+<p>รูป: หน้าเว็บสำหรับดาวน์โหลด <strong>Gowin EDA (Educational Version)</strong> สำหรับ <strong>Windows / Linux</strong></p>
+<p><img alt="" src="../tang_nano_boards/tang_nano_1k_pinout.png" /></p>
+<p><img alt="" src="../tang_nano_boards/tang_nano_1k_pinheaders.png" /></p>
+<p>รูป: บอร์ด <strong>Tang Nano 1K</strong></p>
+<p>&nbsp;</p>
+<p>ในเอกสารนี้นำเสนอตัวอย่างการออกแบบวงจรดิจิทัลในระดับพื้นฐาน เพื่อสาธิตการเชื่อมต่อกับอุปกรณ์อิเล็กทรอนิกส์พื้นฐานหลายรูปแบบ 
+โดยใช้ภาษา <strong>VHDL</strong> ในการเขียนโค้ด และได้นำไปทดลองใช้งานกับบอร์ด
+<a href="../tang_nano_boards/#sipeed-tang-nano-1k"><strong>Sipeed Tang Nano 1K (GW1NZ-LV1)</strong></a> ตามรายการต่อไปนี้</p>
+<ol>
+<li><code>rgb_led_demo</code>: วงจรดิจิทัลเพื่อสาธิตการกำหนดสถานะลอจิกให้กับ <strong>RGB LED</strong> ที่มีอยู่บนบอร์ด <strong>Tang Nano 1K</strong><ul>
+<li><a href="rgb_led_demo/rgb_led_demo.vhd">rgb_led_demo.vhd</a> </li>
+<li><a href="rgb_led_demo/rgb_led_demo.cst">rgb_led_demo.cst</a> </li>
+</ul>
+</li>
+<li><code>leds_demo</code>: วงจรดิจิทัลเพื่อสาธิตการกำหนดสถานะลอจิก จำนวน 8 บิต โดยจะต้องใช้บอร์ด <strong>FPGA</strong> ต่อใช้งานกับโมดูล <strong>LED Bar</strong><ul>
+<li><a href="leds_demo/leds_demo.vhd">rgb_led_demo.vhd</a> </li>
+<li><a href="leds_demo/leds_demo.cst">rgb_led_demo.cst</a> </li>
+</ul>
+</li>
+<li><code>rotary_encoder_demo</code>: วงจรดิจิทัลเพื่อตรวจจับการเปลี่ยนแปลงของสัญญาณดิจิทัลจากโมดูล
+<strong>Rotary Encoder Switch</strong> และนำไปใช้ในการเพิ่มหรือลดระดับ 8 ระดับ โดยแสดงสถานะลอจิกด้วยโมดูล <strong>LED Bar</strong><ul>
+<li><a href="rotary_encoder_demo/rotary_encoder_demo.vhd">rotary_encoder_demo.vhd</a> </li>
+<li><a href="rotary_encoder_demo/rotary_encoder_demo.cst">rotary_encoder_demo.cst</a> </li>
+</ul>
+</li>
+<li><code>disp_7seg_demo</code>:  วงจรดิจิทัลเพื่อแสดงค่าตัวเลข <strong>BCD</strong> แบบ 4 หลัก โดยใช้โมดูล <strong>4-Digit 7-Segment Display</strong>
+และต้องใช้วิธีการควบคุมตามรูปแบบที่เรียกว่า <strong>Time-Multiplexing</strong> <ul>
+<li><a href="disp_7seg_demo/disp_7seg_demo.vhd">disp_7seg_demo.vhd</a></li>
+<li><a href="disp_7seg_demo/disp_7seg_demo.cst">disp_7seg_demo.cst</a></li>
+</ul>
+</li>
+<li><code>tm1637_driver_demo</code>: วงจรดิจิทัลเพื่อเชื่อมต่อกับโมดูลที่มีไอซี
+<strong>TM1637</strong> ทำหน้าที่ควบคุบการทำงานของ <strong>4-Digit 7-Segment Display</strong> โดยใช้สัญญาณดิจิทัลเพียง 2 เส้น ในการเชื่อมต่อสื่อสาร<ul>
+<li><a href="tm1637_driver_demo/tm1637_driver.vhd">tm1637_driver.vhd</a></li>
+<li><a href="tm1637_driver_demo/tm1637_driver_demo.vhd">tm1637_driver_demo.vhd</a></li>
+<li><a href="tm1637_driver_demo/tm1637_driver_demo.cst">tm1637_driver_demo.cst</a></li>
+</ul>
+</li>
+<li><code>lcd16x2_ctrl_demo</code>:  วงจรดิจิทัลเพื่อสาธิตการควบคุมและแสดงข้อความจำนวน 2 บรรทัด โดยใช้โมดูล
+<strong>LCD 16x2</strong> แบบ <strong>4-bit data parallel</strong> (ใช้แรงดันไฟเลี้ยง +5V และใช้ตัวต้านทานปรับค่าได้สร้างแรงดันไฟฟ้าที่ขา <strong>VO</strong> สำหรับการปรับระดับความสว่าง)<ul>
+<li><a href="lcd16x2_ctrl_demo/lcd16x2_ctrl.vhd">lcd16x2_ctrl.vhd</a></li>
+<li><a href="lcd16x2_ctrl_demo/lcd16x2_ctrl_demo.vhd">lcd16x2_ctrl_demo.vhd</a></li>
+<li><a href="lcd16x2_ctrl_demo/lcd16x2_ctrl_demo.cst">lcd16x2_ctrl_demo.cst</a></li>
+</ul>
+</li>
+</ol>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>โมดูลหรืออุปกรณ์ที่ได้นำมาทดลองร่วมกับบอร์ด <strong>Tang Nano</strong> เป็นอุปกรณ์ที่หาซื้อได้ทั่วไป มักนำมาใช้กับบอร์ดไมโครคอนโทรลเลอร์ (<strong>MCU</strong>) เช่น
+ <strong>Arduino</strong> , <strong>Raspberry Pi Pico</strong> หรือ <strong>Espressif ESP32</strong> เป็นต้น
+ดังนั้นผู้ใช้ที่คุ้นเคยกับการใช้งาน <strong>MCU</strong> มาบ้างแล้ว ก็สามารถลองเปรียบเทียบรูปแบบการใช้งาน <strong>MCU</strong> กับ <strong>FPGA</strong>
+และการเขียนโค้ดภาษา <strong>C/C++</strong> กับ <strong>VHDL</strong> ในการเชื่อมต่อกับโมดูลหรืออุปกรณ์ในแต่ละชนิดว่า มีความเหมือน หรือแตกต่างกันอย่างไร</li>
+<li>ขาสัญญาณ <strong>I/O</strong>  ของวงจรดิจิทัลบนบอร์ด <strong>FPGA</strong> ให้เลือกใช้แรงดันไฟฟ้า <strong>3.3V (LVCMOS-3.3)</strong> </li>
+<li>โค้ดตัวอย่าง <strong>VHDL</strong> ได้นำไปทดลองใช้กับบอร์ด <strong>Tang Nano 1K</strong> เนื่องจากบอร์ดนี้มีชิป <strong>FPGA</strong> ที่มีความจุเชิงลอจิก 
+(<strong>Logic Capacity</strong>) น้อยที่สุด (<strong>~1000 LEs (Logic Elements</strong>) ดังนั้นจึงมีราคาต่ำสุดในซีรีย์ <strong>Tang Nano</strong>
+แต่จะใช้ได้กับวงจรดิจิทัลที่ไม่ซับซ้อน</li>
+<li>ตัวอย่างโค้ด <strong>VHDL</strong> สามารถนำไปใช้ได้กับบอร์ด <strong>Tang Nano 1K / 4K / 9K</strong> (มีความจุเชิงลอจิกเพิ่มขึ้นตามลำดับ) 
+แต่จะต้องเลือกขาสัญญาณ <strong>I/O</strong> ให้ตรงกับบอร์ดที่เลือกใช้งาน เช่น การเลือกใช้งานปุ่มกดบนบอร์ดเพื่อใช้เป็นสัญญาณอินพุตสำหรับการรีเซตวงจร 
+ขาสัญญาณอินพุตจาก <strong>Clock</strong> บนบอร์ด (ใช้ความถี่ <strong>27MHz</strong> ในตัวอย่าง) เป็นต้น 
+โดยผู้ใชจะต้องกำหนดค่า ในไฟล์ <strong>Gowin Design Physical Constraints File (.cst)</strong> ให้ถูกต้อง
+และที่สำคัญ จะต้องเลือก <strong>FPGA Device</strong> ให้ตรงกับบอร์ดที่จะใช้งาน</li>
+</ul>
+<p><img alt="" src="tang_1k_rotary.jpg" /></p>
+<p>รูป: การทดลองกับโมดูล <strong>Rotary Encoder Switch</strong> </p>
+<p><img alt="" src="tang_1k_led_bar.jpg" /></p>
+<p>รูป: การทดลองกับโมดูล <strong>8-level LED Bar (active-low)</strong> </p>
+<p><img alt="" src="tang_1k_ws2812b.jpg" /></p>
+<p>รูป: การทดลองกับโมดูล <strong>1-Pixel WS2812B RGB LED</strong> </p>
+<p><img alt="" src="tang_1k_4xseg7_tm.jpg" /></p>
+<p>รูป: การทดลองกับโมดูล <strong>4-Digit 7-Segment Display (Timing Multiplexing Control)</strong> </p>
+<p><img alt="" src="tang_1k_tm1637.jpg" /></p>
+<p>รูป: การทดลองกับโมดูล <strong>TM1637-based 4-Digit 7-Segment Display</strong> </p>
+<p><img alt="" src="tang_1k_lcd16x2.jpg" /></p>
+<p>รูป: การทดลองกับโมดูล <strong>LCD 16x2 LCD (4-bit data parallel)</strong> </p>
+<p><strong>Zip Files:</strong></p>
+<ul>
+<li><a href="rgb_led_demo.zip"><code>rgb_led_demo.zip</code></a></li>
+<li><a href="leds_demo.zip"><code>leds_demo.zip</code></a></li>
+<li><a href="rotary_encoder_demo.zip"><code>rotary_encoder_demo.zip</code></a></li>
+<li><a href="disp_7seg_demo.zip"><code>disp_7seg_demo.zip</code></a></li>
+<li><a href="tm1637_driver_demo.zip"><code>tm1637_driver_demo.zip</code></a></li>
+<li><a href="lcd16x2_ctrl_demo.zip"><code>lcd16x2_ctrl_demo.zip</code></a></li>
+</ul>
+<hr />
+<h2 id="gowin-eda-educational">&#9655; <strong>แนวทางการใช้งาน Gowin EDA (Educational)</strong><a class="headerlink" href="#gowin-eda-educational" title="Permanent link">#</a></h2>
+<p>เปิดใช้งานซอฟต์แวร์ <strong>Gowin EDA (Education)</strong> แล้วสร้างโปรเจกต์ใหม่ 
+ระบุไดเรกทอรี และชื่อของโปรเจกต์ จากนั้นไปนำไฟล์ตัวอย่าง เช่น <code>.vhd</code>, <code>.cst</code> และ <code>.sdc</code>
+ไปใส่ไว้ในไดเรกทอรีย่อย <code>src</code> ของโปรเจกต์ จากนั้นให้ทำขั้นตอน <strong>Synthesize</strong>
+และ <strong>Place &amp; Route</strong> ตามลำดับ เพื่อให้ได้ไฟล์ <strong>Bitstream</strong> (<code>.fs</code>)</p>
+<p><img alt="" src="gowin_ide-1.jpg" /></p>
+<p>รูป: ขั้นตอนการเริ่มต้นสร้างโปรเจกต์ใหม่</p>
+<p><img alt="" src="gowin_ide-2.jpg" /></p>
+<p>รูป: การเลือกชิป <strong>FPGA</strong> ให้ตรงกับอุปกรณ์ที่ต้องการใช้งาน (สำหรับบอร์ด <strong>Tang Nano 1K</strong>)</p>
+<p><img alt="" src="gowin_ide-3.jpg" /></p>
+<p>รูป: การเพิ่มไฟล์จากซอร์สโค้ดจากวงจรตัวอย่าง (<code>rgb_led</code>) ไว้ในโปรเจกต์</p>
+<p><img alt="" src="gowin_ide-4.jpg" /></p>
+<p>รูป: การทำขั้นตอนเพื่อคอมไพล์ และแปลงโค้ดให้เป็นวงจร (<strong>FPGA Design Process</strong>)</p>
+<p><img alt="" src="rtl_viewer-1.jpg" /></p>
+<p>รูป: การแสดงวงจรที่ได้จากการสังเคราะห์วงจร (<strong>Synthesized Digital Design</strong>) โดยใช้ <strong>RTL Design Viewer</strong></p>
+<p><img alt="" src="gowin_ide-5.jpg" /></p>
+<p>รูป: การเปิดใช้งาน <strong>Gowin Programmer</strong> และเชื่อมต่อกับบอร์ด <strong>FPGA</strong></p>
+<hr />
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../gowin_fpga_tools/">การใช้งานซอฟต์แวร์ <strong>Open Source FPGA Design Tools</strong> สำหรับบอร์ด <strong>Sipeed Tang Nano FPGA</strong></a></li>
+<li><a href="../tang_nano/">การติดตั้งและใช้งานซอฟต์แวร์ <strong>Gowin IDE Standard Edition</strong> และใช้งานกับบอร์ด <strong>Sipeed Tang Nano FPGA</strong></a></li>
+</ul>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2025-06-20 | Last Updated: 2025-06-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -196,6 +196,7 @@
 <p>รูป: ไอซี <strong>TPD12S016 (HDMI Interface Device)</strong> และพอร์ต <strong>HDMI</strong></p>
 <p><img alt="" src="schematic-10.jpg" /></p>
 <p>รูป: วงจรมีไอซี <strong>Realtek RTL8211EG</strong></p>
+<p>&nbsp;</p>
 <p><strong>ข้อสังเกต:</strong> บอร์ด <strong>FPGA</strong> รุ่นนี้ มีวงจรต่อไปนี้ </p>
 <ul>
 <li>วงจรสำหรับเชื่อมต่อกับพอร์ต <strong>USB</strong> โดยใช้ไอซี <strong>CP2102</strong> เป็นตัวแปลง <strong>USB-to-Serial</strong> 
@@ -225,49 +226,50 @@
 วงจรนี้มีสัญญาณอินพุต  <code>CLK</code> (<strong>50MHz</strong>) และนำไปสร้างสัญญาณควบคุมการนับของวงจรตัวนับ
 ด้วยอัตราที่ต่ำ เช่น <strong>10Hz</strong> มีการใช้ปุ่มกดสำหรับการรีเซตการทำงานของวงจรด้วยสัญญาณอินพุต <code>NRST</code>
 และใช้ <strong>LEDs</strong> จำนวน 2 ชุด สำหรับแสดงสถานะลอจิกสลับกัน  </p>
-<pre><code class="language-VHDL">library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity qmtech_cyc10_demo is
-  port (
-     CLK   : in  std_logic;   -- 50 MHz clock input
-     NRST  : in  std_logic;   -- Active-low asynchronous reset
-     LEDS  : out std_logic_vector(1 downto 0)
-  );
-end qmtech_cyc10_demo;
+ENTITY qmtech_cyc10_demo IS
+    PORT (
+        CLK  : IN STD_LOGIC; -- 50 MHz clock input
+        NRST : IN STD_LOGIC; -- Active-low asynchronous reset
+        LEDS : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    );
+END qmtech_cyc10_demo;
 
-architecture behavioral of qmtech_cyc10_demo is
-  constant CLK_DIV   : integer := (50e6 / 10) - 1;
-  signal clk_div_cnt : integer := 0;
-  signal ce          : std_logic := '0';
-  signal toggle      : std_logic := '0';
+ARCHITECTURE behavioral OF qmtech_cyc10_demo IS
+    CONSTANT CLK_DIV : INTEGER := (50e6 / 10) - 1;
+    SIGNAL clk_div_cnt : INTEGER := 0;
+    SIGNAL ce : STD_LOGIC := '0';
+    SIGNAL toggle : STD_LOGIC := '0';
 
-begin
+BEGIN
 
-  clk_div_proc: process (CLK, NRST)
-  begin
-    if NRST = '0' then
-       clk_div_cnt &lt;= 0;
-       ce &lt;= '0';
-   toggle &lt;= '0';
-    elsif rising_edge(CLK) then
-       if clk_div_cnt = CLK_DIV then
-          ce &lt;= '1';
-          clk_div_cnt &lt;= 0; 
-       else
-          ce &lt;= '0';
-          clk_div_cnt &lt;= clk_div_cnt + 1;
-       end if;
-   if ce = '1' then
-      toggle &lt;= not toggle;
-   end if;
-    end if;
-  end process;
+    clk_div_proc : PROCESS (CLK, NRST)
+    BEGIN
+        IF NRST = '0' THEN
+            clk_div_cnt &lt;= 0;
+            ce &lt;= '0';
+            toggle &lt;= '0';
+        ELSIF rising_edge(CLK) THEN
+            IF clk_div_cnt = CLK_DIV THEN
+                ce &lt;= '1';
+                clk_div_cnt &lt;= 0;
+            ELSE
+                ce &lt;= '0';
+                clk_div_cnt &lt;= clk_div_cnt + 1;
+            END IF;
+            IF ce = '1' THEN
+                toggle &lt;= NOT toggle;
+            END IF;
+        END IF;
+    END PROCESS;
 
-  LEDS &lt;= &quot;11&quot; when NRST = '0' else toggle &amp; (not toggle);
+    LEDS &lt;= &quot;11&quot; WHEN NRST = '0' ELSE
+        toggle &amp; (NOT toggle);
 
-end behavioral;
+END behavioral;
 </code></pre>
 <p>ไฟล์ <strong>Tcl Script</strong> สำหรับการเลือกใช้ขา <strong>I/O</strong> ของชิป <strong>FPGA</strong> มีดังนี้</p>
 <pre><code class="language-text"># set_global_assignment -name FAMILY &quot;Cyclone 10 LP&quot;
@@ -298,136 +300,136 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
 และมีขาสัญญาณควบคุม 3 ขา (<code>DIGITS[2:0]</code>) ให้เลือกทีละตำแหน่งและส่งข้อมูลไบต์ใช้กับตำแหน่งดังกล่าว
 แล้วเปลี่ยนไปตำแหน่งถัดไปตามลำดับ ทำไปจนครบแล้ววนซ้ำไปเรื่อย ๆ 
 ดังนั้นสัญญาณควบคุม <code>DIGITS[2:0]</code> จะมีค่าตามลำดับดังนี้ <code>001 &gt; 010 &gt; 100 &gt; ...</code> </p>
-<pre><code class="language-VHDL">library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity qmtech_cyc10_7seg_disp is
-  generic( 
-    CLK_HZ     : natural := 50000000;
-    NUM_DIGITS : natural := 3
-  );
-  port(
-    CLK        : in std_logic;
-    NRST       : in std_logic;
-    SEG7       : out std_logic_vector(7 downto 0);
-    DIGITS     : out std_logic_vector(2 downto 0) 
-  );
-end qmtech_cyc10_7seg_disp;
+ENTITY qmtech_cyc10_7seg_disp IS
+    GENERIC (
+        CLK_HZ : NATURAL := 50000000;
+        NUM_DIGITS : NATURAL := 3
+    );
+    PORT (
+        CLK    : IN STD_LOGIC;
+        NRST   : IN STD_LOGIC;
+        SEG7   : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        DIGITS : OUT STD_LOGIC_VECTOR(NUM_DIGITS - 1 DOWNTO 0)
+    );
+END qmtech_cyc10_7seg_disp;
 
-architecture behavioral of qmtech_cyc10_7seg_disp is
-  constant CNT_MAX1   : natural := (CLK_HZ/200) - 1;
-  constant CNT_MAX2   : natural := (CLK_HZ/10) - 1;
+ARCHITECTURE behavioral OF qmtech_cyc10_7seg_disp IS
+    CONSTANT CNT_MAX1 : NATURAL := (CLK_HZ/200) - 1;
+    CONSTANT CNT_MAX2 : NATURAL := (CLK_HZ/10) - 1;
 
-  type bcd_counter_t is array(0 to NUM_DIGITS-1) of integer range 0 to 9;
-  signal bcd_count    : bcd_counter_t; 
+    TYPE bcd_counter_t IS ARRAY(0 TO NUM_DIGITS - 1) OF INTEGER RANGE 0 TO 9;
+    SIGNAL bcd_count : bcd_counter_t;
 
-  signal data_buf     : std_logic_vector(7 downto 0);
-  signal digits_sel   : std_logic_vector(NUM_DIGITS-1 downto 0);
-  signal digit_index  : natural range 0 to NUM_DIGITS-1 := 0;
+    SIGNAL data_buf : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL digits_sel : STD_LOGIC_VECTOR(NUM_DIGITS - 1 DOWNTO 0);
+    SIGNAL digit_index : NATURAL RANGE 0 TO NUM_DIGITS - 1 := 0;
 
-  subtype nibble is unsigned(3 downto 0);
-  -- This function implements a BCD to 7-Segment decoder.
-  function BCD2SEG7( data: nibble ) return std_logic_vector is
-     variable seg7bits : std_logic_vector(6 downto 0);
-  begin
-     case data is
-        when &quot;0000&quot; =&gt; seg7bits := &quot;0111111&quot;; -- 0
-        when &quot;0001&quot; =&gt; seg7bits := &quot;0000110&quot;; -- 1
-        when &quot;0010&quot; =&gt; seg7bits := &quot;1011011&quot;; -- 2
-        when &quot;0011&quot; =&gt; seg7bits := &quot;1001111&quot;; -- 3
-        when &quot;0100&quot; =&gt; seg7bits := &quot;1100110&quot;; -- 4
-        when &quot;0101&quot; =&gt; seg7bits := &quot;1101101&quot;; -- 5
-        when &quot;0110&quot; =&gt; seg7bits := &quot;1111101&quot;; -- 6
-        when &quot;0111&quot; =&gt; seg7bits := &quot;0000111&quot;; -- 7
-        when &quot;1000&quot; =&gt; seg7bits := &quot;1111111&quot;; -- 8
-        when &quot;1001&quot; =&gt; seg7bits := &quot;1101111&quot;; -- 9
-        when others =&gt; seg7bits := &quot;0000000&quot;; -- off
-     end case;
-     return seg7bits;
-  end BCD2SEG7;
+    SUBTYPE nibble IS unsigned(3 DOWNTO 0);
+    -- This function implements a BCD to 7-Segment decoder.
+    FUNCTION BCD2SEG7(data : nibble) RETURN STD_LOGIC_VECTOR IS
+        VARIABLE seg7bits : STD_LOGIC_VECTOR(6 DOWNTO 0);
+    BEGIN
+        CASE data IS
+            WHEN &quot;0000&quot; =&gt; seg7bits := &quot;0111111&quot;; -- 0
+            WHEN &quot;0001&quot; =&gt; seg7bits := &quot;0000110&quot;; -- 1
+            WHEN &quot;0010&quot; =&gt; seg7bits := &quot;1011011&quot;; -- 2
+            WHEN &quot;0011&quot; =&gt; seg7bits := &quot;1001111&quot;; -- 3
+            WHEN &quot;0100&quot; =&gt; seg7bits := &quot;1100110&quot;; -- 4
+            WHEN &quot;0101&quot; =&gt; seg7bits := &quot;1101101&quot;; -- 5
+            WHEN &quot;0110&quot; =&gt; seg7bits := &quot;1111101&quot;; -- 6
+            WHEN &quot;0111&quot; =&gt; seg7bits := &quot;0000111&quot;; -- 7
+            WHEN &quot;1000&quot; =&gt; seg7bits := &quot;1111111&quot;; -- 8
+            WHEN &quot;1001&quot; =&gt; seg7bits := &quot;1101111&quot;; -- 9
+            WHEN OTHERS =&gt; seg7bits := &quot;0000000&quot;; -- off
+        END CASE;
+        RETURN seg7bits;
+    END BCD2SEG7;
 
-begin
-  -- This process implements a N-digit BCD counter.
-  process (NRST,CLK)
-    variable wait_cnt    : natural range 0 to CNT_MAX2 := 0;
-    variable clk_enabled : boolean;
-    variable carry       : boolean; 
-  begin
-    if NRST = '0' then
-      wait_cnt := 0;
-      for i in bcd_count'range loop
-         bcd_count(i) &lt;= 0;
-      end loop;
-    elsif rising_edge(CLK) then 
-       if wait_cnt = CNT_MAX2 then
-          wait_cnt := 0;
-          clk_enabled := true;
-       else 
-          wait_cnt := wait_cnt + 1;
-          clk_enabled := false;
-       end if;
-       if clk_enabled then
-          carry := true;
-          for i in 0 to NUM_DIGITS-1 loop
-             if carry then
-                if bcd_count(i)=9 then
-                   bcd_count(i) &lt;= 0;
-                   carry := true;
-                else
-                   bcd_count(i) &lt;= bcd_count(i)+1;
-                   carry := false;
-                end if;
-             else
-                carry := false;
-             end if;
-          end loop;
-       end if;
-    end if;
-  end process; 
+BEGIN
+    -- This process implements a N-digit BCD counter.
+    PROCESS (NRST, CLK)
+        VARIABLE wait_cnt : NATURAL RANGE 0 TO CNT_MAX2 := 0;
+        VARIABLE clk_enabled : BOOLEAN;
+        VARIABLE carry : BOOLEAN;
+    BEGIN
+        IF NRST = '0' THEN
+            wait_cnt := 0;
+            FOR i IN bcd_count'RANGE LOOP
+                bcd_count(i) &lt;= 0;
+            END LOOP;
+        ELSIF rising_edge(CLK) THEN
+            IF wait_cnt = CNT_MAX2 THEN
+                wait_cnt := 0;
+                clk_enabled := true;
+            ELSE
+                wait_cnt := wait_cnt + 1;
+                clk_enabled := false;
+            END IF;
+            IF clk_enabled THEN
+                carry := true;
+                FOR i IN 0 TO NUM_DIGITS - 1 LOOP
+                    IF carry THEN
+                        IF bcd_count(i) = 9 THEN
+                            bcd_count(i) &lt;= 0;
+                            carry := true;
+                        ELSE
+                            bcd_count(i) &lt;= bcd_count(i) + 1;
+                            carry := false;
+                        END IF;
+                    ELSE
+                        carry := false;
+                    END IF;
+                END LOOP;
+            END IF;
+        END IF;
+    END PROCESS;
 
-  -- This process implements a 7-segment driver using time-multiplexing.
-  process (NRST, CLK) 
-    variable wait_cnt    : natural range 0 to CNT_MAX1 := 0;
-    variable clk_enabled : boolean;
-    variable bcd_value   : unsigned(3 downto 0);
-  begin
-    if NRST = '0' then
-       wait_cnt := 0;
-       data_buf    &lt;= x&quot;00&quot;;
-       digits_sel  &lt;= (others =&gt; '0');
-       digit_index &lt;= 0;
-    elsif rising_edge(CLK) then     
-       if wait_cnt = CNT_MAX1 then
-          wait_cnt := 0;
-          clk_enabled := true;
-       else 
-          wait_cnt := wait_cnt + 1;
-          clk_enabled := false;
-       end if;
-       if clk_enabled then
-          if digit_index = NUM_DIGITS-1 then 
-             digit_index &lt;= 0;
-          else 
-             digit_index &lt;= digit_index + 1;
-          end if;
-          for i in 0 to NUM_DIGITS-1 loop
-             if i = digit_index then
-               digits_sel(i) &lt;= '1';
-             else 
-               digits_sel(i) &lt;= '0';
-             end if;
-          end loop;
-          bcd_value := to_unsigned(bcd_count(digit_index),4);
-          data_buf &lt;= '0' &amp; BCD2SEG7( bcd_value );
-       end if;
-    end if;
-  end process;
+    -- This process implements a 7-segment driver using time-multiplexing.
+    PROCESS (NRST, CLK)
+        VARIABLE wait_cnt : NATURAL RANGE 0 TO CNT_MAX1 := 0;
+        VARIABLE clk_enabled : BOOLEAN;
+        VARIABLE bcd_value : unsigned(3 DOWNTO 0);
+    BEGIN
+        IF NRST = '0' THEN
+            wait_cnt := 0;
+            data_buf &lt;= x&quot;00&quot;;
+            digits_sel &lt;= (OTHERS =&gt; '0');
+            digit_index &lt;= 0;
+        ELSIF rising_edge(CLK) THEN
+            IF wait_cnt = CNT_MAX1 THEN
+                wait_cnt := 0;
+                clk_enabled := true;
+            ELSE
+                wait_cnt := wait_cnt + 1;
+                clk_enabled := false;
+            END IF;
+            IF clk_enabled THEN
+                IF digit_index = NUM_DIGITS - 1 THEN
+                    digit_index &lt;= 0;
+                ELSE
+                    digit_index &lt;= digit_index + 1;
+                END IF;
+                FOR i IN 0 TO NUM_DIGITS - 1 LOOP
+                    IF i = digit_index THEN
+                        digits_sel(i) &lt;= '1';
+                    ELSE
+                        digits_sel(i) &lt;= '0';
+                    END IF;
+                END LOOP;
+                bcd_value := to_unsigned(bcd_count(digit_index), 4);
+                data_buf &lt;= '0' &amp; BCD2SEG7(bcd_value);
+            END IF;
+        END IF;
+    END PROCESS;
 
-  DIGITS &lt;= (others =&gt; '0') when NRST = '0' else digits_sel; -- active-high
-  SEG7   &lt;= not data_buf; -- for common-anode 7-segment LEDs
+    DIGITS &lt;= (OTHERS =&gt; '0') WHEN NRST = '0' ELSE digits_sel; -- active-high
+    SEG7   &lt;= NOT data_buf; -- for common-anode 7-segment LEDs
 
-end behavioral;
+END behavioral;
 </code></pre>
 <p>ไฟล์ <strong>Tcl Script</strong> สำหรับการตั้งค่าการใช้งานขา <strong>I/O</strong> มีดังนี้</p>
 <pre><code class="language-text"># set_global_assignment -name FAMILY &quot;Cyclone 10 LP&quot;
@@ -477,123 +479,123 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DIGITS[2]
 ตามลำดับไปจนถึงบิต <strong>MSB</strong>) และจบด้วย <strong>Stop Bit (1)</strong> และไม่มีการใช้ <strong>Parity Bit</strong>
 การเว้นระยะเวลาในการส่งข้อมูลทีละบิต จะต้องเป็นไปตามค่า <strong>Baudrate</strong> ที่เลือกใช้</p>
 <p>ในตัวอย่างนี้ จะส่งข้อความออกไปหนึ่งครั้ง ก็ต่อเมื่อมีการกดปุ่ม <code>SW4</code> แล้วปล่อย และใช้ปุ่ม <code>SW1</code> เป็นปุ่มรีเซตการทำงานของวงจร   </p>
-<pre><code class="language-VHDL">library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity cyc10_uart_tx_demo is
-  port (
-    CLK   : in  std_logic;   -- 50 MHz clock
-    NRST  : in  std_logic;   -- Active-low reset
-    BTN   : in  std_logic;   -- Active-low user button
-    RXD   : in  std_logic;   -- UART RX pin (not used)
-    TXD   : buffer std_logic; -- UART TX pin
-    LEDS  : out std_logic_vector(1 downto 0)
-  );
-end cyc10_uart_tx_demo;
+ENTITY cyc10_uart_tx_demo IS
+    PORT (
+        CLK  : IN STD_LOGIC; -- 50 MHz clock
+        NRST : IN STD_LOGIC; -- Active-low reset
+        BTN  : IN STD_LOGIC; -- Active-low user button
+        RXD  : IN STD_LOGIC; -- UART RX pin (not used)
+        TXD  : BUFFER STD_LOGIC; -- UART TX pin
+        LEDS : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    );
+END cyc10_uart_tx_demo;
 
-architecture behavioral of cyc10_uart_tx_demo is
-   -- Define constants
-   constant CLK_FREQ     : integer := 50e6;    -- 50 MHz clock
-   constant BAUD_RATE    : integer := 115200;  -- 115200 baud rate
-   constant BAUD_PERIOD  : integer := CLK_FREQ / BAUD_RATE - 2;
+ARCHITECTURE behavioral OF cyc10_uart_tx_demo IS
+    -- Define constants
+    CONSTANT CLK_FREQ    : INTEGER := 50e6; -- 50 MHz clock
+    CONSTANT BAUD_RATE   : INTEGER := 115200; -- 115200 baud rate
+    CONSTANT BAUD_PERIOD : INTEGER := CLK_FREQ / BAUD_RATE - 2;
 
-   -- ASCII message to be transmitted
-   type ascii_array_t is array (0 to 13) of std_logic_vector(7 downto 0);
-   constant MESSAGE : ascii_array_t := (
-      x&quot;48&quot;, -- H
-      x&quot;65&quot;, -- e
-      x&quot;6C&quot;, -- l
-      x&quot;6C&quot;, -- l
-      x&quot;6F&quot;, -- o
-      x&quot;20&quot;, -- (space)
-      x&quot;57&quot;, -- W
-      x&quot;6F&quot;, -- o
-      x&quot;72&quot;, -- r
-      x&quot;6C&quot;, -- l
-      x&quot;64&quot;, -- d
-      x&quot;21&quot;, -- !
-      x&quot;0D&quot;, -- \r
-      x&quot;0A&quot;  -- \n
-   );
+    -- ASCII message to be transmitted
+    TYPE ascii_array_t IS ARRAY (0 TO 13) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+    CONSTANT MESSAGE : ascii_array_t := (
+        x&quot;48&quot;, -- H
+        x&quot;65&quot;, -- e
+        x&quot;6C&quot;, -- l
+        x&quot;6C&quot;, -- l
+        x&quot;6F&quot;, -- o
+        x&quot;20&quot;, -- (space)
+        x&quot;57&quot;, -- W
+        x&quot;6F&quot;, -- o
+        x&quot;72&quot;, -- r
+        x&quot;6C&quot;, -- l
+        x&quot;64&quot;, -- d
+        x&quot;21&quot;, -- !
+        x&quot;0D&quot;, -- \r
+        x&quot;0A&quot; -- \n
+    );
 
-   -- FSM states
-   type state_t is (ST_IDLE, ST_LOAD_DATA, ST_SEND_DATA, ST_STOP, ST_WAIT);
-   signal state        : state_t := ST_IDLE;
-   signal next_state   : state_t := ST_IDLE;
-   signal wait_counter : integer := 0;
-   signal bit_counter  : integer range 0 to 9 := 0;
-   signal char_counter : integer range 0 to MESSAGE'length := 0;
-   signal shift_reg    : std_logic_vector(9 downto 0) := (others =&gt; '1');
-   signal btn_capture  : std_logic_vector(1 downto 0) := (others =&gt; '1');
+    -- FSM states
+    TYPE state_t IS (ST_IDLE, ST_LOAD_DATA, ST_SEND_DATA, ST_STOP, ST_WAIT);
+    SIGNAL state        : state_t := ST_IDLE;
+    SIGNAL next_state   : state_t := ST_IDLE;
+    SIGNAL wait_counter : INTEGER := 0;
+    SIGNAL bit_counter  : INTEGER RANGE 0 TO 9 := 0;
+    SIGNAL char_counter : INTEGER RANGE 0 TO MESSAGE'length := 0;
+    SIGNAL shift_reg    : STD_LOGIC_VECTOR(9 DOWNTO 0) := (OTHERS =&gt; '1');
+    SIGNAL btn_capture  : STD_LOGIC_VECTOR(1 DOWNTO 0) := (OTHERS =&gt; '1');
 
-begin
+BEGIN
 
-  LEDS &lt;= TXD &amp; RXD;
+    LEDS &lt;= TXD &amp; RXD;
 
-  process(CLK, NRST)
-  begin
-    if NRST = '0' then
-      state        &lt;= ST_IDLE;
-      bit_counter  &lt;= 0;
-      wait_counter &lt;= 0;
-      char_counter &lt;= 0;
-      btn_capture  &lt;= &quot;11&quot;;
-      shift_reg    &lt;= (others =&gt; '1');
-      TXD          &lt;= '1'; -- TXD idle (high)
-
-    elsif rising_edge(CLK) then
-
-      btn_capture &lt;= btn_capture(0) &amp; BTN;
-
-      case state is
-         when ST_IDLE =&gt;
-            TXD &lt;= '1'; 
-            if btn_capture = &quot;01&quot; then -- button click
-              state &lt;= ST_LOAD_DATA;
-              char_counter &lt;= 0;
-            end if;
-
-         when ST_LOAD_DATA =&gt;
-            shift_reg &lt;= '1' &amp; MESSAGE(char_counter) &amp; '0'; 
-            state &lt;= ST_SEND_DATA;
-            bit_counter &lt;= 0;
-
-         when ST_SEND_DATA =&gt;
-            TXD       &lt;= shift_reg(0); -- LSB bit 
-            shift_reg &lt;= '1' &amp; shift_reg(9 downto 1); -- Shift data
-            state     &lt;= ST_WAIT;
-            wait_counter &lt;= BAUD_PERIOD;
-            if bit_counter = 9 then
-              next_state   &lt;= ST_STOP;
-              bit_counter  &lt;= 0;
-            else
-              next_state   &lt;= ST_SEND_DATA;
-              bit_counter  &lt;= bit_counter + 1;
-            end if;
-
-         when ST_STOP =&gt;
-            TXD &lt;= '1'; 
-            if char_counter = MESSAGE'length-1 then
-              state &lt;= ST_IDLE;
-            else
-              char_counter &lt;= char_counter + 1;
-              state &lt;= ST_LOAD_DATA;
-            end if;
-
-         when ST_WAIT =&gt;
-            if wait_counter = 0 then
-              state &lt;= next_state;
-            else
-              wait_counter &lt;= wait_counter - 1;
-            end if;
-
-         when others =&gt;
+    PROCESS (CLK, NRST)
+    BEGIN
+        IF NRST = '0' THEN
             state &lt;= ST_IDLE;
-       end case;
-    end if;
-  end process;
-end behavioral;
+            bit_counter &lt;= 0;
+            wait_counter &lt;= 0;
+            char_counter &lt;= 0;
+            btn_capture &lt;= &quot;11&quot;;
+            shift_reg &lt;= (OTHERS =&gt; '1');
+            TXD &lt;= '1'; -- TXD idle (high)
+
+        ELSIF rising_edge(CLK) THEN
+
+            btn_capture &lt;= btn_capture(0) &amp; BTN;
+
+            CASE state IS
+                WHEN ST_IDLE =&gt;
+                    TXD &lt;= '1';
+                    IF btn_capture = &quot;01&quot; THEN -- button click
+                        state &lt;= ST_LOAD_DATA;
+                        char_counter &lt;= 0;
+                    END IF;
+
+                WHEN ST_LOAD_DATA =&gt;
+                    shift_reg &lt;= '1' &amp; MESSAGE(char_counter) &amp; '0';
+                    state &lt;= ST_SEND_DATA;
+                    bit_counter &lt;= 0;
+
+                WHEN ST_SEND_DATA =&gt;
+                    TXD &lt;= shift_reg(0); -- LSB bit 
+                    shift_reg &lt;= '1' &amp; shift_reg(9 DOWNTO 1); -- Shift data
+                    state &lt;= ST_WAIT;
+                    wait_counter &lt;= BAUD_PERIOD;
+                    IF bit_counter = 9 THEN
+                        next_state &lt;= ST_STOP;
+                        bit_counter &lt;= 0;
+                    ELSE
+                        next_state &lt;= ST_SEND_DATA;
+                        bit_counter &lt;= bit_counter + 1;
+                    END IF;
+
+                WHEN ST_STOP =&gt;
+                    TXD &lt;= '1';
+                    IF char_counter = MESSAGE'length - 1 THEN
+                        state &lt;= ST_IDLE;
+                    ELSE
+                        char_counter &lt;= char_counter + 1;
+                        state &lt;= ST_LOAD_DATA;
+                    END IF;
+
+                WHEN ST_WAIT =&gt;
+                    IF wait_counter = 0 THEN
+                        state &lt;= next_state;
+                    ELSE
+                        wait_counter &lt;= wait_counter - 1;
+                    END IF;
+
+                WHEN OTHERS =&gt;
+                    state &lt;= ST_IDLE;
+            END CASE;
+        END IF;
+    END PROCESS;
+END behavioral;
 </code></pre>
 <p>ตัวอย่างไฟล์ <strong>Tcl Script</strong> สำหรับการเลือกใช้งานขา <strong>I/O</strong></p>
 <pre><code class="language-text"># set_global_assignment -name FAMILY &quot;Cyclone 10 LP&quot;
@@ -636,68 +638,71 @@ set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
 <p>รูป: ตัวอย่างข้อมูลที่บันทึกได้และแสดงผลในรูปคลื่นสัญญาณดิจิทัล</p>
 <p>ตัวอย่าง <strong>VHDL Testbench</strong> สำหรับการจำลองการทำงานด้วยซอฟต์แวร์
 <strong>Questa Simulator (Intel Starter FPGA Edition) v2021.2</strong></p>
-<pre><code class="language-TCL">library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity cyc10_uart_tx_demo_tb is
-end cyc10_uart_tx_demo_tb;
+ENTITY cyc10_uart_tx_demo_tb IS
+END cyc10_uart_tx_demo_tb;
 
-architecture testbench of cyc10_uart_tx_demo_tb is
+ARCHITECTURE testbench OF cyc10_uart_tx_demo_tb IS
     -- Testbench signals
-    signal clk   : std_logic := '0';
-    signal nrst  : std_logic := '0';  -- Active-low reset
-    signal btn   : std_logic := '1';  -- Active-low button (starts high)
-    signal rxd   : std_logic := '1';  -- RXD not used
-    signal txd   : std_logic;
-    signal leds  : std_logic_vector(1 downto 0);
+    SIGNAL clk  : STD_LOGIC := '0';
+    SIGNAL nrst : STD_LOGIC := '0'; -- Active-low reset
+    SIGNAL btn  : STD_LOGIC := '1'; -- Active-low button (starts high)
+    SIGNAL rxd  : STD_LOGIC := '1'; -- RXD not used
+    SIGNAL txd  : STD_LOGIC;
+    SIGNAL leds : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
     -- Clock period (50 MHz clock, 20 ns period)
-    constant CLK_PERIOD : time := 20 ns;
+    CONSTANT CLK_PERIOD : TIME := 20 ns;
 
     -- Component under test (DUT)
-    component cyc10_uart_tx_demo
-        port (
-            CLK   : in  std_logic;
-            NRST  : in  std_logic;
-            BTN   : in  std_logic;
-            RXD   : in  std_logic;
-            TXD   : buffer std_logic;
-            LEDS  : out std_logic_vector(1 downto 0)
+    COMPONENT cyc10_uart_tx_demo
+        PORT (
+            CLK  : IN STD_LOGIC;
+            NRST : IN STD_LOGIC;
+            BTN  : IN STD_LOGIC;
+            RXD  : IN STD_LOGIC;
+            TXD  : BUFFER STD_LOGIC;
+            LEDS : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
         );
-    end component;
+    END COMPONENT;
 
-begin
+BEGIN
     -- Instantiate the design under test (DUT)
-    uut: cyc10_uart_tx_demo
-       port map ( CLK =&gt; clk, NRST =&gt; nrst, BTN =&gt; btn,
-            RXD =&gt; rxd, TXD =&gt; txd, LEDS =&gt; leds );
+    uut : cyc10_uart_tx_demo
+    PORT MAP(
+        CLK =&gt; clk, NRST =&gt; nrst, BTN =&gt; btn,
+        RXD =&gt; rxd, TXD =&gt; txd, LEDS =&gt; leds);
 
-    clk_proc : process -- Clock generation process
-    begin
-      clk &lt;= '0'; wait for CLK_PERIOD / 2;
-      clk &lt;= '1'; wait for CLK_PERIOD / 2;
-    end process;
+    clk_proc : PROCESS -- Clock generation process
+    BEGIN
+        clk &lt;= '0';
+        WAIT FOR CLK_PERIOD / 2;
+        clk &lt;= '1';
+        WAIT FOR CLK_PERIOD / 2;
+    END PROCESS;
 
-    stim_proc : process -- Stimulus process
-    begin
+    stim_proc : PROCESS -- Stimulus process
+    BEGIN
         -- Reset the system
         nrst &lt;= '0';
-        wait for 50 ns;  -- Hold reset low for some time
+        WAIT FOR 50 ns; -- Hold reset low for some time
         nrst &lt;= '1';
-        wait for 100 ns; -- Wait for some time after reset
+        WAIT FOR 100 ns; -- Wait for some time after reset
 
         -- Simulate button press (active-low)
-        btn &lt;= '0';  -- Button pressed
-        wait for 1 us;
-        btn &lt;= '1';  -- Button released
+        btn &lt;= '0'; -- Button pressed
+        WAIT FOR 1 us;
+        btn &lt;= '1'; -- Button released
 
         -- Wait for some time to observe UART transmission
-        wait for 1 ms;
-        wait;
-    end process;
+        WAIT FOR 1 ms;
+        WAIT;
+    END PROCESS;
 
-end testbench;
+END testbench;
 </code></pre>
 <p>ไฟล์ <code>sim.do</code> ซึ่งเป็นตัวอย่างโค้ด <strong>Tcl Script</strong> สำหรับการรันคำสั่งเพื่อการจำลองการทำงาน</p>
 <pre><code class="language-text">transcript on

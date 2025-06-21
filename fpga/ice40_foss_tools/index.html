@@ -573,7 +573,7 @@ $ sudo make install
 
 # Check the version
 $ yosys --version
-Yosys 0.31+45 (git sha1 ff3c7873f, clang 14.0.0...)
+Yosys 0.54+17 (git sha1 44aa313ba, g++ 13.3.0-6ubuntu2~24.04 -fPIC -O3)
 
 # see: https://github.com/YosysHQ/nextpnr/blob/master/README.md
 </code></pre>
@@ -588,16 +588,24 @@ $ sudo make install
 $ mkdir -p ~/Tools &amp;&amp; cd ~/Tools
 $ git clone https://github.com/YosysHQ/nextpnr.git
 $ cd nextpnr
+$ git submodule update --init --recursive
+$ mkdir -p build &amp;&amp; cd build
 
 # Option 1: No GUI 
-$ cmake -DARCH=ice40 -DCMAKE_INSTALL_PREFIX=/usr/local .
+$ cmake .. -DARCH=&quot;ice40&quot;
+$ make -j$(nproc)
+$ sudo make install
 
 # Option 2: with GUI
 $ sudo apt install qtbase5-dev qt5-qmake
-$ cmake -DBUILD_GUI=ON -DARCH=ice40 -DCMAKE_INSTALL_PREFIX=/usr/local . 
-
+$ cmake .. -DBUILD_GUI=ON -DARCH=&quot;ice40&quot;
 $ make -j $(nproc)
 $ sudo make install
+</code></pre>
+<p><strong>Multi-architecture Support:</strong></p>
+<p>ในกรณีที่ต้องการใช้งานกับ <strong>FPGA Architectures</strong> มากกว่าหนึ่งตัวเลือก
+เช่น  <strong>ICE40</strong> กับ <strong>Gowin FPGA</strong> ก็มีตัวอย่างการระบุชื่อดังนี้</p>
+<pre><code class="language-text">$ cmake .. -DARCH=&quot;ice40;himbaechel&quot; -DHIMBAECHEL_UARCH=&quot;gowin&quot;
 </code></pre>
 <p>&nbsp;</p>
 <p>ในกรณีที่ใช้บอร์ด <strong>Muse Lab iCE-Sugar FPGA Board</strong>
@@ -683,13 +691,13 @@ clean:
 <pre><code class="language-text">$ lsusb | grep &quot;ID 1d50:602b&quot;
 Bus 001 Device 010: ID 1d50:602b OpenMoko, Inc. FPGALink
 
-$ icesprog -p
+$ sudo icesprog -p
 probe chip
 board: [iCESugar]
 flash: [w25q64] (8MB)
 done
 
-$ icesprog -e -w leds.bin
+$ sudo icesprog -e -w leds.bin
 flash offset: 0x00000000
 write flash (104090 (0x1969a) Bytes)
 write 0x00000000
@@ -705,8 +713,28 @@ done
 เพื่อเขียนไฟล์บิตสตรีมไปยังชิป <strong>SPI Flash</strong> บนบอร์ด <strong>iCE-Sugar</strong></li>
 </ul>
 <p>&nbsp;</p>
+<p>ในกรณีที่ใช้งาน <strong>WSL2 Ubuntu</strong> และต้องการเชื่อมต่อกับอุปกรณ์ <strong>USB</strong> จะต้องใช้โปรแกรมที่เรียกว่า
+<a href="https://github.com/dorssel/usbipd-win"><code>usbipd-win</code></a></p>
+<p>ตัวอย่างการทำคำสั่งใน <strong>Windows PowerShell (Administrator Mode)</strong>:</p>
+<pre><code class="language-text">&gt; usbipd list
+Connected:
+BUSID  VID:PID    DEVICE                                             STATE
+1-1    13d3:5419  Integrated Camera, Camera DFU Device               Shared
+1-10   8087:0026  Intel(R) Wireless Bluetooth(R)                     Not shared
+4-1    046d:c542  USB Input Device                                   Not shared
+4-4    1d50:602b  USB Mass Storage Device, USB Serial Device (COM7)  Shared
+</code></pre>
+<p>จากข้อความจะเห็นได้ว่า มีอุปกรณ์ตามหมายเลข <code>1d50:602b</code> เชื่อมต่ออยู่</p>
+<p>ถัดไปจึงทำคำสั่งเพื่อให้ <strong>WSL2 Ubuntu</strong> มองเห็นอุปกรณ์  <strong>USB</strong> ดังกล่าว</p>
+<pre><code class="language-text">&gt; usbipd attach --wsl -i 1d50:602b
+</code></pre>
+<p>ในหน้าต่างของ <strong>WSL2 Ubuntu Terminal</strong> ทำคำสั่งต่อไปนี้ เพื่อดูว่า มองเห็นอุปกรณ์แล้วหรือไม่</p>
+<pre><code class="language-text">$ lsusb | grep &quot;1d50:602b&quot;
+Bus 001 Device 003: ID 1d50:602b OpenMoko, Inc. FPGALink
+</code></pre>
+<p>&nbsp;</p>
 <hr />
-<h2 id="hard-ip-ice40-ultraplus">&#9655; <strong>การสาธิตการใช้วงจร Hard IP ภายในชิป  iCE40 UltraPlus</strong><a class="headerlink" href="#hard-ip-ice40-ultraplus" title="Permanent link">#</a></h2>
+<h2 id="hard-ip-ice40-ultraplus">&#9655; <strong>การสาธิตการใช้วงจร Hard IP ภายในชิป iCE40 UltraPlus</strong><a class="headerlink" href="#hard-ip-ice40-ultraplus" title="Permanent link">#</a></h2>
 <p>อีกตัวอย่างหนึ่งเป็นโค้ด <strong>Verilog</strong> เพื่อสาธิตการใช้งานวงจร
 <strong>On-Chip High-Freq. Oscillator (48MHz max.)</strong> (<code>SB_HFOSC</code>)
 และวงจรควบคุม <strong>RGB LED Driver + 3x Open-Drain Outputs</strong> (<code>SB_RGBA_DRV</code>) ของชิป <strong>iCE40 UltraPlus</strong></p>
@@ -892,11 +920,12 @@ set_io rgb_leds[2] 39
 และบอร์ด <strong>FPGA</strong> ที่มีจำหน่าย ซึ่งบอร์ดส่วนใหญ่ที่ได้มีการสำรวจมาเป็นตัวอย่างนั้น เป็นฮาร์ดแวร์ประเภท
 <strong>Open Source Hardware (OSHW)</strong> ที่มีการเปิดเผยและแชร์ไฟล์ของวงจรและการออกแบบ <strong>PCB</strong>
 จุดเด่นของบอร์ด <strong>iCE40 FPGA</strong> เหล่านี้คือ การใช้ซอฟต์แวร์ประเภท <strong>Open Source</strong> 
-ภายใต้โครงการ <strong>IceStorm</strong> สำหรับการออกแบบวงจรดิจิทัลในชิป <strong>FPGA</strong> </p>
+ภายใต้โครงการ <strong>IceStorm</strong> สำหรับการออกแบบวงจรดิจิทัลในชิป <strong>FPGA</strong>
+และทดลองใช้งานกับระบบปฏิบัติการ <strong>WSL 2 / Ubuntu 24.04</strong></p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
-<p>Created: 2023-08-12 | Last Updated: 2023-08-19</p></div>
+<p>Created: 2023-08-12 | Last Updated: 2025-06-20</p></div>
             </div>
         </div>
 
