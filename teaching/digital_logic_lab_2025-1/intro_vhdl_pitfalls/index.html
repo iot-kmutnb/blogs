@@ -154,7 +154,7 @@
 <hr />
 <h2 id="pitfall-inferring-flip-flops-vs-latches"><strong>Pitfall: Inferring Flip-Flops vs. Latches</strong><a class="headerlink" href="#pitfall-inferring-flip-flops-vs-latches" title="Permanent link">#</a></h2>
 <p>Consider the following VHDL code which demonstrates 
-a common pitfall involving inference of <strong>flip-flops</strong> and <strong>latches</strong>, 
+a common pitfall involving inference of <strong>flip-flops</strong> and <strong>latches</strong>,
 which may lead to unintended or mismatched hardware behavior.</p>
 <pre><code class="language-VHDL">LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
@@ -184,8 +184,8 @@ BEGIN
 END ARCHITECTURE;
 </code></pre>
 <p>The first assignment correctly infers a <strong>positive-edge-triggered D flip-flop</strong>,
-since it uses <code>rising_edge(CLK)</code> to trigger output update and includes asynchronous clear logic
-(<code>ACLR</code>).</p>
+since it uses <code>rising_edge(CLK)</code> to trigger output update and
+includes asynchronous clear logic (<code>ACLR</code>).</p>
 <p>The second assignment uses <code>CLK = '1'</code>, which causes the synthesis tool to infer 
 a <strong>level-sensitive D latch</strong>.</p>
 <p><img alt="" src="dff_vs_dlatch.jpg" /></p>
@@ -266,14 +266,14 @@ this implements a MUX2_1 circuit.</p>
 then a conflict occurs on the output <code>Y</code>, which may result in:
 - Simulation warnings or <code>'X'</code> values.
 - Electrical contention in real hardware if mapped to actual tri-state outputs.</p>
-<p>To avoid conflict, ensure that <code>EN0</code> and <code>EN1</code> are mutually exclusive
+<p>To avoid conflict, make sure that <code>EN0</code> and <code>EN1</code> are mutually exclusive
 (i.e., never high at the same time).</p>
-<p>The <strong>tristate buffers</strong> will be implemented using I/O blocks 
-with tristate output of the FPGA chip.
-The FPGA's I/O blocks are configured to allow tristate drive.
+<p>The <strong>tristate buffers</strong> will be set up using the I/O blocks of 
+the FPGA chip, which are designed to support tristate output.
+These I/O blocks are configured to enable tristate driving.
 In addition, a <strong>pull-up resistor</strong> or an <strong>internal weak pull-up</strong> is required.</p>
 <p>We can rewrite the VHDL code using a <strong>with-select statement</strong>,
-which explicitly handles all combinations of (<code>EN0</code>, <code>EN1</code>):
+that clearly addresses all possible combinations of (<code>EN0</code>, <code>EN1</code>):
 The original version does not prevent both drivers being active,
 this version infer safe tri-state behavior on physical I/O pins.</p>
 <pre><code class="language-VHDL">ARCHITECTURE rtl OF top IS
@@ -320,10 +320,9 @@ END ARCHITECTURE;
 <hr />
 <h2 id="vhdl-signal-resolution"><strong>VHDL Signal Resolution</strong><a class="headerlink" href="#vhdl-signal-resolution" title="Permanent link">#</a></h2>
 <p>In VHDL, when <strong>multiple drivers</strong> are connected to the same signal 
-(like from tri-state buffers or concurrent assignments), VHDL must <strong>resolve</strong> 
-what the actual value of the signal should be. This is called <strong>signal resolution</strong>.</p>
-<p>The <code>STD_LOGIC</code> type is a <strong>resolved</strong> type, unlike <code>STD_ULOGIC</code>,<br />
-which is <strong>unresolved</strong> and does not allow multiple drivers.</p>
+&mdash; like from tri-state buffers or concurrent assignments &mdash; 
+VHDL needs to <strong>resolve</strong> or <strong>figure out</strong> or what the actual value of that signal should be. This process is known as <strong>signal resolution</strong>.</p>
+<p>The <code>STD_LOGIC</code> type is a <strong>resolved</strong> type, which means it can handle multiple drivers, while <code>STD_ULOGIC</code> is <strong>unresolved</strong> and doesn’t support that kind of setup.</p>
 <p><strong>Resolution Table for STD_LOGIC</strong></p>
 <p><img alt="" src="vhdl_signal_resolution.jpg" /></p>
 <ul>
@@ -395,11 +394,10 @@ An <code>OUT</code> port of a signal is intended only for <strong>driving</stron
 <ul>
 <li>Use a <code>BUFFER</code> mode port (deprecated and should be avoided)</li>
 <li>Use an <code>INOUT</code> port with appropriate direction control (e.g., tri-state logic)</li>
-<li><strong>Recommended:</strong> Use an internal signal for reading and writing,
-and assign it to the <code>OUT</code> port</li>
+<li>Use an internal signal for reading and writing,
+and assign it to the <code>OUT</code> port.</li>
 </ul>
-<p><strong>Uninitialized Signals</strong>:  Signals without initial values may start with <code>'U'</code> (undefined), 
-leading to unexpected simulation results.</p>
+<p><strong>Uninitialized Signals</strong>:  Signals without initial values may start with <code>'U'</code> (undefined), leading to unexpected simulation results.</p>
 <p>When simulating the VHDL code below, the initial value of<br />
 the <code>Q</code> output is unknown (<code>'U'</code>) until the <code>ACLR</code> input is asserted.<br />
 If <code>CE</code> is <code>'1'</code> and the value of <code>Q</code> is read for a signal update<br />
