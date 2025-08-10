@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/micropython/micropython_esp32/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม MicroPython สำหรับบอร์ด Espressif ESP32 - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#micropython-espressif-esp32" class="nav-link">การเขียนโปรแกรม MicroPython สำหรับบอร์ด Espressif ESP32</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#micropython-esp32" class="nav-link">&#9655; MicroPython สำหรับบอร์ด ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#micropython-esp32_1" class="nav-link">&#9655; การติดตั้งเฟิร์มแวร์ MicroPython-ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#thonny-ide" class="nav-link">&#9655; การติดตั้งใช้งาน Thonny IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#micropython-esp32s3-uf2" class="nav-link">&#9655; ตัวอย่างการติดตั้งเฟิร์มแวร์ MicroPython-ESP32S3 โดยใช้ไฟล์ .uf2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#micropython" class="nav-link">&#9655; ตัวอย่างโค้ด MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#micropython_1" class="nav-link">&#9655; การบันทึกโค้ดลงในไฟล์สำหรับ MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#wokwi-micropython-esp32" class="nav-link">&#9655; การทดลองใช้งาน Wokwi จำลองการทำงานของ MicroPython-ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-lab-for-micropython" class="nav-link">&#9655; การใช้งาน Arduino Lab for MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#mpremote-micropython" class="nav-link">&#9655; การใช้คำสั่ง mpremote เพื่อจัดการระบบไฟล์แฟลชของ MicroPython</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#micropython-bytecode" class="nav-link">&#9655; การคอมไพล์โค้ดให้เป็น MicroPython Bytecode</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; เอกสารออนไลน์สำหรับอ้างอิงและศึกษาเพิ่มเติม</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-espressif-esp32">การเขียนโปรแกรม MicroPython สำหรับบอร์ด Espressif ESP32<a class="headerlink" href="#micropython-espressif-esp32" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Espressif SoCs</em>, <em>ESP32 / ESP32-S3</em>, 
+<em>Thonny IDE</em>, <em>Arduino Lab for MicroPython</em></p>
+<ul>
+<li><a href="#micropython-esp32"><strong>MicroPython สำหรับบอร์ด ESP32</strong></a></li>
+<li><a href="#micropython-esp32_1"><strong>การติดตั้งเฟิร์มแวร์ MicroPython-ESP32</strong></a></li>
+<li><a href="#thonny-ide"><strong>การติดตั้งใช้งาน Thonny IDE</strong></a></li>
+<li><a href="#micropython-esp32s3-uf2"><strong>ตัวอย่างการติดตั้งเฟิร์มแวร์ MicroPython-ESP32S3 โดยใช้ไฟล์ .uf2</strong></a></li>
+<li><a href="#micropython"><strong>ตัวอย่างโค้ด MicroPython</strong></a></li>
+<li><a href="#micropython_1"><strong>การบันทึกโค้ดลงในไฟล์สำหรับ MicroPython</strong></a></li>
+<li><a href="#arduino-lab-for-micropython"><strong>การใช้งาน Arduino Lab for MicroPython</strong></a></li>
+<li><a href="#mpremote-micropython"><strong>การใช้คำสั่ง mpremote เพื่อจัดการระบบไฟล์แฟลชของ MicroPython</strong></a></li>
+<li><a href="#micropython-bytecode"><strong>การคอมไพล์โค้ดให้เป็น MicroPython Bytecode</strong></a></li>
+<li><a href="#_1"><strong>เอกสารออนไลน์สำหรับอ้างอิงและศึกษาเพิ่มเติม</strong></a></li>
+</ul>
+<hr />
+<h2 id="micropython-esp32">&#9655; <strong>MicroPython สำหรับบอร์ด ESP32</strong><a class="headerlink" href="#micropython-esp32" title="Permanent link">#</a></h2>
+<p><strong>MicroPython</strong> ("ไมโครไพธอน") เป็นซอฟต์แวร์ประเภทโอเพ่นซอร์ส (<strong>Open Source</strong>)
+ที่พัฒนาขึ้นโดยอ้างอิงจาก <strong>Python 3.4+</strong> ทำหน้าที่เป็น <strong>Python Runtime</strong>
+สำหรับชิปไมโครคอนโทรลเลอร์ และรองรับบอร์ดไมโครคอนโทรลเลอร์หลายชนิด
+เปรียบเทียบได้กับกรณีของ <strong>CPython</strong> ซึ่งเป็น <strong>C Implementation</strong> ของ <strong>Python</strong>
+สำหรับคอมพิวเตอร์ทั่วไป ดังนั้นการใช้งาน <strong>MicroPython</strong> จำเป็นต้องเลือกไฟล์ <strong>Firmware</strong> ให้ตรงกับบอร์ดที่จะใช้</p>
+<p><strong>MicroPython Runtime</strong> มีองค์ประกอบที่สำคัญเช่น</p>
+<ul>
+<li><strong>Python Interpreter</strong>: เป็นตัวแปลโค้ดในภาษา <strong>Python</strong> ที่แปลงโค้ด <code>.py</code>
+เป็นคำสั่งระดับต่ำที่ฮาร์ดแวร์หรือระบบปฏิบัติการเข้าใจได้ หรือ ทำคำสั่งต่าง ๆ ในไฟล์ <code>.mpy</code>
+ซึ่งเป็นไฟล์แบบ "ไบต์โค้ด" (<strong>Bytecode</strong>) สำหรับ <strong>MicroPython</strong> 
+ที่ถูกคอมไพล์จากไฟล์ซอร์สโค้ด <code>.py</code> โดยใช้คำสั่ง <code>mpy-cross</code>
+ให้เหมาะสมกับ <strong>MicroPython</strong> ตามสถาปัตยกรรมของซีพียูที่ใช้งาน และมีข้อดีคือ <code>.mpy</code>
+ช่วยประหยัดพื้นที่ของไฟล์ และรันโค้ดได้เร็วกว่าในกรณีที่ใช้ไฟล์ <code>.py</code></li>
+<li><strong>Flash-based Filesystem</strong>: ระบบไฟล์แบบแฟลชสำหรับเก็บไฟล์ เช่น <code>boot.py</code>
+, <code>main.py</code> และไดเรกทรอรี เช่น <code>/lib</code></li>
+<li><strong>Standard Python Libraries</strong>: ได้แก่ไลบรารีมาตรฐานของไพธอน เช่น
+<code>time</code>, <code>sys</code>, <code>os</code>, <code>math</code></li>
+<li><strong>MCU-Specific Python Libraries</strong>: เป็นไลบรารีที่ใช้งานเฉพาะกับชิปไมโครคอนโทรลเลอร์
+เช่น <code>machine</code> เพื่อใช้งานวงจรฮาร์ดแวร์ภายในชิปไมโครคอนโทรลเลอร์</li>
+<li><strong>REPL (Read-Eval-Print Loop)</strong>: ส่วนติดต่อกับผู้ใช้สำหรับรับคำสั่ง <strong>Python</strong> ทีละบรรทัด 
+ประมวลผลและแสดงผลลัพธ์แบบโต้ตอบทันที</li>
+</ul>
+<p>ในบทความนี้ จะกล่าวถึงการใช้งาน <strong>MicroPython</strong> สำหรับบอร์ดไมโครคอนโทรลเลอร์ที่ใช้ชิป <strong>Espressif SoC</strong>
+ซึ่งสามารถจำแนกตามสถาปัตยกรรมของซีพียูได้ดังนี้</p>
+<ul>
+<li><a href="https://micropython.org/download/?mcu=esp32"><strong>ESP32 (32-bit Xtensa LX6, dual-core)</strong></a></li>
+<li><a href="https://micropython.org/download/?mcu=esp32s2"><strong>ESP32-S2 (32-bit Xtensa LX7, single-core)</strong></a></li>
+<li><a href="https://micropython.org/download/?mcu=esp32s3"><strong>ESP32-S3 (32-bit Xtensa LX7, dual-core)</strong></a></li>
+<li><a href="https://micropython.org/download/?mcu=esp32c3"><strong>ESP32-C3 (32-bit RISC-V / RV32IMC, single-core)</strong></a></li>
+<li><a href="https://micropython.org/download/?mcu=esp32c6"><strong>ESP32-C6 (32-bit RISC-V / RV32IMAC, single-core)</strong></a></li>
+</ul>
+<p>การเลือกใช้งานไฟล์ <strong>MicroPython Firmware</strong>
+นอกจากต้องพิจารณาตามสถาปัตยกรรมของ <strong>Espressif SoC</strong> และจำแนกตามบอร์ดของผู้ผลิต (<strong>Board Vendors</strong>)
+ยังต้องพิจารณาการจำแนกบอร์ดเป็นสองกลุ่มหลัก คือ มีหรือไม่มีชิป <strong>PSRAM (pseudo-static RAM)</strong>
+ติดตั้งมาด้วยหรือไม่ ซึ่งโดยทั่วไปมีความจุ <strong>2MB</strong>, <strong>4MB</strong> หรือ <strong>8MB</strong> มีทั้งแบบ <strong>On-chip</strong>
+และ <strong>External</strong></p>
+<p><strong>PSRAM</strong> เป็นหน่วยความจำแบบ <strong>RAM (Random Access Memory)</strong> ที่มีลักษณะการทำงานคล้ายกับ 
+<strong>Static RAM (SRAM)</strong> และนิยมใช้การเชื่อมต่อแบบ <strong>SPI ((Serial Peripheral Interface))</strong> 
+อาจเป็นแบบ <strong>Single-Bit, Dual-Bit, Quad-Bit, Octal-Bit</strong>
+โดยใช้สายข้อมูล (<strong>Data Lines</strong>) ขนาด 1 บิต ถึง 8 บิต
+การเพิ่มจำนวนบิตในช่องทางข้อมูลจะช่วยเพิ่มความเร็วในการส่งข้อมูลระหว่าง <strong>PSRAM</strong> กับไมโครคอนโทรลเลอร์</p>
+<p>ไฟล์ <strong>MicroPython-ESP32 Firmware</strong> สามารถดาวน์โหลดได้จาก
+<a href="http://micropython.org/download/esp32/"><strong>micropython.org/download/esp32/</strong></a> 
+ถ้าเป็นบอร์ด <strong>ESP32</strong> ที่ไม่มีชิป <strong>PSRAM</strong> ก็จะใช้ไฟล์ <strong>MicroPython Firmware</strong> ประเภท <code>ESP32_GENERIC</code></p>
+<p><img alt="" src="esp32_generic_download.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การดาวน์โหลดไฟล์ <strong>MicroPython</strong> สำหรับ <strong>ESP32</strong>  (<code>ESP32_GENERIC</code>)</p>
+<p>บอร์ด <strong>ESP32-S2 / ESP32-S3</strong> มีวงจรภายในที่รองรับการทำงานแบบ <strong>USB Native</strong>
+ซึ่งหมายความว่าชิปสามารถสื่อสารผ่านพอร์ต <strong>USB</strong> โดยตรง โดยไม่จำเป็นต้องใช้วงจร <strong>USB-to-Serial</strong> แยกต่างหาก
+ชิปประเภทนี้ สามารถใช้ไฟล์ <strong>Firmware</strong> ในรูปแบบที่เรียกว่า <code>.uf2</code> (<strong>USB Flashing Format</strong>)</p>
+<p>แต่จะต้องทำให้ติดตั้ง <strong>UF2 Bootloader</strong> ให้ได้ก่อน
+(เช่น เลือกใช้เฟิร์มแวร์ <a href="https://github.com/adafruit/tinyuf2"><strong>TinyUF2</strong></a>) 
+ยกตัวอย่าง เช่น บอร์ด <strong>Adafruit ESP32-S3 Feather (4MB Flash 2MB PSRAM)</strong>
+และจะต้องทำให้บอร์ดเข้าสู่โหมด <strong>UF2 Bootloader</strong>
+จากนั้นคอมพิวเตอร์จะมองเห็นบอร์ดเป็นไดรฟ์แฟลช และสามารถคัดลอกไฟล์ <code>.uf2</code> ลงไปได้แบบ <strong>Drag-and-Drop</strong> 
+ระบบจะเขียนเฟิร์มแวร์ลงในหน่วยความจำแฟลชของบอร์ดโดยอัตโนมัติ โดยไม่ต้องใช้โปรแกรมแฟลชเฉพาะทางอย่าง <code>esptool.py</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython-esp32_1">&#9655; <strong>การติดตั้งเฟิร์มแวร์ MicroPython-ESP32</strong><a class="headerlink" href="#micropython-esp32_1" title="Permanent link">#</a></h2>
+<p>การติดตั้งเฟิร์มแวร์สำหรับ <strong>MicroPython</strong> ไปยังบอร์ด <strong>ESP32</strong> 
+โดยทั่วไปแล้ว จะอาศัยโปรแกรม <strong>Python</strong> ที่มีชื่อว่า
+<code>esptool.py</code> (หรือ <code>esptool</code>) และเชื่อมต่อระหว่างคอมพิวเตอร์ผ่านพอร์ต
+<strong>USB-to-serial</strong> ไปยังบอร์ด <strong>ESP32</strong>
+ใช้ได้กับระบบปฏิบัติการ <strong>Windows, Linux, Mac OS</strong>
+ดังนั้นถ้าจะใช้ <code>esptool.py</code> คอมพิวเตอร์จะต้องมีโปรแกรม <strong>Python 3.x</strong> ติดตั้งไว้ใช้งานพร้อมแล้ว 
+(สำหรับผู้ใช้ <strong>Windows</strong> สามารถดาวน์โหลดไฟล์ได้จาก 
+<a href="https://www.python.org/downloads/"><strong>https://www.python.org/downloads/</strong></a>
+หรือจาก <a href="https://apps.microsoft.com/search?query=python"><strong>Microsoft Store</strong></a>)</p>
+<p><img alt="" src="win_python-1.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การตรวจสอบดูว่า สามารถใช้ <strong>Python</strong> สำหรับระบบปฏิบัติการ <strong>Windows</strong> และเวอร์ชันที่ใช้งาน</p>
+<p><img alt="" src="win_python-3.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การติดตั้งโปรแกรม <code>esptool</code> สำหรับ <strong>Windows</strong></p>
+<p>ถัดไปเป็นตัวอย่างการติดตั้ง <code>esptool.py</code> จะใช้คำสั่ง <code>pip</code> ของ <strong>Python</strong> (สำหรับ <strong>Windows</strong> โดยทำคำสั่งใน
+<strong>Windows Powershell</strong>)</p>
+<p><code>pip3 install esptool</code></p>
+<p>จากนั้นให้ลองทำคำสั่งต่อไปนี้ เพื่อดูว่า มีการติดตั้ง <code>esptool</code> ไว้แล้วหรือไม่ และเป็นเวอร์ชันใด
+(ในบทความนี้ ได้ทดลองใช้เวอร์ชัน <code>v5.0.2</code>)</p>
+<p><code>python -m esptool version</code></p>
+<p>เมื่อเชื่อมต่อบอร์ด <strong>ESP32</strong> กับคอมพิวเตอร์ของผู้ใช้ ผ่านทาง <strong>USB</strong> จะต้องทำคำสั่งลบข้อมูลทั้งหมดในหน่วยความจำแฟลช
+(<strong>Flash</strong>) ของชิป <strong>ESP32</strong>  ก่อนทำคำสั่ง ให้กดปุ่ม <strong>BOOT</strong> ค้างไว้ แล้วกดปุ่ม <strong>RESET</strong> แล้วปล่อย
+เพื่อทำให้ชิปเข้าสู่โหมด <strong>USB-Serial Bootloader</strong></p>
+<p><code>python -m esptool --port &lt;portname&gt; erase-flash</code></p>
+<p>จากนั้นจึงเขียนไฟล์ <strong>.bin</strong> สำหรับ <strong>MicroPython-ESP32 Firmware</strong>
+ไปยังหน่วยความจำแฟลช จำแนกตามชนิดของซีพียู</p>
+<p><strong>ESP32 / ESP32-S2</strong>: </p>
+<ul>
+<li><code>python -m esptool --port &lt;portname&gt; --baud 460800 write-flash 0x1000 &lt;firmware.bin&gt;</code></li>
+</ul>
+<p><strong>ESP32-S3 / ESP32-C3 / ESP32-C6</strong> </p>
+<ul>
+<li><code>python -m esptool --port &lt;portname&gt; --baud 460800 write-flash 0 &lt;firmware.bin&gt;</code></li>
+</ul>
+<p>โดยที่ <code>&lt;portname&gt;</code> จะเป็นชื่อของพอร์ตที่ตรงกับการใช้งานบอร์ด <strong>ESP32</strong> ที่กำลังเชื่อมต่อกับคอมพิวเตอร์ของผู้ใช้</p>
+<ul>
+<li><strong>Linux</strong>: ชื่อพอร์ตมีลักษณะเช่น <code>/dev/ttyACM0</code> หรือ <code>/dev/ttyUSB0</code> </li>
+<li><strong>Windows</strong>: ชื่อพอร์ตมีลักษณะเช่น <code>COM4</code></li>
+<li><strong>Mac</strong>: ชื่อพอร์ตมีลักษณะเช่น <code>/dev/cu.usbmodem01</code></li>
+</ul>
+<p>เมื่อติดตั้งไฟล์ได้แล้ว ให้กดปุ่ม <strong>Reset</strong> เพื่อเริ่มต้นการทำงานของ <strong>MicroPython Runtime</strong></p>
+<p><img alt="" src="esptool_flash_esp32s3.jpg" /></p>
+<p><strong>รูปภาพ:</strong> ตัวอย่างการใช้คำสั่ง <code>esptool</code> สำหรับติดตั้งไฟล์ <strong>MicroPython ESP32-S3 Firmware</strong>
+(<code>ESP32_GENERIC_S3-SPIRAM_OCT-20250415-v1.25.0.bin</code>)</p>
+<p>ตัวอย่างบอร์ด <strong>ESP32-S3</strong> ที่สามารถเลือกมาทดลองใช้งาน เช่น</p>
+<ul>
+<li><a href="https://github.com/vcc-gnd/YD-ESP32-S3"><strong>VCC-GND Studio YD-ESP32-S3</strong></a><ul>
+<li>ESP32-S3-WROOM-1 Module (ESP32-S3-N8R2 / N8R8R8 / N16R8)</li>
+</ul>
+</li>
+<li><a href="https://www.waveshare.com/esp32-s3-nano.htm"><strong>Waveshare ESP32-S3-Nano (ESP32-S3R8)</strong></a><ul>
+<li>on-chip 8MB PSRAM, 16MB Flash memory (W25Q128JVSIQ)</li>
+</ul>
+</li>
+<li><a href="https://www.waveshare.com/wiki/ESP32-S3-Pico"><strong>Waveshare ESP32-S3-Pico (ESP32-S3R2)</strong></a><ul>
+<li>on-chip 2MB PSRAM, 16MB Flash memory (W25Q128JVSIQ)</li>
+</ul>
+</li>
+<li><a href="https://www.nologo.tech/product/esp32/esp32s3/esp32s3Pico/esp32S3Pico.html"><strong>Nologo.tech ESP32-S3 Pico</strong></a><ul>
+<li>ESP32-S3R2, on-chip Quad-SPI PSRAM 2MB, onboard Quad-SPI Flash 8MB</li>
+<li>ESP32-S3R8, on-chip Octal-SPI PSRAM 8MB, onboard Quad-SPI Flash 16MB</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="nologo.tech_esp32s3_pico.jpg" /></p>
+<p><strong>รูปภาพ:</strong> บอร์ด <strong>Nologo.tech ESP32-S3 Pico</strong> ที่ได้นำมาทดลองใช้งาน</p>
+<p><img alt="" src="yd_esp32s3.jpg" /></p>
+<p><strong>รูปภาพ:</strong> บอร์ด <strong>YD-ESP3-S3</strong> ที่ได้นำมาทดลองใช้งาน</p>
+<p><img alt="" src="yd_esp32s3_pinout.jpg" /></p>
+<p><strong>รูปภาพ:</strong> บอร์ด <strong>YD-ESP3-S3 Pinout</strong> 
+(และรูปผังวงจร <a href="yd_esp32s3_schematic_v1.4.pdf"><strong>Schematic</strong></a>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="thonny-ide">&#9655; <strong>การติดตั้งใช้งาน Thonny IDE</strong><a class="headerlink" href="#thonny-ide" title="Permanent link">#</a></h2>
+<p>ในการเขียนโค้ด <strong>MicroPython</strong> สามารถใช้ซอฟต์แวร์ที่มีชื่อว่า <strong>Thonny IDE</strong> ซึ่งเป็น <strong>Open Source</strong>
+โดยทำคำสั่งเพื่อติดตั้งก่อน</p>
+<pre><code class="language-text">pip install thonny
+</code></pre>
+<p>แล้วเรียกใช้โปรแกรม <strong>Thonny</strong> ดังนี้</p>
+<pre><code class="language-text">python -m  thonny
+</code></pre>
+<p>จากนั้นจะต้องตั้งค่าเพื่อเลือกใช้ <strong>Python Interpreter</strong> ให้เป็น <strong>MicroPython (ESP32)</strong></p>
+<p><img alt="" src="thonny_connect-1.jpg" /></p>
+<p><img alt="" src="thonny_connect-2.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การเชื่อมต่อกับบอร์ด <strong>ESP32-S3</strong> โดยใช้ <strong>Thonny IDE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython-esp32s3-uf2">&#9655; <strong>ตัวอย่างการติดตั้งเฟิร์มแวร์ MicroPython-ESP32S3 โดยใช้ไฟล์ .uf2</strong><a class="headerlink" href="#micropython-esp32s3-uf2" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการติดตั้ง <a href="https://github.com/adafruit/tinyuf2/releases"><code>tinyuf2</code></a> 
+ของ <strong>Adafruit</strong> ไปยังบอร์ดที่ชิป <strong>ESP32-S3-R2</strong>
+หรือ <strong>ESP32-S3-R8</strong> (มีหน่วยความจำ <strong>PSRAM</strong> ภายในชิป <strong>2MB</strong> หรือ <strong>8MB</strong> ตามลำดับ)
+และมีหน่วยความจำแฟลชภายนอก อย่างน้อย <strong>8MB</strong></p>
+<p>ในบทความนี้ได้ทดลองใช้ไฟล์จาก <a href="https://github.com/adafruit/tinyuf2/releases/download/0.35.0/tinyuf2-adafruit_feather_esp32s3-0.35.0.zip"><code>tinyuf2-adafruit_feather_esp32s3-0.35.0</code></a> สำหรับบอร์ด <strong>Adafruit Feather ESP32-S3</strong></p>
+<p>เมื่อแตกไฟล์ <code>.zip</code> ที่ได้ดาวน์โหลดมา ให้ทำคำสั่ง <code>esptool</code> (ใน <strong>Windows PowerShell</strong>)
+ตามตัวอย่างต่อไปนี้ ภายใต้ไดเรกทอรี <code>tinyuf2-adafruit_feather_esp32s3-0.35.0</code></p>
+<pre><code class="language-text">python -m esptool `
+   --chip esp32s3 `
+   write-flash `
+   --flash-mode dio `
+   --flash-freq 80m `
+   --flash-size 8MB `
+   0x0      bootloader.bin `
+   0x2d0000 tinyuf2.bin `
+   0x8000   partition-table.bin `
+   0xe000   ota_data_initial.bin
+</code></pre>
+<p>จากนั้นจึงดาวน์โหลดไฟล์  <code>.uf2</code> สำหรับบอร์ด <strong>ESP32-S3 (PSRAM)</strong> จากเว็บไซต์ของ <strong>MicroPython</strong>:
+<a href="https://micropython.org/download/ESP32_GENERIC_S3/"><strong>ESP32-S3 (with Octal-SPIRAM Support)</strong></a> เมื่อกดปุ่ม <strong>Reset</strong> บนบอร์ด ในลักษณะ <strong>Double Click</strong>  จะเข้าสู่ <strong>UF2 Bootloader Mode</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython">&#9655; <strong>ตัวอย่างโค้ด MicroPython</strong><a class="headerlink" href="#micropython" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>MicroPython</strong> สำหรับแสดงข้อมูลเกี่ยวกับเฟิร์มแวร์ และชิป <strong>Espressif SoC</strong> ที่นำมาใช้งาน</p>
+<pre><code class="language-python">import esp
+import machine
+import gc
+import binascii
+import network
+import os
+
+def show_chip_info():    
+    # Get Chip revision (hardware version)
+    chip_rev = esp.flash_user_start()
+    print(f&quot;- Chip revision: 0x{chip_rev:08x}&quot;)
+
+    # Get the CPU frequency 
+    print(f&quot;- CPU frequency: {int(machine.freq()//1e6)} MHz&quot;)
+
+    #  Get flash size in byte
+    flash_size = esp.flash_size() 
+    print(f&quot;- Flash size: {flash_size // (1024*1024)} MB&quot;)
+
+    try:
+        psram_size = esp.psram_size() # Get PSRAM info (if available)
+        if psram_size &gt; 0:
+            print(f&quot;- PSRAM size: {psram_size // (1024*1024)} MB&quot;)
+        else:
+            print(&quot;- PSRAM: Not available&quot;)
+    except AttributeError:
+        pass
+
+    # Get free memory
+    print(f&quot;- Free memory: {gc.mem_free()//1024:d} KB&quot;)
+    # Get allocated memory
+    print(f&quot;- Allocated memory: {gc.mem_alloc()//1024:d} KB&quot;)
+
+    # Get the machine ID (MAC address of ESP32)
+    hex_id = binascii.hexlify( machine.unique_id(),':')
+    print( f&quot;- MAC: {hex_id.decode('ascii')}&quot;)
+
+print(32*&quot;-&quot;)
+print(&quot;MicroPython runtime info&quot;)
+print(32*&quot;-&quot;)
+
+names = ['sysname','nodename',
+         'release','version','machine']
+sys_info = dict(zip(names, os.uname()))
+for n,v in sys_info.items():
+    print( &quot;- {:&lt;8s}: '{}'&quot;.format(n,v) )
+print(32*&quot;-&quot;)
+
+gc.collect() # run garbage collector
+
+print(&quot;ESP32 Chip Info&quot;)
+print(32*&quot;-&quot;)
+
+show_chip_info()
+print(32*&quot;-&quot;)
+</code></pre>
+<p><img alt="" src="thonny_demo-1.jpg" /></p>
+<p><strong>รูปภาพ:</strong> ตัวอย่างการรันโค้ดตัวอย่างโดยใช้ <strong>Thonny IDE</strong></p>
+<p>บอร์ด <strong>Nologo.tech ESP32-S3</strong> มี <strong>Onboard LED</strong> ตรงกับขา <strong>GPIO-21</strong>
+ถัดไปเป็นตัวอย่างโค้ดทำให้ <strong>LED</strong> กระพริบ</p>
+<pre><code class="language-python">from machine import Pin
+import time
+
+# Test board: Nologo.tech ESP32-S3
+# Create Pin object for GPIO21 as output
+led = Pin(21, Pin.OUT)
+
+while True:
+    led.value(not led.value())  # Toggle LED state
+    time.sleep(0.5)             # Delay 500 ms
+</code></pre>
+<p>หรือจะเขียนโค้ดตามรูปแบบที่เรียกว่า <strong>Asynchronous Programming</strong>
+โดยใช้ไลบรารี <code>uasyncio</code> ของ <strong>MicroPython</strong>
+ในตัวอย่างนี้ ฟังก์ชัน <code>blink()</code> เป็นฟังก์ชันแบบ <strong>coroutine</strong>
+และภายในใช้คำสั่ง <code>asyncio.sleep(...)</code> 
+ซึ่งเป็นการหน่วงเวลาแบบ <strong>non-blocking</strong>
+และระหว่างรอเวลาดังกล่าว การทำงานอื่น ๆ ยังสามารถดำเนินต่อไปได้ โดยไม่หยุดทั้งระบบ</p>
+<pre><code class="language-python">import uasyncio as asyncio
+from machine import Pin
+
+# Test board: Nologo.tech ESP32-S3
+led = Pin(21, Pin.OUT) # Create Pin object for GPIO21 as output
+
+async def blink(): # Define a coroutine method for LED blink
+    while True:
+        led.value(not led.value())  # Toggle LED
+        await asyncio.sleep(0.5)    # Non-blocking delay
+
+# Run the asyncio loop
+asyncio.run(blink())
+</code></pre>
+<p>ในกรณีที่บอร์ด <strong>ESP32</strong> มีวงจร <strong>RGB LED (WS2812)</strong> ก็สามารถทดลองใช้โค้ดต่อไปนี้
+เพื่อลองเปลี่ยนสีของ <strong>RGB LED</strong> โดยใช้ไลบรารีที่มีชื่อว่า <code>neopixel</code> </p>
+<pre><code class="language-python">from machine import Pin
+import neopixel
+import time
+
+NUM_LEDS = 1  # Onboard Single-pixel RGB LED (WS2812) 
+PIN_NUM  = 48 # use GPIO48 (for VCC-GND YD-ESP32-S3 board)
+
+np = neopixel.NeoPixel(Pin(PIN_NUM), NUM_LEDS)
+
+def set_color(r, g, b, brightness=1.0):
+    # Clamp brightness between 0.0 and 1.0
+    brightness = max(0.0, min(1.0, brightness))
+    # Scale colors
+    r = int(r * brightness)
+    g = int(g * brightness)
+    b = int(b * brightness)
+    np[0] = (r, g, b)
+    np.write()
+
+while True:
+    set_color(255, 0, 0, brightness=0.2) 
+    time.sleep(0.5)
+    set_color(0, 255, 0, brightness=0.2) 
+    time.sleep(0.5)
+    set_color(0, 0, 255, brightness=0.2)  
+    time.sleep(0.5)
+</code></pre>
+<p>หรือจะใช้วิธีปรับความสว่างขึ้นและลงเป็นระดับ และเปลี่ยนสีได้ โดยเว้นช่วงเวลาสั้น ๆ ดังนี้</p>
+<pre><code class="language-python">from machine import Pin
+import neopixel
+import time
+import math
+
+NUM_LEDS = 1  # Onboard Single-pixel RGB LED (WS2812) 
+PIN_NUM  = 48 # GPIO48 for your board
+
+np = neopixel.NeoPixel(Pin(PIN_NUM), NUM_LEDS)
+
+def set_color(r, g, b, brightness=1.0):
+    brightness = max(0.0, min(1.0, brightness))
+    r = int(r * brightness)
+    g = int(g * brightness)
+    b = int(b * brightness)
+    np[0] = (r, g, b)
+    np.write()
+
+# List of colors to breathe through (red, green, blue)
+colors = [
+    (255, 0, 0),    # Red
+    (0, 255, 0),    # Green
+    (0, 0, 255),    # Blue
+    (255, 255, 0),  # Yellow
+    (0, 255, 255),  # Cyan
+    (255, 0, 255),  # Magenta
+]
+
+N = 100 # number of levels
+while True:
+    for color in colors:
+        # Breathing effect: brightness from 0 to 1 then back to 0
+        for i in range(0, N):
+            # Use a sine wave for smooth breathing
+            brightness = (math.sin(math.pi * i / N))
+            set_color(color[0], color[1], color[2], brightness)
+            time.sleep(0.02)
+</code></pre>
+<p><img alt="" src="esp32s3_board.jpg" /></p>
+<p><strong>รูปภาพ:</strong> บอร์ด <strong>ESP32-S3</strong> ที่ได้นำมาทดสอบการทำงานของโค้ดตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython_1">&#9655; <strong>การบันทึกโค้ดลงในไฟล์สำหรับ MicroPython</strong><a class="headerlink" href="#micropython_1" title="Permanent link">#</a></h2>
+<p>การบันทึกโค้ด <strong>MicroPython</strong> ลงในไฟล์ มีตัวเลือก 2 กรณี คือ </p>
+<ol>
+<li>บันทึกไฟล์เก็บไว้ในคอมพิวเตอร์ของผู้ใช้
+และสามารถใช้ <strong>Thonny IDE</strong> รันโค้ดดังกล่าวโดยใช้บอร์ด <strong>ESP32</strong></li>
+<li>บันทึกไฟล์เก็บไว้ใน <strong>Flash Filesystem</strong> ของบอร์ด <strong>ESP32</strong> เช่น บันทึกเป็นไฟล์ <code>main.py</code>
+ไฟล์นี้จะถูกเรียกให้ทำงานโดยอัตโนมัติหลังจากมีการรีเซตการทำงานของบอร์ดทุกครั้ง (ทำงานต่อจากคำสั่งในไฟล์ <code>boot.py</code>)</li>
+</ol>
+<p><img alt="" src="thonny_save_file-1.jpg" /></p>
+<p><img alt="" src="thonny_save_file-2.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การบันทึกโค้ดลงในไฟล์ <code>main.py</code> และเก็บไว้ในระบบไฟล์ที่ใช้หน่วยความจำแฟลชบนบอร์ด <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-micropython-esp32">&#9655; <strong>การทดลองใช้งาน Wokwi จำลองการทำงานของ MicroPython-ESP32</strong><a class="headerlink" href="#wokwi-micropython-esp32" title="Permanent link">#</a></h2>
+<p>ผู้ใช้สามารถไปยังเว็บไซต์ของ <a href="https://wokwi.com/projects/new/"><strong>Wokwi</strong></a>
+แล้วเลือกบอร์ดในกลุ่ม <strong>ESP32</strong> เพื่อสร้างโปรเจกต์ใหม่สำหรับเขียนโค้ด <strong>MicroPython</strong> (เลือก <strong>MicroPython Template</strong>) เช่น</p>
+<ul>
+<li><a href="https://wokwi.com/projects/new/micropython-esp32"><strong>ESP32</strong></a>
+เป็นบอร์ดรุ่น <strong>ESP32-DevkitC-v4</strong></li>
+<li><a href="https://wokwi.com/projects/new/choose-board/esp32-s3"><strong>ESP32-S3</strong></a> 
+เป็นบอร์ดรุ่น <strong>ESP32-S3 DevkitC-1</strong></li>
+<li><a href="https://wokwi.com/projects/new/choose-board/esp32-c3"><strong>ESP32-C3</strong></a>
+เป็นบอร์ดรุ่น <strong>ESP32-C3 DevkitM-1</strong></li>
+</ul>
+<p><img alt="" src="wokwi-1.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การเลือกบอร์ดไมโครคอนโทรลเลอร์และสร้างโปรเจกต์ใหม่สำหรับ <strong>Wokwi</strong></p>
+<p><img alt="" src="wokwi-2.jpg" /></p>
+<p><strong>รูปภาพ:</strong> การเลือก <strong>MicroPython Template</strong> สำหรับบอร์ด <strong>ESP32-DevkitC-v4</strong></p>
+<p><img alt="" src="wokwi-3.jpg" /></p>
+<p><strong>รูปภาพ:</strong> ตัวอย่างสำหรับบอร์ด <strong>ESP32-DevkitC-v4</strong>
+ซึ่งมีการต่อวงจร <strong>LED</strong> เพิ่ม ที่ขา <strong>GPIO2</strong> และจำลองการทำงานแบบเสมือนจริง (<strong>LED Blink</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-lab-for-micropython">&#9655; <strong>การใช้งาน Arduino Lab for MicroPython</strong><a class="headerlink" href="#arduino-lab-for-micropython" title="Permanent link">#</a></h2>
+<p>นอกจาก <strong>Thonny IDE</strong> ยังมีซอฟต์แวร์ที่เป็นตัวเลือกอื่นสำหรับการเขียนโค้ด <strong>MicroPython</strong>
+ถัดไปเป็นตัวอย่างการใช้งาน <a href="https://lab-micropython.arduino.cc/"><strong>Arduino Lab for MicroPython</strong></a>
+ซึ่งเป็น <strong>Web-based Editor</strong> สำหรับ <strong>MicroPython</strong> ที่ทีมงานของบริษัท <strong>Arduino.cc</strong> 
+ได้จัดทำ และรองรับสำหรับบอร์ดของบริษัท เช่น 
+<a href="https://docs.arduino.cc/hardware/nano-esp32/#tech-specs"><strong>Arduino Nano ESP32</strong></a> ซึ่งใช้โมดูล <strong>u-blox NORA-W106</strong> และภายในมีชิป <strong>ESP32-S3 + 16MB Flash (no PSRAM)</strong> </p>
+<p>อย่างไรก็ตาม เราก็สามารถใช้ <strong>Arduino Lab for MicroPython</strong> กับบอร์ด <strong>ESP32-S3</strong> ทั่วไปได้ ซึ่งได้มีการติดตั้ง
+<strong>MicroPython Firmware</strong> ไว้แล้ว</p>
+<p><img alt="" src="arduino_lab_micropython-1.jpg" /></p>
+<p><strong>รูปภาพ:</strong>  การเชื่อมต่อกับบอร์ด <strong>ESP32-S3</strong> โดยใช้รูปแบบที่เรียกว่า <strong>Web-Serial</strong>  (ให้กดปุ่ม <strong>Connect</strong> เพื่อเชื่อมต่อ)</p>
+<p><img alt="" src="arduino_lab_micropython-2.jpg" /></p>
+<p><img alt="" src="arduino_lab_micropython-3.jpg" /></p>
+<p><img alt="" src="arduino_lab_micropython-4.jpg" /></p>
+<p><strong>รูปภาพ:</strong> ตัวอย่างการบันทึกโค้ดลงในไฟล์ <code>main.py</code> เก็บไว้ในหน่วยความจำแฟลช และรันโค้ด</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="mpremote-micropython">&#9655; <strong>การใช้คำสั่ง mpremote เพื่อจัดการระบบไฟล์แฟลชของ MicroPython</strong><a class="headerlink" href="#mpremote-micropython" title="Permanent link">#</a></h2>
+<p>โปรแกรมชื่อ <code>mpremote</code> สามารถนำมาใช้ในการเขียนอ่านไฟล์ระหว่างคอมพิวเตอร์ของผู้ใช้
+กับระบบไฟล์แฟลชของ <strong>MicroPython</strong></p>
+<p>เริ่มต้นด้วยการติดตั้งซอฟต์แวร์ <code>mpremote</code> โดยใช้คำสั่ง <code>pip</code> ดังนี้</p>
+<pre><code class="language-text">pip install mpremote
+</code></pre>
+<p>ถัดไปให้ลองใช้คำสั่งต่อไปนี้ เพื่อแสดงรายการไฟล์และไดเรกทอรีในระบบไฟล์แฟลชของ <strong>MicroPython</strong>
+อาจมีการระบุชื่อพอร์ตของบอร์ด <strong>ESP32</strong> ที่กำลังเชื่อมต่อกับคอมพิวเตอร์ผู้ใช้
+เช่น <code>/dev/ttyUSB0</code> หรือ <code>/dev/ttyACM0</code> สำหรับ <strong>Linux</strong>
+ถ้าเป็น <strong>Windows</strong> จะเป็น <code>COM3</code> หรือเลขอื่น ๆ</p>
+<pre><code class="language-text">python -m mpremote ls
+
+python -m mpremote exec &quot;import os; print(os.listdir())&quot;
+</code></pre>
+<p>หรือมีการระบุชื่อพอร์ต</p>
+<pre><code class="language-text">python -m mpremote connect /dev/ttyUSB0 ls
+</code></pre>
+<p>ตัวอย่างการทำคำสั่งเพื่อนำไปจากคอมพิวเตอร์ผู้ใช้ ไปใส่ไว้ในระบบไฟลแฟลชภายใต้ไดเรกทอรี <code>/lib</code></p>
+<pre><code class="language-text">python -m mpremote cp file.py :/lib/
+</code></pre>
+<p>ตัวอย่างการทำคำสั่งลบไฟล์ <code>main.py</code></p>
+<pre><code class="language-text">python -m mpremote fs rm :/main.py
+</code></pre>
+<p>ตัวอย่างการทำคำสั่ง <strong>Soft Reset</strong></p>
+<pre><code class="language-text">python -m mpremote reset
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="micropython-bytecode">&#9655; <strong>การคอมไพล์โค้ดให้เป็น MicroPython Bytecode</strong><a class="headerlink" href="#micropython-bytecode" title="Permanent link">#</a></h2>
+<p>การคอมไพล์หรือแปลงไฟล์ <code>.py</code> ให้เป็น <code>.mpy</code> (<strong>MicroPython Bytecode</strong> หรือ <code>.mpy</code>)
+จะต้องใช้โปรแกรมของ <strong>MicroPython</strong> ที่มีชื่อว่า <code>mpy-cross</code> 
+แต่แนะนำให้ใช้ <strong>WSL2 Ubuntu</strong> สำหรับขั้นตอนนี้</p>
+<pre><code class="language-text"># Install git and build tools (gcc, make, etc.)
+$ sudo apt install git build-essential 
+
+# Clone source code from the MicroPython repo
+$ cd $HOME
+$ git clone https://github.com/micropython/micropython.git   
+
+# Change directory to the mpy-cross compiler source
+$ cd micropython/mpy-cross                     
+
+# Build the mpy-cross compiler
+$ make                                         
+</code></pre>
+<p>คำสั่งสำหรับคอมไพล์ไฟล์ <code>main.py</code> ให้ได้ไฟล์ <code>main.mpy</code>
+(ในตัวอย่างนี้ ไฟล์ <code>main.py</code> อยู่ใน <code>C:\Work\MicroPython\</code> 
+ในระบบไฟล์ของ <strong>Windows</strong>) </p>
+<pre><code class="language-text"># Compile main.py to main.mpy for ESP32/ESP32-S2/ESP32-S3 (Xtensa arch)
+$ ./build/mpy-cross -march=xtensawin /mnt/c/Work/MicroPython/main.py
+</code></pre>
+<p>เมื่อได้ไฟล์ <code>main.mpy</code> ในระบบไฟล์ของ <strong>Windows</strong> แล้ว ให้ทำคำสั่ง <code>mpremote</code>
+(ใน <strong>Windows PowerShell</strong>) เพื่อนำไปใส่ลงใน
+ระบบไฟล์แฟลชของ <strong>ESP32</strong></p>
+<pre><code class="language-text">python -m mpremote cp main.mpy :/
+</code></pre>
+<p>ทำคำสั่งเพื่อให้รันโค้ดใน <code>main.mpy</code></p>
+<pre><code class="language-text">python -m mpremote exec &quot;import main&quot;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>เอกสารออนไลน์สำหรับอ้างอิงและศึกษาเพิ่มเติม</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="http://docs.micropython.org/en/latest/"><strong>MicroPython Online Documentation</strong></a></li>
+<li><a href="https://docs.micropython.org/en/latest/esp32/tutorial/intro.html"><strong>Getting started with MicroPython on the ESP32</strong></a></li>
+<li><a href="https://docs.micropython.org/en/latest/esp32/quickref.html"><strong>Quick Reference for the ESP32</strong></a></li>
+<li><a href="https://docs.micropython.org/en/latest/library/index.html"><strong>MicroPython Libraries</strong></a></li>
+</ul>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอขั้นตอนการติดตั้ง <strong>MicroPython Firmware</strong> สำหรับ <strong>Espressif SoC</strong>
+มีตัวอย่างโค้ด <strong>MicroPython</strong> และการใช้ซอฟต์แวร์ <strong>Thonny IDE</strong> และ <strong>Arduino Lab for MicroPython</strong>
+ในการเขียนโค้ดและอัปโหลดโค้ดไปยัง บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32-S3</strong> เพื่อรันโค้ดและทดสอบ</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-08-09 | Last Updated: 2025-08-10</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
