@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/micropython/micropython_esp32_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#micropython-espressif-esp32-2" class="nav-link">ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#example-10-led-toggle-with-spi-interface" class="nav-link">&#9655; Example 10: LED Toggle with SPI Interface</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-11-led-blink-with-rmi" class="nav-link">&#9655; Example 11: LED Blink with RMI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-12-led-blink-with-pwm" class="nav-link">&#9655; Example 12: LED Blink with PWM</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-13-io-follower-with-gpio-interrupt" class="nav-link">&#9655; Example 13: I/O Follower with GPIO Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-14-pulse-counting-with-gpio-interrupt" class="nav-link">&#9655; Example 14: Pulse Counting with GPIO Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-15-pulse-counting-with-esp32-pulse-counter" class="nav-link">&#9655; Example 15: Pulse Counting with ESP32 Pulse Counter</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-16-frequency-measurement-with-gpio-interrupt" class="nav-link">&#9655; Example 16: Frequency Measurement with GPIO Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-17-frequency-measurement-with-esp32-pcnt" class="nav-link">&#9655; Example 17: Frequency Measurement with ESP32 PCNT</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-18-button-click-detection-with-debounce-logic" class="nav-link">&#9655; Example 18: Button Click Detection with Debounce Logic</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-19-button-click-detection-with-input-sampling" class="nav-link">&#9655; Example 19: Button Click Detection with Input Sampling</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-20-notification-from-isr-to-asyncio-function" class="nav-link">&#9655; Example 20: Notification from ISR to AsyncIO Function</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-espressif-esp32-2">ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 2)<a class="headerlink" href="#micropython-espressif-esp32-2" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Espressif SoCs</em>, <em>ESP32 / ESP32-S3</em>, 
+<em>Thonny IDE</em>, <em>Arduino Lab for MicroPython</em>, <em>Wokwi</em></p>
+<ul>
+<li><a href="#example-10-led-toggle-with-spi-interface"><strong>Example 10: LED Toggle with SPI Interface</strong></a></li>
+<li><a href="#example-11-led-blink-with-rmi"><strong>Example 11: LED Toggle with RMI</strong></a></li>
+<li><a href="#example-12-led-blink-with-pwm"><strong>Example 12: LED Toggle with PWM</strong></a></li>
+<li><a href="#example-13-io-follower-with-gpio-interrupt"><strong>Example 13: I/O Follower with GPIO Interrupt</strong></a></li>
+<li><a href="#example-14-pulse-counting-with-gpio-interrupt"><strong>Example 14: Pulse Counting with GPIO Interrupt</strong></a></li>
+<li><a href="#example-15-pulse-counting-with-esp32-pulse-counter"><strong>Example 15: Pulse Counting with ESP32 Pulse Counter</strong></a></li>
+<li><a href="#example-16-frequency-measurement-with-gpio-interrupt"><strong>Example 16: Frequency Measurement with GPIO Interrupt</strong></a></li>
+<li><a href="#example-17-frequency-measurement-with-esp32-pcnt"><strong>Example 17: Frequency Measurement with ESP32 PCNT</strong></a></li>
+<li><a href="#example-18-button-click-detection-with-debounce-logic"><strong>Example 18: Button Click Detection with Debounce Logic</strong></a></li>
+<li><a href="#example-19-button-click-detection-with-input-sampling"><strong>Example 19: Button Click Detection with Input Sampling</strong></a></li>
+<li><a href="#example-20-notification-from-isr-to-asyncio-function"><strong>Example 20: Notification from ISR to AsyncIO Function</strong></a></li>
+</ul>
+<hr />
+<h2 id="example-10-led-toggle-with-spi-interface">&#9655; <strong>Example 10: LED Toggle with SPI Interface</strong><a class="headerlink" href="#example-10-led-toggle-with-spi-interface" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้บัส <strong>SPI (Serial Peripheral Interface)</strong> เพื่อส่งข้อมูลทีละบิตออกไปด้วยอัตราคงที่
+และให้เกิดการสลับสถานะลอจิกของ <strong>LED</strong>
+โดยปกติ การเชื่อมต่อแบบ <strong>SPI</strong> จะต้องมีไมโครคอนโทรลเลอร์ทำหน้าที่เป็นอุปกรณ์ <strong>SPI Master</strong> 
+และมีอุปกรณ์อย่างน้อยหนึ่งตัวทำหน้าที่เป็น <strong>SPI Slave</strong> ทั้งสองจะสื่อสารกันโดยใช้สัญญาณต่อไปนี้ (<strong>4-Wire SPI Bus</strong>)</p>
+<ul>
+<li><strong>CS</strong> คือสัญญาณ <strong>Chip Select</strong></li>
+<li><strong>SCK</strong> คือสัญญาณ <strong>Serial Clock</strong></li>
+<li><strong>MOSI</strong> คือสัญญาณ <strong>Master Out Slave In</strong></li>
+<li><strong>MISO</strong> คือสัญญาณ <strong>Master In Slave Out</strong></li>
+</ul>
+<p>แต่ในตัวอย่างนี้ จะใช้เพื่อส่งข้อมูลบิตตามรูปแบบที่กำหนด (เช่น จำนวน 2 ไบต์) 
+โดยไม่ได้ใช้สำหรับการสื่อสารกับอุปกรณ์อื่น และ ไม่มีอุปกรณ์ <strong>SPI Slave</strong>
+ข้อมูลบิตจะถูกเลื่อนหรือส่งออกผ่านทางขา <strong>MOSI</strong></p>
+<p>การกำหนดความถี่ของสัญญาณ <strong>SCK</strong> สำหรับบัส <strong>SPI</strong> มีข้อสังเกตดังนี้</p>
+<ul>
+<li>ระบบบัสภายในของ <strong>ESP32</strong> สำหรับ <strong>I/O Peripherals</strong> ทำงานที่ความถี่ <strong>80 MHz</strong>
+ดังนั้น ถ้าใช้วงจร <strong>SPI Block</strong> โดยเฉพาะ เช่น <strong>HSPI/SPI1</strong> หรือ <strong>VSPI/SPI2</strong> 
+จะใช้ความถี่ของ <strong>SPI Bus</strong> ได้สูงสุด <strong>80 MHz</strong>
+แต่ถ้าไม่ได้ใช้ขาสำหรับ <strong>SPI</strong> โดยตรง (ใช้ผ่าน <strong>GPIO Multiplexing</strong> หมายถึง เลือกใช้ขา <strong>GPIO</strong>
+ทั่วไป ไม่ได้เจาะจงสำหรับ <strong>Hardware SPI Pins</strong>) 
+ความถี่สูงสุดจะลดลงครึ่งหนึ่ง เหลือไม่เกิน <strong>40 MHz</strong></li>
+<li>ขาของ <strong>SPI Block</strong> สำหรับ <strong>ESP32</strong> ได้แก่<ul>
+<li><strong>HSPI (id=1)</strong>: <strong>SCK=14</strong>, <strong>MOSI=13</strong>, <strong>MISO=12</strong>, <strong>CS=15</strong></li>
+<li><strong>VSPI (id=2)</strong>: <strong>SCK=18</strong>, <strong>MOSI=23</strong>, <strong>MISO=19</strong>, <strong>CS=5</strong></li>
+</ul>
+</li>
+<li>ขาของ <strong>ESP32-S3</strong> สำหรับ <strong>SPI</strong> (มี 4 ชุด คือ  <strong>SPI0</strong> ~ <strong>SPI3</strong>)<ul>
+<li><strong>SPI0 &amp; SPI1</strong> (<strong>GPIO 26~32</strong>) จะใช้สำหรับชิป <strong>SPI Flash/PSRAM</strong></li>
+<li><strong>SPI2 (HSPI,id=1)</strong>: <strong>SCK=12</strong>, <strong>MOSI=11</strong>, <strong>MISO=13</strong>, <strong>CS=10</strong></li>
+<li><strong>SPI3 (VSPI,id=2)</strong>: <strong>SCK=36</strong>, <strong>MOSI=35</strong>, <strong>MISO=37</strong>, <strong>CS=39</strong></li>
+</ul>
+</li>
+<li>การใช้งาน <strong>SPI</strong> บน <strong>MicroPython-ESP32</strong> แบ่งได้เป็น 2 แบบ คือ
+<strong>Hardware SPI</strong> ที่ใช้วงจร <strong>SPI Block</strong> ของ <strong>ESP32</strong> โดยตรง และ
+<strong>SoftSPI</strong> (<em>Software/Bit-banged SPI</em>) ที่ควบคุมด้วยซอฟต์แวร์<ul>
+<li>รูปแบบแรกรองรับความถี่สูงและมีความแม่นยำกว่า ส่วนรูปแบบที่สองรองรับความถี่ต่ำกว่า
+และอาจเกิด <strong>Clock Jitter</strong> (ความไม่สม่ำเสมอของสัญญาณนาฬิกา) ได้ โดยเฉพาะเมื่อมีงานอื่นรันพร้อมกัน</li>
+</ul>
+</li>
+<li>แต่ในตัวอย่างนี้ หากใช้กับ <strong>LED</strong> จำเป็นต้องตั้งค่าความถี่ของ <strong>SCK</strong> ให้ต่ำพอที่จะมองเห็นการกระพริบได้
+และสามารถเลือกใช้ <strong>SoftSPI</strong> ได้</li>
+<li>ในตัวอย่างนี้ ข้อมูลที่จะถูกส่งออกมี 2 ไบต์ หรือ 16 บิต ได้แก่ <code>0xFF</code> และ <code>0x00</code>
+หมายถึง บิตลอจิก <code>1</code> จำนวน 8 บิต และบิตลอจิก <code>0</code> อีกจำนวน 8 บิต ตามสัญญาณบิตของ <strong>SPI</strong>
+หรือกล่าวได้ว่า ไบต์แรกใช้สัญญาณพัลส์ช่วงที่เป็น <strong>High</strong> และไบต์ที่สองใช้สัญญาณพัลส์ช่วงที่เป็น <strong>Low</strong> </li>
+<li>ถ้าให้ความถี่เท่ากับ <strong>80Hz</strong> จะได้สัญญาณเอาต์พุตที่มีความถี่ประมาณ <strong>80Hz / 16 = 5Hz</strong>
+ซึ่งเป็นอัตราการกระพริบของ <strong>LED</strong></li>
+<li>โค้ดตัวอย่าง (สำหรับทดลองใช้กับบอร์ด <strong>ESP32-S3</strong>)
+มีการเลือกใช้  <strong>SPI</strong> (<code>machine.SPI</code>) และ <strong>SoftSPI</strong> (<code>machine.SoftSPI</code>) ได้สองกรณี เพื่อเปรียบเทียบกัน<ul>
+<li><strong>SPI</strong>: ทดลองใช้ความถี่ <strong>8 MHz</strong></li>
+<li><strong>SoftSPI</strong>: ทดลองใช้ความถี่ <strong>80 Hz</strong></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script demonstrates how to use SPI / SoftSPI on MicroPython to send 
+# data continuously using hardware SPI or bit-banged SPI on specified pins.
+#-------------------------------------------------------------------------
+from machine import Pin, SPI, SoftSPI  # Import Pin, SPI and SoftSPI classes
+
+USE_HW_SPI = True # True: use machine.SPI, False: use machine.SoftSPI
+
+# Use GPIO Multiplexing for SPI or VSPI for ESP32-S3
+MOSI = Pin(11)  # Assign GPIO11 as MOSI pin (used to drive an LED circuit)
+SCK  = Pin(12)  # Assign GPIO12 as SCK pin
+MISO = Pin(13)  # Assign GPIO13 as MISO pin (not used)
+
+if USE_HW_SPI: # Use Hardware SPI id=1
+    SCK_FREQ = 8_000_000
+    spi = SPI(1, baudrate=SCK_FREQ, polarity=0, phase=0, 
+          bits=8, firstbit=SPI.MSB, sck=SCK, mosi=MOSI, miso=MISO )
+else: # Use bit-banged SPI (SoftSPI)
+    SCK_FREQ = 80
+    spi = SoftSPI(baudrate=SCK_FREQ, polarity=0, phase=0, 
+          bits=8, firstbit=SPI.MSB, sck=SCK, mosi=MOSI, miso=MISO)
+
+data = bytes([0xFF, 0x00])
+try:
+    while True:
+        # Continuously write two bytes [0x00, 0xFF] over SPI
+        # Since baudrate is 80Hz, and each transfer sends 16 bits,
+        # this roughly results in a blink rate of 80/16 = 5Hz
+        spi.write(data)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+    pass
+finally:
+    spi.deinit()  # Deinitialize (disable) the SPI interface cleanly
+</code></pre>
+<p>&nbsp;</p>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex10-wave-1.jpg" /></p>
+<p><img alt="" src="ex10-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณ <strong>MOSI</strong> และ <strong>SCK</strong> สำหรับกรณี <strong>SoftSPI</strong> (80 Hz)</p>
+<p><img alt="" src="ex10-wave-3.jpg" /></p>
+<p><img alt="" src="ex10-wave-4.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณ <strong>MOSI</strong> และ <strong>SCK</strong> สำหรับกรณี <strong>SPI</strong> (8 MHz)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-11-led-blink-with-rmi">&#9655; <strong>Example 11: LED Blink with RMI</strong><a class="headerlink" href="#example-11-led-blink-with-rmi" title="Permanent link">#</a></h2>
+<p>โค้ดนี้สาธิตการใช้งานวงจร <strong>RMT (Remote Control) Peripheral</strong> ภายในชิป <strong>ESP32 / ESP32-S3</strong> 
+และใช้คำสั่งจากคลาส <code>esp32.RMT</code> ของ <strong>MicroPython</strong>
+เพื่อสร้างสัญญาณพัลส์ซ้ำ ๆ สำหรับกระพริบ <strong>LED</strong> ที่ต่อกับขา <strong>GPIO-11</strong> ด้วยความถี่ประมาณ 
+<strong>10Hz</strong> โดยไม่ต้องใช้คำสั่งหน่วงเวลา (<code>time.sleep</code>) เพื่อสลับสถานะ <strong>LED</strong> เอง</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script uses the ESP32 RMT peripheral to generate 
+# a repetitive pulse signal to toggle an LED connected to GPIO-11 
+# at a frequency of about 10Hz.
+#-------------------------------------------------------------------------
+from machine import Pin  # Import Pin class for GPIO control
+import time              # Import time module for delay functions
+import esp32             # Import esp32-specific modules (RMT)
+
+ledPin = Pin(11, Pin.OUT)  # Initialize GPIO-11 as an LED output pin
+
+# Create an RMT object on channel 0, outputting pulses on ledPin
+# The RMT clock runs at 80 MHz. 
+# Dividing by 250 slows this down to 320 kHz timer.
+# Each pulse length unit corresponds to 1/(80MHz/250) = 3.125 usec.
+# High pulse length of 32000 correspond to ~100 ms.
+
+CLK_DIV = 250
+rmt = esp32.RMT(id=0, pin=ledPin, clock_div=CLK_DIV)
+rmt.loop(True) # Enable continuous looping of pulses
+
+# Write pulses to RMT:
+# The list [32000, 32000] specifies the pulse widths (in timer ticks) 
+# for low and high signals.
+# The second parameter '0' means the pulses start with the low signal.
+rmt.write_pulses([32000, 32000], 0)
+
+try: 
+    while True: # The main loop (do nothing)
+        time.sleep(1)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    rmt.loop(False)  # Disable pulse looping (stop repeating pulses)
+    rmt.deinit()     # Deinitialize the RMT peripheral to free resources
+</code></pre>
+<p>วงจร <strong>RMT</strong> จะถูกตั้งค่าให้แบ่งความถี่สัญญาณนาฬิกาภายในจาก <strong>80 MHz</strong> ลงมาเป็น <strong>320 kHz</strong>
+เมื่อใช้ตัวหารความถี่เท่ากับ <strong>256</strong> ทำให้หนึ่งหน่วยความยาวพัลส์มีค่า <strong>3.125 µsec</strong> 
+จากนั้นกำหนดความยาวพัลส์ <strong>32000</strong> หน่วย สำหรับสถานะ <strong>Low</strong> และ <strong>High</strong> อย่างละหนึ่งช่วง 
+(ความกว้างพัลส์ประมาณ <strong>100 msec</strong> และคาบเวลาของสัญญาณเอาต์พุตประมาณ <strong>200 msec</strong>)
+ทำให้ <strong>LED</strong> กระพริบอัตโนมัติจนกว่า จะหยุดโปรแกรม หรือปิดการทำงานของ <strong>RMT</strong></p>
+<p>การคำนวณหาความกว้างของสัญญาณพัลส์ มีดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+   \text{Pulse Width (msec)}
+  = \frac{ CLK\_DIV \times 32000 }{ 80\times 10^6 \text{ Hz}} \times 10^3
+</script>
+</p>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex11-wave-1.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณ <strong>GPIO-11</strong> (เมื่อใช้ค่า <code>CLK_DIV = 250</code>)
+วัดความกว้างของพัลส์ได้ <strong>100 msec</strong></p>
+<p><img alt="" src="ex11-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณ <strong>GPIO-11</strong> (เมื่อใช้ค่า <code>CLK_DIV = 1</code>)
+วัดความกว้างของพัลส์ได้ <strong>400 usec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-12-led-blink-with-pwm">&#9655; <strong>Example 12: LED Blink with PWM</strong><a class="headerlink" href="#example-12-led-blink-with-pwm" title="Permanent link">#</a></h2>
+<p>โค้ดนี้สาธิตการใช้งานวงจร <strong>LEDC</strong> ของ <strong>ESP32 / ESP32-S3</strong> และใช้คำสั่งจากคลาส <code>machine.PWM</code>
+ของ <strong>MicroPython</strong> เพื่อสร้างสัญญาณ <strong>PWM (Pulse Width Modulation)</strong> ซึ่งเป็นสัญญาณดิจิทัลที่มีคาบ
+(<strong>Periodic Signal</strong>) สามารถนำมาใช้ เพื่อทำให้ <strong>LED</strong> กระพริบได้ 
+โดยตั้งค่า <strong>Duty Cycle</strong> เท่ากับ <strong>50%</strong> แต่จะต้องใช้ความถี่ไม่สูงมากนัก
+ในกรณีของ <strong>ESP32-S3</strong> ความถี่ <strong>PWM</strong> ต่ำสุดที่ฮาร์ดแวร์รองรับได้อยู่ที่ประมาณ <strong>10 Hz</strong>
+ดังนั้นหากต้องการความถี่ต่ำกว่านี้ ต้องใช้วิธีสร้างสัญญาณด้วยซอฟต์แวร์แทน</p>
+<pre><code class="language-python">#--------------------------------------------------------------
+# Example: Generate the lowest-frequency PWM on a selected pin
+# to blink an LED continuously.
+#--------------------------------------------------------------
+from machine import Pin, PWM
+import time
+
+# Define the LED pin (e.g. GPIO-11)
+led_pin = Pin(11, Pin.OUT)
+
+# Create PWM object
+# duty_u16=32768 sets 50% duty cycle (for 16-bit range: 0..65535)
+FREQ = 10 # lowest PWM frequency for ESP32-S3
+DUTY_MAX = 65535
+pwm = PWM(led_pin, freq=FREQ, duty_u16=65535)
+pwm.duty_u16( (DUTY_MAX+1) // 2 ) # Set the duty cycle to 50%
+
+try:
+    while True: # The main loop
+        time.sleep(1)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    pwm.deinit() # Stop PWM and release the pin
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex12-wave-1.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณ <strong>GPIO-11</strong> วัดความกว้างพัลส์ได้ <strong>50 msec</strong>
+และคาบเท่ากับ <strong>100 msec</strong> (<strong>10Hz</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-13-io-follower-with-gpio-interrupt">&#9655; <strong>Example 13: I/O Follower with GPIO Interrupt</strong><a class="headerlink" href="#example-13-io-follower-with-gpio-interrupt" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สร้างสัญญาณ <strong>PWM</strong> เป็นเอาต์พุตที่ขา <strong>GPIO-13</strong>
+สัญญาณนี้ จะต้องนำไปเชื่อมต่อด้วยสายไฟจาก <strong>GPIO-13</strong> ไปยัง <strong>GPIO-11</strong>
+เพื่อใช้เป็นสัญญาณอินพุตสำหรับการทดสอบ</p>
+<p><strong>GPIO-11</strong> ถูกตั้งค่าให้เป็นอินพุตและเปิดใช้งานอินเทอร์รัพท์ (<strong>Interrupt</strong>) 
+ที่เกิดขึ้นทั้งขอบขาขึ้นและขอบขาลงของสัญญาณ
+เมื่อเกิดอินเทอร์รัพท์ ฟังก์ชัน <strong>ISR</strong> ที่กำหนดไว้ (<code>irq_handler</code>)
+จะอ่านสถานะ จาก <strong>GPIO-11</strong> แล้วนำไปตั้งค่าขา <strong>GPIO-12</strong> ให้มีค่าเหมือนกับอินพุตแบบเรียลไทม์</p>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This script generates a PWM test signal on GPIO-13.
+# The signal is looped back to GPIO-11 by connecting a wire
+# between GPIO-13 and GPIO-11.
+# GPIO-11 is configured as an input with an external interrupt
+# that triggers on both rising and falling edges.
+# In the interrupt service routine (ISR), the state of GPIO-11
+# is read and used to update the output level of GPIO-12
+# in real time.
+#--------------------------------------------------------------
+from machine import Pin, PWM
+import time
+
+# Generate a test pulse (PWM) signal
+pwmPin = Pin(13, Pin.OUT)
+pwm = PWM(pwmPin)
+pwm.freq(10_000)      # Set PWM frequency to 10 kHz
+pwm.duty_u16(32768)   # 50% duty cycle (16-bit scale)
+
+# PulseIn pin
+pulseOutPin = Pin(12, Pin.OUT)
+
+def irq_handler(pin): # GPIO interrupt handler (callback)
+    global pulseOutPin
+    pulseOutPin.value(pin.value())
+
+# PulseOut pin
+pulseInPin = Pin(11, Pin.IN, Pin.PULL_UP)
+pulseInPin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, 
+               handler=irq_handler)
+
+try:
+    while True: # Main loop 
+        time.sleep(1)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    pwm.deinit()
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex13-wave-1.jpg" /></p>
+<p><img alt="" src="ex13-wave-2.jpg" /></p>
+<p><img alt="" src="ex13-wave-3.jpg" /></p>
+<p><strong>รูป:</strong> การวัดสัญญาณที่ขา <strong>GPIO-11 &amp; GPIO-12</strong></p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า สัญญาณอินพุตที่ขา  <strong>GPIO-11</strong> เป็นสัญญาณพัลส์ที่มีความถี่ <strong>10kHz</strong>
+และสัญญาณเอาต์พุตที่ขา <strong>GPIO-12</strong> ตอบสนองต่อเหตุการณ์ขอบขาขึ้นหรือขาลงของสัญญาณอินพุต
+เมื่อเกิดขอบขาขึ้นหรือขาลงบนสัญญาณอินพุต จะมีระยะเวลาตอบสนองสำหรับสัญญาณเอาต์พุต
+(<strong>16 ~ 22 usec</strong> โดยประมาณ) ระยะเวลาดังกล่าวประกอบด้วยสองส่วนคือ
+<strong>Interrupt Latency</strong> และการเขียนค่าเพื่ออัปเดตเอาต์พุตในฟังก์ชัน <strong>ISR</strong>
+และมีผลต่อความถี่สูงสุดของสัญญาณอินพุตที่สามารถตอบสนองได้ทัน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-14-pulse-counting-with-gpio-interrupt">&#9655; <strong>Example 14: Pulse Counting with GPIO Interrupt</strong><a class="headerlink" href="#example-14-pulse-counting-with-gpio-interrupt" title="Permanent link">#</a></h2>
+<p>โค้ดนี้สาธิตการใช้วงจร <strong>RMT</strong> ของ <strong>ESP32</strong> เพื่อสร้างสัญญาณพัลส์ออกที่ขา <strong>GPIO-13</strong>
+โดยสัญญาณจะมีพัลส์ระดับสูงคงที่ 50 ไมโครวินาที และพัลส์ระดับต่ำที่มีความกว้างสุ่มในช่วง 50 ถึง 200 ไมโครวินาที</p>
+<p>สัญญาณเอาต์พุตที่ขา <strong>GPIO-13</strong> จะถูกเชื่อมต่อกลับเข้ามายังขา <strong>GPIO-11</strong>
+เป็นอินพุต และมีการเปิดใช้งานอินเทอร์รัพท์ เพื่อจับการเปลี่ยนแปลงของสัญญาณที่ขาอินพุตในขอบขาขึ้น
+ทุกครั้งที่มีขอบขาขึ้น ฟังก์ชันขัดจังหวะจะเพิ่มตัวนับพัลส์
+จำนวนพัลส์ที่ตรวจจับได้จะแสดงผลหลังจากส่งสัญญาณพัลส์แต่ละครั้ง</p>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This script generates a variable pulse pattern using 
+# the ESP32 RMT peripheral on GPIO-13 and counts the number of
+# rising pulses detected on GPIO-11 using an interrupt handler.
+# The output pulse pattern consists of fixed 50 µs high pulses
+# and random low pulse widths between 50 and 200 µs.
+# GPIO-13 (RMT output) should be connected physically to 
+# GPIO-11 (input) for pulse counting.
+#--------------------------------------------------------------
+from machine import Pin
+from esp32 import RMT
+import time
+import random
+
+pulseInPin = Pin(11, Pin.IN, Pin.PULL_UP)
+pulseOutPin = Pin(13, Pin.OUT)
+
+pulse_count = 0 # store the number of detected pulses
+
+def irq_handler(pin):
+    global pulse_count
+    pulse_count += 1
+
+# Enable interrupt on pulseInPin for rising edge triggers,
+# calling irq_handler each time a rising edge is detected
+irq = pulseInPin.irq(trigger=Pin.IRQ_RISING, handler=irq_handler)
+
+# Create an RWM object, 1usec resolution
+CLK_DIV = 80  # 1 MHz tick (1us per tick), 80 MHz/80
+rmt = RMT(id=0, pin=pulseOutPin, clock_div=CLK_DIV)
+rmt.loop(False)
+
+# Pattern: [high_us, low_us, high_us, low_us, ...]
+# This example: 10 pulses with different spacing
+NUM_PULSES = 10
+pattern_us = []
+for i in range(NUM_PULSES):
+    high_time = 50 # fixed high pulse width = 50usec
+    low_time  = random.randint(50, 200)
+    pattern_us.extend([high_time, low_time])
+
+# Convert microseconds to RMT ticks (1 tick = 1us here)
+pattern_ticks = [t for t in pattern_us]
+
+try:
+    while True:
+        print(&quot;Sending RMT pulse pattern...&quot;)
+        pulse_count = 0 # Clear pulse counter
+        rmt.write_pulses(pattern_ticks, 1)  # Start with HIGH level
+        time.sleep_ms(10) # Wait for pulses to complete
+        print(f&quot;Number of Pulses detected: {pulse_count}\n&quot;)
+        time.sleep(5) 
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    rmt.deinit()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-15-pulse-counting-with-esp32-pulse-counter">&#9655; <strong>Example 15: Pulse Counting with ESP32 Pulse Counter</strong><a class="headerlink" href="#example-15-pulse-counting-with-esp32-pulse-counter" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างต่อไปนี้สาธิตการใช้งานวงจร <strong>PCNT (Pulse Counter)</strong> ภายใน <strong>ESP32</strong> 
+สำหรับการนับจำนวนพัลส์ที่เกิดขึ้น แทนการใช้อินเทอร์รัพท์และฟังก์ชัน <strong>Callback</strong></p>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This script generates a variable pulse pattern using 
+# the ESP32 RMT peripheral on GPIO-13 and counts the number 
+# of rising pulses detected on GPIO-11 using one of the
+# pulse counter units inside the ESP32.
+# The output pulse pattern consists of fixed 5 µs high pulses
+# and random low pulse widths between 5 and 20 µs.
+# GPIO-13 (RMT output) should be connected physically to 
+# GPIO-11 (input) for pulse counting.
+#--------------------------------------------------------------
+from machine import Pin
+from esp32 import RMT, PCNT
+import time
+import random
+
+pulseInPin = Pin(11, Pin.IN, Pin.PULL_UP)
+pulseOutPin = Pin(13, Pin.OUT)
+
+# Create an RWM object, 1usec resolution
+CLK_DIV = 80  # 1 MHz tick (1us per tick), 80 MHz/80
+rmt = RMT(id=0, pin=pulseOutPin, clock_div=CLK_DIV)
+rmt.loop(False)
+
+# Pattern: [high_us, low_us, high_us, low_us, ...]
+# This example: 10 pulses with different spacing
+NUM_PULSES = 10
+pattern_us = []
+for i in range(NUM_PULSES):
+    high_time = 5
+    low_time  = random.randint(5, 20)
+    pattern_us.extend([high_time, low_time])
+
+# Convert microseconds to RMT ticks (1 tick = 1us here)
+pattern_ticks = [t for t in pattern_us]
+
+pcnt = PCNT(0, pin=pulseInPin)
+# Increment the pulse counter on rising edges
+# Pulse width filtering: 80 =&gt; 1usec minimum pulse width
+pcnt.init(pin=pulseInPin, rising=PCNT.INCREMENT, falling=PCNT.IGNORE, filter=80) 
+pcnt.start()  # Start the pulse counter
+
+try:
+    while True:
+        print(&quot;Sending RMT pulse pattern...&quot;)
+        pcnt.value(0) # Reset the pulse counter
+        rmt.write_pulses(pattern_ticks, 1)  # Start with HIGH level
+        time.sleep_ms(10) # Wait for pulses to complete
+        print(f&quot;Number of Pulses detected: {pcnt.value()}\n&quot;)
+        time.sleep(5) 
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    rmt.deinit()
+    pcnt.deinit()
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex15-wave-1.jpg" /></p>
+<p><img alt="" src="ex15-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> สัญญาณอินพุตที่ขา <strong>GPIO-11</strong> นับจำนวนพัลส์ได้ 10 ครั้ง มีความกว้างช่วงที่เป็น <strong>High</strong>
+เท่ากับ <strong>5 usec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-16-frequency-measurement-with-gpio-interrupt">&#9655; <strong>Example 16: Frequency Measurement with GPIO Interrupt</strong><a class="headerlink" href="#example-16-frequency-measurement-with-gpio-interrupt" title="Permanent link">#</a></h2>
+<p>โค้ดนี้ใช้สำหรับวัดความถี่ของสัญญาณ <strong>PWM</strong> โดยการนับจำนวนขอบขาขึ้น ที่ตรวจจับได้ภายในช่วงเวลาที่กำหนด
+มีการใช้ตัวจับเวลา (<strong>Hrdware Timer</strong>) ที่ตั้งค่าให้ทำงานแบบเป็นรอบ (<strong>Periodic Mode</strong>) 
+เพื่อกำหนดช่วงเวลาการวัด เมื่อถึงเวลาที่ตั้งไว้ ตัวจับเวลาจะทำหน้าที่
+บันทึกจำนวนพัลส์ที่นับได้ในช่วงเวลาก่อนหน้าและรีเซ็ตตัวนับพัลส์เพื่อเริ่มนับใหม่สำหรับรอบถัดไป</p>
+<p>ในตัวอย่างนี้ มีการสร้างสัญญาณ <strong>PWM</strong> บนขา <strong>GPIO-13</strong> เพื่อใช้เป็นสัญญาณทดสอบ
+และนำไปป้อนกลับเข้าสู่ขา <strong>GPIO-11</strong> ซึ่งใช้สำหรับวัดสัญญาณ
+และมีการสร้างฟังก์ชัน <strong>IRQ handler</strong> สำหรับ <strong>GPIO Interrupt</strong> 
+ซึ่งจะทำการเพิ่มตัวนับทุกครั้งที่ตรวจจับขอบขาขึ้นของสัญญาณที่ขา <strong>GPIO-11</strong></p>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This script measures the frequency of a PWM signal by counting
+# the number of rising edges detected within a fixed time window.
+# 
+# A hardware timer is configured in periodic mode to define the
+# measurement interval. On each timer tick:
+#   - The current pulse count is saved.
+#   - The counter is reset for the next measurement cycle.
+#
+# In this example:
+#   - A PWM signal is generated on GPIO-13 (test signal).
+#   - The PWM output is looped back to GPIO-11 (measurement input).
+#   - An IRQ handler increments the counter on each rising edge.
+#   - The measured frequency is calculated and compared to the
+#     set PWM frequency.
+# Requirements:
+#   - Connect GPIO-13 to GPIO-11 for loopback measurement.
+#   - Tested with MicroPython on an ESP32 / ESP32-S3.
+#--------------------------------------------------------------
+import uasyncio as asyncio
+from machine import Pin, PWM, Timer
+import time 
+
+done = False
+pulse_count = 0
+saved_pulse_count = 0
+timer_period_ms = 20   # Set the measurement interval (msec)
+
+# Interrupt handler for rising edge detection
+def irq_handler(pin):
+    global pulse_count, done
+    if not done: # if pulse counting is enabled
+        pulse_count += 1
+
+# Input pin for measuring signal
+pulseInPin = Pin(11, Pin.IN, Pin.PULL_UP)
+# Set up the input pin with pull-down and attach IRQ
+pulseInPin.irq(trigger=Pin.IRQ_RISING, handler=irq_handler)
+
+# Generate a test PWM signal on GPIO-13 
+# Connect GPIO-13 to GPIO-11 for testing
+pwmOutPin = Pin(13, Pin.OUT)
+pwm = PWM(pwmOutPin)
+pwm.duty_u16(32768)  # 50% duty cycle
+pwm.freq(1000)       # 1kHz (default)
+
+# Timer callback
+def timer_callback(timer):
+    global pulse_count, saved_pulse_count, done
+    saved_pulse_count = pulse_count
+    pulse_count = 0
+    done = not done
+
+# Create periodic timer 
+timer = Timer(0)
+timer.init(period=timer_period_ms, 
+           mode=Timer.PERIODIC, 
+           callback=timer_callback)
+
+# Main async. function
+async def main():
+    global pwm, saved_pulse_count, timer_period_ms, done
+    test_frequencies = [100, 200, 1_000, 5_000, 10_000, 20_000]
+    print( &quot;\nFrequency measurement&quot;)
+    while True:
+        print(50*&quot;-&quot;)
+        for f in test_frequencies:
+            pwm.freq( f ) # Set the PWM frequency
+            await asyncio.sleep_ms(2*timer_period_ms)
+            while not done: 
+                await asyncio.sleep_ms(5)
+            freq = 1000.0 * saved_pulse_count / timer_period_ms
+            print(f&quot;Frequency [Hz]: {f:.1f} set, {freq:.1f} measured&quot;)
+            await asyncio.sleep(1)  # wait before next measurement
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    pwm.deinit()
+    timer.deinit()
+</code></pre>
+<p><img alt="" src="ex16-demo.jpg" /></p>
+<p><strong>รูป:</strong> การสาธิตการทำงานของโค้ดตัวอย่างโดยใช้ <strong>Arduino Lab for MicroPython</strong>
+โดยมีการสร้างสัญญาณทดสอบที่มีความถี่แตกต่างกัน ตั้งแต่ <strong>100 Hz</strong> จนถึง <strong>20 kHz</strong></p>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex16-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> สัญญาณทดสอบความถี่ <strong>100 Hz</strong></p>
+<p><img alt="" src="ex16-wave-1.jpg" /></p>
+<p><strong>รูป:</strong> สัญญาณทดสอบความถี่ <strong>20 kHz</strong></p>
+<p>หากจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> ก็สามารถวัดความถี่ของสัญญาณทดสอบเสมือนจริงได้
+ในรูปเป็นการทดสอบกับบอร์ด <strong>ESP32</strong> และมีการเลือกใช้ขา <strong>GPIO-12</strong> เป็นอินพุต และเชื่อมต่อกับขา
+เอาต์พุต <strong>GPIO-13</strong> แต่มีข้อสังเกตว่า ค่าความถี่วัดได้ถูกต้องสำหรับความถี่ต่ำ 
+แต่หากใช้ความถี่สูง เช่น <strong>5000 Hz</strong> หรือมากกว่า จะวัดค่าได้ไม่ถูกต้อง</p>
+<p><img alt="" src="ex16-wokwi.jpg" /></p>
+<p><strong>รูป:</strong> การจำลองการทำงานด้วย <strong>Wokwi Simulator</strong> โดยใช้บอร์ด <strong>ESP32 DevKit-C</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-17-frequency-measurement-with-esp32-pcnt">&#9655; <strong>Example 17: Frequency Measurement with ESP32 PCNT</strong><a class="headerlink" href="#example-17-frequency-measurement-with-esp32-pcnt" title="Permanent link">#</a></h2>
+<p>โค้ดนี้เป็นตัวอย่างการวัดความถี่ของสัญญาณ <strong>PWM</strong> ด้วยการใช้วงจร <strong>PCNT (Pulse Counter)</strong>
+ของ <strong>ESP32</strong> นับจำนวนพัลส์ที่เกิดขึ้นในช่วงเวลาที่กำหนด โดยมีการทำงานหลักดังนี้:</p>
+<ul>
+<li>สร้างสัญญาณ <strong>PWM</strong> ออกที่ขา <strong>GPIO13</strong> เพื่อใช้เป็นสัญญาณทดสอบ</li>
+<li>ใช้วงจร <strong>PCNT</strong> สำหรับสัญญาณอินพุตที่ขา <strong>GPIO-11</strong> นับจำนวนขอบขาขึ้นของสัญญาณ <strong>PWM</strong></li>
+<li>ตั้งค่าตัวจับเวลาฮาร์ดแวร์ให้ทำงานแบบเป็นรอบ (<strong>Periodic</strong>) เช่น ทุก 20 มิลลิวินาที เพื่อเรียกใช้ฟังก์ชันวัดความถี่</li>
+<li>สร้างฟังก์ชันเพื่ออ่านค่าจำนวนพัลส์ที่นับได้ ในช่วงเวลาก่อนหน้า แล้วรีเซ็ตตัวนับพัลส์สำหรับรอบถัดไป</li>
+<li>ใช้ตัวแปร <code>done</code> เพื่อสลับสถานะการอ่านและรีเซ็ตตัวนับพัลส์</li>
+<li>ในลูปหลักจะตั้งค่าความถี่ <strong>PWM</strong> ให้เปลี่ยนไปตามรายการทดสอบ และแสดงผลความถี่ที่วัดได้เปรียบเทียบกับค่าที่ตั้งไว้</li>
+</ul>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This script measures the frequency of a PWM signal by using
+# the PCNT block inside the ESP32 to count the number of 
+# rising edges detected within a fixed time window.
+# Note that he ESP32 PCNT hardware uses a 16-bit signed counter
+# internally. This means the counter max is +32767.
+#--------------------------------------------------------------
+import uasyncio as asyncio
+from machine import Pin, PWM, Timer
+from esp32 import PCNT
+import time
+
+# Global variables
+done = False
+saved_pulse_count = 0
+
+# Setup PWM output
+pwmOutPin = Pin(13, Pin.OUT)
+pwm = PWM(pwmOutPin)
+pwm.duty_u16(32768)  # 50% duty cycle
+pwm.freq(1000)       # 1 kHz test PWM (default)
+
+# Setup PCNT (Pulse Counter) on GPIO11 to count pulses from PWM 
+pulseInPin = Pin(11, Pin.IN, pull=Pin.PULL_UP)
+# Create pulse counter on PCNT unit 0
+pcnt = PCNT(0, pulseInPin)
+pcnt.init(pin=pulseInPin,rising=PCNT.INCREMENT, falling=PCNT.IGNORE, filter=10) 
+pcnt.start() # Start pulse counting
+
+def measure_freq(timer):
+    global pcnt, saved_pulse_count, done
+    if not done:
+        # Read current pulse count from PCNT
+        saved_pulse_count = pcnt.value()
+    else:
+        # Clear PCNT value
+        pcnt.value(0)
+    done = not done
+
+# Setup a periodic timer to measure frequency
+timer_period_ms = 20 # msec
+timer = Timer(0)
+timer.init(period=timer_period_ms, 
+           mode=Timer.PERIODIC, 
+           callback=measure_freq)
+
+def format_freq(freq):
+    if freq &gt;= 1_000_000:
+        return &quot;{:6.2f} MHz&quot;.format(freq / 1_000_000)
+    elif freq &gt;= 1_000:
+        return &quot;{:6.2f} kHz&quot;.format(freq / 1_000)
+    else:
+        return &quot;{:6.2f}  Hz&quot;.format(freq)
+
+# Main async. function
+async def main():
+    global saved_pulse_count, timer_period_ms, done
+    test_frequencies = [100, 500, 1_000, 5_000, 10_000, 50_000, 1_000_000]
+    print( &quot;\nFrequency measurement&quot;)
+    while True:
+        print(50*&quot;-&quot;)
+        for f in test_frequencies:
+            pwm.freq( f ) # Set the PWM frequency
+            await asyncio.sleep_ms(2*timer_period_ms)
+            while not done: 
+                await asyncio.sleep_ms(5)
+            freq = 1000.0 * saved_pulse_count / timer_period_ms
+            f_measured = format_freq(freq)
+            f_set = format_freq(f)
+            print(f&quot;Frequency: {f_set} set, {f_measured} measured&quot;)
+            await asyncio.sleep(1)  # wait before next measurement
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    pwm.deinit()
+    pcnt.deinit()
+    timer.deinit()
+</code></pre>
+<p><img alt="" src="ex17-demo.jpg" /></p>
+<p><strong>รูป:</strong> การสาธิตการทำงานของโค้ดตัวอย่างโดยใช้ <strong>Arduino Lab for MicroPython</strong>
+โดยมีการสร้างสัญญาณทดสอบที่มีความถี่แตกต่างกัน ตั้งแต่ <strong>100 Hz</strong> จนถึง <strong>1 MHz</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-18-button-click-detection-with-debounce-logic">&#9655; <strong>Example 18: Button Click Detection with Debounce Logic</strong><a class="headerlink" href="#example-18-button-click-detection-with-debounce-logic" title="Permanent link">#</a></h2>
+<p>โค้ดนี้แสดงตัวอย่างการใช้ <strong>Hardware Timer</strong> ของ <strong>ESP32</strong> 
+ในการอ่านค่าจากปุ่มกด (<strong>Push Button</strong>) เช่น ทุก ๆ 10 มิลลิวินาที (<strong>10 msec</strong>)
+เมื่อเกิดอินเทอร์รัปต์จากวงจร <strong>Timer</strong> ฟังก์ชัน <strong>Timer Callback</strong>
+จะทำการตรวจสอบการเปลี่ยนแปลงสถานะของปุ่มกด พร้อมกับจับเวลาสำหรับสถานะลอจิก <strong>Low</strong> ที่คงที่อย่างน้อย <strong>50 msec*
+เพื่อกรองสัญญาณเด้ง (</strong>Bouncing**) ที่เกิดขึ้นทั้งช่วงกดและปล่อยปุ่ม
+ซึ่งช่วยให้การตรวจจับการกดปุ่มมีความแม่นยำและถูกต้องมากขึ้น</p>
+<pre><code class="language-python">from machine import Pin, Timer
+import time 
+
+SAMPLE_PERIOD_MS = 10    # Sampling interval (10 msec)
+DEBOUNCE_MS = 50         # Minimum stable time to confirm press
+
+buttonPin = Pin(2, Pin.IN, Pin.PULL_UP)  # Push button (active low)
+last_btn_value = buttonPin.value()
+last_stable_value = last_btn_value
+last_change_time = time.ticks_ms()
+click_detected = False
+
+def timer_callback(timer):
+    global last_btn_value, last_stable_value
+    global last_change_time, click_detected
+
+    value = buttonPin.value()   # Read current button state
+    now = time.ticks_ms()       # Read current time (in msec)
+    if value != last_btn_value: # Button state change detected
+        last_btn_value = value  # Save the last button state
+        last_change_time = now  # Reset debounce timer
+    else: # Stable button state
+        if time.ticks_diff(now, last_change_time) &gt;= DEBOUNCE_MS:
+            if value != last_stable_value:
+                last_stable_value = value
+                if value == 0:  # active-low press detected
+                    click_detected = True
+
+timer = Timer(0)
+timer.init(period=SAMPLE_PERIOD_MS, 
+           mode=Timer.PERIODIC, 
+           callback=timer_callback)
+
+try:
+    while True: # Main loop
+        if click_detected:
+            click_detected = False  # Reset for next press
+            print(&quot;Click detected..&quot;)
+        time.sleep(0.01)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    timer.deinit()
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex18-wave-1.jpg" /></p>
+<p><strong>รูป:</strong> การวัดสัญญาณจากวงจรปุ่มกดภายนอกเมื่อมีการกดปุ่มหนึ่งครั้ง (วัดความกว้างช่วง <strong>Low</strong> ได้ประมาณ <strong>59.3 msec</strong>)</p>
+<p><img alt="" src="ex18-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> การวัดสัญญาณจากวงจรปุ่มกดภายนอกเมื่อมีการกดปุ่มหนึ่งครั้ง (วัดความกว้างช่วง <strong>Low</strong> ได้ประมาณ <strong>31.9 msec</strong>)</p>
+<p><img alt="" src="ex18-wave-3.jpg" /></p>
+<p><strong>รูป:</strong> ช่วงเวลาที่มีการกระเด้งของปุ่มกดเมื่อมีการปล่อยปุ่มแล้ว</p>
+<p><img alt="" src="ex18-wokwi.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการทดสอบโค้ดโดยใช้ <strong>Wokwi Simulator</strong> แบบเสมือนจริง</p>
+<p><img alt="" src="ex18-demo-esp32s3.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการทดสอบโค้ดโดยใช้บอร์ด <strong>ESP32-S3</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-19-button-click-detection-with-input-sampling">&#9655; <strong>Example 19: Button Click Detection with Input Sampling</strong><a class="headerlink" href="#example-19-button-click-detection-with-input-sampling" title="Permanent link">#</a></h2>
+<p>โค้ดนี้ใช้เทคนิคเพื่ออ่านค่าอินพุตด้วยอัตราคงที่ (<strong>Input Sampling</strong>) เช่น ทุก ๆ 10 มิลลิวินาที
+แล้วเก็บค่าบิตไว้ในตัวแปร โดยเลื่อนบิตเข้าทาง <strong>LSB</strong> (<strong>Left-Shift Register</strong>) แต่จำกัดไว้ไม่เกิน 8 บิต
+จากนั้นใช้ค่าของตัวแปรนี้ตรวจหาลำดับบิตที่บ่งบอกว่าปุ่มกดหรือปล่อยจริง ทำให้สามารถกรองสัญญาณเด้ง 
+(<strong>Bounce</strong>) และตรวจจับการคลิกได้โดยไม่ต้องหน่วงเวลาในหลักโปรแกรม</p>
+<p>ปุ่มกดภายนอกทำงานแบบ <strong>Active-Low</strong> ดังนั้น ถ้ายังไม่มีการกดปุ่ม ค่าของตัวแปรจะเป็น <code>0b11111111</code>
+หรือ <code>0xFF</code> และถ้ามีการกดปุ่ม ค่าบิตบางตำแหน่งจะเริ่มเปลี่ยนเป็น <code>0</code> แต่ถ้าปล่อยปุ่มจะเปลี่ยนกลับเป็น <code>1</code>
+การตรวจสอบขอบสัญญาณอินพุตจะเป็นไปตามเงื่อนไข:</p>
+<ul>
+<li><code>0xF0</code> หมายถึง ขอบขาลง ซึ่งหมายความว่า สัญญาณจะต้องเปลี่ยนเป็น <code>0</code> ต่อเนื่องกัน 4 บิต (เท่ากับ <strong>4 x 10 = 40 msec</strong>)</li>
+<li><code>0x0F</code> หมายถึง ขอบขาขึ้น ซึ่งหมายความว่า สัญญาณจะต้องเปลี่ยนเป็น <code>1</code> ต่อเนื่องกัน 4 บิต (เท่ากับ <strong>4 x 10 = 40 msec</strong>)</li>
+</ul>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This example implements button click detection by periodically 
+# sampling the button input using a hardware timer of the ESP32. 
+# A 8-bit shift register is used to debounce the button signal 
+# by tracking recent samples to detect stable press and 
+# release patterns. 
+# The timer ISR updates the sample state and sets a flag when 
+# a click is detected, allowing the main loop to respond 
+# asynchronously without blocking or excessive polling. 
+#--------------------------------------------------------------
+from machine import Pin, Timer
+import time 
+
+SAMPLE_PERIOD_MS = 10    # Sampling interval
+
+buttonPin = Pin(2, Pin.IN, Pin.PULL_UP)  # Push button (active low)
+saved_value = 0xFF 
+state = 0
+click_detected = False
+
+def timer_callback(timer):
+    global state, saved_value, click_detected
+    saved_value = ((saved_value &lt;&lt; 1) | int(buttonPin.value())) &amp; 0xFF
+    if saved_value == 0xF0 and state == 0: # Button pressed
+        state = 1
+        click_detected = False
+    elif saved_value == 0x0F and state == 1: # Button released
+        state = 0
+        click_detected = True
+    elif saved_value == 0xFF:
+        state = 0
+
+timer = Timer(0)
+timer.init(period=SAMPLE_PERIOD_MS, 
+           mode=Timer.PERIODIC, 
+           callback=timer_callback)
+
+try:
+    clicks = 0 # Total click count
+    while True: # Main loop
+        if click_detected:
+            clicks += 1
+            click_detected = False  # Reset for next press
+            print(f&quot;Click detected.. total clicks: {clicks}&quot;)
+        time.sleep(0.01)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    timer.deinit()
+</code></pre>
+<p><img alt="" src="ex19-wokwi.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการทดสอบโค้ดโดยใช้ <strong>Wokwi Simulator</strong> แบบเสมือนจริง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-20-notification-from-isr-to-asyncio-function">&#9655; <strong>Example 20: Notification from ISR to AsyncIO Function</strong><a class="headerlink" href="#example-20-notification-from-isr-to-asyncio-function" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้ใช้วงจร <strong>Hardware Timer</strong> ของ <strong>ESP32</strong> เพื่อสลับสถานะขาออก <code>pinA</code> 
+ภายในฟังก์ชัน <strong>ISR</strong> (<strong>Timer Callback</strong>)ทุก ๆ 1 มิลลิวินาที พร้อมกับตั้งค่า 
+<code>ThreadSafeFlag</code> เพื่อแจ้งเตือนไปยังลูปหลักซึ่งรอรับสัญญาณและสลับสถานะขาออก <code>pinB</code> </p>
+<pre><code class="language-python">#--------------------------------------------------------------
+# This example uses a hardware timer on the ESP32 to toggle 
+# one output pin (pinA) inside the timer ISR every 1 ms.
+# The ISR also sets a ThreadSafeFlag to notify the asynchronous 
+# main loop, which toggles a second output pin (pinB)
+# each time it receives the notification.
+#--------------------------------------------------------------
+import uasyncio as asyncio
+from uasyncio import ThreadSafeFlag
+from machine import Pin, Timer
+
+pinA = Pin(12, Pin.OUT)
+pinB = Pin(11, Pin.OUT)
+pinA.off()
+pinB.off()
+
+# Create the flag for notification from ISR to async. function
+flag = ThreadSafeFlag()
+
+# Timer callback (ISR)
+def timer_callback(timer):
+    pinA.toggle() # Toggle pin A
+    flag.set()    # Notify main loop
+
+timer = Timer(0)
+timer.init(period=1, mode=Timer.PERIODIC, callback=timer_callback) 
+
+async def main():
+    while True:
+        await flag.wait() # Wait until timer ISR sets the flag
+        pinB.toggle()     # Toggle pin B
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    timer.deinit()
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex20-wave-1.jpg" /></p>
+<p><img alt="" src="ex20-wave-2.jpg" /></p>
+<p><img alt="" src="ex20-wave-3.jpg" /></p>
+<p><strong>รูป:</strong> การวัดสัญญาณ <code>pinA</code> กับ <code>pinB</code> และวัดระยะเวลาในการตอบสนอง
+เมื่อฟังก์ชัน <code>main()</code> ได้รับการแจ้งเตือนจากฟังก์ชัน <strong>ISR</strong> ในแต่ละครั้ง
+(วัดระยะเวลาตอบสนองได้ประมาณ <strong>90 usec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอเนื้อหาตอนที่ 2 ที่มีตัวอย่างการเขียนโค้ด เพื่อใช้งาน <strong>GPIO</strong> (ดิจิทัล) ของ <strong>ESP32</strong> เบื้องต้น 
+เช่น การใช้งาน <strong>LED</strong> เป็นเอาต์พุต และการใช้ปุ่มกดแบบ <strong>Push Button</strong> เป็นอินพุต 
+ได้มีการนำเสนอและเปรียบเทียบรูปแบบการเขียนโค้ดที่แตกต่างกันสำหรับการใช้คำสั่ง
+หรือไลบรารีต่าง ๆ ของ <strong>MicroPython</strong> และมีตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> 
+เพื่อศึกษาพฤติกรรมการทำงานของโค้ด <strong>MicroPython</strong> และช่วยให้เข้าใจหลักการทำงานของ <strong>MicroPython</strong> 
+สำหรับ <strong>ESP32 / ESP32-S3</strong> ได้ดีขึ้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-08-12 | Last Updated: 2025-08-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

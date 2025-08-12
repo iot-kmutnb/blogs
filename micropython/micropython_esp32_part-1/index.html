@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/micropython/micropython_esp32_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#micropython-espressif-esp32-1" class="nav-link">ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#micropython-esp32" class="nav-link">&#9655; การทดลองโค้ด MicroPython สำหรับ ESP32</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-1-led-blink-with-time-delay" class="nav-link">&#9655; Example 1: LED Blink with Time Delay</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-2-led-blink-without-time-delay" class="nav-link">&#9655; Example 2: LED Blink without Time Delay</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-3-multi-threaded-led-blinking" class="nav-link">&#9655; Example 3: Multi-threaded LED Blinking</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-4-led-blink-with-coroutines" class="nav-link">&#9655; Example 4: LED Blink with Coroutines</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-5-led-blink-with-esp32-timer" class="nav-link">&#9655; Example 5: LED Blink with ESP32 Timer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-6-dual-gpio-toggle-with-multi-threading" class="nav-link">&#9655; Example 6: Dual-GPIO Toggle with Multi-Threading</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-7-dual-gpio-toggle-with-asyncio" class="nav-link">&#9655; Example 7: Dual-GPIO Toggle with Asyncio</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-8-dual-gpio-toggle-with-esp32-timers" class="nav-link">&#9655; Example 8: Dual-GPIO Toggle with ESP32 Timers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-9-dual-gpio-toggle-with-event-based-synchronization" class="nav-link">&#9655; Example 9: Dual-GPIO Toggle with Event-based Synchronization</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-espressif-esp32-1">ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 1)<a class="headerlink" href="#micropython-espressif-esp32-1" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Espressif SoCs</em>, <em>ESP32 / ESP32-S3</em>, 
+<em>Thonny IDE</em>, <em>Arduino Lab for MicroPython</em>, <em>Wokwi</em></p>
+<ul>
+<li><a href="#micropython-esp32"><strong>การทดลองโค้ด MicroPython สำหรับ ESP32</strong></a></li>
+<li><a href="#example-1-led-blink-with-time-delay"><strong>Example 1: LED Blink with Time Delay</strong></a></li>
+<li><a href="#example-2-led-blink-without-time-delay"><strong>Example 2: LED Blink without Time Delay</strong></a></li>
+<li><a href="#example-3-multi-threaded-led-blinking"><strong>Example 3: LED Blink with Multi-Threading</strong></a></li>
+<li><a href="#example-4-led-blink-with-coroutines"><strong>Example 4: LED Blink with Coroutines</strong></a></li>
+<li><a href="#example-5-led-blink-with-esp32-timer"><strong>Example 5: LED Blink with ESP32 Timer</strong></a></li>
+<li><a href="#example-6-dual-gpio-toggle-with-multi-threading"><strong>Example 6: Dual-GPIO Toggle with Multi-Threading</strong></a></li>
+<li><a href="#example-7-dual-gpio-toggle-with-asyncio"><strong>Example 7: Dual-GPIO Toggle with Asyncio</strong></a></li>
+<li><a href="#example-8-dual-gpio-toggle-with-esp32-timers"><strong>Example 8: Dual-GPIO Toggle with ESP32 Timers</strong></a></li>
+<li><a href="#example-9-dual-gpio-toggle-with-event-based-synchronization"><strong>Example 9: Dual-GPIO Toggle with Event-based Synchronization</strong></a></li>
+</ul>
+<hr />
+<h2 id="micropython-esp32">&#9655; <strong>การทดลองโค้ด MicroPython สำหรับ ESP32</strong><a class="headerlink" href="#micropython-esp32" title="Permanent link">#</a></h2>
+<p>บทความนี้ซึ่งแบ่งออกเป็นหลายตอน นำเสนอตัวอย่างการเขียนโค้ด <strong>MicroPython</strong> สำหรับไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+เพื่อแสดงให้เห็นรูปแบบการเขียนโค้ดสำหรับ <strong>Embedded Systems Programming</strong> และการทำงานของไมโครคอนโทรลเลอร์ <strong>ESP32</strong>
+และได้มีการทดลองใช้กับบอร์ด <strong>ESP32 / ESP32-S3</strong> 
+ร่วมกับ <strong>MicroPython Firmware v1.26</strong> มีการใช้ซอฟต์แวร์ดังต่อไปนี้ ในการเขียนและรันโค้ด  </p>
+<ul>
+<li><a href="https://thonny.org/"><strong>Thonny IDE (offline)</strong></a> </li>
+<li><a href="https://labs.arduino.cc/en/labs/micropython"><strong>Arduino Lab for MicroPython (web-based)</strong></a></li>
+<li><a href="https://wokwi.com/projects/new/micropython-esp32"><strong>WokWi Simulator</strong></a></li>
+</ul>
+<p>ในบทความนี้ มีตัวอย่างการเขียนโค้ด เพื่อใช้งาน <strong>GPIO</strong> (ดิจิทัล) ของ <strong>ESP32</strong> เบื้องต้น
+มีการนำเสนอและเปรียบเทียบรูปแบบการเขียนโค้ด เพื่อทำให้เกิดการเปลี่ยนสถานะลอจิกสำหรับขาเอาต์พุต <strong>GPIO</strong> เช่น การทำงานแบบมัลติเธรด
+(<strong>Multi-threading</strong>) การใช้ฟังก์ชันของ <code>uasyncio</code> (<strong>Asynchronous Programming</strong>) 
+การใช้วงจร <strong>Hardware Timer</strong> ของชิป <strong>ESP32</strong> เพื่อให้เกิดการทำงานของฟังก์ชันซ้ำด้วยอัตราคงที่ เป็นต้น
+นอกจากนั้นแล้ว ยังมีตัวอย่างการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> เพื่อศึกษาพฤติกรรมการทำงานของโค้ด <strong>MicroPython</strong></p>
+<p>แนะนำให้ผู้อ่านได้ศึกษาการใช้ซอฟต์แวร์ที่เกี่ยวข้องสำหรับ <strong>MicroPython-ESP32</strong> จากบทความ
+<a href="../micropython_esp32/">"<strong>การเขียนโปรแกรม MicroPython สำหรับบอร์ด Espressif ESP32</strong>"</a></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-1-led-blink-with-time-delay">&#9655; <strong>Example 1: LED Blink with Time Delay</strong><a class="headerlink" href="#example-1-led-blink-with-time-delay" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการทำให้ <strong>LED</strong> กระพริบ 
+โดยเขียนค่าลอจิกสลับกันไป และเลือกใช้ขา <strong>GPIO 22</strong> เป็นเอาต์พุต มีการหน่วงเวลาในแต่ละครั้ง โดยใช้คำสั่ง<code>time.sleep()</code></p>
+<p>ข้อสังเกต: การเลือกใช้หมายเลขขา <strong>GPIO</strong> อาจต้องปรับให้เหมาะสมกับขาสำหรับวงจร <strong>LED</strong>
+ของบอร์ด <strong>ESP32</strong> ที่ใช้งานจริง</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# MicroPython-ESP32 Example: Different ways to blink an LED.
+# This script shows how to toggle an LED and use the time.sleep() function
+# to delay between consecutive LED toggles.
+#-------------------------------------------------------------------------
+from machine import Pin      # Import Pin class to control GPIO pins
+from time import sleep       # Import sleep function for delays
+
+# Create a Pin object for GPIO22 configured as an output
+led = Pin(22, Pin.OUT)
+
+# The main loop
+while True:
+    value = led.value()          # Read the current LED state
+    led.value( not value )       # Toggle the output.
+    print(f&quot;LED: {led.value()}&quot;) # Print the current LED state 
+    sleep(0.5)                   # Wait 0.5 seconds (blocking call)
+#-------------------------------------------------------------------------
+</code></pre>
+<p><img alt="" src="ex1-arduino-lab-micropython.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการใช้งานซอฟต์แวร์ <strong>Arduino Lab for MicroPython</strong>  ร่วมกับบอร์ด <strong>ESP32-S3</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-2-led-blink-without-time-delay">&#9655; <strong>Example 2: LED Blink without Time Delay</strong><a class="headerlink" href="#example-2-led-blink-without-time-delay" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้แตกต่างจากตัวแรก โดยหลีกเลี่ยงการใช้ฟังก์ชันหน่วงเวลาในไลบรารี <code>time</code> เช่น <code>sleep()</code>
+หรือ <code>sleep_ms()</code> ซึ่งเป็นคำสั่งประเภท <strong>blocking call</strong> แต่ใช้วิธีตรวจสอบเวลาที่ผ่านไปจากการสลับสถานะลอจิกครั้งก่อน 
+โดยใช้ฟังก์ชัน <code>time.ticks_diff(...)</code> เปรียบผลต่างของค่าเวลา (หน่วยมิลลิวินาที) 
+หากมีค่ามากกว่าหรือเท่ากับระยะเวลาที่กำหนดไว้ ก็จะสลับสถานะลอจิกอีกครั้ง</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This version avoids time.sleep() and uses time.ticks_ms() 
+# with time.ticks_diff() for a non-blocking delay, so other code 
+# can run in the same loop without being paused.
+#-------------------------------------------------------------------------
+from machine import Pin     # Import Pin class to control GPIO pins
+import time                 # Import time functions for timing operations
+
+led = Pin(22, Pin.OUT)      # Setup LED pin (GPIO 22) as output
+interval_msec = 500         # Set the time interval for LED update
+last_time = time.ticks_ms() # Store the last recorded time in msec
+
+# The main loop
+while True:
+    # Get the current time in milliseconds
+    now = time.ticks_ms()
+    # Check if the time interval has passed since the last toggle
+    if time.ticks_diff(now, last_time) &gt;= interval_msec:
+        last_time = now              # Update the last_time variable
+        led.value(not led.value())   # Toggle the LED state
+        print(f&quot;LED: {led.value()}&quot;) # Print the current LED state
+#-------------------------------------------------------------------------
+</code></pre>
+<p><img alt="" src="ex2-wokwi-sim.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการใช้งานซอฟต์แวร์ <strong>Wokwi Simulator</strong>  จำลองการทำงานของโค้ด
+<strong>MicroPython</strong> ด้วยบอร์ด <strong>ESP32</strong> แบบเสมือนจริง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-3-multi-threaded-led-blinking">&#9655; <strong>Example 3: Multi-threaded LED Blinking</strong><a class="headerlink" href="#example-3-multi-threaded-led-blinking" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งานไลบรารี <code>_thread</code> เพื่อใช้เรียกหรือรันฟังก์ชันในรูปแบบของ
+"เธรด" (<strong>Thread</strong>) ซึ่งสามารถทำงานได้พร้อม ๆ กัน (<strong>Concurrency</strong>)</p>
+<ul>
+<li>ฟังก์ชัน <code>toggle_led_state(...)</code> ทำหน้าที่สลับสถานะลอจิกและหน่วงเวลาตามที่กำหนด (ทุก ๆ 0.5 วินาที)</li>
+<li>ฟังก์ชัน <code>print_led_state(...)</code> ตรวจสอบการเปลี่ยนแปลงค่าลอจิกของ <strong>GPIO</strong> ทุก ๆ 1 มิลลิวินาที
+และถ้ามีการเปลี่ยนแปลงก็จะแสดงค่าลอจิกล่าสุด</li>
+</ul>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script demonstrates using MicroPython's _thread module to blink
+# an LED and print the LED state changes in two separate threads.
+# It shows how to use _thread in MicroPython, but there is a better way
+# to do this task (=&gt; use asyncio or timer).
+#-------------------------------------------------------------------------
+from machine import Pin       # Import Pin class to control GPIO pins
+from time import sleep_ms     # Import millisecond sleep function
+import _thread                # Import MicroPython threading support
+import time                   # Import MicroPython time library
+import gc                     # Import MicroPython garbage collector
+
+# Create a Pin object for GPIO 22 configured as an output
+led = Pin(22, Pin.OUT)
+
+# Global variable to store the last LED state
+last_led_state = led.value()
+
+# Define a function as the entry point for a thread
+# This toggles the LED state every 500msec.
+def toggle_led_state(pin):
+    while True:
+        pin.value(not pin.value())    # Toggle the LED state
+        sleep_ms(500)                 # Wait for 500 msec
+
+# Define a function as the entry point for a thread
+# This checks the LED state change every 1 msec
+# and prints only when the state changes.
+def print_led_state(pin):
+    global last_led_state
+    while True:
+        if last_led_state != pin.value():   # LED state change detected
+            last_led_state = pin.value()    # Update the stored LED state
+            print(f&quot;LED: {last_led_state}&quot;) # Print the LED state
+        sleep_ms(1)                         # Wait for 1 ms
+
+# Start two new threads
+_thread.start_new_thread(toggle_led_state, (led,))
+_thread.start_new_thread(print_led_state, (led,))
+
+# The main loop
+while True:
+    pass
+</code></pre>
+<p><img alt="" src="ex3-thonny.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการใช้ซอฟต์แวร์ <strong>Thonny IDE</strong> เพื่อรันโค้ดตัวอย่างโดยใช้บอร์ด <strong>ESP32</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-4-led-blink-with-coroutines">&#9655; <strong>Example 4: LED Blink with Coroutines</strong><a class="headerlink" href="#example-4-led-blink-with-coroutines" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้คำสั่งของไลบรารี <code>uasyncio</code>  สำหรับ <strong>MicroPython</strong>
+โดยประกอบด้วยฟังก์ชันแบบ <strong>Coroutine</strong> สองฟังก์ชัน (หรือเรียกว่า <strong>Async Function</strong>) ได้แก่</p>
+<ul>
+<li>ฟังก์ชัน <code>toggle_led_state(...)</code> ทำหน้าที่สลับสถานะลอจิกและหน่วงเวลาตามที่กำหนด (ทุก ๆ 0.5 วินาที)</li>
+<li>ฟังก์ชัน <code>print_led_state(...)</code> ตรวจสอบการเปลี่ยนแปลงค่าลอจิกของ <strong>GPIO</strong> ทุก ๆ 1 มิลลิวินาที
+และถ้ามีการเปลี่ยนแปลงก็จะแสดงค่าลอจิกล่าสุด</li>
+</ul>
+<p>ทั้งสองฟังก์ชันนี้ จะทำงานได้โดยสลับช่วงเวลาการทำงาน โดยมี <strong>Asyncio Scheduler</strong> 
+ทำหน้าที่เป็นตัวกำหนดว่า จะให้ฟังก์ชันใดทำงานในช่วงเวลาใด</p>
+<p>ในแต่ละฟังก์ชัน มีการใช้คำสั่ง <code>await asyncio.sleep(...)</code> เมื่อทำคำสั่งดังกล่าว
+การทำงานของฟังก์ชัน จะหยุดชั่วคราว และถูกสลับให้ฟังก์ชันอื่นได้ทำงานต่อไป</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This code demonstrates how to use MicroPython's uasyncio library 
+# to run multiple asynchronous tasks concurrently on an ESP32.
+# The use of asyncio allows these tasks to share CPU time efficiently
+# without blocking each other or requiring multiple threads.
+#-------------------------------------------------------------------------
+from machine import Pin       # Import Pin class to control GPIO pins
+import uasyncio as asyncio    # Import MicroPython asyncio
+
+# Create a Pin object for GPIO 22 configured as an output
+led = Pin(22, Pin.OUT)
+
+last_led_state = led.value() # Store the last LED state (initially)
+
+# Async task to toggle the LED every 500 ms
+async def toggle_led_state():
+    while True:
+        led.value(not led.value())   # Toggle the LED state
+        await asyncio.sleep(0.5)     # Non-blocking delay 500 ms
+
+# Async task to check and print LED state changes every 10 ms
+async def print_led_state():
+    global last_led_state
+    while True:
+        current_state = led.value()
+        if last_led_state != current_state:  # LED state change detected
+            last_led_state = current_state   # Update stored state
+            print(f&quot;LED: {last_led_state}&quot;)  # Print LED state
+        await asyncio.sleep_ms(10)           # Non-blocking delay 10 ms
+
+# Main coroutine to run both tasks concurrently
+async def main():
+    # Run toggle_led_state() and print_led_state() concurrently
+    await asyncio.gather(toggle_led_state(), print_led_state())
+
+# Run the asyncio event loop
+asyncio.run(main())
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-5-led-blink-with-esp32-timer">&#9655; <strong>Example 5: LED Blink with ESP32 Timer</strong><a class="headerlink" href="#example-5-led-blink-with-esp32-timer" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ได้ใช้วงจร <strong>Hardware Timer</strong> ภายในชิป <strong>ESP32</strong> ทำให้เกิดการรันฟังก์ชันซ้ำตามคาบเวลาได้
+โดยไม่ต้องใช้เธรด (<strong>Thread</strong>) หรือการหน่วงเวลาในลูปหลัก
+ฟังก์ชันประเภทนี้เรียกว่า ฟังก์ชัน <strong>Timer Callback</strong> ในตัวอย่างนี้ได้แก่
+<code>toggle_led_callback(...)</code> และ <code>print_led_state_callback(...)</code>
+และมีข้อสังเกตว่า การทำงานของฟังก์ชัน <strong>Timer Callback</strong> 
+จะต้องไม่มีการหน่วงเวลา และทำคำสั่งทั้งหมดของฟังก์ชันให้แล้วเสร็จ</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script demonstrates using MicroPython's machine.Timer
+# to blink an LED and print its state periodically without threads.
+# Timers execute callback functions in the background at fixed intervals.
+#-------------------------------------------------------------------------
+# Import Pin for GPIO, Timer for periodic tasks
+from machine import Pin, Timer  
+
+# Create a Pin object for GPIO 22 configured as output
+led = Pin(22, Pin.OUT)
+
+# Store last LED state for change detection
+last_led_state = led.value()
+
+# A timer callback: toggles LED every 500 ms
+def toggle_led_callback(timer):
+    led.value(not led.value())  # Toggle LED state
+
+# A timer callback: checks LED state every 1 ms and prints on change
+def print_led_state_callback(timer):
+    global last_led_state
+    current_state = led.value()
+    if current_state != last_led_state:
+        last_led_state = current_state
+        print(f&quot;LED: {current_state}&quot;)
+
+# Create and start timers
+# Timer 0: Toggle LED every 500 ms
+toggle_timer = Timer(0)
+toggle_timer.init(period=500, mode=Timer.PERIODIC, 
+                  callback=toggle_led_callback)
+
+# Timer 1: Monitor the LED state every 1 ms
+print_timer = Timer(1)
+print_timer.init(period=1, mode=Timer.PERIODIC, 
+                 callback=print_led_state_callback)
+
+# The main loop does nothing, timers work in the background
+while True:
+    pass
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-6-dual-gpio-toggle-with-multi-threading">&#9655; <strong>Example 6: Dual-GPIO Toggle with Multi-Threading</strong><a class="headerlink" href="#example-6-dual-gpio-toggle-with-multi-threading" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้ไลบรารี <code>_thread</code> เพื่อรันฟังก์ชันที่ทำหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong> โดยไม่มีการหน่วงเวลา
+ในตัวอย่างจะใช้สองขา คือ <strong>GPIO11</strong> และ <strong>GPIO12</strong> ทำงานในเธรดแยกจากกัน
+ผู้ใช้สามารถนำบอร์ดไปเชื่อมต่อกับอุปกรณ์ตรวจวัดสัญญาณ เช่น <strong>USB Logic Analyzer</strong> 
+เพื่อดูรูปแบบคลื่นสัญญาณเอาต์พุตที่ได้จากทั้งสองขา</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script shows how to toggle two pins (e.g. GPIO11 and GPIO12)
+# in separate threads as fast as possible (no delays in loops)
+#-------------------------------------------------------------------------
+import _thread
+from machine import Pin
+
+# Configure pins as outputs
+pins = [Pin(11, Pin.OUT), Pin(12, Pin.OUT)]
+
+# Thread function: toggle pin as fast as possible
+def toggle_pin(pin):
+    while True:
+        pin.value(not pin.value())
+
+# Start threads
+for pin in pins:
+    _thread.start_new_thread(toggle_pin, (pin,))
+
+# Main loop does nothing — threads run independently
+while True:
+    pass
+#-------------------------------------------------------------------------
+</code></pre>
+<p>ตัวอย่างการใช้อุปกรณ์ <strong>USB Logic Analyzer</strong> ร่วมกับซอฟต์แวร์ <strong>PulseView</strong> 
+เพื่อวัดสัญญาณ ได้ผลดังนี้</p>
+<p><img alt="" src="ex6-wave-1.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างคลื่นสัญญาณเอาต์พุตที่ขา <strong>GPIO11</strong> และ <strong>GPIO12</strong></p>
+<p>จากรูปจะเห็นได้ว่า แต่ละเธรดนั้น จะทำงานตามฟังก์ชัน <code>toggle_pin(...)</code>
+ที่ได้กำหนดไว้ แต่ใช้กับขา <strong>GPIO</strong> ต่างกัน ในช่วงเวลาใดถ้าฟังก์ชันรันโค้ด จะเห็นว่า สัญญาณมีการเปลี่ยนแปลงสถานะลอจิก
+แต่จะไม่สามารถทำงานต่อเนื่องได้ เกิดการหยุดชั่วคราว (ช่วงนั้นไม่มีการสร้างสัญญาณพัลส์ออกมา)
+และถูกสลับให้อีกฟังก์ชันหนึ่งได้รันโค้ดบ้าง ซึ่งเป็นไปตามรูปแบบการทำงานของ
+<strong>Multi-threading</strong> โดยสลับกันไปเป็นช่วง ๆ แต่ละช่วงมีระยะเวลาประมาณ <strong>~130 usec</strong> (ไมโครวินาที)</p>
+<p><img alt="" src="ex6-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> การวัดช่วงเวลาการทำงานของแต่ละฟังก์ชันก่อนถูกสลับให้ฟังก์ชันอื่นทำงานบ้าง</p>
+<p><img alt="" src="ex6-wave-3.jpg" /></p>
+<p><strong>รูป:</strong> การวัดช่วงความกว้างของสัญญาณพัลส์ ซึ่งได้ค่าประมาณ <strong>4 usec</strong></p>
+<p>จากรูปคลื่นสัญญาณจะเห็นได้ว่า พัลส์ที่เกิดขึ้นมีความกว้างช่วงที่เป็นลอจิก <strong>High</strong> ประมาณ  <strong>4 usec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-7-dual-gpio-toggle-with-asyncio">&#9655; <strong>Example 7: Dual-GPIO Toggle with Asyncio</strong><a class="headerlink" href="#example-7-dual-gpio-toggle-with-asyncio" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ได้เปลี่ยนจากการใช้ <code>_thread</code> มาเป็น <a href="https://docs.micropython.org/en/latest/library/asyncio.html"><code>uasyncio</code></a>
+เพื่อรันฟังก์ชันที่ทำหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong> โดยไม่มีการหน่วงเวลา
+ในตัวอย่างจะใช้สองขา คือ <strong>GPIO11</strong> และ <strong>GPIO12</strong> ทำงานแยกจากกัน</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script shows how to toggle two pins (e.g. GPIO11 and GPIO12)
+# using asyncio coroutines instead of threads.
+#-------------------------------------------------------------------------
+import uasyncio as asyncio
+from machine import Pin
+
+# Configure pins as outputs
+pins = [Pin(11, Pin.OUT), Pin(12, Pin.OUT)]
+
+# Coroutine: toggle pin as fast as possible
+async def toggle_pin(pin):
+    while True:
+        pin.value(not pin.value())  # Toggle the output
+        await asyncio.sleep_ms(0)   # Yield to other coroutine
+
+# Main entry point
+async def main():
+    # Create toggle tasks for each pin
+    tasks = [asyncio.create_task(toggle_pin(pin)) for pin in pins]
+    await asyncio.gather(*tasks)
+
+# Run event loop
+asyncio.run(main())
+</code></pre>
+<p>จากผลการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> จะเห็นได้ว่า
+ทั้งสองฟังก์ชันมีการสลับการทำงานทุก ๆ <strong>~148 usec</strong> จึงเห็นเป็นรูปคลื่นสัญญาณสี่เหลี่ยมที่ขา <strong>GPIO</strong> ทั้งสอง</p>
+<p><img alt="" src="ex7-wave-1.jpg" /></p>
+<p><img alt="" src="ex7-wave-2.jpg" /></p>
+<p><img alt="" src="ex7-wave-3.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณเมื่อไม่มีการหน่วงเวลา โดยใช้ <code>await asyncio.sleep_ms(0)</code></p>
+<p>&nbsp;</p>
+<p>แต่ถ้าเปลี่ยนจากกรณีแรกที่ใช้ <code>await asyncio.sleep_ms(0)</code> ซึ่งจะไม่มีการหน่วงเวลา
+(และเป็นการส่งต่อให้อีกฟังก์ชันหนึ่งได้ทำงานต่อไป) ให้มีการหน่วงเวลา เช่น
+ให้มีการหน่วงเวลาไว้อย่างน้อย <strong>1 msec</strong> และ <strong>10 msec</strong>
+(มิลลิวินาที) ตามลำดับ โดยใช้คำสั่งต่อไปนี้ แล้วลองวัดสัญญาณเอาต์พุต ดูความแตกต่าง</p>
+<ul>
+<li><code>await asyncio.sleep_ms(1)</code></li>
+<li><code>await asyncio.sleep_ms(10)</code></li>
+</ul>
+<pre><code class="language-python"># Coroutine: toggle pin as fast as possible
+async def toggle_pin(pin):
+    while True:
+        pin.value(not pin.value())  # Toggle the output
+        await asyncio.sleep_ms(1)   # Sleep for 1 msec
+</code></pre>
+<p>ในกรณีที่สองนี้ จากผลการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> แสดงให้เห็นได้ว่า
+ทั้งสองฟังก์ชันมีการสลับการทำงานจริง แต่ให้ผลแตกต่างจากกรณีแรกอย่างชัดเจน
+และการหน่วงเวลาประมาณ <strong>1msec</strong> ในความเป็นจริง จะใช้เวลามากกว่านั้น เช่น วัดได้ถึง <strong>10 msec</strong></p>
+<p><img alt="" src="ex7-wave-4.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณเมื่อหน่วงเวลาด้วย <code>await asyncio.sleep_ms(1)</code></p>
+<p><img alt="" src="ex7-wave-5.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณเมื่อหน่วงเวลาด้วย <code>await asyncio.sleep_ms(10)</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-8-dual-gpio-toggle-with-esp32-timers">&#9655; <strong>Example 8: Dual-GPIO Toggle with ESP32 Timers</strong><a class="headerlink" href="#example-8-dual-gpio-toggle-with-esp32-timers" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการใช้วงจร <strong>Hardware Timer</strong> ของชิป <strong>ESP32</strong> ซึ่งสามารถใช้ได้ถึง 4 ชุด
+(<strong>Hardware Timer 0..3</strong>) และนำมาเปิดใช้งานจำนวน 2 ชุด เพื่อสร้างสัญญาณอินเทอร์รัพท์
+และจะเกิดเหตุการณ์ทุก ๆ 1 มิลลิวินาที และทำคำสั่งของฟังก์ชันที่เป็น <strong>Timer Callback</strong> ตามที่กำหนดไว้
+การทำงานของฟังก์ชัน <strong>Timer Callback</strong> จะต้องไม่มีการหน่วงเวลา และทำคำสั่งทั้งหมดของฟังก์ชันให้แล้วเสร็จ</p>
+<p><strong>ข้อสังเกต:</strong> ระยะเวลาในการเกิดอินเทอร์รัพท์ น้อยที่สุดคือ <strong>1 msec</strong> หรือ กำหนดความถี่ได้สูงสุดไม่เกิน <strong>1kHz</strong></p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script toggles two GPIO pins (GPIO11 &amp; GPIO12) using ESP32 timers.
+# Each pin is toggled periodically by its own timer interrupt callback,
+# allowing very precise and efficient toggling without blocking the CPU.
+#-------------------------------------------------------------------------
+from machine import Pin, Timer 
+
+# Configure pins as outputs
+pins = [Pin(11, Pin.OUT), Pin(12, Pin.OUT)]
+
+# Create a timer callback function to toggle a GPIO pin
+def make_toggle_callback(pin):
+    def toggle_pin(timer):
+        pin.value(not pin.value())
+    return toggle_pin # Return a Timer callback function
+
+# Create timers and start them
+TIMER_PERIOD_MSEC = 1
+timers = []
+callbacks = []
+for i, pin in enumerate(pins):
+    tim = Timer(i)  # Create a hardware timer object
+    timers.append(tim)
+    callbacks.append(make_toggle_callback(pin))
+for i, tim in enumerate(timers):
+    tim.init(period=TIMER_PERIOD_MSEC, mode=Timer.PERIODIC, 
+             callback=callbacks[i]) # Start timer
+while True:
+    pass
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วย <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex8-wave-1.jpg" /></p>
+<p><img alt="" src="ex8-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณทั้งสองช่อง วัดความกว้างของหนึ่งคาบได้ <strong>1 msec</strong> หรือ มีความถี่เท่ากับ <strong>1 kHz</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-9-dual-gpio-toggle-with-event-based-synchronization">&#9655; <strong>Example 9: Dual-GPIO Toggle with Event-based Synchronization</strong><a class="headerlink" href="#example-9-dual-gpio-toggle-with-event-based-synchronization" title="Permanent link">#</a></h2>
+<p>โค้ดในตัวอย่างนี้สาธิตการสร้างฟังก์ชันแบบ <strong>Coroutine</strong> โดยมีสองฟังก์ชันที่ทำหน้าที่สลับสถานะลอจิกที่ขาเอาต์พุต
+ที่ขา <strong>GPIO11</strong> และ <strong>GPIO12</strong> ทั้งสองมีการสื่อสารกันโดยใช้ <strong>Events</strong> เพื่อส่งต่อลำดับการทำงานให้ทำงานสลับกัน</p>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งาน ฟังก์ชันแบบ <strong>Coroutine</strong> (ทำงานแบบอะซิงโครนัส) จำนวน 2 ฟังก์ชัน 
+โดยแต่ละฟังก์ชันมีหน้าที่สลับสถานะลอจิก (<strong>Toggle</strong>) ที่ขาเอาต์พุต <strong>GPIO11</strong> และ <strong>GPIO12</strong> ตามลำดับ
+ฟังก์ชันทั้งสองทำงานสลับกันโดยอาศัย <strong>Event</strong> จากไลบรารี <code>uasyncio</code> ทำหน้าที่เป็นตัว "ส่งต่อสิทธิ์" 
+(<strong>Token Passing</strong>) เพื่อควบคุมลำดับการทำงานไม่ให้ทำงานพร้อมกัน แต่จะรอให้ฟังก์ชันหนึ่งเสร็จก่อนแล้วส่งสิทธิ์ไปให้อีกฟังก์ชัน</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This script demonstrates token passing synchronization (using events)
+# between two async tasks, each toggling a separate GPIO pin alternately.
+#-------------------------------------------------------------------------
+import uasyncio as asyncio    # Import asyncio for async support
+from machine import Pin       # Import Pin class to control GPIO pins
+
+# Initialize two output pins (GPIO11 and GPIO12)
+pins = [Pin(11, Pin.OUT), Pin(12, Pin.OUT)]  
+# Create two Event objects for synchronization between two tasks
+events = [asyncio.Event(), asyncio.Event()] 
+
+async def task(id, pins, events):
+    # Compute the index of the next task in a circular manner
+    next_id = (id + 1) % len(pins)  
+    pin = pins[id]
+    event = events[id]
+    while True:
+        await event.wait()           # Wait until this task's event is set
+        event.clear()                # Clear the event
+        pin.value(not pin.value())   # Toggle the pin state
+        await asyncio.sleep_ms(1)     # Wait for 1 msec
+        events[next_id].set()        # Notify the next task
+
+async def main():
+    events[0].set()  # Set the first event to start the token passing with task 0
+    for i, _ in enumerate(pins):
+        asyncio.create_task(task(i, pins, events))  # Create async task
+    await asyncio.sleep(10)  # Run the event loop for 10 seconds before exiting
+
+#asyncio.run(main())  # Start the asyncio event loop and run main()
+
+try:
+    # Gets the async &quot;scheduler&quot;
+    loop = asyncio.get_event_loop()
+    # Runs that coroutine until it's completely done
+    loop.run_until_complete(main())
+
+except KeyboardInterrupt:
+    # This part runs when Ctrl+C is pressed
+    print(&quot;Program stopped. Exiting...&quot;)
+    # Stop the async scheduler
+    loop.stop() 
+</code></pre>
+<p>จากการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> พบว่า:</p>
+<ul>
+<li><strong>สัญญาณเดียวกัน</strong>: การเปลี่ยนสถานะลอจิกสองครั้งถัดกันของสัญญาณเดียวกัน มีระยะห่าง <strong>20 msec</strong> เนื่องจากในโค้ดกำหนดให้แต่ละฟังก์ชันรอให้ฟังก์ชันอีกตัวทำงานเสร็จ (ให้หน่วงไว้อย่างน้อย <strong>1 msec</strong>) ก่อนที่จะได้รับสิทธิ์ทำงานอีกครั้ง ทำให้รอบการทำงานของสัญญาณเดียวกันกินเวลาของทั้งสองฟังก์ชันรวมกัน</li>
+<li><strong>สัญญาณต่างกัน</strong>: เมื่อเปรียบเทียบการเปลี่ยนสถานะระหว่างสองสัญญาณ จะพบว่ามีระยะห่างเพียง <strong>10 msec</strong> เพราะทั้งสองฟังก์ชันทำงานสลับกัน ทำให้หลังจากฟังก์ชันหนึ่งสลับสถานะแล้ว อีกฟังก์ชันจะสลับต่อทันทีในครึ่งรอบเวลา</li>
+</ul>
+<p><img alt="" src="ex9-wave-1.jpg" /></p>
+<p><img alt="" src="ex9-wave-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณทั้งสองช่อง (<strong>GPIO-11</strong> และ <strong>GPIO-12</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอเนื้อหาตอนที่ 1 ที่มีตัวอย่างการเขียนโค้ด เพื่อใช้งาน <strong>GPIO</strong> (ดิจิทัล) ของ <strong>ESP32</strong> เบื้องต้น
+ได้มีการนำเสนอและเปรียบเทียบรูปแบบการเขียนโค้ดที่แตกต่างกันสำหรับการใช้คำสั่ง
+หรือไลบรารีต่าง ๆ ของ <strong>MicroPython</strong> และมีตัวอย่างการวัดสัญญาณด้วย
+<strong>USB Logic Analyzer</strong> เพื่อศึกษาพฤติกรรมการทำงานของโค้ด <strong>MicroPython</strong> และช่วยให้เข้าใจหลักการทำงานของ <strong>MicroPython</strong> สำหรับ <strong>ESP32 / ESP32-S3</strong> ได้ดีขึ้น</p>
+<p>บทความถัดไป: <a href="../micropython_esp32_part-2/">"<strong>ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 2)</strong></a></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-08-11 | Last Updated: 2025-08-12</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
