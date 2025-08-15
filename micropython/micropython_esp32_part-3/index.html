@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/micropython/micropython_esp32_part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#micropython-espressif-esp32-3" class="nav-link">ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#example-21-using-esp32-timer-for-an-interrupt-driven-task" class="nav-link">&#9655; Example 21: Using ESP32 Timer for an Interrupt-driven Task</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-22-using-esp32-timer-in-one-shot-and-periodic-modes" class="nav-link">&#9655; Example 22: Using ESP32 Timer in One-Shot and Periodic Modes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-23-multi-pin-io-toggle-using-multiple-esp32-timers" class="nav-link">&#9655; Example 23: Multi-Pin I/O Toggle Using Multiple ESP32 Timers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-24-software-timer-for-periodic-tasks" class="nav-link">&#9655; Example 24: Software Timer for Periodic Tasks</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-25-push-button-interrupt-with-deferred-execution" class="nav-link">&#9655; Example 25: Push Button Interrupt with Deferred Execution</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-26-event-driven-led-toggle-using-push-button-interrupt" class="nav-link">&#9655; Example 26: Event-Driven LED Toggle Using Push Button Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-27-quadrature-pulse-signal-generation-with-asyncio-delays" class="nav-link">&#9655; Example 27: Quadrature Pulse Signal Generation with AsyncIO Delays</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-28-generating-quadrature-pulse-signals-using-hardware-timer" class="nav-link">&#9655; Example 28: Generating Quadrature Pulse Signals Using Hardware Timer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#example-29-generating-quadrature-pulse-signals-using-esp32-rmts" class="nav-link">&#9655; Example 29: Generating Quadrature Pulse Signals Using ESP32 RMTs</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="micropython-espressif-esp32-3">ตัวอย่างการเขียนโค้ด MicroPython สำหรับบอร์ด Espressif ESP32 (ตอนที่ 3)<a class="headerlink" href="#micropython-espressif-esp32-3" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>Python 3</em>, <em>MicroPython</em>, <em>Espressif SoCs</em>, <em>ESP32 / ESP32-S3</em>, 
+<em>Thonny IDE</em>, <em>Arduino Lab for MicroPython</em>, <em>Wokwi</em></p>
+<ul>
+<li><a href="#example-21-using-esp32-timer-for-an-interrupt-driven-task"><strong>Example 21: Using ESP32 Timer for an Interrupt-driven Task</strong></a></li>
+<li><a href="#example-22-using-esp32-timer-in-one-shot-and-periodic-modes"><strong>Example 22: Using ESP32 Timer in One-Shot and Periodic Modes</strong></a></li>
+<li><a href="#example-23-multi-pin-io-toggle-using-multiple-esp32-timers"><strong>Example 23: Multi-Pin I/O Toggle Using Multiple ESP32 Timers</strong></a></li>
+<li><a href="#example-24-software-timer-for-periodic-tasks"><strong>Example 24: Software Timer for Periodic Tasks</strong></a></li>
+<li><a href="#example-25-push-button-interrupt-with-deferred-execution"><strong>Example 25: Push Button Interrupt with Deferred Execution</strong></a></li>
+<li><a href="#example-26-event-driven-led-toggle-using-push-button-interrupt"><strong>Example 26: Event-Driven LED Toggle Using Push Button Interrupt</strong></a></li>
+<li><a href="#example-27-quadrature-pulse-signal-generation-with-asyncio-delays"><strong>Example 27: Quadrature Pulse Signal Generation with AsyncIO Delays</strong></a></li>
+<li><a href="#example-28-generating-quadrature-pulse-signals-using-hardware-timer"><strong>Example 28: Generating Quadrature Pulse Signals Using Hardware Timer</strong></a></li>
+<li><a href="#example-29-generating-quadrature-pulse-signals-using-esp32-rmts"><strong>Example 29: Generating Quadrature Pulse Signals Using ESP32 RMTs</strong></a></li>
+</ul>
+<hr />
+<h2 id="example-21-using-esp32-timer-for-an-interrupt-driven-task">&#9655; <strong>Example 21: Using ESP32 Timer for an Interrupt-driven Task</strong><a class="headerlink" href="#example-21-using-esp32-timer-for-an-interrupt-driven-task" title="Permanent link">#</a></h2>
+<p>การใช้งานวงจร <strong>Hardware Timer</strong> ของ <strong>ESP32</strong> ใน <strong>MicroPython</strong> 
+จะเกี่ยวข้องกับคลาส <code>machine.Timer</code> สำหรับการทำงานตามระยะเวลาที่ตั้งไว้ 
+เมื่อครบกำหนดเวลา ฟังก์ชันประเภท <strong>Callback (Interrupt Handler)</strong> ที่เกี่ยวข้องจะถูกเรียกใช้งาน</p>
+<p><strong>Timer</strong> มีโหมดหลัก 2 แบบ คือ</p>
+<ul>
+<li><code>Timer.ONE_SHOT</code> - ทำงานเพียงครั้งเดียวเมื่อครบเวลาที่กำหนด</li>
+<li><code>Timer.PERIODIC</code> - ทำงานซ้ำเป็นรอบ ๆ ตามคาบเวลาที่ตั้งไว้</li>
+</ul>
+<p>การกำหนดช่วงเวลาสามารถทำได้ 2 วิธี คือ</p>
+<ul>
+<li>กำหนดคาบเวลา (<code>period</code> หน่วยเป็นมิลลิวินาที) หรือ</li>
+<li>กำหนดความถี่ (<code>freq</code> หน่วยเป็น <strong>Hz</strong>)</li>
+</ul>
+<p>ชิป <strong>ESP32</strong> ปกติจะมี <strong>Hardware Timers</strong> อยู่ 4 ชุด (หมายเลข <strong>id: 0–3</strong>) ให้ใช้งาน
+แต่จำนวนนี้ อาจแตกต่างกันในรุ่นย่อยของชิป เช่น</p>
+<ul>
+<li><strong>ESP32 / ESP32S2 / ESP3S3: 4</strong></li>
+<li><strong>ESP32C4 / ESP32C6 /  ESP32H4: 2</strong></li>
+</ul>
+<p>ตัวอย่างนี้สาธิตการเปิดใช้งาน <strong>ESP32 Timer</strong> โดยเลือกใช้ <strong>Timer 0</strong>
+ในโหมด <strong>Periodic</strong> และใช้ความถี่ค่อนข้างสูง เช่น <strong>10kHz</strong> (กำหนดค่าโดยใช้ตัวแปร <code>TIMER_FREQ_HZ</code>)
+เมื่อนับเวลาได้ตามที่กำหนดไว้ จะเกิดอินเทอร์รัพท์ และเรียกให้ฟังก์ชัน <strong>Callback</strong> ทำงาน (ในโค้ดตัวอย่างคือ ฟังก์ชัน <code>toggle_led</code>) 
+เช่น ให้สลับสถานะลอจิกของ <strong>GPIO</strong> หนึ่งขา (เช่น <code>GPIO-11</code>)
+เมื่อนำไปทดลองกับบอร์ด <strong>ESP32</strong> จริง จะใช้ออสซิลโลสโคปวัดสัญญาณเอาต์พุตที่ขา <strong>GPIO</strong>
+เพื่อดูผลการตอบสนองจากการทำงาน</p>
+<pre><code class="language-python">from machine import Pin, Timer
+import time 
+
+TIMER_FREQ_HZ = 10_000 # Set the timer frequency (use a high value)
+
+led = Pin(11, Pin.OUT) # Configure a GPIO pin for output
+
+# Define a callback function for timer
+def toggle_led(timer):
+    led.toggle() # Toggle the LED
+
+# Create a hardware timer (ESP32 timer 0)
+tim = Timer(0) 
+
+# Start the timer in periodic mode
+tim.init(freq=TIMER_FREQ_HZ, mode=Timer.PERIODIC, callback=toggle_led)  
+
+try:
+    while True:
+        time.sleep(1.0)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+finally:
+    tim.deinit() # Stop the timer
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex21-wave-1.jpg" /></p>
+<p>รูป: การวัดสัญญาณเอาต์พุต เมื่อใช้ความถี่สำหรับ <strong>Timer</strong> เท่ากับ <strong>10 kHz</strong> 
+ซึ่งจะต้องมีระยะเวลาในการสลับสถานะลอจิกแต่ละครั้งเท่ากับ <strong>100 usec</strong></p>
+<p>แต่ถ้าใช้ความถี่สูงขึ้น ระยะเวลาของแต่ละช่วงของสัญญาณพัลส์ จะเริ่มมีความผิดพลาดจากค่าที่ต้องการ
+หรือถ้าความถี่สูงเกินไป จะทำให้ฟังก์ชัน <strong>Callback</strong> ตอบสนองและทำงานไม่ทันอัตราการเกิดอินเทอร์รัพท์จากวงจร <strong>Timer</strong>
+ดังนั้นในการใช้ <strong>Hardware Timer</strong>  ของ <strong>ESP32</strong> จะต้องคำนึงข้อจำกัดของความถี่ด้วย</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-22-using-esp32-timer-in-one-shot-and-periodic-modes">&#9655; <strong>Example 22: Using ESP32 Timer in One-Shot and Periodic Modes</strong><a class="headerlink" href="#example-22-using-esp32-timer-in-one-shot-and-periodic-modes" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้สาธิตการเปิดใช้งานวงจร <strong>ESP32 Hardware Timer</strong> โดยเริ่มต้นจะทำงานในโหมด
+<strong>One-Shot</strong> (เช่น กำหนดระยะเวลาไว้  <strong>1000 msec</strong>) และเมื่อครบระยะเวลาดังกล่าว
+ฟังก์ชัน <code>oneshot_cb(...)</code> จะทำงานหนึ่งครั้งแล้ว มีการปรับโหมดการทำงานใหม่เป็น <strong>Periodic</strong></p>
+<p>ฟังก์ชัน <strong>Callback</strong> ที่เกี่ยวข้องคือ <code>periodic_cb()</code> ในแต่ละครั้งที่ทำงาน
+จะมีการสลับสถานะลอจิกที่ขา <strong>GPIO</strong> สำหรับ <strong>LED</strong> หนึ่งครั้ง
+และมีการเพิ่มคาบเวลา เริ่มต้นที่ <strong>10 msec</strong> เป็นสองเท่า
+ไปจนกว่าคาบเวลาจะมากกว่า <strong>200 msec</strong> จึงจะหยุดการทำงานของ <strong>Timer</strong></p>
+<pre><code class="language-python">from machine import Pin, Timer 
+import time
+
+led = Pin(11, Pin.OUT, value=0) # Configure a GPIO pin for LED output
+time.sleep_ms(100)
+tim = Timer(0)           # Create a Timer object (ID = 0)
+timer_period = 10        # Initial timer period in ms
+
+# Callback for the timer in periodic mode
+def periodic_cb(timer):
+    global timer_period
+    led.toggle()           # Toggle the LED state
+    timer_period += 10     # Increment the timer period
+
+    # Reinitialize the timer with the new period
+    timer.init(period=timer_period, mode=Timer.PERIODIC, 
+               callback=periodic_cb)
+    if timer_period &gt; 200:
+        timer.deinit()     # Stop the timer if period exceeds 200 ms
+
+# Callback for the timer in one-shot mode
+def oneshot_cb(timer):
+    global timer_period
+    led.on()  # Turn on the LED when one-shot fires
+    # Restart the timer in periodic mode
+    timer.init(period=timer_period, mode=Timer.PERIODIC, 
+               callback=periodic_cb)
+
+led.on()  # Turn the LED in before starting the timer
+
+# Start the timer in one-shot mode (fires after 1000 ms)
+tim.init(period=1000, mode=Timer.ONE_SHOT, callback=oneshot_cb)
+
+try:
+    while True:
+        time.sleep(1)  # Main loop does nothing, timer runs in background
+except KeyboardInterrupt:
+    tim.deinit()       # Stop the timer on Ctrl+C
+    print(&quot;Terminated..&quot;)
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex22-wave-1.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุต ซึ่งจะเห็นได้ว่า มีการสลับสถานะลอจิกของสัญญาณ ช่วงแรกกว้างประมาณ <strong>1000msec</strong>
+ซึ่งเกิดจากการทำงานในโหมด <strong>One-Shot</strong> ในช่วงถัดไป มีความกว้างของพัลส์ที่เกิดขึ้นไม่คงที่ (เพิ่มขึ้นตามลำดับ)
+ซึ่งเป็นผลจากการทำงานของ <strong>Timer</strong> ในโหมด <strong>Periodic</strong> ตามรูปแบบที่กำหนดไว้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-23-multi-pin-io-toggle-using-multiple-esp32-timers">&#9655; <strong>Example 23: Multi-Pin I/O Toggle Using Multiple ESP32 Timers</strong><a class="headerlink" href="#example-23-multi-pin-io-toggle-using-multiple-esp32-timers" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการเปิดใช้งาน <strong>ESP32 Timers</strong> จำนวน 4 ชุด พร้อมกัน มีคาบเวลาเท่ากับ <strong>10 msec</strong>
+(หรือ <strong>100Hz</strong>)  เหมือนกัน โดยแต่ละชุด จะให้มีฟังก์ชันทำงานเป็นคาบเวลา (<strong>Periodic Timer Mode</strong>)
+และทำหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong> ที่เกี่ยวข้อง
+ในตัวอย่างนี้ มีการหน่วงเวลาก่อนเริ่มต้นการทำงานของวงจร <strong>Timer</strong> แต่ละชุด เช่น <strong>5 msec</strong> ตามลำดับ</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This example demonstrates how to use multiple ESP32 hardware timers to 
+# toggle four GPIO pins independently at a fixed rate.
+# Each pin is assigned its own periodic timer callback, with a small 
+# start delay (e.g. 5msec) between timers to offset their toggle phases. 
+# The main loop remains idle while the timers handle all I/O toggling 
+# in the background.
+#-------------------------------------------------------------------------
+from machine import Pin, Timer
+import time
+
+# List of GPIO pin numbers to use
+gpio_nums = [11, 12, 13, 14]
+
+# Create Pin objects for each GPIO and set as output
+pins = [Pin(gpio, mode=Pin.OUT, value=0) for gpio in gpio_nums]
+time.sleep_ms(100)
+
+# Factory function to create a timer callback for a specific pin
+def make_timer_callback(pin):
+    def _callback(timer):
+        pin.toggle()  # Toggle pin state (HIGH ↔ LOW)
+    return _callback  # Return the callback function
+
+# List to store Timer objects
+timers = []
+
+# Create Timer objects (one per pin)
+for i in range(len(pins)):
+    timers.append(Timer(i))  # Create a Timer object first
+
+extra_start_delay_ms = 5
+
+# Initialize and start each timer
+for i, timer in enumerate(timers):
+    timer.init(
+        period=10,                # Timer period in milliseconds
+        mode=Timer.PERIODIC,      # Periodic mode
+        callback=make_timer_callback(pins[i])  # Toggle the corresponding pin
+    )
+    time.sleep_ms( extra_start_delay_ms)
+
+try:
+    while True:
+        time.sleep(1)  # Main loop does nothing, timers run in background
+except KeyboardInterrupt:
+    # Stop all timers on Ctrl+C
+    for tim in timers:
+        tim.deinit()
+    print(&quot;Terminated...&quot;)
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex23-wave-1.jpg" /></p>
+<p><img alt="" src="ex23-wave-2.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตจากขา <strong>GPIO</strong> จำนวน 4 สัญญาณ 
+ที่มีลักษณะเหมือนกัน (ความถี่เท่ากัน และมีค่า <strong>Duty Cycle = 50%</strong>)
+แต่มีความต่างเฟสของแต่ละสัญญาณตามลำดับ (เกิดจากการเลื่อนเวลาแต่ละสัญญาณประมาณ <strong>5msec</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-24-software-timer-for-periodic-tasks">&#9655; <strong>Example 24: Software Timer for Periodic Tasks</strong><a class="headerlink" href="#example-24-software-timer-for-periodic-tasks" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการสร้างคลาส (ชื่อ <code>SoftwareTimer</code>) สำหรับ <strong>MicroPython</strong>
+เพื่อใช้งาน  <strong>ESP32 Hardware Timer</strong> จำนวน 1 วงจร
+และรองรับการเพิ่มฟังก์ชัน เพื่อให้สามารถเรียกฟังก์ชันเหล่านั้นให้ทำงานตามคาบเวลาที่กำหนดไว้ได้
+(ความละเอียดของคาบเวลาเท่ากับ <strong>1 msec</strong>)
+ในเชิงเปรียบเทียบ ตัวอย่างที่แล้วมีการใช้ <strong>ESP32 Hardware Timer</strong> จำนวน 4 วงจรพร้อมกัน</p>
+<p>โค้ดนี้สาธิตการสร้างฟังก์ชันเพื่อนำไปใช้กับ <strong>Software Timer</strong>
+และให้ทำหน้าที่สลับสถานะลอจิกของขา <strong>GPIO</strong> มีจำนวน 4 ขา และมีคาบเวลาแตกต่างกัน
+(มีคาบเวลาเท่ากับ <strong>100</strong>, <strong>200</strong>, <strong>300</strong> และ <strong>400</strong> มิลลิวินาที ตามลำดับ)</p>
+<pre><code class="language-python">from machine import Pin, Timer
+import time
+
+class SoftwareTimer:
+    def __init__(self, id=0):
+        self.tasks = []          # Store task info
+        self._timer = Timer(id)  # Use one hardware timer
+        self._tick_ms = 1        # 1 ms resolution
+
+    def add_task(self, callback, task_id, interval_ms, args=(), kwargs={}):
+        &quot;&quot;&quot;
+        Add a task with optional arguments for the callback.
+        &quot;&quot;&quot;
+        self.tasks.append({
+            &quot;id&quot;: task_id,            # Unique task ID
+            &quot;callback&quot;: callback,     
+            &quot;interval&quot;: interval_ms, 
+            &quot;elapsed&quot;: 0,
+            &quot;args&quot;: args,             # Arguments to pass to callback
+            &quot;kwargs&quot;: kwargs
+        })
+
+    def get_task_info(self, task_id):
+        &quot;&quot;&quot;Return task dictionary by ID.&quot;&quot;&quot;
+        for task in self.tasks:
+            if task[&quot;id&quot;] == task_id:
+                return task
+        return None
+
+    def start(self):
+        &quot;&quot;&quot;Start the hardware timer ticking every 1 ms.&quot;&quot;&quot;
+        self._timer.init(period=self._tick_ms, 
+                         mode=Timer.PERIODIC, 
+                         callback=self._tick)
+
+    def stop(self):
+        &quot;&quot;&quot;Stop the hardware timer.&quot;&quot;&quot;
+        self._timer.deinit()
+
+    def _tick(self, t):
+        &quot;&quot;&quot;Internal tick function called every 1 ms.&quot;&quot;&quot;
+        for task in self.tasks:
+            task[&quot;elapsed&quot;] += self._tick_ms
+            if task[&quot;elapsed&quot;] &gt;= task[&quot;interval&quot;]:
+                try:
+                    # Call the callback with stored arguments
+                    task[&quot;callback&quot;](*task[&quot;args&quot;], **task[&quot;kwargs&quot;])
+                except Exception as e:
+                    print(&quot;Error in task:&quot;, e)
+                task[&quot;elapsed&quot;] = 0  # Reset elapsed time
+
+# List of GPIO pin numbers to use
+gpio_nums = [11, 12, 13, 14]
+
+# Create Pin objects for each GPIO and set as output
+pins = [Pin(gpio, mode=Pin.OUT, value=0) for gpio in gpio_nums]
+
+# Define a task callback
+def task_callback(task_id, pin):
+    pin.toggle() # Toggle the LED pin
+    print(f&quot;Task id={task_id} active&quot;)
+
+# Create a SoftwareTimer object
+stm = SoftwareTimer()
+for id in range(len(pins)):
+    # Add a task to the software timer
+    stm.add_task(task_callback, task_id=id, 
+                 interval_ms=100*(id+1), 
+                 args=(id,pins[id]))
+stm.start() # Start the software timer
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    stm.stop()
+    print(&quot;Terminated...&quot;)
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex24-wave-1.jpg" /></p>
+<p>รูป: สัญญาณเอาต์พุตของขา <strong>GPIO</strong> ที่มีคาบเวลาแตกต่างกัน เป็นจำนวนเท่าของ <strong>100 msec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-25-push-button-interrupt-with-deferred-execution">&#9655; <strong>Example 25: Push Button Interrupt with Deferred Execution</strong><a class="headerlink" href="#example-25-push-button-interrupt-with-deferred-execution" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ใช้อินเทอร์รัพท์ (<strong>GPIO Interrupt</strong>) ของ <strong>ESP32</strong> ในการตรวจจับการกดปุ่ม 
+และตรวจสอบเวลาระหว่างการกดแต่ละครั้ง เพื่อป้องกันการตรวจจับซ้ำที่เกิดการกระเด้งของปุ่มกด (<strong>Mechanical Bounce</strong>) </p>
+<p>เมื่อพบว่า มีการกดปุ่ม จึงใช้ <code>micropython.schedule()</code> จึงส่งต่อการทำงานของฟังก์ชันที่เกี่ยวข้อง
+เช่น การสลับสถานะ <strong>LED</strong>  เพื่อให้ <strong>Main Thread</strong> ทำงาน แทนการทำงานใน <strong>ISR</strong> โดยตรง 
+ซึ่งเป็นแนวทางที่ทำให้ <strong>ISR</strong> ใช้เวลาในสั้น และไม่บล็อกการทำงานอื่นของระบบ</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This example shows how to use an ESP32 hardware interrupt to detect 
+# a push button press, apply software debounce, and safely execute 
+# the associated task outside the interrupt context.
+# The micropython.schedule() function is used to defer the LED toggle 
+# function, passing arguments from the ISR to the main thread.
+#------------------------------------------------------------------------
+from machine import Pin
+import micropython
+import time
+
+led = Pin(21, Pin.OUT, value=0) # Configure LED output pin
+
+# Function to be called outside ISR
+def handle_button_press(args):
+    pin, value = args
+    print(f&quot;Button pressed! LED {'on' if value else 'off'}&quot;)
+    pin.value(value)
+
+state = 0
+last_press_ms = 0  # keep last press time (in msec)
+DEBOUNCE_MS = 50
+
+# IRQ handler (ISR) with debounce
+def button_isr(pin):
+    global state, led, last_press_ms
+    now = time.ticks_ms()
+    if time.ticks_diff(now, last_press_ms) &gt; DEBOUNCE_MS:
+        last_press_ms = now
+        state = not state
+        # Schedule function to run outside ISR with arguments
+        micropython.schedule(handle_button_press, (led, state))
+
+# Configure push button (active-low with pull-up)
+button = Pin(1, Pin.IN, Pin.PULL_UP)
+button.irq(trigger=Pin.IRQ_FALLING, handler=button_isr)
+
+print(&quot;\n\nPress the button...&quot;)
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex25-wave-1.jpg" /></p>
+<p>รูป: สัญญาณ <strong>Button</strong> และ <strong>LED</strong> เมื่อมีการกดปุ่มแล้วปล่อยหนึ่งครั้ง</p>
+<p>จากรูปสัญญาณตัวอย่าง ระยะเวลาตอบสนอง เมื่อมีการกดปุ่ม วัดได้ประมาณ <strong>11 msec</strong>
+ที่ส่งผลให้ <strong>LED</strong> เปลี่ยนสถานะลอจิกตามมา</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-26-event-driven-led-toggle-using-push-button-interrupt">&#9655; <strong>Example 26: Event-Driven LED Toggle Using Push Button Interrupt</strong><a class="headerlink" href="#example-26-event-driven-led-toggle-using-push-button-interrupt" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้อินเทอร์รัพท์ (<strong>Interrupt</strong>) ของ <strong>GPIO</strong> เพื่อตรวจจับการกดปุ่ม
+และกำหนดให้ฟังก์ชัน <strong>ISR</strong> ส่งสัญญาณไปยัง <strong>Main Thread</strong> โดยใช้ <code>uasyncio.Event</code> 
+เพื่อสลับสถานะ <strong>LED</strong> เมื่อมีการกดปุ่มแต่ละครั้ง </p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This example shows an event-driven approach to handle a push button.
+# A hardware interrupt (ISR) detects the button press and applies 
+# a software debounce. The ISR signals the main async. task via 
+# a uasyncio.Event, which toggles the LED state.
+# This keeps the ISR short and non-blocking, while the main task 
+# reacts promptly to button presses.
+#-------------------------------------------------------------------------
+
+from machine import Pin
+import uasyncio as asyncio
+import time
+
+led = Pin(21, Pin.OUT, value=0)  # Configure GPIO21 as output for LED,
+button_event = asyncio.Event()   # Create an asyncio Event to signal button presses
+state = 0                        # Store the current LED state
+last_press_ms = 0                # Timestamp of last button press (for debounce)
+DEBOUNCE_MS = 50                 # Debounce period in milliseconds
+
+# ISR for the push button
+def button_isr(pin):
+    global state, last_press_ms
+    now = time.ticks_ms()             # Get current time in milliseconds
+    # Check if enough time has passed since last press
+    if time.ticks_diff(now, last_press_ms) &gt; DEBOUNCE_MS:
+        last_press_ms = now           # Update last press timestamp
+        state = not state             # Toggle LED state
+        button_event.set()            # Signal async task that button was pressed
+
+# Async task to toggle LED when event occurs
+async def led_task():
+    global state
+    while True:
+        await button_event.wait()     # Wait for ISR to signal event
+        button_event.clear()          # Clear event for next button press
+        led.value(state)              # Update LED output
+
+# Main async loop
+async def main():
+    asyncio.create_task(led_task())   # Start the LED task
+    while True:
+        await asyncio.sleep(0.1)      # Keep main loop alive, non-blocking
+
+# Configure push button on GPIO1 (active-low with pull-up)
+button = Pin(1, Pin.IN, Pin.PULL_UP)
+
+# Attach ISR to button press
+button.irq(trigger=Pin.IRQ_FALLING, handler=button_isr) 
+
+# Run the asyncio event loop
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex26-wave-1.jpg" /></p>
+<p><img alt="" src="ex26-wave-2.jpg" /></p>
+<p><img alt="" src="ex26-wave-3.jpg" /></p>
+<p>รูป: สัญญาณ <strong>Button</strong> และ <strong>LED</strong> เมื่อมีการกดปุ่มแล้วปล่อย 2 ครั้งถัดกัน</p>
+<p>จากรูปสัญญาณตัวอย่าง ระยะเวลาตอบสนองวัดค่าได้ประมาณ <strong>22 ~ 72 msec</strong> เมื่อมีการกดปุ่ม แล้วทำให้ <strong>LED</strong> เปลี่ยนสถานะลอจิก</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-27-quadrature-pulse-signal-generation-with-asyncio-delays">&#9655; <strong>Example 27: Quadrature Pulse Signal Generation with AsyncIO Delays</strong><a class="headerlink" href="#example-27-quadrature-pulse-signal-generation-with-asyncio-delays" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการสร้างสัญญาณหนึ่งคู่ในรูปแบบที่เรียกว่า <strong>Quadrature Pulse Signal</strong>
+ซึ่งเป็นสัญญาณดิจิทัลที่มีสองสัญญาณ (เรียกว่า <strong>Channel A</strong> และ <strong>Channel B</strong>) 
+พบเห็นได้เมื่อใช้อุปกรณ์ตรวจจับการหมุน เช่น <strong>Rotary Encoder</strong> เพื่อบอกทั้งความเร็วและทิศทางของการหมุน
+เช่น หมุนตามเข็มนาฬิกา (<strong>Clockwise: CW</strong>) หรือหมุนทวนเข็มนาฬิกา (<strong>Counter-clockwise: CCW</strong>)
+สัญญาณทั้งสองจะเฟสต่างกัน <strong>90° (1/4 รอบคาบ)</strong> โดยประมาณ โดยที่ <strong>A</strong> จะ "นำ" (<strong>Lead</strong>)
+หรือ "ตาม" (<strong>Lag</strong>) <strong>B</strong> อยู่หนึ่งในสี่ของรอบสัญญาณ และเป็นคลื่นสี่เหลี่ยมที่มีความถี่เท่ากัน</p>
+<p>โค้ดตัวอย่างจะสร้างสัญญาณ <strong>A &amp; B</strong> สำหรับจำลองการหมุนของ <strong>Rotary Encoder</strong>
+โดยมีการเว้นระยะห่างหรือต่างเฟส โดยใช้คำสั่ง <code>asyncio.sleep_ms(...)</code>
+มีการจำลองการหมุนในทิศทาง <strong>CW</strong> จำนวน 10 พัลส์ (<strong>20 steps</strong>)
+เว้นระยะเวลา และหมุนกลับในทิศทาง <strong>CCW</strong> จำนวน 5 พัลส์ (<strong>10 steps</strong>) แล้วทำซ้ำ</p>
+<pre><code class="language-python">#-------------------------------------------------------------------------
+# This example uses MicroPython’s uasyncio to generate simulated 
+# quadrature encoder signals on two GPIO pins (A and B).
+# It defines sequences for the rotation direction: CW and CCW, toggling 
+# the pins in the correct phase relationship to emulate a rotary encoder.
+#-------------------------------------------------------------------------
+import uasyncio as asyncio
+from machine import Pin
+
+A, B = Pin(11, Pin.OUT), Pin(12, Pin.OUT)
+
+async def send_encoder_pulses(steps, direction=1):
+    # Quadrature sequence for CW rotation
+    seq_cw  = [(1,0),(1,1),(0,1),(0,0)]
+    # Quadrature sequence for CCW rotation
+    seq_ccw = list(reversed(seq_cw))
+    seq = seq_cw if direction &gt; 0 else seq_ccw
+    for _ in range(steps):
+        for a, b in seq:
+            A.value(a); B.value(b)
+            await asyncio.sleep_ms(5)
+
+async def main():
+    while True:
+        await send_encoder_pulses(20, 1) # 10 steps, CW
+        await asyncio.sleep_ms(200)
+        await send_encoder_pulses(10, -1) # 4 steps, CCW
+        await asyncio.sleep(2)
+
+asyncio.run(main())
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex27-wave-1.jpg" /></p>
+<p><img alt="" src="ex27-wave-2.jpg" /></p>
+<p>รูป: สัญญาณ <strong>A</strong> และ <strong>B</strong></p>
+<p>จากรูปคลื่นสัญญาณที่วัดได้ การใช้คำสั่ง <code>asyncio.sleep_ms(5)</code>
+เพื่อกำหนดระยะเวลาของ <strong>Step</strong> ทำให้เกิดความต่างเฟส ระหว่าง <strong>A</strong> และ <strong>B</strong> 
+แต่วัดจริงได้ค่าประมาณ <strong>10 msec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-28-generating-quadrature-pulse-signals-using-hardware-timer">&#9655; <strong>Example 28: Generating Quadrature Pulse Signals Using Hardware Timer</strong><a class="headerlink" href="#example-28-generating-quadrature-pulse-signals-using-hardware-timer" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้ <strong>Hardware Timer</strong> เพื่อสร้างสัญญาณ <strong>Quadrature Pulse (Channel A &amp; B)</strong>
+สำหรับจำลองการหมุนของ <strong>Rotary Encoder</strong> สามารถกำหนดทิศทางหมุนได้ (<strong>CW</strong> หรือ <strong>CCW</strong>) </p>
+<p>ฟังก์ชัน <code>send_pulses()</code> รับจำนวน <strong>Steps</strong> ความถี่ (<strong>Hz</strong>) และทิศทาง
+จากนั้นตั้งค่า <strong>Timer</strong> ให้ส่งลำดับสัญญาณพัลส์
+ในฟังก์ชันหลัก จะสลับส่งสัญญาณ <strong>10 Steps</strong> (<strong>500Hz, CW</strong>) แล้วหยุดสั้น ๆ
+จากนั้น <strong>5 Steps</strong> (<strong>200Hz, CCW</strong>) ทำซ้ำต่อเนื่อง</p>
+<pre><code class="language-python">from machine import Pin, Timer
+import uasyncio as asyncio
+
+A, B = Pin(11, Pin.OUT), Pin(12, Pin.OUT)
+A.value(1), B.value(1)
+
+seq_cw  = [(0,1), (0,0), (1,0), (1,1)]
+seq_ccw = [(1,0), (0,0), (0,1), (1,1)]
+
+step_count = 0
+steps_target = 0
+seq_idx = 0
+done = False
+
+def timer_callback(timer):
+    global seq_idx, step_count, done
+    global A, B
+    values = seq[seq_idx]
+    A.value(values[0]), B.value(values[1])
+    step_count += 1
+    if step_count &gt;= steps_target:
+        done = True
+        timer.deinit()
+        A.value(1), B.value(1)
+    seq_idx = (seq_idx + 1) % 4
+
+async def send_pulses(steps, rate_hz, direction=1):
+    global seq, steps_target, step_count, seq_idx, done
+    seq = seq_cw if direction &gt; 0 else seq_ccw
+    steps_target = 4*steps
+    step_count = 0
+    seq_idx = 0
+    done = False
+    Timer(0).init(freq=rate_hz * 4, 
+                  mode=Timer.PERIODIC, 
+                  callback=timer_callback)
+    while not done:
+        await asyncio.sleep_ms(1)  # yield control
+
+async def main():
+    while True:
+        # Step rate 500Hz, 10 steps, CW
+        await send_pulses(10, 500, 1)
+        await asyncio.sleep_ms(10)
+        # Step rate 200Hz, 5 steps, CCW
+        await send_pulses(5, 200, -1) 
+        await asyncio.sleep(1)
+
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex28-wave-1.jpg" /></p>
+<p><img alt="" src="ex28-wave-2.jpg" /></p>
+<p><img alt="" src="ex28-wave-3.jpg" /></p>
+<p>รูป: สัญญาณ <strong>A</strong> และ <strong>B</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="example-29-generating-quadrature-pulse-signals-using-esp32-rmts">&#9655; <strong>Example 29: Generating Quadrature Pulse Signals Using ESP32 RMTs</strong><a class="headerlink" href="#example-29-generating-quadrature-pulse-signals-using-esp32-rmts" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ใช้วงจร <strong>RMT (Remote Control)</strong> ภายในชิป <strong>ESP32</strong>
+เพื่อสร้างสัญญาณ <strong>Quadrature Pulses</strong> จำลองการหมุนของ <strong>Rotary Encoder</strong> โดยมีคุณสมบัติและขั้นตอนดังนี้</p>
+<ul>
+<li>กำหนดขา <strong>GPIO</strong> ให้เป็นเอาต์พุตสำหรับสัญญาณ <strong>A</strong> และ <strong>B</strong></li>
+<li>ใช้ <strong>RMT Channel 0</strong> และ <strong>1</strong> เพื่อสร้างพัลส์ที่มีความละเอียด <strong>1 µs</strong> (ตั้งค่า <code>clock_div=80</code>)</li>
+<li>กำหนดความกว้างของช่วง <strong>High</strong> และ <strong>Low</strong> ของหนึ่งคาบเท่ากันคือ <strong>500usec</strong></li>
+<li>สร้างฟังก์ชัน <code>send_pulse(steps, direction)</code> จะส่งสัญญาณพัลส์ตามจำนวน <strong>Step</strong> ที่กำหนด</li>
+</ul>
+<p>ในลูปหลัก จะสลับส่งสัญญาณพัลส์ <strong>10 Steps</strong> (<strong>CW</strong>) และ <strong>4 Steps</strong> (<strong>CCW</strong>)</p>
+<pre><code class="language-python">import machine
+from machine import Pin
+import esp32
+import time
+
+# Define channel pins
+pulseOutA = Pin(11, Pin.OUT)
+pulseOutB = Pin(12, Pin.OUT)
+pulseOutA.off(), pulseOutB.off()
+
+# Initialize RMT channels
+clk_div = 80  # =&gt; 1 tick = 1usec
+rmtA = esp32.RMT(0, pin=pulseOutA, clock_div=clk_div)
+rmtB = esp32.RMT(1, pin=pulseOutB, clock_div=clk_div)
+
+# Send pulses using two RMT channels
+def send_pulse(steps, direction=1):
+    pulses = []
+    for i in range(steps):
+        pulses.extend( [500,500] )  # 500usec , 500usec (step size)    
+    if direction &gt; 0:
+        a, b = rmtB, rmtA
+    else:
+        a, b = rmtA, rmtB
+    state = machine.disable_irq()  
+    a.write_pulses(pulses, 0)
+    time.sleep_us(500//2)
+    b.write_pulses(pulses, 0)
+    machine.enable_irq(state)
+    pulses = []
+    while not b.wait_done(timeout=1):
+        pass
+
+try:
+    while True:
+       send_pulse(10, 1) # 10 steps, CW
+       time.sleep_ms(10)
+       send_pulse(4, -1) # 4 steps, CCW
+       time.sleep(1)
+except KeyboardInterrupt:
+    print(&quot;Terminated...&quot;)
+    rmtA.deinit()
+    rmtB.deinit()
+</code></pre>
+<p>ตัวอย่างการวัดสัญญาณเอาต์พุตด้วยอุปกรณ์ <strong>USB Logic Analyzer</strong> มีดังนี้</p>
+<p><img alt="" src="ex29-wave-1.jpg" /></p>
+<p><img alt="" src="ex29-wave-2.jpg" /></p>
+<p><img alt="" src="ex29-wave-3.jpg" /></p>
+<p>รูป: สัญญาณ <strong>A</strong> และ <strong>B</strong></p>
+<p>จากรูปคลื่นสัญญาณ จะเห็นได้ว่า ความกว้างของ <strong>Step</strong> จะเท่ากับ <strong>500 usec</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอเนื้อหาเป็นตอนที่ 3 การใช้งาน <strong>MicroPython</strong> สำหรับบอร์ด <strong>ESP32 / ESP32-S3</strong>
+เช่น การใช้งานวงจร <strong>Hardware Timer</strong> เพื่อทำงานที่เกิดขึ้นซ้ำ ตามความถี่หรือคาบเวลาที่ต้องการ
+การใช้งานอินเทอร์รัพท์กับขา <strong>GPIO</strong> และการใช้งานฟังก์ชัน <strong>AsyncIO</strong> และสื่อสารกับฟังก์ชัน <strong>ISR</strong>
+การสร้างสัญญาณจำลองการทำงานของ <strong>Quadrature Encoder</strong> เป็นต้น</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-08-14 | Last Updated: 2025-08-14</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
