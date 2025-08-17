@@ -202,7 +202,6 @@ while True:
     led.value( not value )       # Toggle the output.
     print(f&quot;LED: {led.value()}&quot;) # Print the current LED state 
     sleep(0.5)                   # Wait 0.5 seconds (blocking call)
-#-------------------------------------------------------------------------
 </code></pre>
 <p><img alt="" src="ex1-arduino-lab-micropython.jpg" /></p>
 <p><strong>รูป:</strong> ตัวอย่างการใช้งานซอฟต์แวร์ <strong>Arduino Lab for MicroPython</strong>  ร่วมกับบอร์ด <strong>ESP32-S3</strong></p>
@@ -234,7 +233,6 @@ while True:
         last_time = now              # Update the last_time variable
         led.value(not led.value())   # Toggle the LED state
         print(f&quot;LED: {led.value()}&quot;) # Print the current LED state
-#-------------------------------------------------------------------------
 </code></pre>
 <p><img alt="" src="ex2-wokwi-sim.jpg" /></p>
 <p><strong>รูป:</strong> ตัวอย่างการใช้งานซอฟต์แวร์ <strong>Wokwi Simulator</strong>  จำลองการทำงานของโค้ด
@@ -426,7 +424,6 @@ for pin in pins:
 # Main loop does nothing — threads run independently
 while True:
     pass
-#-------------------------------------------------------------------------
 </code></pre>
 <p>ตัวอย่างการใช้อุปกรณ์ <strong>USB Logic Analyzer</strong> ร่วมกับซอฟต์แวร์ <strong>PulseView</strong> 
 เพื่อวัดสัญญาณ ได้ผลดังนี้</p>
@@ -495,12 +492,25 @@ async def toggle_pin(pin):
         await asyncio.sleep_ms(1)   # Sleep for 1 msec
 </code></pre>
 <p>ในกรณีที่สองนี้ จากผลการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> แสดงให้เห็นได้ว่า
-ทั้งสองฟังก์ชันมีการสลับการทำงานจริง แต่ให้ผลแตกต่างจากกรณีแรกอย่างชัดเจน
-และการหน่วงเวลาประมาณ <strong>1msec</strong> ในความเป็นจริง จะใช้เวลามากกว่านั้น เช่น วัดได้ถึง <strong>10 msec</strong></p>
+ทั้งสองฟังก์ชันมีการสลับการทำงานจริง แต่ให้ผลแตกต่างจากกรณีแรกอย่างชัดเจน</p>
 <p><img alt="" src="ex7-wave-4.jpg" /></p>
 <p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณเมื่อหน่วงเวลาด้วย <code>await asyncio.sleep_ms(1)</code></p>
 <p><img alt="" src="ex7-wave-5.jpg" /></p>
 <p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณเมื่อหน่วงเวลาด้วย <code>await asyncio.sleep_ms(10)</code></p>
+<p>ข้อสังเกต: การหน่วงเวลา <strong>1~10msec</strong> ด้วยคำสั่ง <code>await asyncio.sleep_ms(...)</code>
+ในความเป็นจริง อาจใช้เวลามากกว่าค่าตัวเลขที่กำหนดไว้ เช่น วัดได้ถึง <strong>10 msec</strong> ซึ่งเป็นผลมาจากอัตราการทำงาน
+หรือ <strong>Tick Rate</strong> ของระบบปฏิบัติการ <strong>FreeRTOS</strong> ที่ชิป <strong>ESP32</strong> ใช้ในการทำงาน</p>
+<p>ค่า  <strong>Default FreeRTOS Tick Rate</strong> (<code>CONFIG_FREERTOS_HZ</code>) คือ <strong>100 Hz</strong>
+ดังนั้นจึงมีช่วงเวลาคาบเท่ากับ <strong>10 msec</strong> หากต้องการจะใช้  <strong>FreeRTOS Tick Rate</strong>
+สูงขึ้น เช่น <strong>1 kHz</strong> จะต้องมีการคอมไพล์ <strong>MicroPython</strong> สำหรับ <strong>ESP32</strong> เพื่อปรับเปลี่ยนค่าดังกล่าว</p>
+<p>หากมีการเปลี่ยนเฟิร์มแวร์ เพื่อปรับค่าความถี่ <strong>FreeRTOS Tick Rate = 1000 Hz</strong>
+การหน่วงเวลาด้วยคำสั่ง <code>await asyncio.sleep_ms(1)</code> เพื่อสร้างสัญญาณพัลส์ในโค้ดตัวอย่าง
+จะส่งผลอย่างไรบ้าง ก็สามารถวัดสัญญาณเอาต์พุต ได้ตามรูปตัวอย่างต่อไปนี้</p>
+<p><img alt="" src="ex7-wave-6.jpg" /></p>
+<p><img alt="" src="ex7-wave-7.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างรูปคลื่นสัญญาณเมื่อหน่วงเวลาด้วย <code>await asyncio.sleep_ms(1)</code> แต่ใช้ความถี่
+<strong>FreeRTOS Tick Rate = 1000 Hz</strong></p>
+<p>จากรูปสัญญาณจะเห็นได้ว่า ความกว้างพัลส์ของแต่ละสัญญาณลดลง และวัดได้ประมาณ <strong>2msec</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="example-8-dual-gpio-toggle-with-esp32-timers">&#9655; <strong>Example 8: Dual-GPIO Toggle with ESP32 Timers</strong><a class="headerlink" href="#example-8-dual-gpio-toggle-with-esp32-timers" title="Permanent link">#</a></h2>
@@ -573,7 +583,7 @@ async def task(id, pins, events):
         await event.wait()           # Wait until this task's event is set
         event.clear()                # Clear the event
         pin.value(not pin.value())   # Toggle the pin state
-        await asyncio.sleep_ms(1)     # Wait for 1 msec
+        await asyncio.sleep_ms(1)    # Wait at least for 1 msec
         events[next_id].set()        # Notify the next task
 
 async def main():
@@ -598,8 +608,12 @@ except KeyboardInterrupt:
 </code></pre>
 <p>จากการวัดสัญญาณด้วย <strong>USB Logic Analyzer</strong> พบว่า:</p>
 <ul>
-<li><strong>สัญญาณเดียวกัน</strong>: การเปลี่ยนสถานะลอจิกสองครั้งถัดกันของสัญญาณเดียวกัน มีระยะห่าง <strong>20 msec</strong> เนื่องจากในโค้ดกำหนดให้แต่ละฟังก์ชันรอให้ฟังก์ชันอีกตัวทำงานเสร็จ (ให้หน่วงไว้อย่างน้อย <strong>1 msec</strong>) ก่อนที่จะได้รับสิทธิ์ทำงานอีกครั้ง ทำให้รอบการทำงานของสัญญาณเดียวกันกินเวลาของทั้งสองฟังก์ชันรวมกัน</li>
-<li><strong>สัญญาณต่างกัน</strong>: เมื่อเปรียบเทียบการเปลี่ยนสถานะระหว่างสองสัญญาณ จะพบว่ามีระยะห่างเพียง <strong>10 msec</strong> เพราะทั้งสองฟังก์ชันทำงานสลับกัน ทำให้หลังจากฟังก์ชันหนึ่งสลับสถานะแล้ว อีกฟังก์ชันจะสลับต่อทันทีในครึ่งรอบเวลา</li>
+<li><strong>สัญญาณเดียวกัน</strong>: การเปลี่ยนสถานะลอจิกสองครั้งถัดกันของสัญญาณเดียวกัน
+เมื่อวัดสัญญาณ พบว่า มีระยะห่างประมาณ <strong>20 msec</strong>
+เนื่องจากในโค้ด มีการกำหนดให้แต่ละฟังก์ชัน รอให้ฟังก์ชันอีกตัวทำงานเสร็จ (ให้หน่วงไว้อย่างน้อย <strong>1 msec</strong>
+แต่หน่วงเวลาจริงประมาณ <strong>10msec</strong>) ก่อนที่จะได้รับสิทธิ์ทำงานอีกครั้ง</li>
+<li><strong>สัญญาณต่างกัน</strong>: เมื่อเปรียบเทียบการเปลี่ยนสถานะระหว่างสองสัญญาณ จะพบว่ามีระยะห่าง <strong>10 msec</strong>
+(ใกล้เคียงกับ <strong>Tick Period</strong> ของ <strong>FreeRTOS</strong>) เพราะทั้งสองฟังก์ชันจะต้องทำงานสลับกัน </li>
 </ul>
 <p><img alt="" src="ex9-wave-1.jpg" /></p>
 <p><img alt="" src="ex9-wave-2.jpg" /></p>
@@ -615,7 +629,7 @@ except KeyboardInterrupt:
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-08-11 | Last Updated: 2025-08-12</p></div>
+<p>Created: 2025-08-11 | Last Updated: 2025-08-17</p></div>
             </div>
         </div>
 

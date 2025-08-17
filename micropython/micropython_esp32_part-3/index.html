@@ -547,7 +547,8 @@ except KeyboardInterrupt:
 <p><img alt="" src="ex26-wave-2.jpg" /></p>
 <p><img alt="" src="ex26-wave-3.jpg" /></p>
 <p>รูป: สัญญาณ <strong>Button</strong> และ <strong>LED</strong> เมื่อมีการกดปุ่มแล้วปล่อย 2 ครั้งถัดกัน</p>
-<p>จากรูปสัญญาณตัวอย่าง ระยะเวลาตอบสนองวัดค่าได้ประมาณ <strong>22 ~ 72 msec</strong> เมื่อมีการกดปุ่ม แล้วทำให้ <strong>LED</strong> เปลี่ยนสถานะลอจิก</p>
+<p>จากรูปสัญญาณตัวอย่าง ระยะเวลาตอบสนองวัดค่าได้ประมาณ <strong>22 ~ 72 msec</strong>
+เมื่อมีการกดปุ่ม แล้วทำให้ <strong>LED</strong> เปลี่ยนสถานะลอจิก</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="example-27-quadrature-pulse-signal-generation-with-asyncio-delays">&#9655; <strong>Example 27: Quadrature Pulse Signal Generation with AsyncIO Delays</strong><a class="headerlink" href="#example-27-quadrature-pulse-signal-generation-with-asyncio-delays" title="Permanent link">#</a></h2>
@@ -556,11 +557,12 @@ except KeyboardInterrupt:
 พบเห็นได้เมื่อใช้อุปกรณ์ตรวจจับการหมุน เช่น <strong>Rotary Encoder</strong> เพื่อบอกทั้งความเร็วและทิศทางของการหมุน
 เช่น หมุนตามเข็มนาฬิกา (<strong>Clockwise: CW</strong>) หรือหมุนทวนเข็มนาฬิกา (<strong>Counter-clockwise: CCW</strong>)
 สัญญาณทั้งสองจะเฟสต่างกัน <strong>90° (1/4 รอบคาบ)</strong> โดยประมาณ โดยที่ <strong>A</strong> จะ "นำ" (<strong>Lead</strong>)
-หรือ "ตาม" (<strong>Lag</strong>) <strong>B</strong> อยู่หนึ่งในสี่ของรอบสัญญาณ และเป็นคลื่นสี่เหลี่ยมที่มีความถี่เท่ากัน</p>
+หรือ "ตาม" (<strong>Lag</strong>) <strong>B</strong> อยู่หนึ่งในสี่ของรอบสัญญาณ และเป็นคลื่นสี่เหลี่ยม
+(<strong>Rectangular Wave</strong>) ที่มีความถี่เท่ากัน</p>
 <p>โค้ดตัวอย่างจะสร้างสัญญาณ <strong>A &amp; B</strong> สำหรับจำลองการหมุนของ <strong>Rotary Encoder</strong>
 โดยมีการเว้นระยะห่างหรือต่างเฟส โดยใช้คำสั่ง <code>asyncio.sleep_ms(...)</code>
-มีการจำลองการหมุนในทิศทาง <strong>CW</strong> จำนวน 10 พัลส์ (<strong>20 steps</strong>)
-เว้นระยะเวลา และหมุนกลับในทิศทาง <strong>CCW</strong> จำนวน 5 พัลส์ (<strong>10 steps</strong>) แล้วทำซ้ำ</p>
+มีการจำลองการหมุนในทิศทาง <strong>CW</strong> จำนวน <strong>20 Steps</strong>
+เว้นระยะเวลา และหมุนกลับในทิศทาง <strong>CCW</strong> จำนวน <strong>10 Steps</strong> แล้วทำซ้ำ</p>
 <pre><code class="language-python">#-------------------------------------------------------------------------
 # This example uses MicroPython’s uasyncio to generate simulated 
 # quadrature encoder signals on two GPIO pins (A and B).
@@ -581,13 +583,13 @@ async def send_encoder_pulses(steps, direction=1):
     for _ in range(steps):
         for a, b in seq:
             A.value(a); B.value(b)
-            await asyncio.sleep_ms(5)
+            await asyncio.sleep_ms(5) # delay for at least 5 msec
 
 async def main():
     while True:
-        await send_encoder_pulses(20, 1) # 10 steps, CW
+        await send_encoder_pulses(20, 1)  # 20 steps, CW
         await asyncio.sleep_ms(200)
-        await send_encoder_pulses(10, -1) # 4 steps, CCW
+        await send_encoder_pulses(10, -1) # 10 steps, CCW
         await asyncio.sleep(2)
 
 asyncio.run(main())
@@ -606,8 +608,8 @@ asyncio.run(main())
 สำหรับจำลองการหมุนของ <strong>Rotary Encoder</strong> สามารถกำหนดทิศทางหมุนได้ (<strong>CW</strong> หรือ <strong>CCW</strong>) </p>
 <p>ฟังก์ชัน <code>send_pulses()</code> รับจำนวน <strong>Steps</strong> ความถี่ (<strong>Hz</strong>) และทิศทาง
 จากนั้นตั้งค่า <strong>Timer</strong> ให้ส่งลำดับสัญญาณพัลส์
-ในฟังก์ชันหลัก จะสลับส่งสัญญาณ <strong>10 Steps</strong> (<strong>500Hz, CW</strong>) แล้วหยุดสั้น ๆ
-จากนั้น <strong>5 Steps</strong> (<strong>200Hz, CCW</strong>) ทำซ้ำต่อเนื่อง</p>
+ในฟังก์ชันหลัก จะสลับส่งสัญญาณ <strong>10 Steps</strong> (<strong>500Hz, CW</strong>) แล้วหยุดช่วงเวลาสั้น ๆ
+จากนั้น หมุนกลับอีก <strong>5 Steps</strong> (<strong>200Hz, CCW</strong>) ทำซ้ำต่อเนื่อง</p>
 <pre><code class="language-python">from machine import Pin, Timer
 import uasyncio as asyncio
 
@@ -637,7 +639,7 @@ def timer_callback(timer):
 async def send_pulses(steps, rate_hz, direction=1):
     global seq, steps_target, step_count, seq_idx, done
     seq = seq_cw if direction &gt; 0 else seq_ccw
-    steps_target = 4*steps
+    steps_target = 4*steps    # the number of steps multiplied by 4
     step_count = 0
     seq_idx = 0
     done = False
@@ -649,11 +651,9 @@ async def send_pulses(steps, rate_hz, direction=1):
 
 async def main():
     while True:
-        # Step rate 500Hz, 10 steps, CW
-        await send_pulses(10, 500, 1)
+        await send_pulses(10, 500, 1)   # Step rate 500Hz, 10 steps, CW
         await asyncio.sleep_ms(10)
-        # Step rate 200Hz, 5 steps, CCW
-        await send_pulses(5, 200, -1) 
+        await send_pulses(5, 200, -1)   # Step rate 200Hz, 5 steps, CCW
         await asyncio.sleep(1)
 
 try:
@@ -666,6 +666,7 @@ except KeyboardInterrupt:
 <p><img alt="" src="ex28-wave-2.jpg" /></p>
 <p><img alt="" src="ex28-wave-3.jpg" /></p>
 <p>รูป: สัญญาณ <strong>A</strong> และ <strong>B</strong></p>
+<p>ข้อสังเกต: ในช่วงเวลา <strong>Idle</strong> ซึ่งไม่มีการเปลี่ยนแปลงใดๆ  สถานะลอจิกของสัญญาณ <strong>A</strong> และ <strong>B</strong> จะเป็น <strong>High (1)</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="example-29-generating-quadrature-pulse-signals-using-esp32-rmts">&#9655; <strong>Example 29: Generating Quadrature Pulse Signals Using ESP32 RMTs</strong><a class="headerlink" href="#example-29-generating-quadrature-pulse-signals-using-esp32-rmts" title="Permanent link">#</a></h2>
@@ -697,15 +698,15 @@ rmtB = esp32.RMT(1, pin=pulseOutB, clock_div=clk_div)
 def send_pulse(steps, direction=1):
     pulses = []
     for i in range(steps):
-        pulses.extend( [500,500] )  # 500usec , 500usec (step size)    
+        pulses.extend( [500,500] )  # L=500usec, H=500usec (step size)    
     if direction &gt; 0:
         a, b = rmtB, rmtA
     else:
         a, b = rmtA, rmtB
     state = machine.disable_irq()  
-    a.write_pulses(pulses, 0)
+    a.write_pulses(pulses, 0)  # Start sending pulses with logic 0
     time.sleep_us(500//2)
-    b.write_pulses(pulses, 0)
+    b.write_pulses(pulses, 0)  # Start sending pulses with logic 0
     machine.enable_irq(state)
     pulses = []
     while not b.wait_done(timeout=1):
@@ -728,6 +729,7 @@ except KeyboardInterrupt:
 <p><img alt="" src="ex29-wave-3.jpg" /></p>
 <p>รูป: สัญญาณ <strong>A</strong> และ <strong>B</strong></p>
 <p>จากรูปคลื่นสัญญาณ จะเห็นได้ว่า ความกว้างของ <strong>Step</strong> จะเท่ากับ <strong>500 usec</strong></p>
+<p>ข้อสังเกต: ในช่วงเวลา <strong>Idle</strong> ซึ่งไม่มีการเปลี่ยนแปลงใดๆ  สถานะลอจิกของสัญญาณ <strong>A</strong> และ <strong>B</strong> จะเป็น <strong>Low (0)</strong></p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
@@ -738,7 +740,7 @@ except KeyboardInterrupt:
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-08-14 | Last Updated: 2025-08-14</p></div>
+<p>Created: 2025-08-14 | Last Updated: 2025-08-17</p></div>
             </div>
         </div>
 
