@@ -187,14 +187,20 @@ the valid output is LOW.</li>
 <p>This VHDL code below shows how to scan a 4x4 keypad and
 show the valid key value using two digits of 7-segment display
 (<code>HEX0</code> for the column index and <code>HEX1</code> for the row index).</p>
+<p>Note:</p>
+<ul>
+<li>The valid key signal (<code>key_valid</code>) is connected to <code>LEDS(9)</code>.</li>
+<li>The <code>DBG(7..0)</code> signals are used for debugging purposes and can be<br />
+  monitored or analyzed with a logic analyzer.</li>
+</ul>
 <p><strong>VHDL Code Listing</strong></p>
 <pre><code class="language-VHDL">-- File: keypad_scan.vhd
 
 -- Keypad layout:
---  R0C0   R0C1   R0C2   R0C3
---  R1C0   R1C1   R1C2   R1C3
---  R2C0   R2C1   R2C2   R2C3
---  R3C0   R3C1   R3C2   R3C3
+--  R0C0 (1) R0C1 (2) R0C2 (3)  R0C3 (A)
+--  R1C0 (4) R1C1 (5) R1C2 (6)  R1C3 (B)
+--  R2C0 (7) R2C1 (8) R2C2 (9)  R2C3 (C)
+--  R3C0 (*) R3C1 (0) R3C2 (#)  R3C3 (D)
 
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
@@ -202,17 +208,18 @@ USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY keypad_scan IS
     GENERIC (
-        CLK_FREQ_HZ : INTEGER := 50000000;
-        SCAN_RATE   : INTEGER := 500
+        CLK_FREQ_HZ : INTEGER := 50_000_000;
+        SCAN_RATE : INTEGER := 500
     );
     PORT (
-        CLK   : IN  STD_LOGIC; -- Clock input
-        RST_N : IN  STD_LOGIC; -- Active-low asynchronous reset
+        CLK   : IN STD_LOGIC; -- Clock input
+        RST_N : IN STD_LOGIC; -- Active-low asynchronous reset
         ROWS  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0); -- Row inputs
         COLS  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); -- Column outputs
         HEX0  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- Detected row index
         HEX1  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- Detected column index
-        VALID : OUT STD_LOGIC -- Valid key status
+        LEDS  : OUT STD_LOGIC_VECTOR(9 DOWNTO 0); -- LEDs
+        DBG   : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)  -- Debug signals 
     );
 END keypad_scan;
 
@@ -229,6 +236,9 @@ ARCHITECTURE behavioral OF keypad_scan IS
     SIGNAL key_row   : INTEGER RANGE 0 TO 15 := 0;
     SIGNAL key_col   : INTEGER RANGE 0 TO 15 := 0;
     SIGNAL key_valid : STD_LOGIC := '0';
+    SIGNAL key_code  : INTEGER RANGE 0 TO 15 := 0;
+    SIGNAL key_cnt   : INTEGER RANGE 0 TO 15 := 0;
+    SIGNAL key_released : STD_LOGIC := '1';
 
     FUNCTION bcd2seg7(bcd : INTEGER) RETURN STD_LOGIC_VECTOR IS
         VARIABLE seg : STD_LOGIC_VECTOR(6 DOWNTO 0);
@@ -255,14 +265,14 @@ BEGIN
     BEGIN
         IF RST_N = '0' THEN
             clk_cnt &lt;= 0;
-            clk_en  &lt;= '0';
+            clk_en &lt;= '0';
         ELSIF rising_edge(CLK) THEN
             IF clk_cnt = COUNT_MAX - 1 THEN
                 clk_cnt &lt;= 0;
-                clk_en  &lt;= '1';
+                clk_en &lt;= '1';
             ELSE
                 clk_cnt &lt;= clk_cnt + 1;
-                clk_en  &lt;= '0';
+                clk_en &lt;= '0';
             END IF;
         END IF;
     END PROCESS;
@@ -273,7 +283,7 @@ BEGIN
     BEGIN
         IF RST_N = '0' THEN
             col_index &lt;= 0;
-            col_reg   &lt;= &quot;1110&quot;;
+            col_reg &lt;= &quot;1110&quot;;
         ELSIF rising_edge(CLK) THEN
             IF clk_en = '1' THEN
                 next_col_index := (col_index + 1) MOD 4;
@@ -313,13 +323,40 @@ BEGIN
     END PROCESS;
 
     -- Concurrent output signal assignments
-    COLS  &lt;= col_reg;
-    VALID &lt;= key_valid;
+    COLS &lt;= col_reg;
+    LEDS(9) &lt;= key_valid;
+    LEDS(8 DOWNTO 0) &lt;= (OTHERS =&gt; '0'); -- not used
 
+    -- Show row and column indices of the pressed key on the 2-digit 7-segment display
     HEX1 &lt;= '1' &amp; bcd2seg7(key_row) WHEN key_valid = '1' ELSE
-            (OTHERS =&gt; '1');
+        (OTHERS =&gt; '1');
     HEX0 &lt;= '1' &amp; bcd2seg7(key_col) WHEN key_valid = '1' ELSE
-            (OTHERS =&gt; '1');
+        (OTHERS =&gt; '1');
+
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            key_code &lt;= 0;
+            key_released &lt;= '1';
+            key_cnt &lt;= 15;
+        ELSIF rising_edge(clk) AND clk_en = '1' THEN
+            IF key_valid = '1' THEN
+                key_code &lt;= 4 * key_row + key_col;
+                key_cnt &lt;= 15;
+                key_released &lt;= '0';
+            ELSE
+                IF key_cnt = 0 THEN
+                    key_released &lt;= '1';
+                ELSE
+                    key_cnt &lt;= key_cnt - 1; -- count down
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    -- Assign debug output signals
+    DBG(3 DOWNTO 0) &lt;= STD_LOGIC_VECTOR(TO_UNSIGNED(key_code, 4));
+    DBG(7 DOWNTO 4) &lt;= &quot;00&quot; &amp; key_released &amp; key_valid;
 
 END behavioral;
 </code></pre>
@@ -349,15 +386,23 @@ set_location_assignment PIN_B8 -to RST_N
 # LEDS
 #============================================================
 
-foreach i {0 1 2 3 4 5 6 7} {
-    set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to KEY[$i]
+foreach i {0 1 2 3 4 5 6 7 8 9} {
+    set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[$i]
 }
 
-set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to VALID
-set_location_assignment PIN_A8 -to VALID
+set_location_assignment PIN_A8  -to LEDS[0]
+set_location_assignment PIN_A9  -to LEDS[1]
+set_location_assignment PIN_A10 -to LEDS[2]
+set_location_assignment PIN_B10 -to LEDS[3]
+set_location_assignment PIN_D13 -to LEDS[4]
+set_location_assignment PIN_C13 -to LEDS[5]
+set_location_assignment PIN_E14 -to LEDS[6]
+set_location_assignment PIN_D14 -to LEDS[7]
+set_location_assignment PIN_A11 -to LEDS[8]
+set_location_assignment PIN_B11 -to LEDS[9]
 
 #============================================================
-# 7-segments
+# 7-Segment Display
 #============================================================
 
 foreach i {0 1 2 3 4 5 6 7} {
@@ -400,6 +445,15 @@ set_location_assignment PIN_W11  -to COLS[0]
 set_location_assignment PIN_AA10 -to COLS[1]
 set_location_assignment PIN_Y8   -to COLS[2]
 set_location_assignment PIN_Y7   -to COLS[3]
+
+
+# Assign locations by iterating over both index and pin
+set idx 0
+foreach pin {PIN_V10 PIN_V9 PIN_V8 PIN_V7 PIN_W10 PIN_W9 PIN_W8 PIN_W7} {
+    set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DBG[$idx]
+    set_location_assignment $pin -to DBG[$idx]
+    incr idx
+}
 </code></pre>
 <p><strong>Note:</strong></p>
 <ul>
@@ -416,6 +470,11 @@ using the following Tcl command:</li>
 <p><strong>Figure:</strong> Key pressed at R2C0</p>
 <p><img alt="" src="demo-3.jpg" /></p>
 <p><strong>Figure:</strong> Key pressed at R3C1</p>
+<p>The following figure shows the waveforms of the <code>DBG</code> (debug)
+signals when pressing the keypad in the sequence <code>1 → 2 → 3</code>,
+corresponding to the keycode sequence <code>"0000" → "0001" → "0010"</code>.</p>
+<p><img alt="" src="keypad_debug_waveforms.png" /></p>
+<p><strong>Figure:</strong> Digital waveforms of the DEBUG signals captured by a USB logic analyzer</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="coding-exercise"><strong>Coding Exercise</strong><a class="headerlink" href="#coding-exercise" title="Permanent link">#</a></h2>
@@ -424,12 +483,18 @@ using the following Tcl command:</li>
 <li>The number should consist of up to 6 digits, ranging from 0 to 9.</li>
 <li>Each time a valid digit is pressed, update the 7-segment display to reflect the current input.</li>
 <li>To submit the entered number, press the <code>#</code> key.</li>
-<li>If the entered number matches the secret PIN, turn on the <code>LED</code>.<br />
-  Otherwise, keep the <code>LED</code> turned off.</li>
+<li>To clear the enry, press the <code>*</code> key.</li>
+<li>
+<p>If the entered number matches the secret PIN, turn on the <code>LED</code>.<br />
+  Otherwise, keep the <code>LED</code> turned off.</p>
+</li>
+<li>
+<p>VHDL Example: <a href="keypad_scan_123456.vhd"><code>keypad_scan_123456.vhd</code></a></p>
+</li>
 </ul>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-06-11 | Last Updated: 2025-06-11</p></div>
+<p>Created: 2025-06-11 | Last Updated: 2025-08-29</p></div>
             </div>
         </div>
 
