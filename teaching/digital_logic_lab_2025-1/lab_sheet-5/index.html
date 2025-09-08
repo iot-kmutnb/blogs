@@ -142,6 +142,30 @@
             </li>
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#lab-5-ram-based-fifo-testing" class="nav-link">Lab 5: RAM-based FIFO Testing</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#objective_4" class="nav-link">Objective</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#lab-procedure_3" class="nav-link">Lab Procedure</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#lab-6-altera-fifo-ip-core-testing" class="nav-link">Lab 6: Altera FIFO IP Core Testing</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#objective_5" class="nav-link">Objective</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#lab-procedure_4" class="nav-link">Lab Procedure</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -156,6 +180,8 @@
 <li><a href="#lab-2-accumulator"><strong>Lab 2: Accumulator</strong></a></li>
 <li><a href="#lab-3-linear-feedback-shift-register-lfsr"><strong>Lab 3: Linear Feedback Shift Register (LFSR)</strong></a></li>
 <li><a href="#lab-4-on-chip-ram-testing"><strong>Lab 4: On-chip RAM Testing</strong></a></li>
+<li><a href="#lab-5-ram-based-fifo-testing"><strong>Lab 5: RAM-based FIFO Testing</strong></a></li>
+<li><a href="#lab-6-altera-fifo-ip-core-testing"><strong>Lab 6: Altera FIFO IP Core Testing</strong></a></li>
 </ul>
 <h3 id="hardware-software-required"><strong>Hardware / Software Required</strong><a class="headerlink" href="#hardware-software-required" title="Permanent link">#</a></h3>
 <ul>
@@ -255,7 +281,7 @@ ARCHITECTURE sim OF tb_adder IS
     COMPONENT ADDER IS
         GENERIC (N : INTEGER := 8);
         PORT (
-            CIN  : IN STD_LOGIC;
+            CIN  : IN  STD_LOGIC;
             A, B : IN  STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             SUM  : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             COUT : OUT STD_LOGIC
@@ -340,7 +366,7 @@ on the next clock cycle.</li>
 Use an <code>N</code>-bit adder and an <code>M</code>-bit register 
 (where <code>M &gt; N</code>, e.g., <code>N=8</code>, <code>M=12</code>) to implement the accumulator.
 Make the design modular by creating separate components 
-and then instantiating them in the top-level accumulator system (<code>accumulator_demo</code>).</li>
+and then instantiating them in the top-level design (<code>acc_demo</code>).</li>
 <li>Connect the I/O of the accumulator as follows:<ul>
 <li>The integer (unsigned) value from the external <code>N</code>-bit slide switches 
   is internally zero-extended to <code>M</code> bits and applied as one input of the adder.</li>
@@ -359,10 +385,11 @@ to verify its correctness.</li>
 and observe the resulting change in the accumulator value.</li>
 </ul>
 </li>
+<li>Demonstrate your FPGA design to the lab instructor.</li>
 </ol>
 <p><strong>VHDL entity for the accumulator demo</strong></p>
 <pre><code class="language-VHDL">
-ENTITY accumulator_demo IS
+ENTITY acc_demo IS
     GENERIC (
         N : INTEGER := 8;
         M : INTEGER := 12
@@ -378,7 +405,7 @@ ENTITY accumulator_demo IS
         HEX2  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
         HEX3  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)   
     );
-END ENTITY accumulator_demo;
+END ENTITY acc_demo;
 </code></pre>
 <p>&nbsp;</p>
 <hr />
@@ -402,8 +429,9 @@ The seed must not be all zeros, otherwise it will stay at all 0's forever.</p>
 If the XOR taps are chosen correctly, the LFSR is called a <strong>maximum-length LFSR</strong>.</p>
 <p>Mathematically, the tap selection depends on the so-called <strong>primitive polynomials over GF(2)</strong>, where <strong>GF(2)</strong> denotes the <strong>Galois Field with two elements: 0 and 1</strong>.</p>
 <ol>
-<li>Write VHDL code to implement a circuit that uses the provided VHDL code
-for an LFSR. The function of the circuit is as follows:<ul>
+<li>Write VHDL code to implement a circuit (with the VHDL entity name <code>lfsr_demo</code>)
+that instantiates the provided the LFSR module (<code>lfsr</code>) in VHDL. 
+The function of the circuit is as follows:<ul>
 <li>When the reset input (<code>RST_N</code>) is asserted ('0', active-low) or at power-up
   or when the button (<code>BTN</code>) is clicked, 
   the initial value from the slide switches (<code>SW</code>) 
@@ -560,16 +588,22 @@ END ARCHITECTURE;
 <ul>
 <li>Learn how to use on-chip RAM of the MAX10 FPGA chip.</li>
 </ul>
+<p><strong>Embedded Memory Blocks</strong></p>
+<p>Modern FPGA architectures typically include different types of storage components such as flip-flops, LUT-RAMs (also called <strong>distributed RAMs</strong>), and embedded memory blocks (also called <strong>Block RAMs</strong>). Embedded memory blocks on an FPGA have a fixed storage capacity (typically a few kilobits), but their configuration—such as memory depth and data width—is flexible. 
+In addition, they support both single- and dual-port read/write memory configurations, with single or dual clocks.</p>
+<p>In this lab, we will learn how to write VHDL code to infer the use of embedded memory blocks
+available on the MAX10 FPGA to implement a <strong>synchronous single-port RAM</strong>.</p>
 <h3 id="lab-procedure_2"><strong>Lab Procedure</strong><a class="headerlink" href="#lab-procedure_2" title="Permanent link">#</a></h3>
 <ol>
-<li>Write VHDL code that implements a simple <strong>on-chip RAM tester</strong>.</li>
+<li>Write VHDL code that implements a simple <strong>on-chip RAM tester</strong> 
+(with the VHDL entity name <code>ram_tester</code>).</li>
 <li>The function of the RAM tester is as follows:<ul>
 <li>It utilizes the provided VHDL model of a <strong>single-port synchronous RAM</strong>,
   which the Quartus software can infer to implement using the FPGA’s on-chip RAM resources.</li>
 <li>The RAM has <code>N</code> data bits and <code>M</code> address bits, and should infer <strong>FPGA block RAM</strong>
   when the size of the memory (<script type="math/tex">2^M \times N</script>) is large enough to fit into
   the FPGA’s <strong>dedicated memory blocks</strong> rather than being mapped to <strong>distributed RAM logic</strong>.</li>
-<li>An LFSR is used to generate test patterns for the RAM.</li>
+<li>An LFSR is used to generate test patterns for writing data into the RAM.</li>
 <li>An FSM controls the RAM write and read operations for testing purposes.</li>
 <li>On reset, the LFSR is seeded with an initial value, and the FSM waits for a <code>START</code> pulse.</li>
 <li>When <code>START</code> is asserted by pressing the button, the FSM writes to all RAM addresses one by one, starting from address zero, with data generated by the LFSR.</li>
@@ -580,6 +614,7 @@ END ARCHITECTURE;
 <li>When the RAM test process is complete, the <code>LED_DONE</code> output is high, otherwise it is low.</li>
 </ul>
 </li>
+<li>Demonstrate your FPGA design to the lab instructor.</li>
 </ol>
 <p><strong>VHDL entity for the RAM tester</strong></p>
 <pre><code class="language-VHDL">ENTITY ram_tester IS
@@ -632,7 +667,10 @@ ARCHITECTURE rtl OF RAM_SP IS
         RETURN tmp;
     END init_ram;
 
-    --signal ram : ram_t := init_ram; -- use this for simulation only
+    -- RAM declaration with initialization (use this for simulation only!)
+    --signal ram : ram_t := init_ram;
+
+    -- RAM declaration without initialization (use this for synthesis!)
     SIGNAL ram : ram_t;
 
     SIGNAL addr_reg : NATURAL RANGE 0 TO 2**ADDR_WIDTH - 1 := 0;
@@ -652,7 +690,7 @@ BEGIN
 END ARCHITECTURE;
 </code></pre>
 <p><img alt="" src="tb_ram_tester_sim.jpg" /></p>
-<p><strong>Figure:</strong> Example of simulation waveforms (using GHDL and GTKwave form VHDL simulation)</p>
+<p><strong>Figure:</strong> Example of simulation waveforms (using GHDL and GTKwave for VHDL simulation)</p>
 <p><strong>Questions</strong></p>
 <ul>
 <li>For a data width of 8 bits, what is the maximum memory depth that can be used and still fit on the target FPGA?</li>
@@ -660,10 +698,309 @@ END ARCHITECTURE;
 <li>How does the width of the data bus affect the number of block RAMs required to implement a given memory?</li>
 <li>How can it be checked whether memory inference in VHDL will use block RAM rather than distributed logic?</li>
 </ul>
+<hr />
+<h2 id="lab-5-ram-based-fifo-testing"><strong>Lab 5: RAM-based FIFO Testing</strong><a class="headerlink" href="#lab-5-ram-based-fifo-testing" title="Permanent link">#</a></h2>
+<h3 id="objective_4"><strong>Objective</strong><a class="headerlink" href="#objective_4" title="Permanent link">#</a></h3>
+<ul>
+<li>Learn how to use on-chip RAM of the MAX10 FPGA chip to implement a FIFO.</li>
+<li>Understand the principles of FIFO (First-In-First-Out) memory.</li>
+</ul>
+<p>A <strong>FIFO</strong> (<em>First-In-First-Out</em>) is a special type of memory that stores data 
+in the order it is written and guarantees that the first data written is 
+the first data read. It is commonly used for buffering and data streaming.</p>
+<p>In this lab, we will use the FPGA’s embedded memory blocks to implement a FIFO with two independent, synchronous read and write ports.</p>
+<h3 id="lab-procedure_3"><strong>Lab Procedure</strong><a class="headerlink" href="#lab-procedure_3" title="Permanent link">#</a></h3>
+<ol>
+<li>Write VHDL testbench (<code>tb_fifo_sc</code>) to simulate the operation of the 
+the provided FIFO module (<code>fifo_sc</code>), which requires
+a single-clock, dual-port RAM module (<code>ram_dp_sc</code>).</li>
+<li>Write VHDL code that implements a simple <strong>FIFO tester</strong> 
+(with the VHDL entity name <code>fifo_tester</code>).</li>
+<li>The function of the FIFO tester is as follows:<ul>
+<li>It uses the provided FIFO module (<code>fifo_sc</code>).</li>
+<li>Two onboard push buttons are used for the <code>RST_N</code> signal and the <code>TEST</code> signal. Both input signals are active-low.</li>
+<li>Two onboard slide switches are used to select the <strong>FIFO put and get operations</strong>.</li>
+<li>Two onboard LEDs are used to indicate the <strong>FIFO full and empty status</strong>.</li>
+<li>The <code>TEST</code> input must be processed through debounce logic.</li>
+<li>If <code>TEST</code> is held ('0') and <code>PUT</code> = '1', the tester puts the next value from an 8-bit counter into the FIFO every 100 ms, provided the FIFO is not full.</li>
+<li>If <code>TEST</code> is held ('0') and <code>GET</code> = '1', the tester gets data from the FIFO every 100 ms, provided the FIFO is not empty.</li>
+<li>Data pushed comes from an 8-bit counter that increments each time.
+  Initially, the counter starts with the value <code>0xA0</code> (hex).</li>
+<li>The input data to the FIFO is displayed in HEX format on two 7-segment displays.</li>
+<li>The output data from the FIFO is displayed in HEX format on two 7-segment displays.</li>
+</ul>
+</li>
+<li>Complete the design project and test your design on the FPGA board.<ul>
+<li>Synthesize, implement, and download the design to the FPGA board.</li>
+<li>Apply test inputs using the switches and observe the results.</li>
+<li>Verify that the sequence of input data matches the sequence of output data according to FIFO operation.</li>
+<li>Check the FIFO full and empty indicators using the LEDs.</li>
+<li>Test the design with two different FIFO depth settings (e.g., memory depths of 16 and 256). This step requires changing the memory depth and recompiling the design.</li>
+</ul>
+</li>
+</ol>
+<p><img alt="" src="fifo_sim-1.jpg" /></p>
+<p><img alt="" src="fifo_sim-2.jpg" /></p>
+<p><strong>Figure:</strong> Example waveform of FIFO simulation (FIFO depth = 16)</p>
+<p><strong>VHDL entity for the FIFO tester</strong> (<code>fifo_tester</code>)</p>
+<pre><code class="language-VHDL">ENTITY fifo_tester IS
+    PORT (
+        RST_N : IN STD_LOGIC;  -- active-low reset
+        CLK   : IN STD_LOGIC;  -- 50 MHz clock
+        TEST  : IN STD_LOGIC;  -- test button
+        PUT   : IN STD_LOGIC;  -- FIFO put operation
+        GET   : IN STD_LOGIC;  -- FIFO get operation
+        FULL  : OUT STD_LOGIC; -- FIFO full flag (LED)
+        EMPTY : OUT STD_LOGIC; -- FIFO empty flag (LED)
+        HEX3  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- for data output
+        HEX2  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX1  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- for data input
+        HEX0  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+</code></pre>
+<p><strong>VHDL code for dual-port, single-clock synchronous RAM</strong></p>
+<pre><code class="language-VHDL">-- Simple dual-port RAM with different read/write addresses 
+-- but single read/write clock
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+
+ENTITY ram_dp_sc IS
+    GENERIC (
+        DATA_WIDTH : NATURAL := 8;
+        ADDR_WIDTH : NATURAL := 6
+    );
+    PORT (
+        clk   : IN STD_LOGIC;         -- clock
+        we    : IN STD_LOGIC := '0';  -- write enable
+        raddr : IN NATURAL RANGE 0 TO 2**ADDR_WIDTH - 1; -- read address
+        waddr : IN NATURAL RANGE 0 TO 2**ADDR_WIDTH - 1; -- write address
+        data  : IN  STD_LOGIC_VECTOR((DATA_WIDTH - 1) DOWNTO 0); -- data in
+        q     : OUT STD_LOGIC_VECTOR((DATA_WIDTH - 1) DOWNTO 0)  -- data out
+    );
+
+END ENTITY;
+
+ARCHITECTURE rtl OF ram_dp_sc IS
+    -- Build a 2-D array type for the RAM
+    SUBTYPE word_t IS STD_LOGIC_VECTOR((DATA_WIDTH - 1) DOWNTO 0);
+    TYPE memory_t IS ARRAY(2**ADDR_WIDTH - 1 DOWNTO 0) OF word_t;
+    -- Declare the RAM signal. 
+    SIGNAL ram : memory_t;
+
+BEGIN
+    PROCESS (clk)
+    BEGIN
+        IF (rising_edge(clk)) THEN
+            IF (we = '1') THEN
+                ram(waddr) &lt;= data; -- write the data
+            END IF;
+            q &lt;= ram(raddr); -- read the data
+        END IF;
+    END PROCESS;
+END rtl;
+</code></pre>
+<p><strong>VHDL code for single-clock FIFO</strong></p>
+<pre><code class="language-VHDL">-- Single-clock FIFO (Altera-like behavior, show-ahead)
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY fifo_sc IS
+    GENERIC (
+        DATA_WIDTH : NATURAL := 8;
+        ADDR_WIDTH : NATURAL := 10 -- FIFO depth = 2^ADDR_WIDTH
+    );
+    PORT (
+        clk   : IN STD_LOGIC;
+        rst_n : IN STD_LOGIC;
+        wr_en : IN STD_LOGIC;
+        rd_en : IN STD_LOGIC;
+        din   : IN STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+        dout  : OUT STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+        full  : OUT STD_LOGIC;
+        empty : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF fifo_sc IS
+    CONSTANT MEM_DEPTH : NATURAL := 2 ** ADDR_WIDTH;
+
+    SIGNAL wr_ptr, rd_ptr : NATURAL RANGE 0 TO MEM_DEPTH - 1 := 0;
+    SIGNAL fifo_count : NATURAL RANGE 0 TO MEM_DEPTH := 0;
+
+    SIGNAL ram_in   : STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+    SIGNAL ram_out  : STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0);
+    SIGNAL dout_reg : STD_LOGIC_VECTOR(DATA_WIDTH - 1 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL ram_we   : STD_LOGIC;
+    SIGNAL is_full, is_empty : STD_LOGIC;
+
+BEGIN
+    ram_in &lt;= din;
+    ram_we &lt;= (wr_en AND NOT is_full);
+
+    -- dual-port RAM
+    u_ram : ENTITY work.ram_dp_sc
+        GENERIC MAP(
+            DATA_WIDTH =&gt; DATA_WIDTH,
+            ADDR_WIDTH =&gt; ADDR_WIDTH
+        )
+        PORT MAP(
+            clk =&gt; clk,
+            raddr =&gt; rd_ptr,
+            waddr =&gt; wr_ptr,
+            data =&gt; ram_in,
+            we =&gt; ram_we,
+            q =&gt; ram_out
+        );
+
+    fifo_wr_proc : PROCESS (clk, rst_n)
+    BEGIN
+        IF rst_n = '0' THEN
+            wr_ptr &lt;= 0;
+        ELSIF rising_edge(clk) THEN
+            IF (wr_en = '1' AND is_full = '0') THEN
+                IF wr_ptr = MEM_DEPTH - 1 THEN
+                    wr_ptr &lt;= 0;
+                ELSE
+                    wr_ptr &lt;= wr_ptr + 1;
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    fifo_rd_proc : PROCESS (clk, rst_n)
+    BEGIN
+        IF rst_n = '0' THEN
+            rd_ptr &lt;= 0;
+            dout_reg &lt;= (OTHERS =&gt; '0');
+        ELSIF rising_edge(clk) THEN
+            -- Update read pointer when valid read
+            IF (rd_en = '1' AND is_empty = '0') THEN
+                IF rd_ptr = MEM_DEPTH - 1 THEN
+                    rd_ptr &lt;= 0;
+                ELSE
+                    rd_ptr &lt;= rd_ptr + 1;
+                END IF;
+            END IF;
+            -- Output logic
+            IF (rd_en = '1' AND is_empty = '0') THEN
+                -- Normal read
+                dout_reg &lt;= ram_out;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    fifo_cnt_proc : PROCESS (clk, rst_n)
+        VARIABLE wr_rd_en : STD_LOGIC_VECTOR(1 DOWNTO 0);
+    BEGIN
+        IF rst_n = '0' THEN
+            fifo_count &lt;= 0;
+        ELSIF rising_edge(clk) THEN
+            wr_rd_en := wr_en &amp; rd_en;
+            CASE wr_rd_en IS
+                WHEN &quot;10&quot; =&gt; -- write only
+                    IF is_full = '0' THEN
+                        fifo_count &lt;= fifo_count + 1;
+                    END IF;
+                WHEN &quot;01&quot; =&gt; -- read only
+                    IF is_empty = '0' THEN
+                        fifo_count &lt;= fifo_count - 1;
+                    END IF;
+                WHEN OTHERS =&gt;
+                    NULL; -- write+read (no net change) or idle
+            END CASE;
+        END IF;
+    END PROCESS;
+
+    -- Status signals
+    is_full &lt;= '1' WHEN fifo_count = MEM_DEPTH ELSE
+        '0';
+    is_empty &lt;= '1' WHEN fifo_count = 0 ELSE
+        '0';
+
+    full &lt;= is_full;
+    empty &lt;= is_empty;
+    dout &lt;= dout_reg;
+END ARCHITECTURE;
+</code></pre>
+<p><strong>Questions</strong></p>
+<ul>
+<li>What are the initial logic states of the <code>EMPTY</code> and <code>FULL</code> signals?</li>
+<li>If the FIFO is not empty, does the data output of the FIFO give the first data to be read?</li>
+<li>Explain the behavior of the FIFO by observing <code>din</code> and <code>dout</code>
+on the 7-segment display when the FIFO is empty, and both 
+the <code>PUT</code> and <code>GET</code> inputs are '1', while <code>TEST</code> is clicked multiple times.</li>
+<li>According to the Quartus synthesis report, how many bits of on-chip memory are used to implement the FIFO for FIFO depths of 16 and 256, respectively?</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="lab-6-altera-fifo-ip-core-testing"><strong>Lab 6: Altera FIFO IP Core Testing</strong><a class="headerlink" href="#lab-6-altera-fifo-ip-core-testing" title="Permanent link">#</a></h2>
+<h3 id="objective_5"><strong>Objective</strong><a class="headerlink" href="#objective_5" title="Permanent link">#</a></h3>
+<ul>
+<li>Learn how to use an FIFO generated by Intel/Altera IP Catalog.</li>
+</ul>
+<h3 id="lab-procedure_4"><strong>Lab Procedure</strong><a class="headerlink" href="#lab-procedure_4" title="Permanent link">#</a></h3>
+<ol>
+<li>Create a new project in <strong>Quartus Prime Lite</strong> first, then open the <strong>IP Catalog</strong>:<ul>
+<li>Select <strong>FIFO</strong>:
+Tools &gt; IP Catalog &gt; Basic Functions &gt; On-Chip Memory &gt; FIFO</li>
+<li>Set the IP variation filename to <code>fifo_ip</code> (use VHDL file type).</li>
+<li>Configure the FIFO IP core:<ul>
+<li>Use single common clock for both FIFO read and write operations.</li>
+<li>Select the data with (e.g. 8 bits) and the FIFO depth (e.g. 256).</li>
+</ul>
+</li>
+<li>Make sure that the FIFO IP core will have the following interface
+as shown in the figure below.</li>
+<li>Generate the IP core and insert the <strong>.qip</strong> file into the project.</li>
+</ul>
+</li>
+<li>Reuse your code from <strong>Lab 5</strong>, but replace the FIFO with the one generated
+by the IP Catalog.        </li>
+<li>Complete the design project and test your design on the FPGA board.</li>
+</ol>
+<p>&nbsp;</p>
+<p><img alt="" src="fifo_ip-1.jpg" /></p>
+<p><strong>Figure:</strong> Setting the IP variation filename for the FIFO</p>
+<p><img alt="" src="fifo_ip-2.jpg" /></p>
+<p><strong>Figure:</strong> FIFO Configuration (single-clock, synchronous FIFO mode)</p>
+<p><img alt="" src="fifo_ip-3.jpg" /></p>
+<p><strong>Figure:</strong> FIFO Configuration (with FIFO full, empty status and asynchronous clear)</p>
+<p><img alt="" src="fifo_ip-4.jpg" /></p>
+<p><strong>Figure:</strong> FIFO File Generation</p>
+<p><strong>VHDL entity of the FIFO generated by the IP Catalog</strong></p>
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+LIBRARY altera_mf;
+USE altera_mf.all;
+
+ENTITY fifo_ip IS
+    PORT (
+        aclr   : IN STD_LOGIC ;  -- async. clear
+        clock  : IN STD_LOGIC ;  -- clock
+        data   : IN STD_LOGIC_VECTOR (7 DOWNTO 0); -- data in
+        rdreq  : IN STD_LOGIC ;  -- FIFO read request
+        wrreq  : IN STD_LOGIC ;  -- FIFO write request
+        empty  : OUT STD_LOGIC ; -- FIFO empty status
+        full   : OUT STD_LOGIC ; -- FIFO full status
+        q      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0) -- data out
+    );
+END fifo_ip;
+</code></pre>
+<p><strong>Questions</strong></p>
+<ul>
+<li>Explain the behavior of the FIFO by observing <code>din</code> and <code>dout</code>
+on the 7-segment display when the FIFO is empty, and both 
+the <code>PUT</code> and <code>GET</code> inputs are '1', while <code>TEST</code> is clicked multiple times.</li>
+<li>Does the behavior of the FIFO in Lab 6 differ from that in Lab 5? If so, describe the difference.</li>
+</ul>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-09-03 | Last Updated: 2025-09-04</p></div>
+<p>Created: 2025-09-03 | Last Updated: 2025-09-08</p></div>
             </div>
         </div>
 
