@@ -166,6 +166,18 @@
             </li>
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#lab-7-signed-multiplier" class="nav-link">Lab 7: Signed Multiplier</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#objective_6" class="nav-link">Objective</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#lab-procedure_5" class="nav-link">Lab Procedure</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -182,6 +194,7 @@
 <li><a href="#lab-4-on-chip-ram-testing"><strong>Lab 4: On-chip RAM Testing</strong></a></li>
 <li><a href="#lab-5-ram-based-fifo-testing"><strong>Lab 5: RAM-based FIFO Testing</strong></a></li>
 <li><a href="#lab-6-altera-fifo-ip-core-testing"><strong>Lab 6: Altera FIFO IP Core Testing</strong></a></li>
+<li><a href="#lab-7-signed-multiplier"><strong>Lab 7: Signed Multiplier</strong></a></li>
 </ul>
 <h3 id="hardware-software-required"><strong>Hardware / Software Required</strong><a class="headerlink" href="#hardware-software-required" title="Permanent link">#</a></h3>
 <ul>
@@ -999,8 +1012,130 @@ the <code>PUT</code> and <code>GET</code> inputs are '1', while <code>TEST</code
 </ul>
 <p>&nbsp;</p>
 <hr />
+<h2 id="lab-7-signed-multiplier"><strong>Lab 7: Signed Multiplier</strong><a class="headerlink" href="#lab-7-signed-multiplier" title="Permanent link">#</a></h2>
+<h3 id="objective_6"><strong>Objective</strong><a class="headerlink" href="#objective_6" title="Permanent link">#</a></h3>
+<ul>
+<li>Learn how to implement a signed multiplier in VHDL.</li>
+</ul>
+<p>Multiplication is an arithmetic operation that can be implemented
+in digital logic circuits using various methods.
+In this lab, we will implement an <strong>array multiplier for
+two signed integers in 2’s complement form</strong>:
+<script type="math/tex">p = a \cdot b</script>, where <script type="math/tex">a</script> and <script type="math/tex">b</script> (the multiplicand and multiplier) are <script type="math/tex">N</script>-bit signed integers, and <script type="math/tex">p</script> is their <script type="math/tex">2N</script>-bit product.</p>
+<p>
+<script type="math/tex; mode=display">\begin{align}
+   a &= -a_{N-1}\cdot 2^{N-1} + \sum_{i=0}^{N-2} a_{i} \cdot 2^{i}, \, a_i \in \{0,1\} \\
+   b &= -b_{N-1}\cdot 2^{N-1} + \sum_{i=0}^{N-2} b_{i} \cdot 2^{i}, \, b_i \in \{0,1\} \\
+   p &= -p_{2N-1}\cdot 2^{2N-1} + \sum_{i=0}^{2N-2} p_{i} \cdot 2^{i}, \, p_i \in \{0,1\} \\
+     &= a \cdot b = a \cdot ( -b_{N-1}\cdot 2^{N-1} + \sum_{i=0}^{N-2} b_{i} \cdot 2^{i} ) \\
+     &= -b_{N-1} (a \ll (N-1)) + \sum_{i=0}^{N-2} b_{i} (a \ll i) \\
+\end{align}</script>
+</p>
+<p>Note that multiplication by <script type="math/tex">2^i</script> is equivalent to shifting <script type="math/tex">a</script> left by <script type="math/tex">i</script> bit positions:
+<script type="math/tex">a \cdot 2^i = a \ll i</script>. Before shifting, <script type="math/tex">a</script> must be signed extended to <script type="math/tex">2N</script> bits.</p>
+<h3 id="lab-procedure_5"><strong>Lab Procedure</strong><a class="headerlink" href="#lab-procedure_5" title="Permanent link">#</a></h3>
+<ol>
+<li>Write a VHDL testbench to simulate a signed array multiplier module.
+Its VHDL code (<code>mult_signed</code>) is provided below.<ul>
+<li>There are two different implementation styles of the signed multiplier 
+ (<code>rtl_infer</code> and <code>rtl_array</code>) in the VHDL code. </li>
+</ul>
+</li>
+<li>Write VHDL code (<code>mult_tester</code>) to test the signed multiplier. </li>
+<li>The multiplier tester has the following functions:<ul>
+<li>The VHDL entity of the design is given below.</li>
+<li>It uses the provided multiplier module (<code>mult_signed</code>).</li>
+<li>It takes input from 10-bit slide switches on the FPGA board to provide 
+  two 5-bit signed integers (2's complement representation) to the multiplier.</li>
+<li>The output of the multiplier is a 10-bit signed integer, 
+  which is displayed on four 7-segment display units. 
+  If the number is negative, the leftmost 7-segment unit must show a minus sign.</li>
+<li>For example, the slide switch input <code>1000001111</code> (bin) represents
+  the multiplier and multiplicand of <code>10000</code> = -16 and <code>01111</code> = 15, 
+  respectively and the multiplication result is -240.</li>
+<li>The signed multiplier (<code>mult_signed</code>) is combinational, 
+  meaning it computes the full multiplication result in a single clock cycle.</li>
+<li>The circuit has a system clock of 50 MHz and an asynchronous reset. 
+  The input signals from the slide switches must be registered before 
+  being fed to the multiplier. The result from the multiplier must 
+  also be registered before being used by the 7-segment display.</li>
+</ul>
+</li>
+<li>Complete the design project and test your design on the FPGA board.
+Compare the synthesis results for both multiplier implementation styles.</li>
+<li>Reimplement the signed-multiplier module as a <strong>sequential, multi-cycle multiplier</strong> that produces the same result. The multiplication will take several clock cycles rather than being completed in a single cycle. Revise the VHDL code of the top-level module to match the sequential version of the signed-multiplier module.</li>
+</ol>
+<p><strong>Questions:</strong></p>
+<ul>
+<li>Based on the provided VHDL code for a signed array multiplier, describe how the array multiplier builds the product step by step: from generating partial products, to combining them, and finally to handling the signed case.</li>
+<li>According to the Quartus synthesis report, which implementation style of 
+the signed multiplier uses fewer FPGA logic resources?</li>
+<li>According to the Static Timing Analysis report, which implementation style 
+of the signed multiplier has the maximum clock frequency (Fmax)?</li>
+</ul>
+<p><img alt="" src="signed_mult_sim.jpg" /></p>
+<p><strong>Figure:</strong> Example of simulation waveforms</p>
+<p><strong>The VHDL entity of the multiplier (top-level design)</strong></p>
+<pre><code class="language-VHDL">ENTITY multiplier IS
+    PORT (
+        CLK   : IN STD_LOGIC; -- system clock
+        RST_N : IN STD_LOGIC; -- async active-low reset
+        SW    : IN  STD_LOGIC_VECTOR(9 DOWNTO 0); -- multiplier input
+        HEX0  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- 7-seg outputs
+        HEX1  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX2  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        HEX3  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+</code></pre>
+<p><strong>VHDL code for the signed array multiplier</strong></p>
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY mult_signed IS
+  GENERIC (
+    N : INTEGER := 8 -- operand size
+  );
+  PORT (
+    a : IN signed(N - 1 DOWNTO 0);
+    b : IN signed(N - 1 DOWNTO 0);
+    p : OUT signed(2 * N - 1 DOWNTO 0)
+  );
+END ENTITY;
+
+-- Inferred multiplier
+ARCHITECTURE rtl_infer OF mult_signed IS
+BEGIN
+  p &lt;= a * b;
+END rtl_infer;
+
+-- array multiplier 
+ARCHITECTURE rtl_array OF mult_signed IS
+BEGIN
+  PROCESS (a, b)
+    VARIABLE product : signed(2 * N - 1 DOWNTO 0);
+    VARIABLE pp : signed(2 * N - 1 DOWNTO 0); -- partial product
+  BEGIN
+    product := (OTHERS =&gt; '0');
+    -- Generate partial products
+    FOR i IN 0 TO N - 2 LOOP
+      IF b(i) = '1' THEN
+        pp := resize(a, 2 * N) SLL i; -- shift left by i
+        product := product + pp;
+      END IF;
+    END LOOP;
+    -- Handle negative numbers (2's complement)
+    IF b(N - 1) = '1' THEN
+      product := product - (resize(a, 2 * N) SLL (N - 1));
+    END IF;
+    p &lt;= product;
+  END PROCESS;
+END ARCHITECTURE rtl_array;
+</code></pre>
+<hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-09-03 | Last Updated: 2025-09-08</p></div>
+<p>Created: 2025-09-03 | Last Updated: 2025-09-09</p></div>
             </div>
         </div>
 
