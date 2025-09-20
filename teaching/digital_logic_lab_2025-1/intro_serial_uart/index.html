@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/digital_logic_lab_2025-1/intro_serial_uart/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: Quartus Prime RS232-UART IP Core - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-quartus-prime-rs232-uart-ip-core" class="nav-link">Tutorial: Quartus Prime RS232-UART IP Core</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#serial-communication" class="nav-link">Serial Communication</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#rs232-uart-ip-core" class="nav-link">RS232 UART IP Core</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#serial-tx-testing" class="nav-link">Serial TX Testing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#analyzing-the-serial-tx-signal-using-a-digital-oscilloscope" class="nav-link">Analyzing the Serial Tx Signal Using a Digital Oscilloscope</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#analyzing-the-serial-tx-signal-using-a-usb-logic-analyzer" class="nav-link">Analyzing the Serial TX Signal Using a USB Logic Analyzer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#using-a-usb-to-serial-module" class="nav-link">Using a USB-to-Serial Module</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-code-for-serial-testing" class="nav-link">Python Code for Serial Testing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#serial-loopback-test" class="nav-link">Serial Loopback Test</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#on-chip-debug-with-signal-tap-logic-analyzer" class="nav-link">On-Chip Debug with Signal Tap Logic Analyzer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-quartus-prime-rs232-uart-ip-core"><strong>Tutorial: Quartus Prime RS232-UART IP Core</strong><a class="headerlink" href="#tutorial-quartus-prime-rs232-uart-ip-core" title="Permanent link">#</a></h1>
+<ul>
+<li><a href="#serial-communication"><strong>Serial Communication</strong></a></li>
+<li><a href="#rs232-uart-ip-core"><strong>RS232 UART IP Core</strong></a></li>
+<li><a href="#serial-tx-testing"><strong>Serial TX Testing</strong></a></li>
+<li><a href="#analyzing-the-serial-tx-signal-using-a-digital-oscilloscope"><strong>Analyzing the Serial Tx Signal Using a Digital Oscilloscope</strong></a></li>
+<li><a href="#analyzing-the-serial-tx-signal-using-a-usb-logic-analyzer"><strong>Analyzing the Serial TX Signal Using a USB Logic Analyzer</strong></a></li>
+<li><a href="#using-a-usb-to-serial-module"><strong>Using a USB-to-Serial Module</strong></a></li>
+<li><a href="#python-code-for-serial-testing"><strong>Python Code for Serial Testing</strong></a></li>
+<li><a href="#serial-loopback-test"><strong>Serial Loopback Test</strong></a></li>
+<li><a href="#on-chip-debug-with-signal-tap-logic-analyzer"><strong>On-Chip Debug with Signal Tap Logic Analyzer</strong></a></li>
+</ul>
+<hr />
+<h2 id="serial-communication"><strong>Serial Communication</strong><a class="headerlink" href="#serial-communication" title="Permanent link">#</a></h2>
+<p>Data communication between devices can be classified such as</p>
+<ul>
+<li><strong>bit-serial vs. bit-parallel</strong>: Devices can transmit one bit at a time (serial) or multiple bits simultaneously (parallel).</li>
+<li><strong>synchronous vs. asynchronous</strong>: In synchronous communication, data is transmitted with a shared clock; in asynchronous, data uses start/stop bits and no shared clock.</li>
+<li><strong>half-duplex vs. full-duplex</strong>: Half-duplex allows data in both directions but only one at a time. Full-duplex allows simultaneous two-way communication.</li>
+<li><strong>single-ended vs. differential signaling</strong>: Single-ended uses one wire per signal with a reference (often ground). Differential uses a pair of wires carrying opposite-polarity signals for noise immunity.</li>
+<li><strong>point-to-point vs. bus</strong>: Point-to-point connects only two devices. A bus connects multiple devices sharing the same communication path.</li>
+<li><strong>with handshaking vs. without handshaking</strong>: With handshaking, devices use control signals — like request-to-send (RTS) or busy-wait — to coordinate when data is sent. This ensures the sender only transmits data when the receiver is ready. Without handshaking, data is sent without any coordination, which can lead to timing errors if the receiver is not ready.</li>
+</ul>
+<p>In this tutorial, we will focus on <strong>UART</strong>, which stands for "<em>Universal Asynchronous Receiver / Transmitter</em>". It is a widely used protocol for <strong>asynchronous, bit-serial, full-duplex (two-way) communication</strong> between two hardware devices. </p>
+<p>A UART can be considered a hardware module responsible for the transmission and reception of data over a serial port interface. The <strong>idle (no-data) state</strong> on a serial line is typically a logic-high state. </p>
+<p>The UART hardware transmits each character framed with a logic-low <strong>start bit</strong>, an arbitrary number of <strong>data bits</strong> (typically 8 bits), an optional <strong>parity bit</strong>, and one or more <strong>stop bits</strong>. In most UART implementations, the least significant bit (<strong>LSB</strong>) is transmitted first. </p>
+<p>A commonly used standard for serial configuration is known as <strong>8N1</strong>: eight (8) data bits, no (N) parity bit, and one (1) stop bit. UART requires two data pins for two-way communication, namely <strong>TX</strong> (output) and <strong>RX</strong> (input). </p>
+<p><img alt="" src="uart_frame.jpg" /></p>
+<p><strong>Figure:</strong> UART frame (<strong>8N1</strong>)</p>
+<p>Some UART implementations include <strong>flow control signals</strong> such as <strong>CTS</strong> (<em>Clear to Send</em>) and <strong>RTS</strong> (<em>Request to Send</em>). They may also include <strong>FIFOs</strong> for RX and TX data buffering.</p>
+<p>With a UART hardware unit, simple data communication between a host computer and an FPGA board can be established. Although many open-source IP cores exist for UART implementation, we can use the <strong>RS232 UART IP core</strong> provided by Intel/Altera  when working with their FPGA devices.</p>
+<p>Next, we will learn how to use the <strong>RS232 UART IP core</strong> provided by <strong>Quartus Prime</strong> and test it on the <strong>DE10-Lite</strong> FPGA board.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="rs232-uart-ip-core"><strong>RS232 UART IP Core</strong><a class="headerlink" href="#rs232-uart-ip-core" title="Permanent link">#</a></h2>
+<p>This section provides a guideline for using <strong>RS232 UART IP core</strong>:</p>
+<ol>
+<li>Open <strong>Quartus Prime</strong>, create a new FPGA project using the <strong>New Project Wizard</strong>, then go to the menu "<strong>Tools &gt; Platform Designer</strong>" to start the <strong>Platform Designer</strong> tool.</li>
+<li>Add the <strong>RS-232 UART IP core</strong> to the <strong>System Contents</strong>. Select the IP core from "<strong>Library &gt; University Program &gt; Communication &gt; RS232 UART</strong>".</li>
+<li>Configure the IP core: select "<strong>Streaming</strong>" for the Avalon interface type.
+Use the <code>8N1</code> configuration and a baud rate of <code>115200</code>.</li>
+<li>Export and rename the selected UART signals, then connect the clock and reset signals for the components as shown in the wiring diagram below.</li>
+<li>Click the "<strong>Generate HDL</strong>" button to generate code for the IP core. Choose <strong>VHDL</strong> as the output type and specify the output directory for the IP core files.</li>
+<li>Save the <strong>Platform Designer project</strong> (<code>.qsys</code>)</li>
+<li>After generating the IP core, add the <code>.qsys</code> to the project.</li>
+<li>Instantiate the RS232 UART IP core in your top-level design.</li>
+</ol>
+<p><img alt="" src="uart_ip_gen-1.jpg" /></p>
+<p><strong>Figure:</strong> Platform Designer</p>
+<p><img alt="" src="uart_ip_gen-2.jpg" /></p>
+<p><strong>Figure:</strong> System Contents view in Platform Designer</p>
+<p><img alt="" src="uart_ip_gen-3.jpg" /></p>
+<p><strong>Figure:</strong> Adding the RS232 UART IP core</p>
+<p><img alt="" src="uart_ip_gen-4.jpg" /></p>
+<p><strong>Figure:</strong> Configuring the RS232 UART IP core (<strong>Streaming mode, 8N1, 115200</strong>)</p>
+<p><img alt="" src="uart_ip_gen-5.jpg" /></p>
+<p><strong>Figure:</strong> Exporting, renaming signals (<strong>clk</strong>, <strong>reset</strong>, <strong>from_uart</strong>,
+<strong>to_uart</strong>, <strong>uart</strong>) and connecting the components (<strong>clk_0</strong> and <strong>rs232_0</strong>) in the System Contents</p>
+<p><img alt="" src="uart_ip_gen-6.jpg" /></p>
+<p><strong>Figure:</strong> Generating HDL code</p>
+<p><img alt="" src="uart_ip_gen-7.jpg" /></p>
+<p><strong>Figure:</strong> Saving the Platform Designer System file (<code>.qsys</code>)</p>
+<p><img alt="" src="uart_ip_gen-8.jpg" /></p>
+<p><strong>Figure:</strong> Adding the Platform Designer System file (<code>.qsys</code>) to the project</p>
+<p>Note that <strong>Avalon</strong> is the name of a bus architecture for a CPU-based system, originally designed by Altera. Basically, the Avalon bus has two interface types: </p>
+<ul>
+<li>"<strong>Memory-Mapped</strong>" (Avalon-MM) </li>
+<li>"<strong>Streaming</strong>" (Avalon-ST)</li>
+</ul>
+<p>In this example, we will use the <strong>Avalon Streaming interface</strong> for the UART IP core.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="serial-tx-testing"><strong>Serial TX Testing</strong><a class="headerlink" href="#serial-tx-testing" title="Permanent link">#</a></h2>
+<p>In this section, an example VHDL code is provided
+to test the UART IP core in data transmission mode.
+The following VHDL code shows how to instantiate the UART core (<code>uart_core</code>) 
+and connect its interface signals in the top-level design (<code>uart_tester</code>).</p>
+<p>The design implements an FSM to send a predefined string (e.g. <code>Hello!\r\n</code>)
+as a sequence of characters at a baud rate of 115200. 
+The FSM sends one byte to the UART and waits for the transmitted byte to complete before proceeding to the next byte.</p>
+<p><strong>VHDL Code Listing</strong>: <code>uart_tester.vhd</code></p>
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY uart_tester IS
+    PORT (
+        CLK      : IN STD_LOGIC;
+        RESET_N  : IN STD_LOGIC;
+        UART_RXD : IN STD_LOGIC;
+        UART_TXD : OUT STD_LOGIC;
+        LEDS     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl_v1 OF uart_tester IS
+
+    COMPONENT uart_core IS
+        PORT (
+            clk_clk         : IN  STD_LOGIC;
+            reset_reset_n   : IN  STD_LOGIC;
+            from_uart_ready : IN  STD_LOGIC;
+            from_uart_data  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            from_uart_error : OUT STD_LOGIC;
+            from_uart_valid : OUT STD_LOGIC;
+            to_uart_data    : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+            to_uart_error   : IN  STD_LOGIC;
+            to_uart_valid   : IN  STD_LOGIC;
+            to_uart_ready   : OUT STD_LOGIC;
+            uart_RXD        : IN  STD_LOGIC;
+            uart_TXD        : OUT STD_LOGIC
+        );
+    END COMPONENT uart_core;
+
+    -- Signals to connect to UART IP core
+    SIGNAL rx_uart_ready : STD_LOGIC;
+    SIGNAL rx_uart_data  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL rx_uart_error : STD_LOGIC;
+    SIGNAL rx_uart_valid : STD_LOGIC;
+
+    SIGNAL tx_uart_data  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL tx_uart_error : STD_LOGIC := '0';
+    SIGNAL tx_uart_valid : STD_LOGIC := '0';
+    SIGNAL tx_uart_ready : STD_LOGIC;
+
+    -- FSM states
+    TYPE state_type IS (ST_IDLE, ST_SEND_BYTE, ST_UPDATE_LED, ST_DELAY);
+    SIGNAL state : state_type := ST_IDLE;
+
+    -- Array of bytes to send 
+    TYPE byte_array_t IS ARRAY (0 TO 7) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+    CONSTANT TEST_BYTES : byte_array_t := (
+        x&quot;48&quot;, -- 'H'
+        x&quot;65&quot;, -- 'e'
+        x&quot;6C&quot;, -- 'l'
+        x&quot;6C&quot;, -- 'l'
+        x&quot;6F&quot;, -- 'o'
+        x&quot;21&quot;, -- '!'
+        x&quot;0D&quot;, -- '\r'
+        x&quot;0A&quot;  -- '\n'
+    );
+
+    SIGNAL byte_index : INTEGER RANGE 0 TO TEST_BYTES'length - 1 := 0;
+
+    CONSTANT CNT_MAX : INTEGER := 10e6 - 1;
+    SIGNAL wait_cnt  : INTEGER RANGE 0 TO CNT_MAX := 0;
+
+BEGIN
+
+    -- Instantiate UART IP Core
+    u0 : uart_core
+    PORT MAP(
+        clk_clk         =&gt; CLK,
+        reset_reset_n   =&gt; reset_n,
+        UART_RXD        =&gt; UART_RXD,
+        UART_TXD        =&gt; UART_TXD,
+        from_uart_ready =&gt; rx_uart_ready,
+        from_uart_data  =&gt; rx_uart_data,
+        from_uart_error =&gt; rx_uart_error,
+        from_uart_valid =&gt; rx_uart_valid,
+        to_uart_data    =&gt; tx_uart_data,
+        to_uart_error   =&gt; tx_uart_error,
+        to_uart_valid   =&gt; tx_uart_valid,
+        to_uart_ready   =&gt; tx_uart_ready
+    );
+
+    -- FSM process
+    fsm_proc: PROCESS (CLK, RESET_N)
+    BEGIN
+        IF RESET_N = '0' THEN
+            state &lt;= ST_IDLE;
+            tx_uart_valid &lt;= '0';
+            tx_uart_data &lt;= (OTHERS =&gt; '0');
+            LEDS &lt;= (OTHERS =&gt; '0');
+            byte_index &lt;= 0;
+            wait_cnt &lt;= 0;
+
+        ELSIF rising_edge(CLK) THEN
+            CASE state IS
+
+                WHEN ST_IDLE =&gt;
+                    -- Wait until UART ready to accept new data for TX
+                    IF tx_uart_ready = '1' THEN
+                        tx_uart_data  &lt;= TEST_BYTES(byte_index);
+                        tx_uart_valid &lt;= '1'; -- assert data valid to UART
+                        state &lt;= ST_SEND_BYTE;
+                    END IF;
+
+                WHEN ST_SEND_BYTE =&gt;
+                    -- Deassert valid after one clock
+                    tx_uart_valid &lt;= '0';
+                    state &lt;= ST_UPDATE_LED;
+
+                WHEN ST_UPDATE_LED =&gt;
+                    LEDS &lt;= TEST_BYTES(byte_index); -- show byte on LEDs
+                    -- increment index for next byte
+                    IF byte_index = TEST_BYTES'length - 1 THEN
+                        wait_cnt &lt;= CNT_MAX;
+                        byte_index &lt;= 0; -- wrap to first byte
+                    ELSE
+                        wait_cnt &lt;= CNT_MAX/100;
+                        byte_index &lt;= byte_index + 1;
+                    END IF;
+                    state &lt;= ST_DELAY;
+
+                WHEN ST_DELAY =&gt;
+                    IF wait_cnt = 0 THEN
+                        state &lt;= ST_IDLE; -- send next byte
+                    ELSE
+                        wait_cnt &lt;= wait_cnt - 1;
+                    END IF;
+
+            END CASE;
+        END IF;
+    END PROCESS;
+
+END ARCHITECTURE;
+</code></pre>
+<p><img alt="" src="uart_ip_tester.jpg" /></p>
+<p><strong>Figure:</strong> Compilation for the Quartus project.</p>
+<p>&nbsp;</p>
+<p>The <strong>Tcl script</strong> for FPGA pin assignment (for the DE10-Lite FPGA board) is given as an example below.</p>
+<pre><code class="language-Tcl">#set_global_assignment -name DEVICE 10M50DAF484C7G
+#set_global_assignment -name FAMILY &quot;MAX 10&quot;
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3 V Schmitt Trigger&quot; -to RESET_N
+set_location_assignment PIN_P11 -to CLK
+set_location_assignment PIN_B8  -to RESET_N
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to UART_RXD
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to UART_TXD
+set_location_assignment PIN_V5  -to UART_RXD
+set_location_assignment PIN_W7  -to UART_TXD
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to LEDS[7]
+
+set_location_assignment PIN_A8  -to LEDS[0]
+set_location_assignment PIN_A9  -to LEDS[1]
+set_location_assignment PIN_A10 -to LEDS[2]
+set_location_assignment PIN_B10 -to LEDS[3]
+set_location_assignment PIN_D13 -to LEDS[4]
+set_location_assignment PIN_C13 -to LEDS[5]
+set_location_assignment PIN_E14 -to LEDS[6]
+set_location_assignment PIN_D14 -to LEDS[7]
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="analyzing-the-serial-tx-signal-using-a-digital-oscilloscope"><strong>Analyzing the Serial Tx Signal Using a Digital Oscilloscope</strong><a class="headerlink" href="#analyzing-the-serial-tx-signal-using-a-digital-oscilloscope" title="Permanent link">#</a></h2>
+<p>In this section, a digital oscilloscope is used to measure and analyze the TX signal of the UART interface.
+The following are examples of signal waveforms resulting from
+measuring the TX pin with a digital oscilloscope.
+Note that modern digital oscilloscopes can analyze RS232 UART signals and decode the data.</p>
+<p><img alt="" src="serial_waveform-1.jpg" /></p>
+<p><strong>Figure:</strong> Sending the character <code>'H'</code></p>
+<p><img alt="" src="serial_waveform-2.jpg" /></p>
+<p><strong>Figure:</strong> Sending the character <code>'e'</code></p>
+<p><img alt="" src="serial_waveform-3.jpg" /></p>
+<p><strong>Figure:</strong> Sending the character <code>'o'</code></p>
+<p><img alt="" src="serial_waveform-4.jpg" /></p>
+<p><strong>Figure:</strong> Sending the character <code>LF</code> (Line Feed)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="analyzing-the-serial-tx-signal-using-a-usb-logic-analyzer"><strong>Analyzing the Serial TX Signal Using a USB Logic Analyzer</strong><a class="headerlink" href="#analyzing-the-serial-tx-signal-using-a-usb-logic-analyzer" title="Permanent link">#</a></h2>
+<p>In addition, a low-cost <strong>USB logic analyzer</strong> (such as <strong>WeAct LogicAnalyzer V1</strong>
+<a href="https://github.com/WeActStudio/LogicAnalyzerV1"></a>) can also be used with
+<a href="https://sigrok.org/wiki/Downloads"><strong>Sigrok-PulseView</strong></a>
+software to capture and decode the serial Tx data.</p>
+<p><img alt="" src="pulseview_serial_decode.jpg" /></p>
+<p><strong>Figure:</strong> Serial data decoding in PulseView </p>
+<p>Note: The ASCII code of the character <code>H</code> in the ASCII table is <code>0x40</code>.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="using-a-usb-to-serial-module"><strong>Using a USB-to-Serial Module</strong><a class="headerlink" href="#using-a-usb-to-serial-module" title="Permanent link">#</a></h2>
+<p>In this section, we will use a <strong>USB-to-serial module</strong> (<strong>3.3V logic level</strong>) to interface with the <strong>DE10-Lite FPGA board</strong> according to
+the wiring diagram below).</p>
+<p><strong>Wiring Diagram</strong></p>
+<pre><code class="language-text">USB-to-Serial    FPGA 
+--------------------------------------
+TXD pin    ----&gt;  UART_RXD pin
+RXD pin    &lt;----  UART_TXD pin
+GND        -----  GND
+--------------------------------------
+</code></pre>
+<p>In this tutorial, we use the <strong>WCH-DAPlink</strong> module (with a serial interface) as
+an example.</p>
+<p><img alt="" src="usb-serial_module.jpg" /></p>
+<p><strong>Figure:</strong> WCH-DAPlink with a serial interface</p>
+<p><img alt="" src="fpga_usb_serial_module.jpg" /></p>
+<p><strong>Figure:</strong> Interfacing between the USB-to-Serial module and the FPGA board.</p>
+<p><strong>Note:</strong></p>
+<ul>
+<li>On Windows, you may need to install a <strong>USB device driver</strong> for the USB-to-serial module, depending on the chip used on the module (e.g., CP210x, FT232 and CH34x).</li>
+</ul>
+<p>To receive data from the FPGA board via the USB-to-serial module, a terminal program
+for Windows such as <a href="https://github.com/TeraTermProject/teraterm/releases/"><strong>Tera Term</strong></a> can be used. </p>
+<ol>
+<li>Download and install the Tera Term program.</li>
+<li>Open the Tera Term program and go to "<strong>Setup &gt; Serial Port...</strong>".</li>
+<li>Configure the serial port (select the correct port number, 8N1 and the baud rate),
+then click the Open button to connect to the serial port and receive data.</li>
+</ol>
+<p><img alt="" src="teraterm-1.jpg" /></p>
+<p><strong>Figure:</strong> Configuring the serial port in Tera Term</p>
+<p><img alt="" src="teraterm-2.jpg" /></p>
+<p><strong>Figure:</strong> Receiving data from the serial port in Tera Term</p>
+<p>Alternatively, <strong>VS Code IDE</strong> together with the <strong>Serial Monitor</strong> extension can be used for this purpose.</p>
+<ul>
+<li>For Windows users, refer to <a href="https://code.visualstudio.com/docs/setup/windows"><strong>Visual Studio Code on Windows</strong></a> for setup guidelines.</li>
+</ul>
+<p><img alt="" src="vscode_serial_monitor-1.jpg" /></p>
+<p><strong>Figure:</strong> Installing the <strong>Serial Monitor</strong> extension in <strong>VS Code IDE</strong></p>
+<p><img alt="" src="vscode_serial_monitor-2.jpg" /></p>
+<p><strong>Figure:</strong> Receiving data from the serial port in VS Code IDE using the Serial Monitor</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-code-for-serial-testing"><strong>Python Code for Serial Testing</strong><a class="headerlink" href="#python-code-for-serial-testing" title="Permanent link">#</a></h2>
+<p>This Python script is provided as an example. After opening the serial port, it waits for an incoming byte and sends the received byte back to the serial port, corresponding to the serial loopback test. Note that in this example, the FPGA acts as the initiator, starting the data transmission first.</p>
+<p><strong>Note:</strong></p>
+<ul>
+<li>For installing <strong>Python on Windows</strong>, refer to <a href="https://learn.microsoft.com/en-us/windows/python/beginners">"<strong>Get started using Python on Windows for beginners</strong>"</a>.</li>
+<li>It is recommended to install and use the <a href="https://code.visualstudio.com/docs/setup/windows"><strong>VS Code IDE</strong></a> for writing and running Python code.</li>
+</ul>
+<pre><code class="language-python">import serial
+
+# Configure and open the serial port 
+ser = serial.Serial(
+    port=&quot;/dev/ttyACM0&quot;, # Specify the serial port (e.g. 'COM13' on Windows)
+    baudrate=115200,     # Set the baud rate
+    timeout=0.1,         # Set serial timeout (in seconds) for reading data
+)
+
+print(f&quot;Opened {ser.portstr} (waiting for incoming bytes...)&quot;)
+
+try:
+    recv_str = &quot;&quot;
+    while True:
+        # Wait for one incoming byte (blocks until a byte is received)
+        # Read exactly one byte
+        incoming = ser.read(1)  # This returns a 'bytes' object
+        if incoming:
+            # Send the same byte back
+            ser.write(incoming)
+            # Convert the raw byte object into a string (Unicode)
+            ch = incoming.decode(&quot;utf-8&quot;, errors=&quot;replace&quot;)
+            # Append the received character to the received string
+            recv_str = recv_str + ch
+            if ch == &quot;\n&quot;: # if newline is received
+                print(f&quot;Received message: {recv_str}&quot;, end=&quot;&quot;)
+                recv_str = &quot;&quot;   # Clear the received string
+
+except KeyboardInterrupt: # if Ctrl+C is pressed by the user
+    print(&quot;Terminated...&quot;)
+finally:
+    if ser:
+        ser.close() # Close the serial port
+    print(&quot;Serial port closed.&quot;)
+</code></pre>
+<p>&nbsp;</p>
+<p><img alt="" src="vscode_py_serial_loopback.jpg" /></p>
+<p><strong>Figure:</strong> Running the Python script in VS Code IDE (Ubuntu OS)</p>
+<p><img alt="" src="vscode_win_serial-1.jpg" /></p>
+<p><img alt="" src="vscode_win_serial-2.jpg" /></p>
+<p><strong>Figure:</strong> Running the Python script in VS Code IDE (Windows 11)</p>
+<p><strong>Note:</strong> </p>
+<ul>
+<li>This Python script uses the <a href="https://pypi.org/project/pyserial/"><code>pyserial</code></a> package for serial communication. Make sure that this package is installed, for example, by using the following pip command:</li>
+</ul>
+<pre><code class="language-text">pip install pyserial 
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="serial-loopback-test"><strong>Serial Loopback Test</strong><a class="headerlink" href="#serial-loopback-test" title="Permanent link">#</a></h2>
+<p>In this example, we revise the previous VHDL code to operate in <strong>serial loopback mode</strong>. The FPGA waits for an incoming byte from the host computer (Python) via the UART and sends the received byte back to the UART.</p>
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY uart_tester IS
+    PORT (
+        CLK      : IN  STD_LOGIC;
+        RESET_N  : IN  STD_LOGIC;
+        UART_RXD : IN  STD_LOGIC;
+        UART_TXD : OUT STD_LOGIC;
+        LEDS     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl_v2 OF uart_tester IS
+
+    COMPONENT uart_core IS
+        PORT (
+            clk_clk         : IN  STD_LOGIC;
+            reset_reset_n   : IN  STD_LOGIC;
+            from_uart_ready : IN  STD_LOGIC;
+            from_uart_data  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+            from_uart_error : OUT STD_LOGIC;
+            from_uart_valid : OUT STD_LOGIC;
+            to_uart_data    : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+            to_uart_error   : IN  STD_LOGIC;
+            to_uart_valid   : IN  STD_LOGIC;
+            to_uart_ready   : OUT STD_LOGIC;
+            uart_RXD        : IN  STD_LOGIC;
+            uart_TXD        : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    -- Signals to/from UART IP core
+    SIGNAL rx_uart_data  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL rx_uart_error : STD_LOGIC;
+    SIGNAL rx_uart_valid : STD_LOGIC;
+
+    SIGNAL tx_uart_data  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL tx_uart_error : STD_LOGIC := '0';
+    SIGNAL tx_uart_valid : STD_LOGIC := '0';
+    SIGNAL tx_uart_ready : STD_LOGIC;
+
+    -- This is usually tied high to always accept data
+    SIGNAL rx_uart_ready : STD_LOGIC := '1';
+
+BEGIN
+
+    -- Instantiate UART IP Core
+    u0 : uart_core
+    PORT MAP(
+        clk_clk         =&gt; CLK,
+        reset_reset_n   =&gt; RESET_N,
+        from_uart_ready =&gt; rx_uart_ready,
+        from_uart_data  =&gt; rx_uart_data,
+        from_uart_error =&gt; rx_uart_error,
+        from_uart_valid =&gt; rx_uart_valid,
+        to_uart_data    =&gt; tx_uart_data,
+        to_uart_error   =&gt; tx_uart_error,
+        to_uart_valid   =&gt; tx_uart_valid,
+        to_uart_ready   =&gt; tx_uart_ready,
+        uart_RXD        =&gt; UART_RXD,
+        uart_TXD        =&gt; UART_TXD
+    );
+
+    --------------------------------------------------------------------
+    -- Loopback process: wait for incoming byte, send it back immediately
+    --------------------------------------------------------------------
+    PROCESS (CLK, RESET_N)
+    BEGIN
+        IF RESET_N = '0' THEN
+            tx_uart_valid &lt;= '0';
+            tx_uart_data  &lt;= (OTHERS =&gt; '0');
+            LEDS          &lt;= (OTHERS =&gt; '0');
+
+        ELSIF rising_edge(CLK) THEN
+
+            tx_uart_valid &lt;= '0';
+
+            -- When a new byte arrives from UART RX
+            IF rx_uart_valid = '1' THEN
+                -- Put the received byte on LEDs
+                LEDS &lt;= rx_uart_data;
+
+                -- If UART TX is ready, send it back
+                IF tx_uart_ready = '1' THEN
+                    tx_uart_data  &lt;= rx_uart_data;
+                    tx_uart_valid &lt;= '1';  -- assert one clock to send
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+
+END ARCHITECTURE;
+</code></pre>
+<p>The following Python code corresponds to the serial loopback test. It sends a predefined string byte by byte and waits for each incoming byte before proceeding to the next one.</p>
+<pre><code class="language-python">import serial
+import time
+
+# Configure and open the serial port 
+ser = serial.Serial(
+    port=&quot;/dev/ttyACM0&quot;,  # specify the serial port (e.g. 'COM13' on Windows)
+    baudrate=115200,      # set the baud rate
+    timeout=0.1,          # set serial timeout (in seconds) for reading data
+)
+
+print(f&quot;Opened {ser.portstr}&quot;)
+
+try:
+    msg = &quot;Hello World!\r\n&quot;
+    recv_str = &quot;&quot;
+    while True:
+        for ch in msg:
+            # Send each character as a 'bytes' object
+            ser.write( ch.encode(&quot;utf-8&quot;) )
+            time.sleep(0.001)  # Add some delay (in seconds)
+
+            # Read exactly one byte
+            incoming = ser.read(1)
+            if incoming:
+                # Decode incoming byte to string
+                ch_in = incoming.decode(&quot;utf-8&quot;, errors=&quot;replace&quot;)
+                recv_str += ch_in
+                if ch_in == &quot;\n&quot;:  # if the newline character is received
+                    print(f&quot;Received message: {recv_str}&quot;, end=&quot;&quot;)
+                    recv_str = &quot;&quot;
+                    time.sleep(1.0)  # pause for 1 second after full line
+
+except KeyboardInterrupt:
+    print(&quot;\nTerminated...&quot;)
+
+finally:
+    if ser:
+        ser.close()
+    print(&quot;Serial port closed.&quot;)
+</code></pre>
+<p><img alt="" src="vscode_win_serial-3.jpg" /></p>
+<p><strong>Figure:</strong> Running the Python script in VS Code IDE (Windows 11) for serial-loopback test</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="on-chip-debug-with-signal-tap-logic-analyzer"><strong>On-Chip Debug with Signal Tap Logic Analyzer</strong><a class="headerlink" href="#on-chip-debug-with-signal-tap-logic-analyzer" title="Permanent link">#</a></h2>
+<p>In this section, we will learn how to use the Signal Tap Logic Analyzer tool
+which is part of the Quartus Prime software.</p>
+<p>Steps to set up and include the <strong>Signal Tap Logic Analyzer</strong> in the project</p>
+<ol>
+<li>Complete the <strong>Full Compilation</strong> process for the design project first.</li>
+<li>Go to "<strong>Tools &gt; Signal Tap Logic Analyzer</strong>".</li>
+<li>In the <strong>Setup</strong> tab, double-click in the <strong>Node Table</strong> area and 
+add the nodes (signal names) that will be captured at runtime by the Signal Tap LA.<ul>
+<li>For the <strong>Filter</strong> option, select "<strong>Signal Tap: pre-synthesis</strong>"</li>
+<li>Click the <strong>List</strong> button to show the filtered node names.</li>
+<li>Add the selected node names (e.g. <code>tx_uart_valid</code> and <code>tx_uart_data</code>)
+  and click the <strong>Insert</strong> buttton.</li>
+</ul>
+</li>
+<li>Select a signal to use as the trigger and configure the trigger condition.<ul>
+<li>Use the <code>tx_uart_valid</code> (rising edge) as the trigger condition.</li>
+</ul>
+</li>
+<li>In the <strong>Signal Configuration</strong> tab, select the clock input signal
+as the clock source for the Signal Tap LA <ul>
+<li>Use the <code>CLK</code> signal in the top-level design.</li>
+</ul>
+</li>
+<li>Select the RAM capacity (Sample Depth) and use the <strong>Segmented Sample Memory</strong>.</li>
+<li>Save the Signal Tap LA configuration to a <code>.stp</code> file.
+This file will be added to the design project.</li>
+<li>Recompile the project (full compilation) and upload the bitstream to the FPGA board.</li>
+<li>If the Signal Tap LA is "ready to acquire", click "Run Analysis" and observe
+the waveforms in the <strong>Data</strong> tab. </li>
+</ol>
+<p><img alt="" src="stp-1.jpg" /></p>
+<p><strong>Figure:</strong> Starting <strong>Signal Tap Logic Analyzer</strong> in <strong>Quartus Prime</strong></p>
+<p><img alt="" src="stp-2.jpg" /></p>
+<p><strong>Figure:</strong> The main window of <strong>Signal Tap Logic Analyzer</strong></p>
+<p><img alt="" src="stp-3.jpg" /></p>
+<p><strong>Figure:</strong> Filtering and adding nodes of the design for logic analysis</p>
+<p><img alt="" src="stp-4.jpg" /></p>
+<p><strong>Figure:</strong> Setting the trigger condition for the logic analyzer</p>
+<p><img alt="" src="stp-5.jpg" /></p>
+<p><strong>Figure:</strong> Selecting the <strong>Clock</strong> signal, configuring the <strong>Sample Depth</strong> and selecting the "<strong>Segmented Sample Memory</strong>" option</p>
+<p><img alt="" src="stp-6.jpg" /></p>
+<p><strong>Figure:</strong> Saving the Signal Tap LA configuration to a <code>.stp</code> file</p>
+<p><img alt="" src="stp-7.jpg" /></p>
+<p><strong>Figure:</strong> Adding the <code>.stp</code> file to the project.</p>
+<p><img alt="" src="stp-8.jpg" /></p>
+<p><strong>Figure:</strong> Starting the Signal Tap LA to run the analysis</p>
+<p>The following sample waveforms show a sequence of characters sent to the UART unit on the FPGA.</p>
+<p><img alt="" src="stp-9.jpg" /></p>
+<p><strong>Figure:</strong> Samples displayed as waveforms in the <strong>Data</strong> tab</p>
+<p>In summary, the Signal Tap LA is a useful tool for monitoring and analyzing on-chip signals within an FPGA device. However, it consumes some FPGA logic resources in addition to the resources used by the user’s design.</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-09-19 | Last Updated: 2025-09-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
