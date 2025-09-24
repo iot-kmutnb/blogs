@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/digital_logic_lab_2025-1/intro_adc_max10/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: On-Chip ADC IP Core for MAX 10 FPGA - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-on-chip-adc-ip-core-for-max-10-fpga" class="nav-link">Tutorial: On-Chip ADC IP Core for MAX 10 FPGA</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#on-chip-adc" class="nav-link">On-Chip ADC</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#avalon-mm-interface-for-the-adc-ip-core" class="nav-link">Avalon-MM Interface for the ADC IP Core</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#adc-ip-core-generation" class="nav-link">ADC IP Core Generation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-code-for-adc-core-testing" class="nav-link">VHDL Code for ADC Core Testing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-on-chip-adc-ip-core-for-max-10-fpga"><strong>Tutorial: On-Chip ADC IP Core for MAX 10 FPGA</strong><a class="headerlink" href="#tutorial-on-chip-adc-ip-core-for-max-10-fpga" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="on-chip-adc"><strong>On-Chip ADC</strong><a class="headerlink" href="#on-chip-adc" title="Permanent link">#</a></h2>
+<p>The <strong>MAX 10 FPGA</strong> chip has a built-in <strong>12-bit SAR ADC</strong>
+(<em>Successive Approximation Analog-to-Digital Converter</em>) <strong>hard IP core</strong> 
+with up to 8 input channels.
+It can sample analog signals directly without external ADC chips.</p>
+<p><img alt="" src="../max10_floorplan.jpg" /></p>
+<p><strong>Figure:</strong> A simplified floorplan of the MAX 10 FPGA</p>
+<p>Intel's ADC IP Core provides a convenient interface to access this built-in ADC
+functionality on DE-Series FPGA boards such as the <strong>DE10-Lite</strong>.
+On the <strong>Terasic MAX 10 FPGA board</strong>, the FPGA receives analog input signals at pins
+<code>ADC_IN0 ~ ADC_IN5</code> on the Arduino Shield connector (input voltage range 0V ~ 5V).
+Pins <code>ADC_IN6</code> and <code>ADC_IN7</code> are not connected.</p>
+<p>Because the internal reference voltage (<code>Vref</code>) for the on-chip ADC unit is <strong>+2.5V</strong>,
+the internal analog input range must be between 0V and <code>Vref</code>.
+To support the voltage range between 0V and 5V, the input signal voltage 
+on the FPGA board is reduced by half using a voltage divider circuit.
+There is also an <strong>Op-Amp</strong> circuit working as a voltage buffer on each channel.
+Thus, the voltage going into the ADC circuit inside the MAX 10 FPGA chip is 
+in the range 0V ~ 2.5V.  </p>
+<p>The ADC circuit works with a clock frequency up to <strong>10 MHz</strong> and
+can read and convert signals at a speed of up to <strong>1 MSamples/s</strong>.
+For this purpose, the <strong>ALTPLL hard IP core</strong> on the MAX 10 FPGA can be used
+to generate   a 10 MHz clock signal for the ADC circuit
+from the 50 MHz clock from the board at pin <code>inclk0</code>.
+It generates two output clock signals.</p>
+<p>The DE10-Lite board has a 10 MHz clock signal input on the board 
+that can also be used as the ADC Clock. But in this tutorial, 
+<strong>ALTPLL</strong> is used to show how to generate a clock signal inside the FPGA chip
+from the external 50 MHz input signal.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="avalon-mm-interface-for-the-adc-ip-core"><strong>Avalon-MM Interface for the ADC IP Core</strong><a class="headerlink" href="#avalon-mm-interface-for-the-adc-ip-core" title="Permanent link">#</a></h2>
+<p>In this tutorial, we will use the <strong>on-chip ADC IP Core</strong> (or <strong>ADC Controller for
+DE-series Boards</strong>) with an <strong>Avalon Memory-Mapped (Avalon-MM) interface</strong> for communication between the FPGA logic and the on-chip ADC hardware.
+Through this interface, users can easily read converted data from multiple analog input channels and configure the ADC's operating mode.</p>
+<p>The ADC core provides up to eight readable addresses for as many as eight analog inputs.<br />
+Each address holds the <strong>12-bit digital output</strong> from its respective ADC channel.</p>
+<p>The ADC core has two writable addresses to control its operation:</p>
+<ul>
+<li><strong>Manual-Update Mode:</strong> Conversions are triggered by user logic manually.</li>
+<li><strong>Auto-Update Mode:</strong> Conversions run continuously, automatically updating channel data.</li>
+</ul>
+<p>Writing a '1' to the <strong>Auto-Update register</strong> will enable auto-updating, 
+while writing a ‘0’ will disable it.
+When auto-update is enabled, the system will automatically begin another update operation after the previous one finishes.
+In Auto-Update mode, the 16th bit of the channel register acts as a <strong>refresh flag</strong>. 
+After all channels are refreshed, the flags are high. Upon reading a channel, that
+channel’s flag is set to low automatically.</p>
+<p>If reads to the channel registers are attempted during an update operation, the stored values from the previous update operation will be read without waiting for the latest update to finish. This is in contrast to
+a read during an update operation triggered by the Update register, where the <code>wait_request</code> signal would be asserted until the current update operation finishes.</p>
+<p><img alt="" src="avalon_mm_bus_timing.jpg" /></p>
+<p><strong>Figure:</strong> Bus waveforms for Avalon-MM read and write operations</p>
+<p><img alt="" src="adc_regs.jpg" /></p>
+<p><strong>Figure:</strong> Registers of the ADC Controller</p>
+<p>The next section explains the setup and operation of the ADC IP Core,
+including how to instantiate the IP in the user design, configure
+its control registers, and read analog values from the input channels.</p>
+<hr />
+<h2 id="adc-ip-core-generation"><strong>ADC IP Core Generation</strong><a class="headerlink" href="#adc-ip-core-generation" title="Permanent link">#</a></h2>
+<p>Steps to create the ADC IP Core (ADC Controller):</p>
+<ol>
+<li>Create a new project using the <strong>New Project Wizard</strong> in Quartus Prime.</li>
+<li>Open <strong>Platform Designer</strong>.</li>
+<li>Add the ADC IP Core, available under 
+"<strong>University Program &gt; Generic IO &gt; ADC Controller for DE-Series Boards</strong>".</li>
+<li>Configure the ADC IP Core (select the <strong>DE10-Lite board</strong>, 
+set the <strong>ADC Clock Frequency</strong> to 10 MHz, and specify 
+the <strong>Number of Channels</strong> as 6).</li>
+<li>Connect the clock and reset signals between the components in 
+<strong>System Contents</strong>.</li>
+<li>Rename and export the <strong>Avalon Memory-Mapped Slave</strong> to <code>adc_slave</code>.</li>
+<li>Click the "<strong>Generate HDL</strong>" button to generate the IP core and its HDL code 
+(choose VHDL output).</li>
+<li>Save the IP core configuration as a <code>.qsys</code> file and includes this type in the project.</li>
+<li>Instantiate the ADC IP Core in the top-level design.</li>
+</ol>
+<p><img alt="" src="adc_core-1.jpg" /></p>
+<p><strong>Figure:</strong> Adding the ADC Controller in the System Contents tab of Platform Designer</p>
+<p><img alt="" src="adc_core-2.jpg" /></p>
+<p><strong>Figure:</strong> Configuring the ADC Controller</p>
+<p><img alt="" src="adc_core-3.jpg" /></p>
+<p><strong>Figure:</strong> Connecting the components and exporting selected signals</p>
+<p><img alt="" src="adc_core-4.jpg" /></p>
+<p><strong>Figure:</strong> Generating HDL output files and saving IP configuration in a <code>.qsys</code> file</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-code-for-adc-core-testing"><strong>VHDL Code for ADC Core Testing</strong><a class="headerlink" href="#vhdl-code-for-adc-core-testing" title="Permanent link">#</a></h2>
+<p>The following VHDL code demonstrates how to use the ADC IP core generated in the previous section with Platform Designer.</p>
+<pre><code class="language-VHDL">LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+ENTITY adc_tester IS
+    PORT (
+        CLK     : IN STD_LOGIC;
+        RESET_N : IN STD_LOGIC;
+        LEDS    : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF adc_tester IS
+
+    -------------------------------------------------------------------
+    -- Component Declaration for ADC core
+    -------------------------------------------------------------------
+    COMPONENT adc_core IS
+        PORT (
+            clk_clk               : IN STD_LOGIC;
+            reset_reset_n         : IN STD_LOGIC;
+            adc_slave_write       : IN STD_LOGIC;
+            adc_slave_readdata    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            adc_slave_writedata   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            adc_slave_address     : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            adc_slave_waitrequest : OUT STD_LOGIC;
+            adc_slave_read        : IN STD_LOGIC
+        );
+    END COMPONENT;
+
+    -------------------------------------------------------------------
+    -- Signals for ADC interface
+    -------------------------------------------------------------------
+    SIGNAL adc_slave_write : STD_LOGIC := '0';
+    SIGNAL adc_slave_read  : STD_LOGIC := '0';
+    SIGNAL adc_slave_address   : STD_LOGIC_VECTOR( 2 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL adc_slave_writedata : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL adc_slave_readdata  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL adc_slave_waitrequest : STD_LOGIC;
+
+    TYPE state_type IS (ST_INIT, ST_ENA_AUTO_UPDATE, ST_IDLE, ST_READ, ST_SAVE_DATA);
+    SIGNAL state : state_type := ST_INIT;
+
+    SIGNAL adc_data : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS =&gt; '0');
+
+BEGIN
+
+    -------------------------------------------------------------------
+    -- Instantiate the ADC core
+    -------------------------------------------------------------------
+    u0 : adc_core
+    PORT MAP(
+        clk_clk =&gt; CLK,
+        reset_reset_n =&gt; RESET_N,
+        adc_slave_write =&gt; adc_slave_write,
+        adc_slave_readdata =&gt; adc_slave_readdata,
+        adc_slave_writedata =&gt; adc_slave_writedata,
+        adc_slave_address =&gt; adc_slave_address,
+        adc_slave_waitrequest =&gt; adc_slave_waitrequest,
+        adc_slave_read =&gt; adc_slave_read
+    );
+
+    -------------------------------------------------------------------
+    -- ADC initialization process
+    -- Enable Auto-Update on reset
+    -------------------------------------------------------------------
+    PROCESS (CLK, RESET_N)
+    BEGIN
+        IF RESET_N = '0' THEN
+            adc_slave_write &lt;= '0';
+            adc_slave_read &lt;= '0';
+            adc_slave_address &lt;= (OTHERS =&gt; '0');
+            adc_slave_writedata &lt;= (OTHERS =&gt; '0');
+            adc_data &lt;= (OTHERS =&gt; '0');
+            state &lt;= ST_INIT;
+
+        ELSIF rising_edge(CLK) THEN
+            CASE state IS
+
+                WHEN ST_INIT =&gt;
+                    state &lt;= ST_ENA_AUTO_UPDATE;
+
+                WHEN ST_ENA_AUTO_UPDATE =&gt;
+                    IF adc_slave_waitrequest = '0' THEN
+                        adc_slave_address &lt;= &quot;001&quot;; -- Auto-Update register (W)
+                        adc_slave_writedata(0) &lt;= '1'; -- Enable auto-update
+                        adc_slave_write &lt;= '1';
+                        state &lt;= ST_IDLE;
+                    END IF;
+
+                WHEN ST_IDLE =&gt;
+                    adc_slave_write &lt;= '0';
+                    adc_slave_read  &lt;= '0';
+                    adc_slave_address &lt;= &quot;000&quot;; -- select the ADC channel 0
+                    state &lt;= ST_READ;
+
+                WHEN ST_READ =&gt;
+                    IF adc_slave_waitrequest = '0' THEN
+                        adc_slave_read &lt;= '1';
+                        state &lt;= ST_SAVE_DATA;
+                    END IF;
+
+                WHEN ST_SAVE_DATA =&gt;
+                    IF adc_slave_readdata(15) = '1' THEN -- Check update flag
+                        adc_data &lt;= adc_slave_readdata(15 downto 0);
+                    END IF;
+                    adc_slave_read &lt;= '0';
+                    state &lt;= ST_READ;
+
+                WHEN OTHERS =&gt;
+                    state &lt;= ST_INIT;
+            END CASE;
+        END IF;
+    END PROCESS;
+
+    PROCESS (CLK)
+    BEGIN
+        IF rising_edge(CLK) THEN
+            LEDS &lt;= adc_data(11 DOWNTO 2);
+        END IF;
+    END PROCESS;
+
+END ARCHITECTURE;
+</code></pre>
+<p>It is highly recommended to use the Signal Tap Logic Analyzer to analyze the operation of the FPGA design, as it increases both visibility and debuggability.</p>
+<p><img alt="" src="stp_waveforms.jpg" /></p>
+<p><strong>Figure:</strong> Using the Signal Tap Logic Analyzer to analyze the internal signals of the FPGA design.</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-09-23 | Last Updated: 2025-09-23</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

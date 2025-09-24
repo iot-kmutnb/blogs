@@ -133,6 +133,8 @@ This core uses the <strong>Avalon bus memory-mapped interface</strong>, and ther
 16-bit readable and writable registers associated with the operation of the UART core.</p>
 <p><img alt="" src="uart_core_block_diagram.jpg" /></p>
 <p><strong>Figure:</strong> Block diagram of the Lightweight UART Core (Source: Intel / Altera)</p>
+<p><img alt="" src="uart_regs.jpg" /></p>
+<p><strong>Figure:</strong> Registers of the Lightweight UART Core (Source: Intel / Altera)</p>
 <p>For more details, please consult the <a href="../embedded_peripheral_ip_userguide_v24.1.pdf">"<strong>Embedded Peripherals IP User Guide</strong>"</a>.</p>
 <p>&nbsp;</p>
 <hr />
@@ -179,14 +181,15 @@ After generating the IP core, add the <code>.qsys</code> to the project.</li>
 <hr />
 <h2 id="serial-loopback-test"><strong>Serial-Loopback Test</strong><a class="headerlink" href="#serial-loopback-test" title="Permanent link">#</a></h2>
 <p>Below is a top-level design written in VHDL, provided as an example
-showing how to implement an FSM to interface with the UART core 
+showing how to implement an FSM to interface with the UART core
 according to the Avalon memory-mapped interface.</p>
 <p>The FSM starts with a polling read operation to check whether
 the <strong>RXFIFO</strong> is not empty. It reads the <strong>STATUS</strong> register of the IP core
-and checks the "<strong>RXFIFO Not Empty Flag</strong>" bit. If it is set,
+and checks the "<strong>Receive character ready</strong>" (<code>RRDY</code>) bit. If it is set,
 the FSM reads the <strong>RXFIFO</strong> register and extracts the data byte from the 16-bit value.</p>
 <p>Next, the FSM performs a polling read operation on the <strong>STATUS</strong> register
-to check whether the TX data register is empty. If it is empty,
+to check whether the "<strong>TX data empty</strong>" bit  (<code>TMT</code>) is set. 
+If the transmit data register is empty,
 the data byte is written as a 16-bit value to the <strong>TXFIFO</strong> register,
 enabling a <strong>serial-loopback</strong> test behavior.</p>
 <pre><code class="language-VHDL">LIBRARY ieee;
@@ -215,7 +218,7 @@ ARCHITECTURE rtl OF serial_tester IS
             uart_slave_write     : IN STD_LOGIC;
             uart_slave_writedata : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             uart_slave_readdata  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-            uart_rxd             : IN STD_LOGIC;
+            uart_rxd             : IN  STD_LOGIC;
             uart_txd             : OUT STD_LOGIC
         );
     END COMPONENT;
@@ -413,7 +416,7 @@ to gain a better understanding of the circuit’s operation.</p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-09-22 | Last Updated: 2025-09-22</p></div>
+<p>Created: 2025-09-22 | Last Updated: 2025-09-23</p></div>
             </div>
         </div>
 
