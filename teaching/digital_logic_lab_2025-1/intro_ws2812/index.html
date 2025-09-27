@@ -268,9 +268,9 @@ is approximately: <strong>1 / 1.25 µs ≈ 800 kHz</strong></p>
 <p>The <code>ws2812b_driver</code> module provided below is used to shift out 24-bit data to
 a <strong>WS2812B</strong> module. When the control signal <code>WR</code> (<em>Write Strobe</em>)
 is high, the 24-bit data on the <code>DATA</code> pins is written into
-an internal register of the module. The <code>BUSY</code> signal changes
-from 0 to 1, and the data is shifted out through the <code>DOUT</code> pin.
-After all 24 bits are sent, the <code>BUSY</code> signal changes from 1 back to 0.</p>
+an internal register of the driver module. The <code>BUSY</code> signal then changes
+from low to high, indicating that the driver is actively shifting data out the <code>DOUT</code> pin.
+After the high pulse of the final bit has been transmitted, the <code>BUSY</code> signal returns low to indicate that the driver is  ready to do  the next write operation.</p>
 <pre><code class="language-VHDL">-- File: ws2812b_driver.vhd
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
@@ -281,12 +281,12 @@ ENTITY ws2812b_driver IS
         CLK_HZ : INTEGER := 50_000_000 -- Input clock frequency
     );
     PORT (
-        CLK   : IN STD_LOGIC; -- Clock input
-        RST_N : IN STD_LOGIC; -- Async reset active low
-        WR    : IN STD_LOGIC; -- Write strobe input
+        CLK   : IN STD_LOGIC;  -- Clock input
+        RST_N : IN STD_LOGIC;  -- Async reset active low
+        WR    : IN STD_LOGIC;  -- Write strobe input
         DATA  : IN STD_LOGIC_VECTOR(23 DOWNTO 0); -- 24-bit GRB color data
         BUSY  : OUT STD_LOGIC; -- High when sending data
-        DOUT  : OUT STD_LOGIC -- Serial data output to WS2812
+        DOUT  : OUT STD_LOGIC  -- Serial data output to WS2812B
     );
 END ws2812b_driver;
 
@@ -303,14 +303,17 @@ ARCHITECTURE behavioral OF ws2812b_driver IS
     SIGNAL state : state_type := IDLE;
 
     -- Internal signals
-    SIGNAL data_reg  : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS =&gt; '0');
-    SIGNAL bit_index : INTEGER RANGE 0 TO 23 := 23;
+    SIGNAL data_reg    : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL bit_index   : INTEGER RANGE 0 TO 23 := 23;
     SIGNAL clk_counter : INTEGER;
-    SIGNAL busy_reg : STD_LOGIC := '0';
-    SIGNAL dout_reg : STD_LOGIC := '0';
+    SIGNAL busy_reg    : STD_LOGIC := '0';
+    SIGNAL dout_reg    : STD_LOGIC := '0';
 
-    SIGNAL cnt_t_high : INTEGER := 0;
-    SIGNAL cnt_t_low  : INTEGER := 0;
+    SIGNAL cnt_t_high  : INTEGER := 0;
+    SIGNAL cnt_t_low   : INTEGER := 0;
+
+    SIGNAL next_write  : STD_LOGIC := '0';
+    SIGNAL next_data   : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS =&gt; '0');
 
 BEGIN
 
@@ -322,71 +325,94 @@ BEGIN
     BEGIN
         IF RST_N = '0' THEN
             state &lt;= IDLE;
-            busy_reg &lt;= '0';
-            dout_reg &lt;= '0';
+            busy_reg    &lt;= '0';
+            dout_reg    &lt;= '0';
             clk_counter &lt;= 0;
-            bit_index &lt;= 23;
-            data_reg &lt;= (OTHERS =&gt; '0');
-            cnt_t_high &lt;= 0;
-            cnt_t_low &lt;= 0;
+            bit_index   &lt;= 23;
+            data_reg    &lt;= (OTHERS =&gt; '0');
+            cnt_t_high  &lt;= 0;
+            cnt_t_low   &lt;= 0;
+            next_write  &lt;= '0';
+            next_data   &lt;= (OTHERS =&gt; '0');
 
         ELSIF rising_edge(CLK) THEN
 
             CASE state IS
                 WHEN IDLE =&gt;
-                    busy_reg &lt;= '0';
-                    dout_reg &lt;= '0';
+                    busy_reg    &lt;= '0';
+                    dout_reg    &lt;= '0';
                     clk_counter &lt;= 0;
-                    bit_index &lt;= 23;
+                    bit_index   &lt;= 23;
                     IF WR = '1' THEN
-                        data_reg &lt;= DATA;
+                        data_reg &lt;= DATA; -- capture data input
                         busy_reg &lt;= '1';
-                        state &lt;= LOAD;
+                        state    &lt;= LOAD;
                     END IF;
 
                 WHEN LOAD =&gt;
-                    IF data_reg(23) = '1' THEN -- MSB timing
+                    IF data_reg(23) = '1' THEN -- set MSB timing
                         cnt_t_high &lt;= T1H;
-                        cnt_t_low &lt;= T1L;
+                        cnt_t_low  &lt;= T1L;
                     ELSE
                         cnt_t_high &lt;= T0H;
-                        cnt_t_low &lt;= T0L;
+                        cnt_t_low  &lt;= T0L;
                     END IF;
                     clk_counter &lt;= 0;
-                    dout_reg &lt;= '1';
-                    state &lt;= SEND_BIT_H;
+                    dout_reg    &lt;= '1';
+                    state       &lt;= SEND_BIT_H;
 
                 WHEN SEND_BIT_H =&gt;
                     clk_counter &lt;= clk_counter + 1;
+
+                    IF bit_index = 0 AND WR = '1' THEN -- next write?
+                        next_write &lt;= '1';  -- set next write flag
+                        next_data  &lt;= DATA; -- capture data input
+                    END IF;
+
                     IF clk_counter = cnt_t_high THEN
-                        dout_reg &lt;= '0';
+                        dout_reg    &lt;= '0';
                         clk_counter &lt;= 0;
-                        state &lt;= SEND_BIT_L;
+                        state       &lt;= SEND_BIT_L;
                     END IF;
 
                 WHEN SEND_BIT_L =&gt;
                     clk_counter &lt;= clk_counter + 1;
                     IF clk_counter = cnt_t_low THEN
                         IF bit_index = 0 THEN -- LSB sent
-                            dout_reg &lt;= '0';
+                            dout_reg    &lt;= '0';
                             clk_counter &lt;= 0;
-                            busy_reg &lt;= '0';
-                            state &lt;= IDLE;
+                            busy_reg    &lt;= '0';
+
+                            IF next_write = '1' THEN
+                                data_reg   &lt;= next_data;
+                                next_write &lt;= '0';
+                                IF next_data(23) = '1' THEN -- set MSB timing
+                                    cnt_t_high &lt;= T1H;
+                                    cnt_t_low  &lt;= T1L;
+                                ELSE
+                                    cnt_t_high &lt;= T0H;
+                                    cnt_t_low  &lt;= T0L;
+                                END IF;
+                                dout_reg &lt;= '1';
+                                state &lt;= SEND_BIT_H;
+                            ELSE
+                                state &lt;= IDLE;
+                            END IF;
                         ELSE
                             -- Shift data left by 1 (MSB first)
-                            data_reg &lt;= data_reg(22 DOWNTO 0) &amp; '0';
+                            data_reg  &lt;= data_reg(22 DOWNTO 0) &amp; '0';
                             bit_index &lt;= bit_index - 1;
                             -- Setup timings for next bit
                             IF data_reg(22) = '1' THEN
                                 cnt_t_high &lt;= T1H;
-                                cnt_t_low &lt;= T1L;
+                                cnt_t_low  &lt;= T1L;
                             ELSE
                                 cnt_t_high &lt;= T0H;
-                                cnt_t_low &lt;= T0L;
+                                cnt_t_low  &lt;= T0L;
                             END IF;
                             clk_counter &lt;= 0;
-                            dout_reg &lt;= '1';
-                            state &lt;= SEND_BIT_H;
+                            dout_reg    &lt;= '1';
+                            state       &lt;= SEND_BIT_H;
                         END IF;
                     END IF;
 
@@ -411,8 +437,8 @@ USE IEEE.NUMERIC_STD.ALL;
 ENTITY ws2812b_driver_demo IS
     PORT (
         CLK   : IN STD_LOGIC; -- 50MHZ clock
-        RST_N : IN STD_LOGIC;
-        DOUT  : OUT STD_LOGIC
+        RST_N : IN STD_LOGIC; -- async. active-low reset
+        DOUT  : OUT STD_LOGIC -- data output to WS2812B
     );
 END ws2812b_driver_demo;
 
@@ -452,11 +478,16 @@ ARCHITECTURE rtl OF ws2812b_driver_demo IS
 
     SIGNAL rom_index : INTEGER RANGE 0 TO 7 := 0;
     SIGNAL wr_strobe : STD_LOGIC := '0';
-    SIGNAL busy : STD_LOGIC;
+    SIGNAL busy      : STD_LOGIC;
     SIGNAL delay_cnt : INTEGER := 0;
-    SIGNAL data : STD_LOGIC_VECTOR(23 DOWNTO 0);
-    CONSTANT CLK_HZ : INTEGER := 50e6;
+    SIGNAL data      : STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+    CONSTANT CLK_HZ    : INTEGER := 50e6;
     CONSTANT DELAY_MAX : INTEGER := CLK_HZ/2; -- use a smaller value for simulation
+    -- CONSTANT DELAY_MAX : INTEGER := 500; -- for simulation
+
+    CONSTANT NUM_PIXELS : INTEGER := 8; -- for 8-pixel NeoPixel bar
+    SIGNAL pixel_cnt    : INTEGER := 0;
 
 BEGIN
 
@@ -470,12 +501,12 @@ BEGIN
         CLK_HZ =&gt; CLK_HZ
     )
     PORT MAP(
-        CLK   =&gt; CLK,
+        CLK =&gt; CLK,
         RST_N =&gt; RST_N,
-        WR    =&gt; wr_strobe,
-        DATA  =&gt; data,
-        BUSY  =&gt; busy,
-        DOUT  =&gt; DOUT
+        WR =&gt; wr_strobe,
+        DATA =&gt; data,
+        BUSY =&gt; busy,
+        DOUT =&gt; DOUT
     );
 
     --------------------------------------------------------------------
@@ -486,32 +517,43 @@ BEGIN
         IF RST_N = '0' THEN
             wr_strobe &lt;= '0';
             rom_index &lt;= 0;
-            state &lt;= IDLE;
+            state     &lt;= IDLE;
             delay_cnt &lt;= 0;
+            pixel_cnt &lt;= 0;
 
         ELSIF rising_edge(CLK) THEN
             CASE state IS
                 WHEN IDLE =&gt; -- Idle: wait until not busy
                     IF busy = '0' THEN
                         wr_strobe &lt;= '1';
-                        state &lt;= WRITE_DATA;
+                        state     &lt;= WRITE_DATA;
                     END IF;
 
                 WHEN WRITE_DATA =&gt; -- Issue write strobe
                     IF busy = '1' THEN
                         wr_strobe &lt;= '0';
-                        state &lt;= WAIT_BUSY;
+                        state     &lt;= WAIT_BUSY;
+                        pixel_cnt &lt;= pixel_cnt + 1;
                     END IF;
 
                 WHEN WAIT_BUSY =&gt; -- Wait for delay before next color
                     IF busy = '0' THEN
-                        IF delay_cnt &lt; DELAY_MAX THEN
-                            delay_cnt &lt;= delay_cnt + 1;
+                        IF pixel_cnt &lt; NUM_PIXELS THEN
+                            wr_strobe &lt;= '1';
+                            state     &lt;= WRITE_DATA;
                         ELSE
-                            delay_cnt &lt;= 0;
-                            rom_index &lt;= (rom_index + 1) MOD 8;
-                            state &lt;= IDLE;
+                            wr_strobe &lt;= '0';
+                            IF delay_cnt &lt; DELAY_MAX THEN
+                                delay_cnt &lt;= delay_cnt + 1;
+                            ELSE
+                                pixel_cnt &lt;= 0;
+                                delay_cnt &lt;= 0;
+                                -- select the next color
+                                rom_index &lt;= (rom_index + 1) MOD 8;
+                                state     &lt;= IDLE;
+                            END IF;
                         END IF;
+
                     END IF;
 
                 WHEN OTHERS =&gt;
@@ -519,8 +561,19 @@ BEGIN
             END CASE;
         END IF;
     END PROCESS;
-
 END rtl;
+</code></pre>
+<p>A Tcl script for pin assignments on the DE10 Lite FPGA board is provided as an example below.</p>
+<pre><code class="language-Tcl">#set_global_assignment -name DEVICE 10M50DAF484C7G
+#set_global_assignment -name FAMILY &quot;MAX 10&quot;
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3 V Schmitt Trigger&quot; -to RST_N
+set_location_assignment PIN_P11 -to CLK
+set_location_assignment PIN_B8  -to RST_N
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT
+set_location_assignment PIN_AA8  -to DOUT
 </code></pre>
 <p>&nbsp;</p>
 <hr />
@@ -599,7 +652,11 @@ was loaded onto the MAX10-Lite FPGA board. The waveform
 of the output signal, measured by a digital oscilloscope, is shown below.</p>
 <p><img alt="" src="ws2812b_demo-1.jpg" /></p>
 <p><img alt="" src="ws2812b_demo-2.jpg" /></p>
-<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module</p>
+<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module (single-pixel)</p>
+<p><img alt="" src="ws2812b_demo-3.jpg" /></p>
+<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module (8-pixel, the same color)</p>
+<p><img alt="" src="ws2812b_demo-4.jpg" /></p>
+<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module (8-pixel, with different colors)</p>
 <p><img alt="" src="wave-2.jpg" /></p>
 <p><strong>Figure:</strong> Waveforms of the output signal</p>
 <p><img alt="" src="wave-3.jpg" /></p>
@@ -609,7 +666,7 @@ of the output signal, measured by a digital oscilloscope, is shown below.</p>
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-07-02 | Last Updated: 2025-07-02</p></div>
+<p>Created: 2025-07-02 | Last Updated: 2025-09-27</p></div>
             </div>
         </div>
 
