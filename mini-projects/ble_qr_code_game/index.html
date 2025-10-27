@@ -118,7 +118,7 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="treasure-hunt-game-using-bluetooth-le-qr-code-technologies">Treasure-Hunt Game using Bluetooth LE &amp; QR Code Technologies<a class="headerlink" href="#treasure-hunt-game-using-bluetooth-le-qr-code-technologies" title="Permanent link">#</a></h1>
-<p><strong>Keywords:</strong> <em>ESP32</em>, <em>Arduino-ESP32 Programming</em>, <em>BLE</em>, <em>QR Code</em></p>
+<p><strong>Keywords:</strong> <em>ESP32</em>, <em>Arduino-ESP32 Programming</em>, <em>Bluetooth Low Energy (BLE)</em>, <em>QR Code</em></p>
 <hr />
 <h2 id="project-overview">&#9655; <strong>Project Overview</strong><a class="headerlink" href="#project-overview" title="Permanent link">#</a></h2>
 <p>This is an educational <strong>treasure-hunt game</strong> designed to teach kids or students
@@ -144,14 +144,14 @@ to scan the collected photos, verify the codes and score the players.</li>
 <ul>
 <li>BLE-capable microcontroller boards such as <strong>ESP32/ESP32-C3</strong> 
 (and other BLE-capable, Arduino-programmable MCU boards) are used for this game.</li>
-<li>Each device is programmed to periodically advertises <strong>iBeacon packets</strong> with a fixed UUID and a unique name like "<code>ECE-&lt;MAC Hex string&gt;</code>" such as "<code>ECE-24A1F01234AB</code>".</li>
-<li>Each device is powered by a rechargeable battery (LiPo 3.7V) and enclosed in a small plastic box.</li>
+<li>Each device is programmed to periodically advertises <strong>iBeacon packets</strong> with a fixed UUID and a unique name like "<code>ECE-&lt;Hex string&gt;</code>" such as "<code>ECE-24A1F01234AB</code>".</li>
+<li>Each device can be powered by a rechargeable battery (LiPo 3.7V) and enclosed in a small plastic box.</li>
 </ul>
 </li>
 <li>
 <p><strong>Game Environment</strong></p>
 <ul>
-<li>A small number of beacon boxes are placed at different locations in lab space, or outdoor space.</li>
+<li>The beacon boxes are placed at different locations in lab space, or outdoor space.</li>
 <li>Each box has a QR code printed on it that encodes its beacon name or UUID.</li>
 </ul>
 </li>
@@ -178,7 +178,7 @@ to scan the collected photos, verify the codes and score the players.</li>
 <li>The device enters deep sleep to save battery.</li>
 </ul>
 </li>
-<li>BLE power level (<code>ESP_PWR_LVL_P9</code> is the highest TX poewr) could be 
+<li>BLE power level (<code>ESP_PWR_LVL_P9</code> is the highest TX power) could be 
   reduced to balance range and lifetime.</li>
 </ul>
 </li>
@@ -213,73 +213,126 @@ to scan the collected photos, verify the codes and score the players.</li>
 <p><img alt="" src="web_app_demo-2.jpg" /></p>
 <p><strong>Figure:</strong> Web App GUI demo showing only valid QR codes after invalid entries are removed.</p>
 <p>The following is the web app demo code (HTML, CSS, and JavaScript) that demonstrates the main concept of the game.</p>
+<p><strong>File:</strong> index.html</p>
 <pre><code class="language-HTML">&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-&lt;meta charset=&quot;UTF-8&quot;&gt;
-&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-&lt;title&gt;Treasure-Hunt Game using Bluetooth LE &amp; QR Code&lt;/title&gt;
-&lt;style&gt;
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f9fafb;
-    color: #1f2937;
-    padding: 2rem;
-  }
-  .container {
-    max-width: 750px;
-    margin: 0 auto;
-    background-color: #fff;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  h1 { text-align: center; margin-bottom: 1rem; }
-  h2 { text-align: center; margin-bottom: 2rem; }
-  #validCount { font-weight: bold; margin-bottom: 0.5rem; }
-  table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-  th, td { border: 1px solid #d1d5db; padding: 0.5rem; text-align: center; }
-  th { background-color: #e5e7eb; }
-  .valid-mark { color: green; font-weight: bold; }
-  .invalid-mark { color: red; font-weight: bold; }
-  button {
-    background-color: #ef4444; color: white;
-    padding: 0.5rem 1rem; border: none; 
-    border-radius: 0.5rem; cursor: pointer;
-    margin-top: 0.5rem; margin-right: 0.5rem;
-  }
-  button:hover { opacity: 0.9; }
-  #hiddenInput { position: absolute; left: -9999px; }
-&lt;/style&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;Treasure-Hunt Game using Bluetooth LE &amp; QR Code&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot;&gt;
 &lt;/head&gt;
 &lt;body&gt;
-&lt;div class=&quot;container&quot;&gt;
-  &lt;h1&gt;BLE QR Code Image Checker&lt;/h1&gt;
-  &lt;p id=&quot;validCount&quot;&gt;Valid QR Codes: 0&lt;/p&gt;
-  &lt;p&gt;Type or scan a QR code and press ENTER.&lt;/p&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;h1&gt;BLE QR Code Image Checker&lt;/h1&gt;
+    &lt;p id=&quot;validCount&quot;&gt;Valid QR Codes: 0&lt;/p&gt;
+    &lt;p&gt;Type or scan a QR code and press ENTER.&lt;/p&gt;
 
-  &lt;input type=&quot;text&quot; id=&quot;hiddenInput&quot; autocomplete=&quot;off&quot;&gt;
+    &lt;input type=&quot;text&quot; id=&quot;hiddenInput&quot; autocomplete=&quot;off&quot;&gt;
 
-  &lt;table&gt;
-    &lt;thead&gt;
-      &lt;tr&gt;
-        &lt;th&gt;#&lt;/th&gt;
-        &lt;th&gt;QR Code&lt;/th&gt;
-        &lt;th&gt;Scan Date/Time&lt;/th&gt;
-        &lt;th&gt;Valid&lt;/th&gt;
-      &lt;/tr&gt;
-    &lt;/thead&gt;
-    &lt;tbody id=&quot;qrTableBody&quot;&gt;&lt;/tbody&gt;
-  &lt;/table&gt;
+    &lt;table&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th&gt;#&lt;/th&gt;
+          &lt;th&gt;QR Code&lt;/th&gt;
+          &lt;th&gt;Scan Date/Time&lt;/th&gt;
+          &lt;th&gt;Valid&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody id=&quot;qrTableBody&quot;&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
 
-  &lt;button id=&quot;clearInvalidBtn&quot; 
-          style=&quot;background-color:#3b82f6;&quot;&gt;Remove Invalid&lt;/button&gt;
-  &lt;button id=&quot;clearAllBtn&quot;&gt;Clear All&lt;/button&gt;
-&lt;/div&gt;
+    &lt;button id=&quot;clearInvalidBtn&quot; class=&quot;btn-blue&quot;&gt;Remove Invalid&lt;/button&gt;
+    &lt;button id=&quot;clearAllBtn&quot; class=&quot;btn-red&quot;&gt;Clear All&lt;/button&gt;
+  &lt;/div&gt;
 
-&lt;script&gt;
-const scannedQRs = new Map();
-const tableBody = document.getElementById('qrTableBody');
+  &lt;script src=&quot;script.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><strong>File:</strong> style.css</p>
+<pre><code class="language-CSS">body {
+  font-family: Arial, sans-serif;
+  background-color: #f9fafb;
+  color: #1f2937;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 750px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#validCount {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+th, td {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+th {
+  background-color: #e5e7eb;
+}
+
+.valid-mark {
+  color: green;
+  font-weight: bold;
+}
+
+.invalid-mark {
+  color: red;
+  font-weight: bold;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.btn-blue {
+  background-color: #3b82f6;
+}
+
+.btn-red {
+  background-color: #ef4444;
+}
+
+#hiddenInput {
+  position: absolute;
+  left: -9999px;
+}
+</code></pre>
+<p><strong>File:</strong> script.js</p>
+<pre><code class="language-JavaScript">const scannedQRs = new Map();
+const tableBody  = document.getElementById('qrTableBody');
 const hiddenInput = document.getElementById('hiddenInput');
 const clearAllBtn = document.getElementById('clearAllBtn');
 const clearInvalidBtn = document.getElementById('clearInvalidBtn');
@@ -288,17 +341,17 @@ const validCountLabel = document.getElementById('validCount');
 let validQRCodes = [];
 let validCount = 0;
 
-// Load valid QR codes from JSON
+// Load valid QR codes from JSON file
 fetch('valid_codes.json')
   .then(res =&gt; res.json())
   .then(data =&gt; { validQRCodes = data; })
-  .catch(err =&gt; { console.error('Failed to load valid QR codes:', err); });
+  .catch(err =&gt; console.error('Failed to load valid QR codes:', err));
 
-// Focus hidden input
+// Keep input focused for scanner
 hiddenInput.focus();
 document.addEventListener('click', () =&gt; hiddenInput.focus());
 
-// Play beep
+// Beep sound
 function playBeep(frequency = 1000, duration = 0.1) {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const oscillator = audioCtx.createOscillator();
@@ -309,24 +362,23 @@ function playBeep(frequency = 1000, duration = 0.1) {
   oscillator.stop(audioCtx.currentTime + duration);
 }
 
-// Update row index numbers
+// Update row indices
 function updateRowIndices() {
   const rows = tableBody.querySelectorAll('tr');
-  rows.forEach((row, index) =&gt; { row.cells[0].textContent = index + 1; });
+  rows.forEach((row, index) =&gt; row.cells[0].textContent = index + 1);
 }
 
-// Update valid count label
+// Update valid count
 function updateValidCount() {
   validCountLabel.textContent = `Valid QR Codes: ${validCount}`;
 }
 
-// Add or update a row
+// Add or update a QR code entry
 function addOrUpdateRow(qr) {
   const now = new Date().toLocaleString();
   const isValid = validQRCodes.includes(qr);
 
   if (scannedQRs.has(qr)) {
-    // Update date/time and mark validity
     const row = scannedQRs.get(qr);
     row.cells[2].textContent = now;
     const wasValid = row.cells[3].textContent === '✔';
@@ -344,12 +396,11 @@ function addOrUpdateRow(qr) {
       if (wasValid) validCount--;
       playBeep(400, 0.1);
     }
-    updateValidCount();
   } else {
     const row = tableBody.insertRow();
     const indexCell = row.insertCell(0);
-    const qrCell = row.insertCell(1);
-    const timeCell = row.insertCell(2);
+    const qrCell    = row.insertCell(1);
+    const timeCell  = row.insertCell(2);
     const validCell = row.insertCell(3);
 
     qrCell.textContent = qr;
@@ -365,16 +416,17 @@ function addOrUpdateRow(qr) {
       validCell.classList.add('invalid-mark');
       playBeep(400, 0.1);
     }
-
     scannedQRs.set(qr, row);
     updateRowIndices();
-    updateValidCount();
   }
+
+  updateValidCount();
 }
 
-// Handle Enter
+// Handle Enter key
 hiddenInput.addEventListener('keydown', (e) =&gt; {
   if (e.key === 'Enter') {
+    e.preventDefault();
     const qr = hiddenInput.value.trim();
     if (qr) addOrUpdateRow(qr);
     hiddenInput.value = '';
@@ -385,18 +437,6 @@ hiddenInput.addEventListener('keydown', (e) =&gt; {
 document.addEventListener('paste', (e) =&gt; {
   const qr = (e.clipboardData || window.clipboardData).getData('text').trim();
   if (qr) addOrUpdateRow(qr);
-});
-
-// Keyboard typing
-document.addEventListener('keydown', (e) =&gt; {
-  if (/^[a-zA-Z0-9-_]$/.test(e.key)) hiddenInput.value += e.key;
-  else if (e.key === 'Enter') {
-    const qr = hiddenInput.value.trim();
-    if (qr) addOrUpdateRow(qr);
-    hiddenInput.value = '';
-  } else if (e.key === 'Backspace') {
-    hiddenInput.value = hiddenInput.value.slice(0, -1);
-  }
 });
 
 // Clear all rows
@@ -421,10 +461,8 @@ clearInvalidBtn.addEventListener('click', () =&gt; {
   updateRowIndices();
   updateValidCount();
 });
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
 </code></pre>
+<p>&nbsp;</p>
 <p>A JSON file named <code>valid_codes.json</code> is also required.
 This file contains a list of all valid QR codes that the web app will recognize.
 A sample JSON file is shown below:</p>
@@ -432,13 +470,111 @@ A sample JSON file is shown below:</p>
   &quot;ECE-24A1F01234AB&quot;,
   &quot;ECE-FAE19C01A7B3&quot;,
   &quot;ECE-0A1B2C3D4E5F&quot;,
-  &quot;ECE-112233445566&quot;
+  &quot;ECE-112233445566&quot;,
+  &quot;ECE-82A15086EC9B&quot;,
+  &quot;ECE-CB745B11C682&quot;,
+  &quot;ECE-6F2344DF1AB9&quot;
 ]
 </code></pre>
 <p>&nbsp;</p>
+<p>The following Python code generates a sequence of QR code images for the strings 
+listed in the <code>valid_codes.json</code> file by utilizing the <strong>qrcode</strong>, 
+<strong>OpenCV</strong>, <strong>NumPy</strong> and <strong>Pillow</strong> libraries.</p>
+<pre><code class="language-python">import json
+import time
+import qrcode
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
+# Load list of valid QR codes from JSON file
+with open(&quot;valid_codes.json&quot;, &quot;r&quot;) as f:
+    qr_strings = json.load(f)
+
+if not qr_strings:
+    print(&quot;No QR codes found in the JSON file.&quot;)
+    exit()
+
+def generate_qr_image(data, box_size=5, border=4):
+    &quot;&quot;&quot;
+    Generate a QR code with text displayed below.
+    Returns the image in OpenCV format.
+    &quot;&quot;&quot;
+    # Create QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=box_size,
+        border=border,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color=&quot;black&quot;, 
+                           back_color=&quot;white&quot;).convert(&quot;RGB&quot;)
+
+    # Load font
+    font_size = 2*box_size + 4
+    try:
+        font = ImageFont.truetype(&quot;arial.ttf&quot;, font_size)
+    except OSError:
+        font = ImageFont.load_default()
+
+    # Measure text size
+    draw = ImageDraw.Draw(qr_img)
+    bbox = draw.textbbox((0, 0), data, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+
+    # Create new image with extra space for text
+    img_width = qr_img.width
+    total_height = qr_img.height + text_height + 10
+    final_img = Image.new(&quot;RGB&quot;, (img_width, total_height), &quot;white&quot;)
+    final_img.paste(qr_img, (0, 0))
+
+    # Draw centered text below QR code
+    draw = ImageDraw.Draw(final_img)
+    text_x = (img_width - text_width) // 2
+    text_y = qr_img.height - font_size // 2
+    draw.text((text_x, text_y), data, fill=&quot;black&quot;, font=font)
+    # Convert PIL image to OpenCV format
+    cv_img = cv2.cvtColor(np.array(final_img), cv2.COLOR_RGB2BGR)
+    return cv_img
+
+# --- Main display loop ---
+cv2.namedWindow(&quot;QR Code Display&quot;, cv2.WINDOW_AUTOSIZE)
+SHOW_INTERVAL_SEC = 2
+
+try:
+    print(&quot;Press ESC to exit...\n&quot;)
+    count = 1
+
+    while True:
+        for data in qr_strings:
+            print(f&quot;Showing QR code {count}: {data}&quot;)
+            count += 1
+
+            img = generate_qr_image(data)
+            cv2.imshow(&quot;QR Code Display&quot;, img)
+
+            # Show image for a few seconds or until ESC is pressed
+            start_time = time.time()
+            while time.time() - start_time &lt; SHOW_INTERVAL_SEC:
+                key = cv2.waitKey(100)
+                if key == 27:  # ESC key
+                    raise KeyboardInterrupt
+
+except KeyboardInterrupt:
+    print(&quot;\nStopped by user.&quot;)
+finally:
+    cv2.destroyAllWindows()
+</code></pre>
+<p><img alt="" src="qrcode_testing.jpg" /></p>
+<p><strong>Figure:</strong> Generating QR code images with a Python script for testing with a USB-HID QR code scanner.</p>
+<p>&nbsp;</p>
 <hr />
 <h2 id="arduino-esp32-demo-code-for-ibeacon-broadcasting">&#9655; <strong>Arduino-ESP32 Demo Code for iBeacon Broadcasting</strong><a class="headerlink" href="#arduino-esp32-demo-code-for-ibeacon-broadcasting" title="Permanent link">#</a></h2>
-<p>The provided Arduino code implements an ESP32-based iBeacon for the treasure-hunt game. The first version sets up a basic BLE advertisement using a fixed UUID, Major/Minor values, and device name. It continuously broadcasts iBeacon packets while the LED flashes briefly at startup, allowing players to detect the device using BLE scanner apps.</p>
+<p>The provided Arduino code implements an ESP32-based iBeacon for the treasure-hunt game.
+The first version sets up a basic BLE advertisement using a fixed UUID, Major/Minor values, and device name. It continuously broadcasts iBeacon packets while the LED flashes briefly at startup, allowing players to detect the device using BLE scanner apps.</p>
 <pre><code class="language-C++">#include &lt;BLEDevice.h&gt;
 #include &lt;BLEBeacon.h&gt;
 #include &lt;BLEUtils.h&gt;
@@ -679,12 +815,68 @@ void setup() {
 
 void loop() {}
 </code></pre>
+<p>The following Arduino sketch is a modified version of the previous example, enabling the ESP32 device to broadcast BLE beacons under three different beacon names.</p>
+<pre><code class="language-C++"></code></pre>
 <p>&nbsp;</p>
 <p>The following figures show screenshots from the <strong>nRF Connect app</strong> on an Android smartphone, used to scan BLE beacons with name filtering. 
 The screenshots display nearby BLE beacons, where the RSSI values in dBm indicate the approximate distance between the smartphone and each BLE box.
 As the smartphone moves closer to a BLE box, the RSSI value increases.</p>
 <p><img alt="" src="nrf_connect-1.jpg" /></p>
-<p><strong>Figure:</strong> Using nRF Connecgt App to scan BLE beacons</p>
+<p><strong>Figure:</strong> Using nRF Connect App to scan BLE beacons</p>
+<p>&nbsp;</p>
+<p>The following <strong>Python code</strong> can be used to scan BLE beacons.
+It utilizes the <strong>Bleak</strong> library (<strong>version 0.22.2</strong>) for this purpose.</p>
+<pre><code class="language-Python">import asyncio
+from bleak import BleakScanner
+from datetime import datetime
+import importlib.metadata
+
+version = importlib.metadata.version(&quot;bleak&quot;)
+print(&quot;\n\n\n\nBleak version:&quot;, version)
+
+SCAN_INTERVAL_SEC = 5
+
+# Dictionary to store detected devices:
+# { (MAC, Name): {&quot;rssi&quot;: int, &quot;last_seen&quot;: str} }
+detected_devices = {}
+
+def detection_callback(device, advertisement_data):
+    name = device.name
+    if name is None or not name.startswith(&quot;ECE&quot;):
+        return
+
+    mac = device.address
+    rssi = advertisement_data.rssi  # Use RSSI from AdvertisementData
+    now = datetime.now().strftime(&quot;%H:%M:%S&quot;)
+
+    key = (mac, name)
+    detected_devices[key] = {
+        &quot;rssi&quot;: rssi,
+        &quot;last_seen&quot;: now
+    }
+
+async def main():
+    scanner = BleakScanner(detection_callback)
+    print(&quot;Scanning for BLE devices (Press Ctrl+C to stop)...\n&quot;)
+    await scanner.start()
+    try:
+        while True:
+            await asyncio.sleep( SCAN_INTERVAL_SEC )
+            print(f&quot;{'MAC Address':&lt;25} {'Name':&lt;30} {'RSSI':&lt;8} {'Last Seen'}&quot;)
+            print(&quot;-&quot; * 80)
+            for (mac, name), info in sorted(detected_devices.items()):
+                rssi_str = f&quot;{info['rssi']} dBm&quot; if info['rssi'] is not None else &quot;N/A&quot;
+                print(f&quot;{mac:&lt;25} {name:&lt;30} {rssi_str:&lt;8} {info['last_seen']}&quot;)
+            print(&quot;\n&quot;)
+    except KeyboardInterrupt:
+        await scanner.stop()
+        print(&quot;\nScan stopped by user.&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<p><img alt="" src="python_qrcode_scan.jpg" /></p>
+<p><strong>Figure:</strong> Running the Python script to scan and filter BLE beacons.</p>
 <p>&nbsp;</p>
 <hr />
 <h2 id="conclusion">&#9655; <strong>Conclusion</strong><a class="headerlink" href="#conclusion" title="Permanent link">#</a></h2>
