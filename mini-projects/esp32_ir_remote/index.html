@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/mini-projects/esp32_ir_remote/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>DIY ESP32-Based IR Remote Web Server - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#diy-esp32-based-ir-remote-web-server" class="nav-link">DIY ESP32-Based IR Remote Web Server</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#project-motivation" class="nav-link">&#9655; Project Motivation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-esp32-programming" class="nav-link">&#9655; Arduino-ESP32 Programming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-sketch" class="nav-link">&#9655; Arduino Sketch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ideas-for-improvement" class="nav-link">&#9655; Ideas for Improvement</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="diy-esp32-based-ir-remote-web-server">DIY ESP32-Based IR Remote Web Server<a class="headerlink" href="#diy-esp32-based-ir-remote-web-server" title="Permanent link">#</a></h1>
+<p><strong>Keywords:</strong> <em>ESP32</em>, <em>Arduino-ESP32 Programming</em>, <em>IR Remote for LCD TV</em></p>
+<hr />
+<h2 id="project-motivation">&#9655; <strong>Project Motivation</strong><a class="headerlink" href="#project-motivation" title="Permanent link">#</a></h2>
+<p>I own an old LCD TV (Skyworth 24E510) and I have used it for many years, but its remote control no longer functions properly and needs repair or replacement. To address this, I decided to design and build a DIY ESP32-based IR remote control with an integrated web server, using an ESP32 board and an infrared transmitter module.</p>
+<p>Of course, there are other possible approaches, such as using <strong>Home Assistant</strong> or <strong>ESPHome</strong>. However, building the system directly with the ESP32 is an excellent choice for learning and experimenting with an IoT-based mini project.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-esp32-programming">&#9655; <strong>Arduino-ESP32 Programming</strong><a class="headerlink" href="#arduino-esp32-programming" title="Permanent link">#</a></h2>
+<p>The ESP32 is programmed using the Arduino-ESP32 framework to connect to a local Wi-Fi network and operate as a standalone web server. It hosts a simple web application that provides virtual buttons corresponding to the TV's remote control functions. By connecting my smartphone to the ESP32 web server in the same WiFi network, I can conveniently control the TV through the browser interface.</p>
+<p>A low-cost IR transmitter module was used in this project; however, its transmission power is quite limited, resulting in a short operating range. For improved performance, using a high-power IR transmitter module is recommended.</p>
+<p><img alt="" src="ir_tx_modules.jpg" /></p>
+<p><strong>Figure:</strong> IR LED transmitter modules used in this project</p>
+<p>To implement the IR remote control functions, I used the <code>IRremote</code> library (v4.5.0) and the <strong>Arduino-ESP32 core (v3.4.0)</strong>. These specific versions ensure compatibility and stable operation. Both libraries are available on GitHub:</p>
+<ul>
+<li><strong>Arduino-ESP32 Core</strong>: <a href="https://github.com/espressif/arduino-esp32">github.com/espressif/arduino-esp32</a></li>
+<li><strong>IRremote</strong>: <a href="https://github.com/Arduino-IRremote/Arduino-IRremote">github.com/Arduino-IRremote/Arduino-IRremote</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch">&#9655; <strong>Arduino Sketch</strong><a class="headerlink" href="#arduino-sketch" title="Permanent link">#</a></h2>
+<p>Initially, I developed and tested the hardware using a simple Arduino sketch.  In this setup, command strings for the IR remote control were received through the Serial interface.  When a valid command string was detected, the ESP32 transmitted the corresponding IR signal to the TV.</p>
+<p>The initial version of the Arduino code for this project is shown below.</p>
+<pre><code class="language-c++">// Date: 2025-10-13
+// Board: ESP32 (Arduino-ESP32 v3.4.0+)
+// Skyworth TV model 24E510
+// Dependencies:
+// - IRremote v4.5.0 (https://github.com/Arduino-IRremote/Arduino-IRremote)
+//
+#include &lt;IRremote.hpp&gt;
+#include &lt;map&gt;
+
+#define IR_LED_PIN 4   // GPIO pin connected to the IR LED
+
+IRsend irsend;         // IR transmitter object
+
+// Map of commands to NEC 32-bit codes
+std::map&lt;String, uint32_t&gt; irMap = {
+    {&quot;POWER&quot;,    0x707030CF},
+    {&quot;MENU&quot;,     0x70708877},
+    {&quot;VOL+&quot;,     0x707028D7},
+    {&quot;VOL-&quot;,     0x7070A857},
+    {&quot;PR+&quot;,      0x707048B7},
+    {&quot;PR-&quot;,      0x7070C837},
+    {&quot;RETURN&quot;,   0x7070DD22},
+    {&quot;ENTER&quot;,    0x7070629D},
+    {&quot;UP&quot;,       0x707042BD},
+    {&quot;DOWN&quot;,     0x7070C23D},
+    {&quot;LEFT&quot;,     0x707022DD},
+    {&quot;RIGHT&quot;,    0x7070A25D},
+    {&quot;MUTE&quot;,     0x7070B04F},
+    {&quot;CHANLIST&quot;, 0x7070CD32},
+    {&quot;EXIT&quot;,     0x7070AD52}
+};
+
+void setup() {
+    Serial.begin(115200);          // Initialize Serial
+    IrSender.begin(IR_LED_PIN);    // Initialize IR transmitter
+    Serial.println(&quot;IR Remote Ready. Send a command via Serial.&quot;);
+}
+
+void loop() {
+    // Check if a command is received via Serial
+    if (Serial.available()) {
+        String cmd = Serial.readStringUntil('\n'); // Read full line
+        cmd.trim();         // Remove leading/trailing whitespace
+        cmd.toUpperCase();  // Normalize to uppercase
+
+        // Look up the command in the map
+        auto it = irMap.find(cmd);
+        if (it != irMap.end()) {
+            uint32_t code = it-&gt;second;
+
+            // Print command and code in hexadecimal (8 digits, uppercase)
+            Serial.printf(&quot;Command: %s (Code: 0x%08lX)\n&quot;, cmd.c_str(), code);
+
+            // Send the 32-bit NEC code (MSB first)
+            // Parameters: code, number of bits, repeat frames
+            irsend.sendNECMSB(code, 32, 0);
+
+            delay(50);              // Short delay to separate signals
+
+            // Send NEC repeat code (simulate holding button)
+            irsend.sendNECRepeat();
+        } else {
+            // Command not found
+            Serial.println(&quot;Invalid code!!!&quot;);
+        }
+    }
+}
+</code></pre>
+<p>After confirming that the hardware functioned correctly, I extended the code to include a built-in web server, allowing the IR commands to be sent through a web interface instead of Serial communication.</p>
+<pre><code class="language-c++">// Date: 2025-10-26
+// Function:
+//   ESP32 connects to your Wi-Fi AP, starts a web server,
+//   and sends IR NEC commands when buttons on the web page are pressed.
+
+#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+#include &lt;IRremote.hpp&gt; // IRremote v4.5.0
+
+// ----------------------- USER CONFIG -----------------------
+#define WIFI_SSID     &quot;esl-ap&quot;
+#define WIFI_PASSWORD &quot;cnch2687&quot;
+
+// GPIO connected to IR LED
+#define IR_LED_PIN 4
+
+// Onboard LED pin
+#define LED_PIN   22
+
+// -----------------------------------------------------------
+
+IRsend irsend; // IR transmitter object
+WebServer server(80); // HTTP server on port 80
+
+// Define IR command mapping (TCL / Skyworth TV)
+struct IRCommand {
+  const char* name;
+  uint32_t code;
+};
+
+IRCommand irCommands[] = {
+  {&quot;ON/OFF&quot;, 0x707030CF},
+  {&quot;MENU&quot;,   0x70708877},
+  {&quot;EXIT&quot;,   0x7070AD52},
+  //-------------------------
+  {&quot;PROG&quot;,   0x7070CD32},
+  {&quot;PR+&quot;,    0x707048B7},
+  {&quot;PR-&quot;,    0x7070C837},
+  //-------------------------
+  {&quot;VOL+&quot;,   0x707028D7},
+  {&quot;MUTE&quot;,   0x7070B04F},
+  {&quot;VOL-&quot;,   0x7070A857},
+  //-------------------------
+  {&quot;LEFT&quot;,   0x707022DD},
+  {&quot;ENTER&quot;,  0x7070629D},
+  {&quot;RIGHT&quot;,  0x7070A25D},
+  //-------------------------
+  {&quot;UP&quot;,     0x707042BD},
+  {&quot;RETURN&quot;, 0x7070DD22},
+  {&quot;DOWN&quot;,   0x7070C23D}
+};
+const int NUM_COMMANDS = sizeof(irCommands) / sizeof(irCommands[0]);
+
+// -----------------------------------------------------------
+// Send IR command by name
+void sendIRCommand(const String&amp; cmd) {
+  for (int i = 0; i &lt; NUM_COMMANDS; i++) {
+    if (cmd.equalsIgnoreCase(irCommands[i].name)) {
+      uint32_t code = irCommands[i].code;
+      Serial.printf(&quot;Sending IR: %s (0x%08lX)\n&quot;, cmd.c_str(), code);
+      irsend.sendNECMSB(code, 32, 0);
+      delay(50);
+      irsend.sendNECRepeat();
+      return;
+    }
+  }
+  Serial.printf(&quot;Unknown command received via web: '%s'\n&quot;, cmd.c_str());
+}
+
+// -----------------------------------------------------------
+// HTML Web UI
+String buildHTML() {
+  String html = R&quot;rawliteral(
+  &lt;!DOCTYPE html&gt;
+  &lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;ESP32 IR Remote&lt;/title&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+    &lt;style&gt;
+      body { font-family: Arial; text-align: center; 
+             background: #121212; color: white; }
+      h1 { color: #00e0ff; }
+      button {
+        width: 100px; height: 60px; margin: 8px;
+        font-size: 18px; border-radius: 10px; border: none;
+        background: #1e88e5; color: white;
+        transition: background 0.2s;
+      }
+      button:hover { background: #00bcd4; }
+      .row { margin-top: 10px; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;ESP32 IR Remote&lt;/h1&gt;
+  )rawliteral&quot;;
+
+  for (int i = 0; i &lt; NUM_COMMANDS; i++) {
+    html += &quot;&lt;button onclick=\&quot;sendCmd('&quot;
+       + String(irCommands[i].name) + &quot;')\&quot;&gt;&quot; 
+       + irCommands[i].name + &quot;&lt;/button&gt;&quot;;
+    if ((i + 1) % 3 == 0) html += &quot;&lt;br&gt;&quot;;
+  }
+
+  html += R&quot;rawliteral(
+    &lt;script&gt;
+      function sendCmd(cmd) {
+        const encoded = encodeURIComponent(cmd);
+        fetch(&quot;/ir?cmd=&quot; + encoded)
+          .then(res =&gt; console.log(&quot;Sent:&quot;, cmd))
+          .catch(err =&gt; console.error(err));
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;&lt;/html&gt;
+  )rawliteral&quot;;
+
+  return html;
+}
+
+// -----------------------------------------------------------
+// HTTP request handlers
+void handleRoot() {
+  server.sendHeader(&quot;Cache-Control&quot;, &quot;no-cache&quot;);
+  server.sendHeader(&quot;Content-Type&quot;, &quot;text/html; charset=UTF-8&quot;);
+  server.send(200, &quot;text/html&quot;, buildHTML());
+}
+
+void handleIR() {
+  if (server.hasArg(&quot;cmd&quot;)) {
+    String cmd = server.arg(&quot;cmd&quot;);
+    sendIRCommand(cmd);
+    server.send(200, &quot;text/plain&quot;, &quot;OK: &quot; + cmd);
+  } else {
+    server.send(400, &quot;text/plain&quot;, &quot;Bad Request&quot;);
+  }
+}
+
+// -----------------------------------------------------------
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  delay(1000);
+  Serial.println(&quot;\nESP32 IR Remote Web Server&quot;);
+
+  // Start IR transmitter
+  IrSender.begin(IR_LED_PIN);
+
+  // Connect to Wi-Fi
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.printf(&quot;Connecting to %s&quot;, WIFI_SSID);
+  while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(200);
+    Serial.print(&quot;.&quot;);
+  }
+  Serial.println(&quot;\nWiFi connected!&quot;);
+  Serial.print(&quot;IP Address: &quot;);
+  Serial.println(WiFi.localIP());
+  digitalWrite(LED_PIN, HIGH);
+
+  // Register HTTP routes
+  server.on(&quot;/&quot;, handleRoot);
+  server.on(&quot;/ir&quot;, handleIR);
+  server.begin();
+
+  Serial.println(&quot;HTTP server started...&quot;);
+}
+
+// -----------------------------------------------------------
+void loop() {
+  server.handleClient();
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>Finally, I tested the web app using both a web browser and an Android-based smartphone. It worked correctly with my TV, allowing me to control it through the ESP32 device.</p>
+<p><img alt="" src="web_app_gui.jpg" /></p>
+<p><strong>Figure:</strong> Web App GUI</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ideas-for-improvement">&#9655; <strong>Ideas for Improvement</strong><a class="headerlink" href="#ideas-for-improvement" title="Permanent link">#</a></h2>
+<p>This project can be further improved with the following suggestions:</p>
+<ul>
+<li>Use a high-power IR transmitter module to increase the communication range.</li>
+<li>Add a LiPo battery and charging circuit to enable portable, battery-powered operation.</li>
+<li>Implement the ESP32's deep-sleep mode to reduce power consumption.
+The device can be awakened using a push button when needed.</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-10-26 | Last Updated: 2025-10-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
