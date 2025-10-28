@@ -815,8 +815,158 @@ void setup() {
 
 void loop() {}
 </code></pre>
+<p>&nbsp;</p>
 <p>The following Arduino sketch is a modified version of the previous example, enabling the ESP32 device to broadcast BLE beacons under three different beacon names.</p>
-<pre><code class="language-C++"></code></pre>
+<pre><code class="language-C++">#include &lt;Arduino.h&gt;
+
+#include &lt;BLEDevice.h&gt;
+#include &lt;BLEBeacon.h&gt;
+#include &lt;BLEUtils.h&gt;
+#include &lt;BLE2902.h&gt;
+#include &lt;BLEAdvertising.h&gt;
+#include &lt;esp_sleep.h&gt;
+#include &lt;sys/time.h&gt;
+
+#define BTN_PIN  (9)   // use the onboard BOOT button
+#define LED_PIN  (8)   // use the onboard LED
+//#define LED_PIN  (RGB_BUILTIN)
+
+#define BEACON_UUID &quot;2D7A9F0C-E0E8-4CC9-A71B-A21DB2D034A1&quot;  // iBeacon UUID
+#define DEEP_SLEEP_DURATION_SEC 5
+
+// Use the desired power level
+// ESP_PWR_LVL_N12: -12 dBm
+// ESP_PWR_LVL_N9: -9 dBm
+// ESP_PWR_LVL_N6: -6 dBm
+// ESP_PWR_LVL_N3: -3 dBm
+// ESP_PWR_LVL_P3: 3 dBm
+// ESP_PWR_LVL_P6: 6 dBm
+// ESP_PWR_LVL_P9: 9 dBm
+#define BEACON_POWER ESP_PWR_LVL_P3
+
+#define LED_ON  (LOW)
+#define LED_OFF (!LED_ON)
+
+// Beacon name list (up to 3)
+const char *names[] = {
+  &quot;ECE-24A1F01234AB&quot;,
+  &quot;ECE-FAE19C01A7B3&quot;,
+  &quot;ECE-0A1B2C3D4E5F&quot;
+};
+const int NUM_NAMES = sizeof(names) / sizeof(names[0]);
+
+// Store across sleep cycles
+RTC_DATA_ATTR static time_t last;
+RTC_DATA_ATTR static uint32_t bootcount = 0;
+
+BLEAdvertising *pAdvertising;
+struct timeval now;
+
+// LED blink task
+static TaskHandle_t ledTaskHandle = NULL;
+const TickType_t FLASH_DELAY_MS = pdMS_TO_TICKS(100);
+const int FLASH_COUNT_MAX = 20;
+
+void LedToggleTask(void *pvParameters) {
+  int count = 0;
+  while (count &lt; FLASH_COUNT_MAX) {
+    digitalWrite(LED_PIN, LED_ON);
+    vTaskDelay(1);
+    digitalWrite(LED_PIN, LED_OFF);
+    vTaskDelay(499);
+    count++;
+  }
+  digitalWrite(LED_PIN, LED_ON);
+  vTaskDelete(NULL);
+}
+
+void setBeacon(const char *beaconName) {
+  uint16_t dynamicMajor = (uint16_t)(bootcount / 10);
+  uint16_t dynamicMinor = (uint16_t)(bootcount % 10);
+
+  BLEBeacon beacon;
+  beacon.setManufacturerId(0x4c00);  // Apple iBeacon ID
+  beacon.setProximityUUID(BLEUUID(BEACON_UUID));
+  beacon.setMajor(dynamicMajor);
+  beacon.setMinor(dynamicMinor);
+  beacon.setSignalPower(BEACON_POWER);
+
+  BLEAdvertisementData advData;
+  advData.setFlags(0x06);
+  advData.setName(beaconName);
+  advData.setManufacturerData(beacon.getData());
+
+  // Advertising rate: 160 × 0.625 ms = 100 ms
+  pAdvertising-&gt;setMinInterval(160);
+  pAdvertising-&gt;setMaxInterval(160);
+  pAdvertising-&gt;setAdvertisementData(advData);
+  pAdvertising-&gt;setAdvertisementType(0x02);
+
+  Serial.printf(&quot;Broadcasting beacon: %s (Major=%d, Minor=%d)\n&quot;,
+                beaconName, dynamicMajor, dynamicMinor);
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BTN_PIN, INPUT);
+  gettimeofday(&amp;now, NULL);
+  xTaskCreate(LedToggleTask, &quot;LED_TOGGLE&quot;, 2048, NULL, 1, &amp;ledTaskHandle);
+  Serial.println(&quot;LED Toggle Task created...&quot;);
+
+  Serial.printf(&quot;Start ESP32 #%lu\n&quot;, bootcount);
+  Serial.printf(&quot;Deep sleep (%llds since last reset, %llds since last boot)\n&quot;,
+                now.tv_sec, now.tv_sec - last);
+  last = now.tv_sec;
+
+  // Select beacon name based on bootcount
+  int index = bootcount % NUM_NAMES;
+  const char *currentName = names[index];
+  Serial.printf(&quot;Selected beacon name: %s\n&quot;, currentName);
+
+  // Initialize BLE
+  BLEDevice::init(currentName);
+  BLEDevice::setPower(BEACON_POWER);
+  pAdvertising = BLEDevice::getAdvertising();
+
+  // Configure and start beacon advertising
+  setBeacon(currentName);
+  pAdvertising-&gt;start();
+
+  Serial.println(&quot;Advertising started...&quot;);
+  delay(2000);
+  pAdvertising-&gt;stop();
+  Serial.println(&quot;Advertising stopped...&quot;);
+
+  // Stop LED task
+  if (ledTaskHandle != NULL &amp;&amp; eTaskGetState(ledTaskHandle) != eDeleted) {
+    vTaskDelete(ledTaskHandle);
+    Serial.println(&quot;LED Toggle Task deleted&quot;);
+  }
+  ledTaskHandle = NULL;
+
+  // Increment bootcount
+  bootcount++;
+  if (digitalRead(BTN_PIN) == HIGH) { // Button is not pressed.
+    // Enter deep sleep
+    Serial.println(&quot;Entering deep sleep...&quot;);
+    delay(100);
+    esp_deep_sleep(1000000LL * DEEP_SLEEP_DURATION_SEC);
+  } else {
+     Serial.println(&quot;Exit the wakeup and deep-sleep cycle...&quot;);
+  }
+}
+
+void loop() {
+  for (int i=0; i &lt; NUM_NAMES; i++) {
+    Serial.printf( &quot;%d) Beacon name: '%s'\n&quot;, i+1, names[i]);
+  }
+  String mac = BLEDevice::getAddress().toString();
+  mac.toUpperCase();
+  Serial.printf(&quot;BLE MAC: %s\n\n&quot;, mac.c_str() );
+  delay(5000);
+}
+</code></pre>
 <p>&nbsp;</p>
 <p>The following figures show screenshots from the <strong>nRF Connect app</strong> on an Android smartphone, used to scan BLE beacons with name filtering. 
 The screenshots display nearby BLE beacons, where the RSSI values in dBm indicate the approximate distance between the smartphone and each BLE box.
@@ -884,7 +1034,7 @@ if __name__ == &quot;__main__&quot;:
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-10-26 | Last Updated: 2025-10-27</p></div>
+<p>Created: 2025-10-26 | Last Updated: 2025-10-28</p></div>
             </div>
         </div>
 
