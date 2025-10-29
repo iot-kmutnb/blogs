@@ -206,6 +206,8 @@ to scan the collected photos, verify the codes and score the players.</li>
 </ul>
 </li>
 </ol>
+<p><img alt="" src="esp32c3_modules.jpg" /></p>
+<p><strong>Figure:</strong> Examples of ESP32-C3 modules </p>
 <p><img alt="" src="web_app_demo-init.jpg" /></p>
 <p><strong>Figure:</strong> Web App GUI demo before any QR codes are scanned</p>
 <p><img alt="" src="web_app_demo-1.jpg" /></p>
@@ -575,7 +577,8 @@ finally:
 <h2 id="arduino-esp32-demo-code-for-ibeacon-broadcasting">&#9655; <strong>Arduino-ESP32 Demo Code for iBeacon Broadcasting</strong><a class="headerlink" href="#arduino-esp32-demo-code-for-ibeacon-broadcasting" title="Permanent link">#</a></h2>
 <p>The provided Arduino code implements an ESP32-based iBeacon for the treasure-hunt game.
 The first version sets up a basic BLE advertisement using a fixed UUID, Major/Minor values, and device name. It continuously broadcasts iBeacon packets while the LED flashes briefly at startup, allowing players to detect the device using BLE scanner apps.</p>
-<pre><code class="language-C++">#include &lt;BLEDevice.h&gt;
+<pre><code class="language-C++">// Date: 2025-10-28
+#include &lt;BLEDevice.h&gt;
 #include &lt;BLEBeacon.h&gt;
 #include &lt;BLEUtils.h&gt;
 #include &lt;BLE2902.h&gt;
@@ -585,6 +588,9 @@ The first version sets up a basic BLE advertisement using a fixed UUID, Major/Mi
 
 #define DEVICE_NAME &quot;ECE-&quot;
 #define BEACON_UUID &quot;2D7A9F0C-E0E8-4CC9-A71B-A21DB2D034A1&quot;
+
+// ESP_PWR_LVL_N24 (lowest), ..., ESP_PWR_LVL_P9 (highest)
+#define BEACON_POWER ESP_PWR_LVL_P9 
 
 // Static Major/Minor values
 uint16_t STATIC_MAJOR = 1;
@@ -600,6 +606,9 @@ String formatName(String name) {
 void init_BLE() {
   BLEDevice::init(DEVICE_NAME);
 
+  // Set the actual hardware transmit power
+  BLEDevice::setPower(BEACON_POWER);
+
   // --- 1. Set up iBeacon Payload ---
   BLEBeacon beacon;
   beacon.setManufacturerId(0x4c00);
@@ -607,13 +616,11 @@ void init_BLE() {
   beacon.setProximityUUID(BLEUUID(BEACON_UUID));
   beacon.setMajor(STATIC_MAJOR);  // Static Major
   beacon.setMinor(STATIC_MINOR);  // Static Minor (No changes)
-  // ESP_PWR_LVL_N12 (lowest), ESP_PWR_LVL_N9, ESP_PWR_LVL_N6, ESP_PWR_LVL_N3,
-  // ESP_PWR_LVL_0, ESP_PWR_LVL_P3, ESP_PWR_LVL_P6, ESP_PWR_LVL_P9 (highest)
-  beacon.setSignalPower(ESP_PWR_LVL_N12);
+  beacon.setSignalPower(BEACON_POWER);
 
   // --- 2. Create Advertisement Data ---
   BLEAdvertisementData advData;
-  advData.setFlags(0x06);  // LE General Discoverable + BR/EDR Not Supported
+  advData.setFlags(0x06); // LE General Discoverable + BR/EDR Not Supported
 
   // Add the device name to the primary advertisement payload
   String name = DEVICE_NAME;
@@ -650,7 +657,6 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);  // Simple loop, no dynamic changes
 }
 </code></pre>
 <p>&nbsp;</p>
@@ -667,7 +673,8 @@ It dynamically updates Major/Minor values based on boot count, toggles an LED fo
 #include &lt;sys/time.h&gt;
 
 #define BTN_PIN  (9)  // use the onboard BOOT button
-#define LED_PIN  (RGB_BUILTIN)
+#define LED_PIN  (8)  // use the onboard LED
+//#define LED_PIN  (RGB_BUILTIN)
 
 #define DEVICE_NAME &quot;ECE-&quot;
 
@@ -817,7 +824,8 @@ void loop() {}
 </code></pre>
 <p>&nbsp;</p>
 <p>The following Arduino sketch is a modified version of the previous example, enabling the ESP32 device to broadcast BLE beacons under three different beacon names.</p>
-<pre><code class="language-C++">#include &lt;Arduino.h&gt;
+<pre><code class="language-C++">// Target board: ESP32-C3 Super Mini
+#include &lt;Arduino.h&gt;
 
 #include &lt;BLEDevice.h&gt;
 #include &lt;BLEBeacon.h&gt;
@@ -834,15 +842,7 @@ void loop() {}
 #define BEACON_UUID &quot;2D7A9F0C-E0E8-4CC9-A71B-A21DB2D034A1&quot;  // iBeacon UUID
 #define DEEP_SLEEP_DURATION_SEC 5
 
-// Use the desired power level
-// ESP_PWR_LVL_N12: -12 dBm
-// ESP_PWR_LVL_N9: -9 dBm
-// ESP_PWR_LVL_N6: -6 dBm
-// ESP_PWR_LVL_N3: -3 dBm
-// ESP_PWR_LVL_P3: 3 dBm
-// ESP_PWR_LVL_P6: 6 dBm
-// ESP_PWR_LVL_P9: 9 dBm
-#define BEACON_POWER ESP_PWR_LVL_P3
+#define BEACON_POWER ESP_PWR_LVL_N3
 
 #define LED_ON  (LOW)
 #define LED_OFF (!LED_ON)
@@ -853,7 +853,31 @@ const char *names[] = {
   &quot;ECE-FAE19C01A7B3&quot;,
   &quot;ECE-0A1B2C3D4E5F&quot;
 };
+
 const int NUM_NAMES = sizeof(names) / sizeof(names[0]);
+
+// Function to convert enum to string
+const char* powerLevelToString(esp_power_level_t level) {
+  switch (level) {
+    case ESP_PWR_LVL_N24: return &quot;-24 dBm&quot;;
+    case ESP_PWR_LVL_N21: return &quot;-21 dBm&quot;;
+    case ESP_PWR_LVL_N18: return &quot;-18 dBm&quot;;
+    case ESP_PWR_LVL_N15: return &quot;-15 dBm&quot;;
+    case ESP_PWR_LVL_N12: return &quot;-12 dBm&quot;;
+    case ESP_PWR_LVL_N9:  return &quot;-9 dBm&quot;;
+    case ESP_PWR_LVL_N6:  return &quot;-6 dBm&quot;;
+    case ESP_PWR_LVL_N3:  return &quot;-3 dBm&quot;;
+    case ESP_PWR_LVL_N0:  return &quot;0 dBm&quot;;
+    case ESP_PWR_LVL_P3:  return &quot;+3 dBm&quot;;
+    case ESP_PWR_LVL_P6:  return &quot;+6 dBm&quot;;
+    case ESP_PWR_LVL_P9:  return &quot;+9 dBm&quot;;
+    case ESP_PWR_LVL_P12: return &quot;+12 dBm&quot;;
+    case ESP_PWR_LVL_P15: return &quot;+15 dBm&quot;;
+    case ESP_PWR_LVL_P18: return &quot;+18 dBm&quot;;
+    case ESP_PWR_LVL_P20: return &quot;+20 dBm&quot;;
+    default: return &quot;Invalid Power Level&quot;;
+  }
+};
 
 // Store across sleep cycles
 RTC_DATA_ATTR static time_t last;
@@ -871,9 +895,9 @@ void LedToggleTask(void *pvParameters) {
   int count = 0;
   while (count &lt; FLASH_COUNT_MAX) {
     digitalWrite(LED_PIN, LED_ON);
-    vTaskDelay(1);
+    vTaskDelay(5);
     digitalWrite(LED_PIN, LED_OFF);
-    vTaskDelay(499);
+    vTaskDelay(500-5);
     count++;
   }
   digitalWrite(LED_PIN, LED_ON);
@@ -909,7 +933,7 @@ void setBeacon(const char *beaconName) {
 void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
-  pinMode(BTN_PIN, INPUT);
+  pinMode(BTN_PIN, INPUT_PULLUP);
   gettimeofday(&amp;now, NULL);
   xTaskCreate(LedToggleTask, &quot;LED_TOGGLE&quot;, 2048, NULL, 1, &amp;ledTaskHandle);
   Serial.println(&quot;LED Toggle Task created...&quot;);
@@ -958,12 +982,15 @@ void setup() {
 }
 
 void loop() {
+  Serial.printf(&quot;\nCompiled on: %s at %s\n&quot;,__DATE__, __TIME__);
+  Serial.printf(&quot;Chip model: %s\n&quot;, ESP.getChipModel());
+  String mac = BLEDevice::getAddress().toString();
+  mac.toUpperCase();
+  Serial.printf(&quot;BLE MAC: %s\n&quot;, mac.c_str() );
+  Serial.printf(&quot;TX power: %s\n&quot;, powerLevelToString(BEACON_POWER) );
   for (int i=0; i &lt; NUM_NAMES; i++) {
     Serial.printf( &quot;%d) Beacon name: '%s'\n&quot;, i+1, names[i]);
   }
-  String mac = BLEDevice::getAddress().toString();
-  mac.toUpperCase();
-  Serial.printf(&quot;BLE MAC: %s\n\n&quot;, mac.c_str() );
   delay(5000);
 }
 </code></pre>
