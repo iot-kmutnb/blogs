@@ -167,9 +167,12 @@ to scan the collected photos, verify the codes and score the players.</li>
 <li>
 <p><strong>ESP32 / ESP32-C3 devices</strong></p>
 <ul>
+<li>Arduino-ESP32 coding uses the BLE library provided by Espressif ESP-IDF.<ul>
+<li>Note: Remove the <code>ArduinoBLE</code> library by Arduino to avoid library conflicts.</li>
+</ul>
+</li>
 <li>Each ESP32 advertises as an iBeacon using provided Arduino code.<ul>
 <li>Advertisement Interval = 100 ms (default)</li>
-<li>Device name (Beacon local name)</li>
 </ul>
 </li>
 <li>Power-up and deep-sleep cycle:<ul>
@@ -577,20 +580,21 @@ finally:
 <h2 id="arduino-esp32-demo-code-for-ibeacon-broadcasting">&#9655; <strong>Arduino-ESP32 Demo Code for iBeacon Broadcasting</strong><a class="headerlink" href="#arduino-esp32-demo-code-for-ibeacon-broadcasting" title="Permanent link">#</a></h2>
 <p>The provided Arduino code implements an ESP32-based iBeacon for the treasure-hunt game.
 The first version sets up a basic BLE advertisement using a fixed UUID, Major/Minor values, and device name. It continuously broadcasts iBeacon packets while the LED flashes briefly at startup, allowing players to detect the device using BLE scanner apps.</p>
-<pre><code class="language-C++">// Date: 2025-10-28
+<pre><code class="language-C++">// Arduino Sketch: Demo 1
+// Date: 2025-10-28
 #include &lt;BLEDevice.h&gt;
 #include &lt;BLEBeacon.h&gt;
 #include &lt;BLEUtils.h&gt;
 #include &lt;BLE2902.h&gt;
 #include &lt;BLEAdvertising.h&gt;
 
-#define LED_PIN RGB_BUILTIN
+#define LED_PIN  (8) // onboard LED pin
+//#define LED_PIN RGB_BUILTIN
 
 #define DEVICE_NAME &quot;ECE-&quot;
 #define BEACON_UUID &quot;2D7A9F0C-E0E8-4CC9-A71B-A21DB2D034A1&quot;
 
-// ESP_PWR_LVL_N24 (lowest), ..., ESP_PWR_LVL_P9 (highest)
-#define BEACON_POWER ESP_PWR_LVL_P9 
+#define BEACON_POWER ESP_PWR_LVL_N12
 
 // Static Major/Minor values
 uint16_t STATIC_MAJOR = 1;
@@ -609,39 +613,51 @@ void init_BLE() {
   // Set the actual hardware transmit power
   BLEDevice::setPower(BEACON_POWER);
 
-  // --- 1. Set up iBeacon Payload ---
+  // 1. Set up iBeacon Payload
   BLEBeacon beacon;
-  beacon.setManufacturerId(0x4c00);
-  // Apple iBeacon ID
+  beacon.setManufacturerId(0x4c00); // Apple iBeacon ID
   beacon.setProximityUUID(BLEUUID(BEACON_UUID));
   beacon.setMajor(STATIC_MAJOR);  // Static Major
-  beacon.setMinor(STATIC_MINOR);  // Static Minor (No changes)
+  beacon.setMinor(STATIC_MINOR);  // Static Minor
   beacon.setSignalPower(BEACON_POWER);
 
-  // --- 2. Create Advertisement Data ---
+  // 2. Create Advertisement Data (iBeacon only)
   BLEAdvertisementData advData;
   advData.setFlags(0x06); // LE General Discoverable + BR/EDR Not Supported
 
-  // Add the device name to the primary advertisement payload
-  String name = DEVICE_NAME;
-  name += BLEDevice::getAddress().toString();
-  advData.setName( formatName(name).c_str() );
-
-  // Add the iBeacon Manufacturer Data
+  // Add ONLY the iBeacon Manufacturer Data - NO device name
   advData.setManufacturerData(beacon.getData());
 
-  // --- 3. Start Advertising ---
+  // 3. Create Scan Response Data (with device name) &lt;====
+  BLEAdvertisementData scanResponse;
+
+  String name = DEVICE_NAME;
+  name += BLEDevice::getAddress().toString();
+  scanResponse.setName(formatName(name).c_str());
+
+  // 4. Start Advertising
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising-&gt;setMinInterval(160);  // 100 ms
   pAdvertising-&gt;setMaxInterval(160);  // 100 ms
+
+  // Set the primary advertisement data (iBeacon)
   pAdvertising-&gt;setAdvertisementData(advData);
-  // Non-Connectable Undirected Advertising
+
+  // Set the scan response data (device name)
+  pAdvertising-&gt;setScanResponseData(scanResponse);
+
+  // ADV_TYPE_SCAN_IND (0x02) - Scannable undirected advertising
+  // This allows scan responses while remaining non-connectable
   pAdvertising-&gt;setAdvertisementType(0x02);  
   pAdvertising-&gt;start();
 
   // Print the BLE device address
   Serial.print(&quot;BLE Device Address: &quot;);
   Serial.println(BLEDevice::getAddress().toString().c_str());
+
+  // Print the formatted name
+  Serial.print(&quot;Device Name: &quot;);
+  Serial.println(formatName(name));
 }
 
 void setup() {
@@ -657,12 +673,15 @@ void setup() {
 }
 
 void loop() {
+  delay(1000);  // Simple loop, no dynamic changes
 }
 </code></pre>
 <p>&nbsp;</p>
 <p>Next, the extended version adds deep-sleep and wake-up functionality to save battery. 
 It dynamically updates Major/Minor values based on boot count, toggles an LED for visual feedback, and controls BLE transmit power. This ensures energy-efficient beacon operation, while maintaining compatibility with BLE scanners for proximity-based treasure hunting.</p>
-<pre><code class="language-C++">#include &lt;Arduino.h&gt;
+<pre><code class="language-C++">// Arduino Sketch: Demo 2
+// Target board: ESP32-C3 Super Mini
+#include &lt;Arduino.h&gt;
 
 #include &lt;BLEDevice.h&gt;
 #include &lt;BLEBeacon.h&gt;
@@ -723,9 +742,9 @@ void setBeacon() {
   uint16_t dynamicMajor = (uint16_t)(bootcount / 10);
   uint16_t dynamicMinor = (uint16_t)(bootcount % 10);
 
-  // --- 1. Set up iBeacon Payload ---
+  // 1. Set up iBeacon Payload-
   BLEBeacon beacon;
-  beacon.setManufacturerId(0x4c00);  // Apple iBeacon ID
+  beacon.setManufacturerId(0x4c00); // Apple iBeacon ID
   beacon.setProximityUUID(BLEUUID(BEACON_UUID));
 
   // Set dynamic Major/Minor values based on bootcount
@@ -736,33 +755,44 @@ void setBeacon() {
   // The actual hardware power is set by BLEDevice::setPower() in setup()
   beacon.setSignalPower(BEACON_POWER);
 
-  // --- 2. Create Advertisement Data ---
+  // 2. Create Advertisement Data
   BLEAdvertisementData advData;
-  advData.setFlags(0x06);  // LE General Discoverable + BR/EDR Not Supported
+  advData.setFlags(0x06); // LE General Discoverable + BR/EDR Not Supported
+
+  // Create Scan Response Data (with device name)
+  BLEAdvertisementData scanResponse;
 
   // Set the device name in the advertisement payload
   String name = DEVICE_NAME;
   name += BLEDevice::getAddress().toString();
-  advData.setName(formatName(name).c_str());
+  scanResponse.setName(formatName(name).c_str());
 
   // Add the iBeacon Manufacturer Data (this is the core iBeacon payload)
   advData.setManufacturerData(beacon.getData());
 
-  // --- 3. Configure Advertising ---
-  pAdvertising-&gt;setMinInterval(160);  // 100 ms
-  pAdvertising-&gt;setMaxInterval(160);  // 100 ms
+  // 3. Configure Advertising
+  pAdvertising-&gt;setMinInterval(160); // 100 ms
+  pAdvertising-&gt;setMaxInterval(160); // 100 ms
+
+  // Set the primary advertisement data (iBeacon)
+  pAdvertising-&gt;setAdvertisementData(advData);
+
+  // Set the scan response data (device name)
+  pAdvertising-&gt;setScanResponseData(scanResponse);
+
   pAdvertising-&gt;setAdvertisementData(advData);
   // Non-Connectable Undirected Advertising
   pAdvertising-&gt;setAdvertisementType(0x02); 
 
-  Serial.printf(&quot;iBeacon Major: %d, Minor: %d\n&quot;, dynamicMajor, dynamicMinor);
+  Serial.printf(&quot;iBeacon Major: %d, Minor: %d\n&quot;, 
+                dynamicMajor, dynamicMinor);
 }
 
 void setup() {
   Serial.begin(115200);
   gettimeofday(&amp;now, NULL);
   pinMode(LED_PIN, OUTPUT);
-  pinMode(BTN_PIN, INPUT);
+  pinMode(BTN_PIN, INPUT_PULLUP);
 
   xTaskCreate(
         LedToggleTask,         // Task function
@@ -783,6 +813,7 @@ void setup() {
 
   // Create the BLE Device
   BLEDevice::init(DEVICE_NAME);
+
   // Set the actual hardware transmit power
   BLEDevice::setPower(BEACON_POWER);
   pAdvertising = BLEDevice::getAdvertising();
@@ -824,7 +855,8 @@ void loop() {}
 </code></pre>
 <p>&nbsp;</p>
 <p>The following Arduino sketch is a modified version of the previous example, enabling the ESP32 device to broadcast BLE beacons under three different beacon names.</p>
-<pre><code class="language-C++">// Target board: ESP32-C3 Super Mini
+<pre><code class="language-C++">// Arduino Sketch: Demo 3
+// Target board: ESP32-C3 Super Mini
 #include &lt;Arduino.h&gt;
 
 #include &lt;BLEDevice.h&gt;
@@ -917,13 +949,25 @@ void setBeacon(const char *beaconName) {
 
   BLEAdvertisementData advData;
   advData.setFlags(0x06);
-  advData.setName(beaconName);
+
+  // Create Scan Response Data (with device name)
+  BLEAdvertisementData scanResponse;
+  scanResponse.setName(beaconName);
+
   advData.setManufacturerData(beacon.getData());
 
   // Advertising rate: 160 × 0.625 ms = 100 ms
   pAdvertising-&gt;setMinInterval(160);
   pAdvertising-&gt;setMaxInterval(160);
+
+  // Set the primary advertisement data (iBeacon)
   pAdvertising-&gt;setAdvertisementData(advData);
+
+  // Set the scan response data (device name)
+  pAdvertising-&gt;setScanResponseData(scanResponse);
+
+  // ADV_TYPE_SCAN_IND (0x02) - Scannable undirected advertising
+  // This allows scan responses while remaining non-connectable
   pAdvertising-&gt;setAdvertisementType(0x02);
 
   Serial.printf(&quot;Broadcasting beacon: %s (Major=%d, Minor=%d)\n&quot;,
@@ -1061,7 +1105,7 @@ if __name__ == &quot;__main__&quot;:
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-10-26 | Last Updated: 2025-10-28</p></div>
+<p>Created: 2025-10-26 | Last Updated: 2025-10-29</p></div>
             </div>
         </div>
 

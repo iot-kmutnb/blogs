@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/zephyr/zephyr_cli_west/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>แนะนำการใช้งาน Zephyr RTOS แบบ CLI - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#zephyr-rtos-cli" class="nav-link">แนะนำการใช้งาน Zephyr RTOS แบบ CLI</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#zephyr-ubuntu-linux" class="nav-link">&#9655; การติดตั้งซอฟต์แวร์ Zephyr สำหรับ Ubuntu / Linux</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#_1" class="nav-link">ขั้นตอนการดำเนินการมีดังนี้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#zephyr-raspberry-pi-pico" class="nav-link">&#9655; การทดลองใช้ Zephyr ร่วมกับบอร์ด Raspberry Pi Pico</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#zephyr-bbc-microbit-v2" class="nav-link">&#9655; การทดลองใช้ Zephyr ร่วมกับบอร์ด BBC Micro:bit V2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="zephyr-rtos-cli">แนะนำการใช้งาน Zephyr RTOS แบบ CLI<a class="headerlink" href="#zephyr-rtos-cli" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Zephyr RTOS</em>, <em>Zephyr West Tool</em>, <em>Zephyr SDK</em>, <em>Micro:bit v2</em>, <em>Raspberry Pi Pico</em></p>
+<hr />
+<h2 id="zephyr-ubuntu-linux">&#9655; <strong>การติดตั้งซอฟต์แวร์ Zephyr สำหรับ Ubuntu / Linux</strong><a class="headerlink" href="#zephyr-ubuntu-linux" title="Permanent link">#</a></h2>
+<p>แม้ว่าในปัจจุบัน การเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์โดยใช้ <a href="https://www.zephyrproject.org/"><strong>Zephyr RTOS</strong></a> จะมีตัวเลือก เช่น
+การใช้ <strong>Zephyr IDE</strong> ซึ่งเป็น <strong>Extension Pack</strong> สำหรับ <strong>VS Code IDE</strong> แต่การใช้งานซอฟต์แวร์
+<strong>Zephyr RTOS</strong> แบบ <strong>CLI</strong> (<em>Command Line Interface</em>) 
+โดยใช้คำสั่ง <a href="https://github.com/zephyrproject-rtos/west"><code>west</code></a> (<strong>Python-based meta-tool</strong>) ก็ถือว่าเป็นวิธีที่สะดวกเช่นกัน </p>
+<p>บทความนี้นำเสนอขั้นตอนการติดตั้งซอฟต์แวร์ <strong>Zephyr</strong> สำหรับ <strong>Ubuntu 24.04 LTS</strong>
+หรืออาจใช้กับ <strong>WSL 2 Ubuntu</strong> บนระบบปฏิบัติการ <strong>Windows</strong> ได้เช่นกัน
+ในขั้นตอนต่อไปนี้ เป็นการติดตั้งและใช้งาน <strong>Zephyr RTOS v4.3.0</strong> และ <strong>Zephyr SDK v0.17.4</strong></p>
+<h3 id="_1"><strong>ขั้นตอนการดำเนินการมีดังนี้</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h3>
+<ol>
+<li>ติดตั้งเครื่องมือสำหรับการสร้างโปรแกรม (<strong>build tools</strong>) ไลบรารี และ <strong>Python dependencies</strong>
+เช่น <code>git</code>, <code>cmake</code>, <code>ninja-build</code>, <code>python3-dev</code> เป็นต้น</li>
+<li>สร้างไดเรกทอรีสำหรับโปรเจกต์ <strong>Zephyr</strong> โดยใช้ชื่อว่า <code>~/zephyrproject</code> เพื่อเก็บโค้ด
+และ <strong>Zephyr Workspace</strong></li>
+<li>เข้าไปยังไดเรกทอรีโปรเจกต์ <code>~/zephyrproject</code> </li>
+<li>สร้างและเปิดใช้งาน <strong>Python virtual environment</strong> เพื่อแยกสภาพแวดล้อมของ <strong>Python</strong> โดยไม่กระทบระบบหลัก และจะต้องเปิดใช้งานด้วยคำสั่ง <code>source .venv/bin/activate</code></li>
+<li>ติดตั้งโปรแกรม <strong>West</strong> และตรวจสอบเวอร์ชัน (ลองใช้เวอร์ชัน: v1.5.0)</li>
+<li>เริ่มต้นสร้าง <strong>Zephyr Workspace</strong> (ใช้คำสั่ง <code>west init -m &lt;repo_url&gt;</code>) 
+โดยระบุ <strong>Zephyr repository</strong> และคำสั่ง <code>west update</code> เพื่อดาวน์โหลดไฟล์จาก <strong>GitHub</strong>
+ได้แก่โมดูลต่าง ๆ (<strong>Dependencies</strong>) สำหรับ <strong>Zephyr</strong> (ขั้นตอนนี้ใช้เวลาหลายนาที และขึ้นอยู่กับความเร็วอินเทอร์เน็ต)</li>
+<li>ทำคำสั่ง <code>west zephyr-export</code> เพื่อกำหนดตัวแปร เช่น <code>ZEPHYR_BASE</code></li>
+<li>ติดตั้ง <strong>Python dependencies</strong> สำหรับ <strong>build script</strong></li>
+<li>ติดตั้ง <strong>Zephyr SDK</strong> และ <strong>toolchains</strong> ที่เกี่ยวข้อง
+โดยเจาะจงสถาปัตยกรรมที่ต้องการ เช่น <code>x86_64</code>, <code>ARM</code>, <code>RISC-V</code>, <code>ESP32</code> เป็นต้น</li>
+</ol>
+<pre><code class="language-text"># 1) Install required packages for Zephyr development .
+#    (build tools, Python, libraries, etc.)
+$ sudo apt install --no-install-recommends git cmake ninja-build gperf \
+  ccache dfu-util device-tree-compiler wget \
+  python3-dev python3-venv python3-pip python3-setuptools python3-tk \
+  xz-utils file make gcc libsdl2-dev libmagic1 \
+  gcc-multilib g++-multilib
+
+# 2) Create a working directory for Zephyr projects.
+$ mkdir ~/zephyrproject
+
+# 3) Change into the Zephyr project directory.
+$ cd ~/zephyrproject
+
+# 4) Create a Python virtual environment inside the directory
+#    and activate the virtual environment.
+$ python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+
+# 5) Install West, the Zephyr meta-tool, using pip and
+#    verify the installed version of West.
+$ pip3 install west
+$ west --version
+# Expected example: West version: v1.5.0
+
+# 6) Initialize a Zephyr workspace and specify the repository URL.
+$ west init -m https://github.com/zephyrproject-rtos/zephyr 
+
+# 7) Fetch all modules specified by the Zephyr manifest.
+$ west update
+
+# 8) Set environment variables for Zephyr (e.g., ZEPHYR_BASE)
+$ west zephyr-export
+
+# 9) Change into the main Zephyr source directory
+#    and install Python dependencies required by Zephyr build scripts.
+$ cd ~/zephyrproject/zephyr
+$ pip3 install -r scripts/requirements.txt
+
+# Check SDK version used by the Zephyr project
+# zephyrproject/zephyr/SDK_VERSION =&gt; version 0.17.4
+
+# 10) Install Zephyr SDK toolchains
+
+# Option 1: Install Zephyr SDK toolchains for selected architectures.
+$ west sdk install --toolchains x86_64-zephyr-elf \
+   arm-zephyr-eabi aarch64-zephyr-elf riscv64-zephyr-elf
+$ west sdk install --toolchains xtensa-espressif_esp32_zephyr-elf \
+   xtensa-espressif_esp32s3_zephyr-elf
+
+# Option 2: Manual download and installation of Zephyr SDK
+$ ZEPHYR_SDK_URL=https://github.com/zephyrproject-rtos/sdk-ng/releases/download
+$ ZEPHYR_SDK_URL=${ZEPHYR_SDK_URL}/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64.tar.xz
+$ wget $ZEPHYR_SDK_URL
+$ tar xvf zephyr-sdk-0.17.0_linux-x86_64.tar.xz
+$ zephyr-sdk-0.17.0/setup.sh
+</code></pre>
+<p><img alt="" src="zephyr_ubuntu-1.jpg" /></p>
+<p><img alt="" src="zephyr_ubuntu-2.jpg" /></p>
+<p>รูป: ตัวอย่างการทำขั้นตอนการติดตั้งซอฟต์แวร์สำหรับ <strong>Zephyr</strong> แบบ <strong>CLI</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="zephyr-raspberry-pi-pico">&#9655; <strong>การทดลองใช้ Zephyr ร่วมกับบอร์ด Raspberry Pi Pico</strong><a class="headerlink" href="#zephyr-raspberry-pi-pico" title="Permanent link">#</a></h2>
+<p>เมื่อได้ติดตั้งโปรแกรมต่าง ๆ ที่จำเป็นแล้ว ลองคอมไพล์โค้ดของโปรเจกต์ตัวอย่างที่มีอยู่ในไดเรกทอรี
+<code>~/zephyrproject/zephyr/samples</code> โดยเลือกใช้บอร์ด เช่น
+<strong>Raspberry Pi Pico (RP2040) / Pico 2 (RP2350A)</strong></p>
+<ul>
+<li><code>west build --pristine</code> หรือ <code>west build -p</code> ใน <strong>Zephyr</strong>
+หมายถึงการ ล้างการคอมไพล์เดิมทั้งหมดก่อนแล้วจึงเริ่มสร้างใหม่ตั้งแต่ต้น (<strong>Clean Build</strong>)</li>
+<li><code>west -p auto</code> ให้ <strong>Zephyr</strong> ตัดสินเองว่าควรล้าง <strong>build</strong> เก่าหรือไม่</li>
+</ul>
+<pre><code class="language-text"># List all supported Zephyr boards (and filter results for pico)
+$ west boards | grep rpi_pico
+# Expected output:
+# rpi_pico
+# rpi_pico2
+
+# Build the Zephyr &quot;blinky&quot; sample for the Raspberry Pico 2 board
+# (-p: pristine build, -b: specify target board)
+$ west build -p -b rpi_pico2/rp2350a/m33 samples/basic/blinky
+
+# Build the Zephyr &quot;blinky&quot; sample for the Raspberry Pico board
+# (-p: pristine build, -b: specify target board)
+$ west build -p -b rpi_pico samples/basic/blinky
+
+# Copy the compiled .UF2 file to the RPi Pico USB drive
+# This will automatically flash the firmware to the board.
+
+# For Ubuntu:
+$ cp build/zephyr/zephyr.uf2 /media/$USER/RPI_RP2/
+
+# For WSL2 Ubuntu:
+# Create a mount point directory for drive D: inside WSL2
+$ sudo mkdir -p /mnt/d
+
+# Mount the Windows D: drive to the created directory (/mnt/d)
+# -t drvfs tells WSL to use the Windows file system driver
+$ sudo mount -t drvfs D: /mnt/d
+
+# Copy the generated Zephyr .uf2 firmware file to the drive
+# to flash it to the Micro:bit board via drag-and-drop
+$ cp build/zephyr/zephyr.uf2 /mnt/d/
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="zephyr-bbc-microbit-v2">&#9655; <strong>การทดลองใช้ Zephyr ร่วมกับบอร์ด BBC Micro:bit V2</strong><a class="headerlink" href="#zephyr-bbc-microbit-v2" title="Permanent link">#</a></h2>
+<p>สร้างโปรเจกต์ใหม่ <code>~/zephyrproject/microbit_v2_heart_blink</code> (<strong>Heart Symbol Blinking Demo</strong>)</p>
+<pre><code class="language-text">$ cd ~/zephyrproject/
+$ mkdir -p microbit_v2_heart_blink
+</code></pre>
+<p>สร้างไฟล์ใหม่ตามโครงสร้างต่อไปนี้</p>
+<pre><code class="language-text">./microbit_v2_heart_blink/
+├── CMakeLists.txt
+├── prj.conf
+└── src
+    └── main.c
+</code></pre>
+<p><strong>File:</strong> <code>./microbit_v2_heart_blink/CMakeLists.txt</code></p>
+<pre><code class="language-cmake">cmake_minimum_required(VERSION 3.20.0)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(microbit_v2_heart_blink)
+
+target_sources(app PRIVATE src/main.c)
+</code></pre>
+<p><strong>File:</strong> <code>./microbit_v2_heart_blink/prj.conf</code></p>
+<pre><code class="language-yaml"># Configuration file for micro:bit v2 LED matrix display
+
+# -- UART and Console Configuration
+# Enable UART console for serial communication
+CONFIG_UART_CONSOLE=y
+# Redirect stdout to console for printk() output
+CONFIG_STDOUT_CONSOLE=y
+
+# -- GPIO Configuration
+# Enable GPIO driver (required for LED matrix pins)
+CONFIG_GPIO=y
+# Enable Nordic nRFx GPIO driver for nRF52833
+CONFIG_GPIO_NRFX=y
+
+# -- LED Configuration
+# Disable generic LED driver (not needed for matrix)
+CONFIG_LED=n
+
+# -- Input Configuration
+# Enable input subsystem (may be used by display driver)
+CONFIG_INPUT=y
+
+# -- Display Configuration
+# Enable display subsystem
+CONFIG_DISPLAY=y
+# Enable micro:bit specific 5x5 LED matrix driver
+CONFIG_MICROBIT_DISPLAY=y
+
+# -- Thread and Stack Configuration
+# Set main thread stack size to 1KB
+CONFIG_MAIN_STACK_SIZE=1024 
+# Enable thread names for debugging
+CONFIG_THREAD_NAME=y
+
+# -- Timing Configuration
+# Enable timing functions for accurate delays
+CONFIG_TIMING_FUNCTIONS=y
+
+# -- C Library Configuration
+# Disable Newlib C library
+CONFIG_NEWLIB_LIBC=n
+# Use Picolibc (smaller, more efficient for embedded)
+CONFIG_PICOLIBC=y
+</code></pre>
+<p><strong>File:</strong> <code>./microbit_v2_heart_blink/src/main.c</code></p>
+<pre><code class="language-c">/*
+ * Blinking Heart Display on micro:bit v2
+ */
+#include &lt;zephyr/kernel.h&gt;
+#include &lt;zephyr/device.h&gt;
+#include &lt;zephyr/drivers/gpio.h&gt;
+#include &lt;zephyr/display/mb_display.h&gt;
+
+/* Define the heart pattern for 5x5 LED matrix
+ * 1 = LED on, 0 = LED off
+ */
+static const struct mb_image heart = MB_IMAGE(
+    { 0, 1, 0, 1, 0 },
+    { 1, 1, 1, 1, 1 },
+    { 1, 1, 1, 1, 1 },
+    { 0, 1, 1, 1, 0 },
+    { 0, 0, 1, 0, 0 }
+);
+
+/* Blank image for blink effect */
+static const struct mb_image blank = MB_IMAGE(
+    { 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0 }
+);
+
+int main(void)
+{
+    struct mb_display *disp;
+
+    printk(&quot;micro:bit v2 Heart Blink Starting...\n&quot;);
+
+    /* Get the mb_display structure */
+    disp = mb_display_get();
+
+    if (disp == NULL) {
+        printk(&quot;Failed to get display\n&quot;);
+        return -1;
+    }
+
+    printk(&quot;Display ready!\n&quot;);
+
+    /* Main loop - blink the heart */
+    while (1) {
+        /* Show heart */
+        mb_display_image(disp, MB_DISPLAY_MODE_DEFAULT,
+                        SYS_FOREVER_MS, &amp;heart, 1);
+        k_sleep(K_MSEC(500));
+
+        /* Show blank (heart off) */
+        mb_display_image(disp, MB_DISPLAY_MODE_DEFAULT,
+                        SYS_FOREVER_MS, &amp;blank, 1);
+        k_sleep(K_MSEC(500));
+    }
+    return 0;
+}
+</code></pre>
+<p>ตัวอย่างการทำคำสั่งในขั้นตอน <strong>Build</strong> สำหรับ <strong>Micro:bit V2</strong> มีดังนี้</p>
+<pre><code class="language-text">$ west build -p -b bbc_microbit_v2 microbit_v2_heart_blink
+$ sudo mkdir -p /mnt/d
+$ sudo mount -t drvfs D: /mnt/d
+$ cp build/zephyr/zephyr.bin /mnt/d/
+</code></pre>
+<p><img alt="" src="west_microbit_v2_build.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่งในขั้นตอน <strong>Build</strong> สำหรับ <strong>Micro:bit V2</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License.</em></strong></p>
+<p>Created: 2025-10-29 | Last Updated: 2025-10-30</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
