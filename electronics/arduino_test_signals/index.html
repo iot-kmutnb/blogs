@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/electronics/arduino_test_signals/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino Uno / Nano เพื่อการฝึกใช้ออสซิลโลสโคป - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-uno-nano" class="nav-link">การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino Uno / Nano เพื่อการฝึกใช้ออสซิลโลสโคป</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; การสร้างสัญญาณทดสอบด้วยบอร์ดไมโครคอนโทรลเลอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; การจำแนกบอร์ดไมโครคอนโทรลเลอร์สำหรับการสร้างสัญญาณทดสอบ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#1-pwm-2" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 1: การสร้างสัญญาณ PWM จำนวน 2 ช่อง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#2-pulse-train" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 2: การสร้างสัญญาณ Pulse Train</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#3" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 3: การสร้างสัญญาณพัลส์ด้วยอัตราคงที่แต่มีความกว้างแตกต่างกันได้</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#4-spi" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 4: การสร้างสัญญาณพัลส์โดยใช้วงจร SPI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#5" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 5: การสร้างสัญญาณเพื่ออัดและคายประจุสำหรับตัวเก็บประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#6" class="nav-link">&#9655; ตัวอย่างโค้ดที่ 6: การวัดค่าตัวเก็บประจุไฟฟ้า</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-uno-nano">การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino  Uno / Nano เพื่อการฝึกใช้ออสซิลโลสโคป<a class="headerlink" href="#arduino-uno-nano" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Test Signal Generation</em>,  <em>Arduino Programming</em>, <em>Signal Measurement &amp; Analysis with Oscilloscopes</em></p>
+<ul>
+<li><a href="#_1">การสร้างสัญญาณทดสอบด้วยบอร์ดไมโครคอนโทรลเลอร์</a></li>
+<li><a href="#1-pwm-2">ตัวอย่างโค้ดที่ 1: การสร้างสัญญาณ PWM จำนวน 2 ช่อง</a></li>
+<li><a href="#2-pulse-train">ตัวอย่างโค้ดที่ 2: การสร้างสัญญาณ Pulse Train</a></li>
+<li><a href="#3">ตัวอย่างโค้ดที่ 3: การสร้างสัญญาณพัลส์ ด้วยอัตราคงที่แต่มีความกว้างแตกต่างกันได้</a></li>
+<li><a href="#4-spi">ตัวอย่างโค้ดที่ 4: การสร้างสัญญาณพัลส์โดยใช้วงจร SPI</a></li>
+<li><a href="#5">ตัวอย่างโค้ดที่ 5: การสร้างสัญญาณเพื่ออัดและคายประจุสำหรับตัวเก็บประจุไฟฟ้า</a></li>
+<li><a href="#6">ตัวอย่างโค้ดที่ 6: การวัดค่าตัวเก็บประจุไฟฟ้า</a></li>
+</ul>
+<hr />
+<h2 id="_1">&#9655; การสร้างสัญญาณทดสอบด้วยบอร์ดไมโครคอนโทรลเลอร์<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ เช่น บอร์ด <strong>Arduino</strong> สามารถนำมาใช้ในการสร้างสัญญาณทดสอบ เพื่อใช้ฝึกการวัดและวิเคราะห์สัญญาณด้วยเครื่องมือวัดทางอิเล็กทรอนิกส์ เช่น ออสซิลโลสโคป (<strong>Oscilloscope</strong>) และเครื่องวิเคราะห์สัญญาณดิจิทัล (<strong>Logic Analyzer</strong>)</p>
+<p>สัญญาณทดสอบ สามารถจำแนกตามชนิดได้ดังต่อไปนี้</p>
+<ol>
+<li>สัญญาณที่มีคาบ (<strong>Periodic</strong>) และสัญญาณที่ไม่มีคาบ (<strong>Aperiodic</strong>) </li>
+<li>สัญญาณดิจิทัล (<strong>Digital</strong>) และสัญญาณแอนะล็อก (<strong>Analog</strong>)</li>
+<li>สัญญาณดิจิทัล ตามรูปแบบการสื่อสารข้อมูลดิจิทัล เช่น <strong>UART/Serial/ModBus-RS485</strong>, <strong>I²C</strong>, <strong>SPI</strong>, <strong>USB</strong> และ <strong>CAN</strong> เป็นต้น ซึ่งเหมาะสำหรับการนำมาใช้ในการเรียนรู้และวิเคราะห์ด้วยอุปกรณ์ที่มีฟังก์ชัน
+<strong>Protocol Analyzer</strong></li>
+</ol>
+<p>สัญญาณที่ไม่มีคาบ สามารถจำแนกย่อยออกได้เป็นกรณีต่าง ๆ ดังนี้</p>
+<ul>
+<li>สัญญาณที่เกิดขึ้นแบบไม่สามารถคาดเดาได้ (<strong>Random</strong> หรือ <strong>Pseudo-random Signals</strong>)
+เป็นสัญญาณที่มีขอบสัญญาณขาขึ้นหรือขาลง หรือพัลส์เกิดขึ้นแบบไม่เป็นรูปแบบตายตัว มีลักษณะคล้ายสัญญาณสุ่ม เช่น สัญญาณรบกวน (<strong>Noise</strong>) หรือสัญญาณดิจิทัลที่เกิดจากเหตุการณ์ไม่แน่นอน</li>
+<li>สัญญาณพัลส์ที่เกิดซ้ำแต่ไม่มีคาบคงที่ (<strong>Non-periodic Repetitive Pulse Signals</strong>)
+เป็นสัญญาณที่มีขอบสัญญาณขาขึ้นหรือขาลง หรือพัลส์เกิดขึ้นซ้ำหลายครั้ง แต่ช่วงเวลาระหว่างพัลส์ไม่คงที่ เช่น สัญญาณที่เกิดพัลส์ซ้ำภายในช่วงเวลาที่กำหนดไว้ แต่ไม่มีคาบที่แน่นอน</li>
+</ul>
+<p>สัญญาณประเภทนี้เหมาะสำหรับการฝึกใช้ฟังก์ชัน</p>
+<ul>
+<li>การเลือกใช้ <strong>Trigger Type</strong> ให้เหมาะสม เช่น <strong>Edge / Pulse Width / Timeout</strong></li>
+<li>การทำงานของสโคปในโหมด <strong>NORMAL</strong> หรือ <strong>SINGLE-SHOT</strong></li>
+</ul>
+<p>ในกรณีของสัญญาณแอนะล็อก สามารถแบ่งย่อยออกเป็นสัญญาณที่มีระดับแรงดันไฟฟ้าไม่เป็นลบ และสัญญาณที่มีระดับแรงดันไฟฟ้าอยู่ทั้งในช่วงบวกและช่วงลบ</p>
+<p>โดยทั่วไป การสร้างสัญญาณด้วยไมโครคอนโทรลเลอร์ (<strong>Microcontroller: MCU</strong>) จะเป็นสัญญาณที่มีระดับแรงดันไฟฟ้าไม่เป็นลบ (อยู่ในช่วง <strong>0V</strong> ถึง <strong>VCC</strong>) เนื่องจากถูกจำกัดด้วยแหล่งจ่ายไฟของตัวไมโครคอนโทรลเลอร์ อย่างไรก็ตาม หากนำสัญญาณดังกล่าวไปใช้งานร่วมกับวงจรขยายสัญญาณ เช่น วงจรออปแอมป์ (<strong>Operational Amplifier: OpAmp</strong>) ก็สามารถสร้างสัญญาณที่มีช่วงแรงดันไฟฟ้ากว้างขึ้น รวมถึงสัญญาณที่มีค่าเป็นลบได้</p>
+<p>อย่างไรก็ตาม บทความนี้จะกล่าวถึงการสร้างสัญญาณทดสอบที่มีระดับแรงดันไฟฟ้าเป็นบวกเท่านั้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; การจำแนกบอร์ดไมโครคอนโทรลเลอร์สำหรับการสร้างสัญญาณทดสอบ<a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์ที่เหมาะสำหรับการสร้างสัญญาณทดสอบ สามารถจำแนกได้ตามคุณสมบัติที่สำคัญดังต่อไปนี้</p>
+<p><strong>1) ความสามารถในการประมวลผลความเร็วสูง</strong></p>
+<p>ไมโครคอนโทรลเลอร์  (<strong>MCU</strong>) อาจใช้ตัวประมวลผลแบบ 8 บิต หรือ 32 บิต โดยทั่วไปไมโครคอนโทรลเลอร์แบบ 32 บิตหลายรุ่น สามารถทำงานที่ความถี่สัญญาณนาฬิกา (<strong>Clock Frequency</strong>) สูงกว่า และมีสมรรถนะในการประมวลผลที่ดีกว่า เมื่อเทียบกับไมโครคอนโทรลเลอร์แบบ 8 บิต ทั้งนี้ ยกเว้นในกรณีของรุ่นที่ออกแบบมาเพื่อการประหยัดพลังงานเป็นหลัก ซึ่งอาจใช้ความถี่ไม่สูง เช่น ไม่เกิน 48MHz</p>
+<p>วงจรประเภท <strong>Timer/Counter</strong> ภายในชิปไมโครคอนโทรลเลอร์ สามารถนำมาใช้ในการสร้างสัญญาณแบบมีคาบ
+และใช้ในการสร้างสัญญาณแบบ <strong>PWM (Pulse Width Modulation)</strong> โดยคุณสมบัติที่สำคัญของวงจรดังกล่าว ได้แก่ จำนวนช่องสัญญาณเอาต์พุต ความถี่สูงสุดที่สามารถสร้างได้ และความละเอียดในการปรับค่า เช่น ค่า <strong>Duty Cycle</strong> หรือความกว้างของพัลส์ของสัญญาณ</p>
+<p>ชิป <strong>Espressif ESP32</strong> มีวงจรฮาร์ดแวร์เฉพาะภายใน เช่น วงจร <strong>RMT (Remote Control Peripheral)</strong> ซึ่งสามารถนำมาใช้สร้างสัญญาณสำหรับงาน <strong>IR Remote Control</strong> ได้โดยตรง นอกจากนี้ยังมีวงจร <strong>LEDC (LED PWM Controller)</strong> สำหรับการสร้างสัญญาณ <strong>PWM</strong> ซึ่งรองรับหลายช่องสัญญาณ และสามารถกำหนดความถี่และความละเอียดของสัญญาณได้</p>
+<p><strong>2) การมีวงจรแปลงสัญญาณดิจิทัลเป็นแอนะล็อก (DAC)</strong></p>
+<p>ไมโครคอนโทรลเลอร์บางรุ่นมีวงจรแปลงสัญญาณดิจิทัลเป็นแอนะล็อก (<strong>Digital-to-Analog Converter: DAC</strong>) รวมอยู่ภายในอย่างน้อย 1 ช่องสัญญาณเอาต์พุต ซึ่งสามารถนำมาใช้สร้างสัญญาณแอนะล็อกได้โดยตรง</p>
+<p><strong>3) การไม่มีวงจรแปลงสัญญาณดิจิทัลเป็นแอนะล็อก</strong></p>
+<p>ในกรณีที่ไมโครคอนโทรลเลอร์ไม่มีวงจร <strong>DAC</strong> ภายใน สามารถใช้วิธีการต่อไปนี้เพื่อสร้างสัญญาณแอนะล็อกแทนได้</p>
+<p>ตัวอย่างบอร์ดไมโครคอนโทรลเลอร์ที่มีวงจร <strong>DAC</strong></p>
+<ul>
+<li><strong>Arduino DUE</strong> (มี <strong>12-bit DAC</strong> ภายในชิป <strong>SAM3X8E</strong> จำนวน 2 ช่อง)</li>
+<li><strong>Arduino Zero</strong> (มี <strong>10-bit DAC</strong> ภายในชิป <strong>SAMD21</strong> จำนวน 1 ช่อง ความเร็วสูงถึง <strong>350Ksps</strong>)</li>
+<li><strong>Arduino Uno R4 / Uno R4 WiFi</strong> (มี 12-bit DAC ภายในชิป <strong>Renesas RA4M1</strong> จำนวน 1 ช่อง ความเร็วสูงถึง <strong>33.3 Ksps</strong>)</li>
+<li><strong>Espressif ESP32 Dev Kit</strong>  (มี <strong>8-bit DAC</strong> จำนวน 2 ช่อง ความเร็วสูงถึง <strong>100 Ksps</strong> )</li>
+</ul>
+<p><strong>3.1) การใช้สัญญาณ PWM ร่วมกับวงจรกรองสัญญาณ</strong></p>
+<p>สร้างสัญญาณแบบ <strong>Pulse Width Modulation (PWM)</strong> แล้วนำไปผ่านวงจรกรองความถี่ต่ำ (<strong>Low-pass RC filter</strong>) เพื่อแปลงสัญญาณให้มีลักษณะเป็นแอนะล็อก จากนั้นอาจใช้วงจรบัฟเฟอร์ด้วยไอซีออปแอมป์ เพื่อเพิ่มความสามารถในการขับโหลด</p>
+<p><strong>3.2) การใช้ไอซี DAC ภายนอก</strong></p>
+<p>โดยทั่วไป วงจรที่มีไอซี <strong>DAC</strong> ภายนอก จะเชื่อมต่อกับไมโครคอนโทรลเลอร์ ผ่านบัส <strong>I²C</strong> หรือบัส <strong>SPI</strong> ตัวอย่างเช่น ไอซี <strong>MCP4725</strong> ซึ่งเป็นไอซี <strong>DAC</strong> ที่สื่อสารผ่านบัส <strong>I²C</strong> อย่างไรก็ตาม การใช้บัส <strong>I²C</strong> มีข้อจำกัดด้านความเร็วในการสื่อสารหรืออัตราการอัปเดตค่าของสัญญาณเอาต์พุต 
+(หน่วยวัดเป็น <strong>Kilo Samples per Second</strong> หรือ <strong>Ksps</strong>) ซึ่งแตกต่างจากการใช้วงจร <strong>DAC</strong> ที่รวมอยู่ภายในชิปไมโครคอนโทรลเลอร์ </p>
+<p><strong>3.3) การใช้ไอซี Digital Potentiometer</strong></p>
+<p>ในกรณีนี้เป็นการใช้ไอซี <strong>Digital Potentiometer</strong> เพื่อสร้างวงจรแบ่งแรงดันไฟฟ้าที่สามารถปรับค่าแรงดันเอาต์พุตได้โดยการโปรแกรมค่าเอาต์พุต ไอซีประเภทนี้มักเชื่อมต่อผ่านบัส <strong>I²C</strong> ตัวอย่างเช่น ไอซี <strong>MCP4010</strong> เป็นต้น</p>
+<p>ถ้ดไปเป็นตัวอย่างการเขียนโค้ดสำหรับบอร์ด <strong>Arduino Uno / Nano</strong> เพื่อสร้างสัญญาณทดสอบ สำหรับการฝึกใช้งานออสซิลโลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="1-pwm-2">&#9655; ตัวอย่างโค้ดที่ 1: การสร้างสัญญาณ PWM จำนวน 2 ช่อง<a class="headerlink" href="#1-pwm-2" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้สาธิตการเปิดใช้งานวงจร <strong>Timer 1</strong> ภายในชิป <strong>ATmega328P</strong> ที่มีอยู่บนบอร์ด
+<strong>Arduino Uno</strong> หรือ <strong>Arduino Nano</strong>
+โดยสัญญาณเอาต์พุตที่ได้มีจำนวน 2 ช่องสัญญาณ (เลือกใช้ขา <strong>Arduino D9</strong> และ <strong>D10</strong>) และเป็นสัญญาณแบบ <strong>PWM</strong> ทั้งสองช่องมีความถี่เท่ากัน แต่มีค่า <strong>Duty Cycle</strong> แตกต่างกัน</p>
+<p>วงจร <strong>Timer1</strong> ถูกกำหนดให้ทำงานในโหมด <strong>Fast PWM</strong> แบบ 8 บิต (<strong>WGM13:WGM10 = 0b0101</strong>) 
+โดยมีค่า <strong>TOP = 0x00FF (255)</strong> และใช้ตัวหารความถี่นาฬิกา (<strong>Prescaler</strong>) เท่ากับ 8 ส่งผลให้สัญญาณ <strong>PWM</strong>
+ทั้งสองช่องมีความถี่เท่ากัน แต่สามารถกำหนดค่า <strong>Duty Cycle</strong> ของสัญญาณแตกต่างกันได้อย่างอิสระ ผ่านรีจิสเตอร์ <strong>OCR1A</strong> และ <strong>OCR1B</strong> (ซึ่งการทำงานของวงจรจะตรงกับขา <strong>Arduino D9</strong> และ <strong>D10</strong>)</p>
+<p>ข้อสังเกต: คำสั่ง <code>millis()</code> และ <code>micros()</code> ของ <strong>Arduino API</strong> ใช้วงจร <strong>Timer 0</strong> ดังนั้นการใช้งาน
+<strong>Timer 1</strong> จึงไม่ส่งผลต่อการทำงานของ <strong>Arduino</strong> ในส่วนของการใช้คำสั่งดังกล่าว</p>
+<p><strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> คือสัดส่วนของช่วงเวลาที่สัญญาณมีระดับลอจิกสูง (<strong>ON time</strong>) 
+ต่อคาบเวลาของสัญญาณทั้งหมด โดยมักแสดงค่าเป็นเปอร์เซ็นต์ (%)</p>
+<p>ในตัวอย่างนี้ <strong>Duty Cycle</strong> ของสัญญาณ <strong>PWM</strong> จะเปลี่ยนแปลง เพิ่มขึ้นและลดลงอยู่นช่วงที่กำหนดไว้</p>
+<pre><code class="language-c++">const uint8_t PWM_PINS[2] = {9, 10}; // Use Arduino pins: D9 and D10
+
+const uint32_t INTERVAL_MSEC = 5; // msec
+const uint16_t DC_MIN = 16;
+const uint16_t DC_MAX = 255 - DC_MIN;
+
+volatile uint16_t DC = DC_MIN;   // duty cycle 0–255
+
+void initPWMs() {
+  // Timer1: 8-bit Fast PWM (WGM10 + WGM12), prescaler = 8
+  TCCR1A = _BV(WGM10) | _BV(COM1A1) | _BV(COM1B1);
+  TCCR1B = _BV(WGM12) | _BV(CS11);
+  // set initial duty cycle values
+  OCR1A = DC;
+  OCR1B = 255 - DC;
+  // enable overflow interrupt
+  TIMSK1 = _BV(TOIE1);
+  sei();  // enable global interrupts
+}
+
+ISR(TIMER1_OVF_vect) { // Timer1 overflow interrupt
+  // Update PWM registers at beginning of each cycle (glitch-free)
+  OCR1A = (uint8_t)DC;
+  OCR1B = (uint8_t)(255 - DC);
+}
+
+void setup() {
+  pinMode(PWM_PINS[0], OUTPUT);   // D9
+  pinMode(PWM_PINS[1], OUTPUT);   // D10
+  initPWMs(); // Initialize the timer 1 to generate PWM signals
+}
+
+uint32_t ts = 0;
+int16_t step = 8; //  increment or decrement step
+
+void loop() {
+  uint32_t now = millis();
+
+  if (now - ts &gt;= INTERVAL_MSEC) {
+    ts = now; // update timestamp
+    // Compute a new value for the duty cycle
+    DC += step;
+    if (DC &gt;= DC_MAX) {
+      DC = DC_MAX;
+      step = -step; // change to decrement
+    }
+    else if (DC &lt;= DC_MIN) {
+      DC = DC_MIN;
+      step = -step; // change to increment
+    }
+  }
+}
+</code></pre>
+<p><strong>โจทย์การวัดสัญญาณด้วย Oscilloscope</strong></p>
+<ul>
+<li>ใช้ช่องสัญญาณ <strong>CH1</strong> และ <strong>CH2</strong> เพื่อวัดสัญญาณทดสอบที่สร้างจากบอร์ด <strong>Arduino</strong>
+และให้ต่อ <strong>Ground</strong> ของ <strong>Probe</strong> กับ <strong>GND</strong> ของบอร์ด <strong>Arduino</strong></li>
+<li>ตั้งค่า <strong>Time base (Time/Div)</strong> ให้อยู่ในช่วงที่เหมาะสม</li>
+<li>เลือกใช้งานโหมด <strong>NORMAL Data Acquisition</strong> และทดลองใช้งานโหมดการทริกเกอร์ (<strong>Trigger Mode</strong>)
+ต่าง ๆ เช่น <strong>Edge</strong> และ <strong>Pulse Width</strong></li>
+<li>ทำการวัดสัญญาณเพื่อหาค่าความถี่ (<strong>Frequency</strong>) และค่า <strong>Duty Cycle</strong> ต่ำสุดและสูงสุดของสัญญาณในทั้งสองช่อง</li>
+</ul>
+<p><img alt="" src="pwm_signals.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการจำลองการทำงานของโค้ดด้วย <strong>AUTODESK Tinkercad - Circuits</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="2-pulse-train">&#9655; ตัวอย่างโค้ดที่ 2: การสร้างสัญญาณ Pulse Train<a class="headerlink" href="#2-pulse-train" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้สาธิตการเปิดใช้งานวงจร <strong>Timer 1</strong> ภายในชิป <strong>ATmega328P</strong>
+โดยสร้างสัญญาณเอาต์พุต จำนวน 2 ช่องสัญญาณ (เลือกใช้ขา <strong>Arduino D9</strong> และ <strong>D10</strong>)
+และเป็นสัญญาณแบบ <strong>Pulse Train</strong> เช่น มีการสร้างสัญญาณพัลส์จำนวนหนึ่ง แล้วเว้นช่วงเวลา
+ก่อนจะเริ่มสัญญาณพัลส์อีกรอบหนึ่ง</p>
+<p><strong>Pulse Train</strong> คือ สัญญาณที่ประกอบด้วยพัลส์ (<strong>Pulses</strong>) จำนวนหนึ่งซึ่งเกิดขึ้นต่อเนื่องกันในช่วงเวลาหนึ่ง
+โดยพัลส์แต่ละพัลส์ อาจมีความกว้างเท่ากันหรือแตกต่างกันก็ได้ หลังจากจบชุดพัลส์
+จะมีช่วงเวลาที่ไม่มีสัญญาณ ก่อนที่จะเริ่มชุดพัลส์ถัดไป</p>
+<p>สัญญาณแบบ <strong>Pulse Train</strong> มักเป็นสัญญาณที่ ไม่มีคาบคงที่ เมื่อพิจารณาในระยะยาว แต่ภายในแต่ละชุดพัลส์อาจมีความถี่คงที่ สัญญาณประเภทนี้พบได้บ่อยในระบบดิจิทัลที่ทำงานแบบอาศัยเหตุการณ์ (<strong>Event-driven systems</strong>)</p>
+<pre><code class="language-c++">const uint8_t PWM_PINS[2] = {9, 10}; // Arduino pins: D9 and D10
+uint8_t num_pulses = 5;
+uint32_t interval_msec = 50; // msec
+volatile uint8_t count = 0;
+volatile bool active = false;
+
+void initPWMs() {
+  // Timer1: 8-bit Fast PWM (WGM10 + WGM12), prescaler = 8
+  TCCR1A = _BV(WGM10) | _BV(COM1A1) | _BV(COM1B1);
+  TCCR1B = _BV(WGM12) | _BV(CS11);  
+  OCR1A = 127; // 50% duty
+  OCR1B = 63;
+  count = 0;
+  active = true;
+  // enable overflow + compare interrupts
+  TIMSK1 = _BV(TOIE1) | _BV(OCIE1A) | _BV(OCIE1B);
+  sei();
+}
+
+ISR(TIMER1_OVF_vect) {
+  count++;
+  OCR1B += 16;
+  if (count == num_pulses) {
+    active = false;
+    count = 0;
+  }
+}
+
+ISR(TIMER1_COMPA_vect) { // Timer1 Output Compare A interrupt
+  if (!active) {  // Disable PWM output A
+    TCCR1A &amp;= ~_BV(COM1A1);
+    TIMSK1 &amp;= ~_BV(OCIE1A);
+  }
+}
+
+ISR(TIMER1_COMPB_vect) { // Timer1 Output Compare B interrupt
+  if (!active) { // Disable PWM output B
+    TCCR1A &amp;= ~_BV(COM1B1);
+    TIMSK1 &amp;= ~_BV(OCIE1B);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(PWM_PINS[0], OUTPUT);   // D9
+  pinMode(PWM_PINS[1], OUTPUT);   // D10
+  srand(analogRead(A0)); 
+  initPWMs();
+}
+
+uint32_t ts = 0;
+
+void loop() {
+  uint32_t now = millis();
+  if (!active) {
+    if (now - ts &gt;= interval_msec) {
+      ts = now;
+      interval_msec = 10 + rand() % 91;
+      initPWMs();
+    }
+  } else {
+    ts = now;
+  }
+}
+</code></pre>
+<p><strong>โจทย์การวัดสัญญาณด้วย Oscilloscope</strong></p>
+<ul>
+<li>ใช้ช่องสัญญาณ <strong>CH1</strong> และ <strong>CH2</strong> เพื่อวัดสัญญาณทดสอบที่สร้างจากบอร์ด <strong>Arduino</strong>
+และให้ต่อ <strong>Ground</strong> ของ <strong>Probe</strong> กับ <strong>GND</strong> ของบอร์ด <strong>Arduino</strong></li>
+<li>ตั้งค่า <strong>Time base (Time/Div)</strong> ให้อยู่ในช่วงที่เหมาะสม เพื่อให้สามารถมองเห็นทั้งพัลส์ภายในชุด และช่วงเวลาระหว่างชุดพัลส์ได้อย่างชัดเจน</li>
+<li>เลือกใช้งานโหมด <strong>NORMAL Data Acquisition</strong> และทดลองใช้งานโหมดการทริกเกอร์ (<strong>Trigger Mode</strong>)
+ต่าง ๆ เช่น <strong>Edge</strong>, <strong>Pulse Width</strong>, <strong>Nth Edge</strong> และ <strong>Time Out</strong></li>
+<li>วัดสัญญาณจากช่อง <strong>CH1</strong> เพื่อตรวจสอบจำนวนพัลส์ที่ปรากฏในแต่ละชุด รวมถึงสังเกตช่วงเวลาที่ไม่มีสัญญาณ (<strong>Idle Period</strong>) ระหว่างชุด <strong>Pulse Train</strong> และตรวจสอบว่าระยะเวลาระหว่างชุดพัลส์มีการเปลี่ยนแปลงหรือไม่</li>
+<li>วัดสัญญาณจากช่อง <strong>CH2</strong> เพื่อตรวจสอบการเปลี่ยนแปลงของค่า <strong>Duty Cycle</strong> ของสัญญาณ <strong>Pulse Train</strong> ภายในแต่ละชุด</li>
+</ul>
+<hr />
+<h2 id="3">&#9655; ตัวอย่างโค้ดที่ 3: การสร้างสัญญาณพัลส์ด้วยอัตราคงที่แต่มีความกว้างแตกต่างกันได้<a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างถัดไปสาธิตการสร้างสัญญาณพัลส์ที่เกิดขึ้นด้วยอัตราคงที่ ทุก ๆ <strong>5 msec</strong> แต่มีความกว้างไม่คงที่
+พัลส์มีความกว้างเท่ากับ <strong>1 msec</strong> แต่มีบางกรณีที่เกิดพัลส์กว้างเท่ากับ <strong>2 msec</strong>
+ในตัวอย่างนี้ มีการเปิดใช้งานวงจร <strong>Timer1</strong> ภายในไมโครคอนโทรลเลอร์ <strong>ATmega328P</strong>
+โดยให้ทำงานในโหมด <strong>Fast PWM (TOP = ICR1)</strong> ตั้งค่าตัวหารความถี่ <strong>/8</strong> ซึ่งจะได้ความถี่ในการนับ <strong>16MHz/8 = 2MHz</strong> หรือมีความละเอียดของเวลาเท่ากับ <strong>0.5 µs</strong></p>
+<p>ค่าในรีจิสเตอร์ <strong>ICR1</strong> ถูกกำหนดให้เป็นตัวกำหนดคาบเวลาของ <strong>PWM</strong> เท่ากับ <strong>5 msec</strong> ส่วนการสร้างสัญญาณเอาต์พุต <strong>PWM</strong> ที่ขา <strong>D9 (PB1 / OC1A)</strong> จะอาศัยการเปรียบเทียบค่าตัวนับของ <strong>Timer1</strong> กับค่าในรีจิสเตอร์ <strong>OCR1A</strong> เพื่อกำหนดความกว้างของพัลส์ (<strong>Duty Cycle</strong>) ซึ่งแบ่งออกเป็น 2 กรณี คือพัลส์ที่มีความกว้าง <strong>1 msec</strong> และ <strong>2 msec</strong></p>
+<pre><code class="language-c++">#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+
+#define PWM_PERIOD_TICKS  10000  // 5 ms / 0.5 us
+#define SHORT_PULSE_TICKS 2000   // 1 ms / 0.5 usec
+#define LONG_PULSE_TICKS  4000   // 2 ms / 0.5 usec
+
+volatile uint8_t pulseIndex = 0;
+uint8_t long_pulse_index = 0;
+const uint8_t N = 100;
+
+void initGPIO() {
+  // D9 (OC1A) as output
+  DDRB |= (1 &lt;&lt; PB1);
+}
+
+void initTimer1() {
+  cli(); // Disable global interrupts
+  // Timer1 Fast PWM, TOP = ICR1
+  TCCR1A = (1 &lt;&lt; COM1A1) | (1 &lt;&lt; WGM11); // Non-inverting PWM on OC1A
+  TCCR1B = (1 &lt;&lt; WGM13) | (1 &lt;&lt; WGM12) | (1 &lt;&lt; CS11); // Fast PWM, Prescaler=8
+  ICR1  = PWM_PERIOD_TICKS;  // PWM period
+  OCR1A = SHORT_PULSE_TICKS;  // Initial compare output value 
+  // Enable overflow interrupt (once per PWM period)
+  TIMSK1 = (1 &lt;&lt; TOIE1);
+  sei(); // Enable global interrupts
+}
+
+void setup() {
+   srand( analogRead(A0) );
+   initGPIO();
+   initTimer1();
+}
+
+void loop() {
+  if (long_pulse_index == 0) {
+    long_pulse_index = 1 + rand() % (N-1);
+  }
+  delay(1);
+}
+
+// This ISR is called once per PWM period.
+ISR(TIMER1_OVF_vect) {
+  pulseIndex++;
+  if (pulseIndex == long_pulse_index) {
+    OCR1A = LONG_PULSE_TICKS;
+    pulseIndex = 0;
+    long_pulse_index = 0;
+  } else {
+    OCR1A = SHORT_PULSE_TICKS; 
+  }
+}
+</code></pre>
+<p><strong>โจทย์การวัดสัญญาณด้วย Oscilloscope</strong></p>
+<ul>
+<li>ใช้ช่องสัญญาณ <strong>CH1</strong> เพื่อวัดสัญญาณทดสอบที่สร้างจากบอร์ด <strong>Arduino</strong>
+และให้ต่อ <strong>Ground</strong> ของ <strong>Probe</strong> กับ <strong>GND</strong> ของบอร์ด <strong>Arduino</strong></li>
+<li>ตั้งค่า <strong>Time base (Time/Div)</strong> ให้อยู่ในช่วงที่เหมาะสม เพื่อให้สามารถมองเห็นทั้งพัลส์ภายในชุด และช่วงเวลาระหว่างชุดพัลส์ได้อย่างชัดเจน</li>
+<li>เลือกใช้งานโหมด <strong>NORMAL Data Acquisition</strong> และทดลองใช้งานโหมดการทริกเกอร์ (<strong>Trigger Mode</strong>)
+ต่าง ๆ เช่น <strong>Edge</strong>, <strong>Pulse Width</strong> และ <strong>Time Out</strong></li>
+<li>วัดสัญญาณจากช่อง <strong>CH1</strong> เพื่อตรวจสอบและวัดความกว้างของพัลส์ที่เป็นไปได้
+(ในตัวอย่างนี้ คาดหวังว่า จะพบพัลส์มีความกว้าง <strong>1msec</strong> และ <strong>2msec</strong>)</li>
+<li>ในโหมด <strong>Pulse Width Trigger</strong> ควรตั้งเงื่อนไขอย่างไรจึงจะจับพัลส์ 2 ms ได้ ? </li>
+<li>โหมด <strong>Timeout Trigger</strong> ช่วยแยกพัลส์พิเศษออกจากพัลส์ปกติได้อย่างไร ?</li>
+</ul>
+<p><img alt="" src="captured_pulses.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการวัดสัญญาณเอาต์พุตจากบอร์ด <strong>Arduino Uno</strong> โดยใช้ <strong>USB Logic Analyzer + PulseView software</strong></p>
+<p>การวัดสัญญาณดิจิทัลด้วย <strong>Logic Analyzer</strong> สามารถบันทึกข้อมูลและแสดงผลรูปคลื่นสัญญาณ โดยใช้ซอฟต์แวร์บนคอมพิวเตอร์ของผู้ใช้ ทำให้ง่ายและสะดวกกว่าการใช้ออสซิลโลสโคป แต่ก็มีข้อจำกัดในเรื่องอัตราการสุ่มสัญญาณ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="4-spi">&#9655; ตัวอย่างโค้ดที่ 4: การสร้างสัญญาณพัลส์โดยใช้วงจร SPI<a class="headerlink" href="#4-spi" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งานวงจรสื่อสาร <strong>SPI</strong> ในโหมด <strong>SPI Master, Mode 0 (CPOL = 0, CPHA = 0)</strong> โดยใช้ฮาร์ดแวร์ <strong>SPI</strong> ภายในไมโครคอนโทรลเลอร์ เพื่อส่งข้อมูลออกทางขา <strong>MOSI (D11 / PB3)</strong> ขณะที่ขา <strong>/SS (D10 / PB2)</strong> ถูกกำหนดให้เป็นเอาต์พุตและใช้ควบคุมการเริ่มต้น–สิ้นสุดของการสื่อสารข้อมูล (<strong>SPI Transaction</strong>)</p>
+<p>การส่งข้อมูลหนึ่งครั้งเริ่มจากการเขียนข้อมูล หนึ่งไบต์ (8 บิต) ลงในรีจิสเตอร์ <strong>SPDR</strong> ซึ่งจะทำให้ฮาร์ดแวร์ <strong>SPI</strong> เริ่มส่งข้อมูลออกไปโดยอัตโนมัติ เลื่อนบิตออกจาก <strong>MSB</strong> ไปยัง <strong>LSB</strong> ตามลำดับ โดยใช้สัญญาณนาฬิกา <strong>SCK</strong> ที่สร้างจากไมโครคอนโทรลเลอร์</p>
+<p>โค้ดนี้ใช้ <strong>Timer1</strong> ทำงานในโหมด <strong>CTC (Clear Timer on Compare Match)</strong> เพื่อสร้างอินเทอร์รัพท์ทุก ๆ 1 มิลลิวินาที เมื่อเกิดอินเทอร์รัพท์จาก <strong>Timer1</strong> และหากไม่มีการส่งข้อมูล <strong>SPI</strong> อยู่ในขณะนั้น โปรแกรมจะดึงขา <strong>/SS</strong> ลงเป็น <strong>LOW</strong> และเขียนค่าลงใน <strong>SPDR</strong> เพื่อเริ่มต้นการส่งข้อมูลหนึ่งไบต์</p>
+<p>เมื่อส่งข้อมูลครบหนึ่งไบต์แล้ว จะเกิดอินเทอร์รัพท์ <strong>SPI Serial Transfer Complete (SPI_STC_vect)</strong> เพื่อแจ้งว่าสิ้นสุดการส่งข้อมูล โปรแกรมจะยกขา <strong>/SS</strong> กลับเป็นระดับสูง และเตรียมข้อมูลไบต์ถัดไปสำหรับการส่งในรอบถัดไป การใช้ตัวแปรสถานะร่วมกับอินเทอร์รัพท์ช่วยป้องกันไม่ให้มีการเริ่มส่งข้อมูลใหม่ก่อนที่การส่งครั้งก่อนจะเสร็จสมบูรณ์</p>
+<p>ค่าข้อมูลไบต์  <code>BYTE1 (0x70)</code> และ <code>BYTE2 (0x3C)</code> ในโค้ดตัวอย่าง จะส่งผลต่อจำนวนพัลส์
+และความกว้างของพัลส์ที่เกิดขึ้นในช่วงเวลาที่สัญญาณ <strong>/SS</strong> เป็น <strong>LOW</strong></p>
+<pre><code class="language-c++">#define BYTE1 (0x70)
+#define BYTE2 (0x3C)
+#define N     (10)
+
+volatile uint8_t spiBusy = 0;
+volatile uint8_t byteIndex = 0;
+volatile uint8_t txData = BYTE1;
+
+void initSPI(void) {
+  // MOSI (PB3), SCK (PB5), SS (PB2) as outputs
+  DDRB |= (1 &lt;&lt; PB3) | (1 &lt;&lt; PB5) | (1 &lt;&lt; PB2);
+  // Keep SS HIGH when idle
+  PORTB |= (1 &lt;&lt; PB2);
+  /*
+   * SPI Control Register:
+   * SPE  = 1 (SPI enable)
+   * MSTR = 1 (Master mode)
+   * SPIE = 1 (SPI interrupt enable)
+   * SPR1:SPR0 = 11 =&gt; f_SCK = F_CPU / 128 (125 kHz @ 16 MHz)
+   * CPOL = 0, CPHA = 0 =&gt; use SPI Mode 0 (change if needed)
+   */
+  SPCR = (1 &lt;&lt; SPE) | (1 &lt;&lt; MSTR) | (1 &lt;&lt; SPIE)
+       | (1 &lt;&lt; SPR1) | (1 &lt;&lt; SPR0);
+  SPSR &amp;= ~(1 &lt;&lt; SPI2X); // no double speed
+}
+
+void initTimer1(uint16_t interval_us) {
+  cli();
+  TCCR1A = 0;
+  TCCR1B = 0;
+  // CTC mode
+  TCCR1B |= (1 &lt;&lt; WGM12);
+  /*
+   * Prescaler = 64
+   * Timer clock = 16 MHz / 64 = 250 kHz
+   * 1 tick = 4 us
+   */
+  TCCR1B |= (1 &lt;&lt; CS11) | (1 &lt;&lt; CS10);
+  OCR1A = (interval_us / 4) - 1;
+  TIMSK1 |= (1 &lt;&lt; OCIE1A);
+  sei();
+}
+
+ISR(TIMER1_COMPA_vect) {
+  if (spiBusy) return;
+  PORTB &amp;= ~(1 &lt;&lt; PB2); // SS LOW
+  SPDR = txData; // Start first byte
+}
+
+ISR(SPI_STC_vect) {
+  spiBusy = 0;   // SPI Transfer done
+  PORTB |= (1 &lt;&lt; PB2); // SS HIGH
+  byteIndex = (byteIndex + 1) % N;
+  txData = (byteIndex == (N-1)) ? BYTE2 : BYTE1;
+}
+
+void setup() {
+  initSPI();
+  initTimer1(1000);   // Start SPI burst every 1 ms (1 kHz)
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="spi_pulses.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการวัดสัญญาณเอาต์พุตจากบอร์ด <strong>Arduino Uno</strong> โดยใช้ <strong>USB Logic Analyzer + PulseView</strong></p>
+<p><strong>โจทย์การวัดสัญญาณด้วย Oscilloscope</strong></p>
+<ul>
+<li>ใช้ <strong>Oscilloscope</strong> ตรวจวัดสัญญาณดิจิทัลสำหรับบัส <strong>SPI</strong>: เช่น สัญญาณ <strong>/SS, MOSI, SCK</strong></li>
+<li>วัดและคำนวณค่า <strong>Pulse Width</strong> และ <strong>Period</strong> ของสัญญาณ <strong>SCK</strong></li>
+<li>ถอดรหัสข้อมูล (<strong>decode</strong>) สำหรับสัญญาณของบัส <strong>SPI</strong></li>
+<li>ลองเปลี่ยนค่าข้อมูลไบต์  <code>BYTE1 (0x70)</code> และ <code>BYTE2 (0x3C)</code> ในโค้ดตัวอย่าง ให้เป็นค่าอื่น แล้วลองวัดสัญญาณ หรือ ตรวจสอบข้อมูล</li>
+</ul>
+<hr />
+<h2 id="5">&#9655; ตัวอย่างโค้ดที่ 5: การสร้างสัญญาณเพื่ออัดและคายประจุสำหรับตัวเก็บประจุไฟฟ้า<a class="headerlink" href="#5" title="Permanent link">#</a></h2>
+<p>ค้ดตัวอย่างต่อไปนี้สาธิตการสร้างสัญญาณดิจิทัลที่ขา <strong>D10</strong> ของบอร์ด <strong>Arduino</strong> เพื่อใช้ควบคุมการ อัดประจุ (<strong>Charge</strong>) และ คายประจุ (<strong>Discharge</strong>) ของตัวเก็บประจุไฟฟ้า (<strong>Capacitor</strong>) โดยต่อผ่านตัวต้านทานจำกัดกระแส เช่น ค่า <strong>1 kΩ</strong></p>
+<p>แรงดันไฟฟ้าตกคร่อมที่ตัวเก็บประจุ (<script type="math/tex">V_C</script>) จะถูกวัดด้วยวงจรแปลงสัญญาณแอนะล็อกเป็นดิจิทัล (<strong>ADC</strong>) ของ 
+บอร์ด <strong>Arduino</strong> โดยต่อเข้าที่ขา <strong>A0</strong> เพื่อใช้ติดตามการเปลี่ยนแปลงของแรงดันระหว่างการอัดและคายประจุ</p>
+<p>นอกจากนี้ ยังมีการใช้งานไอซี <strong>LM393 (Dual Comparator)</strong> จำนวน 1 ตัว ซึ่งภายในประกอบด้วยตัวเปรียบเทียบแรงดันไฟฟ้า 2 ชุด (ใช้เพียง 1 ชุดในการทดลองนี้) โดยมีการต่อวงจรดังนี้</p>
+<ul>
+<li>ขา <strong>IN1+</strong> ต่อกับขั้วบวกของตัวเก็บประจุ เพื่อรับแรงดันไฟฟ้า <script type="math/tex">V_C</script>​</li>
+<li>ขา <strong>IN1-</strong> ต่อกับวงจรแบ่งแรงดัน โดยใช้ตัวต้านทานปรับค่าได้ (<strong>Potentiometer</strong>) ขนาด  <strong>10 kΩ</strong>
+ เพื่อปรับแรงดันอ้างอิงให้มีค่าเท่ากับ <strong>2.5 V (VCC/2)</strong></li>
+</ul>
+<p>เมื่อแรงดันไฟฟ้า <script type="math/tex">V_C</script> ต่ำกว่า แรงดันอ้างอิงที่ขา <strong>IN1-</strong> เอาต์พุตที่ขา <strong>OUT1</strong> จะอยู่ในสถานะ <strong>LOW</strong>
+แต่ถ้าแรงดันไฟฟ้า <script type="math/tex">V_C</script> สูงกว่า แรงดันอ้างอิงที่ขา <strong>IN1-</strong> เอาต์พุตที่ขา <strong>OUT1</strong> จะเปลี่ยนเป็นสถานะ <strong>HIGH</strong>
+(โดยเอาต์พุตของ <strong>LM393</strong> เป็นแบบ <strong>Open-Collector</strong> จึงจำเป็นต้องมีตัวต้านทาน <strong>Pull-up</strong>)</p>
+<p>โค้ดตัวอย่างด้านล่างใช้การอ่านค่า <strong>ADC</strong> จากขา <strong>A0</strong> เพื่อตรวจสอบแรงดันที่ตัวเก็บประจุ และควบคุมการอัด-คายประจุด้วยการตั้งค่าขา <strong>D10</strong> ให้เป็น <strong>HIGH</strong> หรือ <strong>LOW</strong> ตามลำดับ</p>
+<pre><code class="language-c++">const uint8_t CHARGE_PIN = 10;
+const uint8_t COMPARE_PIN = 2;
+const uint16_t ADC_MIN = 5;
+const uint16_t ADC_MAX = 1023 - ADC_MIN;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode( CHARGE_PIN, OUTPUT );
+  pinMode( COMPARE_PIN, INPUT_PULLUP );
+  digitalWrite( CHARGE_PIN, LOW );
+  delay(1000);
+}
+
+void loop() {
+  // Charging the capacitor
+  digitalWrite( CHARGE_PIN, HIGH );
+  // Wait until V_c close to Vref=VCC
+  while (analogRead(A0) &lt; (ADC_MAX-5)); 
+  // Discharging the capacitor
+  digitalWrite( CHARGE_PIN, LOW );
+   // wait unit V_c close to 0V.
+  while (analogRead(A0) &gt; 5);
+}
+</code></pre>
+<p><img alt="" src="charge_discharge_sim.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการจำลองการทำงานด้วย <strong>AUTODESK Tinkercad</strong></p>
+<p><strong>โจทย์การวัดสัญญาณด้วย Oscilloscope</strong></p>
+<p>ให้ใช้ <strong>Oscilloscope</strong> ตรวจวัดและวิเคราะห์สัญญาณในวงจรทดลองตามขั้นตอนต่อไปนี้</p>
+<ul>
+<li>ตรวจวัดสัญญาณดิจิทัลที่ขา <strong>D10</strong> ของบอร์ด <strong>Arduino</strong> ซึ่งใช้ควบคุมการอัดประจุและคายประจุของตัวเก็บประจุ</li>
+<li>ตรวจวัดสัญญาณแอนะล็อกที่ขา <strong>A0</strong> ของบอร์ด <strong>Arduino</strong> เพื่อสังเกตรูปคลื่นแรงดันไฟฟ้าบนตัวเก็บประจุ (<script type="math/tex">V_C</script>)</li>
+<li>ตรวจวัดสัญญาณดิจิทัลที่ขา <strong>OUT1</strong> ของไอซี <strong>LM393</strong> ซึ่งเป็นเอาต์พุตจากวงจรเปรียบเทียบแรงดันไฟฟ้า</li>
+<li>ลองหมุนปรับค่าตัวต้านทานปรับค่าได้ เพื่อเปลี่ยนแรงดันอ้างอิงของ <strong>Comparator</strong></li>
+<li>สังเกตและวัดความกว้างของพัลส์ และความถี่ของสัญญาณที่วัดได้</li>
+<li>เปรียบเทียบความสัมพันธ์ระหว่างแรงดันอ้างอิงที่เปลี่ยนไปกับลักษณะของสัญญาณเอาต์พุต</li>
+</ul>
+<hr />
+<h2 id="6">&#9655; ตัวอย่างโค้ดที่ 6: การวัดค่าตัวเก็บประจุไฟฟ้า<a class="headerlink" href="#6" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างต่อไปนี้สาธิตการวัดค่าความจุของตัวเก็บประจุไฟฟ้า (<strong>Capacitance Measurement</strong>) โดยอาศัยหลักการชาร์จของวงจร <strong>RC (Resistor–Capacitor)</strong> และการตรวจจับจุดตัดแรงดันด้วยวงจรเปรียบเทียบแรงดันไฟฟ้า (<strong>Voltage Comparator IC</strong>)</p>
+<p>การทดลองเริ่มต้นจากการคายประจุตัวเก็บประจุให้แรงดันไฟฟ้า <script type="math/tex">V_C</script>  ลดลงใกล้ <strong>0V</strong> จากนั้นจึงเริ่มอัดประจุโดยกำหนดขา <strong>D10</strong> ให้เป็นระดับ <strong>HIGH</strong> และจับเวลาตั้งแต่เริ่มต้นการชาร์จ
+แรงดันไฟฟ้าบนตัวเก็บประจุ <script type="math/tex">V_C</script> จะเพิ่มขึ้นตามสมการการชาร์จของวงจร RC เมื่อแรงดันเพิ่มขึ้นจนถึงระดับ <script type="math/tex">V_{CC}/2</script>
+</p>
+<p>วงจรเปรียบเทียบแรงดัน <strong>LM393</strong> จะเปลี่ยนสถานะเอาต์พุตจาก <strong>LOW</strong> เป็น <strong>HIGH</strong> ซึ่งสัญญาณนี้ถูกส่งไปยังขา <strong>D2 (INT0)</strong> ของ <strong>Arduino</strong> เพื่อทำให้เกิดเหตุการณ์ <strong>External Interrupt</strong> และบันทึกเวลาสิ้นสุดของการจับเวลา</p>
+<p>เวลาที่วัดได้ในช่วงตั้งแต่เริ่มอัดประจุจนถึง <script type="math/tex">V_{CC}/2</script> เรียกว่า <strong>Charge Half-Time</strong> ซึ่งถูกนำไปใช้คำนวณค่าความจุของตัวเก็บประจุไฟฟ้า (<strong>Measured Capacitance</strong>) ตามความสัมพันธ์ทางทฤษฎีของวงจร <strong>RC</strong></p>
+<p>
+<script type="math/tex; mode=display">
+ V_C(t) = V_{CC} (1 - e^{-t/{RC}})
+</script>
+</p>
+<p>
+<script type="math/tex">t = t_{half}</script> จะทำให้ <script type="math/tex">V_C(t_{half}) = V_{CC}/2</script>  ดังนั้น </p>
+<p>
+<script type="math/tex; mode=display">
+  V_C({t_{half}}) = \frac{ V_{CC} }{2} =  V_{CC} (1 - e^{-t_{half}/{RC}}) \\
+  \frac{1}{2} = 1 - e^{-t_{half}/{RC}} \\
+    e^{-t_{half}/{RC}} = \frac{1}{2} \\
+ \frac{t_{half}}{RC} = ln(2) \\
+  t_{half} = RC \cdot ln(2)
+</script>
+</p>
+<p>และคำนวณค่า <script type="math/tex">C</script> ได้ดังนี้</p>
+<p>
+<script type="math/tex; mode=display">
+  C = \frac{t_{half}}{R \cdot ln(2)} \approx  \frac{t_{half}}{R \cdot 0.69315} 
+</script>
+</p>
+<p>&nbsp;</p>
+<pre><code class="language-c++">const uint8_t CHARGE_PIN  = 10; // Output pin for Charge / Discharge
+const uint8_t COMPARE_PIN = 2;  // External interrupt INT0 (LM393 OUT1)
+const float R_OHMS = 1000.0;    // 1 kΩ
+
+const int16_t ADC_MIN = 5;
+const int16_t ADC_MAX = 1023-ADC_MIN;
+
+volatile uint32_t t_start = 0, t_end = 0;
+volatile uint32_t charge_time_usec = 0;
+volatile bool done = false;
+
+void exteranlInterruptCallback() {
+  t_end =  micros();
+  charge_time_usec = t_end - t_start;
+  done = true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(CHARGE_PIN, OUTPUT);
+  pinMode(COMPARE_PIN, INPUT_PULLUP); // LM393 open-collector
+
+  digitalWrite(CHARGE_PIN, LOW); // Discharge the capacitor
+  while (analogRead(A0) &gt; ADC_MIN) ;
+
+  attachInterrupt(digitalPinToInterrupt(COMPARE_PIN),
+                  exteranlInterruptCallback, RISING);
+  delay(1000);
+}
+
+void loop() {
+  done = false;
+  digitalWrite(CHARGE_PIN, HIGH); // Charge the capacitor
+  t_start = micros();
+  while (!done);
+  while (analogRead(A0) &lt; ADC_MAX); // Wait until V_C close to VCC
+
+  float cap_uF = charge_time_usec / (0.69315f * R_OHMS);
+  Serial.print(&quot;Charge half-time [usec]: &quot;);
+  Serial.print(charge_time_usec);
+  Serial.print(&quot;, C [uF] = &quot;);
+  String str = String( cap_uF, 3 );
+  Serial.print( str );
+  Serial.println(&quot;\n&quot;);
+
+  digitalWrite(CHARGE_PIN, LOW); // Discharge the capacitor
+  while (analogRead(A0) &gt; ADC_MIN) ; // Wait until V_C close to 0V
+}
+</code></pre>
+<p><img alt="" src="capacitance_measure_sim.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการจำลองการทำงานด้วย <strong>AUTODESK Tinkercad</strong></p>
+<p><strong>โจทย์การวัดสัญญาณด้วย Oscilloscope</strong></p>
+<p>ให้ใช้ <strong>Oscilloscope</strong> ตรวจวัดและวิเคราะห์สัญญาณในวงจรทดลองตามขั้นตอนต่อไปนี้</p>
+<ul>
+<li>ใช้ฟังก์ชัน <strong>Cursor</strong> ของ <strong>Oscilloscope</strong> วัดช่วงเวลา ที่แรงดันไฟฟ้าบนตัวเก็บประจุ <script type="math/tex">V_C</script>
+เพิ่มขึ้นจากระดับประมาณ <strong>0V</strong> จนถึงระดับ <strong>VCC/2</strong> ระหว่างการอัดประจุ</li>
+<li>บันทึกค่าช่วงเวลาที่วัดได้ และนำไปคำนวณค่าความจุของตัวเก็บประจุไฟฟ้า โดยอาศัยความสัมพันธ์ของวงจร <strong>RC</strong></li>
+<li>วัดค่าตัวต้านทาน <strong>R</strong> ในวงจร <strong>RC</strong> ที่ใช้งานจริงในการทดลอง แล้วนำมาใช้ในการคำนวณ</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_3">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอแนวทางการใช้บอร์ดไมโครคอนโทรลเลอร์ เช่น <strong>Arduino Uno</strong> และ <strong>Arduino Nano</strong> พร้อมโค้ดตัวอย่างสำหรับการสร้างสัญญาณทดสอบ เพื่อนำไปใช้ในการฝึกวัดและวิเคราะห์สัญญาณด้วยออสซิลโลสโคป (<strong>Oscilloscope</strong>) หรืออุปกรณ์วิเคราะห์สัญญาณเชิงลอจิก (<strong>Logic Analyzer</strong>)</p>
+<p>แนวทางการออกแบบโจทย์การทดลองปฏิบัติการนี้สามารถนำไปประยุกต์ใช้กับบอร์ดไมโครคอนโทรลเลอร์ชนิดอื่นได้ อย่างไรก็ตาม จำเป็นต้องมีการปรับแก้ไขโค้ดตัวอย่างซึ่งพัฒนาสำหรับบอร์ด <strong>Arduino Uno / Nano</strong> ให้สอดคล้องกับสถาปัตยกรรมฮาร์ดแวร์ ฟังก์ชันของพอร์ตอินพุต/เอาต์พุต และกลไกการจัดการอินเทอร์รัปต์ของไมโครคอนโทรลเลอร์ที่นำมาใช้งาน</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../../esp32/arduino_esp32_dac/"><strong>การสร้างสัญญาณแอนะล็อกด้วยวงจร DAC ของชิป ESP32</strong></a></li>
+<li><a href="../../tools/logic_analyzer_pulseview/"><strong>การใช้งานอุปกรณ์ USB Logic Analyzer และซอฟต์แวร์ PulseView</strong></a></li>
+<li><a href="../../electronics/mcp4921_dac_spi/"><strong>การใช้งานโมดูล MCP4921 SPI DAC (Digital-to-Analog Converter) ร่วมกับบอร์ด Arduino Uno R4 WiFi</strong></a></li>
+<li><a href="../capacitance_measurement/"><strong>การทดลองหาค่าความจุของตัวเก็บประจุไฟฟ้า</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-12-13 | Last Updated: 2025-12-14</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
