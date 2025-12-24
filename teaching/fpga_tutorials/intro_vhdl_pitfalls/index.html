@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/fpga_tutorials/intro_vhdl_pitfalls/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: VHDL Pitfalls - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-vhdl-pitfalls" class="nav-link">Tutorial: VHDL Pitfalls</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-inferring-flip-flops-vs-latches" class="nav-link">Pitfall: Inferring Flip-Flops vs. Latches</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-multiple-driver-conflict" class="nav-link">Pitfall: Multiple-Driver Conflict</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#code-example-1" class="nav-link">Code Example 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#code-example-2" class="nav-link">Code Example 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-signal-resolution" class="nav-link">VHDL Signal Resolution</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-sensitivity-lists-for-processes" class="nav-link">Pitfall: Sensitivity Lists for Processes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-reading-output-signals-inside-the-architecture" class="nav-link">Pitfall: Reading Output Signals Inside the Architecture</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-signals-vs-variables" class="nav-link">Pitfall: Signals vs. Variables</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-incorrect-type-signal-assignments" class="nav-link">Pitfall: Incorrect Type Signal Assignments</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pitfall-single-vs-separate-processes-for-synchronous-design" class="nav-link">Pitfall: Single vs. Separate Processes for Synchronous Design</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-vhdl-pitfalls"><strong>Tutorial: VHDL Pitfalls</strong><a class="headerlink" href="#tutorial-vhdl-pitfalls" title="Permanent link">#</a></h1>
+<ul>
+<li><a href="#pitfall-inferring-flip-flops-vs-latches"><strong>Pitfall 1: Inferring Flip-Flops vs. Latches</strong></a></li>
+<li><a href="#pitfall-multiple-driver-conflict"><strong>Pitfall 2: Multiple-Driver Conflict</strong></a></li>
+<li><a href="#pitfall-sensitivity-lists-for-processes"><strong>Pitfall 3: Sensitivity Lists for Processes</strong></a></li>
+<li><a href="#pitfall-reading-output-signals-inside-the-architecture"><strong>Pitfall 4: Reading Output Signals Inside the Architecture</strong></a></li>
+<li><a href="#pitfall-signals-vs-variables"><strong>Pitfall 5: Signals vs. Variables</strong></a></li>
+<li><a href="#pitfall-incorrect-type-signal-assignments"><strong>Pitfall 6: Incorrect Type Signal Assignments</strong></a></li>
+<li><a href="#pitfall-single-vs-separate-processes-for-synchronous-design"><strong>Pitfall 7: Single vs. Separate Processes for Synchronous Design</strong></a></li>
+</ul>
+<hr />
+<h2 id="pitfall-inferring-flip-flops-vs-latches"><strong>Pitfall: Inferring Flip-Flops vs. Latches</strong><a class="headerlink" href="#pitfall-inferring-flip-flops-vs-latches" title="Permanent link">#</a></h2>
+<p>Consider the following VHDL code which demonstrates 
+a common pitfall involving inference of <strong>flip-flops</strong> and <strong>latches</strong>,
+which may lead to unintended or mismatched hardware behavior.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    PORT (
+        ACLR  : IN  STD_LOGIC; -- asynchronous clear
+        CLK   : IN  STD_LOGIC; -- clock
+        D     : IN  STD_LOGIC;
+        Q     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+   SIGNAL q_int : STD_LOGIC_VECTOR(1 DOWNTO 0) := &quot;00&quot;;
+BEGIN
+   -- 1) Infer a positive edge-triggered D flip-flop.
+   q_int(0) &lt;= '0' when ACLR='1' else 
+               D when rising_edge(CLK) else q_int(0);
+
+   -- 2) Infer a positive level-sensitive D latch.
+   q_int(1) &lt;= '0' when ACLR='1' else 
+               D when CLK = '1' else q_int(1);
+
+   -- 3) Output signal assignments (inverting output)
+   Q &lt;= not q_int; 
+END ARCHITECTURE;
+</code></pre>
+<p>The first assignment correctly infers a <strong>positive-edge-triggered D flip-flop</strong>,
+since it uses <code>rising_edge(CLK)</code> to trigger output update and
+includes asynchronous clear logic (<code>ACLR</code>).</p>
+<p>The second assignment uses <code>CLK = '1'</code>, which causes the synthesis tool to infer 
+a <strong>level-sensitive D latch</strong>.</p>
+<p><img alt="" src="dff_vs_dlatch.jpg" /></p>
+<p><strong>Figure:</strong> Schematic of the synthesized logic circuit (D-FF vs. D-Latch)</p>
+<p>&nbsp;</p>
+<p>The same behavior can be expressed more explicitly using <code>PROCESS</code> statements:</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    PORT (
+        ACLR  : IN  STD_LOGIC;
+        CLK   : IN  STD_LOGIC; -- clock
+        D     : IN  STD_LOGIC;
+        Q     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+   SIGNAL q_int : STD_LOGIC_VECTOR(1 DOWNTO 0) := &quot;00&quot;;
+BEGIN
+   -- 1) Infer a positive edge-triggered D flip-flop.
+   dff_proc: PROCESS (ACLR, CLK)
+   BEGIN
+     IF ACLR = '1' THEN 
+        q_int(0) &lt;= '0';
+     ELSIF rising_edge(CLK) THEN 
+        q_int(0) &lt;= D;
+     END IF;
+   END PROCESS;
+
+   -- Infer a positive level-sensitive D latch.
+   dlatch_proc: PROCESS (ACLR, CLK, D)
+   BEGIN
+     IF ACLR = '1' THEN 
+        q_int(1) &lt;= '0';
+     ELSIF CLK='1' THEN 
+        q_int(1) &lt;= D;
+     END IF;
+   END PROCESS;
+
+   -- Output signal assignments (inverting output)
+   Q &lt;= not q_int; 
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pitfall-multiple-driver-conflict"><strong>Pitfall: Multiple-Driver Conflict</strong><a class="headerlink" href="#pitfall-multiple-driver-conflict" title="Permanent link">#</a></h2>
+<p>Consider the following VHDL (VHDL-2008) code.</p>
+<h3 id="code-example-1"><strong>Code Example 1</strong><a class="headerlink" href="#code-example-1" title="Permanent link">#</a></h3>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    PORT (
+        I0   : IN  STD_LOGIC;
+        I1   : IN  STD_LOGIC;
+        EN0  : IN  STD_LOGIC;
+        EN1  : IN  STD_LOGIC;
+        Y    : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE behavior OF top IS
+BEGIN
+    -- Tristate buffer for input A
+    Y &lt;= I0 WHEN EN0 = '1' ELSE 'Z';
+    -- Tristate buffer for input B
+    Y &lt;= I1 WHEN EN1 = '1' ELSE 'Z';
+END ARCHITECTURE;
+</code></pre>
+<p>The signal <code>Y</code> is assigned in two <strong>concurrent signal statements</strong>,
+which uses <strong>multiple signal drivers</strong> in VHDL.</p>
+<p>If we use <code>EN0 = not EN1</code> and use this as a select signal (<code>SEL</code>),
+this implements a MUX2_1 circuit.</p>
+<p>If both <code>EN0</code> and <code>EN1</code> are <code>'1'</code> at the same time and 
+<code>I0</code> and <code>I1</code> are different,
+then a conflict occurs on the output <code>Y</code>, which may result in:
+- Simulation warnings or <code>'X'</code> values.
+- Electrical contention in real hardware if mapped to actual tri-state outputs.</p>
+<p>To avoid conflict, make sure that <code>EN0</code> and <code>EN1</code> are mutually exclusive
+(i.e., never high at the same time).</p>
+<p>The <strong>tristate buffers</strong> will be set up using the I/O blocks of 
+the FPGA chip, which are designed to support tristate output.
+These I/O blocks are configured to enable tristate driving.
+In addition, a <strong>pull-up resistor</strong> or an <strong>internal weak pull-up</strong> is required.</p>
+<p>We can rewrite the VHDL code using a <strong>with-select statement</strong>,
+that clearly addresses all possible combinations of (<code>EN0</code>, <code>EN1</code>):
+The original version does not prevent both drivers being active,
+this version infer safe tri-state behavior on physical I/O pins.</p>
+<pre><code class="language-VHDL">ARCHITECTURE rtl OF top IS
+BEGIN
+    -- Tristate MUX using with-select
+    WITH EN1 &amp; EN0 SELECT
+        Y &lt;= I0 WHEN &quot;01&quot;,
+             I1 WHEN &quot;10&quot;,
+             'Z' WHEN OTHERS;
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<h3 id="code-example-2"><strong>Code Example 2</strong><a class="headerlink" href="#code-example-2" title="Permanent link">#</a></h3>
+<p>In the following code, the signal <code>t</code> is assigned 
+by two concurrent assignment statements, which 
+can infer two latches (<strong>Implicit Latch Inference</strong>). </p>
+<p>In VHDL, each concurrent signal assignment is 
+effectively interpreted as an independent process.
+Therefore, <code>t</code> ends up with <strong>multiple signal drivers</strong>, 
+resulting in a <strong>multi-driver conflict</strong>.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    PORT (
+        I0   : IN  STD_LOGIC;
+        I1   : IN  STD_LOGIC;
+        EN0  : IN  STD_LOGIC;
+        EN1  : IN  STD_LOGIC;
+        Q    : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+    SIGNAL t : STD_LOGIC := '0';
+BEGIN
+    -- The following two statements cause a multi-driver problem!
+    t &lt;= I0 WHEN EN0 = '1' else t; -- D Latch
+    t &lt;= I1 WHEN EN1 = '1' else t; -- D Latch
+    Q &lt;= t;
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-signal-resolution"><strong>VHDL Signal Resolution</strong><a class="headerlink" href="#vhdl-signal-resolution" title="Permanent link">#</a></h2>
+<p>In VHDL, when <strong>multiple drivers</strong> are connected to the same signal 
+&mdash; like from tri-state buffers or concurrent assignments &mdash; 
+VHDL needs to <strong>resolve</strong> or <strong>figure out</strong> or what the actual value of that signal should be. This process is known as <strong>signal resolution</strong>.</p>
+<p>The <code>STD_LOGIC</code> type is a <strong>resolved</strong> type, which means it can handle multiple drivers, while <code>STD_ULOGIC</code> is <strong>unresolved</strong> and doesn’t support that kind of setup.</p>
+<p><strong>Resolution Table for STD_LOGIC</strong></p>
+<p><img alt="" src="vhdl_signal_resolution.jpg" /></p>
+<ul>
+<li><code>U</code>: Uninitialized</li>
+<li><code>X</code>: Invalid</li>
+<li><code>0</code>: Strong Low</li>
+<li><code>1</code>: Strong High</li>
+<li><code>Z</code>: High Impedance</li>
+<li><code>W</code>: Weak Unknown</li>
+<li><code>L</code>: Weak Low</li>
+<li><code>H</code>: Weak High</li>
+<li><code>-</code>: Don't Care</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pitfall-sensitivity-lists-for-processes"><strong>Pitfall: Sensitivity Lists for Processes</strong><a class="headerlink" href="#pitfall-sensitivity-lists-for-processes" title="Permanent link">#</a></h2>
+<p>In VHDL, the <strong>sensitivity list</strong> of a process determines when the process should be 
+"re-evaluated" to update signals' state.
+For <strong>sequential logic</strong> (like flip-flops), the sensitivity list typically includes:</p>
+<ul>
+<li><strong>Asynchronous control signals</strong> (e.g., reset or clear)</li>
+<li><strong>Clock signal</strong> (e.g. edge-triggered for D flip-flops or level-sensitive for D latches)</li>
+</ul>
+<p>The process in the followiong VHDL code models
+<strong>a clocked flip-flop with asynchronous clear</strong>. </p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    PORT (
+        ACLR  : IN  STD_LOGIC; -- asynchronous clear
+        CLK   : IN  STD_LOGIC; -- clock
+        CE    : IN  STD_LOGIC; -- clock enable
+        D     : IN  STD_LOGIC;
+        Q     : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+BEGIN
+   -- The sensitivity list of this process
+   PROCESS (ACLR, CLK)
+   BEGIN
+     IF ACLR = '1' THEN
+       Q &lt;= '0';
+     ELSIF RISING_EDGE(CLK) THEN
+       IF CE = '1' THEN -- clock enable
+          Q &lt;= D;
+       END IF;
+     END IF;
+   END PROCESS;
+END ARCHITECTURE;
+</code></pre>
+<p>Both <code>CE</code> and <code>D</code> are used only within a conditional block that is executed on
+the rising edge of <code>CLK</code>.
+The process evaluates <code>CE</code> and <code>D</code> only when there is a rising edge on <code>CLK</code>.
+Therefore, signals <code>CE</code> (Clock Enable) and <code>D</code> (Data input) do <strong>not</strong> need to
+be included in the process sensitivity list.</p>
+<p>However, missing signals in the sensitivity list cause <strong>simulation mismatches</strong>
+since processes may not trigger as expected.</p>
+<p><img alt="" src="dffce.jpg" /></p>
+<p><strong>Figure:</strong> Schematic of the synthesized logic circuit (a D-type flip-flop)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pitfall-reading-output-signals-inside-the-architecture"><strong>Pitfall: Reading Output Signals Inside the Architecture</strong><a class="headerlink" href="#pitfall-reading-output-signals-inside-the-architecture" title="Permanent link">#</a></h2>
+<p>In VHDL, a signal declared as <code>OUT</code> <strong>cannot be read</strong> inside the architecture body.
+An <code>OUT</code> port of a signal is intended only for <strong>driving</strong> values out of the entity.</p>
+<p>To read and write the same signal internally, the following methods can be used either:</p>
+<ul>
+<li>Use a <code>BUFFER</code> mode port (deprecated and should be avoided)</li>
+<li>Use an <code>INOUT</code> port with appropriate direction control (e.g., tri-state logic)</li>
+<li>Use an internal signal for reading and writing,
+and assign it to the <code>OUT</code> port.</li>
+</ul>
+<p><strong>Uninitialized Signals</strong>:  Signals without initial values may start with <code>'U'</code> (undefined), leading to unexpected simulation results.</p>
+<p>When simulating the VHDL code below, the initial value of<br />
+the <code>Q</code> output is unknown (<code>'U'</code>) until the <code>ACLR</code> input is asserted.<br />
+If <code>CE</code> is <code>'1'</code> and the value of <code>Q</code> is read for a signal update<br />
+on the next rising edge of the clock, the result will be invalid (<code>'X'</code>),<br />
+since reading from an <code>OUT</code> port is not defined behavior.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    PORT (
+        ACLR  : IN  STD_LOGIC; -- asynchronous clear
+        CLK   : IN  STD_LOGIC; -- clock
+        CE    : IN  STD_LOGIC; -- clock enable
+        Q     : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+BEGIN
+   -- The sensitivity list of this process
+   PROCESS (ACLR, CLK)
+   BEGIN
+     IF ACLR = '1' THEN
+       Q &lt;= '0';
+     ELSIF RISING_EDGE(CLK) THEN
+       IF CE = '1' THEN 
+          Q &lt;= not Q; -- not allowed (reading from an OUT port)!
+       END IF;
+     END IF;
+   END PROCESS;
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<p>The previous VHDL code can be rewritten as follows.</p>
+<pre><code class="language-VHDL">ARCHITECTURE rtl OF top IS
+    SIGNAL q_int : STD_LOGIC := '0'; -- internal signal
+BEGIN
+    PROCESS (ACLR, CLK)
+    BEGIN
+        IF ACLR = '1' THEN
+            q_int &lt;= '0';
+        ELSIF RISING_EDGE(CLK) THEN
+            IF CE = '1' THEN
+                q_int &lt;= NOT q_int; -- toggle internal signal
+            END IF;
+        END IF;
+    END PROCESS;
+
+    Q &lt;= q_int; -- drive output from internal signal
+
+END ARCHITECTURE;
+</code></pre>
+<p><code>q_int</code> is an internal signal declared as <code>STD_LOGIC</code>
+with an initial value of <code>0</code>. 
+It is used to store the internal state of the toggling logic and
+is safely read and written inside the process.</p>
+<p>The <code>Q</code> output is assigned from <code>q_int</code> outside the process,
+which avoids reading the <code>OUT</code> port directly and ensures proper synthesis behavior.</p>
+<p><img alt="" src="tffce.jpg" /></p>
+<p><strong>Figure:</strong> Schematic of the synthesized logic circuit (a toggle flop-flop)</p>
+<hr />
+<h2 id="pitfall-signals-vs-variables"><strong>Pitfall: Signals vs. Variables</strong><a class="headerlink" href="#pitfall-signals-vs-variables" title="Permanent link">#</a></h2>
+<p>In VHDL, <strong>signals and variables</strong> have data types and values.</p>
+<ul>
+<li>Variables declared in a process are visible only inside the body of that process,
+while signals are visible inside the architecture body.</li>
+<li>Signals are used for inter-process communication, while 
+variables are used only inside a process.</li>
+<li>Variables are updated immediately when assigned using the <code>:=</code> operator,
+while signals use the <code>&lt;=</code> operator and are updated after the current process 
+is suspended, either at the end of the delta cycle or when a <code>wait</code> completes.</li>
+<li>Each new viable assignment updates the value immediately. 
+while multiple signal assignments in the same process will queue updates, 
+and only the last one will overwrite the previous assignments.</li>
+</ul>
+<p>Consider the following VHDL code, which is intended to compute
+the <strong>parity bit</strong> of the data bits provided by the <code>D</code> input signal, using <strong>XOR</strong> operators. 
+However, this code is <strong>incorrect</strong>.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+
+ENTITY top IS
+    GENERIC (
+       N : NATURAL := 4
+    );
+    PORT (
+        CLK : IN STD_LOGIC;
+        D   : IN STD_LOGIC_VECTOR(N-1 DOWNTO 0);
+        Q   : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+   SIGNAL sum : STD_LOGIC := '0';
+BEGIN
+    PROCESS (CLK)
+    BEGIN
+        IF rising_edge(CLK) THEN
+           FOR i in 0 to N-1 LOOP
+              sum &lt;= sum XOR D(i); -- signal assignment
+           END LOOP;
+        END IF;
+    END PROCESS;
+
+    Q &lt;= sum;
+
+END ARCHITECTURE;
+</code></pre>
+<p><strong>Problem:</strong> Inside the <code>FOR</code> loop, the signal <code>sum</code> is assigned multiple times sequentially
+within the same clock cycle.</p>
+<p><strong>Cause:</strong> In VHDL, signal assignments are scheduled, not executed immediately. 
+As a result, only the last assignment to sum in the loop takes effect after the clock edge 
+&mdash; all previous assignments are effectively ignored.
+This results in an incorrect parity computation.</p>
+<p>A correct version is shown below.</p>
+<pre><code class="language-VHDL">ARCHITECTURE rtl OF top IS
+   SIGNAL sum : STD_LOGIC := '0';
+BEGIN
+    PROCESS (CLK)
+      VARIABLE sum : STD_LOGIC := '0';
+    BEGIN
+        IF rising_edge(CLK) THEN
+           FOR i in 0 to N-1 LOOP
+              sum := sum XOR D(i); -- variable assignment
+           END LOOP;
+        END IF;
+        Q &lt;= sum;
+    END PROCESS;
+
+END ARCHITECTURE;
+</code></pre>
+<p><img alt="" src="parity_bit_calc.jpg" /></p>
+<p><strong>Figure:</strong> Schematic of the synthesized logic circuit (XOR-based parity bit generator
+with a registered output)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pitfall-incorrect-type-signal-assignments"><strong>Pitfall: Incorrect Type Signal Assignments</strong><a class="headerlink" href="#pitfall-incorrect-type-signal-assignments" title="Permanent link">#</a></h2>
+<p>VHDL is a strictly typed HDL and supports various types for signals, variables, 
+and constants used to represent <strong>multi-bit values</strong>. Common types include:</p>
+<ul>
+<li><code>STD_LOGIC_VECTOR</code></li>
+<li><code>STD_ULOGIC_VECTOR</code></li>
+<li><code>BIT_VECTOR</code></li>
+<li><code>UNSIGNED</code></li>
+<li><code>INTEGER</code></li>
+<li><code>NATURAL</code></li>
+</ul>
+<p>For example, when implementing a counter, the internal register
+is often modeled as a signal updated on the rising edge of a clock. 
+This signal can be of type <code>INTEGER</code>, which is convenient for <strong>arithmetic operations</strong>.</p>
+<p>To interface with hardware (e.g., output to LEDs), the <code>INTEGER</code> value 
+may need to be converted to <code>UNSIGNED</code> or <code>STD_LOGIC_VECTOR</code> of a specific bit width.</p>
+<p>The following VHDL code shows an implementation of a <strong>down counter</strong> 
+whose maximum value is set by <code>MAX_VALUE</code>. 
+It counts down on every rising edge of the <code>CLK</code> signal, 
+provided that <code>CE</code> (clock enable) is high.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+USE IEEE.math_real.ALL;
+
+ENTITY top IS
+    GENERIC (
+        MAX_VALUE : NATURAL := 9;
+        BW   : NATURAL := INTEGER(ceil(log2(real(MAX_VALUE + 1))))
+    );
+    PORT (
+        ACLR : IN STD_LOGIC;
+        CLK  : IN STD_LOGIC;
+        CE   : IN STD_LOGIC;
+        Q    : OUT STD_LOGIC_VECTOR(BW - 1 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+    CONSTANT INIT_VALUE : INTEGER := MAX_VALUE;
+    SIGNAL cnt : INTEGER RANGE 0 TO MAX_VALUE
+    := INIT_VALUE;
+BEGIN
+    PROCESS (ACLR, CLK)
+    BEGIN
+        IF ACLR = '1' THEN -- asynchronous reset
+            cnt &lt;= INIT_VALUE; -- initialize the counter register
+        ELSIF rising_edge(CLK) THEN -- edge triggered
+            IF CE = '1' THEN -- clock enabled
+                IF cnt = 0 THEN
+                    cnt &lt;= INIT_VALUE; -- reload the counter register
+                ELSE
+                    cnt &lt;= cnt - 1; -- decrement the counter register
+                END IF;
+            ELSE
+            END IF;
+        END IF;
+    END PROCESS;
+
+    Q &lt;= STD_LOGIC_VECTOR(to_unsigned(cnt, BW));
+
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="pitfall-single-vs-separate-processes-for-synchronous-design"><strong>Pitfall: Single vs. Separate Processes for Synchronous Design</strong><a class="headerlink" href="#pitfall-single-vs-separate-processes-for-synchronous-design" title="Permanent link">#</a></h2>
+<p>In <strong>synchronous VHDL design</strong>
+like counters and FSMDs (finite-state machines with datapaths),
+there are <strong>two modeling approaches</strong>:
+using either a <strong>single clocked process</strong> or <strong>multiple processes</strong> 
+(e.g., separate for state updates and combinational logic). 
+Both styles synthesize to equivalent hardware, but each has trade‑offs.
+However, the single-Process style is preferred by many designers and easier to maintain.</p>
+<p><strong>Single-Process Style</strong>: This is a single-process implementation of an <strong>N-bit counter</strong>.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+
+ENTITY top IS
+    GENERIC (
+        N : NATURAL := 4
+    );
+    PORT (
+        CLK : IN STD_LOGIC;
+        CE  : IN STD_LOGIC;
+        Q   : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF top IS
+    SIGNAL q_int : UNSIGNED(N - 1 DOWNTO 0) := (OTHERS =&gt; '0');
+BEGIN
+    PROCESS (CLK)
+    BEGIN
+        IF rising_edge(CLK) THEN
+            IF CE = '1' THEN
+                q_int &lt;= q_int + 1;
+            END IF;
+        END IF;
+    END PROCESS;
+    Q &lt;= STD_LOGIC_VECTOR(q_int);
+END ARCHITECTURE;
+</code></pre>
+<p><strong>Separate Sequential + Combinational Logic:</strong></p>
+<p>This code separates combinational and sequential logic.</p>
+<pre><code>ARCHITECTURE rtl OF top IS
+    SIGNAL q_int  : UNSIGNED(N-1 DOWNTO 0) := (others =&gt; '0');
+    SIGNAL q_next : UNSIGNED(N-1 DOWNTO 0);
+BEGIN
+    -- This is a concurrent signal assignment (equivalent to a process)
+    -- used to compute the next value of the counter.
+    q_next &lt;= q_int + 1;
+
+    update_counter_proc: PROCESS (CLK)
+    BEGIN
+       IF rising_edge(CLK) THEN
+         IF CE = '1' THEN
+           q_int &lt;= q_next;
+          END IF;
+       END IF;
+    END PROCESS;
+
+   Q &lt;= std_logic_vector( q_int );
+
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-06-21 | Last Updated: 2025-06-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

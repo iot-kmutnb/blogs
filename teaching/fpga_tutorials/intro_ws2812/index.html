@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/fpga_tutorials/intro_ws2812/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: WS2812B / NeoPixel RGB LED Programming - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-ws2812b-neopixel-rgb-led-programming" class="nav-link">Tutorial: WS2812B / NeoPixel RGB LED Programming</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#what-is-ws2812" class="nav-link">What is WS2812?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ws2812-programming" class="nav-link">WS2812 Programming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#data-transmission-protocol" class="nav-link">Data Transmission Protocol</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#pulse-timing-definitions" class="nav-link">Pulse Timing Definitions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-coding-ws2812b-driver" class="nav-link">VHDL Coding: WS2812B Driver</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-simulation" class="nav-link">VHDL Simulation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#output-signal-measurement" class="nav-link">Output Signal Measurement</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-ws2812b-neopixel-rgb-led-programming"><strong>Tutorial: WS2812B / NeoPixel RGB LED Programming</strong><a class="headerlink" href="#tutorial-ws2812b-neopixel-rgb-led-programming" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="what-is-ws2812"><strong>What is WS2812?</strong><a class="headerlink" href="#what-is-ws2812" title="Permanent link">#</a></h2>
+<p><strong>RGB LEDs</strong> are optoelectronic devices that integrate three
+light-emitting diodes (LEDs) of Red, Green, and Blue (RGB) colors
+into a single package. Typical RGB LEDs have four pins:</p>
+<ul>
+<li>A common pin (either common cathode or common anode)</li>
+<li>Three pins for driving the RGB LEDs</li>
+</ul>
+<p>Modern RGB LEDs often include built-in control circuitry,
+which can be programmed to display different RGB colors
+and brightness levels.</p>
+<p>The <strong>WS2812</strong>, <strong>WS2812B</strong> (an improved version of the <strong>WS2812</strong>),
+and <strong>SK6812</strong> are popular examples of programmable RGB LED ICs, 
+typically available in an <strong>SMD5050</strong> package. 
+They can be programmed using a single digital signal and 
+can be cascaded using the <code>DIN</code> and <code>DOUT</code> pins for input and output, respectively.</p>
+<p><img alt="" src="ws2812_ws2812b.jpg" /></p>
+<p><strong>Figure:</strong> WS2812 vs. WS2812B Module</p>
+<p><img alt="" src="ws2812b_module.jpg" /></p>
+<p><strong>Figure:</strong> Single-Pixel WS2812B Modules</p>
+<p><img alt="" src="ws2812b_array.jpg" /></p>
+<p><strong>Figure:</strong> Multi-Pixel WS2812B Modules</p>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>WS2812 devices typically operate at 5V,
+but some variants can also work at 3.3V with reduced brightness.</li>
+<li>WS2812-based RGB LED modules are also known under the brand name <strong>NeoPixel</strong> by Adafruit Industries.</li>
+<li>When using a 5V WS2812B device and the <code>DIN</code> data signal is at 3.3V logic level, a logic level shifter (from 3.3V to 5V) is required (e.g., SN74HCT245).</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ws2812-programming"><strong>WS2812 Programming</strong><a class="headerlink" href="#ws2812-programming" title="Permanent link">#</a></h2>
+<p>To set the color of an RGB LED in a WS2812 module,
+3 bytes (or 24 bits) of data are required per RGB LED (or pixel).
+A value of 0 represents the lowest brightness level, and
+255 represents the highest brightness level for each color component.
+The WS2812 module uses the <code>DIN</code> pin to receive data
+from another device, such as a microcontroller.
+Data is shifted in a <strong>bit-serial</strong> manner.</p>
+<p>When multiple WS2812 LEDs are connected in a chain, data bits are fed into
+the <code>DIN</code> pin of the first module and propagated through its DOUT pin
+to the next module in a daisy-chained (cascading) configuration.
+Each LED (or pixel) requires 24 bits to define its RGB color.
+Therefore, for <script type="math/tex">N</script> LEDs, a total of <script type="math/tex">N \times 24</script> bits, or
+<script type="math/tex">N \times 3</script> bytes, must be sent.
+The first 24 bits (or three bytes) shifted in will be used
+by the first RGB LED in the chain and are removed;
+the remaining data is shifted out through the DOUT pin to the next LED.</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="data-transmission-protocol"><strong>Data Transmission Protocol</strong><a class="headerlink" href="#data-transmission-protocol" title="Permanent link">#</a></h2>
+<p>Questions
+- How does the WS2812 module determine whether each bit is a 0 or a 1?
+- How is the boundary of each bit defined?</p>
+<p><strong>WorldSemi</strong>, the company that manufactures the <strong>WS2812B</strong> chip,
+has defined a data transmission protocol.
+According to the <strong>WS2812 &amp; WS2812B</strong> datasheets,
+each bit is encoded using <strong>pulse-width modulation (PWM)</strong>
+in the time domain, with durations measured in microseconds.
+The duration of the High and Low voltage levels within
+each bit determines whether it represents a 0 or a 1.</p>
+<p><img alt="" src="ws2812b_bit_timing.jpg" /></p>
+<p><strong>Figure:</strong> WS2812B Bit Timing</p>
+<h3 id="pulse-timing-definitions"><strong>Pulse Timing Definitions</strong><a class="headerlink" href="#pulse-timing-definitions" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>T1H</strong>: Duration of High signal for bit 1</li>
+<li><strong>T1L</strong>: Duration of Low signal for bit 1</li>
+<li><strong>T0H</strong>: Duration of High signal for bit 0</li>
+<li><strong>T0L</strong>: Duration of Low signal for bit 0</li>
+<li><strong>TH + TL</strong>: Total duration of one bit (bit time)</li>
+<li><strong>Reset</strong>: A Low signal duration (&gt;= 50 µs) used to signal the end of a transmission frame.</li>
+</ul>
+<p><strong>WS2812 Timing Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Bit Value</th>
+<th>High Time (T_H)</th>
+<th>Low Time (T_L)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.40 µs ± 150 ns</td>
+<td>0.85 µs ± 150 ns</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.80 µs ± 150 ns</td>
+<td>0.45 µs ± 150 ns</td>
+</tr>
+</tbody>
+</table>
+<p><strong>WS2812B Timing Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Bit Value</th>
+<th>High Time (T_H)</th>
+<th>Low Time (T_L)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.35 µs ± 150 ns</td>
+<td>0.90 µs ± 150 ns</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.90 µs ± 150 ns</td>
+<td>0.35 µs ± 150 ns</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Total Bit Time (T_H + T_L)</strong>: 1.25 µs ± 600 ns  </li>
+<li><strong>Reset Signal</strong>: ≥ 50 µs of Low level</li>
+</ul>
+<p>Based on a bit time of 1.25 µs, the effective data transmission frequency 
+is approximately: <strong>1 / 1.25 µs ≈ 800 kHz</strong></p>
+<p><strong>Data Format and Bit Order</strong></p>
+<ul>
+<li><strong>Bit order</strong> within each byte is <strong>MSB first</strong> (Most Significant Bit first).</li>
+<li>The <strong>byte order</strong> sent to the WS2812B follows <strong>GRB format</strong>:<ul>
+<li>First byte: Green (G)</li>
+<li>Second byte: Red (R)</li>
+<li>Third byte: Blue (B)</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="vhdl-coding-ws2812b-driver"><strong>VHDL Coding: WS2812B Driver</strong><a class="headerlink" href="#vhdl-coding-ws2812b-driver" title="Permanent link">#</a></h2>
+<p>The <code>ws2812b_driver</code> module provided below is used to shift out 24-bit data to
+a <strong>WS2812B</strong> module. When the control signal <code>WR</code> (<em>Write Strobe</em>)
+is high, the 24-bit data on the <code>DATA</code> pins is written into
+an internal register of the driver module. The <code>BUSY</code> signal then changes
+from low to high, indicating that the driver is actively shifting data out the <code>DOUT</code> pin.
+After the high pulse of the final bit has been transmitted, the <code>BUSY</code> signal returns low to indicate that the driver is  ready to do  the next write operation.</p>
+<pre><code class="language-VHDL">-- File: ws2812b_driver.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY ws2812b_driver IS
+    GENERIC (
+        CLK_HZ : INTEGER := 50_000_000 -- Input clock frequency
+    );
+    PORT (
+        CLK   : IN STD_LOGIC;  -- Clock input
+        RST_N : IN STD_LOGIC;  -- Async reset active low
+        WR    : IN STD_LOGIC;  -- Write strobe input
+        DATA  : IN STD_LOGIC_VECTOR(23 DOWNTO 0); -- 24-bit GRB color data
+        BUSY  : OUT STD_LOGIC; -- High when sending data
+        DOUT  : OUT STD_LOGIC  -- Serial data output to WS2812B
+    );
+END ws2812b_driver;
+
+ARCHITECTURE behavioral OF ws2812b_driver IS
+    -- Timing constants
+    CONSTANT CLK_TICK_US : INTEGER := CLK_HZ / INTEGER(1e6);
+    CONSTANT T0H : INTEGER := (CLK_TICK_US * 400/1000); -- '0' bit high time 
+    CONSTANT T0L : INTEGER := (CLK_TICK_US * 850/1000); -- '0' bit  low time
+    CONSTANT T1H : INTEGER := (CLK_TICK_US * 800/1000); -- '1' bit high time
+    CONSTANT T1L : INTEGER := (CLK_TICK_US * 450/1000); -- '1' bit  low time
+
+    -- FSM states
+    TYPE state_type IS (IDLE, LOAD, SEND_BIT_H, SEND_BIT_L);
+    SIGNAL state : state_type := IDLE;
+
+    -- Internal signals
+    SIGNAL data_reg    : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS =&gt; '0');
+    SIGNAL bit_index   : INTEGER RANGE 0 TO 23 := 23;
+    SIGNAL clk_counter : INTEGER;
+    SIGNAL busy_reg    : STD_LOGIC := '0';
+    SIGNAL dout_reg    : STD_LOGIC := '0';
+
+    SIGNAL cnt_t_high  : INTEGER := 0;
+    SIGNAL cnt_t_low   : INTEGER := 0;
+
+    SIGNAL next_write  : STD_LOGIC := '0';
+    SIGNAL next_data   : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS =&gt; '0');
+
+BEGIN
+
+    -- output signal assignments
+    BUSY &lt;= busy_reg;
+    DOUT &lt;= dout_reg;
+
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            state &lt;= IDLE;
+            busy_reg    &lt;= '0';
+            dout_reg    &lt;= '0';
+            clk_counter &lt;= 0;
+            bit_index   &lt;= 23;
+            data_reg    &lt;= (OTHERS =&gt; '0');
+            cnt_t_high  &lt;= 0;
+            cnt_t_low   &lt;= 0;
+            next_write  &lt;= '0';
+            next_data   &lt;= (OTHERS =&gt; '0');
+
+        ELSIF rising_edge(CLK) THEN
+
+            CASE state IS
+                WHEN IDLE =&gt;
+                    busy_reg    &lt;= '0';
+                    dout_reg    &lt;= '0';
+                    clk_counter &lt;= 0;
+                    bit_index   &lt;= 23;
+                    IF WR = '1' THEN
+                        data_reg &lt;= DATA; -- capture data input
+                        busy_reg &lt;= '1';
+                        state    &lt;= LOAD;
+                    END IF;
+
+                WHEN LOAD =&gt;
+                    IF data_reg(23) = '1' THEN -- set MSB timing
+                        cnt_t_high &lt;= T1H;
+                        cnt_t_low  &lt;= T1L;
+                    ELSE
+                        cnt_t_high &lt;= T0H;
+                        cnt_t_low  &lt;= T0L;
+                    END IF;
+                    clk_counter &lt;= 0;
+                    dout_reg    &lt;= '1';
+                    state       &lt;= SEND_BIT_H;
+
+                WHEN SEND_BIT_H =&gt;
+                    clk_counter &lt;= clk_counter + 1;
+
+                    IF bit_index = 0 AND WR = '1' THEN -- next write?
+                        next_write &lt;= '1';  -- set next write flag
+                        next_data  &lt;= DATA; -- capture data input
+                    END IF;
+
+                    IF clk_counter = cnt_t_high THEN
+                        dout_reg    &lt;= '0';
+                        clk_counter &lt;= 0;
+                        state       &lt;= SEND_BIT_L;
+                    END IF;
+
+                WHEN SEND_BIT_L =&gt;
+                    clk_counter &lt;= clk_counter + 1;
+                    IF clk_counter = cnt_t_low THEN
+                        IF bit_index = 0 THEN -- LSB sent
+                            dout_reg    &lt;= '0';
+                            clk_counter &lt;= 0;
+                            busy_reg    &lt;= '0';
+
+                            IF next_write = '1' THEN
+                                data_reg   &lt;= next_data;
+                                next_write &lt;= '0';
+                                IF next_data(23) = '1' THEN -- set MSB timing
+                                    cnt_t_high &lt;= T1H;
+                                    cnt_t_low  &lt;= T1L;
+                                ELSE
+                                    cnt_t_high &lt;= T0H;
+                                    cnt_t_low  &lt;= T0L;
+                                END IF;
+                                dout_reg &lt;= '1';
+                                state &lt;= SEND_BIT_H;
+                            ELSE
+                                state &lt;= IDLE;
+                            END IF;
+                        ELSE
+                            -- Shift data left by 1 (MSB first)
+                            data_reg  &lt;= data_reg(22 DOWNTO 0) &amp; '0';
+                            bit_index &lt;= bit_index - 1;
+                            -- Setup timings for next bit
+                            IF data_reg(22) = '1' THEN
+                                cnt_t_high &lt;= T1H;
+                                cnt_t_low  &lt;= T1L;
+                            ELSE
+                                cnt_t_high &lt;= T0H;
+                                cnt_t_low  &lt;= T0L;
+                            END IF;
+                            clk_counter &lt;= 0;
+                            dout_reg    &lt;= '1';
+                            state       &lt;= SEND_BIT_H;
+                        END IF;
+                    END IF;
+
+                WHEN OTHERS =&gt;
+                    state &lt;= IDLE;
+
+            END CASE;
+        END IF;
+    END PROCESS;
+
+END behavioral;
+</code></pre>
+<p>&nbsp;</p>
+<p>The following module (<code>ws2812b_driver_demo</code>) shows how to instantiate the
+the <code>ws2812b_driver</code> driver and can be used to drive a single-pixel <strong>WS2812B</strong> module.
+There are a set of predefined color bits (24 bits for each color)
+which will be applied to the <strong>WS2812B</strong> in sequence.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY ws2812b_driver_demo IS
+    PORT (
+        CLK   : IN STD_LOGIC; -- 50MHZ clock
+        RST_N : IN STD_LOGIC; -- async. active-low reset
+        DOUT  : OUT STD_LOGIC -- data output to WS2812B
+    );
+END ws2812b_driver_demo;
+
+ARCHITECTURE rtl OF ws2812b_driver_demo IS
+
+    COMPONENT ws2812b_driver
+        GENERIC (
+            CLK_HZ : INTEGER := 50_000_000
+        );
+        PORT (
+            CLK   : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            WR    : IN STD_LOGIC;
+            DATA  : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
+            BUSY  : OUT STD_LOGIC;
+            DOUT  : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    --------------------------------------------------------------------
+    -- Color ROM (8 test colors: GRB format)
+    --------------------------------------------------------------------
+    TYPE rom_type IS ARRAY (0 TO 7) OF STD_LOGIC_VECTOR(23 DOWNTO 0);
+    CONSTANT color_rom : rom_type := (
+        x&quot;00FF00&quot;,
+        x&quot;FF0000&quot;,
+        x&quot;0000FF&quot;,
+        x&quot;FFFF00&quot;,
+        x&quot;00FFFF&quot;,
+        x&quot;FF00FF&quot;,
+        x&quot;FFFFFF&quot;,
+        x&quot;000000&quot;
+    );
+    -- FSM states
+    TYPE state_type IS (IDLE, WRITE_DATA, WAIT_BUSY);
+    SIGNAL state : state_type := IDLE;
+
+    SIGNAL rom_index : INTEGER RANGE 0 TO 7 := 0;
+    SIGNAL wr_strobe : STD_LOGIC := '0';
+    SIGNAL busy      : STD_LOGIC;
+    SIGNAL delay_cnt : INTEGER := 0;
+    SIGNAL data      : STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+    CONSTANT CLK_HZ    : INTEGER := 50e6;
+    CONSTANT DELAY_MAX : INTEGER := CLK_HZ/2; -- use a smaller value for simulation
+    -- CONSTANT DELAY_MAX : INTEGER := 500; -- for simulation
+
+    CONSTANT NUM_PIXELS : INTEGER := 8; -- for 8-pixel NeoPixel bar
+    SIGNAL pixel_cnt    : INTEGER := 0;
+
+BEGIN
+
+    data &lt;= color_rom(rom_index);
+
+    --------------------------------------------------------------------
+    -- DUT: WS2812B Driver Instance
+    --------------------------------------------------------------------
+    inst_driver : ws2812b_driver
+    GENERIC MAP(
+        CLK_HZ =&gt; CLK_HZ
+    )
+    PORT MAP(
+        CLK =&gt; CLK,
+        RST_N =&gt; RST_N,
+        WR =&gt; wr_strobe,
+        DATA =&gt; data,
+        BUSY =&gt; busy,
+        DOUT =&gt; DOUT
+    );
+
+    --------------------------------------------------------------------
+    -- FSM Controller to loop through color_rom
+    --------------------------------------------------------------------
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            wr_strobe &lt;= '0';
+            rom_index &lt;= 0;
+            state     &lt;= IDLE;
+            delay_cnt &lt;= 0;
+            pixel_cnt &lt;= 0;
+
+        ELSIF rising_edge(CLK) THEN
+            CASE state IS
+                WHEN IDLE =&gt; -- Idle: wait until not busy
+                    IF busy = '0' THEN
+                        wr_strobe &lt;= '1';
+                        state     &lt;= WRITE_DATA;
+                    END IF;
+
+                WHEN WRITE_DATA =&gt; -- Issue write strobe
+                    IF busy = '1' THEN
+                        wr_strobe &lt;= '0';
+                        state     &lt;= WAIT_BUSY;
+                        pixel_cnt &lt;= pixel_cnt + 1;
+                    END IF;
+
+                WHEN WAIT_BUSY =&gt; -- Wait for delay before next color
+                    IF busy = '0' THEN
+                        IF pixel_cnt &lt; NUM_PIXELS THEN
+                            wr_strobe &lt;= '1';
+                            state     &lt;= WRITE_DATA;
+                        ELSE
+                            wr_strobe &lt;= '0';
+                            IF delay_cnt &lt; DELAY_MAX THEN
+                                delay_cnt &lt;= delay_cnt + 1;
+                            ELSE
+                                pixel_cnt &lt;= 0;
+                                delay_cnt &lt;= 0;
+                                -- select the next color
+                                rom_index &lt;= (rom_index + 1) MOD 8;
+                                state     &lt;= IDLE;
+                            END IF;
+                        END IF;
+
+                    END IF;
+
+                WHEN OTHERS =&gt;
+                    state &lt;= IDLE;
+            END CASE;
+        END IF;
+    END PROCESS;
+END rtl;
+</code></pre>
+<p>A Tcl script for pin assignments on the DE10 Lite FPGA board is provided as an example below.</p>
+<pre><code class="language-Tcl">#set_global_assignment -name DEVICE 10M50DAF484C7G
+#set_global_assignment -name FAMILY &quot;MAX 10&quot;
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3 V Schmitt Trigger&quot; -to RST_N
+set_location_assignment PIN_P11 -to CLK
+set_location_assignment PIN_B8  -to RST_N
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to DOUT
+set_location_assignment PIN_AA8  -to DOUT
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-simulation"><strong>VHDL Simulation</strong><a class="headerlink" href="#vhdl-simulation" title="Permanent link">#</a></h2>
+<p>The following VHDL testbench (<code>ts_ws2812b_driver_demo</code>) is provided for simulation.</p>
+<pre><code class="language-VHDL">-- File: ts_ws2812b_driver_demo.vhd
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity tb_ws2812b_driver_demo is
+end tb_ws2812b_driver_demo;
+
+architecture sim of tb_ws2812b_driver_demo is
+    -- Clock period definition
+    constant CLK_PERIOD : time := 20 ns; -- 50 MHz
+
+    -- DUT signals
+    signal t_CLK    : std_logic := '0';
+    signal t_RST_N  : std_logic := '0';
+    signal t_DOUT   : std_logic;
+
+    -- DUT instance
+    component ws2812b_driver_demo
+        port (
+            CLK   : in  std_logic;
+            RST_N : in  std_logic;
+            DOUT  : out std_logic
+        );
+    end component;
+
+begin
+    -- Instantiate the DUT
+    uut: ws2812b_driver_demo
+        port map (
+            CLK   =&gt; t_CLK,
+            RST_N =&gt; t_RST_N,
+            DOUT  =&gt; t_DOUT );
+
+    -- Clock generation
+    clk_process : process
+    begin
+        while true loop
+            t_CLK &lt;= '0';
+            wait for CLK_PERIOD / 2;
+            t_CLK &lt;= '1';
+            wait for CLK_PERIOD / 2;
+        end loop;
+    end process;
+
+    -- Reset and simulation control
+    stim_proc : process
+    begin
+        -- Apply reset
+        t_RST_N &lt;= '0';
+        wait for 100 ns;
+        t_RST_N &lt;= '1';
+        wait;
+    end process;
+
+end sim;
+
+-- ghdl -a ws2812b_driver.vhd ws2812b_driver_demo.vhd tb_ws2812b_driver_demo.vhd 
+-- ghdl -e tb_ws2812b_driver_demo
+-- ghdl -r tb_ws2812b_driver_demo --vcd=waveform.vcd --stop-time=10ms
+</code></pre>
+<p><img alt="" src="sim-1.jpg" /></p>
+<p><img alt="" src="sim-2.jpg" /></p>
+<p><strong>Figure:</strong> Simulation waveforms</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="output-signal-measurement"><strong>Output Signal Measurement</strong><a class="headerlink" href="#output-signal-measurement" title="Permanent link">#</a></h2>
+<p>The VHDL source code has been compiled, and the resulting bitstream
+was loaded onto the MAX10-Lite FPGA board. The waveform
+of the output signal, measured by a digital oscilloscope, is shown below.</p>
+<p><img alt="" src="ws2812b_demo-1.jpg" /></p>
+<p><img alt="" src="ws2812b_demo-2.jpg" /></p>
+<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module (single-pixel)</p>
+<p><img alt="" src="ws2812b_demo-3.jpg" /></p>
+<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module (8-pixel, the same color)</p>
+<p><img alt="" src="ws2812b_demo-4.jpg" /></p>
+<p><strong>Figure:</strong> MAX10-Lite FPGA board + WS2812 module (8-pixel, with different colors)</p>
+<p><img alt="" src="wave-2.jpg" /></p>
+<p><strong>Figure:</strong> Waveforms of the output signal</p>
+<p><img alt="" src="wave-3.jpg" /></p>
+<p><strong>Figure:</strong> Waveforms of the output signal (bit value = 0)</p>
+<p><img alt="" src="wave-4.jpg" /></p>
+<p><strong>Figure:</strong> Waveforms of the output signal (bit value = 1)</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-07-02 | Last Updated: 2025-09-27</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/fpga_tutorials/intro_de0_cv_board/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: Guidelines for Using the DE0-CV FPGA Board - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-guidelines-for-using-the-de0-cv-fpga-board" class="nav-link">Tutorial: Guidelines for Using the DE0-CV FPGA Board</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#terasic-de0-cv-board" class="nav-link">Terasic DE0-CV Board</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#fpga-board-comparison" class="nav-link">FPGA Board Comparison</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#vhdl-demo-code" class="nav-link">VHDL Demo Code</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-guidelines-for-using-the-de0-cv-fpga-board"><strong>Tutorial: Guidelines for Using the DE0-CV FPGA Board</strong><a class="headerlink" href="#tutorial-guidelines-for-using-the-de0-cv-fpga-board" title="Permanent link">#</a></h1>
+<ul>
+<li><a href="#terasic-de0-cv-board"><strong>Terasic DE0-CV Board</strong></a></li>
+<li><a href="#fpga-board-comparison"><strong>FPGA Board Comparison</strong></a></li>
+<li><a href="#vhdl-demo-code"><strong>VHDL Demo Code</strong></a></li>
+</ul>
+<hr />
+<h2 id="terasic-de0-cv-board"><strong>Terasic DE0-CV Board</strong><a class="headerlink" href="#terasic-de0-cv-board" title="Permanent link">#</a></h2>
+<p>As an alternative to the <strong>DE10-Lite FPGA board</strong>, the <strong>DE0-CV board</strong>
+can also be used for learning and project-based exploration.
+Below is a summary of the technical specifications for the <strong>DE0-CV board</strong>:</p>
+<ul>
+<li>Intel / Altera Cyclone V FPGA (<code>5CEBA4F23C7N</code> Device)<ul>
+<li>with ~49K Logic Elements (LEs)</li>
+</ul>
+</li>
+<li>Onboard serial configuration memory IC (<code>EPCS64</code>)</li>
+<li>Onboard USB Blaster (FT245 + MAX-II CPLD) for JTAG programming<ul>
+<li>Type B USB connector</li>
+</ul>
+</li>
+<li>50MHz clock oscillator<ul>
+<li>4x buffered 50MHz clocks </li>
+</ul>
+</li>
+<li>Switches/Buttons/LEDs<ul>
+<li>10x LEDs (active-high)</li>
+<li>10x Slide Switches</li>
+<li>5x Push Buttons<ul>
+<li>active-low, debounced with a Schmitt Trigger IC (<code>74AUC17</code>)</li>
+<li>4x User-defined (<code>KEY[3:0]</code>)</li>
+<li>1x CPU Reset (active-low)</li>
+</ul>
+</li>
+<li>6x 7-Segments (<code>HEX0</code>..<code>HEX5</code>)<ul>
+<li>Common anode (CA) type (active-low)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Two 2x20 GPIO Header (+3.3V I/Os)<ul>
+<li>Each pin on the expansion headers is connected to two diodes (Schottky diodes)
+  and a series resistor for protection against high (+3.3V) or low voltage (GND) level.</li>
+<li>There are 5V and 3.3V pins which can provide a total of 5W power.</li>
+</ul>
+</li>
+<li>4-bit Resistor DAC + VGA connector (15-pin D-sub connector)</li>
+<li>64MB SDRAM, 16 bits data bus</li>
+<li>Micro SD Card Socket (both SPI and 4-bit SD mode)</li>
+<li>PS/2 mouse/keyboard</li>
+<li>Supply voltage: 5V (via a DC Power Jack) with a power on/off toggle switch</li>
+<li>1x slide switch for <code>RUN</code> or <code>PROG</code> (selection between <strong>JTAG</strong> and <strong>AS</strong> modes)<ul>
+<li><code>RUN</code> position: uploading a bitstream file to the on-chip SRAM-based configuration memory of the FPGA</li>
+<li><code>PROG</code> position: flash a configuration data file to the EPCS64
+   using the <strong>Active-Serial</strong> configuration mode.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="de0_cv_board.jpg" /></p>
+<p><strong>Figure:</strong> DE0-CV FPGA Board (with AC-to-5VDC Adapter)</p>
+<p><img alt="" src="de0_cv_front_back.jpg" /></p>
+<p><strong>Figure:</strong> The front and back side of the DE0-CV board (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_block_diagram.jpg" /></p>
+<p><strong>Figure:</strong> DE0-CV Block Diagram (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_config_modes.jpg" /></p>
+<p><strong>Figure:</strong> FPGA Configuration Modes &mdash; JTAG vs. AS  (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_clocks.jpg" /></p>
+<p><strong>Figure:</strong> Clock inputs on the DE0-CV board (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_keys.jpg" /></p>
+<p><strong>Figure:</strong> Push buttons (KEYS) on the DE0-CV board (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_leds.jpg" /></p>
+<p><strong>Figure:</strong> 10-bit Red LEDs on the DE0-CV board (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_slide_switches.jpg" /></p>
+<p><strong>Figure:</strong> 10-bit Slide Switches (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_7seg_disp.jpg" /></p>
+<p><strong>Figure:</strong> 6-Digit 7-Segment Display (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_gpios.jpg" /></p>
+<p><strong>Figure:</strong> GPIO Pins &mdash; 2x20 Pin Headers (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_vga.jpg" /></p>
+<p><strong>Figure:</strong> VGA Pins (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_ps2.jpg" /></p>
+<p><strong>Figure:</strong> PS/2 Pins (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_sdcard.jpg" /></p>
+<p><strong>Figure:</strong> SDCard Pins (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_sdram.jpg" /></p>
+<p><strong>Figure:</strong> SDRAM Pins (Source: Terasic)</p>
+<p><img alt="" src="de0_cv_gpio_connectors.jpg" /></p>
+<p><strong>Figure:</strong> GPIO Connectors</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="fpga-board-comparison"><strong>FPGA Board Comparison</strong><a class="headerlink" href="#fpga-board-comparison" title="Permanent link">#</a></h2>
+<ul>
+<li>The <strong>DE0-CV</strong> board uses a <strong>Cyclone V</strong> FPGA device (<code>5CEBA4F23C7N</code>), whereas the DE10-Lite board uses a MAX 10 FPGA device (<code>10M50DAF484C7G</code>). The FPGA devices on these boards offer nearly the same logic capacity (approximately 50K logic elements).</li>
+<li>The <strong>MAX 10</strong> FPGA includes on-chip flash configuration memory for storing the FPGA bitstream, while the <strong>Cyclone V</strong> FPGA requires an external serial configuration device.</li>
+<li>The <strong>MAX 10</strong> FPGA also includes an on-chip <strong>ADC IP core</strong>, whereas the <strong>Cyclone V</strong> FPGA does not.</li>
+<li>The <strong>DE10-Lite</strong> has an Arduino-compatible female-pin connector, while the <strong>DE0-CV</strong> does not.</li>
+<li>The <strong>DE10-Lite</strong> provides an accelerometer (<code>ADXL345</code>), while the <strong>DE0-CV</strong> does not have an onboard accelerometer.</li>
+<li>The GPIO pins of the <strong>DE0-CV</strong> include protection (clamping) diodes, whereas the <strong>MAX 10</strong> device on the <strong>DE10-Lite</strong> does not.</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="vhdl-demo-code"><strong>VHDL Demo Code</strong><a class="headerlink" href="#vhdl-demo-code" title="Permanent link">#</a></h2>
+<p>The following VHDL code is provided as an example for 
+implementation and testing on the <strong>DE0-CV board</strong>.
+The design implements a counter that increments every 100 ms.
+The current counter value is displayed on the 6-digit, 7-segment display 
+(<code>HEX5</code>..<code>HEX0</code>).
+In addition, the 10-bit slide switches (<code>SW[9..0]</code>) are used as inputs, and their values are displayed on the 10 LEDs (<code>LEDR[9..0]</code>) when one of the four push buttons (<code>KEY[3..0]</code>) is pressed.</p>
+<pre><code class="language-VHDL">LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY de0cv_demo_1 IS
+    PORT (
+        CLK     : IN STD_LOGIC; -- 50 MHz clock
+        RESET_N : IN STD_LOGIC; -- active-low asynchronous reset
+        HEX5    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX4    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX3    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX2    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX1    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX0    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        KEY     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+        SW      : IN  STD_LOGIC_VECTOR(9 DOWNTO 0);
+        LEDR    : OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF de0cv_demo_1 IS
+
+    --------------------------------------------------------------------
+    -- Function: integer (0–9) to 7-segment decode
+    --------------------------------------------------------------------
+    FUNCTION DEC7SEG(d : INTEGER RANGE 0 TO 15) RETURN STD_LOGIC_VECTOR IS
+    BEGIN
+        CASE d IS
+            WHEN 0 =&gt; RETURN &quot;1000000&quot;; -- 0
+            WHEN 1 =&gt; RETURN &quot;1111001&quot;; -- 1
+            WHEN 2 =&gt; RETURN &quot;0100100&quot;; -- 2
+            WHEN 3 =&gt; RETURN &quot;0110000&quot;; -- 3
+            WHEN 4 =&gt; RETURN &quot;0011001&quot;; -- 4
+            WHEN 5 =&gt; RETURN &quot;0010010&quot;; -- 5
+            WHEN 6 =&gt; RETURN &quot;0000010&quot;; -- 6
+            WHEN 7 =&gt; RETURN &quot;1111000&quot;; -- 7
+            WHEN 8 =&gt; RETURN &quot;0000000&quot;; -- 8
+            WHEN 9 =&gt; RETURN &quot;0010000&quot;; -- 9
+            WHEN OTHERS =&gt; RETURN &quot;1111111&quot;; -- off
+        END CASE;
+    END FUNCTION;
+
+    --------------------------------------------------------------------
+    -- Clock parameters
+    --------------------------------------------------------------------
+    CONSTANT CLK_FREQ : INTEGER := 50_000_000;
+    CONSTANT TICK_MS  : INTEGER := 100;
+    CONSTANT TICK_COUNT : INTEGER := (CLK_FREQ / 1000) * TICK_MS;
+    SIGNAL tick_counter : integer range 0 to TICK_COUNT := 0;
+
+    CONSTANT CNT_MAX : INTEGER := 999999;
+    SIGNAL counter   : INTEGER RANGE 0 TO CNT_MAX := 0;
+
+    --------------------------------------------------------------------
+    -- BCD digit storage
+    --------------------------------------------------------------------
+    TYPE bcd_array_t IS ARRAY(5 DOWNTO 0) OF INTEGER RANGE 0 TO 9;
+    SIGNAL bcd_digits : bcd_array_t := (OTHERS =&gt; 0);
+
+    --------------------------------------------------------------------
+    -- FSM for sequential division/mod extraction
+    --------------------------------------------------------------------
+    TYPE state_t IS (IDLE, DIVIDE, DONE);
+    SIGNAL state : state_t := IDLE;
+    SIGNAL div_result  : INTEGER RANGE 0 TO CNT_MAX := 0;
+    SIGNAL digit_index : INTEGER RANGE 0 TO 5 := 0;
+
+    SIGNAL tick_pulse : STD_LOGIC := '0';
+    SIGNAL bcd_update : STD_LOGIC := '0';
+
+BEGIN
+    --------------------------------------------------------------------
+    -- Tick generator: produces pulse every 100 ms
+    --------------------------------------------------------------------
+    PROCESS (CLK, RESET_N)
+    BEGIN
+        IF RESET_N = '0' THEN
+            tick_counter &lt;= 0;
+        ELSIF rising_edge(CLK) THEN
+            IF tick_counter = TICK_COUNT THEN
+                tick_counter &lt;= 0;
+            ELSE
+                tick_counter &lt;= tick_counter + 1;
+            END IF;
+        END IF;
+    END PROCESS;
+
+    tick_pulse &lt;= '1' WHEN tick_counter = TICK_COUNT  ELSE '0';
+
+    --------------------------------------------------------------------
+    -- Binary counter
+    --------------------------------------------------------------------
+    PROCESS (CLK, RESET_N)
+    BEGIN
+        IF RESET_N = '0' THEN
+            counter &lt;= 0;
+            bcd_update &lt;= '0';
+        ELSIF rising_edge(CLK) THEN
+            bcd_update &lt;= '0';
+            IF tick_pulse = '1' THEN -- one-cycle tick pulse is high
+                IF counter = CNT_MAX THEN
+                    counter &lt;= 0;
+                ELSE
+                    counter &lt;= counter + 1;
+                END IF;
+                bcd_update &lt;= '1'; -- one-cycle pulse
+            END IF;
+        END IF;
+    END PROCESS;
+
+    --------------------------------------------------------------------
+    -- Sequential mod/div BCD conversion
+    --------------------------------------------------------------------
+    PROCESS (CLK, RESET_N)
+    BEGIN
+        IF RESET_N = '0' THEN
+            bcd_digits &lt;= (OTHERS =&gt; 0);
+            div_result &lt;= 0;
+            digit_index &lt;= 0;
+            state &lt;= IDLE;
+        ELSIF rising_edge(CLK) THEN
+            CASE state IS
+                WHEN IDLE =&gt;
+                    IF bcd_update = '1' THEN
+                        state &lt;= DIVIDE;
+                        div_result  &lt;= counter;
+                        digit_index &lt;= 0;
+                    END IF;
+
+                WHEN DIVIDE =&gt;
+                    bcd_digits(digit_index) &lt;= div_result MOD 10;
+                    div_result &lt;= div_result / 10;
+                    IF digit_index = 5 THEN
+                        state &lt;= DONE;
+                    ELSE
+                        digit_index &lt;= digit_index + 1;
+                    END IF;
+
+                WHEN DONE =&gt;
+                    state &lt;= IDLE;
+            END CASE;
+        END IF;
+    END PROCESS;
+
+    --------------------------------------------------------------------
+    -- Drive 7-segment outputs (active-low)
+    --------------------------------------------------------------------
+    HEX0 &lt;= DEC7SEG(bcd_digits(0));
+    HEX1 &lt;= DEC7SEG(bcd_digits(1));
+    HEX2 &lt;= DEC7SEG(bcd_digits(2));
+    HEX3 &lt;= DEC7SEG(bcd_digits(3));
+    HEX4 &lt;= DEC7SEG(bcd_digits(4));
+    HEX5 &lt;= DEC7SEG(bcd_digits(5));
+
+    LEDR &lt;= SW WHEN not(KEY(0) and KEY(1) and KEY(2) and KEY(3)) = '1'
+            ELSE (others =&gt; '0');
+
+END ARCHITECTURE rtl;
+</code></pre>
+<p><img alt="" src="quartus_prime_device_selection.jpg" /></p>
+<p><strong>Figure:</strong> Device Selection (<strong>Cyclone V Base E - 5CEBA4F23C7</strong>)</p>
+<p>&nbsp;</p>
+<p>A Tcl script is provided to configure the pin assignments for the design example 
+on the <strong>DE0-CV</strong> board.</p>
+<pre><code class="language-Tcl">#set_global_assignment -name FAMILY &quot;Cyclone V&quot;
+#set_global_assignment -name DEVICE 5CEBA4F23C7
+
+# 50MHz system clock and async. active-low reset (push button)
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to CLK
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to RESET_N
+set_location_assignment PIN_M9  -to CLK
+set_location_assignment PIN_P22 -to RESET_N
+
+######################################################################
+# Push buttons
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to KEY[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to KEY[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to KEY[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to KEY[3]
+
+set_location_assignment PIN_U7 -to KEY[0]
+set_location_assignment PIN_W9 -to KEY[1]
+set_location_assignment PIN_M7 -to KEY[2]
+set_location_assignment PIN_M6 -to KEY[3]
+
+######################################################################
+# Red LEDs
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[8]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to  LEDR[9]
+
+set_location_assignment PIN_AA2 -to LEDR[0]
+set_location_assignment PIN_AA1 -to LEDR[1]
+set_location_assignment PIN_W2 -to LEDR[2]
+set_location_assignment PIN_Y3 -to LEDR[3]
+set_location_assignment PIN_N2 -to LEDR[4]
+set_location_assignment PIN_N1 -to LEDR[5]
+set_location_assignment PIN_U2 -to LEDR[6]
+set_location_assignment PIN_U1 -to LEDR[7]
+set_location_assignment PIN_L2 -to LEDR[8]
+set_location_assignment PIN_L1 -to LEDR[9]
+
+######################################################################
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[6]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[7]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[8]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to SW[9]
+
+set_location_assignment PIN_U13 -to SW[0]
+set_location_assignment PIN_V13 -to SW[1]
+set_location_assignment PIN_T13 -to SW[2]
+set_location_assignment PIN_T12 -to SW[3]
+set_location_assignment PIN_AA15 -to SW[4]
+set_location_assignment PIN_AB15 -to SW[5]
+set_location_assignment PIN_AA14 -to SW[6]
+set_location_assignment PIN_AA13 -to SW[7]
+set_location_assignment PIN_AB13 -to SW[8]
+set_location_assignment PIN_AB12 -to SW[9]
+
+#####################################################################
+# Six-Digit 7-Segment Display
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX0[6]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX1[6]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX2[6]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX3[6]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX4[6]
+
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[0]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[1]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[2]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[3]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[4]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[5]
+set_instance_assignment -name IO_STANDARD &quot;3.3-V LVTTL&quot; -to HEX5[6]
+
+set_location_assignment PIN_U21 -to HEX0[0]
+set_location_assignment PIN_V21 -to HEX0[1]
+set_location_assignment PIN_W22 -to HEX0[2]
+set_location_assignment PIN_W21 -to HEX0[3]
+set_location_assignment PIN_Y22 -to HEX0[4]
+set_location_assignment PIN_Y21 -to HEX0[5]
+set_location_assignment PIN_AA22 -to HEX0[6]
+
+set_location_assignment PIN_AA20 -to HEX1[0]
+set_location_assignment PIN_AB20 -to HEX1[1]
+set_location_assignment PIN_AA19 -to HEX1[2]
+set_location_assignment PIN_AA18 -to HEX1[3]
+set_location_assignment PIN_AB18 -to HEX1[4]
+set_location_assignment PIN_AA17 -to HEX1[5]
+set_location_assignment PIN_U22  -to HEX1[6]
+
+set_location_assignment PIN_Y19  -to HEX2[0]
+set_location_assignment PIN_AB17 -to HEX2[1]
+set_location_assignment PIN_AA10 -to HEX2[2]
+set_location_assignment PIN_Y14  -to HEX2[3]
+set_location_assignment PIN_V14  -to HEX2[4]
+set_location_assignment PIN_AB22 -to HEX2[5]
+set_location_assignment PIN_AB21 -to HEX2[6]
+
+set_location_assignment PIN_Y16  -to HEX3[0]
+set_location_assignment PIN_W16  -to HEX3[1]
+set_location_assignment PIN_Y17  -to HEX3[2]
+set_location_assignment PIN_V16  -to HEX3[3]
+set_location_assignment PIN_U17  -to HEX3[4]
+set_location_assignment PIN_V18  -to HEX3[5]
+set_location_assignment PIN_V19  -to HEX3[6]
+
+set_location_assignment PIN_U20  -to HEX4[0]
+set_location_assignment PIN_Y20  -to HEX4[1]
+set_location_assignment PIN_V20  -to HEX4[2]
+set_location_assignment PIN_U16  -to HEX4[3]
+set_location_assignment PIN_U15  -to HEX4[4]
+set_location_assignment PIN_Y15  -to HEX4[5]
+set_location_assignment PIN_P9   -to HEX4[6]
+
+set_location_assignment PIN_N9   -to HEX5[0]
+set_location_assignment PIN_M8   -to HEX5[1]
+set_location_assignment PIN_T14  -to HEX5[2]
+set_location_assignment PIN_P14  -to HEX5[3]
+set_location_assignment PIN_C1   -to HEX5[4]
+set_location_assignment PIN_C2   -to HEX5[5]
+set_location_assignment PIN_W19  -to HEX5[6]
+set_location_assignment PIN_W19  -to HEX5[6]
+</code></pre>
+<p><img alt="" src="de0_cv_bcd_counter.jpg" /></p>
+<p><strong>Figure:</strong> 6-digit BCD Counter Demo Using the DE0-CV Board</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-09-29 | Last Updated: 2025-09-29</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

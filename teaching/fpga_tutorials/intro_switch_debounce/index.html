@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/teaching/fpga_tutorials/intro_switch_debounce/">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Tutorial: Debouncing Mechanical Switch Inputs &amp; VHDL Simulation - IoT Engineering Education</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#tutorial-debouncing-mechanical-switch-inputs-vhdl-simulation" class="nav-link">Tutorial: Debouncing Mechanical Switch Inputs &amp; VHDL Simulation</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#techniques-for-debouncing-mechanical-switch-inputs" class="nav-link">Techniques for Debouncing Mechanical Switch Inputs</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#vhdl-modeling-of-debounce-logic" class="nav-link">VHDL Modeling of Debounce Logic</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#vhdl-simulation" class="nav-link">VHDL Simulation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="tutorial-debouncing-mechanical-switch-inputs-vhdl-simulation"><strong>Tutorial: Debouncing Mechanical Switch Inputs &amp; VHDL Simulation</strong><a class="headerlink" href="#tutorial-debouncing-mechanical-switch-inputs-vhdl-simulation" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="techniques-for-debouncing-mechanical-switch-inputs"><strong>Techniques for Debouncing Mechanical Switch Inputs</strong><a class="headerlink" href="#techniques-for-debouncing-mechanical-switch-inputs" title="Permanent link">#</a></h2>
+<p>When pressing or releasing a mechanical push button, it may bounce and cause rapid, unintended changes in logic states. If such a push-button circuit is used as a digital input to an FPGA device, this bouncing effect should be suppressed.</p>
+<p><img alt="" src="waveform_bouncing.jpg" /></p>
+<p><strong>Figure:</strong> I/O signal waveforms captured with a digital oscilloscope, showing the effects of switch bounce.</p>
+<p>There are different approaches to avoid or reduce bouncing:</p>
+<ul>
+<li><strong>Hardware approach</strong>: Use an RC delay circuit in combination with a buffer IC that has a Schmitt trigger input.</li>
+<li><strong>Digital approach</strong>: Implement user-defined debounce logic using FPGA resources.</li>
+</ul>
+<p><img alt="" src="inv_schmitt_trigger_buf.jpg" /></p>
+<p><strong>Figure:</strong> Hardware approach for switch debouncing</p>
+<p>The purpose of debounce logic is to detect a rising or falling edge on the input signal, ensuring that the signal remains <strong>stable</strong> (i.e., does not change) for a specific time interval (e.g., 10–50 milliseconds) after the transition.
+If this condition is met, the edge is considered valid — either a valid rising edge or a valid falling edge.</p>
+<p>&nbsp;</p>
+<hr />
+<h3 id="vhdl-modeling-of-debounce-logic"><strong>VHDL Modeling of Debounce Logic</strong><a class="headerlink" href="#vhdl-modeling-of-debounce-logic" title="Permanent link">#</a></h3>
+<p>In this tutorial, a basic switch debouncing module is modeled in VHDL.</p>
+<ul>
+<li>The switch (asynchronous) input signal is first fed into a synchronizer consisting
+of at least two cascaded flip-flops forming a shift register (<code>sync_reg</code>), used to avoid "metastability".</li>
+<li>The output of the shift register is compared against the previously saved logic value
+(<code>saved_logic</code>). If a logic change is detected, an internal counter starts counting.</li>
+<li>If the input remains unchanged and stable, the counter increments.</li>
+<li>Once the counter reaches <code>COUNT_MAX</code>, the <code>saved_logic</code> is updated with the new stable input value.</li>
+<li>This debounce logic acts as a transition filter to suppress spurious glitches caused by switch bounce.</li>
+</ul>
+<p><strong>VHDL Code Listing</strong></p>
+<pre><code class="language-VHDL">-- File: debounce.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY debounce IS
+    GENERIC (
+        COUNT_MAX : INTEGER := 500000 -- number of clock cycles
+    );
+    PORT (
+        CLK : IN STD_LOGIC;
+        RST_N : IN STD_LOGIC;
+        D : IN STD_LOGIC;
+        Q : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE rtl OF debounce IS
+    SIGNAL counter : INTEGER RANGE 0 TO COUNT_MAX := 0;
+    SIGNAL sync_reg : STD_LOGIC_VECTOR(1 DOWNTO 0) := (OTHERS =&gt; '1');
+    SIGNAL saved_logic : STD_LOGIC := '1';
+BEGIN
+
+    PROCESS (CLK, RST_N)
+    BEGIN
+        IF RST_N = '0' THEN
+            sync_reg &lt;= (OTHERS =&gt; '1');
+            saved_logic &lt;= '1';
+            counter &lt;= 0;
+        ELSIF rising_edge(CLK) THEN
+            -- 2-stage synchronizer using D-type flip-flops
+            sync_reg &lt;= sync_reg(0) &amp; D;
+            IF sync_reg(1) /= saved_logic THEN
+                IF counter = COUNT_MAX THEN
+                    saved_logic &lt;= sync_reg(1);
+                    counter &lt;= 0;
+                ELSE
+                    counter &lt;= counter + 1;
+                END IF;
+            ELSE
+                counter &lt;= 0; -- reset counter
+            END IF;
+        END IF;
+    END PROCESS;
+
+    Q &lt;= saved_logic;
+
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h3 id="vhdl-simulation"><strong>VHDL Simulation</strong><a class="headerlink" href="#vhdl-simulation" title="Permanent link">#</a></h3>
+<p>To simulate the VHDL testbench, a <strong>VHDL simulator</strong> is required such as:</p>
+<ul>
+<li><strong>Questa Intel Start Edition</strong> (commercial, free for Quartus Prime Lite)</li>
+<li><strong>GHDL</strong> (open source VHDL simulator)</li>
+</ul>
+<p>In this section:</p>
+<ul>
+<li><strong>Visual Studio Code (VS Code)</strong> and a <strong>VHDL extension</strong> are used to write and manage VHDL code.</li>
+<li><strong>GHDL</strong> (for Windows) is used to compile and run simulations.<ul>
+<li><strong>GHDL</strong> is a command-line tool (no GUI) available for <strong>Windows</strong>, <strong>Linux</strong> and <strong>Mac OSX</strong>.</li>
+<li><a href="https://github.com/ghdl/ghdl/releases"><strong>GHDL: pre-built binaries</strong></a></li>
+</ul>
+</li>
+<li><strong>GTKWave</strong> or <strong>Surfer</strong> is used for waveform visualization.<ul>
+<li><a href="https://gitlab.com/surfer-project/surfer"><strong>Surfer: pre-built binaries</strong></a></li>
+<li><a href="https://sourceforge.net/projects/gtkwave/files/"><strong>GTKwave: pre-built binaries</strong></a></li>
+</ul>
+</li>
+</ul>
+<p>⚠️ Ensure that the <strong><code>PATH</code> environment variable</strong> includes the directories containing the executable files for <strong>GHDL</strong> and <strong>Surfer</strong> before running commands in 
+a terminal or console.</p>
+<p>&nbsp;</p>
+<p><strong>VHDL Code Listing</strong></p>
+<pre><code class="language-VHDL">-- File: tb_debounce.vhd
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY tb_debounce IS
+END ENTITY;
+
+ARCHITECTURE sim OF tb_debounce IS
+    -- Component under test
+    COMPONENT debounce
+        GENERIC (
+            COUNT_MAX : INTEGER := 100000
+        );
+        PORT (
+            CLK : IN STD_LOGIC;
+            RST_N : IN STD_LOGIC;
+            D : IN STD_LOGIC;
+            Q : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    -- Signals
+    SIGNAL t_clk   : STD_LOGIC := '0';
+    SIGNAL t_rst_n : STD_LOGIC := '0';
+    SIGNAL t_btn   : STD_LOGIC := '1'; -- active-low push button
+    SIGNAL t_q_out : STD_LOGIC;
+
+    -- Clock period
+    CONSTANT clk_period : TIME := 20 ns; -- 50MHz clock
+
+BEGIN
+
+    -- Instantiate the DUT
+    uut : debounce
+    GENERIC MAP(
+        COUNT_MAX =&gt; 100000
+    )
+    PORT MAP(
+        CLK   =&gt; t_clk,
+        RST_N =&gt; t_rst_n,
+        D     =&gt; t_btn,
+        Q     =&gt; t_q_out
+    );
+
+    -- Clock generation
+    clk_process : PROCESS
+    BEGIN
+        WHILE TRUE LOOP
+            t_clk &lt;= '0';
+            WAIT FOR clk_period / 2;
+            t_clk &lt;= '1';
+            WAIT FOR clk_period / 2;
+        END LOOP;
+    END PROCESS;
+
+    -- Stimulus
+    stim_proc : PROCESS
+    BEGIN
+        t_btn &lt;= '1';
+        -- Initial reset
+        t_rst_n &lt;= '0';
+        WAIT FOR 100 ns;
+        t_rst_n &lt;= '1';
+        WAIT FOR 1 ms;
+
+        -- Simulate button press with bounce
+        -- Falling edge (button press starts)
+        t_btn &lt;= '0';
+        WAIT FOR 1 ms;
+        t_btn &lt;= '1';
+        WAIT FOR 1 ms;
+        t_btn &lt;= '0';
+        WAIT FOR 0.5 ms;
+        t_btn &lt;= '1';
+        WAIT FOR 1 ms;
+        t_btn &lt;= '0'; -- stable low (pressed)
+        WAIT FOR 20 ms;
+
+        -- Simulate button release with bounce
+        t_btn &lt;= '1';
+        WAIT FOR 2 ms;
+        t_btn &lt;= '0';
+        WAIT FOR 0.5 ms;
+        t_btn &lt;= '1';
+        WAIT FOR 0.5 ms;
+        t_btn &lt;= '0';
+        WAIT FOR 1 ms;
+        t_btn &lt;= '1'; -- stable high (released)
+        WAIT FOR 20 ms;
+
+        -- Finish simulation
+        WAIT FOR 500 ns;
+        ASSERT FALSE REPORT &quot;Simulation finished.&quot; SEVERITY NOTE;
+        WAIT;
+    END PROCESS;
+
+END ARCHITECTURE;
+</code></pre>
+<p>&nbsp;</p>
+<p>The following commands are used to compile the VHDL source code files,
+run the simulator and visualize the waveform files (<code>.vcd</code> or <code>.fst</code>).</p>
+<pre><code class="language-text"># Check the version of GHDL (e.g. GHDL 6.0.0-dev).
+ghdl version
+</code></pre>
+<pre><code class="language-text"># Analyze the design file and the testbench file.
+ghdl -a --std=08 debounce.vhd tb_debounce.vhd
+
+# Elaborate the testbench
+ghdl -e tb_debounce
+</code></pre>
+<pre><code class="language-text"># Run the simulation with .vcd output (for GTKwave).
+ghdl -r tb_debounce --stop-time=50ms --vcd=waveform.vcd
+gtkwave waveform.vcd
+</code></pre>
+<pre><code class="language-text"># Run the simulation with .vcd output (for Surfer).
+ghdl -r tb_debounce --stop-time=50ms --fst=debounce.fst
+surfer debounce.fst
+</code></pre>
+<p><img alt="" src="vscode_vhdl.jpg" /></p>
+<p><strong>Figure:</strong> VS Code IDE used for VHDL code editing and command-line execution
+in the integrated terminal.</p>
+<p><img alt="" src="surfer-1.jpg" /></p>
+<p><img alt="" src="surfer-2.jpg" /></p>
+<p><img alt="" src="surfer-3.jpg" /></p>
+<p><strong>Figure:</strong> Waveform visualization with <strong>Surfer</strong></p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2025-06-01 | Last Updated: 2025-06-01</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2025 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
