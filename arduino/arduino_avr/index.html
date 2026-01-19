@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/arduino/arduino_avr/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>บทบาทของบอร์ดไมโครคอนโทรลเลอร์ Arduino Uno / Nano (8-bit MCU) ต่อการเรียนรู้ระบบสมองกลฝังตัวในปัจจุบัน - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-uno-nano-8-bit-mcu" class="nav-link">บทบาทของบอร์ดไมโครคอนโทรลเลอร์ Arduino Uno / Nano (8-bit MCU) ต่อการเรียนรู้ระบบสมองกลฝังตัวในปัจจุบัน</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-8-bit-mcu" class="nav-link">&#9655; บทบาทของบอร์ด Arduino 8-bit MCU</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; แพลตฟอร์มสำหรับการเรียนรู้ระบบคอมพิวเตอร์ฝังตัว</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; ระดับของการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#led-blink" class="nav-link">&#9655; ตัวอย่างโค้ด: LED Blink</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#avr-gcc-toolchain" class="nav-link">ความสำคัญของซอฟต์แวร์ AVR GCC Toolchain</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">&#9655; การจำลองการทำงานและการดีบัก</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ws2812b-rgb-led" class="nav-link">&#9655; กรณีศึกษา: WS2812B RGB LED</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#wokwi-simulator-vs-code-ide" class="nav-link">&#9655; การจำลองการทำงานแบบเสมือนจริงด้วย Wokwi Simulator + VS Code IDE</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-api" class="nav-link">&#9655; ข้อจำกัดของ Arduino API</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#freertos" class="nav-link">&#9655; ตัวอย่างการเขียนโค้ดโดยใช้ FreeRTOS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_4" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-uno-nano-8-bit-mcu">บทบาทของบอร์ดไมโครคอนโทรลเลอร์ Arduino Uno / Nano (8-bit MCU) ต่อการเรียนรู้ระบบสมองกลฝังตัวในปัจจุบัน<a class="headerlink" href="#arduino-uno-nano-8-bit-mcu" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>AVR</em>, <em>ATmega328P</em>, <em>Arduino Uno</em>, <em>Arduino Nano</em>, 
+<em>Bare-metal C Programming</em>, <em>AVR Assembly</em>, <em>Wokwi Simulator</em>, <em>FreeRTOS for Arduino</em></p>
+<ul>
+<li><a href="#arduino-8-bit-mcu"><strong>บทบาทของบอร์ด Arduino 8-bit MCU</strong></a></li>
+<li><a href="#_1"><strong>แพลตฟอร์มสำหรับการเรียนรู้ระบบคอมพิวเตอร์ฝังตัว</strong></a></li>
+<li><a href="#_2"><strong>ระดับของการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์</strong></a></li>
+<li><a href="#led-blink"><strong>ตัวอย่างโค้ด: LED Blink</strong></a></li>
+<li><a href="#avr-gcc-toolchain"><strong>ความสำคัญของซอฟต์แวร์ AVR GCC Toolchain</strong></a></li>
+<li><a href="#_3"><strong>การจำลองการทำงานและการดีบัก</strong></a></li>
+<li><a href="#ws2812b-rgb-led"><strong>กรณีศึกษา: WS2812B RGB LED</strong></a></li>
+<li><a href="#wokwi-simulator-vs-code-ide"><strong>การจำลองการทำงานแบบเสมือนจริงด้วย Wokwi Simulator + VS Code IDE</strong></a></li>
+<li><a href="#arduino-api"><strong>ข้อจำกัดของ Arduino API</strong></a></li>
+<li><a href="#freertos"><strong>ตัวอย่างการเขียนโค้ดโดยใช้ FreeRTOS</strong></a></li>
+</ul>
+<hr />
+<h2 id="arduino-8-bit-mcu">&#9655; <strong>บทบาทของบอร์ด Arduino 8-bit MCU</strong><a class="headerlink" href="#arduino-8-bit-mcu" title="Permanent link">#</a></h2>
+<p>บอร์ดไมโครคอนโทรลเลอร์อย่าง <a href="https://docs.arduino.cc/hardware/uno-rev3/"><strong>Arduino Uno</strong></a>
+และ <a href="https://docs.arduino.cc/hardware/nano/"><strong>Arduino Nano</strong></a> 
+ที่ใช้ชิป <strong>Atmel ATmega328P</strong> รวมถึงบอร์ด <a href="https://docs.arduino.cc/hardware/mega-2560/"><strong>Arduino Mega 2560</strong></a> ที่ใช้ชิป <strong>ATmega2560</strong>
+มีบทบาทสำคัญอย่างยิ่งในการทำให้แพลตฟอร์ม <a href="https://docs.arduino.cc/"><strong>Arduino</strong></a> เป็นที่รู้จักอย่างแพร่หลาย
+และช่วยลดอุปสรรคในการเริ่มต้นพัฒนา <strong>Embedded Systems</strong> สำหรับผู้เรียนและผู้เริ่มต้น</p>
+<p>จุดเด่นของ <strong>Arduino</strong> ในยุคเริ่มต้น คือ การซ่อนความซับซ้อนของฮาร์ดแวร์และเครื่องมือพัฒนาไว้เบื้องหลัง
+และมีการพัฒนา <a href="https://docs.arduino.cc/learn/programming/reference/"><strong>Arduino API</strong></a>
+ซึ่งทำให้ผู้ใช้งานสามารถเขียนโปรแกรมด้วยภาษา <strong>C/C++</strong> ในระดับที่เข้าใจง่าย
+ใช้เวลาเรียนรู้ไม่นาน และมีต้นทุนต่ำเมื่อเทียบกับแพลตฟอร์มไมโครคอนโทรลเลอร์แบบดั้งเดิม</p>
+<p>อย่างไรก็ตาม หากมองในภาพรวมของเทคโนโลยีปัจจุบัน จะเห็นได้ว่าบอร์ด <strong>Arduino</strong> ที่ใช้ไมโครคอนโทรลเลอร์แบบ 8 บิต
+เริ่มมีบทบาทลดลง เมื่อเทียบกับบอร์ดรุ่นใหม่ที่ใช้ไมโครคอนโทรลเลอร์แบบ 32 บิต ซึ่งมีประสิทธิภาพสูงกว่า
+รองรับหน่วยความจำมากกว่า และมีอุปกรณ์ต่อพ่วง (<strong>Peripheral</strong>) ที่ซับซ้อนกว่า</p>
+<p>ด้วยเหตุนี้ หากพิจารณาในมุมของการนำไปใช้งานจริงเชิงอุตสาหกรรม บอร์ด <strong>Arduino 8-bit</strong>
+จึงมักถูกจัดอยู่ในกลุ่มเทคโนโลยีเชิง <strong>legacy</strong> ในยุคปัจจุบัน แต่ยังมีคุณค่าในบริบทของการเรียนรู้ระดับเริ่มต้น</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; แพลตฟอร์มสำหรับการเรียนรู้ระบบคอมพิวเตอร์ฝังตัว<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>แม้ว่าการนำไปประยุกต์ใช้งานมีแนวโน้มลดลง แต่บอร์ด <strong>Arduino Uno / Nano</strong> ยังคงเหมาะสมสำหรับการใช้เป็น
+“โมเดลอ้างอิง” เพื่อศึกษารูปแบบการเขียนโค้ด <strong>Arduino Sketch</strong>
+รวมถึงหลักการทำงานของบอร์ดไมโครคอนโทรลเลอร์ ขนาด 8 บิต
+และสถาปัตยกรรมของซีพียู (<strong>CPU</strong>) ภายในชิปไมโครคอนโทรลเลอร์</p>
+<p>ชิป <strong>ATmega328P</strong> บนบอร์ด <strong>Arduino Uno / Nano</strong>
+เป็นตัวอย่างของซีพียูแบบ <strong>RISC</strong> (<em>Reduced Instruction Set Computer</em>)
+ที่มีโครงสร้างไม่ซับซ้อน และมีไปป์ไลน์ (<strong>Pipeline</strong>) ที่ไม่ซับซ้อนในการทำคำสั่ง
+(เป็นแบบ <strong>2-stage Pipeline</strong> คือ <strong>Instruction Fetch</strong> และ <strong>Instruction Execute</strong>)
+ทำให้สามารถนำมาใช้เป็นกรณีศึกษา เพื่ออธิบายการทำงานของซีพียูได้อย่างเป็นรูปธรรม</p>
+<p>ผู้เรียนสามารถศึกษาประเด็นต่าง ๆ ได้ เช่น</p>
+<ul>
+<li>การทำงานของรีจิสเตอร์ภายในซีพียู</li>
+<li>ผังของหน่วยความจำภายในที่มีการแบ่งแยกระหว่าง <strong>Data Memory</strong> และ <strong>Program Memory</strong>
+ตามสถาปัตยกรรมแบบ <strong>Modified Harvard Architecture</strong></li>
+<li>รูปแบบการเข้าถึงหน่วยความจำประเภท <strong>SRAM</strong> และ <strong>Flash</strong></li>
+<li>การทำงานของคำสั่งของซีพียู (<strong>Instruction execution</strong>)</li>
+<li>ความสัมพันธ์ระหว่างซอฟต์แวร์ระดับสูงกับฮาร์ดแวร์ระดับล่าง</li>
+</ul>
+<p>สิ่งสำคัญคือ ชิป <strong>AVR</strong> อย่างเช่น <strong>ATmega328P</strong> เปิดโอกาสให้ผู้เรียนสามารถเขียนโปรแกรมได้หลายระดับ
+(<strong>Multi-Level Programming</strong>) ตั้งแต่ระดับ <strong>API</strong> ไปจนถึงระดับคำสั่งของซีพียูโดยตรง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>ระดับของการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>รูปแบบการเรียนรู้และการเขียนโค้ดเพื่อใช้งานกับบอร์ด <strong>Arduino Uno / Nano</strong> สามารถจำแนกตามระดับความลึก
+และความรู้ความเข้าใจการทำงานระดับล่างของฮาร์ดแวร์ ได้ดังนี้</p>
+<p>1) ระดับ <strong>Arduino API (C/C++)</strong></p>
+<ul>
+<li>เป็นการเขียนโค้ดในภาษา <strong>C/C++</strong> แต่ใช้คำสั่งต่าง ๆ ของ <strong>Arduino API</strong> </li>
+<li>ผู้เรียนสามารถเลือกใช้ <strong>IDE</strong> (<em>Integrated Development Environment</em>) อย่างเช่น
+<a href="https://www.arduino.cc/en/software"><strong>Arduino IDE</strong></a> หรือ
+<a href="https://code.visualstudio.com/"><strong>VS Code IDE</strong></a> ร่วมกับ 
+<a href="https://platformio.org/install/ide"><strong>PlatformIO</strong></a>
+หรือเครื่องมืออื่น ๆ เพื่อเรียนรู้โครงสร้างโปรแกรม รวมถึงการใช้ไลบรารี 
+(<a href="https://www.arduinolibraries.info/"><strong>Arduino Libraries</strong></a>)
+ซึ่งทำให้ง่ายและสะดวกในการเขียนโค้ด</li>
+</ul>
+<p>2) ระดับ <strong>Bare-metal C</strong></p>
+<ul>
+<li>เป็นการเขียนโปรแกรมภาษา <strong>C</strong> โดยเข้าถึงรีจิสเตอร์ของ <strong>AVR</strong> โดยตรง
+เพื่อควบคุมอุปกรณ์ภายใน เช่น <strong>GPIO</strong>, <strong>Timer</strong>, <strong>UART</strong>, <strong>SPI</strong> และ <strong>I2C</strong> 
+โดยไม่พึ่ง <strong>Arduino API</strong></li>
+<li>โดยทั่วไป มีการใช้ <a href="https://gcc.gnu.org/wiki/avr-gcc"><strong>AVR GCC Toolchain</strong></a>
+สำหรับการคอมไพล์โค้ด และ <a href="https://github.com/avrdudes/avr-libc/"><strong>AVR-LibC</strong></a>
+ซึ่งเป็นไลบรารีสำหรับการเขียนโค้ดภาษา <strong>C</strong> ได้ด้วย<ul>
+<li>ดาวน์โหลด <a href="https://www.microchip.com/en-us/tools-resources/develop/microchip-studio/gcc-compilers"><strong>AVR GCC Compiler</strong></a> สำหรับ <strong>Windows / Linux / Mac OS</strong></li>
+</ul>
+</li>
+<li>ในส่วนการอัปโหลดไฟล์ <strong>.hex</strong> ที่ได้จากการขั้นตอนคอมไพล์โค้ดภาษา <strong>C</strong> ก็จะใช้โปรแกรมที่มีชื่อว่า
+<a href="https://github.com/avrdudes/avrdude/releases"><strong>AVRDude</strong></a></li>
+<li>บอร์ด <strong>Arduino Uno / Nano</strong> สามารถใช้งานร่วมกับ <strong>AVRDude</strong> เนื่องจากสามารถใช้ 
+<strong>Arduino Bootloader</strong> ที่ได้มีการติดตั้งไว้ในชิป เพื่อการอัปโหลดไฟล์ (<strong>.hex</strong>) 
+และไม่จำเป็นต้องมีอุปกรณ์ภายนอก (<strong>External Hardware Programmer</strong>) </li>
+<li>นอกจากนั้น ยังมีเครื่องมือที่เป็นซอฟต์แวร์จากบริษัทผู้ผลิต ได้แก่
+<a href="https://www.microchip.com/en-us/tools-resources/develop/microchip-studio"><strong>Microchip Studio for AVR</strong></a> หรือ <a href="https://www.microchip.com/en-us/tools-resources/develop/mplab-x-ide"><strong>MPLAB X IDE</strong></a></li>
+</ul>
+<p>3) ระดับ <strong>AVR Assembly</strong></p>
+<ul>
+<li>เป็นการเขียนโปรแกรมด้วยภาษา <strong>Assembly</strong> ทั้งหมด หรือผสมผสานกับภาษา <strong>C</strong> (เช่น <strong>Inline Assembly</strong>)
+เพื่อควบคุมการทำงานของซีพียูในระดับคำสั่ง (<strong>Instruction Level</strong>)</li>
+<li>เหมาะสำหรับการศึกษาเชิงลึกด้านสถาปัตยกรรมซีพียู และการปรับแต่งประสิทธิภาพของโค้ดในระดับรอบสัญญาณนาฬิกา</li>
+<li>การเขียนโค้ด <strong>AVR Assembly</strong> สามารถใช้เครื่องมือ <strong>AVR GCC Toolchain</strong> ในการคอมไพล์โค้ด
+<strong>AVR Assembly</strong> เพื่อสร้างไฟล์ <strong>.hex</strong> แต่ก็มีเครื่องมืออื่นให้เลือกใช้ได้ เช่น<ul>
+<li><a href="https://github.com/Ro5bert/avra"><strong>AVRA for Linux</strong></a> ซึ่งเป็น 
+<strong>Open Source AVR Assembler</strong> ที่ออกแบบมาเฉพาะสำหรับไมโครคอนโทรลเลอร์ <strong>AVR</strong> </li>
+<li><a href="https://github.com/GreatCowBASIC/AVRASM2/tree/master/avrassembler"><code>AVRASM2 for Windows</code></a>
+ซึ่งเป็นโปรแกรม <strong>Assembler</strong> อย่างเป็นทางการของบริษัท <strong>Atmel</strong></li>
+</ul>
+</li>
+</ul>
+<p>การเขียนโค้ดด้วย <strong>Arduino API</strong> ใช้วิธีการอ้างอิงขา <strong>Arduino Pin</strong> ตามรูปแบบที่ <strong>Arduino API</strong>
+กำหนดไว้ แต่ถ้าเขียนโค้ดแบบ <strong>Bare-metal C</strong> จะต้องอ้างอิงจากขาของชิป  (<strong>MCU Pin</strong>)</p>
+<p><img alt="" src="atmega328p_pinmap.jpg" /></p>
+<p><strong>รูป:</strong> การแสดงตำแหน่งขาและความเชื่อมโยงระหว่าง <strong>Arduino Pin</strong> กับ <strong>MCU Pin</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="led-blink">&#9655; <strong>ตัวอย่างโค้ด: LED Blink</strong><a class="headerlink" href="#led-blink" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ดในไฟล์ <code>main.c</code> แสดงให้เห็นรูปแบบการเขียนโค้ดแบบ <strong>Bare-metal C</strong>
+ที่ทำให้ <strong>LED</strong> บนบอร์ด <strong>Arduino Uno / Nano</strong> กระพริบด้วยอัตราคงที่
+ในตำแหน่งขา <strong>Arduino D13 Pin</strong> หรือ <strong>PB5 Pin</strong> ของชิป  <strong>ATmega328P</strong></p>
+<p>ในโค้ด มีตัวอย่างการเข้าถึงรีจิสเตอร์ของ <strong>ATmega328P</strong> เพื่อเขียนหรืออ่านค่า เช่น การใช้รีจิสเตอร์
+<code>DDRB</code> และ <code>PORTB</code> เป็นต้น นอกจากนั้นแล้วยังมีการเรียกใช้ฟังก์ชัน  เช่น <code>_delay_ms()</code> เพื่อหน่วงเวลาไว้
+ตามระยะเวลาที่ต้องการ ก่อนทำคำสั่งถัดไป ฟังก์ชันนี้เป็นส่วนหนึ่งของไลบรารี <strong>AVR LibC</strong></p>
+<pre><code class="language-c">// Define the CPU clock frequency as 16 MHz.
+// The AVR fuse bits must be configured to use an external 16 MHz crystal.
+#ifndef F_CPU 
+#define F_CPU 16000000UL 
+#endif
+
+#include &lt;avr/io.h&gt; // Provides definitions for I/O registers and bit names
+#include &lt;util/delay.h&gt;  // for _delay_ms()
+
+#define LED_PIN   5
+#define LED_PORT  PORTB
+#define LED_DDR   DDRB
+
+// Software delay
+void sw_delay(uint8_t n) {
+    for (uint8_t i = 0; i &lt; n; i++) {
+        for (uint16_t j = 0; j &lt; 16000-1; j++) {
+            asm volatile (&quot;nop&quot;); 
+        }
+    }
+}
+
+int main(void) {
+    // Configure PB5 as an output pin.
+    // DDRB is the Data Direction Register for PORTB.
+    // Writing '1' to bit PB5 sets the corresponding pin as output.
+    LED_DDR  |=  (1 &lt;&lt; LED_PIN); // configure PB5 as output pin
+    LED_PORT &amp;= ~(1 &lt;&lt; LED_PIN); // output LOW
+    while (1) {
+        PORTB ^= (1 &lt;&lt; PB5); // Toggle PB5 pin
+        // Delay for approximately 500 milliseconds (0.5 seconds).
+        _delay_ms(500);
+              // sw_delay(100);
+    }
+    // This return statement is never reached,
+    // but is included to satisfy the C standard.
+    return 0;
+}
+</code></pre>
+<p>ในโค้ดตัวอย่าง มีการสร้างฟังก์ชัน <code>sw_delay()</code> เพื่อใช้หน่วงเวลาได้เช่นกัน
+และแสดงให้เห็นตัวอย่างการใช้คำสั่ง <code>nop</code> ของ <strong>AVR Assembly</strong>
+แบบ <strong>Inline</strong> ในโค้ดภาษา <strong>C</strong> มีการทำคำสั่งวนลูปซ้อน (<strong>Nested Loop</strong>) เพื่อหน่วงเวลา</p>
+<p>หากคอมไพล์โค้ดด้วย <strong>Arduino IDE</strong> และทดสอบกับฮาร์ดแวร์จริง จะพบว่า
+การทำงานของลูปใน (<strong>Inner Loop</strong>) จำนวน <strong>16000</strong> รอบ จะใช้เวลาประมาณ <strong>5 ms</strong> (จากการวัดสัญญาณ)</p>
+<p>เมื่อกำหนดให้ <strong>F_CPU = 16 MHz</strong> ซึ่งมีคาบเวลา <strong>62.5 ns</strong> ต่อหนึ่งไซเคิล (<strong>Clock Cycle</strong>)
+จะได้ว่า การทำงานของลูปใน ใช้เวลา <strong>5 ms / (16000 cycles x 62.5 ns) = 5 cycles</strong>
+โดยหนึ่งรอบของลูปไม่ได้มีเพียงคำสั่ง <code>nop</code> เท่านั้น แต่ยังรวมถึงคำสั่งควบคุมลูป เช่น การลดค่าตัวนับ
+การตรวจสอบเงื่อนข และการกระโดดกลับของลูป เพื่อทำขั้นตอนซ้ำ</p>
+<p>ถ้าลองทำคำสั่งต่อไปนี้</p>
+<p>1) <code>avr-gcc -mmcu=atmega328p  -Os main.c -o main.elf</code> เพื่อคอมไพล์โค้ด <code>main.c</code> ให้เป็น <code>main.elf</code>
+โดยใช้ <code>-Os</code> คือ ต้องการทำให้โค้ดมีขนาดเล็ก หรือสั้นที่สุดที่ยังถูกต้อง แต่ไม่ได้เร็วที่สุด</p>
+<p>2) <code>avr-objdump -d main.elf</code> เพื่อดูโค้ด <strong>AVR Assembly</strong> </p>
+<p>เอาต์พุตบางส่วน มีตัวอย่างดังนี้ (ตัดมาเฉพาะส่วนที่เกี่ยวกับฟังก์ชัน <code>sw_delay</code> และ <code>main</code>)
+ซึ่งทำให้เห็นคำสั่งต่าง ๆ ที่ได้จากการแปลงโค้ดของ <strong>AVR GCC Compiler</strong></p>
+<p><img alt="" src="avr_disasm.jpg" /></p>
+<p><strong>รูป:</strong> <strong>Disassembler Output</strong></p>
+<p>&nbsp;</p>
+<p>การคอมไพล์โค้ดแบบ <strong>Command Line</strong> สำหรับผู้ใช้ <strong>Ubuntu</strong> ให้ทำคำสั่งดังต่อไปนี้</p>
+<pre><code># Update package index
+sudo apt update
+
+# Install AVR-GCC toolchain, avr-libc and avrdude
+sudo apt install gcc-avr avr-libc avrdude
+
+# Check avr-gcc installation (e.g.avr-gcc GCC 7.3.0)
+avr-gcc --version
+
+# Compile C source for ATmega328P (optimize for size)
+avr-gcc -mmcu=atmega328p -Os -Wall -o main.elf main.c
+
+# Convert .elf to .hex
+avr-objcopy -j .text -j .data -O ihex main.elf main.hex
+
+# Check the check memory usage (Flash, SRAM, EEPROM) of the .elf file
+avr-size main.elf
+
+# Disassemble the .elf file
+avr-objdump -d main.elf
+</code></pre>
+<p>เมื่อได้ไฟล์ <strong>.hex</strong> แล้ว ก็สามารถนำไปทดลองใช้กับบอร์ด <strong>Arduino</strong> ได้ โดยใช้คำสั่ง <code>avrdude</code>
+และมีตัวอย่างการทำคำสั่งแบบ <strong>Command Line</strong> (สำหรับ <strong>Linux</strong>) ดังนี้</p>
+<pre><code>avrdude -c arduino -p m328p -P /dev/ttyACM0 -b 115200 -U flash:w:main.hex
+</code></pre>
+<p>&nbsp;</p>
+<p>ถัดไปลองเปรียบเทียบกับโค้ด <strong>AVR Assembly</strong> (<code>main.asm</code>) ที่ทำให้ <strong>LED</strong> กระพริบ และใช้สำหรับ
+<strong>AVRASM2</strong> หรือ <strong>AVRA</strong> มีดังนี้</p>
+<pre><code class="language-text">;-------------------------------------------------
+; ATmega328P – Blink PB0 with software delay
+; Clock: 16 MHz (external crystal)
+;-------------------------------------------------
+
+.include &quot;m328Pdef.inc&quot;     ; Device definitions
+.cseg
+.org 0x0000
+    rjmp RESET              ; Reset vector
+RESET:
+    ldi  r16, HIGH(RAMEND)  ; Init stack pointer
+    out  SPH, r16
+    ldi  r16, LOW(RAMEND)
+    out  SPL, r16
+    sbi  DDRB, PB5          ; PB5 as output
+
+MAIN:
+    sbi  PORTB, PB5         ; PB5 = HIGH
+    rcall SW_DELAY
+    cbi  PORTB, PB5         ; PB5 = LOW
+    rcall SW_DELAY
+    rjmp MAIN
+
+;-------------------------------------------------
+; software delay (approx. 0.5 seconds)
+; Uses 16-bit down counter: r25:r24
+;-------------------------------------------------
+
+.equ INNER_CNT = 50000      ; 16-bit inner loop
+.equ OUTER_CNT = 40         ; outer loop count
+
+SW_DELAY:
+    ldi  r18, OUTER_CNT     ; outer loop counter
+OUTER_LOOP:
+    ldi  r25, HIGH(INNER_CNT)
+    ldi  r24, LOW(INNER_CNT)
+INNER_LOOP:
+    sbiw r24, 1             ; 2 cycles
+    brne INNER_LOOP         ; 2 cycles if branch taken, otherwise 1 cycle
+    dec  r18                ; 1 cycle
+    brne OUTER_LOOP         ; 2 cycles if branch taken, otherwise 1 cycle
+    ret                     ; 4 cycles
+</code></pre>
+<p>ตัวอย่างการทำคำสั่งแบบ <strong>Command Line</strong> สำหรับ <strong>Ubuntu</strong> เพื่อคอมไพล์โค้ดและสร้างไฟล์ <code>.hex</code>  มีดังนี้</p>
+<pre><code># Install avra
+sudo apt install avra
+
+# Check the version
+# Output&gt; AVRA: advanced AVR macro assembler (version 1.4.2)
+avra --version
+
+# Compile the definition file to the working directory
+cp /usr/share/avra/m328Pdef.inc ./m328pdef.inc
+
+# Compile AVR assembly code and generate a .hex file
+avra -m atmega328p  -o main.hex main.asm
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="avr-gcc-toolchain"><strong>ความสำคัญของซอฟต์แวร์ AVR GCC Toolchain</strong><a class="headerlink" href="#avr-gcc-toolchain" title="Permanent link">#</a></h2>
+<p>ตามที่ได้นำเสนอไป จะเห็นได้ว่า <strong>AVR GCC Toolchain</strong> มีบทบาทที่สำคัญ และมีองค์ประกอบหลักของซอฟต์แวร์ เช่น</p>
+<p>1) <code>avr-gcc</code> (<strong>C/C++ Compiler</strong>)</p>
+<ul>
+<li>คอมไพเลอร์ภาษา <strong>C/C++</strong> สำหรับสถาปัตยกรรม <strong>AVR</strong> แปลงซอร์สโค้ดเป็นไฟล์ออบเจกต์ (<strong>.o</strong>)</li>
+<li>รองรับการเขียน <strong>Inline Assembly</strong></li>
+</ul>
+<p>2) <code>avr-as</code> (<strong>GNU Assembler</strong>)</p>
+<ul>
+<li>แอสเซมเบลอร์สำหรับโค้ด <strong>AVR Assembly</strong>  ทำหน้าที่แปลงไฟล์ <strong>.S / .asm</strong> เป็นไฟล์อ็อบเจกต์ (<strong>.o</strong>)</li>
+<li>ใช้ได้ทั้งกรณีเขียน <strong>Assembly</strong> ล้วน หรือผสมกับโค้ดภาษา <strong>C</strong></li>
+</ul>
+<p>3) <code>avr-ld</code> (<strong>Linker</strong>)</p>
+<ul>
+<li>รวมไฟล์ออบเจกต์หลายไฟล์เข้าด้วยกัน</li>
+<li>จัดวางโค้ดและข้อมูลลงในหน่วยความจำ (<strong>Flash / SRAM</strong>) ตามผัง <strong>Memory Layout</strong> ของไมโครคอนโทรลเลอร์</li>
+</ul>
+<p>4) <code>avr-objcopy</code></p>
+<ul>
+<li>แปลงไฟล์เอาต์พุต <strong>.elf</strong> ให้เป็นไฟล์ <strong>Intel HEX (.hex)</strong> ซึ่งเป็นไฟล์ที่ใช้สำหรับเขียนลงชิปจริง</li>
+</ul>
+<p>5) <code>avr-size</code></p>
+<ul>
+<li>ดูขนาดโค้ดและการใช้หน่วยความจำ (<strong>Flash / SRAM</strong>)</li>
+</ul>
+<p>6) <code>avr-objdump</code></p>
+<ul>
+<li>ถอดรหัส <strong>Assembly</strong> จากไฟล์ <strong>.elf</strong></li>
+</ul>
+<p>7) <code>avr-libc</code></p>
+<ul>
+<li>เป็น ลบรารีมาตรฐานสำหรับ <strong>AVR</strong></li>
+<li>มีฟังก์ชันพื้นฐาน เช่น การจัดการ <strong>I/O</strong> การจัดการอินเทอร์รัพท์ (<strong>Interrupt</strong>) การนิยามชื่อของรีจิสเตอร์ต่าง ๆ ภายใน <strong>MCU</strong></li>
+</ul>
+<hr />
+<h2 id="_3">&#9655; <strong>การจำลองการทำงานและการดีบัก</strong><a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<p>การเขียนโปรแกรมด้วย <strong>Bare-metal C</strong> และ <strong>AVR Assembly</strong> สามารถใช้เครื่องมืออย่าง
+<strong>Microchip Studio for AVR</strong> หรือ <strong>MPLAB X IDE</strong> ซึ่งรองรับการจำลองการทำงานของซีพียู
+(<strong>CPU Simulation</strong>)
+ที่มีความถูกต้องในระดับคำสั่งและไซเคิลของซีพียู และการดีบักในระดับคำสั่ง</p>
+<p>ผู้เรียนสามารถตรวจสอบได้ทั้ง</p>
+<ul>
+<li>ค่ารีจิสเตอร์ของซีพียู</li>
+<li>หน่วยความจำ <strong>SRAM</strong> และ <strong>Flash</strong></li>
+<li>ลำดับการทำงานของคำสั่ง</li>
+<li>ตัวนับจำนวนไซเคิล (<strong>CPU Cycle Count</strong>)</li>
+<li>ค่าของตัวแปรในโค้ด</li>
+</ul>
+<p>อย่างไรก็ตาม การจำลองลักษณะนี้ยังมีข้อจำกัดเมื่อต้องทำงานร่วมกับอุปกรณ์ภายนอกจริง เช่น 
+การสร้างสัญญาณอินพุตหรือการวิเคราะห์สัญญาณแบบ <strong>Waveform</strong></p>
+<p>อีกทางเลือกหนึ่งคือ <a href="https://wokwi.com/"><strong>Wokwi Simulator</strong></a> ซึ่งสามารถจำลองการทำงานของระบบ 
+<strong>Arduino</strong> และ <strong>AVR</strong> ในรูปแบบที่ใช้งานง่าย ผู้ใช้สามารถเขียนโค้ด คอมไพล์
+และทดสอบการทำงานร่วมกับอุปกรณ์พื้นฐานได้อย่างสะดวก</p>
+<p>อย่างไรก็ตาม การดีบักโค้ดยังมีข้อจำกัดในเชิงลึก โดยเฉพาะการตรวจสอบการทำงานในระดับรีจิสเตอร์ และคำสั่งของซีพียู 
+แม้ว่า <strong>Wokwi</strong> จะรองรับการใช้งาน <strong>GDB Debugger for AVR</strong> ในระดับหนึ่งก็ตาม</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ws2812b-rgb-led">&#9655; <strong>กรณีศึกษา: WS2812B RGB LED</strong><a class="headerlink" href="#ws2812b-rgb-led" title="Permanent link">#</a></h2>
+<p>โมดูล <strong>WS2812B</strong> เป็น <strong>RGB LED</strong> ที่กำหนดค่าสีด้วยข้อมูล 24 บิต
+(8 บิตต่อสี: <strong>G=Green</strong>, <strong>R=Read</strong>, <strong>B=Blue</strong>)
+โดยชิปไมโครคอนโทรลเลอร์ ต้องส่งข้อมูลออกไปทีละบิต ผ่านสายข้อมูลเพียงเส้นเดียว โดยไม่มีสัญญาณนาฬิกา (<strong>Clock</strong>) แยกต่างหาก
+สัญญาณที่ใช้เป็นสัญญาณพัลส์ดิจิทัล (<strong>Digital Pulse Signal</strong>)
+ซึ่งการตีความค่า 0 หรือ 1 ขึ้นอยู่กับ ความกว้างของพัลส์ (<strong>Pulse Width</strong>) ที่ต้องแม่นยำตามข้อกำหนดของชิป
+หากการทำงานในเชิงเวลา (<strong>Timing</strong>) ไม่ถูกต้อง <strong>LED</strong> จะอ่านข้อมูลผิดพลาดและแสดงสีไม่ตรงตามที่ต้องการ</p>
+<p>สัญญาณ <code>DATA</code> ของ <strong>WS2812B</strong> เป็นสัญญาณดิจิทัลที่มีลักษณะเป็นพัลส์สลับระหว่างระดับ
+<strong>HIGH</strong> และ <strong>LOW</strong></p>
+<table>
+<thead>
+<tr>
+<th>Bit value</th>
+<th>T_H (HIGH)</th>
+<th>T_L (LOW)</th>
+<th>Total period</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>0.40 µs (±0.15 µs)</td>
+<td>0.85 µs (±0.15 µs)</td>
+<td>≈ 1.25 µs</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>0.80 µs (±0.15 µs)</td>
+<td>0.45 µs (±0.15 µs)</td>
+<td>≈ 1.25 µs</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>อัตราการส่งข้อมูลโดยประมาณ <strong>800 kHz</strong></p>
+</blockquote>
+<p>หลังจากส่งข้อมูลครบ 24 บิตต่อ <strong>LED</strong> แล้ว หากสัญญาณ <strong>DATA</strong>
+เปลี่ยนเป็นระดับ <strong>LOW</strong> ต่อเนื่องนานกว่าค่าที่กำหนดสำหรับการรีเซต
+จะถือว่าการส่งข้อมูลสิ้นสุด และนำข้อมูลที่รับได้ไปแสดงผล</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Symbol</th>
+<th>Typical value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reset time</td>
+<td>T_RESET</td>
+<td>≥ 50 µs</td>
+</tr>
+</tbody>
+</table>
+<p>แม้ว่าในงานทั่วไปจะนิยมใช้ไลบรารี เช่น <a href="https://github.com/FastLED/FastLED"><code>FastLED</code></a> 
+หรือ <a href="https://github.com/adafruit/Adafruit_NeoPixel"><code>Adafruit_NeoPixel</code></a>
+แต่ในระดับล่าง โค้ดที่สร้างสัญญาณเหล่านี้มักถูกเขียนด้วยภาษา <strong>AVR Assembly</strong>
+กรณีนี้จึงเป็นตัวอย่างที่ดีในการเชื่อมโยงความรู้ด้านสถาปัตยกรรมซีพียู การจัดการเวลา และการเขียนโค้ดระดับต่ำเข้าด้วยกัน</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างโค้ด <strong>Arduino Sketch</strong> เพื่อกำหนดค่าสีของ <strong>Single-Pixel WS2812B</strong> 
+ซึ่งใช้ไลบรารี <code>FastLED</code>  และเลือกใช้ขา <strong>Arduino D11 Pin / PB3 MCU Pin</strong> เป็นขาเอาต์พุต</p>
+<pre><code class="language-c++">#include &lt;FastLED.h&gt;  // This requires the FastLED library.
+
+#define LED_PIN     11        // D11 / PB3 on Arduino Uno
+#define NUM_LEDS    1
+#define LED_TYPE    WS2812
+#define COLOR_ORDER GRB
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  FastLED.addLeds&lt;LED_TYPE, LED_PIN, COLOR_ORDER&gt;(leds, NUM_LEDS);
+  FastLED.clear();
+  FastLED.show();
+}
+
+void loop() {
+  static uint8_t g = 255, r = 0, b = 0;
+  leds[0] = CRGB(r, g, b);   // Assign a new CRGB object
+  FastLED.show();            // Update the WS2812B color
+  delay(1000); 
+  // Rotate colors
+  uint8_t tmp = g;
+  g = r;
+  r = b;
+  b = tmp;
+}
+</code></pre>
+<p><img alt="" src="uno_ws2812b.jpg" /></p>
+<p><strong>รูป:</strong> <strong>Arduino Uno Rev.3 + WS2812B Module</strong></p>
+<p>ลองเปรียบเทียบกับโค้ดภาษา <strong>C</strong> ต่อไปนี้ ซึ่งจะเห็นได้ว่า มีการเขียนโค้ด
+ภายในฟังก์ชัน <code>ws2812_send_byte(uint8_t data)</code>
+ด้วย <strong>Inline AVR Assembly</strong> ซึ่งทำหน้าที่สร้างสัญญาณดิจิทัลสำหรับโมดูล <strong>WS2812B</strong></p>
+<pre><code class="language-c">#ifndef F_CPU
+#define F_CPU 16000000UL
+#endif
+#include &lt;avr/io.h&gt;
+#include &lt;avr/interrupt.h&gt;
+#include &lt;util/delay.h&gt;
+
+#define WS2812_PIN   3       // PB3 (Arduino D11)
+#define WS2812_PORT  PORTB
+#define WS2812_DDR   DDRB
+
+// Send one byte to WS2812 (MSB first)
+static inline void ws2812_send_byte(uint8_t data) {
+    asm volatile (
+        &quot;ldi  r19, 8            \n&quot; // 8 bits
+        &quot;1:                     \n&quot; 
+        &quot;lsl  %[data]           \n&quot; // logical shift left: C &lt;- MSB 
+        &quot;brcs 2f                \n&quot; // brach to 2 (forward) if C=1
+        // send '0'
+        &quot;sbi  %[port], %[pin]   \n&quot; // set bit (HIGH)
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;cbi  %[port], %[pin]   \n&quot; // clear bit (LOW)
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;rjmp 3f                \n&quot; // jump to 3 (forward)
+
+        // send '1'
+        &quot;2:                     \n&quot;
+        &quot;sbi  %[port], %[pin]   \n&quot; // set bit (HIGH)
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;nop                    \n&quot;
+        &quot;cbi  %[port], %[pin]   \n&quot; // clear bit (LOW)
+
+        &quot;3:                     \n&quot;
+        &quot;dec  r19               \n&quot;
+        &quot;brne 1b                \n&quot; // branch to 1 (backward) if Z=0
+        :
+        : [data] &quot;r&quot; (data),
+          [port] &quot;I&quot; (_SFR_IO_ADDR(WS2812_PORT)),
+          [pin]  &quot;I&quot; (WS2812_PIN)
+        : &quot;r19&quot;
+    );
+}
+
+// Set the GRB color to WS2812B
+void ws2812_set_color(uint8_t g, uint8_t r, uint8_t b) {
+    cli();                 // disable interrupts
+    ws2812_send_byte(g);   // Green
+    ws2812_send_byte(r);   // Red
+    ws2812_send_byte(b);   // Blue
+    sei();                 // enable interrupts
+}
+
+int main(void) {
+    uint8_t g = 255, r = 0, b = 0;
+    // Configure PB3 as output
+    WS2812_DDR |= (1 &lt;&lt; WS2812_PIN);
+    WS2812_PORT &amp;= ~(1 &lt;&lt; WS2812_PIN);
+    while (1) {
+        ws2812_set_color(g, r, b);
+        // Rotate colors: G -&gt; R -&gt; B
+        uint8_t tmp = g;
+        g = r;
+        r = b;
+        b = tmp;
+        _delay_ms(500);
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>การเลือกเขียนโค้ดด้วย <strong>AVR Assembly</strong> แทนการใช้ภาษา <strong>C</strong>
+ก็มีวัตถุประสงค์ เพื่อการควบคุมเวลาในระดับไซเคิล (<strong>Clock Cycle</strong>)
+ซึ่งเป็นข้อกำหนดโดยตรงของโปรโตคอล <strong>WS2812B</strong></p>
+<p>การส่งข้อมูลไปยัง<strong> WS2812B</strong> เป็นการสร้างสัญญาณพัลส์ ที่ความกว้างของช่วง <strong>HIGH</strong> และ <strong>LOW</strong>
+ต้องอยู่ในช่วงที่กำหนดอย่างเคร่งครัด ความคลาดเคลื่อนในเชิง <strong>Timing</strong> อาจทำให้ <strong>LED</strong> ได้รับข้อมูลบิตที่ผิดพลาดได้</p>
+<p>ในระดับ <strong>Assembly</strong> สามารถกำหนดรูปแบบสัญญาณได้โดยตรง
+เริ่มจากใช้คำสั่ง <code>sbi</code> เพื่อเซตบิตของพอร์ตเอาต์พุต (เช่น <code>PORTB</code>, <code>PB5</code>) ให้เป็น <strong>HIGH</strong>
+จากนั้นแทรกคำสั่ง <code>nop</code> ตามจำนวนที่คำนวณจากความถี่สัญญาณนาฬิกา
+เพื่อสร้างความกว้างพัลส์ในช่วงเวลาที่ต้องการ และจบด้วยคำสั่ง <code>cbi</code> เพื่อลดระดับสัญญาณกลับเป็น <strong>LOW</strong></p>
+<p>แนวทางนี้ทำให้จำนวนไซเคิล ของแต่ละช่วงเวลาถูกกำหนดอย่างแน่นอน
+จึงเหมาะสำหรับงานที่มีลักษณะเป็น <strong>Timing-critical</strong> อย่างการควบคุม <strong>WS2812B</strong></p>
+<p><img alt="" src="avr_gcc_win.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการทำคำสั่งแบบ <strong>Command line</strong> สำหรับระบบปฏิบัติการ <strong>Windows</strong> 
+เพื่อคอมไพล์และอัปโหลดโปรแกรมไปยังบอร์ด <strong>Arduino</strong></p>
+<p><img alt="" src="ws2812b_wave-1.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการวัดสัญญาณเอาต์พุตด้วย <strong>USB Logic Analyzer + PulseView</strong>
+ที่แสดงให้เห็นสัญญาณพัลส์ที่เกิดขึ้น สำหรับการส่งข้อมูล 3 ไบต์ ไปยังโมดูล <strong>WS2812B</strong></p>
+<p><img alt="" src="ws2812b_wave-3.jpg" /></p>
+<p><strong>รูป:</strong> ความกว้างของสัญญาณ เมื่อบิตมีค่าเป็น 0 ซึ่งวัดได้ประมาณ 1.25 us</p>
+<p><img alt="" src="ws2812b_wave-2.jpg" /></p>
+<p><strong>รูป:</strong> ความกว้างช่วงที่เป็น <strong>LOW</strong> เมื่อบิตมีค่าเป็น 1 ซึ่งวัดได้ประมาณ 0.375 us</p>
+<p><img alt="" src="ws2812b_wave-6.jpg" /></p>
+<p><strong>รูป:</strong> ความกว้างของสัญญาณ เมื่อบิตมีค่าเป็น 1 ซึ่งวัดได้ประมาณ 1.25 us</p>
+<p><img alt="" src="ws2812b_wave-5.jpg" /></p>
+<p><strong>รูป:</strong> ความกว้างช่วงที่เป็น <strong>HIGH</strong> เมื่อบิตมีค่าเป็น 1 ซึ่งวัดได้ประมาณ 0.75 us</p>
+<p>&nbsp;</p>
+<p>ถัดไป ลองมาดูตัวอย่างรูปแบบการเขียนโค้ด <strong>AVR Assembly</strong> ทั้งหมด และใช้คำสั่ง <code>avr-gcc</code> ในการคอมไพล์โค้ด</p>
+<pre><code class="language-text">#define __SFR_OFFSET 0
+#include &lt;avr/io.h&gt;    // Get the &quot;basic&quot; symbolic names for registers
+#define WS2812_PIN 3
+.text
+.global main
+main:
+        ; Initialize stack pointer 
+        ldi r16, hi8(RAMEND)
+        out SPH, r16
+        ldi r16, lo8(RAMEND)
+        out SPL, r16
+        ; PB3 output 
+        sbi DDRB, WS2812_PIN
+        cbi PORTB, WS2812_PIN
+
+        ; Initial color: G=255, R=0, B=0
+        ldi r20, 255        /* G */
+        clr r21             /* R */
+        clr r22             /* B */
+
+main_loop:
+        cli
+        rcall send_grb
+        sei
+        rcall sw_delay
+        ; Rotate colors
+        mov r23, r20
+        mov r20, r21
+        mov r21, r22
+        mov r22, r23
+        rjmp main_loop
+
+; send_grb: send G, R, B (r20, r21, r22)
+send_grb:
+        mov r24, r20
+        rcall send_byte
+        mov r24, r21
+        rcall send_byte
+        mov r24, r22
+        rcall send_byte
+        ret
+
+; send_byte: send 8 bits MSB-first (r24)
+send_byte:
+        ldi r25, 8
+send_bit:
+        sbi PORTB, WS2812_PIN
+        lsl r24
+        brcs send_1
+send_0:
+        nop
+        nop
+        cbi PORTB, WS2812_PIN        
+        nop 
+        nop 
+        nop
+        nop
+        nop
+        nop 
+        rjmp send_bit_done
+send_1:
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        cbi PORTB, WS2812_PIN
+        nop
+        nop
+send_bit_done:
+        dec  r25
+        brne send_bit
+        ret
+
+; sw_delay
+sw_delay:
+        ldi r18, 20             ; set outer loop count
+delay_outer:
+        ldi r25, hi8(50000)     ; load r25:24 with 50000 (iterations)
+        ldi r24, lo8(50000)
+delay_inner:
+        sbiw r24, 1             ; decrement r25:r24 (inner loop counter)
+        brne delay_inner        ; repeat inner loop if not zero
+        dec r18                 ; decrement r18 (outer loop counter)
+        brne delay_outer        ; repeat outer loop if not zero
+        ret                     ; return from subroutine
+</code></pre>
+<p>ตัวอย่างการทำคำสั่งสำหรับ <strong>Windows</strong></p>
+<pre><code>avr-gcc -mmcu=atmega328p -DF_CPU=16000000UL -Os main.S -o main.elf 
+avr-objcopy -O ihex main.elf main.hex
+avrdude -c arduino -p m328p -P COM8 -b 115200 -U flash:w:main.hex
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="wokwi-simulator-vs-code-ide">&#9655; <strong>การจำลองการทำงานแบบเสมือนจริงด้วย Wokwi Simulator + VS Code IDE</strong><a class="headerlink" href="#wokwi-simulator-vs-code-ide" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการจำลองการทำงานด้วย  <strong>VS Code IDE</strong> ร่วมกับ <strong>Wokwi Simulator Extension</strong></p>
+<p>ไฟล์ที่ต้องใช้ในการจำลองการทำงานตามตัวอย่าง ได้แก่</p>
+<ul>
+<li><code>wokwi.toml</code> (ต้องสร้างขึ้นใหม่ ตามตัวอย่าง เพื่อใช้ระบุว่า จะใช้ไฟล์ใดในการรัน)</li>
+<li><code>diagram.json</code> (ต้องวาดผังวงจรด้วย <strong>Wokwi Simulator</strong> แบบ <strong>online</strong> แล้วนำไฟล์มาใช้)</li>
+<li><code>main.elf</code> และ <code>main.hex</code> (ได้จากขั้นตอนการคอมไพล์โค้ดด้วย <code>avr-gcc</code>)</li>
+</ul>
+<p><strong>File:</strong> <code>diagram.json</code></p>
+<pre><code class="language-json">{
+  &quot;version&quot;: 1,
+  &quot;author&quot;: &quot;Anonymous Maker&quot;,
+  &quot;editor&quot;: &quot;wokwi&quot;,
+  &quot;parts&quot;: [
+    { &quot;type&quot;: &quot;wokwi-arduino-uno&quot;, &quot;id&quot;: &quot;uno&quot;, &quot;top&quot;: 0,
+      &quot;left&quot;: 0, &quot;attrs&quot;: {} },
+    { &quot;type&quot;: &quot;wokwi-neopixel&quot;, &quot;id&quot;: &quot;rgb1&quot;, &quot;top&quot;: -30, 
+      &quot;left&quot;: 300, &quot;attrs&quot;: {} },
+    { &quot;type&quot;: &quot;wokwi-logic-analyzer&quot;, &quot;id&quot;: &quot;logic1&quot;, 
+       &quot;top&quot;: -90, &quot;left&quot;: 380, &quot;attrs&quot;: {} }
+  ],
+  &quot;connections&quot;: [
+    [ &quot;uno:5V&quot;, &quot;rgb1:VDD&quot;, &quot;red&quot;, [ &quot;v30&quot;, &quot;h125&quot;, &quot;v-250&quot;, &quot;h30&quot; ] ],
+    [ &quot;uno:GND.1&quot;, &quot;rgb1:VSS&quot;, &quot;black&quot;, [ &quot;v-70&quot;, &quot;h240&quot;, &quot;v50&quot; ] ],
+    [ &quot;uno:11&quot;, &quot;rgb1:DIN&quot;, &quot;green&quot;, [ &quot;v-60&quot;, &quot;h190&quot; ] ],
+    [ &quot;logic1:GND&quot;, &quot;rgb1:VSS&quot;, &quot;black&quot;, [ &quot;h-20&quot;, &quot;v20&quot;, &quot;h-20&quot; ] ],
+    [ &quot;logic1:D0&quot;, &quot;rgb1:DIN&quot;, &quot;orange&quot;, [ &quot;h-50&quot;, &quot;v80&quot; ] ]
+  ],
+  &quot;dependencies&quot;: {}
+}
+</code></pre>
+<p><strong>File:</strong> <code>wokwi.toml</code></p>
+<pre><code class="language-yaml">[wokwi]
+version = 1
+firmware = 'main.hex'
+elf = 'main.elf'
+</code></pre>
+<p><img alt="" src="wokwi_sim.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการจำลองการทำงานของบอร์ด <strong>Arduino Uno + WS2812B</strong> เสมือนจริง</p>
+<p>จากรูปผังวงจร จะเห็นได้ว่า มีการวัดสัญญาณด้วย <strong>Virtual 8-channel Logic Analyzer</strong>
+เมื่อหยุดการจำลองการทำงาน จะได้ไฟล์  <code>wokwi-logic.vcd</code> และสามารถนำไปเปิดและแสดงรูปคลื่นสัญญาณได้
+โดยใช้โปรแกรม เช่น <a href="https://surfer-project.org/"><strong>Surfer</strong></a> หรือ <a href="https://gtkwave.sourceforge.net/"><strong>GTkWave</strong></a></p>
+<p><img alt="" src="wokwi_surfer_waveform.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการแสดงรูปคลื่นสัญญาณจากไฟล์  <code>wokwi-logic.vcd</code> ด้วยโปรแกรม <strong>Surfer</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-api">&#9655; <strong>ข้อจำกัดของ Arduino API</strong><a class="headerlink" href="#arduino-api" title="Permanent link">#</a></h2>
+<p>แม้ว่า <strong>Arduino API</strong> จะสะดวกและเหมาะสำหรับการเริ่มต้น
+แต่ไม่สามารถเข้าถึงความสามารถเต็มของไมโครคอนโทรลเลอร์
+<strong>ATmega328P</strong> ได้ทั้งหมด ตัวอย่างเช่น ฟังก์ชัน <code>analogWrite()</code></p>
+<ul>
+<li>ใช้สำหรับสร้างสัญญาณ <strong>PWM</strong> (<em>Pulse Width Modulation</em>) เป็นเอาต์พุต</li>
+<li>จะต้องเลือกใช้ขาที่รองรับ <strong>PWM</strong> ซึ่งบน <strong>Arduino Uno (ATmega328P)</strong> มี 6 ขา <strong>PWM</strong>
+ได้แก่ <code>D3</code>, <code>D5</code>, <code>D6</code>, <code>D9</code>, <code>D10</code> และ <code>D11</code></li>
+<li><strong>Arduino API</strong> ได้กำหนดความถี่ของ <strong>PWM</strong> ไว้คงที่สำหรับ <strong>Arduino Uno / Nano</strong>
+เมื่อใช้ฟังก์ชัน <code>analogWrite()</code> สำหรับแต่ละขา (โดยขึ้นอยู่กับวงจร <strong>Timer</strong> ที่ใช้)
+ไม่สามารถปรับความถี่ได้โดยตรง<ul>
+<li><strong>Timer0 (8-bit)</strong>: ขา <strong>D5, D6</strong> ความถี่ <strong>976 Hz</strong></li>
+<li><strong>Timer2 (16-bit)</strong>: ขา <strong>D3, D11</strong> ความถี่ <strong>490 Hz</strong></li>
+<li><strong>Timer1 (8-bit)</strong>: ขา <strong>D9, D10</strong> ความถี่ <strong>490 Hz</strong></li>
+</ul>
+</li>
+</ul>
+<p>หากต้องการปรับความถี่ของสัญญาณเอาต์พุต <strong>PWM</strong> หรือเปลี่ยนรูปแบบ (โหมด) การทำงานของ <strong>Timer</strong>
+หรือ กำหนดรูปแบบการทำงานด้วยอินเทอร์รัพท์ จำเป็นต้องเข้าถึงรีจิสเตอร์ของ <strong>Timer</strong> โดยตรง เช่น</p>
+<ul>
+<li><code>TCCR0A</code>, <code>TCCR0B</code> สำหรับ <strong>Timer0</strong></li>
+<li><code>TCCR1A</code>, <code>TCCR1B</code> สำหรับ <strong>Timer1</strong></li>
+<li><code>TCCR2A</code>, <code>TCCR2B</code> สำหรับ <strong>Timer2</strong></li>
+</ul>
+<p>ฟังก์ชันของ <strong>Arduino (ATmega328P)</strong> เกี่ยวกับเวลา เช่น
+<code>delay()</code>, <code>delayMicroseconds()</code> และ <code>millis()</code> ทำงานอ้างอิงกับ <strong>Timer0</strong></p>
+<ul>
+<li>ถูกตั้งค่าให้ทำงานในโหมด <strong>Fast PWM</strong>
+มีการเปิดใช้งาน <strong>Timer0 Overflow Interrupt (TOV0)</strong>
+เพื่อให้การทำงานของ <strong>Arduino</strong> คำนวณและนับเวลาภายใน</li>
+<li>มีคาบเวลา (<strong>Tick Period</strong>) 4 ไมโครวินาที
+(ความถี่ 16 MHz หารด้วยค่า <strong>Prescaler=64</strong> ได้ความถี่ <strong>250kHz</strong> หรือคิดเป็น <strong>4 us</strong>)</li>
+</ul>
+<p>ตัวอย่างโค้ด <strong>Arduino Sketch</strong> สร้างสัญญาณ <strong>PWM</strong> ทั้ง 6 ขา และกำหนดค่า <strong>Duty Cycle = 50%</strong>
+(ความละเอียด 8 บิตในการกำหนดค่า) มีดังนี้</p>
+<pre><code class="language-c++">// Pin definitions for Arduino Uno PWM outputs
+const int pwmPins[] = {3, 5, 6, 9, 10, 11};
+
+void setup() {
+  // Set all PWM pins as OUTPUT
+  for (int i = 0; i &lt; 6; i++) {
+    pinMode( pwmPins[i], OUTPUT );
+  }
+
+  // Set all PWM outputs to 50% duty cycle
+  // analogWrite range: 0-255 (50% = 128)
+  for (int i=0; i &lt; 6; i++) {
+    analogWrite( pwmPins[i], 128 ); // 50% duty cycle
+  }
+}
+
+void loop() {
+}
+</code></pre>
+<p><img alt="" src="avr_pwm-1.jpg" />
+<img alt="" src="avr_pwm-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการวัดสัญญาณเอาต์พุต <strong>PWM</strong> ทั้งหมด 6 ขา</p>
+<p>&nbsp;</p>
+<p>ตัวอย่างถัดไปเป็นโค้ด <strong>Arduino Sketch</strong> ที่เปิดการใช้งานวงจร <strong>Timer 1 (16-bit)</strong>
+ในโหมดที่เรียกว่า <strong>CTC (Clear Timer on Compare Match)</strong></p>
+<pre><code class="language-c++">const int LED_PIN = 13;  // Arduino D13 pin for onboard LED
+volatile bool ledState = false; 
+
+void initTimer1() {
+  // Stop Timer1
+  TCCR1A = 0;
+  TCCR1B = 0;
+  // f_CPU = 16 MHz, Prescaler = 64 =&gt; Timer tick = 4 us
+  // Set prescaler to 64 and use CTC mode (Clear Timer on Compare Match)
+  TCCR1B |= (1 &lt;&lt; CS11) | (1 &lt;&lt; CS10);
+  TCCR1B |= (1 &lt;&lt; WGM12);
+  // Set Timer1 Compare Match register for 1 ms interrupt:
+  // OCR1A = (1ms / 4us) - 1 = 249
+  OCR1A = 249;
+  // Enable Timer1 compare interrupt
+  TIMSK1 |= (1 &lt;&lt; OCIE1A);
+  // Enable global interrupts
+  sei();
+}
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+  initTimer1();
+}
+
+void loop() {
+}
+
+// Timer1 compare match interrupt service routine
+ISR(TIMER1_COMPA_vect) {
+  ledState = !ledState;  // toggle LED state
+  digitalWrite(LED_PIN, ledState); // apply new state
+}
+</code></pre>
+<p>รีจิสเตอร์ของตัวนับที่เกี่ยวข้อง คือ <code>TCNT1</code> (<strong>Timer/Counter 1 Register</strong>)
+มีการกำหนดอัตราการนับของ <strong>Timer 1</strong> คือ <strong>16 MHz / 64 (prescaler) = 250 kHz</strong>
+หรือเกิด <strong>Timer Tick</strong> ทุก ๆ 4 us
+เริ่มนับจาก 0 เพิ่มขึ้นทีละ 1 ทุก ๆ  4 us ไปจนถึงค่าที่กำหนดไว้ในรีจิสเตอร์ <code>OCR1A</code> (ตั้งค่าไว้ 249) 
+จะเกิดเหตุการณ์ <strong>Compare Match Event</strong> แล้วกลับไปเริ่มต้นที่ 0 ใหม่
+และทำให้เกิดอินเทอร์รัพท์ ในแต่ละรอบจะใช้เวลาเท่ากับ <strong>250 x 4 usec = 1 msec</strong></p>
+<p>ชื่อฟังก์ชัน <strong>ISR</strong> ตามรูปแบบที่กำหนดไว้โดย <strong>AVR GCC lib C</strong>
+สำหรับ <strong>Compare Match Timer1</strong> คือ <code>TIMER1_COMPA_vect</code>
+ฟังก์ชันนี้ จะทำงานทุกครั้งที่เกิดเหตุการณ์ <strong>Compare Match</strong>
+และในตัวอย่างนี้ ทำหน้าที่สลับสถานะ <strong>LED</strong> ที่ขา <strong>Arduino D13</strong></p>
+<p><img alt="" src="avr_timer_1khz.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการวัดสัญญาณเอาต์พุต (มีความกว้างพัลส์เท่ากับ <strong>1 ms</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="freertos">&#9655; <strong>ตัวอย่างการเขียนโค้ดโดยใช้ FreeRTOS</strong><a class="headerlink" href="#freertos" title="Permanent link">#</a></h2>
+<p>รูปแบบการเขียนโค้ดสำหรับไมโครคอนโทรลเลอร์ที่สำคัญอีกรูปแบบหนึ่ง คือ
+การพัฒนาโปรแกรมด้วย ระบบปฏิบัติการเวลาจริง
+(<strong>RTOS</strong>: <em>Real-Time Operating System</em>)</p>
+<p>แม้ว่าชิป <strong>ATmega328P</strong> บนบอร์ด <strong>Arduino Uno / Nano</strong>
+จะมีข้อจำกัดด้านขนาดหน่วยความจำและทรัพยากรของระบบ
+แต่ก็ยังสามารถนำมาใช้เป็นสื่อการเรียนรู้เพื่อทดลองแนวคิดของ <strong>RTOS</strong> ได้
+เช่น การเขียนโปรแกรมแบบ มัลติทาสก์ การกำหนด ระดับความสำคัญของทาสก์ (<strong>Task Priority</strong>)
+รวมถึงการทำความเข้าใจกลไกการสลับบริบทการทำงาน (<strong>Context Switching</strong>)
+การสื่อสารและรอจังหวะระหว่างทาสก์ ซึ่งเป็นแนวคิดพื้นฐานที่สำคัญของการพัฒนาโปรแกรมด้วย <strong>RTOS</strong>
+โดยมีตัวเลือกอย่างเช่น <strong>FreeRTOS</strong> ซึ่งมีการใช้งานแพร่หลาย</p>
+<p>การใช้งาน <strong>RTOS</strong> บนไมโครคอนโทรลเลอร์ขนาดเล็กอย่าง <strong>AVR</strong>
+คงเหมาะสำหรับการศึกษาแนวคิดและโครงสร้างของระบบ
+มากกว่าการนำไปใช้ในงานจริงที่ต้องการประสิทธิภาพหรือความเสถียรสูง</p>
+<pre><code class="language-c++">#include &lt;Arduino_FreeRTOS.h&gt; // FreeRTOS port for Arduino AVR
+#include &lt;queue.h&gt;  // for FreeRTOS queue
+
+#define LED_PIN     13
+#define BUTTON_PIN  2   // External interrupt 0 (INT0)
+
+const TickType_t minPulse = pdMS_TO_TICKS(50);
+QueueHandle_t queue;
+volatile uint16_t blinkDelayMs = 100;
+
+/* Button Pulse ISR */
+void buttonISR() {
+  static TickType_t startTick = 0;
+  static uint8_t validClickCount = 0;
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    // FALLING edge: start of LOW pulse
+    startTick = xTaskGetTickCountFromISR();
+  } else {
+    // RISING edge: end of LOW pulse
+    if (xTaskGetTickCountFromISR() - startTick &gt;= minPulse) {
+      validClickCount++;
+      xQueueSendFromISR(queue, &amp;validClickCount, NULL);
+    }
+  }
+}
+
+void TaskBlink(void *pvParameters) {
+  (void) pvParameters;
+  uint8_t state = 0;
+  pinMode(LED_PIN, OUTPUT);
+  for (;;) {
+    digitalWrite(LED_PIN, state ^= 1);
+    vTaskDelay(pdMS_TO_TICKS(blinkDelayMs));
+  }
+}
+
+void TaskButton(void *pvParameters) {
+  (void) pvParameters;
+  uint8_t clickCount = 0;
+  for (;;) {
+    if (xQueueReceive(queue, &amp;clickCount, portMAX_DELAY) == pdPASS) {
+      blinkDelayMs = (clickCount &amp; 1) ? 500 : 100;
+      Serial.print( &quot;Button event count: &quot; );
+      Serial.println( clickCount );     
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  char sbuf[32];
+  Serial.println( F(&quot;\n\nArduino Uno + FreeRTOS Demo&quot;) );
+  snprintf( sbuf, 32, &quot;FreeRTOS v%d.%d.%d&quot;, 
+            tskKERNEL_VERSION_MAJOR, 
+            tskKERNEL_VERSION_MINOR, 
+            tskKERNEL_VERSION_BUILD );
+  Serial.println( sbuf );
+
+  snprintf( sbuf, 32, &quot;portTICK_PERIOD_MS: %d&quot;, 
+            portTICK_PERIOD_MS );
+  Serial.println( sbuf );
+
+  queue = xQueueCreate(1, sizeof(uint8_t));
+
+  attachInterrupt( digitalPinToInterrupt(BUTTON_PIN),
+    buttonISR, CHANGE /*any edge*/ );
+
+  xTaskCreate( TaskBlink /*task function*/, &quot;Blink&quot; /*task name*/,
+    128 /*stack size*/, NULL, 1 /*task priority*/, NULL );
+
+  xTaskCreate( TaskButton /*task function*/, &quot;Button&quot; /*task name*/,
+    128 /*stack Size*/, NULL, 2 /*task priority*/, NULL );
+
+  // vTaskStartScheduler();
+}
+
+void loop() {
+}
+</code></pre>
+<p>โค้ดตัวอย่างนี้สาธิตการเขียนโค้ด <strong>Arduino Uno</strong> ที่ทำงานร่วมกับ <strong>FreeRTOS</strong>
+แสดงแนวคิดสำคัญของการเขียนโปรแกรมแบบมัลติทาสก์ 
+ระบบใช้ <strong>External Interrupt (INT0)</strong> ตรวจจับการกดปุ่ม และใช้ตัวนับเวลาของ 
+<strong>FreeRTOS</strong> วัดความกว้างของพัลส์สัญญาณระดับ <strong>LOW</strong>
+เพื่อคัดกรองเฉพาะการกดที่ถูกต้อง ลดผลกระทบจากการเด้งของปุ่ม (<strong>Debouncing</strong>)
+จากนั้นฟังก์ชันที่ทำหน้าที่เป็น <strong>ISR</strong> (<em>Interrupt Service Routine</em>)
+จะส่งเหตุการณ์ไปยังทาสก์ด้วย <strong>FreeRTOS Queue</strong>
+ซึ่งเป็นวิธีที่เหมาะสมในการสื่อสารระหว่าง <strong>ISR</strong> กับทาสก์</p>
+<p>ทาสก์ <code>TaskButton</code> ทำหน้าที่รอรับเหตุการณ์จาก <strong>Queue</strong>
+แล้วใช้ในการเปลี่ยนความเร็วการกระพริบ <strong>LED</strong> ระหว่างช้ากับเร็ส
+ส่วนทาสก์ <code>TaskBlink</code> เป็นทาสก์แบบคาบเวลา ใช้ <code>vTaskDelay()</code> แทน <code>delay()</code>
+เพื่อไม่บล็อกการทำงานของทาสก์อื่น</p>
+<p><img alt="" src="avr_freertos.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการเขียน <strong>Arduino Sketch</strong>  ที่มีการใช้งานไลบรารี <strong>FreeRTOS port for AVR</strong> (v11.1.0)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_4">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>แม้ไมโครคอนโทรลเลอร์แบบ 8 บิต จะมีบทบาทลดลงในเชิงการใช้งานจริง แต่ยังคงมีคุณค่าอย่างยิ่ง
+ในฐานะแพลตฟอร์มสำหรับการเรียนรู้ โดยเฉพาะการทำความเข้าใจพื้นฐานของระบบคอมพิวเตอร์ฝังตัว และสถาปัตยกรรมซีพียู</p>
+<p>บอร์ด <strong>Arduino Uno / Nano</strong> และชิป <strong>ATmega328P</strong> สามารถทำหน้าที่เป็น "โมเดล"
+สำหรับการเรียนรู้ตั้งแต่ระดับ <strong>Arduino API</strong> ไปจนถึงระดับ <strong>Assembly</strong> ได้อย่างครบถ้วน</p>
+<p>อย่างไรก็ตาม การจัดการเรียนการสอนไม่ควรจำกัดอยู่เพียงแพลตฟอร์มเดียว
+ผู้เรียนควรมีโอกาสต่อยอดไปสู่ไมโครคอนโทรลเลอร์แบบ 32 บิตในแนวคิดเดียวกัน
+เพื่อให้สอดคล้องกับเทคโนโลยีและการใช้งานในปัจจุบันและอนาคต</p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-01-15 | Last Updated: 2026-01-17</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
