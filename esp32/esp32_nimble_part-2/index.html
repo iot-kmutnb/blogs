@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_nimble_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#esp32-ble-nimble-arduino-2" class="nav-link">การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#nimble-arduino" class="nav-link">&#9655; แนะนำ NimBLE-Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-uart-service" class="nav-link">&#9655; BLE UART Service</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#serial1-ble-esp32" class="nav-link">ข้อมูลจาก Serial1 เพื่อส่งไปยัง BLE (ESP32 เป็นผู้ส่ง)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#ble-serial1-esp32" class="nav-link">ข้อมูลจาก BLE ไปยัง Serial1 (ESP32 เป็นผู้รับ)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-chrome" class="nav-link">&#9655; การเชื่อมต่อเพื่อใช้บริการ BLE บนหน้าเว็บด้วย Chrome</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-ble-nimble-arduino-2">การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 2)<a class="headerlink" href="#esp32-ble-nimble-arduino-2" title="Permanent link">#</a></h1>
+<hr />
+<h2 id="nimble-arduino">&#9655; <strong>แนะนำ NimBLE-Arduino</strong><a class="headerlink" href="#nimble-arduino" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด Arduino สำหรับการใช้งาน
+<strong>Bluetooth LE (BLE)</strong> โดยใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32 / ESP32-S3</strong> และใช้ไลบรารี
+<a href="https://github.com/h2zero/NimBLE-Arduino"><strong>NimBLE-Arduino</strong></a></p>
+<p>&#9888; แนะนำให้ผู้อ่านได้ศึกษาและทำความเข้าใจเนื้อหาในบทความ <a href="../esp32_nimble_part-1/">"<strong>ตอนที่ 1</strong>"</a> ก่อน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-uart-service">&#9655; <strong>BLE UART Service</strong><a class="headerlink" href="#ble-uart-service" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้ สาธิตการใช้ <strong>ESP32</strong> ให้ทำหน้าที่เป็น <strong>BLE UART Bridge</strong>
+โดยใช้ไลบรารี <strong>NimBLE + FreeRTOS</strong> ในการเขียนโค้ด 
+มีการแยกการทำงานของโปรแกรม ออกเป็นสองทาสก์ (<strong>FreeRTOS Task</strong>)
+ซึ่งเชื่อมต่อหรือสื่อสารข้อมูลกันด้วย <strong>FreeRTOS Queue</strong>
+เพื่อให้การรับ–ส่งข้อมูลระหว่างวงจร <strong>BLE</strong> กับวงจร <strong>Hardware Serial</strong> ภายในชิป <strong>ESP32</strong></p>
+<p>ตัวอย่างนี้แสดงให้เห็น แนวคิดหลัก เช่น</p>
+<ul>
+<li>การใช้ <strong>Nordic UART Service (NUS)</strong> เพื่อเลียนแบบพอร์ตอนุกรมโดยใช้การสื่อสารไร้สายแบบ <strong>BLE</strong></li>
+<li>การใช้ <strong>FreeRTOS Tasks + Queues</strong> เช่น การสร้างทาสก์ใหม่ แบ่งงานออกเป็น 3 ทาสก์</li>
+<li>การจัดการรายละเอียดระดับระบบเกี่ยวกับ <strong>BLE</strong> เช่น การกำหนด <strong>BLE Service Characteristics</strong> เป็นต้น</li>
+</ul>
+<h3 id="serial1-ble-esp32"><strong>ข้อมูลจาก Serial1 เพื่อส่งไปยัง BLE (ESP32 เป็นผู้ส่ง)</strong><a class="headerlink" href="#serial1-ble-esp32" title="Permanent link">#</a></h3>
+<ol>
+<li>
+<p>เมื่อมีข้อมูลเข้าที่ขา <strong>Serial (RX)</strong> ทาสก์ <code>serialToBleTask</code> อ่านข้อมูลมาทีละไบต์
+สะสมข้อมูลลง <strong>Data Buffer</strong> ถ้าข้อมูลเต็มแล้ว หรือ พบว่าได้รับสัญลักษณ์ <code>\n</code> หรือ <code>\r</code>
+หรือ ไม่มีข้อมูลใหม่เข้ามาเกิน <strong>20 ms (timeout)</strong> ถ้าเป็นตามเงื่อนไขนี้ ให้นำข้อมูลใส่ลง <code>serialToBleQueue</code></p>
+</li>
+<li>
+<p>ทาสก์ <code>bleNotifyTask</code> จะคอยดึงข้อมูลจาก <code>serialToBleQueue</code>
+ถ้ามี <strong>BLE Client</strong> เชื่อมต่ออยู่ ก็ให้ส่งข้อมูลออกด้วยวิธี <strong>BLE Notification</strong>
+เพื่อแจ้งให้ <strong>BLE Client</strong> ทราบว่า มีข้อมูลที่ถูกส่งไป</p>
+</li>
+</ol>
+<h3 id="ble-serial1-esp32"><strong>ข้อมูลจาก BLE ไปยัง Serial1 (ESP32 เป็นผู้รับ)</strong><a class="headerlink" href="#ble-serial1-esp32" title="Permanent link">#</a></h3>
+<ol>
+<li>เมื่อ <strong>BLE Client</strong> เขียนข้อมูลเข้ามา
+ฟังก์ชัน <code>RXCallbacks::onWrite()</code> จะทำงาน และเมื่อได้ข้อมูลจาก <strong>BLE</strong>
+มาแล้ว จึงส่งข้อมูลเข้า <code>bleToSerialQueue</code></li>
+<li>ทาสก์ <code>bleToSerialTask</code> จะรอข้อมูลจาก <code>bleToSerialQueue</code> ถ้ามี ก็เขียนข้อมูลออกทาง <code>Serial1 TX</code></li>
+</ol>
+<p>&nbsp;</p>
+<pre><code class="language-c++">/*
+ * ESP32 BLE UART Bridge with FreeRTOS (Peripheral)
+ * Library: NimBLE-Arduino v2.3.6
+ * Target: ESP32 / ESP32-C3
+ */
+#include &lt;Arduino.h&gt;
+#include &lt;NimBLEDevice.h&gt;
+
+#define LED_PIN  (22)
+#define LED_ON   (LOW)
+#define LED_OFF  (HIGH)
+
+// Serial1 pins (adjust for your board)
+#define SERIAL1_RX 16  // GPIO16
+#define SERIAL1_TX 17  // GPIO17
+#define SERIAL1_BAUD 115200
+
+// UUIDs for Nordic UART Service (NUS)
+static NimBLEUUID UART_SERVICE_UUID(&quot;6E400001-B5A3-F393-E0A9-E50E24DCCA9E&quot;);
+static NimBLEUUID UART_RX_UUID(&quot;6E400002-B5A3-F393-E0A9-E50E24DCCA9E&quot;); // Write
+static NimBLEUUID UART_TX_UUID(&quot;6E400003-B5A3-F393-E0A9-E50E24DCCA9E&quot;); // Notify
+
+// BLE objects
+NimBLEServer* pServer = nullptr;
+NimBLECharacteristic* pTxCharacteristic = nullptr;
+bool deviceConnected = false;
+
+// FreeRTOS queues for data transfer
+QueueHandle_t bleToSerialQueue;
+QueueHandle_t serialToBleQueue;
+
+// Queue item structure
+struct QueueData {
+  uint8_t data[244];
+  size_t length;
+};
+
+// Task handles
+TaskHandle_t serialToBleTaskHandle = NULL;
+TaskHandle_t bleToSerialTaskHandle = NULL;
+
+class ServerCallbacks : public NimBLEServerCallbacks {
+  void onConnect(NimBLEServer* pServer, NimBLEConnInfo&amp; connInfo) {
+    deviceConnected = true;
+    Serial.println(&quot;BLE: Client connected&quot;);
+    digitalWrite(LED_PIN, LED_ON);
+  }
+
+  void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo&amp; connInfo, int reason) {
+    deviceConnected = false;
+    Serial.println(&quot;BLE: Client disconnected&quot;);
+    digitalWrite(LED_PIN, LED_OFF);
+    NimBLEDevice::startAdvertising(); // Restart advertising
+  }
+};
+
+class RXCallbacks : public NimBLECharacteristicCallbacks {
+  void onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo&amp; connInfo) {
+    std::string rxData = pCharacteristic-&gt;getValue();
+    if (rxData.length() &gt; 0 &amp;&amp; rxData.length() &lt;= 244) {
+      // Send to BLE→Serial queue
+      QueueData queueItem;
+      queueItem.length = rxData.length();
+      memcpy(queueItem.data, rxData.data(), queueItem.length);
+
+      if (xQueueSend(bleToSerialQueue, &amp;queueItem, 0) == pdTRUE) {
+        Serial.printf(&quot;BLE→Queue: %d bytes\n&quot;, queueItem.length);
+      } else {
+        Serial.println(&quot;BLE→Queue: FULL!&quot;);
+      }
+    }
+  }
+};
+
+// Task: BLE -&gt; Serial1
+void bleToSerialTask(void* parameter) {
+  QueueData queueItem;
+  Serial.println( &quot;Task: BLE -&gt; Serial1 started&quot; );
+  while (true) {
+    // Wait for data from BLE
+    if (xQueueReceive(bleToSerialQueue, &amp;queueItem, portMAX_DELAY) == pdTRUE) {
+      // Write to Serial1
+      Serial1.write( queueItem.data, queueItem.length );
+      Serial.printf( &quot;Queue -&gt; Serial1: %d bytes\n&quot;, queueItem.length );
+    }
+  }
+}
+
+// Task: Serial1 -&gt; BLE
+void serialToBleTask( void* parameter ) {
+  QueueData queueItem;
+  queueItem.length = 0;
+  unsigned long lastRxTime = 0;
+  Serial.println(&quot;Task: Serial1 -&gt; BLE started&quot;);
+
+  while (true) {
+    // Read from Serial1 into buffer
+    while (Serial1.available() &amp;&amp; queueItem.length &lt; 244) {
+      queueItem.data[queueItem.length++] = Serial1.read();
+      lastRxTime = millis();
+    }
+    // Send conditions: buffer full, newline, or timeout
+    bool shouldSend = false;
+    if (queueItem.length &gt;= 244) {
+      shouldSend = true;
+    } else if (queueItem.length &gt; 0) {
+      // Check for newline
+      if (queueItem.data[queueItem.length - 1] == '\n' || 
+          queueItem.data[queueItem.length - 1] == '\r') {
+        shouldSend = true;
+      }
+      // Timeout (20ms since last byte)
+      else if (millis() - lastRxTime &gt; 20) {
+        shouldSend = true;
+      }
+    }
+    // Send to BLE if connected and ready
+    if (shouldSend &amp;&amp; deviceConnected &amp;&amp; queueItem.length &gt; 0) {
+      if (xQueueSend(serialToBleQueue, &amp;queueItem, 0) == pdTRUE) {
+        Serial.printf( &quot;Serial1 -&gt; Queue: %d bytes\n&quot;, queueItem.length );
+        queueItem.length = 0; // Reset buffer
+      } else {
+        Serial.println( &quot;Serial1 -&gt; Queue: FULL!&quot; );
+      }
+    }
+    vTaskDelay(1 / portTICK_PERIOD_MS); // 1ms delay
+  }
+}
+
+// Task: Process Serial1 -&gt; BLE queue and send notifications
+void bleNotifyTask(void* parameter) {
+  QueueData queueItem;
+  Serial.println(&quot;Task: BLE Notify started&quot;);
+  while (true) {
+    if (xQueueReceive(serialToBleQueue, &amp;queueItem, portMAX_DELAY) == pdTRUE) {
+      if (deviceConnected &amp;&amp; queueItem.length &gt; 0) {
+        pTxCharacteristic-&gt;setValue(queueItem.data, queueItem.length);
+        pTxCharacteristic-&gt;notify();
+        Serial.printf(&quot;Queue -&gt; BLE: %d bytes\n&quot;, queueItem.length);
+      }
+    }
+  }
+}
+
+void initBLE() {
+  NimBLEDevice::init(&quot;ESP32-BLE-UART&quot;);
+  NimBLEDevice::setMTU(247); // Max payload size
+  NimBLEDevice::setPower(ESP_PWR_LVL_P9); // Max TX power (+9dBm)
+
+  pServer = NimBLEDevice::createServer();
+  pServer-&gt;setCallbacks(new ServerCallbacks());
+
+  NimBLEService* uartService = pServer-&gt;createService(UART_SERVICE_UUID);
+
+  // TX Characteristic (ESP32 -&gt; BLE Client) - Notify
+  pTxCharacteristic = uartService-&gt;createCharacteristic(
+      UART_TX_UUID, 
+      NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY
+  );
+
+  // Add 2902 descriptor for notifications (required for notify)
+  pTxCharacteristic-&gt;createDescriptor(&quot;2902&quot;);
+
+  // RX Characteristic (BLE Client -&gt; ESP32) - Write
+  NimBLECharacteristic* pRxCharacteristic = uartService-&gt;createCharacteristic(
+      UART_RX_UUID,
+      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR
+  );
+  pRxCharacteristic-&gt;setCallbacks(new RXCallbacks());
+
+  // Start BLE UART Service
+  uartService-&gt;start();
+
+  // Configure advertising - CRITICAL for Web Bluetooth
+  NimBLEAdvertising* pAdvertising = NimBLEDevice::getAdvertising();
+
+  // Set advertising data with service UUID (required for Web Bluetooth filters)
+  NimBLEAdvertisementData advData;
+  advData.setFlags(0x06); // BR/EDR not supported, LE General Discoverable
+  advData.setCompleteServices(UART_SERVICE_UUID); // MUST advertise service UUID
+  advData.setName(&quot;ESP32-BLE-UART&quot;);
+  pAdvertising-&gt;setAdvertisementData(advData);
+
+  // Set scan response data
+  NimBLEAdvertisementData scanData;
+  scanData.setName(&quot;ESP32-BLE-UART&quot;);
+  pAdvertising-&gt;setScanResponseData(scanData);
+
+  // Set intervals
+  pAdvertising-&gt;setMinInterval(0x20); // 32 * 0.625ms = 20ms
+  pAdvertising-&gt;setMaxInterval(0x40); // 64 * 0.625ms = 40ms
+
+  // Start BLE Advertising
+  NimBLEDevice::startAdvertising();
+
+  Serial.println(&quot;BLE: Advertising with UART service UUID&quot;);
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(100);
+  Serial.println(&quot;\nESP32 BLE-UART Bridge (FreeRTOS)&quot;);
+
+  // Hardware serial for bridging
+  Serial1.begin( SERIAL1_BAUD, SERIAL_8N1, SERIAL1_RX, SERIAL1_TX );
+  Serial.printf( &quot;Serial1: RX=%d, TX=%d, Baud=%d\n&quot;, 
+                 SERIAL1_RX, SERIAL1_TX, SERIAL1_BAUD );
+
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LED_OFF);
+
+  // Create FreeRTOS queues
+  bleToSerialQueue = xQueueCreate(10, sizeof(QueueData));
+  serialToBleQueue = xQueueCreate(10, sizeof(QueueData));
+
+  if (bleToSerialQueue == NULL || serialToBleQueue == NULL) {
+    Serial.println(&quot;ERROR: Failed to create queues!&quot;);
+    while (1) delay(1000);
+  }
+
+  initBLE();
+  Serial.println( &quot;BLE: Advertising started..&quot; );
+
+  // Create FreeRTOS tasks
+  // Task: From BLE to Serial1 (Core 0, lower priority)
+  xTaskCreatePinnedToCore(
+    bleToSerialTask,
+    &quot;BLE-to-Serial&quot;,
+    4096,  // Stack size
+    NULL,  // Task Parameters
+    1,     // Task Priority
+    &amp;bleToSerialTaskHandle,
+    0      // CPU Core 0
+  );
+
+  // Task: From Serial1 to BLE (Core 1, higher priority)
+  xTaskCreatePinnedToCore(
+    serialToBleTask,
+    &quot;Serial-to-BLE&quot;,
+    4096,  // Stack size
+    NULL,  // Task parameters
+    2,     // Task priority
+    &amp;serialToBleTaskHandle,
+    1      // CPU Core 1
+  );
+
+  // BLE notify task (Core 0)
+  xTaskCreatePinnedToCore(
+    bleNotifyTask,
+    &quot;BLE-Notify&quot;,
+    4096,  // Stack size
+    NULL,  // Task parameters
+    1,     // Task priority
+    NULL,
+    0      // CPU  Core 0
+  );
+
+  Serial.println(&quot;FreeRTOS tasks created...&quot;);
+}
+
+void loop() {
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-chrome">&#9655; <strong>การเชื่อมต่อเพื่อใช้บริการ BLE บนหน้าเว็บด้วย Chrome</strong><a class="headerlink" href="#ble-chrome" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>HTML + JavaScript</strong> สาธิตการทำงานของ <strong>Web Bluetooth Application</strong> ในเบื้องต้น
+ใช้สำหรับทดสอบและสาธิตการสื่อสาร <strong>BLE</strong> ระหว่างเว็บเบราว์เซอร์ <strong>Google Chrome</strong> กับบอร์ด <strong>ESP32</strong>
+ซึ่งทำหน้าที่เป็น <strong>BLE UART Server</strong></p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;ESP32 BLE UART&lt;/title&gt;
+&lt;style&gt;
+  body { font-family: 'Segoe UI', sans-serif; padding: 20px;
+         max-width: 600px; margin: auto; background: #f9f9f9; }
+  h2 { text-align: center; }
+  #log { width: 100%; height: 300px; overflow-y: auto;
+         border: 1px solid #ccc; padding: 8px; background: #fff;
+         white-space: pre-wrap; }
+  #controls { display: flex; gap: 5px; margin-bottom: 10px; }
+  #sendLine { flex: 1; padding: 6px; }
+  button { padding: 6px 12px; cursor: pointer; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;ESP32 BLE UART&lt;/h2&gt;
+
+&lt;div id=&quot;controls&quot;&gt;
+  &lt;button id=&quot;btnConnect&quot;&gt;Connect&lt;/button&gt;
+  &lt;input type=&quot;text&quot; id=&quot;sendLine&quot; placeholder=&quot;Type message...&quot; /&gt;
+  &lt;button id=&quot;btnSend&quot;&gt;Send&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div id=&quot;log&quot;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+let device, txChar, rxChar;
+
+const UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+const UART_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+const log = msg =&gt; {
+  const logDiv = document.getElementById('log');
+  logDiv.textContent += msg + '\n';
+  logDiv.scrollTop = logDiv.scrollHeight;
+};
+
+const connectDevice = async () =&gt; {
+  try {
+    log('Requesting BLE device...');
+    device = await navigator.bluetooth.requestDevice({
+         filters: [{ services: [UART_SERVICE] }]
+    });
+    device.addEventListener('gattserverdisconnected', () =&gt; {
+      log('Device disconnected');
+      device = txChar = rxChar = null;
+      document.getElementById('btnConnect').textContent = 'Connect';
+    });
+
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(UART_SERVICE);
+
+    txChar = await service.getCharacteristic(UART_TX);
+    rxChar = await service.getCharacteristic(UART_RX);
+
+    await txChar.startNotifications();
+    txChar.addEventListener('characteristicvaluechanged', e =&gt; {
+      log('RX: ' + new TextDecoder().decode(e.target.value));
+    });
+
+    log('Connected!');
+    document.getElementById('btnConnect').textContent = 'Disconnect';
+  } catch (err) {
+    log('Error: ' + err);
+  }
+};
+
+document.getElementById('btnConnect').onclick = () =&gt; {
+  if (!device) connectDevice();
+  else device.gatt.disconnect();
+};
+
+document.getElementById('btnSend').onclick = async () =&gt; {
+  const input = document.getElementById('sendLine');
+  const text = input.value.trim();
+  if (rxChar &amp;&amp; text) {
+    await rxChar.writeValue(new TextEncoder().encode(text + '\n'));
+    log('TX: ' + text);
+    input.value = '';
+  }
+};
+
+// Optional: send on Enter key
+document.getElementById('sendLine').addEventListener('keydown', e =&gt; {
+  if (e.key === 'Enter') document.getElementById('btnSend').click();
+});
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><img alt="" src="ble_uart-1.jpg" />
+<img alt="" src="ble_uart-2.jpg" /></p>
+<p><strong>รูป:</strong> การเชื่อมต่อกับอุปกรณ์ <strong>ESP32</strong> ด้วยเบราว์เซอร์ <strong>Chrome</strong> โดยเปิดใช้งาน <strong>Web Bluetooth</strong> </p>
+<p><img alt="" src="ble_uart-3.jpg" /></p>
+<p><strong>รูป:</strong> การทดสอบพิมพ์ข้อความจาก <strong>Chrome</strong> เพื่อส่งไปยังบอร์ด <strong>ESP32</strong> 
+โดยใช้บริการ <strong>BLE-UART</strong></p>
+<p>เมื่อบอร์ด <strong>ESP32</strong> ได้รับข้อความ ก็จะส่งข้อความที่ได้รับนั้นกลับมา ดังนั้นจึงเป็นการทดสอบรับส่งข้อมูลในลักษณะที่เรียกว่า <strong>Serial Loopback</strong>
+(ให้สายไฟ <strong>Jumper Wire</strong> เชื่อมต่อขา <strong>Tx/GPIO-17</strong> กับ <strong>Rx/GPIO-16</strong> ของบอร์ด <strong>ESP32</strong>)</p>
+<p>ตัวอย่างการนำไปประยุกต์ใช้งาน เช่น การเชื่อมต่อบอร์ด <strong>ESP32</strong> กับอุปกรณ์อื่นที่สื่อสารข้อมูลด้วย
+<strong>Serial / UART (3.3V logic level)</strong> และควบคุมหรือรับส่งข้อมูลผ่าน
+<strong>Web App</strong> บน <strong>Chrome (Web Bluetooth)</strong> ได้</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้แนะนำการใช้งาน <strong>BLE (Bluetooth Low Energy)</strong> บนบอร์ด <strong>ESP32 / ESP32-S3 / ESP32-C3</strong>
+ผ่านไลบรารี <strong>NimBLE-Arduino</strong> โดยใช้ตัวอย่างโค้ดสาธิตการทำงานในรูปแบบ <strong>BLE-UART Bridge</strong>
+มีการสร้างทาสก์ด้วย <strong>FreeRTOS</strong> แบ่งงานย่อย และให้ทำงานร่วมกัน เพื่อสื่อสารข้อมูลกับ <strong>BLE Client</strong> ทำให้สามารถรับส่งข้อมูลระหว่าง <strong>BLE</strong> กับ <strong>Hardware Serial</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../esp32_ble_intro/">ตัวอย่างการเขียนโปรแกรมด้วย Arduino สำหรับใช้งาน <strong>ESP32 - Bluetooth LE</strong></a></li>
+<li><a href="../../zephyr/zephyr_cli_west/">แนะนำการใช้งาน <strong>Zephyr RTOS</strong> แบบ <strong>CLI</strong>: ทดลองใช้งาน <strong>Micro:bit v2 BLE</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2026-01-21 | Last Updated: 2026-01-21</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

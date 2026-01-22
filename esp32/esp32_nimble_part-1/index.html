@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_nimble_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#esp32-ble-nimble-arduino-1" class="nav-link">การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#nimble-arduino" class="nav-link">&#9655; แนะนำ NimBLE-Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-scanner" class="nav-link">&#9655; ตัวอย่างโค้ด: BLE Scanner</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#_1" class="nav-link">แนวคิดหลักของโค้ดตัวอย่าง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#nimble" class="nav-link">ฟังก์ชันสำคัญของ NimBLE ที่ใช้ในโค้ดตัวอย่าง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#callback" class="nav-link">การทำงานฟังก์ชัน Callback ที่เกี่ยวข้อง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-server-button-led-service" class="nav-link">&#9655; ตัวอย่างโค้ด: BLE Server + Button &amp; LED Service</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#_2" class="nav-link">ภาพรวมการทำงานของโค้ดตัวอย่าง</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#_3" class="nav-link">ฟังก์ชันสำคัญที่ใช้ในโค้ด</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#nrf-connect-for-mobile" class="nav-link">&#9655; การทดลองด้วยแอป nRF Connect for Mobile</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-chrome" class="nav-link">&#9655; การเชื่อมต่อเพื่อใช้บริการ BLE บนหน้าเว็บด้วย Chrome</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#_4" class="nav-link">วัตถุประสงค์ของการทดสอบ</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#_5" class="nav-link">ลำดับการทำงานของโค้ดตัวอย่างโดยสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_6" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-ble-nimble-arduino-1">การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 1)<a class="headerlink" href="#esp32-ble-nimble-arduino-1" title="Permanent link">#</a></h1>
+<ul>
+<li><a href="#nimble-arduino"><strong>แนะนำ NimBLE-Arduino</strong></a></li>
+<li><a href="#ble-scanner"><strong>ตัวอย่างโค้ด: BLE Scanner</strong></a></li>
+<li><a href="#ble-server-button-led-service"><strong>ตัวอย่างโค้ด: BLE Server + Button &amp; LED Service</strong></a></li>
+<li><a href="#nrf-connect-for-mobile"><strong>การทดลองด้วยแอป nRF Connect for Mobile</strong></a></li>
+<li><a href="#ble-chrome"><strong>การเชื่อมต่อเพื่อใช้บริการ BLE บนหน้าเว็บด้วย Chrome</strong></a></li>
+</ul>
+<hr />
+<h2 id="nimble-arduino">&#9655; <strong>แนะนำ NimBLE-Arduino</strong><a class="headerlink" href="#nimble-arduino" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการใช้งานไลบรารี <a href="https://github.com/h2zero/NimBLE-Arduino"><strong>NimBLE-Arduino</strong></a> สำหรับสื่อสารข้อมูลแบบไร้สายผ่าน <strong>Bluetooth Low Energy (BLE)</strong>
+โดยใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32 / ESP32-C3</strong></p>
+<p>ในการเขียนโปรแกรมสำหรับชิป <strong>Espressif SoC</strong> เช่น <strong>ESP32 / ESP32-S3</strong>
+เพื่อความสะดวก มักนิยมใช้ <a href="https://github.com/espressif/arduino-esp32"><strong>Arduino-ESP32 Core (C/C++) v3.3.x</strong></a>
+แทนการเขียนด้วย <a href="https://github.com/espressif/esp-idf"><strong>Espressif ESP-IDF SDK v5.5.x</strong></a> โดยตรง
+สำหรับงานด้าน <strong>BLE</strong> ทางบริษัท <strong>Espressif</strong> ได้พัฒนาไลบรารี <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/BLE/"><strong>ESP32-BLE</strong></a> มาให้ใช้งานอยู่แล้ว
+&rarr; ดูบทความที่เกี่ยวข้อง: <a href="../esp32_ble_intro/">"ตัวอย่างการเขียนโปรแกรมด้วย <strong>Arduino</strong> สำหรับใช้งาน <strong>ESP32 - Bluetooth LE</strong>"</a></p>
+<p>อย่างไรก็ตาม อีกทางเลือกหนึ่งที่น่าสนใจคือการใช้ <strong>NimBLE-Arduino</strong> ซึ่งมีขนาดเล็กกว่า ประสิทธิภาพสูงกว่า
+และรองรับทั้งอุปกรณ์ตระกูล <strong>Espressif ESP32</strong> และ <strong>Nordic Semiconductor nRF5x</strong>
+และหากใช้ <strong>Arduino IDE</strong> ก็จะต้องมีการติดตั้งไลบรารีใดังกล่าว ก่อนใช้งาน</p>
+<p><img alt="" src="arduino_nimble_lib.jpg" /></p>
+<p><strong>รูป:</strong> การค้นหาและติดตั้งไลบรารี <strong>NimBLE-Arduino</strong> สำหรับ <strong>Arduino IDE</strong></p>
+<p>ตัวอย่างการใช้งาน <strong>BLE</strong> ด้วย <strong>NimBLE-Arduino</strong></p>
+<ul>
+<li>การสแกนอุปกรณ์ (<strong>BLE Device Scanning</strong>): ตรวจสอบว่าในบริเวณรอบ ๆ มีอุปกรณ์ <strong>BLE</strong> ใด เปิดใช้งานอยู่ และประกาศบริการ (<strong>Advertising</strong>) อะไรบ้าง  </li>
+<li>การทำงานในโหมด <strong>Peripheral (Server)</strong>: ทำหน้าที่เป็นอุปกรณ์ให้บริการ เพื่อให้ <strong>BLE Central</strong> เข้ามาเชื่อมต่อและใช้งาน  </li>
+<li>การทำงานในโหมด <strong>Central (Client)</strong>: เชื่อมต่อไปยังอุปกรณ์ <strong>BLE Peripheral</strong> เพื่อเข้าถึงบริการที่ประกาศไว้</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-scanner">&#9655; <strong>ตัวอย่างโค้ด: BLE Scanner</strong><a class="headerlink" href="#ble-scanner" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้แสดงการใช้งาน <strong>NimBLE-Arduino</strong> สำหรับสแกนอุปกรณ์ <strong>BLE</strong> รอบ ๆ ตัวบอร์ด<br />
+รองรับบอร์ด <strong>ESP32 / ESP32-S3 / ESP32-C3</strong> และทดสอบบน <strong>Arduino ESP32 Core</strong></p>
+<pre><code class="language-c++">/*
+ * Arduino ESP32 Core v3.3.3
+ * BLE scanner using NimBLE-Arduino v2.3.6
+ * Target: ESP32 / ESP32-C3
+ * Library: https://github.com/h2zero/NimBLE-Arduino
+ */
+
+#include &lt;Arduino.h&gt;
+#include &lt;NimBLEDevice.h&gt;
+
+#define LED_ON    (LOW)
+#define LED_OFF   (!LED_ON)
+#define LED_PIN   (22) // GPIO-22
+
+static constexpr uint32_t SCAN_TIME_MS = 5 * 1000; // 5 seconds scan time (ms)
+
+volatile boolean scanning = false;
+
+// Scan callback class (uses NimBLEScanCallbacks API)
+class ScanCallbacks : public NimBLEScanCallbacks {
+    /** Called when a device is initially discovered (advertisement packet). */
+    void onDiscovered( const NimBLEAdvertisedDevice* advertisedDevice ) override {
+        digitalWrite( LED_PIN, LED_ON );
+        delay(10);
+        digitalWrite( LED_PIN, LED_OFF );
+    }
+
+    /**
+     * Called when a scan result is available. If active scanning is enabled
+     * this contains scan response data as well.
+     */
+    void onResult(const NimBLEAdvertisedDevice* advertisedDevice) override {
+        // Optional: Blink LED when device is seen
+        // Print MAC address
+        Serial.printf( &quot;Device MAC: %s\n&quot;, 
+                       advertisedDevice-&gt;getAddress().toString().c_str() );
+        // Print device name if present
+        if (advertisedDevice-&gt;haveName()) {
+            Serial.printf( &quot;Device Name: '%s', &quot;, 
+                           advertisedDevice-&gt;getName().c_str() );
+        }
+        // Print if device is connectable
+        if (advertisedDevice-&gt;isConnectable()) {
+            Serial.printf( &quot;Connectable, &quot; );
+        } 
+        // Print TX power if advertised
+        if (advertisedDevice-&gt;haveTXPower()) {
+            Serial.printf( &quot;TX Power: %d dBm, &quot;, 
+                           advertisedDevice-&gt;getTXPower() );
+        } 
+        Serial.printf( &quot;RSSI: %d dBm\n&quot;, advertisedDevice-&gt;getRSSI() );
+        Serial.printf( &quot;--------------------------------------------------\n&quot; );
+    }
+
+    /**
+     * Called when the scan ends. The example restarts scanning here.
+     * 'reason' is implementation-dependent; we print it for debugging.
+     */
+    void onScanEnd(const NimBLEScanResults&amp; results, int reason) override {
+        // results.getCount() should be 0 (no scan result stored)
+        printf(&quot;BLE Scan ended.&quot;);
+        scanning = false;
+    }
+
+} scanCallbacks;
+
+void setup() {
+    // Initialize Serial
+    Serial.begin(115200);
+    Serial.flush();
+
+    // Setup LED pin
+    pinMode( LED_PIN, OUTPUT );
+    digitalWrite( LED_PIN, LED_OFF );
+
+    Serial.println( &quot;\n\nNimBLE continuous scanner...&quot; );
+
+    // Initialize NimBLE stack (empty name for scanner-only)
+    NimBLEDevice::init(&quot;&quot;);
+
+    // Acquire scan object
+    NimBLEScan* pBLEScan = NimBLEDevice::getScan();
+
+    // Set callback
+    pBLEScan-&gt;setScanCallbacks( &amp;scanCallbacks, false /*filter duplicates*/ );
+
+    // Scan every 60 ms (interval = 60 / 0.625 = 96 units)
+    pBLEScan-&gt;setInterval( 96 );
+
+    // Scan duration within that interval: 30 ms 
+    // (window = 30 / 0.625 = 48 units)
+    pBLEScan-&gt;setWindow( 48 );
+
+    // Active scan requests scan response packets 
+    // (more info, but uses more airtime)
+    pBLEScan-&gt;setActiveScan( true );
+
+    // Do not store results inside NimBLEScan; rely on callbacks instead.
+    // setMaxResults(0) means unlimited / don't stash results internally.
+    pBLEScan-&gt;setMaxResults( 0 );
+
+    // Start scanning (duration in ms, continue=false, restart=true)
+    pBLEScan-&gt;start( SCAN_TIME_MS /*scan duration*/, 
+                     false /*continue*/, true /*restart*/ );
+    scanning = true;
+    Serial.println( &quot;Scanning started...&quot; );
+}
+
+void loop() {
+    // Monitor scanning state and optionally restart if it stopped.
+    NimBLEScan* pScan = NimBLEDevice::getScan();
+    if (!pScan-&gt;isScanning()) {
+        Serial.println( &quot;Scan stopped-restarting in 5 seconds...&quot; );
+        delay(5000);
+        pScan-&gt;start( SCAN_TIME_MS, false, true );
+        scanning = true;
+    }
+    delay(100);
+}
+</code></pre>
+<h3 id="_1">แนวคิดหลักของโค้ดตัวอย่าง<a class="headerlink" href="#_1" title="Permanent link">#</a></h3>
+<ul>
+<li>ใช้คลาส <code>NimBLEDevice</code> เพื่อเริ่มต้นระบบ <strong>BLE Stack</strong> </li>
+<li>ใช้คลาส <code>NimBLEScan</code> สำหรับจัดการการสแกนอุปกรณ์ <strong>BLE</strong></li>
+<li>สร้างและใช้คลาสย่อย <code>ScanCallbacks</code> เพื่อรับเหตุการณ์ต่าง ๆ ขณะสแกน และมีฟังก์ชันที่เกี่ยวข้อง เช่น<ul>
+<li>พบอุปกรณ์ (<code>onDiscovered</code>)  </li>
+<li>ได้ผลลัพธ์การสแกน (<code>onResult</code>)  </li>
+<li>การสแกนสิ้นสุดลง (<code>onScanEnd</code>)  </li>
+</ul>
+</li>
+<li>ใช้ <strong>LED</strong> ที่ขา <strong>GPIO-22</strong> กระพริบสั้น ๆ เพื่อแสดงว่าพบอุปกรณ์ <strong>BLE</strong> ใหม่  </li>
+<li>ใช้ <strong>Callback-based Scanning</strong> (ไม่บันทึกผลลัพธ์ไว้ภายใน) เพื่อประหยัดหน่วยความจำ  </li>
+</ul>
+<h3 id="nimble">ฟังก์ชันสำคัญของ <strong>NimBLE</strong> ที่ใช้ในโค้ดตัวอย่าง<a class="headerlink" href="#nimble" title="Permanent link">#</a></h3>
+<ul>
+<li><code>NimBLEDevice::init("")</code> ใช้เริ่มต้น <strong>BLE Stack</strong> และใส่ชื่ออุปกรณ์ได้ (กรณีทำหน้าที่เป็น <strong>Peripheral</strong>)</li>
+<li><code>NimBLEDevice::getScan()</code> คืนค่าพอยน์เตอร์ (<strong>Pointer</strong>) ไปยังอ็อบเจ็กต์ <code>NimBLEScan</code>
+เพื่อควบคุมการสแกน <strong>BLE</strong> แล้วอ้างอิงโดยตัวแปร <code>pBLEScan</code></li>
+<li><code>pBLEScan-&gt;setScanCallbacks(&amp;scanCallbacks, false)</code> เชื่อมต่อคลาส <strong>Callback</strong> (<code>ScanCallbacks</code>) เพื่อรับเหตุการณ์ระหว่างสแกน  ไม่กรองอุปกรณ์ซ้ำ</li>
+<li><code>pBLEScan-&gt;setInterval(96)</code> ตั้งค่าช่วงเวลา <strong>Scan Interval</strong> (หน่วย 0.625 ms) ค่า 96 = 60 ms (รอบสแกนต่อเนื่องทุก 60 มิลลิวินาที)</li>
+<li><code>pBLEScan-&gt;setWindow(48)</code> ตั้งค่าช่วงเวลาที่สแกนในแต่ละรอบ (หน่วย 0.625 ms)  ค่า 48 = 30 ms (สแกนจริง 30 ms จากทุก ๆ 60 ms ของรอบ)</li>
+<li><code>pBLEScan-&gt;setActiveScan(true)</code> เปิดโหมด <strong>Active Scan</strong> เพื่อร้องขอข้อมูลเพิ่มเติมจากอุปกรณ์ที่พบ (ได้ข้อมูลมากขึ้น เช่น ชื่ออุปกรณ์ แต่ใช้พลังงานมากขึ้น)</li>
+<li><code>pBLEScan-&gt;setMaxResults(0)</code> ไม่จำกัดจำนวนผลลัพธ์ ไม่เก็บผลลัพธ์ไว้ในหน่วยความจำภายใน</li>
+<li><code>pBLEScan-&gt;start(SCAN_TIME_MS, false, true)</code> เริ่มการสแกน <strong>BLE</strong> โดยมีพารามิเตอร์:  <ul>
+<li><code>SCAN_TIME_MS</code> ระยะเวลาสแกน (5 วินาที)  </li>
+<li><code>false</code>ไม่ให้ต่อเนื่องอัตโนมัติ  </li>
+<li><code>true</code> ให้รีสตาร์ทสแกนใหม่เมื่อสิ้นสุด  </li>
+</ul>
+</li>
+</ul>
+<h3 id="callback">การทำงานฟังก์ชัน <strong>Callback</strong> ที่เกี่ยวข้อง<a class="headerlink" href="#callback" title="Permanent link">#</a></h3>
+<ul>
+<li><code>onDiscovered(const NimBLEAdvertisedDevice* advertisedDevice)</code> ถูกเรียกเมื่อพบอุปกรณ์ <strong>BLE</strong> ครั้งแรก</li>
+<li><code>onResult(const NimBLEAdvertisedDevice* advertisedDevice)</code> ถูกเรียกเมื่อได้ผลลัพธ์การสแกน (รวม <strong>Scan Response</strong> ถ้ามี) เช่น แสดงข้อมูลอุปกรณ์ เช่น <strong>MAC Address</strong>, <strong>RSSI</strong>, <strong>TX Power</strong> และความสามารถในการเชื่อมต่อได้</li>
+<li><code>onScanEnd(const NimBLEScanResults&amp; results, int reason)</code> ถูกเรียกเมื่อการสแกนสิ้นสุดลง ใช้ตรวจสอบสถานะและเริ่มการสแกนใหม่</li>
+</ul>
+<p>ดูเอกสาร <a href="https://h2zero.github.io/NimBLE-Arduino/index.html"><strong>Online Doc / NimBLE-Arduino API</strong></a> เพื่อศึกษารายละเอียดการใช้คำสั่ง</p>
+<p><img alt="" src="esp32_ble_scan.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างข้อความเอาต์พุตที่ได้จากบอร์ด <strong>ESP32</strong> เมื่อทดลองด้วยโค้ดตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-server-button-led-service">&#9655; <strong>ตัวอย่างโค้ด: BLE Server + Button &amp; LED Service</strong><a class="headerlink" href="#ble-server-button-led-service" title="Permanent link">#</a></h2>
+<p>โค้ดนี้เป็นตัวอย่างการสร้าง <strong>BLE Server</strong> บนบอร์ด <strong>ESP32</strong> โดยใช้ไลบรารี <strong>NimBLE-Arduino</strong>
+ทำหน้าที่รับคำสั่งจาก <strong>BLE Client</strong> เพื่อควบคุมแอลอีดี (<strong>LED</strong>) และส่งสถานะของปุ่ม (<strong>Button</strong>)
+กลับไปยัง <strong>BLE Client</strong> แบบ <strong>Notify</strong></p>
+<p>เมื่อรันโค้ดตัวอย่างนี้ จะทำให้บอร์ด <strong>ESP32</strong> จะเริ่มโฆษณาการบริการ (<strong>BLE Services</strong>)
+ภายใต้ชื่อ <code>"ESP32-BLE-IO"</code> และทำให้ซอฟต์แวร์ที่ทำหน้าที่เป็น <strong>BLE Client</strong>
+เช่น ซอฟต์แวร์ <strong>nRF Connect</strong> หรือ <strong>LightBlue</strong> จะเห็นอุปกรณ์นี้ ซึ่งมีสองบริการ ดังนี้</p>
+<ul>
+<li><strong>LED Service</strong>: ถ้าส่งข้อความ <code>"ON"</code> หรือ <code>"OFF"</code> ก็สามารถควบคุมสถานะของ <strong>LED</strong> ได้</li>
+<li><strong>Button Service</strong>: สามารถอ่านค่าของปุ่มกด หรือรับการแจ้งเตือน (<strong>Notify</strong>) เมื่อปุ่มถูกกดหรือปล่อย  </li>
+</ul>
+<pre><code class="language-c++">#include &lt;Arduino.h&gt;
+#include &lt;NimBLEDevice.h&gt;
+
+// LED and Button pin definitions
+#define LED_ON     (LOW)     // LED is active-low: writing LOW turns it on
+#define LED_OFF    (!LED_ON)
+#define LED_PIN    (22)      // Onboard LED pin
+#define BUTTON_PIN (14)      // Push button pin (active-low)
+
+// BLE Server and Characteristics pointers
+NimBLEServer* pServer = nullptr;
+NimBLECharacteristic* pLedCharacteristic = nullptr;
+NimBLECharacteristic* pButtonCharacteristic = nullptr;
+
+// Global state variables
+bool deviceConnected = false; // Tracks if a BLE client is connected
+bool lastButtonState = HIGH;  // Tracks the button state for change detection
+
+/* UUID definitions for BLE services and characteristics */
+#define SERVICE_LED_UUID &quot;19b10010-e8f2-537e-4f6c-d104768a1214&quot;
+#define CHARACTERISTIC_LED_UUID &quot;19b10011-e8f2-537e-4f6c-d104768a1214&quot;
+#define SERVICE_BUTTON_UUID &quot;19b10020-e8f2-537e-4f6c-d104768a1214&quot;
+#define CHARACTERISTIC_BUTTON_UUID &quot;19b10021-e8f2-537e-4f6c-d104768a1214&quot;
+
+// BLE Server callback class
+class ServerCallbacks : public NimBLEServerCallbacks {
+  void onConnect( NimBLEServer* pServer, 
+                  NimBLEConnInfo&amp; connInfo ) override {
+    deviceConnected = true;
+    Serial.printf( &quot;Client connected: %s\n&quot;, 
+                    connInfo.getAddress().toString().c_str() );
+
+    // Optional: adjust connection parameters 
+    // (min interval, max interval, latency, timeout)
+    // Min. connection interval = 24 × 1.25 ms = 30 ms.
+    // Max. connection interval = 48 × 1.25 ms = 60 ms.
+    // Connection timeout = 180 × 10 ms = 1800 ms (1.8 s).
+    pServer-&gt;updateConnParams( connInfo.getConnHandle(), 24, 48, 0, 180 );
+  }
+
+  void onDisconnect( NimBLEServer* pServer, 
+                     NimBLEConnInfo&amp; connInfo, int reason ) override {
+    deviceConnected = false;
+    Serial.printf( &quot;Client disconnected (%d), restarting advertising.\n&quot;, reason );
+
+    // Restart advertising so new clients can connect
+    NimBLEDevice::startAdvertising();
+  }
+};
+
+// LED characteristic write callback class
+class LedCharacteristicCallbacks : public NimBLECharacteristicCallbacks {
+  void onWrite( NimBLECharacteristic* pCharacteristic, 
+                NimBLEConnInfo&amp; connInfo ) override {
+    std::string value = pCharacteristic-&gt;getValue(); // Read the written value
+    if (!value.empty()) {
+      String cmd = String( value.c_str() ); // Convert to Arduino String
+      cmd.toUpperCase();  // Convert command to uppercase 
+
+      if (cmd.equals(&quot;ON&quot;)) {
+        digitalWrite( LED_PIN, LED_ON );  // Turn LED on
+        Serial.println( &quot;LED ON&quot; );
+      } 
+      else if (cmd.equals(&quot;OFF&quot;)) {
+        digitalWrite( LED_PIN, LED_OFF ); // Turn LED off
+        Serial.println( &quot;LED OFF&quot; );
+      } 
+      else {
+        Serial.printf( &quot;Unknown LED command: %c\n&quot;, cmd ); 
+      }
+    }
+  }
+};
+
+void setup() {
+  Serial.begin( 115200 );  // Initialize Serial
+  Serial.setDebugOutput( false );
+
+  Serial.flush();
+  Serial.println( &quot;\n\n\nESP32-BLE server demo&quot; );
+  Serial.println( &quot;Arduino-ESP32 v3.3.0 + NimBLE v2.3.6)...&quot; );
+
+  // Configure GPIO pins
+  pinMode( LED_PIN, OUTPUT );
+  pinMode( BUTTON_PIN, INPUT_PULLUP ); // Button with internal pull-up
+
+  // Initialize BLE device
+  NimBLEDevice::init( &quot;ESP32 BLE-IO (LED-Button) Service&quot; );
+
+  // Create BLE server and set callbacks
+  pServer = NimBLEDevice::createServer();
+  pServer-&gt;setCallbacks( new ServerCallbacks() );
+
+  // LED Service
+  NimBLEService* ledService = pServer-&gt;createService( SERVICE_LED_UUID );
+
+  // Create LED characteristic (write-only)
+  pLedCharacteristic = ledService-&gt;createCharacteristic(
+    CHARACTERISTIC_LED_UUID,
+    NIMBLE_PROPERTY::WRITE
+  );
+  pLedCharacteristic-&gt;setCallbacks( new LedCharacteristicCallbacks() );
+  ledService-&gt;start();
+
+  // Button Service
+  NimBLEService* buttonService = pServer-&gt;createService( SERVICE_BUTTON_UUID );
+
+  // Create Button characteristic (read + notify)
+  pButtonCharacteristic = buttonService-&gt;createCharacteristic(
+    CHARACTERISTIC_BUTTON_UUID,
+    NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY
+  );
+  pButtonCharacteristic-&gt;setValue( &quot;RELEASED&quot; ); // Initial state: released
+  buttonService-&gt;start();
+
+  // Start BLE advertising
+  NimBLEAdvertising* advertising = NimBLEDevice::getAdvertising();
+  advertising-&gt;setName( &quot;ESP32-BLE-IO&quot; );
+  advertising-&gt;addServiceUUID( SERVICE_LED_UUID );
+  advertising-&gt;addServiceUUID( SERVICE_BUTTON_UUID );
+  advertising-&gt;enableScanResponse( true );
+  advertising-&gt;start();
+
+  Serial.println( &quot;BLE advertising started...&quot; );
+
+  // Flash LED 3 times on startup
+  for (int i = 0; i &lt; 3; i++) {
+    digitalWrite( LED_PIN, LED_ON );
+    delay( 100 );
+    digitalWrite( LED_PIN, LED_OFF );
+    delay( 100 );
+  }
+}
+
+void loop() {
+  // Read button state (active-low)
+  bool buttonState = digitalRead( BUTTON_PIN );
+  // Detect state change
+  if (buttonState != lastButtonState) {
+    lastButtonState = buttonState;
+
+    // Update characteristic value: &quot;PRESSED&quot; or &quot;RELEASED&quot;
+    String val = buttonState ? &quot;RELEASED&quot; : &quot;PRESSED&quot;;
+    pButtonCharacteristic-&gt;setValue( val.c_str() );
+
+    // Notify connected client
+    if (deviceConnected) {
+      pButtonCharacteristic-&gt;notify();
+    }
+
+    // Print state to Serial
+    Serial.printf( &quot;Button: %s\n&quot;, val.c_str() );
+  }
+  delay(100);
+}
+</code></pre>
+<h3 id="_2">ภาพรวมการทำงานของโค้ดตัวอย่าง<a class="headerlink" href="#_2" title="Permanent link">#</a></h3>
+<ol>
+<li>เริ่มต้นระบบการทำงานของ <strong>BLE</strong><ul>
+<li>ใช้คำสั่ง <code>NimBLEDevice::init(...)</code> เพื่อเริ่มต้น <strong>BLE Stack</strong> และตั้งชื่ออุปกรณ์เป็น <code>"ESP32 BLE-IO"</code></li>
+</ul>
+</li>
+<li>สร้าง <strong>BLE Server</strong><ul>
+<li>ใช้ <code>NimBLEDevice::createServer()</code> เพื่อสร้าง <strong>BLE Server</strong> ที่จะให้บริการ</li>
+<li>กำหนดฟังก์ชัน <strong>Callback</strong> ผ่านคลาส <code>ServerCallbacks</code> สำหรับจัดการเหตุการณ์ เช่น<ul>
+<li><code>onConnect()</code> เมื่อ <strong>Client</strong> เชื่อมต่อเข้ามา</li>
+<li><code>onDisconnect()</code> เมื่อ <strong>Client</strong> ยกเลิกหรือตัดการเชื่อมต่อ (จะเริ่มโฆษณาใหม่โดยอัตโนมัติ)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>สร้างบริการแยกตามการทำงาน<ul>
+<li><strong>LED Service</strong> (<strong>UUID</strong>: <code>19b10010-e8f2-537e-4f6c-d104768a1214</code>)<ul>
+<li>มีการกำหนด <strong>Service Characteristic</strong> สำหรับเขียนคำสั่ง (<code>WRITE</code>) ใช้ควบคุม <strong>LED</strong> (<code>ON</code> / <code>OFF</code>)</li>
+</ul>
+</li>
+<li><strong>Button Service</strong> (<strong>UUID</strong>: <code>19b10020-e8f2-537e-4f6c-d104768a1214</code>)<ul>
+<li>มีการกำหนด <strong>Service Characteristic</strong> สำหรับอ่านสถานะ (<code>READ</code>) และแจ้งเตือน (<code>NOTIFY</code>) โดยจะส่งข้อความ <code>"PRESSED"</code> หรือ <code>"RELEASED"</code> ให้กับ <strong>Client</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>เริ่มการโฆษณา (<strong>BLE Advertising</strong>)<ul>
+<li>ตั้งชื่ออุปกรณ์เป็น <code>"ESP32-BLE-IO"</code></li>
+<li>เพิ่ม <strong>Service UUID</strong> ทั้งสอง ในแพ็กเกจโฆษณา</li>
+<li>เริ่มโฆษณาเพื่อรอการเชื่อมต่อจาก <strong>BLE Client</strong></li>
+</ul>
+</li>
+<li>ในฟังก์ชัน <code>loop()</code><ul>
+<li>อ่านสถานะปุ่มจากขา <strong>GPIO-14</strong> (active-low)</li>
+<li>เมื่อสถานะเปลี่ยน จะอัปเดตค่าใน <strong>Characteristic</strong> ของปุ่มกด</li>
+<li>ถ้ามี <strong>BLE Client</strong> เชื่อมต่อ จะส่งค่าไปให้ผ่านฟังก์ชัน <code>notify()</code> และแสดงสถานะปุ่ม (<code>PRESSED</code> / <code>RELEASED</code>) ผ่าน <strong>Serial Monitor</strong></li>
+</ul>
+</li>
+</ol>
+<h3 id="_3">ฟังก์ชันสำคัญที่ใช้ในโค้ด<a class="headerlink" href="#_3" title="Permanent link">#</a></h3>
+<ul>
+<li><code>NimBLEDevice::init(name)</code> เริ่มต้น <strong>BLE Stack</strong> และตั้งชื่ออุปกรณ์  </li>
+<li><code>NimBLEDevice::createServer()</code> สร้าง <strong>BLE Server</strong> สำหรับให้บริการ  </li>
+<li><code>createService(UUID)</code> สร้าง <strong>BLE Service</strong> ด้วย <strong>UUID</strong> ที่กำหนด  </li>
+<li><code>createCharacteristic(UUID, properties)</code> สร้าง <strong>BLE Characteristic</strong>
+พร้อมกำหนดคุณสมบัติ (เช่น <code>READ</code>, <code>WRITE</code>, <code>NOTIFY</code>)</li>
+<li><code>setCallbacks(...)</code> กำหนดคลาส <strong>Callback</strong> สำหรับจัดการเหตุการณ์ (เขียนค่า, เชื่อมต่อ, ตัดการเชื่อมต่อ)  </li>
+<li><code>setValue(value)</code> / <code>notify()</code>  ใช้กำหนดค่าและแจ้งเตือน (<strong>Notify</strong>) ไปยัง <strong>BLE Client</strong></li>
+<li><code>NimBLEDevice::startAdvertising()</code> เริ่มโฆษณาเพื่อให้ <strong>BLE Client</strong> เข้ามาเชื่อมต่อ  </li>
+</ul>
+<p>การทำงานของฟังก์ชัน <strong>Callback</strong></p>
+<ol>
+<li><code>ServerCallbacks</code><ul>
+<li><code>onConnect()</code> ถูกเรียกเมื่อ <strong>BLE Client</strong> เชื่อมต่อเข้ามา</li>
+<li><code>onDisconnect()</code> ถูกเรียกเมื่อ <strong>BLE Client</strong> ออกจากการเชื่อมต่อ และรีสตาร์ทการโฆษณาใหม่</li>
+</ul>
+</li>
+<li><code>LedCharacteristicCallbacks</code><ul>
+<li><code>onWrite()</code> ถูกเรียกเมื่อ <strong>BLE Client</strong> เขียนค่ามายัง <strong>LED Characteristic</strong> (<code>"ON" หรือ</code>"OFF")</li>
+</ul>
+</li>
+</ol>
+<p>&nbsp;</p>
+<hr />
+<h2 id="nrf-connect-for-mobile">&#9655; <strong>การทดลองด้วยแอป nRF Connect for Mobile</strong><a class="headerlink" href="#nrf-connect-for-mobile" title="Permanent link">#</a></h2>
+<p>ขั้นตอนถัดไปคือการใช้แอป <strong>nRF Connect for Mobile</strong> (จากบริษัท <strong>Nordic Semiconductor</strong>)<br />
+เพื่อยืนยันการทำงานของบริการ (<strong>Service</strong>) และลักษณะข้อมูล (<strong>Characteristic</strong>) ที่อุปกรณ์ได้เปิดให้ใช้งานจริง</p>
+<p>จุดประสงค์ของการทดสอบด้วย <strong>nRF Connect</strong></p>
+<ul>
+<li>ตรวจสอบว่า <strong>ESP32</strong> ประกาศชื่อและบริการ <strong>BLE</strong> ได้ถูกต้อง  </li>
+<li>ทดสอบการอ่านหรือเขียนค่าจาก <strong>Service Characteristic</strong> โดยตรง  </li>
+<li>ตรวจสอบว่า <strong>Service Characteristic</strong> สำหรับปุ่มส่ง การแจ้งเตือน (<strong>Notify</strong>) ได้ตามที่คาดไว้  </li>
+<li>ตรวจสอบโครงสร้าง <strong>UUID</strong> ของ <strong>Service</strong> และ <strong>Characteristic</strong></li>
+</ul>
+<p>ขั้นตอนการใช้งานเบื้องต้น</p>
+<ol>
+<li>เปิดแอป <strong>nRF Connect for Mobile</strong> บนสมาร์ทโฟน (<strong>Android / iOS</strong>)</li>
+<li>เปิด <strong>Bluetooth</strong> บนอุปกรณ์ แล้วกด <strong>SCAN</strong> เพื่อค้นหาอุปกรณ์ <strong>BLE</strong> รอบตัว</li>
+<li>มองหาอุปกรณ์ชื่อ <code>ESP32-BLE-IO</code> แล้วกด <strong>CONNECT</strong> เพื่อเชื่อมต่อ</li>
+<li>แอปจะแสดงรายชื่อ <strong>Services</strong> และ <strong>Characteristics</strong> ที่ <strong>ESP32</strong> เปิดให้ใช้งาน เช่น</li>
+<li><code>19B10010-E8F2-537E-4F6C-D104768A1214</code> (<strong>LED Service</strong>)</li>
+<li><code>19B10020-E8F2-537E-4F6C-D104768A1214</code> (<strong>Button Service</strong>)</li>
+<li>ทดสอบการส่งหรือรับข้อมูล</li>
+<li>เลือก <strong>LED Characteristic</strong> แล้วกด <strong>WRITE</strong> แล้วพิมพ์ส่งค่า <code>"ON"</code> หรือ <code>"OFF"</code> เพื่อควบคุม <strong>LED</strong> </li>
+<li>เปิด <strong>Notifications</strong> บน <strong>Button Characteristic</strong> แล้วลองกดปุ่มจริงบนบอร์ด<br />
+     จะเห็นข้อความ <code>"PRESSED"</code> / <code>"RELEASED"</code> แสดงบนหน้าจอ</li>
+</ol>
+<p><img alt="" src="nrf_connect.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการเชื่อมต่อด้วย <strong>nRF Connect for Mobile</strong> บนสมาร์ทโฟน</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-chrome">&#9655; <strong>การเชื่อมต่อเพื่อใช้บริการ BLE บนหน้าเว็บด้วย Chrome</strong><a class="headerlink" href="#ble-chrome" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างโค้ด <strong>HTML + JavaScript</strong> สาธิตการทำงานของ <strong>Web Bluetooth Application</strong> ในเบื้องต้น
+ใช้สำหรับทดสอบและสาธิตการสื่อสาร <strong>BLE</strong> ระหว่างเว็บเบราว์เซอร์ <strong>Google Chrome</strong> กับบอร์ด <strong>ESP32</strong>
+ซึ่งทำหน้าที่เป็น <strong>BLE Server</strong> ที่มี <strong>LED Service</strong> และ <strong>Button Service</strong> ตามตัวอย่างโค้ดที่แล้ว</p>
+<h3 id="_4">วัตถุประสงค์ของการทดสอบ<a class="headerlink" href="#_4" title="Permanent link">#</a></h3>
+<ul>
+<li>แสดงการเชื่อมต่อ <strong>ESP32 BLE Server</strong> ผ่าน <strong>Web Bluetooth API</strong></li>
+<li>ส่งคำสั่งควบคุม <strong>LED (ON / OFF)</strong> ผ่าน <strong>LED Characteristic</strong> แบบ <code>WRITE</code></li>
+<li>อ่านและรับการแจ้งเตือน (<strong>Notify</strong>) จากปุ่มกดบนบอร์ด <strong>ESP32</strong></li>
+<li>สาธิตการอัปเดตสถานะเรียลไทม์บนหน้าเว็บ โดยไม่ต้องใช้แอปมือถือ  </li>
+</ul>
+<p><img alt="" src="chrome_ble.jpg" /></p>
+<p><strong>รูป:</strong> เปิดใช้งาน <strong>Web Bluetooth Experimental Feature</strong> ใน <strong>Google Chrome Browser</strong> (ไปที่ <code>chrome://flags</code>)</p>
+<h3 id="_5">ลำดับการทำงานของโค้ดตัวอย่างโดยสรุป<a class="headerlink" href="#_5" title="Permanent link">#</a></h3>
+<ol>
+<li>เมื่อกดปุ่ม <strong>"Connect"</strong><ul>
+<li>เว็บเพจจะค้นหาอุปกรณ์ <strong>BLE</strong> ที่ชื่อขึ้นต้นด้วย <code>"ESP32-BLE-IO"</code></li>
+<li>เมื่อเลือกอุปกรณ์แล้ว จะเชื่อมต่อไปยัง <strong>GATT Server</strong> ที่ให้บริการโดย <strong>ESP32</strong></li>
+</ul>
+</li>
+<li>หลังจากเชื่อมต่อสำเร็จ<ul>
+<li>ดึงข้อมูล <strong>LED Service</strong> และ <strong>Button Service</strong></li>
+<li>ติดต่อกับ <strong>Service Characteristic</strong> แต่ละบริการ</li>
+<li>เริ่มรับการแจ้งเตือนจากปุ่มกดบนบอร์ด <strong>ESP32</strong></li>
+</ul>
+</li>
+<li>เมื่อปุ่มบนบอร์ด <strong>ESP32</strong> ถูกกดหรือปล่อย<ul>
+<li><strong>ESP32</strong> จะส่งข้อความ <code>"PRESSED"</code> หรือ <code>"RELEASED"</code></li>
+<li>เว็บเพจจะอัปเดตค่าบนหน้าจอ (<code>Button state: ...</code>) แบบเรียลไทม์</li>
+</ul>
+</li>
+<li>ปุ่ม <strong>"LED Toggle"</strong><ul>
+<li>ใช้สลับสถานะของ <strong>LED</strong> ระหว่าง <code>"ON"</code> และ <code>"OFF"</code></li>
+<li>เมื่อกดแล้ว จะส่งข้อความไปยัง <strong>ESP32</strong> ผ่าน <strong>LED Characteristic</strong></li>
+<li>ปุ่มจะอัปเดตข้อความแสดงสถานะล่าสุด (<code>LED ON</code> / <code>LED OFF</code>)</li>
+</ul>
+</li>
+<li>ปุ่ม <strong>"Disconnect"</strong><ul>
+<li>เมื่อเชื่อมต่ออยู่และกดอีกครั้ง จะตัดการเชื่อมต่อ <strong>BLE</strong></li>
+</ul>
+</li>
+<li>รีเซ็ตสถานะ <strong>UI</strong> และปิดการใช้งานปุ่มควบคุม</li>
+</ol>
+<p><strong>File: index.html</strong></p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;title&gt;ESP32 BLE Toggle Test&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h2&gt;ESP32 BLE Web Toggle&lt;/h2&gt;
+  &lt;button id=&quot;connectBtn&quot;&gt;Connect&lt;/button&gt;
+  &lt;button id=&quot;ledBtn&quot; disabled&gt;LED Toggle&lt;/button&gt;
+  &lt;p&gt;Button state: &lt;span id=&quot;btnState&quot;&gt;?&lt;/span&gt;&lt;/p&gt;
+
+  &lt;script&gt;
+    // UUIDs for ESP32 BLE services and characteristics
+    const SERVICE_LED = &quot;19b10010-e8f2-537e-4f6c-d104768a1214&quot;; // LED service
+    const CHAR_LED = &quot;19b10011-e8f2-537e-4f6c-d104768a1214&quot;;    // LED characteristic (write)
+    const SERVICE_BTN = &quot;19b10020-e8f2-537e-4f6c-d104768a1214&quot;; // Button service
+    const CHAR_BTN = &quot;19b10021-e8f2-537e-4f6c-d104768a1214&quot;;    // Button characteristic (read/notify)
+
+    // Variables to store device, GATT server, and characteristics
+    let device, server, ledChar, btnChar;
+    let ledState = false; // Track LED state: false = OFF, true = ON
+
+    // DOM elements for buttons
+    const connectBtn = document.getElementById(&quot;connectBtn&quot;);
+    const ledBtn = document.getElementById(&quot;ledBtn&quot;);
+
+    // Connect / Disconnect button click handler
+    connectBtn.onclick = async () =&gt; {
+      // If already connected, disconnect and reset UI
+      if (device &amp;&amp; device.gatt.connected) {
+        await device.gatt.disconnect();      // Disconnect from BLE device
+        connectBtn.textContent = &quot;Connect&quot;;  // Update button text
+        ledBtn.disabled = true;              // Disable LED toggle button
+        document.getElementById(&quot;btnState&quot;).textContent = &quot;?&quot;; // Reset button state display
+        console.log(&quot;Disconnected&quot;); 
+        return;
+      }
+
+      try {
+        // Request device with filters: name prefix + advertised service
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: 'ESP32-BLE-IO', services: [SERVICE_LED] }],
+          optionalServices: [SERVICE_LED, SERVICE_BTN] // Required to access both services
+        }); 
+
+        server = await device.gatt.connect(); // Connect to GATT server
+
+        // Get LED characteristic from LED service
+        const ledService = await server.getPrimaryService(SERVICE_LED);
+        ledChar = await ledService.getCharacteristic(CHAR_LED);
+
+        // Get Button characteristic from Button service
+        const btnService = await server.getPrimaryService(SERVICE_BTN);
+        btnChar = await btnService.getCharacteristic(CHAR_BTN);
+
+        // Subscribe to button notifications
+        await btnChar.startNotifications(); // Enable notifications
+        btnChar.addEventListener('characteristicvaluechanged', e =&gt; {
+          const val = new TextDecoder().decode(e.target.value); // Decode value
+          document.getElementById(&quot;btnState&quot;).textContent = val; // Update UI
+        });
+
+        // Read initial button state immediately after connecting
+        const initVal = await btnChar.readValue();
+        document.getElementById(&quot;btnState&quot;).textContent = new TextDecoder().decode(initVal);
+
+        // Update UI to show connected state
+        connectBtn.textContent = &quot;Disconnect&quot;;
+        ledBtn.disabled = false;  // Enable LED toggle
+        console.log(&quot;Connected to ESP32 BLE!&quot;);
+      } catch (err) {
+        console.error(err);  // Log any errors
+      }
+    };
+
+    // LED toggle button click handler
+    ledBtn.onclick = async () =&gt; {
+      if (!ledChar) return;                   // Exit if characteristic not available
+      const cmd = ledState ? &quot;OFF&quot; : &quot;ON&quot;;    // Toggle command
+      await ledChar.writeValue(new TextEncoder().encode(cmd)); // Write command to characteristic
+      ledState = !ledState;     // Update local LED state
+      ledBtn.textContent = ledState ? &quot;LED ON&quot; : &quot;LED OFF&quot;; // Update button text
+    };
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><img alt="" src="web_ble-1.jpg" /></p>
+<p><img alt="" src="web_ble-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างหน้าเว็บแสดงการเชื่อมต่อกับอุปกรณ์ <strong>ESP32</strong> ด้วย <strong>BLE</strong></p>
+<p>รูปตัวอย่างเป็นการเปิดใช้งาน <strong>Local Web Server</strong>
+ผู้ใช้สามารถติดตั้ง <a href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer"><strong>Live Server Extension</strong></a> ใน <strong>VS Code IDE</strong>โดยคลิกขวาที่ <code>index.html</code> แล้วเลือก
+<strong>"Open with Live Server"</strong> เบราว์เซอร์จะเปิดขึ้นและรันไฟล์บน <strong>localhost</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_6">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_6" title="Permanent link">#</a></h2>
+<p>บทความนี้แนะนำการใช้งาน <strong>BLE (Bluetooth Low Energy)</strong> บนบอร์ด <strong>ESP32 / ESP32-S3</strong>
+ผ่านไลบรารี <strong>NimBLE-Arduino</strong> โดยตัวอย่างโค้ดครอบคลุมทั้งการสแกนอุปกรณ์ <strong>BLE</strong>
+และการสร้าง <strong>BLE Server</strong> ที่ให้บริการควบคุม <strong>LED</strong> และอ่านสถานะปุ่มกด (<strong>Button</strong>)
+ผ่าน <strong>BLE Characteristic</strong> มีการใช้ฟังก์ชัน <strong>Callback</strong> ในการจัดการเหตุการณ์ต่าง ๆ
+เช่น การเชื่อมต่อ/ตัดการเชื่อมต่อ และการเขียนค่าไปยัง <strong>Characteristic</strong>
+ทั้งนี้ยังมีตัวอย่างการทดลองเชื่อมต่อผ่านแอป <strong>nRF Connect for Mobile</strong></p>
+<p>นอกจากนี้ บทความยังสาธิตการเชื่อมต่อ <strong>BLE</strong> กับเว็บเบราว์เซอร์ <strong>Google Chrome</strong> ผ่าน <strong>Web Bluetooth API</strong>
+โดยสร้างหน้าเว็บ <strong>HTML + JavaScript</strong> ที่สามารถเชื่อมต่อกับ <strong>ESP32 BLE Server</strong>
+เพื่อ อ่านสถานะปุ่มแบบเรียลไทม์ (<strong>Notify</strong>) และ ควบคุม <strong>LED</strong>
+ซึ่งช่วยให้ผู้ใช้งานสามารถทดลองสื่อสารกับอุปกรณ์ <strong>BLE</strong> ได้โดยไม่ต้องใช้แอปมือถือ
+ทำให้การพัฒนาและทดสอบอุปกรณ์ <strong>BLE</strong> มีความยืดหยุ่นและสะดวกขึ้นทั้งบนมือถือและเว็บเบราว์เซอร์</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../esp32_ble_intro/">ตัวอย่างการเขียนโปรแกรมด้วย Arduino สำหรับใช้งาน <strong>ESP32 - Bluetooth LE</strong></a></li>
+<li><a href="../../zephyr/zephyr_cli_west/">แนะนำการใช้งาน <strong>Zephyr RTOS</strong> แบบ <strong>CLI</strong>: ทดลองใช้งาน <strong>Micro:bit v2 BLE</strong></a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2026-01-20 | Last Updated: 2026-01-20</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
