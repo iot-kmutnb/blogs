@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/esp32/esp32_nimble_part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#esp32-ble-nimble-arduino-3" class="nav-link">การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#nimble-arduino" class="nav-link">&#9655; แนะนำ NimBLE-Arduino</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-adc-service" class="nav-link">&#9655; BLE ADC Service</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-client-serial-bluetooth-terminal" class="nav-link">&#9655; BLE Client: Serial Bluetooth Terminal</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-client-web-bluetooth-chart" class="nav-link">&#9655; BLE Client: Web Bluetooth - Chart</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ble-client-processing-p5js" class="nav-link">&#9655; BLE Client: Processing (p5.js)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="esp32-ble-nimble-arduino-3">การเขียนโปรแกรม ESP32 เพื่อใช้งาน BLE ด้วยไลบรารี NimBLE-Arduino (ตอนที่ 3)<a class="headerlink" href="#esp32-ble-nimble-arduino-3" title="Permanent link">#</a></h1>
+<ul>
+<li><a href="#nimble-arduino"><strong>แนะนำ NimBLE-Arduino</strong></a></li>
+<li><a href="#ble-adc-service"><strong>BLE ADC Service</strong></a></li>
+<li><a href="#ble-client-serial-bluetooth-terminal"><strong>BLE Client: Serial Bluetooth Terminal</strong></a></li>
+<li><a href="#ble-client-processing-p5js"><strong>BLE Client: Processing (p5.js)</strong></a></li>
+</ul>
+<hr />
+<h2 id="nimble-arduino">&#9655; <strong>แนะนำ NimBLE-Arduino</strong><a class="headerlink" href="#nimble-arduino" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด Arduino สำหรับการใช้งาน
+<strong>Bluetooth LE (BLE)</strong> โดยใช้บอร์ดไมโครคอนโทรลเลอร์ <strong>ESP32 / ESP32-S3</strong> และใช้ไลบรารี
+<a href="https://github.com/h2zero/NimBLE-Arduino"><strong>NimBLE-Arduino</strong></a></p>
+<p>&#9888; แนะนำให้ผู้อ่านได้ศึกษาและทำความเข้าใจเนื้อหาในบทความ <a href="../esp32_nimble_part-1/">"<strong>ตอนที่ 1</strong>"</a>
+และ <a href="../esp32_nimble_part-2/">"<strong>ตอนที่ 2</strong>"</a> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-adc-service">&#9655; <strong>BLE ADC Service</strong><a class="headerlink" href="#ble-adc-service" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้ สาธิตการใช้งาน <strong>ESP32</strong> ให้ทำหน้าที่ให้บริการ <strong>BLE ADC (UART) Service</strong>
+โดยใช้ไลบรารี <strong>NimBLE + FreeRTOS</strong> ในการเขียนโค้ด 
+มีการแยกการทำงานของโปรแกรม ออกเป็นสองทาสก์ (<strong>FreeRTOS Task</strong>)
+และสื่อสารข้อมูลกันด้วย <strong>FreeRTOS Queue</strong> ซึ่งจะคล้ายกับตัวอย่างโค้ดในตอนที่ 2
+โดยเปลี่ยนจากการรับส่งข้อมูลผ่านทาง <strong>Hardware Serial</strong> มาเป็นขาสัญญาณแอนะล็อกและวงจร <strong>ADC</strong> ของ <strong>ESP32</strong></p>
+<p>การทำงานของ <strong>ESP32</strong> ในลักษณะนี้ จะช่วยให้ <strong>BLE Client</strong> ได้รับค่าจากสัญญาณอินพุต-แอนะล็อก
+1 ช่องสัญญาณ โดยอาศัยวงจร <strong>ADC</strong> ภายในชิป <strong>ESP32</strong>
+แปลงค่าระดับแรงดันอินพุต ให้เป็นค่าตัวเลขในช่วง 0 ถึง 100 แล้วส่งข้อมูลต่อให้อีกทาสก์ เพื่อเชื่อมต่อด้วย <strong>BLE</strong>
+ไปยัง <strong>BLE Client</strong></p>
+<p>ตัวอย่างนี้สาธิตให้เห็นแนวคิดการประยุกต์ใช้งาน <strong>BLE</strong> ด้วย <strong>ESP32</strong> ในลักษณะของอุปกรณ์เซนเซอร์ที่วัดค่าสัญญาณแอนะล็อกได้ (<strong>Analog Input</strong>)
+แล้วส่งข้อมูลแบบไร้สายไปยังอุปกรณ์อื่น เช่น สมาร์ตโฟน โดยใช้ <strong>nRF Connect for Mobile</strong> หรือ
+เว็บแอปบน <strong>Chrome</strong> ที่รองรับ <strong>Web Bluetooth</strong> </p>
+<p><strong>ESP32</strong> ถูกกำหนดบทบาทให้เป็น <strong>BLE Server</strong> ซึ่งเปิดให้ <strong>BLE Client</strong> เชื่อมต่อเข้ามาเพื่อรับข้อมูลที่ถูกส่งออกมาในรูปแบบของ <strong>Notification</strong> อย่างต่อเนื่อง</p>
+<p>ในเชิงสถาปัตยกรรมซอฟต์แวร์ โค้ดตัวอย่างนี้แสดงให้เห็นการใช้ <strong>FreeRTOS</strong>
+เพื่อแยกหน้าที่การทำงานอย่างชัดเจน แบ่งเป็นสองทาสก์ ดังนี้</p>
+<ul>
+<li><strong>ADC Task</strong> รับผิดชอบการอ่านค่าแรงดันจากขา <strong>GPIO-34</strong> ของ <strong>ESP32</strong> ทุก ๆ 100 มิลลิวินาที
+โดยใช้วงจร <strong>ADC</strong> ที่มีความละเอียดในการแปลงข้อมูลได้ขนาด 12 บิต (0..4095) และแปลงค่าอินพุต ให้อยู่ในช่วง <strong>0–100</strong> </li>
+<li><strong>BLE Notify Task</strong> รับผิดชอบการสื่อสารผ่าน <strong>BLE</strong> เพียงอย่างเดียว </li>
+</ul>
+<p>และการส่งข้อมูลระหว่างสองทาสก์ ทำผ่าน <strong>FreeRTOS Queue</strong> (ตัวแปร <code>adcToBleQueue</code>)</p>
+<pre><code class="language-c++">/*
+ * ESP32 BLE ADC Streaming with FreeRTOS
+ * Library: NimBLE-Arduino v2.3.6
+ */
+
+#include &lt;Arduino.h&gt;
+#include &lt;NimBLEDevice.h&gt;
+
+#define LED_PIN    22
+#define LED_ON     LOW
+#define LED_OFF    HIGH
+
+#define ADC_PIN    34        // ADC1 safe for BLE/WiFi
+#define ADC_MAX    4095.0f
+
+static NimBLEUUID UART_SERVICE_UUID(&quot;6E400001-B5A3-F393-E0A9-E50E24DCCA9E&quot;);
+static NimBLEUUID UART_RX_UUID     (&quot;6E400002-B5A3-F393-E0A9-E50E24DCCA9E&quot;);
+static NimBLEUUID UART_TX_UUID     (&quot;6E400003-B5A3-F393-E0A9-E50E24DCCA9E&quot;);
+
+NimBLEServer* pServer = nullptr;
+NimBLECharacteristic* pTxCharacteristic = nullptr;
+bool deviceConnected = false;
+
+QueueHandle_t adcToBleQueue;
+
+struct QueueData {
+  char payload[32];
+  size_t length;
+};
+
+class ServerCallbacks : public NimBLEServerCallbacks {
+  void onConnect(NimBLEServer*, NimBLEConnInfo&amp;) override {
+    deviceConnected = true;
+    digitalWrite(LED_PIN, LED_ON);
+    Serial.println(&quot;BLE: Client connected&quot;);
+  }
+
+  void onDisconnect(NimBLEServer*, NimBLEConnInfo&amp;, int) override {
+    deviceConnected = false;
+    digitalWrite(LED_PIN, LED_OFF);
+    NimBLEDevice::startAdvertising();
+    Serial.println(&quot;BLE: Client disconnected → Advertising restarted&quot;);
+  }
+};
+
+void adcTask(void* parameter) {
+  QueueData item;
+  TickType_t lastWake = xTaskGetTickCount();
+
+  Serial.println(&quot;Task: ADC started&quot;);
+
+  while (true) {
+    vTaskDelayUntil(&amp;lastWake, pdMS_TO_TICKS(100));
+    int raw = analogRead(ADC_PIN);
+    float value = (raw / ADC_MAX) * 100.0f;
+    item.length = snprintf(item.payload, sizeof(item.payload),
+                            &quot;%.2f\n&quot;, value);
+    Serial.printf(&quot;ADC: %s&quot;, item.payload);
+    xQueueSend(adcToBleQueue, &amp;item, 0);
+  }
+}
+
+void bleNotifyTask(void* parameter) {
+  QueueData item;
+  Serial.println(&quot;Task: BLE Notify started&quot;);
+
+  while (true) {
+    if (xQueueReceive(adcToBleQueue, &amp;item, portMAX_DELAY) == pdTRUE) {
+      if (deviceConnected) {
+        pTxCharacteristic-&gt;setValue(
+          (uint8_t*)item.payload, item.length
+        );
+        pTxCharacteristic-&gt;notify();
+      }
+    }
+  }
+}
+
+void initBLE() {
+  NimBLEDevice::init(&quot;ESP32-BLE-ADC&quot;);
+  NimBLEDevice::setMTU(247);
+  NimBLEDevice::setPower(ESP_PWR_LVL_P9);
+
+  pServer = NimBLEDevice::createServer();
+  pServer-&gt;setCallbacks(new ServerCallbacks());
+
+  NimBLEService* service = pServer-&gt;createService(UART_SERVICE_UUID);
+  // TX (Notify)
+  pTxCharacteristic = service-&gt;createCharacteristic(
+    UART_TX_UUID,
+    NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY
+  );
+  pTxCharacteristic-&gt;createDescriptor(&quot;2902&quot;);
+  // RX (Write)
+  service-&gt;createCharacteristic(
+    UART_RX_UUID,
+    NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR
+  );
+
+  service-&gt;start();
+
+  // Advertising (Android-safe) 
+  NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
+  NimBLEAdvertisementData advData;
+  advData.setFlags(0x06);
+  advData.setCompleteServices(UART_SERVICE_UUID);
+  adv-&gt;setAdvertisementData(advData);
+
+  NimBLEAdvertisementData scanData;
+  scanData.setName(&quot;ESP32-BLE-ADC&quot;);
+  adv-&gt;setScanResponseData(scanData);
+  adv-&gt;setMinInterval(0x20);
+  adv-&gt;setMaxInterval(0x40);
+  NimBLEDevice::startAdvertising();
+  Serial.println(&quot;BLE: Advertising started&quot;);
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(100);
+  Serial.println(&quot;\nESP32 BLE ADC Streaming&quot;);
+
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LED_OFF);
+
+  analogReadResolution(12);
+  analogSetPinAttenuation(ADC_PIN, ADC_11db);
+
+  adcToBleQueue = xQueueCreate(10, sizeof(QueueData));
+  if (!adcToBleQueue) {
+    Serial.println(&quot;ERROR: Queue create failed&quot;);
+    while (1);
+  }
+
+  initBLE();
+
+  xTaskCreatePinnedToCore(
+    adcTask,
+    &quot;ADC Task&quot;,
+    2048,
+    NULL,
+    2,
+    NULL,
+    1
+  );
+
+  xTaskCreatePinnedToCore(
+    bleNotifyTask,
+    &quot;BLE Notify&quot;,
+    4096,
+    NULL,
+    1,
+    NULL,
+    0
+  );
+
+  Serial.println(&quot;System ready....&quot;);
+}
+
+void loop() {
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>ตัวอย่างอุปกรณ์เซนเซอร์ที่ให้เอาต์พุตเป็นสัญญาณแอนะล็อก มีอยู่หลายประเภท ในบทความนี้ได้เลือกใช้
+โมดูลเซนเซอร์วัดความเข้มแสง (<strong>TEMT6000 Ambient Light Sensor</strong>)</p>
+<p><img alt="" src="temt6000_light_sensor.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการเชื่อมต่อโมดูล <strong>TEMT6000 Ambient light sensor</strong> กับบอร์ด <strong>ESP32</strong>
+โดยใช้แรงดันไฟเลี้ยง <strong>+3.3V</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-client-serial-bluetooth-terminal">&#9655; <strong>BLE Client: Serial Bluetooth Terminal</strong><a class="headerlink" href="#ble-client-serial-bluetooth-terminal" title="Permanent link">#</a></h2>
+<p>ตัวอย่างของซอฟต์แวร์ที่ทำหน้าที่เป็น <strong>BLE Client</strong> ได้แก่ แอปพลิเคชันสำหรับสมาร์ทโฟน
+เช่น <strong>Serial Bluetooth Terminal (v1.50)</strong> สำหรับ <strong>Android</strong> และสามารถนำมาทดสอบการทำงาของ <strong>ESP32</strong>
+เพื่อเชื่อมต่อและรับข้อมูลจากอุปกรณ์ผ่าน <strong>BLE</strong> ได้ </p>
+<p><img alt="" src="serial_terminal_android.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการเชื่อมต่อกับ <strong>ESP32</strong> ด้วย <strong>Serial Bluetooth Terminal</strong> บนสมาร์ทโฟน <strong>Android</strong>
+เพื่อรับข้อมูลแบบไร้สายด้วย <strong>BLE</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-client-web-bluetooth-chart">&#9655; <strong>BLE Client: Web Bluetooth - Chart</strong><a class="headerlink" href="#ble-client-web-bluetooth-chart" title="Permanent link">#</a></h2>
+<p>อีกตัวอย่างหนึ่งเป็นโค้ด <strong>HTML</strong> สำหรับไฟล์ <code>index.html</code> เพื่อนำไปใช้งานกับเว็บเบราว์เซอร์ <strong>Chrome</strong>
+โดยมีการใช้งานไลบรารี <strong>JavaScript</strong> ที่มีชื่อว่า <code>chart.js</code> เมื่อเว็บเบราว์เซอร์เชื่อมต่อกับอุปกรณ์ <strong>ESP32</strong>
+ด้วย <strong>BLE</strong> ได้แล้ว ก็จะได้รับข้อความที่เป็นตัวเลข แล้วนำมาแสดงผลในรูปของกราฟและอัปเดตแบบเรียลไทม์</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;BLE UART Chart&lt;/title&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;&gt;&lt;/script&gt;
+&lt;style&gt;
+body { font-family:sans-serif; text-align:center; padding:20px; }
+canvas { max-width:800px; margin:auto; display:block; }
+button { padding:10px 20px; font-size:16px; margin-bottom:20px; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;BLE UART Real-Time Data&lt;/h2&gt;
+&lt;button id=&quot;connectBtn&quot;&gt;Connect to BLE Device&lt;/button&gt;
+&lt;canvas id=&quot;chart&quot; width=&quot;800&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
+
+&lt;script&gt;
+let data = [], labels = [], chart;
+const maxPoints = 40, valueMin = 0, valueMax = 100;
+
+const ble = {
+  device: null,
+  server: null,
+  tx: null,
+  rx: null,
+  connected: false
+};
+
+const connectBtn = document.getElementById('connectBtn');
+
+connectBtn.addEventListener('click', async () =&gt; {
+  if (!ble.connected) {
+    await connectBLE();
+  } else {
+    disconnectBLE();
+  }
+});
+
+async function connectBLE() {
+  try {
+    ble.device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }]
+    });
+
+    ble.device.addEventListener(
+      'gattserverdisconnected',
+      onDisconnected
+    );
+
+    ble.server = await ble.device.gatt.connect();
+
+    const service = await ble.server.getPrimaryService(
+      '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+    );
+
+    ble.tx = await service.getCharacteristic(
+      '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
+    );
+
+    ble.rx = await service.getCharacteristic(
+      '6e400003-b5a3-f393-e0a9-e50e24dcca9e'
+    );
+
+    await ble.rx.startNotifications();
+    ble.rx.addEventListener(
+      'characteristicvaluechanged',
+      handleData
+    );
+
+    await ble.tx.writeValue(
+      new TextEncoder().encode('START\n')
+    );
+
+    ble.connected = true;
+    updateButton();
+
+    console.log('BLE connected');
+
+  } catch (err) {
+    console.error('BLE connect failed:', err);
+    resetBLE();
+  }
+}
+
+function disconnectBLE() {
+  if (ble.device &amp;&amp; ble.device.gatt.connected) {
+    ble.device.gatt.disconnect();
+  }
+}
+
+function onDisconnected() {
+  console.log('BLE disconnected');
+  resetBLE();
+}
+
+function resetBLE() {
+  ble.connected = false;
+  ble.device = ble.server = ble.tx = ble.rx = null;
+  updateButton();
+}
+
+function updateButton() {
+  connectBtn.textContent = ble.connected
+    ? 'Disconnect'
+    : 'Connect to BLE Device';
+}
+
+function handleData(e) {
+  const value = parseFloat(
+    new TextDecoder().decode(e.target.value).trim()
+  );
+
+  if (!isNaN(value) &amp;&amp; value &gt;= valueMin &amp;&amp; value &lt;= valueMax) {
+    if (data.length &gt;= maxPoints) {
+      data.shift();
+      labels.shift();
+    }
+    data.push(value);
+    labels.push(new Date().toLocaleTimeString());
+    chart.update();
+  }
+}
+
+function initChart() {
+  const ctx = document.getElementById('chart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'BLE UART Value',
+        data,
+        borderColor: 'rgba(75,192,192,1)',
+        backgroundColor: 'rgba(75,192,192,0.2)',
+        tension: 0.2,
+        fill: true
+      }]
+    },
+    options: {
+      animation: false,
+      responsive: true,
+      scales: {
+        x: {
+          title: { display: true, text: 'Time', 
+                   font: { size: 16, weight: 'bold' } }
+        },
+        y: {
+          min: 0,
+          max: 100,
+          title: { display: true, text: 'Analog Input',
+                   font: { size: 16, weight: 'bold' } }
+        }
+      }
+    }
+  });
+}
+
+initChart();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><img alt="" src="js_chart-1.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างหน้าเว็บทดสอบโดยใช้ <strong>Chrome Web Browser</strong> ก่อนการเชื่อมต่อกับอุปกรณ์</p>
+<p><img alt="" src="js_chart-2.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการแสดงรูปกราฟเมื่อรับข้อมูลจาก <strong>ESP32</strong> มาแสดงผล</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="ble-client-processing-p5js">&#9655; <strong>BLE Client: Processing (p5.js)</strong><a class="headerlink" href="#ble-client-processing-p5js" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการทดลองใช้ไลบรารี <a href="https://github.com/processing/p5.js/releases"><code>p5.js</code></a>
+ซึ่งเป็นเวอร์ชันของ <strong>Processing</strong> ที่พัฒนาขึ้นมาให้ทำงานบนเว็บ
+เพื่อการสร้างงานกราฟิกเชิงโต้ตอบ โดยใช้ภาษา <strong>JavaScript</strong> โค้ดจะรันในเว็บเบราว์เซอร์ผ่าน <strong>HTML5 Canvas</strong>
+ในตัวอย่างนี้ เป็นการสาธิตการใช้ไลบรารี <code>p5.js</code> (ทดลองใช้เวอร์ชัน <strong>v2.2.0</strong>)
+เพื่อนำข้อมูลจากจากเซนเซอร์ หรือ อุปกรณ์ <strong>IoT</strong> มาแสดงผลบนหน้าเว็บ โดยใช้โค้ดตัวอย่างต่อไปนี้</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;ESP32 BLE UART Plot (p5.js)&lt;/title&gt;
+
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.2.0/lib/p5.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;style&gt;
+body {
+  font-family: system-ui, sans-serif;
+  background: #f4f4f4;
+  text-align: center;
+}
+
+#container {
+  width: 900px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;div id=&quot;container&quot;&gt;
+  &lt;h2&gt;ESP32 BLE UART – Real-Time Plot&lt;/h2&gt;
+  &lt;button id=&quot;btn&quot;&gt;Connect&lt;/button&gt;
+  &lt;div id=&quot;canvas-holder&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const UART_RX      = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+let ble = {
+  device: null,
+  server: null,
+  rx: null,
+  connected: false
+};
+
+const MAX_POINTS = 200;
+const Y_MIN  = 0;
+const Y_MAX  = 100;
+const Y_STEP = 20;
+
+let values = [];
+
+const btn = document.getElementById('btn');
+btn.onclick = toggleBLE;
+
+async function toggleBLE() {
+  ble.connected ? disconnectBLE() : await connectBLE();
+}
+
+async function connectBLE() {
+  try {
+    ble.device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: [UART_SERVICE] }]
+    });
+
+    ble.device.addEventListener(
+      'gattserverdisconnected',
+      onDisconnected
+    );
+
+    ble.server = await ble.device.gatt.connect();
+    const service = await ble.server.getPrimaryService(UART_SERVICE);
+
+    ble.rx = await service.getCharacteristic(UART_RX);
+    await ble.rx.startNotifications();
+    ble.rx.addEventListener(
+      'characteristicvaluechanged',
+      onData
+    );
+
+    ble.connected = true;
+    btn.textContent = 'Disconnect';
+    console.log('BLE connected');
+
+  } catch (err) {
+    console.error(err);
+    resetBLE();
+  }
+}
+
+function disconnectBLE() {
+  if (ble.device?.gatt.connected) {
+    ble.device.gatt.disconnect();
+  }
+}
+
+function onDisconnected() {
+  resetBLE();
+}
+
+function resetBLE() {
+  ble = { device:null, server:null, rx:null, connected:false };
+  btn.textContent = 'Connect';
+}
+
+function onData(e) {
+  const text = new TextDecoder().decode(e.target.value).trim();
+  const v = parseFloat(text);
+
+  if (!isNaN(v)) {
+    if (values.length &gt;= MAX_POINTS) values.shift();
+    values.push(v);
+  }
+}
+
+// p5.js setup
+function setup() {
+  const canvas = createCanvas(860, 400);
+  canvas.parent('canvas-holder');
+}
+
+function draw() {
+  background(250);
+  drawGrid();
+  drawAxes();
+  drawYAxisMarkers();
+  drawPlot();
+}
+
+function drawGrid() {
+  const xMin = 50;
+  const xMax = width - 20;
+  const yMin = 20;
+  const yMax = height - 30;
+  const xDiv = 10;
+  const yDiv = (Y_MAX - Y_MIN) / Y_STEP;
+
+  stroke(200);
+  strokeWeight(1);
+  drawingContext.setLineDash([5, 5]);
+
+  // Vertical grid
+  for (let i = 1; i &lt; xDiv; i++) {
+    const x = map(i, 0, xDiv, xMin, xMax);
+    line(x, yMin, x, yMax);
+  }
+  // Horizontal grid
+  for (let i = 1; i &lt; yDiv; i++) {
+    const y = map(i, 0, yDiv, yMax, yMin);
+    line(xMin, y, xMax, y);
+  }
+  drawingContext.setLineDash([]);
+}
+
+function drawAxes() {
+  stroke(120);
+  strokeWeight(2);
+
+  line(50, 20, 50, height - 30);                   // Y-axis
+  line(50, height - 30, width - 20, height - 30);  // X-axis
+  noStroke();
+  fill(80);
+  text('Value', 30, 10);
+  text('Time (Samples) →', width - 120, height - 10);
+}
+
+function drawYAxisMarkers() {
+  fill(80);
+  noStroke();
+  textAlign(RIGHT, CENTER);
+
+  for (let v = Y_MIN; v &lt;= Y_MAX; v += Y_STEP) {
+    const y = map(v, Y_MIN, Y_MAX, height - 30, 20);
+    text(v.toString(), 45, y);
+  }
+  textAlign(LEFT, BASELINE);
+}
+
+function drawPlot() {
+  if (values.length &lt; 2) return;
+  stroke(0, 150, 200);
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  values.forEach((v, i) =&gt; {
+    const x = map(i, 0, MAX_POINTS - 1, 50, width - 20);
+    const y = map(v, Y_MIN, Y_MAX, height - 30, 20);
+    vertex(x, y);
+  });
+  endShape();
+  noStroke();
+  fill(0);
+  text(`Latest: ${values.at(-1).toFixed(2)}`, width - 150, 30);
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><img alt="" src="p5_js_plot.jpg" /></p>
+<p><strong>รูป:</strong> ตัวอย่างการแสดงรูปกราฟด้วย <strong>Processing (JavaScript)</strong> เมื่อรับข้อมูลจาก <strong>ESP32</strong> มาแสดงผล</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้แนะนำการใช้งาน <strong>BLE (Bluetooth Low Energy)</strong> บนบอร์ด <strong>ESP32 / ESP32-S3</strong>
+ผ่านไลบรารี <strong>NimBLE-Arduino</strong> โดยใช้ตัวอย่างโค้ดสาธิตการทำงานในรูปแบบ <strong>BLE-ADC</strong>
+มีการสร้างทาสก์ด้วย <strong>FreeRTOS</strong> แบ่งงานย่อย และให้ทำงานร่วมกัน เพื่อสื่อสารข้อมูลกับ <strong>BLE Client</strong> ทำให้สามารถรับส่งผ่าน <strong>BLE</strong> และอ่านค่าจากสัญญาณแอนะล็อกอินพุตได้ โดยยกตัวอย่างการแสดงรูปกราฟบนหน้าเว็บ สำหรับข้อมูลที่ได้รับมาจาก <strong>ESP32</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../esp32_ble_intro/">ตัวอย่างการเขียนโปรแกรมด้วย Arduino สำหรับใช้งาน <strong>ESP32 - Bluetooth LE</strong></a></li>
+<li><a href="../../zephyr/zephyr_cli_west/">แนะนำการใช้งาน <strong>Zephyr RTOS</strong> แบบ <strong>CLI</strong>: ทดลองใช้งาน <strong>Micro:bit v2 BLE</strong></a></li>
+<li><a href="../esp32_nimble_part-1/">การเขียนโปรแกรม <strong>ESP32</strong> เพื่อใช้งาน <strong>BLE</strong> ด้วยไลบรารี <strong>NimBLE-Arduino</strong> (ตอนที่ 1)"</a></li>
+<li><a href="../esp32_nimble_part-2/">การเขียนโปรแกรม <strong>ESP32</strong> เพื่อใช้งาน <strong>BLE</strong> ด้วยไลบรารี <strong>NimBLE-Arduino</strong> (ตอนที่ 2)"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.</p>
+<p>Created: 2026-01-22 | Last Updated: 2026-01-22</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
