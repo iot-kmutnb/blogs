@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/arduino/uno_ethernet_part-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 2) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-uno-w5100-ethernet-shield-network-programming-2" class="nav-link">Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 2)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-uno-lan" class="nav-link">&#9655; บอร์ด Arduino Uno กับการเชื่อมต่อระบบเครือข่าย LAN</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-tcp-client" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - TCP Client</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-udp-client" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - UDP Client</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-dns-resolving" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - DNS Resolving</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-http-get" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - HTTP GET</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-http-web-server" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - HTTP Web Server</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-mqtt-publish-subscribe" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - MQTT Publish / Subscribe</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-uno-w5100-ethernet-shield-network-programming-2">Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 2)<a class="headerlink" href="#arduino-uno-w5100-ethernet-shield-network-programming-2" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino Uno</em>, <em>Arduino Ethernet Shield</em>, <em>Network Programming</em></p>
+<ul>
+<li><a href="#arduino-uno-lan"><strong>บอร์ด Arduino Uno กับการเชื่อมต่อระบบเครือข่าย LAN</strong></a></li>
+<li><a href="#arduino-ethernet-tcp-client"><strong>ตัวอย่างโค้ด: Arduino Ethernet - TCP Client</strong></a></li>
+<li><a href="#arduino-ethernet-udp-client"><strong>ตัวอย่างโค้ด: Arduino Ethernet - UDP Client</strong></a></li>
+<li><a href="#arduino-ethernet-dns-resolving"><strong>ตัวอย่างโค้ด: Arduino Ethernet - DNS Resolving</strong></a></li>
+<li><a href="#arduino-ethernet-http-get"><strong>ตัวอย่างโค้ด: Arduino Ethernet - HTTP GET</strong></a></li>
+<li><a href="#arduino-ethernet-http-web-server"><strong>ตัวอย่างโค้ด: Arduino Ethernet - HTTP Web Server</strong></a></li>
+<li><a href="#arduino-ethernet-mqtt-publish-subscribe"><strong>ตัวอย่างโค้ด: Arduino Ethernet - MQTT Publish / Subscribe</strong></a></li>
+</ul>
+<hr />
+<h2 id="arduino-uno-lan">&#9655; <strong>บอร์ด Arduino Uno กับการเชื่อมต่อระบบเครือข่าย LAN</strong><a class="headerlink" href="#arduino-uno-lan" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>Arduino Uno</strong> และโมดูล <strong>Arduino Ethernet Shield (W5100)</strong>
+ถือว่าเป็นฮาร์ดแวร์ยุคแรก ๆ ของ <strong>Arduino.cc</strong> และสามารถจัดอยู่ในกลุ่มของฮาร์ดแวร์
+ที่เป็น <strong>legacy / retired</strong> ได้ในบางกรณี
+อย่างไรก็ตาม บอร์ดลักษณะนี้ยังมีการผลิตและจำหน่ายจากประเทศจีน ซึ่งมีราคาถูกกว่าสินค้าต้นฉบับจาก <strong>Arduino.cc</strong></p>
+<p>บอร์ด <strong>Arduino Uno + W5100</strong> ยังคงสามารถนำมาใช้เป็นตัวอย่างในการเรียนรู้ได้
+แต่มีข้อจำกัดบางประการ เช่น</p>
+<ul>
+<li>ไม่รองรับ <strong>TLS/HTTPS</strong> ซึ่งเป็นมาตรฐานความปลอดภัยสำคัญในระบบเครือข่ายสมัยใหม่
+(แนะนำให้ใช้ <strong>W5500</strong> แทน <strong>W5100</strong>)</li>
+<li>ไม่รองรับการรับส่งข้อมูลความเร็วสูง</li>
+</ul>
+<p>ในบทความนี้จะนำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino</strong> สำหรับงานด้าน
+<strong>Network Programming</strong> ครอบคลุมการใช้งานโปรโตคอลต่าง ๆ เช่น
+<strong>TCP</strong>, <strong>UDP</strong>, <strong>HTTP</strong> และ <strong>MQTT</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-tcp-client">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - TCP Client</strong><a class="headerlink" href="#arduino-ethernet-tcp-client" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้ สาธิตการสื่อสารข้อมูลในระบบเครือข่ายด้วยโปรโตคอล <strong>TCP</strong>
+โดยให้ <strong>Arduino Ethernet</strong> ทำหน้าที่เป็น <strong>TCP Client</strong></p>
+<p>ระบบจะสร้างการเชื่อมต่อผ่าน <strong>TCP Socket</strong> ไปยังคอมพิวเตอร์ เช่น <strong>Raspberry Pi</strong>
+(หมายเลข <strong>IP</strong> = <code>192.168.10.1</code>) ที่รันโค้ด <strong>Python-based TCP Server</strong> บนพอร์ต <code>5000</code> </p>
+<p>บอร์ด <strong>Arduino</strong> จะส่งข้อความทีละหนึ่งบรรทัด ทุก ๆ 1 วินาที ไปยัง <strong>TCP Server</strong>
+เมื่อเซิร์ฟเวอร์จะรับข้อความดังกล่าว และส่งกลับไปยังไคลเอนต์ (<strong>Client</strong>) ทันที
+ในลักษณะการทำงานแบบ <strong>Echo / Loopback</strong> และข้อมูลที่ได้รับกลับมา จะถูกส่งออกทาง <code>Serial</code>
+ของบอร์ด <strong>Arduino</strong></p>
+<p>ในตัวอย่างโค้ดจะเห็นได้ว่า มีการสร้างอ็อบเจกต์จากคลาส <a href="https://github.com/arduino-libraries/Ethernet/blob/master/src/EthernetClient.cpp"><code>EthernetClient</code></a> 
+และใช้ตัวแปรชื่อ <code>client</code> สำหรับอ้างอิงและเรียกใช้งานฟังก์ชันต่าง ๆ เช่น</p>
+<ul>
+<li><code>int EthernetClient::connect( IPAddress ip, uint16_t port )</code> ใช้สำหรับเชื่อมต่อไปยัง <strong>Server</strong>  </li>
+<li><code>size_t EthernetClient::print( const char[] )</code> ใช้สำหรับส่งข้อมูลไปยัง <strong>Server</strong>  </li>
+<li><code>size_t EthernetClient::write(const uint8_t *buf, size_t size)</code> ใช้สำหรับส่งข้อมูลไปยัง <strong>Server</strong></li>
+<li><code>int EthernetClient::available()</code> ใช้สำหรับตรวจสอบว่ามีข้อมูลจาก <strong>Server</strong> เข้ามาหรือไม่  </li>
+<li><code>int EthernetClient::read()</code> ใช้สำหรับอ่านข้อมูลทีละ 1 ไบต์ ที่ได้จาก <strong>Server</strong></li>
+<li><code>int EthernetClient::read(uint8_t *buf, size_t size)</code> ใช้สำหรับอ่านข้อมูลหลายไบต์ลงในบัฟเฟอร์</li>
+<li><code>uint8_t EthernetClient::connected()</code> ใช้สำหรับตรวจสอบสถานะการเชื่อมต่อ</li>
+<li><code>void EthernetClient::stop()</code> ใช้สำหรับปิดการเชื่อมต่อ</li>
+</ul>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 10, 100);   // Static IP address for Arduino Ethernet
+IPAddress server(192, 168, 10, 1); // Server IP address
+
+#define SERVER_PORT   5000
+#define INTERVAL_MS   100
+#define RECONNECT_MS  3000
+#define BUF_LEN       64
+
+EthernetClient client;
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;\n\n\nArduino Ethernet - TCP Client Demo...&quot;);
+  Ethernet.begin(mac, ip);
+  delay(1000);
+}
+
+void loop() {
+  static bool connected = false;
+  static uint32_t lastReconnect = 0;
+  static uint32_t lastSend = 0;
+  static uint32_t counter = 0;
+
+  // 1. Check connection and reconnect if necessary
+  if (!client.connected()) {
+    connected = false;
+    if (millis() - lastReconnect &gt; RECONNECT_MS) {
+      lastReconnect = millis();
+      connected = tryConnect();
+    }
+    return;
+  }
+
+  // 2. send data periodically
+  if (millis() - lastSend &gt;= INTERVAL_MS) {
+    char sbuf[BUF_LEN];
+    lastSend = millis();
+    snprintf(sbuf, sizeof(sbuf),
+             &quot;seq_num=%lu,msg='hello'\n&quot;, counter++);
+    //client.print(sbuf);
+    client.write( sbuf, strlen(sbuf) );
+    client.flush();
+  }
+
+  // 3. read echo (Block Read)
+  int availableBytes = client.available();
+  if (availableBytes &gt; 0) {
+    char rxBuf[BUF_LEN];
+    // Read up to the size of the Rx buffer
+    int bytesToRead = min(availableBytes, (int)sizeof(rxBuf));
+    int bytesRead = client.read((uint8_t*)rxBuf, bytesToRead);
+    if (bytesRead &gt; 0) {
+      Serial.write((uint8_t*)rxBuf, bytesRead); // Bulk write to Serial
+    }
+  }
+}
+
+bool tryConnect() {
+  Serial.println(&quot;Trying to connect...&quot;);
+  client.stop();
+  if ( client.connect(server, SERVER_PORT) ) {
+    Serial.println(&quot;Connected to server&quot;);
+    return true;
+  } else {
+    Serial.println(&quot;Connection failed&quot;);
+    return false;
+  }
+}
+</code></pre>
+<p>โค้ด <strong>Python TCP Server</strong> ต่อไปนี้ ใช้ไลบรารี <code>asyncio</code>
+(เป็นส่วนหนึ่งของ <strong>Python 3 Standard Library</strong>)
+เพื่อรองรับการทำงานแบบ <strong>Asynchronous I/O</strong> และใช้ในการทดสอบการสื่อสารในเครือข่าย
+โดยคอยรับแพ็กเกตจาก <strong>Arduino Ethernet</strong> แล้วส่งกลับไปในลักษณะ <strong>Echo</strong></p>
+<pre><code class="language-python">import asyncio
+
+HOST = &quot;0.0.0.0&quot;
+PORT = 5000  # The server's TCP port number
+
+async def handle_client(reader, writer):
+    addr = writer.get_extra_info(&quot;peername&quot;)
+    print(f&quot;[+] Client connected: {addr}&quot;)
+    try:
+        while True:
+            try:
+                data = await asyncio.wait_for(reader.readline(), timeout=5.0)
+                if not data:
+                    print(f&quot;[-] Client disconnected: {addr}&quot;)
+                    break
+
+                msg = data.decode(errors=&quot;ignore&quot;).strip()
+                print(f&quot;RX {addr}: {msg}&quot;)
+
+                # Echo back
+                response = msg + &quot;\n&quot;
+                writer.write(response.encode())
+                await writer.drain()
+
+            except asyncio.TimeoutError:
+                print(f&quot;[!] Timeout (no data) from {addr}&quot;)
+                break
+
+            except ConnectionResetError:
+                print(f&quot;[!] Connection reset by peer: {addr}&quot;)
+                break
+
+            except asyncio.IncompleteReadError:
+                print(f&quot;[!] Incomplete read from {addr}&quot;)
+                break
+
+    except Exception as e:
+        print(f&quot;[!] Unexpected error {addr}: {e}&quot;)
+
+    finally:
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+        print(f&quot;[x] Connection closed: {addr}&quot;)
+
+async def main():
+    server = await asyncio.start_server(handle_client, HOST, PORT)
+    addr_list = &quot;, &quot;.join(str(sock.getsockname()) for sock in server.sockets)
+    print(f&quot;TCP Server running on {addr_list}&quot;)
+
+    async with server:
+        await server.serve_forever()
+
+if __name__ == &quot;__main__&quot;:
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print(&quot;\nServer stopped.&quot;)
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-5.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+แสดงให้เห็นการส่งข้อความไปยัง <strong>TCP Server</strong> และข้อความที่ได้รับกลับมา</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-udp-client">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - UDP Client</strong><a class="headerlink" href="#arduino-ethernet-udp-client" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้สาธิต การเขียนโปรแกรมให้ <strong>Arduino Ethernet</strong>
+ทำงานเป็น <strong>UDP Client</strong> มีการใช้งานคลาส <a href="https://github.com/arduino-libraries/Ethernet/blob/master/src/EthernetUdp.cpp"><code>EthernetUDP</code></a> 
+และอ้างอิงอ็อปเจกต์ที่ถูกสร้างขึ้นมา โดยใช้ตัวแปรชื่อ <code>client</code> รวมถึงการใช้ฟังก์ชันต่าง ๆ ที่เกี่ยวข้อง เช่น</p>
+<ul>
+<li><code>uint8_t EthernetUDP::begin(uint16_t port)</code>
+  ใช้สำหรับเริ่มต้นการใช้งาน <strong>UDP</strong> และกำหนดหมายเลขพอร์ตของฝั่ง <strong>Client</strong>
+  หากกำหนดเป็น <code>0</code> จะให้ระบบเลือกพอร์ตให้อัตโนมัติ</li>
+<li><code>int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)</code>
+  ใช้สำหรับเริ่มต้นการสร้าง <strong>UDP Packet</strong> เพื่อส่งออกไป</li>
+<li><code>size_t EthernetUDP::write(const uint8_t *buffer, size_t size)</code>
+  ใช้สำหรับเขียนข้อมูลลงใน <strong>UDP Packet (buffer)</strong> ที่เตรียมจะส่ง</li>
+<li><code>int EthernetUDP::endPacket()</code>
+   ใช้สำหรับส่ง <strong>UDP Packet</strong> ออกไปยังปลายทางจริง</li>
+<li><code>int EthernetUDP::parsePacket()</code>
+   ใช้สำหรับตรวจสอบว่ามี <strong>UDP Packet</strong> เข้ามาหรือไม่
+    หากมี จะคืนค่าขนาดของ <strong>Packet</strong> มิฉะนั้นจะคืนค่า <code>0</code></li>
+<li><code>int EthernetUDP::read(unsigned char *buffer, size_t len)</code>
+    ใช้สำหรับอ่านข้อมูลจาก <strong>UDP Packet</strong> ที่ได้รับ และเก็บลงใน <strong>Buffer</strong></li>
+</ul>
+<p>ในตัวอย่างนี้ <strong>Arduino</strong> จะส่งข้อความแบบ <strong>Random Hex String</strong>
+ที่มีขนาดความยาวคงที่ <strong>N=40</strong> ไบต์ ทุก ๆ <strong>500 msec</strong>
+หลังจากส่งไปยัง <strong>UDP Server</strong> แล้ว จะรอรับข้อความตอบกลับ<br />
+โดยกำหนดค่า <strong>Timeout = 20 ms</strong> สำหรับการรอรับในแต่ละครั้ง</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+#include &lt;EthernetUdp.h&gt;
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 10, 100);
+IPAddress server(192, 168, 10, 1);
+const unsigned int serverPort = 5000;
+
+EthernetUDP udp;
+
+#define N_BYTES      40
+#define TX_INTERVAL 500
+#define RX_TIMEOUT   20
+
+char txBuf[N_BYTES * 2 + 1];
+char rxBuf[128];
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;\n\n\nArduino Ethernet - UDP Client Demo..&quot;);
+  Serial.flush();
+  Ethernet.begin(mac, ip);
+  delay(1000);
+  udp.begin(0);  // 0 = choose random UDP local port automatically
+  randomSeed(analogRead(A3));
+}
+
+void loop() {
+  static uint32_t lastTx = 0;
+
+  if (millis() - lastTx &gt;= TX_INTERVAL) {
+    lastTx = millis();
+    // Generate TX message
+    randomHex(txBuf, N_BYTES);
+    // Send UDP
+    uint32_t ts = millis();
+    udp.beginPacket(server, serverPort);
+    udp.write( txBuf, strlen(txBuf) );
+    udp.endPacket();
+
+    // Wait and compare RX
+    bool matched = false, timeout = false;
+    if (waitEcho(RX_TIMEOUT)) {
+      if (strcmp(txBuf, rxBuf) == 0) {
+        matched = true;
+      }
+    } else {
+      timeout = true;
+    }
+    uint32_t t_exec = millis() - ts;
+    Serial.print(&quot;\nUDP exec [msec]: &quot;);
+    Serial.println(t_exec);
+    Serial.print(&quot;TX: &quot;);
+    Serial.println(txBuf);
+
+    if (timeout) {
+      Serial.println(&quot;RX: Timeout [FAILED!]&quot;);
+    } else {
+      Serial.print(&quot;RX: &quot;);
+      Serial.print(rxBuf);
+      if (matched) {
+        Serial.println(&quot; matched [OK]&quot;);
+      } else {
+        Serial.println(&quot; mismatched [FAILED]&quot;);
+      }
+    }
+  }
+}
+
+bool waitEcho(uint32_t timeoutMs) {
+  uint32_t start = millis();
+  while (millis() - start &lt; timeoutMs) {
+    int packetSize = udp.parsePacket();
+    if (packetSize) {
+      int len = udp.read(rxBuf, sizeof(rxBuf) - 1);
+      if (len &gt; 0) { rxBuf[len] = '\0'; }
+      return true;
+    }
+  }
+  memset(rxBuf, 0, sizeof(rxBuf));
+  return false;
+}
+
+void randomHex(char *out, int n) {
+  const char hex[] = &quot;0123456789ABCDEF&quot;;
+  for (int i = 0; i &lt; n * 2; i++) {
+    out[i] = hex[random(0, 16)];
+  }
+  out[n * 2] = '\0';
+}
+</code></pre>
+<p>ตัวอย่างโค้ด <strong>Python - UDP Server</strong> สำหรับใช้ในการทดสอบการทำงานของ <strong>Arduino Ethernet</strong></p>
+<pre><code class="language-python">import asyncio
+
+HOST = &quot;0.0.0.0&quot;
+PORT = 5000
+
+class UDPServerProtocol:
+    def connection_made(self, transport):
+        self.transport = transport
+        print(f&quot;UDP Server running on {HOST}:{PORT}&quot;)
+
+    def datagram_received(self, data, addr):
+        msg = data.decode(errors=&quot;ignore&quot;).strip()
+        print(f&quot;RX {addr}: {msg}&quot;)
+        # echo back
+        self.transport.sendto( msg.encode(), addr)
+
+    def connection_lost(self, exc):
+        print(&quot;[!] UDP connection lost (clean shutdown or error)&quot;)
+        if exc:
+            print(&quot;Error:&quot;, exc)
+
+async def main():
+    loop = asyncio.get_running_loop()
+
+    transport, protocol = await loop.create_datagram_endpoint(
+        lambda: UDPServerProtocol(),
+        local_addr=(HOST, PORT),
+    )
+
+    try:
+        await asyncio.Future()  # run forever
+    finally:
+        transport.close()
+
+if __name__ == &quot;__main__&quot;:
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print(&quot;\nServer stopped.&quot;)
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-6.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+แสดงให้เห็นการส่งข้อความไปยัง <strong>UDP Server</strong> และข้อความที่ได้รับกลับมา</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-dns-resolving">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - DNS Resolving</strong><a class="headerlink" href="#arduino-ethernet-dns-resolving" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งานบอร์ด <strong>Arduino Uno + Ethernet Shield (W5100)</strong>
+เพื่อทำการ แปลงชื่อโดเมน (<strong>Hostname</strong>) เป็นหมายเลข <strong>IP Address</strong> 
+ด้วยโปรโตคอล <strong>DNS (Domain Name System)</strong></p>
+<p>ในโค้ดมีการใช้งานคลาส <a href="https://github.com/ninjablocks/arduino/blob/master/Ethernet/Dns.h"><code>DNSClient</code></a>
+เพื่อสร้างอ็อบเจกต์สำหรับจัดการงานด้าน <strong>DNS (Domain Name Resolution)</strong>
+โดยอ้างอิงผ่านตัวแปร <code>dns</code> และมีการเรียกใช้ฟังก์ชันที่สำคัญ เช่น</p>
+<ul>
+<li><code>void begin( const IPAddress&amp; aDNSServer )</code>
+ใช้กำหนดหมายเลข <strong>IP</strong> ของ<strong> DNS Server</strong> ที่จะใช้ในการส่งคำร้องขอ</li>
+<li><code>int getHostByName( const char* aHostname, IPAddress&amp; aResult )</code>
+ใช้สำหรับแปลงชื่อโดเมน (<strong>Hostname</strong>) ให้เป็นหมายเลข <strong>IP Address</strong>
+โดยผลลัพธ์จะถูกเก็บไว้ในตัวแปร <code>aResult</code> และคืนค่าเป็นสถานะของการทำงาน (เช่น สำเร็จหรือไม่สำเร็จ)</li>
+</ul>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+#include &lt;Dns.h&gt;
+
+// Network config
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 10, 100);
+IPAddress gateway(192, 168, 10, 1);
+IPAddress subnet(255, 255, 255, 0);
+// Use the DNS server of the gateway
+IPAddress dnsServer(192, 168, 10, 1); 
+
+DNSClient dns; // &lt;--
+
+const char* hosts[] = {
+  &quot;google.com&quot;,
+  &quot;github.com&quot;,
+  &quot;github.io&quot;,
+  &quot;arduino.cc&quot;,
+  &quot;api.quotable.io&quot;,
+  &quot;nonexistent.test&quot;
+};
+
+#define NUM_HOSTS (sizeof(hosts) / sizeof(hosts[0]))
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;\n\n\nArduio Ethernet - DNS Revolving...&quot;);
+  Ethernet.begin(mac, ip, gateway, gateway, subnet);
+  delay(1000);
+
+  Serial.print(&quot;Local IP: &quot;);
+  Serial.println(Ethernet.localIP());
+  Serial.print(&quot;DNS Server: &quot;);
+  Serial.println(dnsServer);
+  dns.begin(dnsServer); // &lt;---
+}
+
+void loop() {
+  testDNS();
+  delay(5000);
+}
+
+void testDNS() {
+  for (int i = 0; i &lt; NUM_HOSTS; i++) {
+    resolveHost( hosts[i] );
+    delay(1000);
+  }
+  Serial.println(&quot;---------------------------------\n&quot;);
+}
+
+void resolveHost(const char* host) {
+  IPAddress resolvedIP;
+  Serial.print(&quot;Resolving: &quot;);
+  Serial.print(host);
+
+  int ret = dns.getHostByName(host, resolvedIP); // &lt;--
+  if (ret == 1) {
+    Serial.print(&quot; [OK] IP = &quot;);
+    Serial.println(resolvedIP);
+  } else {
+    Serial.print(&quot; [FAILED] (code=&quot;);
+    Serial.print(ret);
+    Serial.println(&quot;)&quot;);
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-7.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+แสดงให้เห็นผลลัพธ์ของการติดต่อกับ <strong>DNS Server</strong> เพื่อแปลง <strong>Domain Name</strong>
+ให้เป็น <strong>IP Address</strong> ที่สอดคล้องกัน สำหรับโดเมนที่ใช้เป็นตัวอย่าง</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-http-get">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - HTTP GET</strong><a class="headerlink" href="#arduino-ethernet-http-get" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งานโปรโตคอล <strong>HTTP</strong> ด้วยวิธีการ <strong>GET</strong>
+เพื่อส่งคำร้องขอ (<strong>HTTP Request</strong>) ไปยัง <strong>URL:</strong>
+<code>http://api.quotable.io/random</code></p>
+<p>โดยเซิร์ฟเวอร์ จะตอบกลับข้อมูลในรูปแบบ <strong>JSON String</strong> ซึ่งประกอบด้วย
+ข้อความ <strong>Quote</strong> (คำคม / คำกล่าวที่เป็นข้อคิด) ในภาษาอังกฤษ และข้อมูลผู้ประพันธ์ (<strong>Author</strong>)
+จากนั้นโปรแกรมจะทำการประมวลผล (<strong>Parse</strong>) ข้อมูล <strong>JSON</strong> ดังกล่าว
+และแสดงผลเฉพาะข้อความ <strong>Quote</strong> และชื่อผู้ประพันธ์ทาง <strong>Serial Monitor</strong></p>
+<p>โค้ดตัวอย่าง มีการใช้งานไลบรารี <a href="https://github.com/bblanchon/ArduinoJson"><code>&lt;ArduinoJson.h&gt;</code></a> เวอร์ชัน <strong>7.3.1</strong> หรือ สูงกว่า
+โค้ดนี้มีการสร้างอ็อบเจกต์ จากคลาส <code>StaticJsonDocument&lt;512&gt;</code>
+ซึ่งจัดสรรหน่วยความจำแบบคงที่ขนาด 512 ไบต์
+สำหรับใช้เก็บโครงสร้างข้อมูลภายในของ <strong>JSON</strong> หลังจากการ parse (<strong>parsed JSON</strong>)</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+#include &lt;ArduinoJson.h&gt;
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 10, 100);
+IPAddress dns(192, 168, 10, 1);
+IPAddress gateway(192, 168, 10, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+char host[] = &quot;api.quotable.io&quot;;
+const int port = 80;
+
+EthernetClient client;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;\n\n\nArduino Ethernet - HTTP GET demo..&quot;);
+
+  if (Ethernet.begin(mac) == 0) { // Try DHCP first
+    // On DHCP failure (0), fall back to static network config.
+    Ethernet.begin(mac, ip, dns, gateway, subnet);
+  }
+  delay(1000);
+  Serial.print(&quot;IP: &quot;);
+  Serial.println(Ethernet.localIP());
+}
+
+void loop() {
+  fetchQuote();
+  delay(10000); // wait for 10 seconds.
+}
+
+void fetchQuote() {
+  if (!client.connect(host, port)) {
+    Serial.println(F(&quot;Connection failed&quot;));
+    return;
+  }
+  // Send HTTP GET
+  client.println(F(&quot;GET /random HTTP/1.1&quot;));
+  client.print(F(&quot;Host: &quot;));
+  client.println(host);
+  client.println(F(&quot;Connection: close&quot;));
+  client.println();
+
+  // 1. Skip HTTP headers efficiently
+  // The end of headers is always signaled by &quot;\r\n\r\n&quot;
+  if (!client.find(&quot;\r\n\r\n&quot;)) {
+    Serial.println(F(&quot;Invalid response or timeout&quot;));
+    client.stop();
+    return;
+  }
+
+  // 2. Parse directly from the stream (no intermediate String)
+  StaticJsonDocument&lt;512&gt; doc; // JSON buffer up to 512 bytes
+  DeserializationError err = deserializeJson(doc, client);
+
+  if (err) {
+    Serial.print(F(&quot;Parse failed: &quot;));
+    Serial.println(err.c_str());
+  } else {
+    const char *content = doc[&quot;content&quot;];
+    const char *author  = doc[&quot;author&quot;];
+    if (content &amp;&amp; author) {
+      Serial.print(F(&quot;\nQuote: \&quot;&quot;));
+      Serial.print(content);
+      Serial.print(F(&quot;\&quot;\nAuthor: &quot;));
+      Serial.println(author);
+    }
+  }
+  client.stop();
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-8.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+แสดงผลลัพธ์ของการติดต่อกับ <strong>HTTP Server</strong> (<code>api.quotable.io</code>)
+พอร์ต 80 โดยใช้วิธี <strong>HTTP GET</strong>
+ซึ่งได้รับข้อมูลตอบกลับในรูปแบบ <strong>JSON</strong> จากนั้นโปรแกรมจะทำการประมวลผล
+เพื่อเลือกเฉพาะข้อมูลที่สำคัญ และแสดงผลออกทาง <code>Serial</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-http-web-server">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - HTTP Web Server</strong><a class="headerlink" href="#arduino-ethernet-http-web-server" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการสร้าง <strong>HTTP Server (พอร์ต 80)</strong>
+โดยใช้บอร์ด <strong>Arduino Uno</strong> ร่วมกับ <strong>W5100 Ethernet Shield</strong></p>
+<p>ภายในตัวอย่าง มีการสร้างหน้าเว็บแบบเรียบง่าย (<strong>HTML</strong>) เพื่อให้ผู้ใช้สามารถควบคุมสถานะของวงจร <strong>LED</strong>
+ที่เชื่อมต่อกับขา <strong>Arduino D5</strong> ได้ เช่น</p>
+<ul>
+<li>สั่งเปิด (<strong>ON</strong>)</li>
+<li>สั่งปิด (<strong>OFF</strong>)</li>
+<li>สลับสถานะ (<strong>Toggle</strong>)</li>
+</ul>
+<p>นอกจากนี้ ยังสามารถตรวจสอบสถานะของ <strong>LED</strong> ในรูปแบบข้อมูล <strong>JSON</strong> ผ่าน 
+<strong>HTTP Request</strong> (เฉพาะ <strong>GET Method</strong> เท่านั้น) ได้อีกด้วย</p>
+<p>โค้ดตัวอย่างมีการใช้หน่วยความจำ <strong>Flash (PROGMEM)</strong> สำหรับเก็บ <strong>HTML Contents</strong>
+เพื่อลดการใช้ <strong>SRAM</strong> ของ <strong>Arduino Uno</strong></p>
+<p>นอกจากนั้นแล้วยังมีการกำหนด <strong>API</strong> สำหรับเรียกใช้งาน เช่น</p>
+<ul>
+<li><code>/led?state=on</code></li>
+<li><code>/led?state=off</code></li>
+<li><code>/led?state=toggle</code></li>
+<li><code>/led?state=status</code></li>
+<li><code>/led?state=status&amp;fmt=json</code></li>
+</ul>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+#include &lt;avr/pgmspace.h&gt;
+
+#define LED_PIN 5  // Arduino D5 Pin for LED output
+
+// Network config
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip     (192, 168, 10, 100);
+IPAddress gateway(192, 168, 10, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+EthernetServer server(80);
+
+// HTML contents (HTML_HEAD andHTML_TAIL) stored in Flash memory.
+
+static const char HTML_HEAD[] PROGMEM = R&quot;rawliteral(
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;LED Control&lt;/title&gt;
+&lt;style&gt;
+  body { font-family: Arial; text-align: center; margin-top: 40px; }
+  h2 { margin-bottom: 20px; }
+  .status { font-size: 20px; margin: 15px; }
+  a {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    text-decoration: none;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: black;
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Arduino LED Control (D5)&lt;/h2&gt;
+)rawliteral&quot;;
+
+static const char HTML_TAIL[] PROGMEM = R&quot;rawliteral(
+&lt;div&gt;
+  &lt;a href=&quot;/led?state=on&quot;&gt;ON&lt;/a&gt;
+  &lt;a href=&quot;/led?state=off&quot;&gt;OFF&lt;/a&gt;
+  &lt;a href=&quot;/led?state=toggle&quot;&gt;Toggle&lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;API: /led?state=on | off | toggle | status&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+)rawliteral&quot;;
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+  Serial.begin(115200);
+  Serial.println(F(&quot;\n\n\nArduino Ethernet - Web Server Demo...&quot;));
+
+  Ethernet.begin(mac, ip, gateway, gateway, subnet);
+  delay(1000);
+  Serial.print(F(&quot;IP: &quot;));
+  Serial.println(Ethernet.localIP());
+  server.begin();  // Start the HTTP server
+}
+
+void loop() {
+  // Check incoming client connection
+  EthernetClient client = server.available();
+  if (!client) return;
+
+  char req_line[80]; // HTTP request line (GET)
+  readRequestLine(client, req_line, sizeof(req_line));
+  Serial.println(req_line);
+  bool ledOn = digitalRead(LED_PIN);
+
+  if (strncmp(req_line, &quot;GET /led&quot;, 8) == 0) {
+    char *p = strstr(req_line, &quot;state=&quot;);
+    if (p) {
+      p += 6;
+      if      (strncmp(p, &quot;on&quot;, 2)     == 0) { ledOn = true;   }
+      else if (strncmp(p, &quot;off&quot;, 3)    == 0) { ledOn = false;  }
+      else if (strncmp(p, &quot;toggle&quot;, 6) == 0) { ledOn = !ledOn; }
+      digitalWrite(LED_PIN, ledOn ? HIGH : LOW);
+    }
+    if (strstr(req_line, &quot;fmt=json&quot;)) {
+      sendJson(client, ledOn);
+    } else {
+      sendPage(client, ledOn);
+    }
+  } else {
+    sendPage(client, ledOn);
+  }
+  delay(1);
+  client.stop();
+}
+
+void sendProgmem(EthernetClient &amp;client, const char *ptr) {
+  char buf[64];
+  size_t len = strlen_P(ptr);
+  for (size_t i = 0; i &lt; len; i += sizeof(buf)) {
+    size_t chunk = min(sizeof(buf), len - i);
+    memcpy_P(buf, ptr + i, chunk);
+    client.write((uint8_t *)buf, chunk);
+  }
+}
+
+void sendHeaders(EthernetClient &amp;client, const char *type=&quot;text/html&quot;) {
+  client.println(F(&quot;HTTP/1.1 200 OK&quot;));
+  client.print(F(&quot;Content-Type: &quot;));
+  client.println(type);
+  client.println(F(&quot;Connection: close&quot;));
+  client.println();
+}
+
+void sendJson(EthernetClient &amp;client, bool ledOn) {
+  sendHeaders(client, &quot;application/json&quot;);
+  client.print(F(&quot;{\&quot;led\&quot;:\&quot;&quot;));
+  client.print(ledOn ? F(&quot;on&quot;) : F(&quot;off&quot;));
+  client.println(F(&quot;\&quot;}&quot;));
+}
+
+void sendPage(EthernetClient &amp;client, bool ledOn) {
+  sendHeaders(client);
+  sendProgmem(client, HTML_HEAD);
+  client.print(F(&quot;&lt;p class='status'&gt;Status: &quot;));
+  client.print(ledOn ? F(&quot;ON&quot;) : F(&quot;OFF&quot;));
+  client.println(F(&quot;&lt;/p&gt;&quot;));
+  sendProgmem(client, HTML_TAIL);
+}
+
+void readRequestLine(EthernetClient &amp;client, char *buf, size_t len) {
+  size_t i = 0;
+  unsigned long t = millis();
+  while (client.connected() &amp;&amp; millis() - t &lt; 1000) {
+    if (client.available()) {
+      char c = client.read();
+      if (c == '\n') break;
+      if (c != '\r' &amp;&amp; i &lt; len - 1) { buf[i++] = c; }
+    }
+  }
+  buf[i] = '\0';
+  // flush headers
+  while (client.available()) client.read();
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-10.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+แสดงผลลัพธ์ของการรับ <strong>HTTP Request (GET)</strong> เข้ามาจาก <strong>Web Browser</strong></p>
+<p><img alt="" src="web_led_ctrl.jpg" /></p>
+<p>รูป: หน้าเว็บตัวอย่าง แสดงสถานะการทำงาน และการควบคุม <strong>LED</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-mqtt-publish-subscribe">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - MQTT Publish / Subscribe</strong><a class="headerlink" href="#arduino-ethernet-mqtt-publish-subscribe" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งานโปรโตคอล <strong>MQTT</strong>
+(<em>Message Queuing Telemetry Transport</em>) ในเบื้องต้น 
+<strong>MQTT</strong> เป็นโปรโตคอลสื่อสารแบบ <strong>Publish/Subscribe</strong>
+เหมาะกับระบบ <strong>IoT (Internet of Things)</strong>
+โดยแทนที่จะสื่อสารแบบ <strong>Client–Server</strong> ตรง ๆ (เช่น <strong>HTTP/HTTPS</strong>)
+<strong>MQTT</strong> จะมีตัวกลางเรียกว่า <strong>Broker</strong> ทำหน้าที่รับ–ส่งข้อความระหว่างอุปกรณ์</p>
+<p>ในการรับหรือส่งข้อมูล จะต้องระบุชื่อหัวข้อ (<strong>Topic</strong>) ในการสมัครรับข้อมูลหรือส่งข้อมูลไปยัง <strong>Broker</strong>
+และมีการกำหนดระดับความน่าเชื่อถือของการส่งข้อมูล หรือเรียกว่า <strong>QoS</strong> (<em>Quality of Service</em>)
+ในปัจจุบันมี <strong>Publish MQTT Broker</strong> ให้ทดลองใช้งานได้ฟรี เช่น <a href="http://www.mqtt-dashboard.com/"><strong>HiveMQ</strong></a> และ
+<a href="https://test.mosquitto.org/"><strong>Eclipse Mosquitto</strong></a></p>
+<p>บอร์ด <strong>Arduino Uno + Ethernet Shield (W5100)</strong> สามารถใช้งาน <strong>MQTT</strong> ได้
+โดยอาศัยไลบรารี <a href="https://github.com/knolleary/pubsubclient/blob/master/src/PubSubClient.h"><code>PubSubClient</code></a> ซึ่งเป็นไลบรารีที่นิยมใช้มาก แต่ก็มีข้อจำกัด เช่น</p>
+<ul>
+<li>ไม่รองรับ<strong> TLS/SSL</strong></li>
+<li><strong>Publish</strong> รองรับเฉพาะ <strong>QoS 0</strong></li>
+<li><strong>Subscribe</strong> รองรับ <strong>QoS 0</strong> และ <strong>QoS 1</strong> </li>
+<li>ไม่รองรับ <strong>QoS 2</strong></li>
+<li>ขนาดของบัฟเฟอร์จำกัด (~128–256 ไบต์)</li>
+</ul>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+// https://github.com/knolleary/pubsubclient/
+#include &lt;PubSubClient.h&gt;
+
+// Network Settings
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 10, 100);
+
+const char* MQTT_SERVER = &quot;broker.hivemq.com&quot;;
+const uint16_t MQTT_PORT = 1883;
+const char* MQTT_TOPIC = &quot;uno/test&quot;;
+
+EthernetClient ethClient;
+PubSubClient client(ethClient);
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(&quot;\n\n\nArduino Ethernet - MQTT Demo...&quot;);
+
+  Ethernet.begin(mac, ip);
+  delay(1000);
+
+  client.setServer(MQTT_SERVER, MQTT_PORT);
+  client.setCallback(mqttCallback);
+}
+
+void loop() {
+  static unsigned long lastMsg = 0;
+  static uint8_t count = 0;
+
+  if (!client.connected()) { reconnect(); }
+  client.loop();
+
+  // Publish every 5 seconds
+  unsigned long now = millis();
+  if (now - lastMsg &gt; 5000) {
+    lastMsg = now;
+    String msg = &quot;Hello from Arduino, id=&quot;;
+    msg += count++;
+    client.publish(MQTT_TOPIC, msg.c_str()); // Only QoS=0 supported
+    Serial.print(&quot;Published: &quot;);
+    Serial.println(msg);
+  }
+}
+
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.print(F(&quot;Message arrived [&quot;));
+  Serial.print(topic);
+  Serial.print(F(&quot;] &quot;));
+  for (int i = 0; i &lt; length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println(&quot;\n&quot;);
+}
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.println(F(&quot;MQTT boroker connecting...&quot;));
+    // Create a random client ID
+    if (client.connect(&quot;ArduinoUnoClient&quot;)) {
+      Serial.println(F(&quot;connected&quot;));
+      client.subscribe(&quot;uno/test/#&quot;, 1 /*QoS*/);
+    } else {
+      delay(5000);
+    }
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-9.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+แสดงผลลัพธ์ของการติดต่อกับ <strong>MQTT Broker</strong> (<code>broker.hivemq.com</code>
+พอร์ต <code>1883</code>) โดยทดลองส่งข้อมูลออกไป (<strong>Publish</strong>) และรอรับข้อมูลกลับมาด้วย
+(<strong>Subscribe</strong>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> และการใช้ไลบรารีที่เกี่ยวข้อง
+เพื่อใช้งานบอร์ด <strong>Arduino Uno</strong> ร่วมกับ <strong>Arduino Ethernet Shield (W5100)</strong>
+เช่น การเขียนโค้ดให้ <strong>Arduino Ethernet</strong> ทำหน้าที่เป็น <strong>TCP Client</strong>
+และ <strong>UDP Client</strong> เพื่อส่งข้อความและรอรับกลับแบบ <strong>Echo</strong>
+โดยมีโค้ด <strong>Python</strong> สำหรับทำหน้าที่เป็น <strong>TCP Server</strong> และ <strong>UDP Server</strong> ตามลำดับ</p>
+<p>นอกจากนี้ยังมีตัวอย่างการติดต่อกับ <strong>DNS Server</strong> เพื่อแปลงชื่อ <strong>Host Name</strong>
+ให้เป็น <strong>IP Address</strong> รวมถึงการส่ง <strong>HTTP Request</strong> แบบ <strong>GET Method</strong>
+ไปยัง <strong>Web Server</strong> ที่ตอบกลับข้อมูลในรูปแบบ <strong>JSON</strong></p>
+<p>อีกทั้งยังมีตัวอย่างการสื่อสารด้วยโปรโตคอล <strong>MQTT</strong>
+โดยมีการรับ–ส่งข้อมูลกับ <strong>Public MQTT Broker</strong> เช่น <strong>HiveMQ</strong></p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../uno_ethernet_part-3/">"<strong>Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 3)</strong>"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-04-17 | Last Updated: 2026-04-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

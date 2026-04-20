@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/arduino/uno_ethernet_part-3/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 3) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-uno-w5100-ethernet-shield-network-programming-3" class="nav-link">Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 3)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-uno-w5100-ethernet-shield-for-industrial-automation" class="nav-link">&#9655; Arduino Uno + W5100 Ethernet Shield for Industrial Automation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#modbus-rtu-tcp" class="nav-link">&#9655; Modbus RTU &amp; TCP</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#modbus-registers" class="nav-link">&#9655; Modbus Registers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#modbus-tcp-packet" class="nav-link">&#9655; โครงสร้างของ Modbus TCP Packet</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-uno-w5100-ethernet-shield-modbus-tcp" class="nav-link">&#9655; Arduino Uno + W5100 Ethernet Shield - Modbus TCP</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#modbus-tcp-server" class="nav-link">&#9655; ตัวอย่างโค้ด: Modbus TCP Server</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-uno-w5100-ethernet-shield-network-programming-3">Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 3)<a class="headerlink" href="#arduino-uno-w5100-ethernet-shield-network-programming-3" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino Uno</em>, <em>Arduino Ethernet Shield</em>, <em>Network Programming</em>,
+<em>Industrial Automation</em>, <em>Modbus TCP / RTU</em></p>
+<hr />
+<h2 id="arduino-uno-w5100-ethernet-shield-for-industrial-automation">&#9655; <strong>Arduino Uno + W5100 Ethernet Shield for Industrial Automation</strong><a class="headerlink" href="#arduino-uno-w5100-ethernet-shield-for-industrial-automation" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>Arduino</strong> ยุคแรก ๆ เช่น <strong>Arduino Uno</strong> และ <strong>Arduino Mega 2560</strong>
+ไม่ได้ถูกออกแบบมา เพื่อใช้งานในระดับอุตสาหกรรมโดยตรง เช่น ระบบควบคุมอัตโนมัติในโรงงาน (<strong>Industrial Automation</strong>) เนื่องจากมีข้อจำกัดทางฮาร์ดแวร์หลายด้าน ได้แก่ </p>
+<ul>
+<li>ใช้ไมโครคอนโทรลเลอร์สถาปัตยกรรม <strong>8-bit AVR</strong> ซึ่งมีประสิทธิภาพการประมวลผลจำกัด</li>
+<li>มีหน่วยความจำ (<strong>RAM / Flash</strong>) ค่อนข้างน้อย เมื่อเทียบกับงานระบบอุตสาหกรรมสมัยใหม่</li>
+<li>ไม่มีอินเทอร์เฟซอุตสาหกรรมโดยตรง เช่น <strong>CAN bus, Modbus, RS-485</strong> (ต้องใช้โมดูลเสริม)</li>
+<li>การเชื่อมต่อเครือข่ายต้องพึ่งพาอุปกรณ์ภายนอก เช่น <strong>Ethernet Shield (W5100/W5500)</strong> หรือ
+โมดูล <strong>Wi-Fi</strong></li>
+</ul>
+<p>ในทางปฏิบัติ หากต้องการนำบอร์ด <strong>Arduino Uno + Shields</strong>
+มาใช้เป็นอุปกรณ์ทดลองและฝึกเขียนโปรแกรม เพื่อประยุกต์ใช้งานในด้าน "ระบบควบคุมอัตโนมัติในโรงงาน" (<strong>Industrial Automation</strong>) ก็สามารถทำได้เช่นกัน  </p>
+<p>โดยเฉพาะการเรียนรู้การสื่อสารข้อมูลระหว่างอุปกรณ์ผ่านระบบเครือข่าย เช่น</p>
+<ul>
+<li>การเชื่อมต่อกับ <strong>PLC (Programmable Logic Controller)</strong></li>
+<li>การทำงานร่วมกับ <strong>Industrial IoT Embedded Controllers</strong></li>
+<li>การสื่อสารกับอุปกรณ์ <strong>Industrial HMI (Human Machine Interface)</strong></li>
+</ul>
+<p>ตัวอย่างโปรโตคอลที่สามารถนำมาทดลองใช้งานร่วมกันได้ ได้แก่</p>
+<ul>
+<li><strong>Modbus TCP / Modbus RTU</strong></li>
+<li><strong>TCP/IP Socket Communication</strong></li>
+<li><strong>HTTP REST API</strong></li>
+<li><strong>MQTT (Message Queuing Telemetry Transport)</strong></li>
+</ul>
+<p>แม้ว่า <strong>Arduino Uno</strong> จะไม่ใช่อุปกรณ์ระดับอุตสาหกรรมโดยตรง แต่ก็สามารถใช้เป็น
+"แพลตฟอร์มสำหรับการเรียนรู้และการสร้างต้นแบบ" ได้เป็นอย่างดี แต่ก็ต้องคำนึงถึงข้อจำกัดต่าง ๆ ด้วย
+หากจะนำไปใช้งานจริง เช่น</p>
+<ul>
+<li>ความเสถียรของระบบ (<strong>Reliability</strong>)</li>
+<li>ความทนทานต่อสภาพแวดล้อม (<strong>Industrial Environment</strong>)</li>
+<li>ความปลอดภัยของการสื่อสาร (<strong>Security</strong>)</li>
+<li>มาตรฐานอุตสาหกรรม (<strong>Industrial Standards Compliance</strong>)</li>
+</ul>
+<hr />
+<h2 id="modbus-rtu-tcp">&#9655; <strong>Modbus RTU &amp; TCP</strong><a class="headerlink" href="#modbus-rtu-tcp" title="Permanent link">#</a></h2>
+<p>รูปแบบการเชื่อมต่อระหว่างอุปกรณ์ในระบบเครือข่ายสำหรับงาน <strong>Industrial Automation</strong>
+ที่พบเห็นได้บ่อย คือ โปรโตคอล <a href="https://www.modbus.org/"><strong>Modbus</strong></a> แบ่งเป็น 2 ตัวเลือกหลัก
+ที่นิยมใช้งาน ได้แก่</p>
+<ul>
+<li><strong>Modbus RTU (RS-485)</strong></li>
+<li><strong>Modbus TCP (Ethernet / TCP-IP)</strong></li>
+</ul>
+<p><img alt="" src="modbus.jpg" /></p>
+<p>รูป: โครงสร้างสถาปัตยกรรมของ <strong>Modbus Protocol</strong> และแสดงให้เห็นว่า <strong>Modbus</strong>
+สามารถทำงานบนหลายชั้นและหลายรูปแบบการสื่อสารได้ เช่น <strong>RS-232 / RS-485</strong> และ <strong>Ethernet / Network</strong>
+(Source: Wikipedia)</p>
+<p><strong>Modbus RTU</strong> เป็นโปรโตคอลการสื่อสารแบบอนุกรม (<strong>Serial Communication</strong>)
+ที่นิยมใช้งานร่วมกับมาตรฐานทางไฟฟ้า <strong>RS-485</strong> และลักษณะสำคัญ ดังนี้</p>
+<ul>
+<li>เป็นระบบสื่อสารแบบ <strong>Master–Slave</strong></li>
+<li>รองรับการเชื่อมต่อหลายอุปกรณ์บนบัสเดียว (<strong>Multi-drop</strong>)</li>
+<li>ใช้สายสัญญาณแบบ <strong>Differential Signaling</strong> ทำให้ทนต่อสัญญาณรบกวนได้ดี และต้องใช้ร่วมกับวงจร <strong>RS485 Transceiver</strong></li>
+<li>นิยมใช้ในการเชื่อมต่อกับอุปกรณ์ <strong>Sensors &amp; Actuators</strong></li>
+<li>เหมาะกับงานระยะไกลระดับโรงงาน แต่ก็มีความเร็วในการสื่อสารข้อมูล ค่อนข้างต่ำเมื่อเทียบกับ <strong>Ethernet</strong></li>
+</ul>
+<p><strong>Modbus TCP</strong> เป็นการนำโปรโตคอล <strong>Modbus</strong> มาทำงานบนเครือข่าย <strong>TCP/IP</strong>  และลักษณะสำคัญ ดังนี้</p>
+<ul>
+<li>ใช้โครงสร้างแบบ <strong>Client–Server</strong></li>
+<li>ทำงานบนเครือข่าย <strong>Ethernet (LAN / Industrial LAN)</strong></li>
+<li>ใช้พอร์ตมาตรฐาน <strong>TCP</strong> โดยทั่วไปคือ <code>502</code> (default)</li>
+<li>มีความเร็วสูงกว่า <strong>Modbus RTU</strong></li>
+</ul>
+<p>โปรโตคอล <strong>Modbus TCP</strong> เป็นการนำมาตรฐาน <strong>Modbus</strong> มาทำงานบนระบบเครือข่าย <strong>TCP/IP (Ethernet)</strong> ซึ่งทำให้สามารถเชื่อมต่ออุปกรณ์ในระบบควบคุมอุตสาหกรรมได้สะดวกและยืดหยุ่นมากขึ้น
+โดยโครงสร้างการสื่อสาร จะถูกแบ่งบทบาทของอุปกรณ์ออกเป็น 2 ฝั่งหลัก ได้แก่</p>
+<ul>
+<li><strong>Modbus TCP Server</strong> อุปกรณ์ที่ให้บริการข้อมูล และคอยรับการเชื่อมต่อเข้ามา</li>
+<li><strong>Modbus TCP Client</strong> อุกรณ์ที่ขอใช้บริการ เริ่มต้นการสื่อสารข้อมูลในระบบเครือข่าย
+ใช้สำหรับอ่านหรือเขียนข้อมูลไปยังอุปกรณ์ปลายทาง</li>
+</ul>
+<p>ในมุมมองของการเขียนโปรแกรมตามรูปแบบของ <strong>Modbus Protocol</strong>
+อุปกรณ์ฝั่ง <strong>Server (Modbus Slave)</strong> จะต้องมีการกำหนดชุดข้อมูลภายใน
+สำหรับให้บริการแก่ <strong>Client</strong>
+ชุดข้อมูลดังกล่าวถูกจัดเก็บในรูปแบบของ <strong>Register Map</strong>
+ซึ่งเป็นโครงสร้างหน่วยความจำภายในที่ถูกแบ่งออกเป็นหลายประเภทตามลักษณะการใช้งานของข้อมูล</p>
+<p>หากจะทดลองเชื่อมต่อกับ <strong>Modbus TCP Server</strong> ก็สามารถใช้ซอฟต์แวร์
+<a href="https://www.modbustools.com/download.html"><strong>Modbus Poll</strong></a> 
+(<strong>Freeware</strong>, <strong>Windows 32-bit / 64-bit / Arm 64-bit</strong>) ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="modbus-registers">&#9655; <strong>Modbus Registers</strong><a class="headerlink" href="#modbus-registers" title="Permanent link">#</a></h2>
+<p>โดยทั่วไป <strong>Modbus</strong> จำแนกรีจิสเตอร์ออกเป็น 4 กลุ่มหลัก ได้แก่</p>
+<ol>
+<li><strong>Coils</strong> (<code>0xxxx</code>)<ul>
+<li>เป็นข้อมูลแบบบิต (<strong>1-bit</strong>) ใช้สำหรับสถานะ <strong>ON / OFF</strong> เช่น <strong>LED Lamp</strong> และ <strong>Relay</strong> เป็นต้น</li>
+<li>สามารถอ่านและเขียนได้ (<strong>Read/Write</strong>)</li>
+</ul>
+</li>
+<li><strong>Discrete Inputs</strong> (<code>1xxxx</code>)<ul>
+<li>เป็นข้อมูลแบบ <strong>1-bit</strong> เช่นกัน แต่ใช้สำหรับสถานะอินพุตเท่านั้น (<strong>Read-only</strong>)</li>
+<li>ใช้อ่านค่าสถานะของอินพุต จากปุ่มกด <strong>Push Button</strong>, <strong>Limit Switch</strong>  หรือสถานะลอจิกของอุปกรณ์ <strong>Sensor</strong></li>
+</ul>
+</li>
+<li><strong>Input Registers</strong> (<code>3xxxx</code>)<ul>
+<li>เป็นข้อมูลแบบ <strong>16-bit (unsigned int)</strong></li>
+<li>ใช้สำหรับข้อมูลแบบอ่านอย่างเดียว (<strong>Read-only</strong>) เช่น ค่า <strong>Analog</strong> เป็นต้น</li>
+</ul>
+</li>
+<li><strong>Holding Registers</strong> (<code>4xxxx</code>)<ul>
+<li>เป็นข้อมูลแบบ <strong>16-bit</strong> และสามารถอ่านและเขียนได้ (<strong>Read/Write</strong>)</li>
+</ul>
+</li>
+</ol>
+<p>หากข้อมูลจริงมีขนาดมากกว่า <strong>16-bit</strong> สามารถแบ่งเก็บโดยใช้หลายรีจิสเตอร์ต่อเนื่องกันได้
+โดยจะอ้างอิงผ่าน <strong>Register Address</strong> ที่เรียงต่อกัน (<strong>Sequential Addressing</strong>) เช่น</p>
+<ul>
+<li><strong>32-bit float</strong>: ใช้รีจิสเตอร์ 2 ตัว</li>
+<li><strong>64-bit integer</strong>: ใช้รีจิสเตอร์ 4 ตัว</li>
+</ul>
+<p>ในฝั่ง <strong>Modbus TCP Server</strong> จะทำหน้าที่</p>
+<ul>
+<li>สร้าง <strong>Register Map</strong> ภายในหน่วยความจำ</li>
+<li>อัปเดตค่าจากฮาร์ดแวร์จริงเป็นระยะ ๆ</li>
+<li>รอรับคำสั่งจาก <strong>Client</strong></li>
+<li>ประมวลผลคำขอในการอ่านหรือเขียนข้อมูล (<strong>Read / Write Register</strong>)</li>
+<li>ส่งค่ากลับตาม <strong>Register Address</strong> ที่ <strong>Client</strong> ต้องการ</li>
+</ul>
+<hr />
+<h2 id="modbus-tcp-packet">&#9655; <strong>โครงสร้างของ Modbus TCP Packet</strong><a class="headerlink" href="#modbus-tcp-packet" title="Permanent link">#</a></h2>
+<p>ในการสื่อสารระหว่าง <strong>Modbus TCP Client</strong> กับ <strong>Server</strong> จะมีการส่งข้อมูลในรูปแบบที่เรียกว่า
+<strong>Modbus TCP Packet (Modbus Application Data Unit - ADU)</strong>
+ซึ่งประกอบด้วยโครงสร้างข้อมูลที่ถูกกำหนดอย่างเป็นมาตรฐาน เพื่อให้ทั้งสองฝั่งเข้าใจตรงกัน</p>
+<p>โดยทั่วไปแพ็กเกต <strong>Modbus TCP</strong> จะประกอบด้วย 2 ส่วนหลัก</p>
+<ol>
+<li><strong>MBAP Header (Modbus Application Protocol Header)</strong>
+เป็นส่วนหัวของแพ็กเกต ใช้สำหรับควบคุมการสื่อสารผ่าน <strong>TCP/IP</strong> และประกอบด้วย<ul>
+<li><strong>Transaction ID</strong> ใช้ระบุหมายเลขของคำขอ (<strong>Request ID</strong>)</li>
+<li><strong>Protocol ID</strong> (<code>0x0000</code> สำหรับ <strong>Modbus</strong>)</li>
+<li><strong>Data Length</strong> ซึ่งระบุความยาวของข้อมูล</li>
+<li><strong>Unit ID</strong> ใช้ระบุอุปกรณ์ปลายทาง (ถ้ามี <strong>Gateway</strong> หรือ <strong>Bridge</strong> ไปยัง <strong>Modbus RTU</strong>)</li>
+</ul>
+</li>
+<li><strong>PDU (Protocol Data Unit)</strong> เป็นส่วนที่ใช้กำหนดคำสั่งของ <strong>Modbus</strong> ประกอบด้วย<ul>
+<li><strong>Function Code (FC)</strong> ระบุประเภทคำสั่ง</li>
+<li><strong>Register Address (Start Address)</strong> ตำแหน่งหรือแอดเดรสเริ่มต้นของข้อมูล (รีจิสเตอร์)</li>
+<li><strong>Data Length / Quantity</strong>  จำนวนข้อมูล (รีจิสเตอร์) ที่ต้องการอ่านหรือเขียน</li>
+<li><strong>Data Payload</strong> ข้อมูล (เฉพาะกรณี <strong>Write Operation</strong>)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Function Code</strong> ใช้ระบุประเภทของคำสั่งที่ต้องการให้ <strong>Server</strong> ทำงาน เช่น</p>
+<ul>
+<li><code>0x01</code>: <strong>Read Coils</strong> (อ่านรีจิสเตอร์ หลายตัว ได้ตาม <strong>Quantity</strong>)</li>
+<li><code>0x02</code>: <strong>Read Discrete Inputs</strong> (อ่านอินพุตแบบบิตได้หลายตัว ตามค่า <strong>Quantity</strong>)</li>
+<li><code>0x03</code>: <strong>Read Holding Registers</strong> (อ่านรีจิสเตอร์แบบ 16-bit ได้หลายตัว ตามค่า <strong>Quantity</strong>)</li>
+<li><code>0x04</code>: <strong>Read Input Registers</strong> (อ่านรีจิสเตอร์แบบ 16-bit ได้หลายตัว ตามค่า <strong>Quantity</strong>)</li>
+<li><code>0x05</code>: <strong>Write Single Coil</strong> (เขียนบิตสถานะ 1 ตัว)</li>
+<li><code>0x06</code>: <strong>Write Single Register</strong> (เขียนรีจิสเตอร์ 16-bit 1 ตัว)</li>
+<li><code>0x10</code>: <strong>Write Multiple Registers</strong> (เขียนรีจิสเตอร์ 16-bit หลายตัวต่อเนื่อง)</li>
+<li><code>0x17</code>: <strong>Read/Write Multiple Registers</strong> (อ่าน-เขียนรีจิสเตอร์ 16-bit หลายตัวต่อเนื่อง)</li>
+</ul>
+<p>ข้อสังเกต</p>
+<ul>
+<li>ยกตัวอย่าง <strong>Holding Register</strong> อ้างอิงแบบมาตรฐานคือ <code>40001</code>
+แต่ในแพ็กเกตจริง จะใช้ค่า <strong>Register Address Offset</strong> เริ่มต้นที่ <code>0</code></li>
+<li>เนื่องจาก <strong>Modbus TCP</strong> ใช้ <strong>TCP/IP Layer</strong> ในการสื่อสารข้อมูล
+ซึ่งมีการตรวจสอบความถูกต้องของข้อมูลอยู่แล้ว
+ดังนั้นจึงไม่ต้องมีส่วนที่เป็น <strong>CRC (Cyclic Redundancy Check) / Error Checking Checksum</strong>
+ในขณะที่ <strong>Modbus RS485 / RTU</strong> จะต้องมีส่วนนี้ด้วย</li>
+</ul>
+<hr />
+<h2 id="arduino-uno-w5100-ethernet-shield-modbus-tcp">&#9655; <strong>Arduino Uno + W5100 Ethernet Shield - Modbus TCP</strong><a class="headerlink" href="#arduino-uno-w5100-ethernet-shield-modbus-tcp" title="Permanent link">#</a></h2>
+<p>เมื่อใช้ <strong>Arduino Uno + W5100 Ethernet Shield</strong>
+สามารถนำมาใช้งานเป็น <strong>Modbus TCP Client</strong> หรือ <strong>Server</strong> ได้</p>
+<p>ในส่วนของการเขียนโค้ด ก็มีไลบรารี สำหรับ <strong>Modbus TCP / RTU</strong> ให้เลือกใช้งาน เช่น</p>
+<ul>
+<li><a href="https://github.com/arduino-libraries/ArduinoModbus"><code>arduino-libraries/ArduinoModbus</code></a></li>
+<li><a href="https://github.com/Industrial-Shields/arduino-Modbus/"><code>Industrial-Shields/arduino-Modbus</code></a></li>
+<li><a href="https://github.com/CMB27/ModbusRTUMaster"><code>CMB27/ModbusRTUMaster</code></a></li>
+<li><a href="https://github.com/CMB27/ModbusTCPSlave"><code>CMB27/ModbusTCPSlave</code></a></li>
+<li><a href="https://github.com/epsilonrt/modbus-arduino"><code>epsilonrt/modbus-arduino</code></a></li>
+<li><a href="https://github.com/epsilonrt/modbus-ethernet"><code>epsilonrt/modbus-ethernet</code></a></li>
+</ul>
+<p>ไลบรารีแต่ละตัวมีความสามารถและฟีเจอร์แตกต่างกันไป แต่ข้อควรระวังสำคัญในการเลือกใช้งานคือ
+การใช้หน่วยความจำ <strong>SRAM</strong> ซึ่งมีอยู่อย่างจำกัด โดยเฉพาะบนบอร์ดอย่าง <strong>Arduino Uno</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="modbus-tcp-server">&#9655; <strong>ตัวอย่างโค้ด: Modbus TCP Server</strong><a class="headerlink" href="#modbus-tcp-server" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดต่อไปนี้สาธิตการสร้าง <strong>Modbus TCP Server</strong> โดยใช้ <strong>Arduino Uno + W5100</strong>
+และใช้ไลบรารีต่อไปนี้ในการพัฒนาโปรแกรม</p>
+<ul>
+<li><a href="https://github.com/arduino-libraries/ethernet.git"><code>arduino-libraries/ethernet</code></a></li>
+<li><a href="https://github.com/epsilonrt/modbus-arduino"><code>epsilonrt/modbus-arduino</code></a></li>
+<li><a href="https://github.com/epsilonrt/modbus-ethernet"><code>epsilonrt/modbus-ethernet</code></a></li>
+</ul>
+<p>ไลบรารี <code>&lt;Ethernet.h&gt;</code> ใช้สำหรับจัดการการสื่อสารผ่านเครือข่าย <strong>Ethernet (TCP/IP)</strong>
+ส่วน <code>modbus-arduino</code> และ <code>modbus-ethernet</code> ใช้สำหรับจัดการโปรโตคอล <strong>Modbus TCP</strong>
+โดยช่วยลดความซับซ้อนในการจัดการแพ็กเกตและฟังก์ชันโค้ดของ <strong>Modbus</strong></p>
+<p>สำหรับไลบรารี <code>modbus-arduino</code> และ <code>modbus-ethernet</code>
+โดยทั่วไปจะต้องดาวน์โหลดเป็นไฟล์ <code>.ZIP</code> จาก <strong>GitHub Repository</strong>
+แล้วนำเข้าใน <strong>Arduino IDE</strong> ให้เรียบร้อยก่อนทำการ <strong>Build / Upload</strong></p>
+<p>นอกจากนั้นแล้ว จะต้องเปิดไฟล์ <code>ModbusEthernet.h</code> ของไลบรารี <code>modbus-ethernet</code>
+เพื่อใช้งาน</p>
+<pre><code class="language-text">#define TCP_KEEP_ALIVE
+</code></pre>
+<p>โดยปกติการสื่อสารแบบ <strong>Modbus TCP</strong> จะใช้การเชื่อมต่อแบบ <strong>TCP (Connection-oriented)</strong>
+ซึ่งมีการเปิดการเชื่อมต่อค้างไว้ระหว่าง <strong>Client</strong> กับ <strong>Server</strong>
+แต่ในทางปฏิบัติอาจเกิดปัญหา เช่น <strong>Client</strong> หลุดการเชื่อมต่อ</p>
+<p>เมื่อเปิดใช้งาน <code>TCP_KEEP_ALIVE</code> <strong>Arduino</strong> จะมีการตรวจสอบเป็นระยะ ๆ
+ว่า <strong>Client</strong> ยังออนไลน์อยู่หรือไม่ หาก <strong>Client</strong> หายไป จะปิด <strong>Connection (Socket)</strong> อัตโนมัติ</p>
+<p>โค้ดตัวอย่างนี้สาธิตการใช้งาน <strong>Coil Registers</strong> จำนวน 2 รีจิสเตอร์ (เริ่มต้นที่ 0) 
+และค่าของรีจิสเตอร์แต่ละตัว เชื่อมต่อกับขาเอาต์พุต <strong>D5</strong> และ <strong>D6</strong> ตามลำดับ</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+
+// Required libraries:
+// 1) https://github.com/arduino-libraries/ethernet.git
+#include &lt;Ethernet.h&gt;
+// 2) https://github.com/epsilonrt/modbus-arduino
+#include &lt;Modbus.h&gt;
+// 3) https://github.com/epsilonrt/modbus-ethernet
+#include &lt;ModbusEthernet.h&gt;
+// Uncomment //#define TCP_KEEP_ALIVE in ModbusEthernet.h
+
+#define INTERVAL_MS 100
+
+const int numLEDs = 2;
+const int ledPins[] = {5,6};
+const uint16_t coilRegOffset = 0x00;
+int lastValues[] = {0,0};
+
+byte ip[] = { 192, 168, 10, 100 };
+byte mac[] = { 0x02, 0xAA, 0xBB, 0xCC, 0xDD, 0x01 };
+
+ModbusEthernet mb;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(F(&quot;\n\nUno Modbus TCP Server Demo...&quot;));
+
+  // Initialize Ethernet + Modbus TCP
+  mb.config(mac, ip);
+
+  for (int i=0; i &lt; numLEDs; i++ ) {
+    pinMode(ledPins[i], OUTPUT);
+    mb.addCoil(coilRegOffset+i, false /*initial value*/);
+    lastValues[i] = mb.coil(coilRegOffset+i);
+    digitalWrite(ledPins[i], lastValues[i]);
+  }
+}
+
+void loop() {
+  static uint32_t ts = 0;
+  mb.task();  // Handle Modbus TCP requests
+  uint32_t now = millis();
+  if (now - ts &gt;= INTERVAL_MS) {  // Check register every 100 ms
+    ts = now;
+    for (int i=0; i &lt; numLEDs; i++ ) {
+       int value = mb.coil(coilRegOffset+i);
+      // Update output only if value changed
+       if (value != lastValues[i]) {
+         lastValues[i] = value;
+         digitalWrite(ledPins[i], value);
+         Serial.print(&quot;LED &quot;);
+         Serial.print(i);
+         Serial.print(&quot;: &quot;);
+         Serial.println(value);
+       }
+    }
+  }
+}
+</code></pre>
+<p>การทดสอบการทำงานของ <strong>Arduino Modbus TCP Server</strong> สามารถทำได้โดยใช้คำสั่ง
+<code>mbpoll</code> ใน <strong>Linux</strong> ดังนี้</p>
+<pre><code class="language-bash"># Install mbpoll (Modbus master simulator tool)
+$ sudo apt install mbpoll
+
+# Read 2 Coil registers starting from address 0
+# -q       : quiet mode (suppress banner/output)
+# -m tcp   : use Modbus TCP protocol
+# -t 0     : data type = Coils (0xxxx)
+# -r 1     : start address = 1 (mbpoll uses 1-based addressing → offset 0)
+# -c 2     : read 2 coils
+# -l 500   : polling interval = 500 ms
+$ mbpoll -q -1 -m tcp -t 0 -r 1 -c 2 -l 500 192.168.10.100
+
+# Write multiple coils starting from address 0
+# -1       : write multiple values (Write Multiple Coils)
+# Values: 1 0 =&gt; Coil[0]=1, Coil[1]=0
+$ mbpoll -q -1 -m tcp -t 0 -r 1 192.168.10.100 1 0
+
+# Write multiple coils starting from address 0
+# Values: 0 1 =&gt; Coil[0]=0, Coil[1]=1
+$ mbpoll -q -1 -m tcp -t 0 -r 1 192.168.10.100 0 1
+</code></pre>
+<p><img alt="" src="mbpoll_coil_regs.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <code>mbpoll</code> เพื่อเชื่อมต่อกับ <strong>Arduino Modbus TCP Server</strong></p>
+<p>&nbsp;</p>
+<p>อีกวิธีหนึ่งคือ การลองใช้ซอฟต์แวร์ <strong>Modbus Poll</strong> โดยขั้นตอนแรกจะต้องตั้งค่าการเชื่อมต่อ
+ไปยัง <strong>Arduino Modbus TCP Server</strong> ก่อน</p>
+<p><img alt="" src="modbus_poll-0.jpg" /></p>
+<p>รูป: ตั้งค่า <strong>Connection</strong> สำหรับ <strong>Modbus TCP/IP</strong> รวมถึง <strong>IP Address</strong> และ <strong>Server Port</strong></p>
+<p><img alt="" src="modbus_poll-1.jpg" /></p>
+<p>รูป: การเลือกรูปแบบคำสั่งสำหรับอ่านค่า <strong>Coil Registers</strong> เป็นระยะ ๆ</p>
+<p><img alt="" src="modbus_poll-2.jpg" /></p>
+<p>รูป: การทดลองเขียนค่าไปยัง <strong>Coil Register</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอแนวทางการใช้งานบอร์ด <strong>Arduino Uno</strong> 
+ร่วมกับ <strong>Arduino Ethernet Shield (W5100)</strong>
+เพื่อนำมาทดลองใช้งานเป็นอุปกรณ์ในระบบอัตโนมัติสำหรับงานอุตสาหกรรม
+โดยใช้โปรโตคอล <strong>Modbus TCP</strong> มีโค้ดตัวอย่างสาธิตการทำงานในรูปแบบ
+<strong>Modbus TCP Server</strong> ด้วยบอร์ด <strong>Arduino</strong></p>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-04-18 | Last Updated: 2026-04-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

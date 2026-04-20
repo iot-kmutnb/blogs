@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/arduino/uno_ethernet_part-1/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 1) - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino-uno-w5100-ethernet-shield-network-programming-1" class="nav-link">Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 1)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-uno-lan" class="nav-link">&#9655; บอร์ด Arduino Uno กับการเชื่อมต่อระบบเครือข่าย LAN</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-static-ip-address" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - Static IP Address</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-dynamic-ip-address-via-dhcp" class="nav-link">&#9655; ตัวอย่างโค้ด: Arduino Ethernet - Dynamic IP Address via DHCP</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-icmp-ping" class="nav-link">&#9655; ตัวอย่างโค้ด Arduino Ethernet - ICMP / Ping</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-ethernet-ntp-sync" class="nav-link">&#9655; ตัวอย่างโค้ด Arduino Ethernet - NTP Sync</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino-uno-w5100-ethernet-shield-network-programming-1">Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 1)<a class="headerlink" href="#arduino-uno-w5100-ethernet-shield-network-programming-1" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino Uno</em>, <em>Arduino Ethernet Shield</em>, <em>Network Programming</em></p>
+<ul>
+<li><a href="#arduino-uno-lan"><strong>บอร์ด Arduino Uno กับการเชื่อมต่อเครือข่าย LAN</strong></a></li>
+<li><a href="#arduino-ethernet-static-ip-address"><strong>ตัวอย่างโค้ด: Arduino Ethernet - Static IP Address</strong></a></li>
+<li><a href="#arduino-ethernet-dynamic-ip-address-via-dhcp"><strong>ตัวอย่างโค้ด: Arduino Ethernet - Dynamic IP Address via DHCP</strong></a></li>
+<li><a href="#arduino-ethernet-icmp-ping"><strong>ตัวอย่างโค้ด Arduino Ethernet - ICMP / Ping</strong></a></li>
+<li><a href="#arduino-ethernet-ntp-sync"><strong>ตัวอย่างโค้ด Arduino Ethernet - NTP Sync</strong></a></li>
+</ul>
+<hr />
+<h2 id="arduino-uno-lan">&#9655; <strong>บอร์ด Arduino Uno กับการเชื่อมต่อระบบเครือข่าย LAN</strong><a class="headerlink" href="#arduino-uno-lan" title="Permanent link">#</a></h2>
+<p>บอร์ด <strong>Arduino</strong> ในยุคแรก เช่น <strong>Arduino Uno / Nano / Mega 2560</strong>
+ใช้ไมโครคอนโทรลเลอร์ <strong>AVR</strong> สถาปัตยกรรม 8 บิต ซึ่งมีข้อจำกัดด้านหน่วยความจำ 
+และความเร็วในการประมวลผล (<strong>SRAM</strong> ของ <strong>ATmega328P MCU</strong> มีเพียง <strong>2 KB</strong> และ <strong>Flash</strong> ขนาด <strong>32KB</strong> และความถี่ของซีพียู <strong>16MHz</strong>) อีกทั้งยังไม่มีวงจรสื่อสารเครือข่ายในตัว เช่น <strong>Ethernet MAC</strong> หรือวงจรสื่อสารไร้สาย เช่น <strong>Wi-Fi / BLE</strong></p>
+<p>ดังนั้น หากต้องการนำบอร์ด <strong>Arduino</strong> ไปใช้งานด้านระบบเครือข่าย หรือในงานประเภท 
+<strong>IoT (Internet of Things)</strong> จึงจำเป็นต้องใช้อุปกรณ์เสริม อาจเป็นอุปกรณ์ต่อเพิ่มแบบ
+<strong>Arduino Shield</strong> เช่น </p>
+<ul>
+<li><a href="https://docs.arduino.cc/retired/shields/arduino-ethernet-shield-without-poe-module/"><strong>Arduino Ethernet Shield (W5100)</strong></a>  </li>
+<li><a href="https://store.arduino.cc/products/arduino-ethernet-shield-2"><strong>Arduino Ethernet Shield 2 (W5500)</strong></a></li>
+</ul>
+<p>หรือเลือกใช้บอร์ดไมโครคอนโทรลเลอร์ที่มีโมดูล <strong>Wi-Fi</strong> รวมอยู่ด้วย
+เช่น บอร์ด <a href="https://store.arduino.cc/products/arduino-uno-wifi-rev2"><strong>Arduino UNO WiFi Rev 2</strong></a> ที่มีโมดูล <strong>u-blox NINA-W102</strong></p>
+<p>โมดูล <strong>Arduino Ethernet Shield</strong> มี 2 รุ่น </p>
+<ul>
+<li><strong>Arduino Ethernet Shield</strong> ใช้ชิป <strong>Wiznet W5100</strong> (SPI Speed: ~14 MHz max.)  </li>
+<li><strong>Arduino Ethernet Shield 2</strong> ใช้ชิป <strong>Wiznet W5500</strong> (SPI Speed: 80 MHz max.)</li>
+</ul>
+<p>ชิป <strong>W5100 / W5500</strong> ทำหน้าที่เป็น <strong>TCP/IP Offload Engine</strong>
+และเชื่อมต่อกับไมโครคอนโทรลเลอร์ผ่านบัส <strong>SPI (Serial Peripheral Interface)</strong>
+ในส่วนของการเชื่อมต่อ ชิปของ <strong>Wiznet</strong> ทำงานด้วยแรงดันไฟเลี้ยง <strong>+3.3V</strong>
+แต่ชิป <strong>AVR</strong> ใช้แรงดันไฟเลี้ยง <strong>+5V</strong> </p>
+<p>ดังนั้นโมดูล <strong>Arduino Ethernet Shield</strong> มีการใช้ไอซีลอจิกทำหน้าที่แปลงระดับแรงดัน
+<strong>5V -&gt; 3.3V</strong> เช่น <strong>SN74LVC1G14</strong> (Schmitt-Trigger Inverter) และ
+<strong>74LVC1G125</strong> (Bus Buffer Gate With 3-State Output) ซึ่งดูได้จากไฟล์
+<a href="https://www.arduino.cc/en/uploads/Main/arduino-ethernet-shield-06-schematic.pdf"><strong>Schematic</strong></a></p>
+<p>การใช้งาน <strong>Ethernet Shield</strong> กับ <strong>Arduino Uno</strong> ต้องใช้สัญญาณ <strong>SPI</strong> ดังนี้</p>
+<ul>
+<li><code>/SS</code> (<em>Slave Select</em>): ขา D10 ซึ่งจะต้องถูกกำหนดเป็นเอาต์พุต เพื่อให้ชิป <strong>AVR</strong> ทำงานในโหมด <strong>SPI Master</strong></li>
+<li><code>MOSI</code> (<em>Master Out - Slave In</em>): ขา D11</li>
+<li><code>MISO</code> (<em>Master In - Slave Out</em>): ขา D12</li>
+<li><code>SCK</code> (<em>Serial Clock</em>): ขา D13</li>
+</ul>
+<p>แม้ว่าชิป <strong>Wiznet W5100 / W5500</strong> จะรองรับความเร็วระดับ <strong>10/100 Mbps Ethernet</strong>
+แต่ในทางปฏิบัติ ความเร็วที่ได้จะต่ำกว่านี้มาก เนื่องจากข้อจำกัดของไมโครคอนโทรลเลอร์และบัส <strong>SPI</strong>
+(ความถี่สูงสุดของสัญญาณ <strong>SCK</strong> สำหรับ <strong>Arduino Uno</strong> อยู่ที่ประมาณ <strong>8 MHz</strong>)</p>
+<p>นอกจากนี้ แม้ว่าชิป <a href="https://wiznet.io/"><strong>Wiznet</strong></a>
+จะทำหน้าที่จัดการในส่วนของ <strong>TCP/IP Stack</strong> และช่วยลดภาระของ <strong>CPU</strong> ได้มาก แต่ก็มีข้อจำกัดด้านจำนวนการเชื่อมต่อ โดยรองรับการเปิดใช้งาน <strong>TCP Sockets</strong> พร้อมกันได้จำกัด
+(<strong>W5100</strong>: สูงสุด <strong>4 sockets</strong> และ <strong>W5500</strong>: สูงสุด <strong>8 sockets</strong>)</p>
+<p><img alt="" src="w5100_eth_shield.jpg" /></p>
+<p>รูป: โมดูล <strong>Arduino Ethernet Shield (Wiznet W5100)</strong></p>
+<p><img alt="" src="uno_w5100_shield.jpg" /></p>
+<p>รูป: บอร์ด <strong>Arduino Uno + W5100 Ethernet Shield</strong></p>
+<p>ในการพัฒนาโปรแกรม สามารถใช้ไลบรารีมาตรฐานของ <strong>Arduino</strong> ได้แก่  </p>
+<ul>
+<li><a href="https://docs.arduino.cc/language-reference/en/functions/communication/SPI/"><strong>Arduino SPI Library</strong></a></li>
+<li><a href="https://docs.arduino.cc/libraries/ethernet"><strong>Arduino Ethernet Library</strong></a>  </li>
+</ul>
+<p><img alt="" src="arduino_ethernet_lib.jpg" /></p>
+<p>รูป: การติดตั้ง-อัปเดต <strong>Arduino Ethernet Library</strong> ใน <strong>Arduino IDE</strong></p>
+<p>ไลบรารีเหล่านี้ช่วยให้สามารถพัฒนาโปรแกรมเครือข่าย (เช่น <strong>TCP/UDP</strong>) ได้ง่ายขึ้น
+ไลบรารี <strong>Arduino Ethernet</strong> ขณะที่เขียนบทความนี้ มีเวอร์ชันล่าสุดคือ
+<a href="https://github.com/arduino-libraries/Ethernet/releases/tag/2.0.2"><strong>v2.0.2</strong></a>
+(อัปเดตเมื่อวันที่ 21 มีนาคม ค.ศ. 2023)</p>
+<p>ภายในไลบรารีมีโค้ดตัวอย่าง ครอบคลุมการใช้งานเครือข่ายหลายรูปแบบ โดยสามารถจัดกลุ่มได้ เช่น</p>
+<ol>
+<li><strong>TCP Communication / HTTP</strong><ul>
+<li><code>ChatServer</code> — ตัวอย่างการสร้าง <strong>TCP Server</strong> รับส่งข้อความแบบโต้ตอบกันได้</li>
+<li><code>TelnetClient</code> — ตัวอย่างการเชื่อมต่อไปยัง <strong>Telnet Server</strong></li>
+<li><code>WebClient</code> — ตัวอย่างการสร้าง <strong>HTTP Client (GET request)</strong></li>
+<li><code>WebClientRepeating</code> — การส่ง <strong>HTTP Request</strong> เป็นช่วงเวลา</li>
+<li><code>WebServer</code> — ตัวอย่างการสร้าง <strong>HTTP Server</strong></li>
+</ul>
+</li>
+<li><strong>UDP Communication</strong><ul>
+<li><code>UDPSendReceiveString</code> — ส่ง/รับข้อมูลผ่าน <strong>UDP</strong></li>
+<li><code>UdpNtpClient</code> — ใช้ <strong>UDP</strong> ติดต่อ <strong>NTP Server</strong> เพื่ออ่านเวลา</li>
+</ul>
+</li>
+<li><strong>Network Configuration / Utilities</strong><ul>
+<li><code>DhcpAddressPrinter</code> — ขอ <strong>IP Address</strong> จาก <strong>DHCP Server</strong></li>
+<li><code>EthernetBonjour</code> — ใช้ <strong>mDNS/Bonjour</strong> สำหรับค้นหาอุปกรณ์ในเครือข่าย <strong>LAN</strong></li>
+</ul>
+</li>
+</ol>
+<p>นอกจากนั้นแล้วยังมีไลบรารีของ <strong>Arduino</strong> อื่นที่น่าสนใจ เช่น 
+<a href="https://docs.arduino.cc/libraries/arduinomodbus/"><code>ArduinoModbus</code></a>
+ซึ่งรองรับรูปแบบการสื่อสารผ่านบัส <strong>RS485</strong> (<strong>Modbus RTU</strong>) และ <strong>TCP</strong> (<strong>Modbus TCP</strong>)</p>
+<p>คำอธิบายเพิ่มเติม</p>
+<ul>
+<li><strong>Static IP vs. Dynamic IP</strong><ul>
+<li><strong>Static IP</strong> คือ การกำหนด <strong>IP Address</strong> แบบคงที่ โดยผู้ใช้ตั้งค่าเอง</li>
+<li><strong>Dynamic IP (DHCP: Dynamic Host Configuration Protocol)</strong> คือ การรับ <strong>IP Address</strong> อัตโนมัติจาก <strong>DHCP Server</strong> เช่น <strong>Wireless Router</strong> ทำหน้าที่จัดสรร <strong>IP</strong> 
+ให้ชั่วคราว และช่วยในการตั้งค่าเครือข่ายให้กับอุปกรณ์โดยอัตโนมัติ เช่น<ul>
+<li><strong>IP Address</strong></li>
+<li><strong>Subnet Mask</strong></li>
+<li><strong>Default Gateway</strong></li>
+<li><strong>DNS Server</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>IPv4 vs. IPv6</strong><ul>
+<li><strong>IPv4 (Internet Protocol version 4)</strong> เป็นรูปแบบ <strong>IP Address</strong> แบบ 32 บิต 
+แสดงผลเป็นเลข 4 ชุด เช่น <code>192.168.1.1</code></li>
+<li><strong>IPv6 (Internet Protocol version 6)</strong> เป็นรูปแบบ <strong>IP Address</strong> แบบ 128 บิต 
+แสดงผลเป็นเลขฐานสิบหก 8 ชุด เช่น <code>2001:db8::1</code> และออกแบบมาเพื่อแทน <strong>IPv4</strong></li>
+</ul>
+</li>
+<li><strong>Public vs. Private IPv4</strong><ul>
+<li><strong>Public IP Address</strong> คือ <strong>IP</strong> ที่สามารถเข้าถึงได้จาก <strong>Internet</strong> โดยตรง
+ถูกกำหนดและจัดสรรโดยผู้ให้บริการอินเทอร์เน็ต และต้องไม่ซ้ำกันทั่วโลก
+ใช้สำหรับ <strong>Server</strong> หรืออุปกรณ์ที่ต้องการให้เข้าถึงจากภายนอก</li>
+<li><strong>Private IP Address</strong> คือ <strong>IP</strong> ที่ใช้ภายในเครือข่ายเท่านั้น
+ไม่สามารถเข้าถึงได้โดยตรงจาก <strong>Internet</strong> และสามารถใช้ซ้ำกันในหลายเครือข่ายได้
+โดยมีช่วงที่กำหนดตามมาตรฐาน เช่น <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code> และ <code>192.168.0.0/16</code>
+โดยทั่วไปอุปกรณ์ใน <strong>LAN</strong> จะใช้ <strong>Private IP</strong> และเชื่อมต่อออก <strong>Internet</strong>
+ด้วยโปรโตคอล <strong>NAT (Network Address Translation) / Masquerade (Source NAT)</strong> ซึ่งทำหน้าที่แปลง <strong>Private IP</strong>
+เป็น <strong>Public IP</strong> ของอุปกรณ์ <strong>Gateway/Router</strong></li>
+</ul>
+</li>
+<li><strong>DNS (Domain Name System)</strong> คือ ระบบที่ใช้แปลงชื่อโดเมน (เช่น <code>www.google.com</code>)
+    ให้เป็น <strong>IP Address</strong> เพื่อให้อุปกรณ์ในเครือข่ายสามารถติดต่อกันได้<ul>
+<li><strong>mDNS (Multicast DNS)</strong> คือ โปรโตคอลที่ใช้ค้นหาและระบุอุปกรณ์ในเครือข่าย <strong>LAN</strong>
+โดยไม่ต้องมี <strong>DNS Server</strong> กลาง ใช้การส่งข้อมูลแบบ <strong>multicast</strong>
+  และมักใช้ชื่อโดเมนในรูปแบบ <code>.local</code> เช่น <code>arduino.local</code></li>
+<li><strong>Bonjour</strong> คือ ชื่อเรียกของระบบ <strong>mDNS</strong> ที่พัฒนาโดย <strong>Apple</strong> สำหรับการค้นหาอุปกรณ์และบริการในเครือข่ายแบบอัตโนมัติ (ในระบบ <strong>Linux</strong> มีบริการที่คล้ายกันชื่อว่า <strong>Avahi</strong>)</li>
+</ul>
+</li>
+<li><strong>ICMP (Internet Control Message Protocol)</strong> คือ โปรโตคอลในระดับเครือข่าย (<strong>OSI Layer 3</strong>) ที่ใช้สำหรับส่งข้อความควบคุมและรายงานสถานะของเครือข่าย เช่น แจ้งข้อผิดพลาด หรือใช้ตรวจสอบการเชื่อมต่อระหว่างอุปกรณ์</li>
+<li><strong>Ping</strong> เป็นเครื่องมือที่ใช้โปรโตคอล <strong>ICMP</strong> โดยจะส่งแพ็กเกต <strong>ICMP Echo Request</strong> ไปยังปลายทาง และรอรับ <strong>ICMP Echo Reply</strong> กลับมา และวัดเวลาในการตอบสนอง (<strong>Round-Trip Time</strong>)</li>
+<li><strong>TCP vs. UDP</strong><ul>
+<li><strong>TCP (Transmission Control Protocol)</strong> คือ โปรโตคอลแบบ <strong>Connection-oriented</strong> ที่ต้องสร้างการเชื่อมต่อก่อนส่งข้อมูล
+มีการทำขั้นตอน <strong>Handshake</strong> เพื่อรับประกันว่า ข้อมูลครบถ้วนและเรียงลำดับถูกต้อง แต่ช้ากว่า <strong>UDP</strong></li>
+<li><strong>UDP (User Datagram Protocol)</strong> คือ โปรโตคอลแบบ <strong>Connectionless</strong> ส่งข้อมูลทันที
+ไม่ต้องมี <strong>Handshake</strong> ดังนั้นจึงไม่รับประกันว่า ข้อมูลจะถึงหรือเรียงถูกต้องหรือไม่ ดังนั้นจึงมี <strong>Overhead</strong>
+น้อยกว่า <strong>TCP</strong></li>
+</ul>
+</li>
+<li><strong>NTP (Network Time Protocol)</strong> คือ โปรโตคอลที่ใช้สำหรับการซิงโครไนซ์เวลา
+(<strong>Time Synchronization</strong>) ระหว่างอุปกรณ์ในเครือข่ายผ่านอินเทอร์เน็ต โดยใช้ <strong>UDP (User Datagram Protocol)</strong> เป็นกลไกในการรับ-ส่งข้อมูลเวลา</li>
+</ul>
+<hr />
+<h2 id="arduino-ethernet-static-ip-address">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - Static IP Address</strong><a class="headerlink" href="#arduino-ethernet-static-ip-address" title="Permanent link">#</a></h2>
+<p>โค้ดนี้เป็นตัวอย่างการใช้งาน <strong>Arduino Uno ร่วมกับ Ethernet Shield</strong> โดยกำหนดค่าเครือข่ายแบบ <strong>Static IP Address (IPv4)</strong> เพื่อให้บอร์ดสามารถเชื่อมต่อเข้าสู่เครือข่าย <strong>LAN</strong> ได้
+โดยมีขั้นตอนการทำงานที่สำคัญดังนี้</p>
+<ul>
+<li>กำหนด <strong>MAC Address</strong> ให้กับอุปกรณ์ (ต้องไม่ซ้ำในเครือข่าย)</li>
+<li>กำหนดค่าพารามิเตอร์เครือข่ายแบบคงที่ ได้แก่  </li>
+<li><strong>IP Address</strong> ในตัวอย่างนี้ตั้งค่า <strong>IP Address</strong> ให้เป็น <code>192.168.10.100</code>
+เพื่อใช้งานในเครือข่ายที่มีหมายเลข <strong>IP</strong> ในช่วง <code>192.168.10.0/24</code></li>
+<li><strong>Gateway</strong> ตั้งค่าให้เป็น <code>192.168.10.1</code></li>
+<li><strong>Subnet Mask</strong> ตั้งค่าให้เป็น <code>255.255.255.0</code></li>
+<li><strong>DNS Server</strong> ตั้งค่าให้เป็น <code>192.168.10.1</code> โดยที่ <strong>Gateway</strong> ทำหน้าที่เป็น <strong>DNS Server</strong> ในเครือข่ายด้วย</li>
+<li>เรียกใช้ฟังก์ชัน <code>Ethernet.begin()</code> เพื่อเริ่มต้นการทำงานของ Ethernet</li>
+</ul>
+<p>การทำงานของโปรแกรมในฟังก์ชัน <code>setup()</code> และ <code>loop()</code></p>
+<ol>
+<li>เริ่มต้นการสื่อสารผ่าน <code>Serial</code> เพื่อใช้แสดงผล</li>
+<li>เรียก <code>Ethernet.begin(mac, ip, dns, gateway, subnet)</code>
+  ซึ่งเป็นการกำหนดค่าเครือข่ายแบบ <strong>Static IP</strong> และเริ่มต้น <strong>Ethernet</strong> (ไม่ได้ใช้ <strong>DHCP Server</strong> ในตัวอย่างนี้)</li>
+<li>อ่านค่า <strong>IP Address</strong> ปัจจุบันด้วยคำสั่ง <code>Ethernet.localIP()</code></li>
+<li>แสดง <strong>IP Address</strong> ผ่านทาง <strong>Serial Monitor</strong></li>
+<li>ใน <code>loop()</code> ไม่มีการประมวลผลเพิ่มเติม</li>
+</ol>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+// Set the MAC Address (must be unique in the LAN)
+byte mac[] = { 0x02, 0xAB, 0xCD, 0xEF, 0x12, 0x34 };
+
+// Set the Static IP address
+IPAddress ip(192, 168, 10, 100);
+IPAddress gateway(192, 168, 10, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns(192, 168, 10, 1);  // or 8.8.8.8 (Public DNS servver)
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;Arduino-Ethernet Demo..&quot;);
+
+  Ethernet.init(10);  // Set the /SS pin (Arduino Uno D10 pin)
+
+  Ethernet.begin(mac, ip, dns, gateway, subnet);
+  delay(1000);
+
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    Serial.println(&quot;Ethernet shield not found!&quot;);
+    while (true) delay(1);
+  }
+
+  // Show the IP address
+  Serial.print(&quot;IP Address: &quot;);
+  Serial.println(Ethernet.localIP());
+}
+
+void loop() {
+  delay(5);
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-1.jpg" /></p>
+<p>รูป: การทำขั้นตอน <strong>Build</strong> ใน <strong>Arduino IDE</strong> สำหรับโค้ดตัวอย่าง</p>
+<p>เมื่ออัปโหลด <strong>Arduino Sketch</strong> ไปยังบอร์ด <strong>Arduino Uno</strong> ได้สำเร็จแล้ว 
+ให้ทดสอบการเชื่อมต่อเครือข่ายด้วยคำสั่ง <code>ping</code> และ <code>nmap</code> โดยในตัวอย่างนี้ใช้คอมพิวเตอร์ 
+<strong>Raspberry Pi SBC / Raspberry Pi OS</strong> หรือ <strong>Ubuntu</strong> เป็นเครื่องทดสอบ</p>
+<ul>
+<li>ใช้คำสั่ง <code>ping</code> เพื่อตรวจสอบว่า บอร์ด <strong>Arduino</strong> สามารถตอบสนองในระดับ <strong>ICMP</strong> ได้หรือไม่<br />
+  (ยืนยันว่าอุปกรณ์เชื่อมต่ออยู่ในเครือข่ายเดียวกันและสื่อสารได้)</li>
+<li>ใช้คำสั่ง <code>nmap -sP 192.168.10.0/24</code> ใช้สำหรับ <strong>Ping Scan / Host Discovery</strong>
+ เอาไว้ตรวจว่า มีเครื่องไหนออนไลน์อยู่ในเครือข่าย </li>
+</ul>
+<p>ผลลัพธ์ที่ได้จะช่วยยืนยันว่า การตั้งค่า <strong>IP Address</strong> ถูกต้อง และการเชื่อมต่อ <strong>Ethernet</strong> ของ <strong>Arduino Ethernet</strong> ทำงานปกติ</p>
+<p><img alt="" src="rpi5_ping.jpg" /></p>
+<p>รูป: ตัวอย่างการทำคำสั่ง <strong>Linux</strong> บน <strong>Raspberry Pi</strong> (<strong>IP</strong> = <code>192.168.10.1</code>) เพื่อตรวจสอบการเชื่อมต่อกับ <strong>Arduino Ethernet Shield</strong> (<strong>IP</strong> = <code>192.168.10.100</code>) ในเครือข่าย <strong>LAN</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-dynamic-ip-address-via-dhcp">&#9655; <strong>ตัวอย่างโค้ด: Arduino Ethernet - Dynamic IP Address via DHCP</strong><a class="headerlink" href="#arduino-ethernet-dynamic-ip-address-via-dhcp" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดนี้สาธิตการเปลี่ยนจากการใช้ <strong>Static IP</strong> มาเป็นการเชื่อมต่อกับ <strong>DHCP Server</strong><br />
+เพื่อขอ <strong>IP Address</strong> แบบไดนามิก โดยมีการกำหนดระยะเวลา <strong>timeout</strong> และจำนวนครั้งในการพยายามเชื่อมต่อ (<strong>Retry</strong>) หากไม่สามารถขอ <strong>IP</strong> จาก <strong>DHCP</strong> ได้ ภายในเงื่อนไขที่กำหนด ระบบจะเปลี่ยนไปใช้ <strong>Static IP (fallback)</strong> แทน</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+// Unique MAC Address
+byte mac[] = { 0x02, 0xAB, 0xCD, 0xEF, 0x12, 0x34 };
+
+// Optional fallback static IP
+IPAddress fallbackIP(192, 168, 10, 100);
+
+const int MAX_RETRY = 5;
+const unsigned long DHCP_TIMEOUT_MS = 5*1000;  // 5 seconds
+bool ethernetOK = false;
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;\n\n\n&quot;);
+  Serial.flush();
+  Serial.println(&quot;Arduino Ethernet DHCP Demo...&quot;);
+  uint32_t ts = millis();
+  ethernetOK = initEthernetDHCP();
+  Serial.print(&quot;DHCP exec [msec]: &quot;);
+  Serial.println( millis() - ts );
+  if (ethernetOK) {
+    printNetworkInfo();
+  } else {
+    Serial.println(&quot;Ethernet init FAILED!&quot;);
+  }
+}
+
+void loop() {
+  // Maintain DHCP lease (important for long-running systems)
+  Ethernet.maintain();
+  delay(1000);
+}
+
+// DHCP Initialization with Retry
+bool initEthernetDHCP() {
+  for (int attempt = 1; attempt &lt;= MAX_RETRY; attempt++) {
+    Serial.print(&quot;DHCP attempt &quot;);
+    Serial.println(attempt);
+    unsigned long startTime = millis();
+    // Try DHCP
+    int result = Ethernet.begin(mac);
+    if (result != 0) {
+      Serial.println(&quot;DHCP success&quot;);
+      return true;
+    }
+    // Timeout handling
+    while (millis() - startTime &lt; DHCP_TIMEOUT_MS) {
+      delay(100);
+    }
+    Serial.println(&quot;DHCP timeout...&quot;);
+  }
+  // All retries failed =&gt; use static IP for fallback
+  Serial.println(&quot;DHCP failed. Using fallback static IP...&quot;);
+  Ethernet.begin(mac, fallbackIP);
+  if (Ethernet.localIP() != IPAddress(0, 0, 0, 0)) {
+    return true; // IP address is valid.
+  }
+  return false; // IP address is not valid.
+}
+
+// Print Network Info
+void printNetworkInfo() {
+  Serial.print(&quot;IP Address: &quot;);
+  Serial.println(Ethernet.localIP());
+  Serial.print(&quot;Gateway: &quot;);
+  Serial.println(Ethernet.gatewayIP());
+  Serial.print(&quot;Subnet: &quot;);
+  Serial.println(Ethernet.subnetMask());
+  Serial.print(&quot;DNS: &quot;);
+  Serial.println(Ethernet.dnsServerIP());
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-2.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+ที่แสดงให้เห็นว่า สามารถเชื่อมต่อกับ <strong>DHCP Server</strong> และได้รับ <strong>IP Address</strong>
+โดยอัตโนมัติ (<strong>IP</strong> = <code>192.168.10.197</code>)</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-icmp-ping">&#9655; <strong>ตัวอย่างโค้ด Arduino Ethernet - ICMP / Ping</strong><a class="headerlink" href="#arduino-ethernet-icmp-ping" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปเป็นการทดลองส่งแพ็กเกตตามโปรโตคอล <strong>ICMP (Ping)</strong>
+ไปยังคอมพิวเตอร์บนอินเทอร์เน็ต เช่น <code>8.8.8.8</code> (<strong>Google Public DNS Server</strong>)
+เพื่อใช้ตรวจสอบว่า บอร์ด <strong>Arduino Uno</strong> สามารถเชื่อมต่อกับอินเทอร์เน็ตได้หรือไม่</p>
+<p>ในการใช้งาน <strong>ICMP (Ping)</strong> ร่วมกับ <strong>Arduino Ethernet Shield</strong>
+จะใช้ไลบรารี <a href="https://github.com/andrew-susanto/Arduino-Ethernet-Icmp"><code>EthernetICMP</code></a> (legacy) โดยต้องดาวน์โหลดไดเรกทอรี <a href="https://github.com/andrew-susanto/Arduino-Ethernet-Icmp/tree/master/EthernetICMP"><code>EthernetICMP</code></a> จาก <strong>GitHub Repo</strong>
+ในรูปแบบไฟล์ <code>.zip</code> มายังคอมพิวเตอร์ของผู้ใช้ และจากนั้นให้นำเข้าใช้งานใน <strong>Arduino IDE</strong> ผ่านเมนู
+<strong>Sketch &gt; Include Library &gt; Add .ZIP Library...</strong>
+แล้วเลือกไฟล์ <code>EthernetICMP.zip</code> ที่ได้ดาวน์โหลดมาแล้ว</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+// Include the library:
+// https://github.com/andrew-susanto/Arduino-Ethernet-Icmp
+#include &lt;EthernetICMP.h&gt; 
+
+// Set the MAC Address (must be unique in the LAN)
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
+// Set the static IP address of the Arduino Ethernet shield
+IPAddress ip(192, 168, 10, 100);
+IPAddress gateway(192, 168, 10, 1);
+IPAddress dns(8, 8, 8, 8);
+IPAddress subnet(255, 255, 255, 0);
+
+// Target to ping
+IPAddress pingAddr(8, 8, 8, 8);
+
+// Use socket 0 (safer default)
+SOCKET pingSocket = 0;
+
+// Buffer for printing
+char buffer[256];
+
+EthernetICMPPing ping(pingSocket, 0);
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  // Seed random (avoid same ID every reset)
+  randomSeed(analogRead(A2));
+
+  Serial.println(&quot;\nArduino-Ethernet ICMP/Ping Demo..&quot;);
+  // Start Ethernet
+  Ethernet.begin(mac, ip, dns, gateway, subnet);
+  Serial.print(&quot;IP Address: &quot;);
+  Serial.println(Ethernet.localIP());
+  // Re-create ping object with random ID
+  ping = EthernetICMPPing(pingSocket, (uint16_t)random(0, 65535));
+  if (Ethernet.linkStatus() == LinkOFF) {
+    Serial.println(&quot;Warning: Ethernet cable disconnected&quot;);
+  }
+}
+
+void loop() {
+  static uint8_t count = 0;
+  static uint32_t totalMs = 0;
+  static uint8_t successCount = 0;
+  static uint32_t minMs = 0xFFFFFFFF;
+  static uint32_t maxMs = 0;
+
+  uint32_t start = millis();
+
+  // Send ping (3 attempts)
+  EthernetICMPEchoReply echoReply = ping(pingAddr, 3);
+
+  uint32_t rtt = millis() - start;
+
+  if (echoReply.status == SUCCESS) {
+    // Update stats
+    totalMs += rtt;
+    successCount++;
+    if (rtt &lt; minMs) minMs = rtt;
+    if (rtt &gt; maxMs) maxMs = rtt;
+
+    snprintf( buffer, sizeof(buffer),
+         &quot;Reply from %d.%d.%d.%d: bytes=%d TTL=%d time=%lums&quot;,
+         echoReply.addr[0], echoReply.addr[1],
+         echoReply.addr[2], echoReply.addr[3],
+         32,            // fixed payload size
+         echoReply.ttl, // TTL = Time To Live
+         rtt );         // RTT = Round Trip Time
+  } else {
+    snprintf( buffer, sizeof(buffer),
+         &quot;Echo request failed; Error: %d&quot;,
+         echoReply.status );
+  }
+
+  Serial.println(buffer);
+
+  if (++count &gt;= 10) {
+    count = 0;
+
+    if (successCount &gt; 0) {
+      snprintf( buffer, sizeof(buffer),
+          &quot;Info: sent=10 ok=%d min=%lums avg=%lums max=%lums&quot;,
+          successCount,
+          minMs,
+          totalMs / successCount,
+          maxMs );
+      Serial.println(buffer);
+    } else {
+      Serial.println( &quot;Info: 0 successful replies&quot; );
+    }
+    // Reset variables
+    totalMs = 0;
+    successCount = 0;
+    minMs = 0xFFFFFFFF;
+    maxMs = 0;
+
+    delay(30000);  // pause before next batch
+  } else {
+    delay(2000);   // interval between pings
+  }
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-3.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+ที่แสดงให้เห็นว่า สามารถส่งแพ็กเกต <strong>ICMP / Ping</strong> ไปยัง <strong>8.8.8.8</strong> และมีการตอบกลับได้สำเร็จ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-ethernet-ntp-sync">&#9655; <strong>ตัวอย่างโค้ด Arduino Ethernet - NTP Sync</strong><a class="headerlink" href="#arduino-ethernet-ntp-sync" title="Permanent link">#</a></h2>
+<p>ตัวอย่างถัดไปสาธิตการใช้งาน <strong>UDP</strong> ในการส่งแพ็กเกตไปยัง <strong>NTP Server</strong>
+เพื่อดึงข้อมูลวันและเวลาปัจจุบัน และนำมาใช้กำหนดค่า <strong>Local Time</strong> ให้กับบอร์ด <strong>Arduino Uno</strong> </p>
+<p>โดยระบบจะทำการปรับเวลาในตรงกัน (<strong>Time Synchronization</strong>) กับ <strong>NTP Server</strong>
+เป็นระยะ ๆ โดยเลือกใช้เซิร์ฟเวอร์ <code>th.pool.ntp.org</code> เพื่อให้เวลาภายในระบบมีความถูกต้องและใกล้เคียงเวลามาตรฐานมากที่สุด</p>
+<pre><code class="language-c++">#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+
+// https://github.com/arduino-libraries/Ethernet/blob/master/src/EthernetUdp.h
+#include &lt;EthernetUdp.h&gt;
+
+// Network config
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 10, 100);
+IPAddress dns(8, 8, 8, 8);
+IPAddress gateway(192, 168, 10, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+// UDP / NTP
+EthernetUDP udp;
+const char* ntpServer = &quot;th.pool.ntp.org&quot;;
+const int NTP_PORT = 123;
+byte packetBuffer[48];
+
+// timezone (Thailand UTC+7)
+const long tzOffset = 7 * 60 * 60; // in seconds
+
+unsigned long baseEpoch = 0, lastSyncMillis = 0;
+
+// re-sync interval
+const unsigned long SYNC_INTERVAL = 2 * 60 * 1000UL;
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(&quot;\n\n\nArduino Uno NTP Clock Demo...&quot;);
+  Serial.flush();
+  Ethernet.begin(mac, ip, dns, gateway, subnet);
+  udp.begin((uint16_t)random(1024, 65535));
+  syncTime();  // initial sync
+}
+
+void loop() {
+  static unsigned long lastPrint = 0;
+  // print every 1 second
+  if (millis() - lastPrint &gt;= 1000) {
+    lastPrint = millis();
+    printTime();
+  }
+  // re-sync with the NTP server
+  if (millis() - lastSyncMillis &gt;= SYNC_INTERVAL) {
+    syncTime();
+  }
+}
+
+void sendNTP() {
+  memset(packetBuffer, 0, 48);
+  packetBuffer[0] = 0b11100011;
+  udp.beginPacket(ntpServer, NTP_PORT);
+  udp.write(packetBuffer, 48);
+  udp.endPacket();
+}
+
+unsigned long getNTP() {
+  sendNTP();
+  delay(1000);
+  if (udp.parsePacket()) {
+    udp.read(packetBuffer, 48);
+    unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
+    unsigned long lowWord  = word(packetBuffer[42], packetBuffer[43]);
+    unsigned long secs1900 = (highWord &lt;&lt; 16) | lowWord;
+    const unsigned long seventyYears = 2208988800UL;
+    return secs1900 - seventyYears;
+  }
+  return 0;
+}
+
+void syncTime() {
+  Serial.println(&quot;NTP Sync...&quot;);
+  unsigned long epoch = getNTP();
+  if (epoch) {
+    baseEpoch = epoch + tzOffset;
+    lastSyncMillis = millis();
+    Serial.println(&quot;Sync OK&quot;);
+  } else {
+    Serial.println(&quot;Sync FAILED&quot;);
+  }
+}
+
+unsigned long getLocalEpoch() {
+  return baseEpoch + (millis() - lastSyncMillis) / 1000;
+}
+
+void printTime() {
+  unsigned long epoch = getLocalEpoch();
+  int h = (epoch % 86400L) / 3600;
+  int m = (epoch % 3600) / 60;
+  int s = epoch % 60;
+
+  Serial.print(&quot;Time: &quot;);
+  if (h &lt; 10) Serial.print(&quot;0&quot;);
+  Serial.print(h);
+  Serial.print(&quot;:&quot;);
+  if (m &lt; 10) Serial.print(&quot;0&quot;);
+  Serial.print(m);
+  Serial.print(&quot;:&quot;);
+  if (s &lt; 10) Serial.print(&quot;0&quot;);
+  Serial.println(s);
+}
+</code></pre>
+<p><img alt="" src="arduino_eth_demo-4.jpg" /></p>
+<p>รูป: ตัวอย่างข้อความเอาต์พุตใน <strong>Arduino Serial Monitor</strong>
+ที่แสดงให้เห็นว่า สามารถเชื่อมต่อและปรับวันเวลาของระบบในตรงกับ <strong>NTP Server</strong> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino Sketch</strong> และการใช้ไลบรารีที่เกี่ยวข้อง
+เพื่อใช้งานบอร์ด <strong>Arduino Uno</strong> ร่วมกับ <strong>Arduino Ethernet Shield (W5100)</strong>
+แต่มีข้อจำกัดบางประการ เช่น ไม่รองรับ <strong>TLS/HTTPS</strong> ซึ่งเป็นมาตรฐานความปลอดภัยสำคัญในระบบเครือข่ายสมัยใหม่ และไม่รองรับการรับส่งข้อมูลความเร็วสูง</p>
+<p>แม้โมดูลดังกล่าวจะจัดอยู่ในกลุ่มอุปกรณ์รุ่นเก่า (<strong>legacy / retired</strong>)
+และไม่แนะนำให้ใช้ในโปรเจกต์ใหม่ 
+แต่หากมีอุปกรณ์นี้อยู่แล้ว ยังสามารถนำมาใช้เป็นสื่อในการเรียนรู้พื้นฐานการเขียนโปรแกรมเครือข่าย 
+ด้วย <strong>Arduino</strong> ได้เป็นอย่างดี</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li><a href="../uno_ethernet_part-2/">"<strong>Arduino Uno + W5100 Ethernet Shield: Network Programming (ตอนที่ 2)</strong>"</a></li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-04-17 | Last Updated: 2026-04-19</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
