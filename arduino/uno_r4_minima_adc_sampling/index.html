@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/arduino/uno_r4_minima_adc_sampling/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การชักค่าตัวอย่างสัญญาณแอนะล็อก Timer-based ADC Sampling ด้วยบอร์ด Arduino Uno R4 Minima - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#timer-based-adc-sampling-arduino-uno-r4-minima" class="nav-link">การชักค่าตัวอย่างสัญญาณแอนะล็อก Timer-based ADC Sampling ด้วยบอร์ด Arduino Uno R4 Minima</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#constant-rate-adc-sampling" class="nav-link">Constant-Rate ADC Sampling</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#timer-adc-sampling" class="nav-link">การใช้ Timer สำหรับ ADC Sampling</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#hardware-timer-interrupt" class="nav-link">การใช้ Hardware Timer และ Interrupt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#ping-pong-buffer" class="nav-link">การใช้ Ping-Pong Buffer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#frame-format" class="nav-link">การจัดรูปแบบข้อมูล (Frame Format)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino-sketch" class="nav-link">โค้ดตัวอย่างสำหรับ Arduino Sketch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#io-timing-analysis" class="nav-link">การใช้งาน I/O ช่วยในการวิเคราะห์การทำงานเชิงเวลา (Timing Analysis)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python" class="nav-link">โค้ดตัวอย่างสำหรับ Python</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#sine-wave-input" class="nav-link">ตัวอย่างการทดสอบและสาธิตการทำงาน: Sine Wave Input</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="timer-based-adc-sampling-arduino-uno-r4-minima">การชักค่าตัวอย่างสัญญาณแอนะล็อก Timer-based ADC Sampling ด้วยบอร์ด Arduino Uno R4 Minima<a class="headerlink" href="#timer-based-adc-sampling-arduino-uno-r4-minima" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino Uno R4 Minima</em>, <em>Renesas R7FA4M1A</em>, <em>ADC Sampling</em>,
+<em>Data Acquisition</em>, <em>Digital Signal Processing</em>, <em>Python-NumPy</em>, <em>FFT</em>, <em>Frequency Spectrum</em></p>
+<ul>
+<li><a href="#constant-rate-adc-sampling"><strong>Constant-Rate ADC Sampling</strong></a><ul>
+<li><a href="#timer-adc-sampling"><strong>การใช้ Timer สำหรับ ADC Sampling</strong></a></li>
+<li><a href="#hardware-timer-interrupt"><strong>การใช้ Hardware Timer และ Interrupt</strong></a></li>
+<li><a href="#ping-pong-buffer"><strong>การใช้ Ping-Pong Buffer</strong></a></li>
+</ul>
+</li>
+<li><a href="#arduino-sketch"><strong>โค้ดตัวอย่างสำหรับ Arduino Sketch</strong></a></li>
+<li><a href="#io-timing-analysis"><strong>การใช้งาน I/O ช่วยในการวิเคราะห์การทำงานเชิงเวลา (Timing Analysis)</strong></a></li>
+<li><a href="#python"><strong>โค้ดตัวอย่างสำหรับ Python</strong></a></li>
+<li><a href="#sine-wave-input"><strong>ตัวอย่างการทดสอบและสาธิตการทำงาน: Sine Wave Input</strong></a></li>
+</ul>
+<hr />
+<h2 id="constant-rate-adc-sampling"><strong>Constant-Rate ADC Sampling</strong><a class="headerlink" href="#constant-rate-adc-sampling" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Arduino</strong> สำหรับบอร์ด <strong>Arduino Uno R4 Minima</strong>
+เพื่อนำมาใช้ในการชักค่าตัวอย่างสัญญาณแอนะล็อก (<strong>ADC Sampling</strong>)
+โดยใช้วงจร <strong>ADC</strong> ภายในไมโครคอนโทรลเลอร์สำหรับอินพุตจำนวน 1 ช่องสัญญาณ
+และส่งออกข้อมูลไปยังคอมพิวเตอร์เพื่อประมวลผลลำดับถัดไป</p>
+<p>สัญญาณแอนะล็อกที่ใช้เป็นอินพุตจะต้องมีแรงดันอยู่ในช่วง <strong>0V ถึง 5V</strong>
+และนำมาต่อเข้าที่ขา <code>A0</code> ตามที่กำหนดไว้ในโค้ดตัวอย่าง
+การทำงานของวงจร <strong>ADC</strong> จะเป็นการแปลงระดับแรงดันแอนะล็อกให้เป็นข้อมูลดิจิทัล
+ซึ่งเรียกว่า <strong>"Sample"</strong> ในตัวอย่างนี้ได้กำหนดความละเอียดของข้อมูลไว้ที่ 12 บิต
+ด้วยคำสั่ง <code>analogReadResolution(12)</code></p>
+<p>แม้ว่าไมโครคอนโทรลเลอร์รุ่น <strong>R7FA4M1</strong> จะรองรับ <strong>ADC</strong> ซึ่งเป็นแบบ <strong>SAR</strong> (<em>Successive Approximation Register</em>) สูงสุด 14 บิต แต่ในตัวอย่างนี้เลือกใช้เพียง 12 บิต เพื่อให้เหมาะสมกับความเร็วในการอ่านข้อมูลและลดภาระในการประมวลผล</p>
+<hr />
+<h3 id="timer-adc-sampling"><strong>การใช้ Timer สำหรับ ADC Sampling</strong><a class="headerlink" href="#timer-adc-sampling" title="Permanent link">#</a></h3>
+<p>ในการทำงานของไมโครคอนโทรเลลอร์ <strong>Arduino</strong> โดยทั่วไป
+หากใช้คำสั่ง <code>analogRead()</code> ภายใน <code>loop()</code> อัตราการชักตัวอย่างจะไม่คงที่
+เนื่องจากขึ้นอยู่กับเวลาการทำงานของคำสั่งอื่น ๆ ภายในโปรแกรม
+ดังนั้นตัวอย่างนี้จึงใช้วงจรตัวนับตามจังหวะ หรือ <strong>Hardware Timer</strong> ภายใน <strong>MCU</strong>
+เพื่อสร้างเหตุการณ์ตามช่วงเวลาที่แน่นอน และใช้ <strong>Interrupt</strong>
+เพื่อเรียกฟังก์ชัน <strong>Callback</strong> สำหรับอ่านค่า <strong>ADC</strong> โดยอัตโนมัติ</p>
+<p>ในตัวอย่างนี้ได้กำหนดอัตราการทำ <strong>ADC Sampling</strong> ไว้ที่ <code>TIMER_RATE_HZ = 8000</code> (หรือ <strong>8000 Samples/sec</strong>)</p>
+<hr />
+<h3 id="hardware-timer-interrupt"><strong>การใช้ Hardware Timer และ Interrupt</strong><a class="headerlink" href="#hardware-timer-interrupt" title="Permanent link">#</a></h3>
+<p>โค้ดตัวอย่างใช้วงจร <strong>GPT (General PWM Timer)</strong> ซึ่งเป็น <strong>Hardware Timer</strong> ภายใน <strong>R7FA4M1 MCU</strong>
+เมื่อ <strong>Timer</strong> ทำงานครบคาบเวลาที่กำหนด จะเกิด <strong>Interrupt</strong> ขึ้น และระบบจะเรียกฟังก์ชัน <strong>Callback</strong>
+<code>timer_callback()</code> โดยอัตโนมัติ</p>
+<p>ภายในฟังก์ชัน <strong>Callback</strong> จะมีการทำงานสำคัญดังนี้</p>
+<ul>
+<li>อ่านค่า <strong>ADC</strong> จากขา <code>A0</code></li>
+<li>เก็บข้อมูล <strong>Sample</strong> ลงในหน่วยความจำบัฟเฟอร์ (<strong>Buffer</strong>)</li>
+<li>นับจำนวน <strong>Sample</strong> ที่ได้รับ</li>
+<li>สลับบัฟเฟอร์เมื่อเก็บข้อมูลครบหนึ่งชุด</li>
+</ul>
+<hr />
+<h3 id="ping-pong-buffer"><strong>การใช้ Ping-Pong Buffer</strong><a class="headerlink" href="#ping-pong-buffer" title="Permanent link">#</a></h3>
+<p>แนวคิดสำคัญคือ ขณะที่ <strong>ISR</strong> กำลังเขียนข้อมูลลงในบัฟเฟอร์ชุดหนึ่ง
+โปรแกรมหลักใน <code>loop()</code> จะสามารถส่งข้อมูลจากอีกบัฟเฟอร์หนึ่งผ่าน <code>Serial</code></p>
+<p>แม้ว่าซีพียูของ <strong>MCU</strong> จะทำงานได้ทีละคำสั่งและไม่ได้ประมวลผลแบบขนานจริง ๆ
+แต่ระบบสามารถสลับช่วงเวลาการทำงานระหว่าง <strong>ISR</strong> และโปรแกรมหลักได้อย่างรวดเร็ว
+โดย <strong>ISR</strong> จะมีลำดับความสำคัญสูงกว่า</p>
+<p>ดังนั้น เมื่อเกิด <strong>Timer Interrupt</strong> ซีพียูจะหยุดการทำงานใน <code>loop()</code> ชั่วคราว
+เพื่อไปทำ <strong>ADC Sampling</strong> ภายใน <strong>ISR</strong> แล้วจึงกลับมาทำงานเดิมต่อ
+แนวทางนี้ช่วยให้การทำ <strong>ADC Sampling</strong> ทำได้อย่างต่อเนื่องและสม่ำเสมอ
+โดยไม่ต้องหยุดรอการส่งข้อมูลผ่าน <code>Serial</code> ให้เสร็จก่อน</p>
+<hr />
+<h3 id="frame-format"><strong>การจัดรูปแบบข้อมูล (Frame Format)</strong><a class="headerlink" href="#frame-format" title="Permanent link">#</a></h3>
+<p>ข้อมูลแต่ละบล็อกถูกจัดให้อยู่ในรูปแบบ <strong>Frame</strong> ก่อนถูกส่งออกทาง <strong>Serial</strong> ดังนี้</p>
+<ul>
+<li><strong>Header</strong>:   4 Bytes (<code>0xAD 0xDE 0xBE 0xEF</code>)</li>
+<li><strong>ADC Samples</strong>:  512 * 2 Bytes (รวม 1,024 ไบต์)</li>
+<li><strong>CRC16</strong>:    2 Bytes</li>
+</ul>
+<p>ส่วนเริ่มต้นหรือ <strong>Frame Header</strong> มีขนาด 4 ไบต์ ตามด้วยข้อมูล <strong>Samples</strong> จำนวน <strong>512 Samples</strong>
+ซึ่งมีขนาดแต่ละ <strong>Sample</strong> จำนวน 2 ไบต์ (<strong>High Byte</strong> และตามด้วย <strong>Low Byte</strong>) และปิดท้ายด้วยค่า
+<strong>CRC16 Checksum (16-bit)</strong> ซึ่งถูกใช้สำหรับตรวจสอบความถูกต้องของข้อมูล
+และช่วยตรวจจับความผิดพลาดที่อาจเกิดขึ้นระหว่างการส่งผ่าน <code>Serial</code></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino-sketch"><strong>โค้ดตัวอย่างสำหรับ Arduino Sketch</strong><a class="headerlink" href="#arduino-sketch" title="Permanent link">#</a></h2>
+<p>โค้ด <strong>Arduino</strong> ทั้งหมด มีดังนี้ และได้ทดลองใช้กับ <a href="https://github.com/arduino/ArduinoCore-renesas"><strong>Arduino Core for Renesas</strong></a> (<a href="https://github.com/arduino/ArduinoCore-renesas/releases/tag/1.5.3"><strong>v1.5.3</strong></a>)</p>
+<pre><code class="language-cpp">// Target Board: Arduino Uno R4 Minima
+#include &quot;FspTimer.h&quot;
+
+constexpr uint32_t BAUD_RATE = 2000000; // 2Mbps
+constexpr uint32_t TIMER_RATE_HZ = 8000;
+
+constexpr uint32_t BLOCK_SIZE   = 512;
+constexpr uint32_t SAMPLE_SIZE  = 2;
+constexpr uint32_t HEADER_SIZE  = 4;
+constexpr uint32_t CRC_SIZE     = 2;
+constexpr uint32_t DATA_SIZE    = BLOCK_SIZE * SAMPLE_SIZE;
+// Total frame size: 4-byte header + ADC payload + 2-byte CRC16
+constexpr uint32_t BUF_BYTE_SIZE = HEADER_SIZE + DATA_SIZE + CRC_SIZE;
+
+// Ping-pong buffers
+uint8_t pingBuffer[BUF_BYTE_SIZE];
+uint8_t pongBuffer[BUF_BYTE_SIZE];
+
+// Active write/read buffer pointers
+volatile uint8_t* currentWriteBuf = pingBuffer;
+volatile uint8_t* currentReadBuf  = nullptr;
+
+volatile bool dataReady = false;
+volatile uint32_t sampleCount = 0;
+
+FspTimer samplingTimer; // the timer instance for ADC sampling
+
+void initTimer();
+void timer_callback(timer_callback_args_t* p_args);
+uint16_t crc16_ccitt(const uint8_t* data, size_t length);
+
+void setup() {
+  Serial.begin(2000000);
+  while (!Serial &amp;&amp; millis() &lt; 3000) { delay(1); }
+  pinMode(13, OUTPUT); // P111
+  pinMode(10, OUTPUT); // P112
+  analogReadResolution(12);
+  // Initialize the hardware timer for ADC sampling
+  initTimer();
+}
+
+void loop() {
+  if (dataReady) {
+    // Toggle pin HIGH
+    R_PORT1-&gt;POSR = (1 &lt;&lt; 12);
+    // Cache pointer immediately
+    uint8_t* bufferToSend = (uint8_t*)currentReadBuf;
+    // Clear flag early
+    dataReady = false;
+    // Compute CRC16 in main loop
+    uint16_t crc = crc16_ccitt( bufferToSend, HEADER_SIZE + DATA_SIZE);
+    // Append CRC16 at end of frame
+    int crcOffset = HEADER_SIZE + DATA_SIZE;
+    bufferToSend[crcOffset] = (crc &gt;&gt; 8) &amp; 0xFF;
+    bufferToSend[crcOffset + 1] = crc &amp; 0xFF;
+    // Send frame
+    Serial.write(bufferToSend, BUF_BYTE_SIZE);
+    Serial.flush();
+    // Toggle pin LOW
+    R_PORT1-&gt;PORR = (1 &lt;&lt; 12);
+  }
+}
+
+// CRC16-CCITT (Polynomial = 0x1021, Init value = 0xFFFF)
+uint16_t crc16_ccitt(const uint8_t* data, size_t length) {
+  uint16_t crc = 0xFFFF;
+  for (size_t i = 0; i &lt; length; i++) {
+    crc ^= ((uint16_t)data[i] &lt;&lt; 8);
+    for (uint8_t j = 0; j &lt; 8; j++) {
+      if (crc &amp; 0x8000) {
+        crc = (crc &lt;&lt; 1) ^ 0x1021;
+      } else {
+        crc &lt;&lt;= 1;
+      }
+    }
+  }
+  return crc;
+}
+
+// Timer ISR
+void timer_callback(timer_callback_args_t* p_args) {
+  (void)p_args;
+  // Toggle pin HIGH
+  R_PORT1-&gt;POSR = (1 &lt;&lt; 11);
+  // ADC read
+  uint16_t adcVal = analogRead(A0) &lt;&lt; 4;
+  // Toggle pin LOW
+  R_PORT1-&gt;PORR = (1 &lt;&lt; 11);
+
+  // Header written only once at start of block
+  if (sampleCount == 0) {
+    currentWriteBuf[0] = 0xAD;
+    currentWriteBuf[1] = 0xDE;
+    currentWriteBuf[2] = 0xBE;
+    currentWriteBuf[3] = 0xEF;
+  }
+  // Store ADC sample after header
+  uint32_t offset = HEADER_SIZE + sampleCount * SAMPLE_SIZE;
+  currentWriteBuf[offset] = (adcVal &gt;&gt; 8) &amp; 0xFF;
+  currentWriteBuf[offset + 1] = adcVal &amp; 0xFF;
+  sampleCount++;
+
+  // Buffer complete
+  if (sampleCount &gt;= BLOCK_SIZE) {
+    sampleCount = 0; // Reset the sample counter
+    // Swap ping-pong buffers
+    if (currentWriteBuf == pingBuffer) {
+      currentWriteBuf = pongBuffer;
+      currentReadBuf  = pingBuffer;
+    } else {
+      currentWriteBuf = pingBuffer;
+      currentReadBuf  = pongBuffer;
+    }
+    dataReady = true;
+  }
+}
+
+// Timer Initialization
+void initTimer() {
+  uint8_t timer_type = GPT_TIMER;
+  int8_t timer_index = FspTimer::get_available_timer(timer_type);
+
+  if (timer_index &lt; 0) {
+    timer_index = FspTimer::get_available_timer(timer_type, true);
+  }
+
+  FspTimer::force_use_of_pwm_reserved_timer();
+  samplingTimer.begin(
+      TIMER_MODE_PERIODIC,
+      timer_type, timer_index,
+      TIMER_RATE_HZ, 0.0f,
+      timer_callback, nullptr);
+
+  samplingTimer.setup_overflow_irq();
+  samplingTimer.open();
+  samplingTimer.start();
+}
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="io-timing-analysis"><strong>การใช้งาน I/O ช่วยในการวิเคราะห์การทำงานเชิงเวลา (Timing Analysis)</strong><a class="headerlink" href="#io-timing-analysis" title="Permanent link">#</a></h2>
+<p>การทำงานของโค้ด <strong>Arduino Sketch</strong> มีการใช้งานขา <code>D13</code> และ <code>D10</code>
+เป็นเอาต์พุตสำหรับสร้างสัญญาณพัลส์ เพื่อนำไปใช้ในการวิเคราะห์การทำงานเชิงเวลา
+ด้วย <strong>Oscilloscope</strong> หรือ <strong>Logic Analyzer</strong></p>
+<p>ลักษณะการใช้งานมีดังนี้</p>
+<ul>
+<li><code>D13</code>: จะมีสัญญาณพัลส์เป็น <strong>HIGH</strong> ในช่วงเวลาที่มีการใช้คำสั่ง <code>analogRead(A0)</code> สำหรับการทำ <strong>ADC Sampling</strong> ภายใน <strong>ISR</strong></li>
+<li><code>D10</code>: จะมีสัญญาณพัลส์เป็น <strong>HIGH</strong> ในช่วงเวลาที่โปรแกรมหลักกำลังส่งข้อมูลในบัฟเฟอร์ออกทาง <code>Serial</code></li>
+</ul>
+<p>จากสัญญาณที่เกิดขึ้น ผู้ใช้งานสามารถวัดช่วงเวลาการทำงานของส่วนต่าง ๆ ในโปรแกรมได้ เช่น</p>
+<ul>
+<li>ระยะเวลาที่ใช้ในการอ่านค่า <strong>ADC</strong></li>
+<li>คาบเวลาของ <strong>ADC Sampling</strong></li>
+<li>ระยะเวลาที่ใช้ในการส่งข้อมูลผ่าน <code>Serial</code></li>
+<li>ความสม่ำเสมอของการเกิด <strong>Interrupt</strong></li>
+</ul>
+<p>การกำหนดค่าลอจิกที่ขาเอาต์พุตจะหลีกเลี่ยงการใช้คำสั่ง <code>digitalWrite()</code>
+และใช้วิธีเข้าถึงรีจิสเตอร์ระดับล่างโดยตรงแทน เช่น</p>
+<pre><code class="language-cpp">R_PORT1-&gt;POSR = (1 &lt;&lt; 11);  // Set P111 (D13) -&gt; HIGH
+R_PORT1-&gt;PORR = (1 &lt;&lt; 11);  // Clear P111 (D13) -&gt; LOW
+</code></pre>
+<p>แนวทางนี้ช่วยลดเวลาการทำงานของคำสั่งได้อย่างมาก
+เมื่อเปรียบเทียบกับ <code>digitalWrite()</code>
+เนื่องจากไม่มีขั้นตอนของ <strong>Arduino API</strong> เข้ามาเกี่ยวข้อง</p>
+<p>ตามที่ได้กล่าวไปแล้ว การทำงานของบอร์ด <strong>Arduino</strong> มีการสร้างสัญญาณเอาต์พุตที่ขา
+<strong>D13</strong> และ <strong>D10</strong> เพื่อนำไปใช้ในการวิเคราะห์การทำงานเชิงเวลาด้วยออสซิลโลสโคป ดังนี้</p>
+<ul>
+<li><strong>Arduino D13 (P111 MCU Pin)</strong>: จะสร้างสัญญาณพัลส์ โดยเปลี่ยนสถานะจาก <strong>LOW → HIGH</strong> ก่อนเริ่มอ่านค่า <strong>ADC</strong> และเปลี่ยนกลับจาก <strong>HIGH → LOW</strong> เมื่อจบขั้นตอน <strong>ADC</strong></li>
+<li><strong>Arduino D10 (P112 MCU Pin)</strong>: จะสร้างสัญญาณพัลส์ โดยเปลี่ยนสถานะจาก <strong>LOW → HIGH</strong> ก่อนเริ่มส่งข้อมูลของบัฟเฟอร์ออกทาง <code>Serial</code> ซึ่งจะต้องมีการคำนวณค่า <strong>CRC16</strong> ของข้อมูลด้วย และเปลี่ยนกลับจาก <strong>HIGH → LOW</strong> เมื่อจบขั้นตอนดังกล่าว</li>
+</ul>
+<p>ความกว้างของสัญญาณพัลส์ที่ขา <strong>GPIO</strong> ทั้งสอง สามารถวัดได้โดยใช้ออสซิลโลสโคป ซึ่งช่วยให้ทราบระยะเวลาในการทำงานของแต่ละขั้นตอนภายในระบบ</p>
+<p>ตัวอย่างการคำนวณเวลาในการเก็บข้อมูลและส่งข้อมูล มีดังนี้</p>
+<ul>
+<li>อัตรา <strong>ADC Sampling</strong> เท่ากับ <strong>8 kHz</strong> หรือ <strong>8000 Samples/sec</strong> ดังนั้นคาบเวลาของการ 
+Sampling เท่ากับ <script type="math/tex">T_s = 1/8000</script> หรือประมาณ <strong>125 µs per sample</strong></li>
+<li>หากต้องการเก็บข้อมูลจำนวน <strong>512 Samples</strong> จะใช้เวลาประมาณ <strong>512 × 125 μs = 64 ms</strong>
+ดังนั้น จะใช้เวลาประมาณ <strong>64 ms</strong> จึงจะทำให้ข้อมูลครบหนึ่งบัฟเฟอร์</li>
+<li>ในขณะที่อีกบัฟเฟอร์เมื่อได้ข้อมูลครบหนึ่งเฟรมแล้ว จะถูกส่งออกทาง <code>Serial</code> โดยข้อมูลต่อหนึ่งเฟรมมีขนาดเท่ากับ <strong>4+1024+2 = 1030</strong> ไบต์</li>
+<li>สำหรับการส่งข้อมูลแบบ <strong>Serial</strong> รูปแบบ <strong>8N1</strong> ข้อมูล 1 ไบต์จะถูกส่งจริงเป็น 10 บิต ได้แก่<ul>
+<li><strong>Start bit</strong>: 1 บิต</li>
+<li><strong>Data bits</strong>: 8 บิต</li>
+<li><strong>Stop bit</strong>: 1 บิต</li>
+</ul>
+</li>
+<li>จำนวนบิตทั้งหมดที่ต้องส่งคือ <strong>1030 × 10 = 10300 bits</strong>
+เมื่อใช้อัตรา <strong>Baud Rate</strong> เท่ากับ <strong>2 Mbps</strong> (ตามที่ตั้งค่าไว้ในโค้ด) เวลาที่ใช้ในการส่งข้อมูลจะประมาณได้เป็น 
+<strong>10300 / 2000000 = 5.15 ms</strong></li>
+<li>อย่างไรก็ตาม การคำนวณข้างต้นเป็นเพียงการประมาณเวลาส่งข้อมูลตามหลักการของ <strong>UART</strong> แบบ <strong>8N1</strong> ทั่วไป
+แต่ในความเป็นจริง การทำงานของ <code>Serial</code> โดยใช้ <strong>USB-CDC</strong> (<em>USB Communication Device Class</em>)  สำหรับ <strong>Arduino Uno R4 Minima</strong> จะได้อัตราการส่งที่สูงถึงประมาณ <strong>~3.3Mbps</strong> (จากการทดสอบ)
+และใช้เวลาน้อยกว่าค่าที่คำนวณได้ (จะต้องใช้เวลาไม่น้อยกว่า <strong>10300 / 3300000 = 3.12 ms</strong>)</li>
+</ul>
+<p><img alt="" src="d13_pulses.jpg" /></p>
+<p>รูป: สัญญาณที่ขา <strong>D13</strong></p>
+<p><img alt="" src="d10_pulses.jpg" /></p>
+<p>รูป: สัญญาณที่ขา <strong>D10</strong></p>
+<p>สัญญาณที่ขา <code>D13</code> แสดงให้เห็นว่า มีการเกิดสัญญาณพัลส์ด้วยอัตราคงที่ <strong>8 kHz</strong>
+ซึ่งตรงกับความถี่ที่กำหนดไว้สำหรับการทำ <strong>ADC Sampling</strong></p>
+<p>ช่วงเวลาที่สัญญาณมีลอจิกเป็น <strong>HIGH</strong>
+คือช่วงเวลาที่ <strong>MCU</strong> กำลังทำคำสั่ง <code>analogRead()</code>
+ภายใน <strong>ISR</strong> เมื่อเกิด <strong>Timer Interrupt</strong> ในแต่ละครั้ง
+ดังนั้น การเก็บข้อมูลครบหนึ่งเฟรมจะใช้เวลาประมาณ <strong>64 msec</strong></p>
+<p>สัญญาณที่ขา <strong>D10</strong> แสดงให้เห็นช่วงเวลาที่โปรแกรมหลักใช้ในการคำนวณค่า <strong>CRC16</strong>
+และส่งข้อมูลหนึ่งเฟรมออกทาง <code>Serial</code> ไปยังคอมพิวเตอร์</p>
+<p>จากการวัดสัญญาณพบว่า กระบวนการดังกล่าวใช้เวลาประมาณ <strong>4.46 msec</strong> ต่อหนึ่งเฟรม
+เนื่องจากเวลาที่ใช้ในการส่งข้อมูลหนึ่งเฟรมน้อยกว่าระยะเวลาในการเก็บข้อมูลครบหนึ่งเฟรม (<strong>64 msec</strong>)
+จึงทำให้ระบบสามารถส่งข้อมูลได้ทัน และไม่เกิดปัญหา <strong>Buffer Overrun</strong></p>
+<p>การเพิ่มความถี่ของ <strong>ADC Sampling</strong> จากเดิม <strong>8 kHz</strong> ให้สูงขึ้นสามารถทำได้
+แต่จะต้องพิจารณาข้อจำกัดของระบบหลายประการ เช่น</p>
+<ul>
+<li><strong>Timer Interrupt Latency</strong></li>
+<li>ระยะเวลาการทำงานของ <strong>ISR</strong></li>
+<li>ความเร็วในการอ่านค่า <strong>ADC</strong> ซึ่งคำสั่ง <code>analogRead()</code> ใช้เวลาประมาณ <strong>23.5 usec</strong></li>
+<li>ความเร็วในการส่งข้อมูลผ่าน <code>Serial</code></li>
+<li>ภาระการทำงานของ <strong>CPU</strong></li>
+</ul>
+<p>เมื่อเพิ่มความถี่ <strong>Sampling</strong> ให้สูงขึ้น ช่วงเวลาระหว่าง <strong>Interrupt</strong> จะสั้นลง
+ดังนั้น <strong>CPU</strong> จะต้องเข้าไปทำงานภายใน <strong>ISR</strong> บ่อยขึ้น</p>
+<p>หาก <strong>ISR</strong> ใช้เวลาทำงานนานเกินไป จะทำให้ค่า <strong>Duty Cycle</strong> ของการทำงานภายใน <strong>ISR</strong> เพิ่มสูงขึ้น
+ส่งผลให้ <strong>CPU</strong> มีเวลาเหลือน้อยลงสำหรับการทำงานส่วนอื่น </p>
+<p>เมื่อเพิ่มความถี่ของ <strong>ADC Sampling</strong> ให้สูงขึ้น ระยะเวลาในการเก็บข้อมูลให้ครบหนึ่งเฟรมก็จะสั้นลงตามไปด้วย
+ดังนั้น ระบบจะต้องส่งข้อมูลเฟรมออกทาง <code>Serial</code> บ่อยขึ้น ซึ่งทำให้อัตราการรับส่งข้อมูลของระบบเพิ่มสูงขึ้น</p>
+<p>หากโปรแกรมไม่สามารถประมวลผลข้อมูลได้ทัน อาจทำให้เกิดปัญหา เช่น <strong>Buffer Overrun</strong> หรือ <strong>Data Loss</strong> ได้</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python"><strong>โค้ดตัวอย่างสำหรับ Python</strong><a class="headerlink" href="#python" title="Permanent link">#</a></h2>
+<p>ข้อมูลที่ถูกส่งออกมาจากบอร์ด <strong>Arduino Uno R4 Minima</strong> ผ่านทาง <code>Serial</code> (<strong>USB-CDC</strong>)
+จะถูกนำไปรับและประมวลผลด้วยโปรแกรมที่เขียนด้วยภาษา <strong>Python</strong>
+ซึ่งทำหน้าที่ดังนี้</p>
+<ul>
+<li>อ่านข้อมูลเข้าทางพอร์ต <code>Serial</code> ของคอมพิวเตอร์ ตามหมายเลขพอร์ตที่เชื่อมต่อกับบอร์ด</li>
+<li>ตรวจสอบข้อมูลที่ได้รับเพื่อค้นหาส่วน <strong>Framew Header</strong> ของเฟรมข้อมูล</li>
+<li>รอรับข้อมูลให้ครบหนึ่งเฟรม</li>
+<li>ตรวจสอบความถูกต้องของข้อมูลด้วยค่า <strong>CRC16</strong></li>
+<li>นำข้อมูล <strong>Samples</strong> ที่ได้รับไปคำนวณด้วยอัลกอริทึม <strong>FFT</strong> (<em>Fast Fourier Transform</em>)</li>
+<li>แสดงผลข้อมูลในรูปแบบกราฟสเปกตรัมความถี่ (<strong>Frequency Spectrum</strong>)</li>
+</ul>
+<p>ก่อนใช้งาน <strong>Python Script</strong> จะต้องติดตั้งแพ็กเกจที่จำเป็นดังต่อไปนี้</p>
+<pre><code class="language-bash">pip install pyserial matplotlib numpy
+</code></pre>
+<p>การตั้งค่าที่สำคัญภายในโค้ด <strong>Python</strong> มีดังนี้</p>
+<ul>
+<li>ค่า <strong>Sample Rate</strong> จะต้องตรงกับอัตราการทำ <strong>ADC Sampling</strong> ที่กำหนดไว้ในโค้ดของบอร์ด <strong>Arduino</strong> ซึ่งในตัวอย่างนี้ใช้ค่า <strong>8000 Hz</strong></li>
+<li>รูปแบบของเฟรมข้อมูล รวมถึงจำนวน <strong>Samples</strong> ในแต่ละเฟรม จะต้องสอดคล้องกับรูปแบบข้อมูลที่ส่งมาจากบอร์ด <strong>Arduino</strong> โดยในตัวอย่างนี้กำหนดไว้ที่ <strong>512 Samples</strong> ต่อเฟรม</li>
+<li>ชื่อพอร์ต <strong>Serial</strong> จะต้องตรงกับพอร์ตของบอร์ด Arduino ที่เชื่อมต่ออยู่ ซึ่งอาจมีชื่อแตกต่างกันตามระบบปฏิบัติการ เช่น<ul>
+<li>Windows: <code>COM3</code>, <code>COM5</code></li>
+<li>Linux: <code>/dev/ttyACM0</code></li>
+<li>macOS: <code>/dev/cu.usbmodemxxxx</code></li>
+</ul>
+</li>
+</ul>
+<p>โค้ด <strong>Python</strong> ทั้งหมด มีดังนี้</p>
+<pre><code class="language-python">&quot;&quot;&quot;
+Demo: Real-Time Arduino ADC Streaming + FFT Visualization
+
+Description
+-----------
+This Python program receives high-speed ADC sample frames from an
+Arduino Uno R4 board over USB serial UART and displays:
+
+1. Time-domain ADC waveform
+2. Frequency-domain FFT spectrum
+
+The Arduino firmware continuously transmits frames using the format:
+    [4-byte HEADER]
+    [ADC PAYLOAD]
+    [CRC16-CCITT]
+
+Frame Structure
+---------------
+Header:
+    0xAD 0xDE 0xBE 0xEF
+Payload:
+    512 ADC samples
+    Each sample = uint16_t (big-endian)
+    Total payload size = 1024 bytes
+CRC:
+    CRC16-CCITT
+    Polynomial = 0x1021
+    Initial value = 0xFFFF
+Total Frame Size:
+    4 + 1024 + 2 = 1030 bytes
+
+Features
+--------
+- Automatic frame synchronization using header detection
+- CRC16 validation
+- Frame timeout recovery
+- Automatic UART stream re-synchronization
+- Real-time FFT visualization
+- Runtime package version reporting
+
+Required Python Packages
+------------------------
+pip install pyserial numpy matplotlib
+
+Note:
+
+This Python program must be used together with an Arduino Uno R4 Minima, 
+an analog microphone module, and the corresponding Arduino sketch
+for high-speed ADC streaming on the Arduino Uno R4.
+&quot;&quot;&quot;
+
+import time
+import serial
+import numpy as np
+import matplotlib.pyplot as plt
+
+# CONFIGURATION
+SERIAL_PORT = &quot;/dev/ttyACM0&quot;
+BAUDRATE = 2000000
+
+# The sample rate (ADC sampling rate)
+SAMPLING_RATE = 8000
+# The number of samples (suitable for FFT computation)
+BLOCK_SIZE = 512
+
+# The four-byte header
+HEADER = b&quot;\xad\xde\xbe\xef&quot;
+HEADER_SIZE = 4
+CRC_SIZE = 2
+SAMPLE_SIZE = 2
+DATA_SIZE = BLOCK_SIZE * SAMPLE_SIZE
+# Complete frame: [HEADER][ADC PAYLOAD][CRC16]
+FRAME_SIZE = HEADER_SIZE + DATA_SIZE + CRC_SIZE
+
+# Timeout while waiting for remaining frame bytes
+FRAME_TIMEOUT_SEC = 0.050
+
+# CRC16-CCITT: Polynomial = 0x1021, Initial value = 0xFFFF
+def crc16_ccitt(data: bytes) -&gt; int:
+    crc = 0xFFFF
+    for byte in data:
+        crc ^= byte &lt;&lt; 8
+        for _ in range(8):
+            if crc &amp; 0x8000:
+                crc = ((crc &lt;&lt; 1) ^ 0x1021) &amp; 0xFFFF
+            else:
+                crc = (crc &lt;&lt; 1) &amp; 0xFFFF
+    return crc
+
+# FFT Frequency Axis
+fft_freqs = np.fft.rfftfreq(BLOCK_SIZE, d=1.0 / SAMPLING_RATE)
+NUM_FFT_BINS = len(fft_freqs)
+
+# Matplotlib Setup
+plt.ion()
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6))
+fig.suptitle(&quot;Arduino ADC Stream + FFT&quot;, fontsize=12)
+
+# Time Domain Plot
+(line1,) = ax1.plot(range(BLOCK_SIZE), np.zeros(BLOCK_SIZE), lw=1.2)
+ax1.set_title(&quot;ADC Waveform&quot;)
+ax1.set_xlim(0, BLOCK_SIZE)
+ax1.set_ylim(0, 4095)
+ax1.set_ylabel(&quot;ADC Value&quot;)
+ax1.set_xlabel(&quot;Sample Index&quot;)
+ax1.grid(True, linestyle=&quot;--&quot;, alpha=0.5)
+
+# FFT Plot
+(line2,) = ax2.plot(fft_freqs, np.zeros(NUM_FFT_BINS), lw=1.2)
+ax2.set_title(&quot;FFT Spectrum&quot;)
+ax2.set_xlim(0, SAMPLING_RATE / 2)
+ax2.set_ylabel(&quot;Magnitude&quot;)
+ax2.set_xlabel(&quot;Frequency (Hz)&quot;)
+ax2.grid(True, linestyle=&quot;--&quot;, alpha=0.5)
+plt.tight_layout()
+
+# Open Serial Port
+try:
+    ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=0.005)
+    ser.reset_input_buffer()
+    print(f&quot;Connected to {SERIAL_PORT}&quot;)
+
+except Exception as e:
+    print(f&quot;Serial connection error: {e}&quot;)
+    raise SystemExit
+
+# Receive Buffer
+rx_buffer = bytearray()
+
+# Statistics
+good_frames = 0
+crc_errors = 0
+timeout_errors = 0
+
+# Main Loop
+try:
+    while plt.fignum_exists(fig.number):
+        # Read available UART bytes
+        available = ser.in_waiting
+        if available &gt; 0:
+            rx_buffer.extend(ser.read(available))
+
+        # Search for valid frame header
+        header_index = rx_buffer.find(HEADER)
+        if header_index &lt; 0:
+            # Keep only last few bytes
+            # to detect split header sequences
+            if len(rx_buffer) &gt; HEADER_SIZE:
+                rx_buffer = rx_buffer[-HEADER_SIZE:]
+            continue
+
+        # Remove junk before header
+        if header_index &gt; 0:
+            del rx_buffer[:header_index]
+
+        # Wait until complete frame arrives
+        if len(rx_buffer) &lt; FRAME_SIZE:
+            start_wait = time.monotonic()
+            while len(rx_buffer) &lt; FRAME_SIZE:
+                available = ser.in_waiting
+                if available &gt; 0:
+                    rx_buffer.extend(ser.read(available))
+                # Timeout waiting for frame completion
+                if (time.monotonic() - start_wait) &gt; FRAME_TIMEOUT_SEC:
+                    timeout_errors += 1
+                    print(f&quot;Timeout waiting frame &quot;
+                          f&quot;(timeouts={timeout_errors})&quot;)
+                    # Drop first byte and re-sync
+                    del rx_buffer[0]
+                    break
+
+            # restart processing
+            continue
+
+        # Extract one complete frame
+        frame = bytes(rx_buffer[:FRAME_SIZE])
+        del rx_buffer[:FRAME_SIZE]
+
+        # Verify header
+        if frame[0:HEADER_SIZE] != HEADER:
+            continue
+
+        # Split frame
+        payload = frame[HEADER_SIZE : HEADER_SIZE + DATA_SIZE]
+        received_crc = (frame[-2] &lt;&lt; 8) | frame[-1]
+
+        # CRC Check
+        computed_crc = crc16_ccitt(frame[0 : HEADER_SIZE + DATA_SIZE])
+
+        if computed_crc != received_crc:
+            crc_errors += 1
+            print(
+                f&quot;CRC ERROR &quot;
+                f&quot;RX=0x{received_crc:04X} &quot;
+                f&quot;CALC=0x{computed_crc:04X} &quot;
+                f&quot;(crc_errors={crc_errors})&quot;
+            )
+            # Skip bad frame
+            continue
+
+        good_frames += 1
+
+        # Convert payload -&gt; uint16 samples
+        # Arduino sends: MSB and LSB bytes of each sample
+        # Big-endian uint16
+        samples_16 = np.frombuffer(payload, dtype=&quot;&gt;u2&quot;).astype(np.float32)
+        # Undo left shift by 4
+        adc_samples = samples_16 / 16.0
+        # Normalize
+        normalized = adc_samples / 4095.0
+
+        # FFT calculation
+        # Remove Trend / Remove DC Offset
+        detrended = normalized - np.mean(normalized)
+        # Apply the Hanning windowing function
+        windowed = detrended * np.hanning(BLOCK_SIZE)
+        # Compute the FFT coefficients and use the magnitude values for plot
+        fft_mag = np.abs(np.fft.rfft(windowed)) * (2.0 / BLOCK_SIZE)
+
+        # Update waveform plot
+        line1.set_ydata(adc_samples)
+
+        # Update FFT plot
+        line2.set_ydata(fft_mag)
+        ax2.set_ylim(0, max(0.02, np.max(fft_mag) * 1.1))
+
+        # Display statistics
+        ax1.set_title(
+            f&quot;ADC Waveform | &quot;
+            f&quot;Frames = {good_frames}, &quot;
+            f&quot;CRC Errors = {crc_errors}, &quot;
+            f&quot;Timeout Errors = {timeout_errors}&quot;
+        )
+
+        # Refresh GUI
+        fig.canvas.draw_idle()
+        fig.canvas.flush_events()
+
+except KeyboardInterrupt:
+    print(&quot;\nStopped by user.&quot;)
+
+finally:
+    print(&quot;User terminated...&quot;)
+    ser.close()
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="sine-wave-input"><strong>ตัวอย่างการทดสอบและสาธิตการทำงาน: Sine Wave Input</strong><a class="headerlink" href="#sine-wave-input" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างการทดสอบและสาธิตการทำงานของระบบโดยรวม
+โดยเริ่มต้นจากการจัดเตรียมสัญญาณอินพุตแอนะล็อกสำหรับป้อนให้วงจร <strong>ADC</strong>
+ของบอร์ด <strong>Arduino Uno R4 Minima</strong> ที่ขา <code>A0</code>
+สัญญาณอินพุตควรมีระดับแรงดันอยู่ในช่วง <strong>0V ถึง 5V</strong> เพื่อให้เหมาะสมกับช่วงแรงดันของวงจร <strong>ADC</strong> ภายใน <strong>MCU</strong></p>
+<p>ตัวอย่างแหล่งกำเนิดสัญญาณทดสอบ มีดังนี้</p>
+<ol>
+<li>ใช้เครื่องมือวัด <strong>Function Generator</strong> จำนวน 1 ช่องสัญญาณ โดยเลือกสัญญาณรูปไซน์ (<strong>Sine Wave</strong>)และกำหนดค่าตัวอย่างดังนี้ ซึ่งจะทำให้สัญญาณมีระดับแรงดันอยู่ในช่วงประมาณ 0V ถึง 3V<ul>
+<li><strong>Frequency = 500 Hz</strong></li>
+<li><strong>Vpp = 3V</strong></li>
+<li><strong>Voffset = 1.5V</strong></li>
+</ul>
+</li>
+<li>หากไม่มี <strong>Function Generator</strong> อาจใช้โมดูลไมโครโฟนแบบแอนะล็อกเป็นอินพุตแทน
+เช่น โมดูลที่ใช้ไอซี <strong>MAX9814</strong> หรือ <strong>MAX4466</strong> และใช้สัญญาณเสียงทดสอบรูปไซน์ (<strong>Sine Wave Test Tone</strong>) จากคอมพิวเตอร์ หรือ สมาร์ตโฟน ส่งออกทางลำโพง แล้วนำไปวางใกล้ ๆ โมดูลไมโครโฟนเสียง</li>
+</ol>
+<p>โมดูลไมโครโฟนเสียง (ใช้แรงดันไฟเลี้ยง <strong>VCC = +3.3V</strong>) สัญญาณเอาต์พุตของโมดูลไมโครโฟนมีช่วงแรงดันประมาณ <strong>0V</strong> ถึง <strong>VCC</strong> และในกรณีไม่มีสัญญาณเสียง ค่าแรงดันเอาต์พุตจะอยู่ใกล้ระดับ <strong>VCC/2</strong></p>
+<p>ตัวอย่างของสัญญาณแอนะล็อกที่ได้นำมาทดสอบ โดยใช้ออสซิลสโคป ตรวจสอบสัญญาณในเบื้องต้น</p>
+<p><img alt="" src="sound_500hz-1.jpg" /></p>
+<p>รูป: สัญญาณรูปคลื่นไซน์ <strong>500Hz</strong> (มี <strong>DC offset</strong> แรงดันไฟฟ้าไม่ต่ำกว่า <strong>0V</strong>)
+ตั้งค่าออสซิลโลสโคปในโหมด <strong>DC Coupling</strong></p>
+<p><img alt="" src="sound_500hz-2.jpg" /></p>
+<p>รูป: สัญญาณรูปคลื่นไซน์ <strong>500Hz</strong> ตั้งค่าออสซิลโลสโคปในโหมด <strong>DC Coupling</strong> (ไม่มี <strong>DC offset</strong>)</p>
+<p><img alt="" src="python_fft_plot.jpg" /></p>
+<p>รูป: ตัวอย่างการแสดงรูป <strong>Signal Samples</strong> (บน) และ <strong>FFT-based Frequency Spectrum</strong> (ล่าง)  สำหรับสัญญาณเสียงรูปไซน์ความถี่ <strong>500Hz</strong> ที่ได้จากโมดูลไมโครโฟนเสียงแบบแอนะล็อก</p>
+<p>จากรูปกราฟ <strong>Frequency Spectrum</strong> จะเห็นได้ว่า ช่วงความถี่ <strong>500Hz</strong> จะมีขนาดสูงกว่าช่วงความถี่อื่นอย่างชัดเจน
+ซึ่งตรงกับความถี่ของสัญญาณอินพุตรูปไซน์ที่ได้นำมาทดสอบ</p>
+<p><strong>ข้อสังเกต:</strong></p>
+<ul>
+<li>ในการทำงานของโค้ด <strong>Python</strong> ก่อนการคำนวณ <strong>FFT</strong> มีการหาค่าเฉลี่ยของข้อมูล <strong>Samples</strong> ภายในแต่ละเฟรมแล้วนำค่าเฉลี่ยดังกล่าวไปลบออกจากข้อมูลทุกค่า ขั้นตอนนี้มีผลเทียบเท่ากับการตัดค่า <strong>DC Offset</strong> หรือ
+<strong>DC Component</strong> ของสัญญาณออกก่อนทำ <strong>FFT</strong>
+ดังนั้น เมื่อแสดงผลในรูป <strong>Frequency Spectrum</strong> จึงไม่ปรากฏองค์ประกอบของสัญญาณที่ความถี่ <strong>0Hz</strong>
+และช่วยให้สามารถสังเกตองค์ประกอบสัญญาณ <strong>AC</strong> ในย่านความถี่อื่นได้ชัดเจนมากขึ้น</li>
+</ul>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1"><strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอตัวอย่างการใช้งานบอร์ด <strong>Arduino Uno R4 Minima</strong> สำหรับการชักค่าตัวอย่างจากสัญญาณแอนะล็อกจำนวน 1 ช่องสัญญาณ และส่งข้อมูลไปยังคอมพิวเตอร์ผ่านทางพอร์ต <strong>USB-Serial</strong> เพื่อใช้ในการประมวลผลสัญญาณต่อไป</p>
+<p>ข้อมูลที่ได้รับในแต่ละเฟรมจะถูกนำไปคำนวณด้วยอัลกอริทึม <strong>FFT</strong> และแสดงผลในรูปแบบกราฟสเปกตรัมความถี่แบบ <strong>Real-Time Plot</strong></p>
+<p>ตัวอย่างฮาร์ดแวร์และซอฟต์แวร์ในบทความนี้ จัดทำขึ้นเพื่อใช้ในการสาธิตและทดลองเรียนรู้หลักการพื้นฐานของระบบประมวลผลสัญญาณดิจิทัล (<strong>Digital Signal Processing: DSP</strong>) เนื้อหาเกี่ยวข้องกับองค์ความรู้พื้นฐานหลายด้าน เช่น</p>
+<ul>
+<li><strong>Embedded Systems / Microcontroller Programming</strong></li>
+<li><strong>Digital Signal Processing (DSP)</strong></li>
+<li><strong>Instrumentation and Signal Measurement</strong></li>
+<li><strong>Real-Time Data Acquisition</strong></li>
+<li><strong>Python Programming</strong></li>
+</ul>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-05-23 | Last Updated: 2026-05-24</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
