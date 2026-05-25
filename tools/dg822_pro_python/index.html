@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/tools/dg822_pro_python/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การเขียนโปรแกรม Python ควบคุมการทำงาน RIGOL DG822 Pro Function Generator - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#python-rigol-dg822-pro-function-generator" class="nav-link">การเขียนโปรแกรม Python ควบคุมการทำงาน RIGOL DG822 Pro Function Generator</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#rigol-dg822-pro-waveform-generator" class="nav-link">RIGOL DG822 Pro Waveform Generator</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-single-channel-sine-wave-output" class="nav-link">ตัวอย่างโค้ด Python: Single-Channel Sine Wave Output</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-dual-sine-wave-output-with-phase-difference" class="nav-link">ตัวอย่างโค้ด Python: Dual Sine Wave Output with Phase Difference</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-harmonic-combination-output" class="nav-link">ตัวอย่างโค้ด Python: Harmonic Combination Output</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#python-arbitrary-waveform-output" class="nav-link">ตัวอย่างโค้ด Python: Arbitrary Waveform Output</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="python-rigol-dg822-pro-function-generator">การเขียนโปรแกรม Python ควบคุมการทำงาน RIGOL DG822 Pro Function Generator<a class="headerlink" href="#python-rigol-dg822-pro-function-generator" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Python</em>, <em>LXI Standard</em>, <em>RIGOL DG822 Pro</em>, <em>SCPI</em></p>
+<ul>
+<li><a href="#rigol-dg822-pro-waveform-generator"><strong>RIGOL DG822 Pro Waveform Generator</strong></a></li>
+<li><a href="#python-single-channel-sine-wave-output"><strong>ตัวอย่างโค้ด Python: Single-Channel Sine Wave Output</strong></a></li>
+<li><a href="#python-dual-sine-wave-output-with-phase-difference"><strong>ตัวอย่างโค้ด Python: Dual Sine Wave Output with Phase Difference</strong></a></li>
+<li><a href="#python-harmonic-combination-output"><strong>ตัวอย่างโค้ด Python: Harmonic Combination Output</strong></a></li>
+<li><a href="#python-arbitrary-waveform-output"><strong>ตัวอย่างโค้ด Python: Arbitrary Waveform Output</strong></a></li>
+</ul>
+<hr />
+<h2 id="rigol-dg822-pro-waveform-generator"><strong>RIGOL DG822 Pro Waveform Generator</strong><a class="headerlink" href="#rigol-dg822-pro-waveform-generator" title="Permanent link">#</a></h2>
+<p>บทความนี้นำเสนอตัวอย่างการเขียนโค้ด <strong>Python</strong> เพื่อโปรแกรมผ่านเครือข่ายสำหรับอุปกรณ์ <a href="https://rigolthai.com/product/dg800-pro-series-waveform-generator/"><strong>RIGOL DG822 Pro</strong></a> </p>
+<p>อุปกรณ์รุ่นนี้ จัดอยู่ในกลุ่มเครื่องมือทดสอบและสร้างสัญญาณทางอิเล็กทรอนิกส์ หรือ <strong>T&amp;M Instrument</strong> (<em>Test and Measurement Instrument</em>) หน้าที่หลักของอุปกรณ์ คือ การสร้างสัญญาณไฟฟ้า (<strong>Electrical Signal Generation</strong>)
+สำหรับใช้ในการทดลอง ทดสอบ และวิเคราะห์วงจรอิเล็กทรอนิกส์ต่าง ๆ</p>
+<p>อุปกรณ์รุ่นนี้สามารถสร้างสัญญาณเอาต์พุตได้จำนวน 2 ช่องสัญญาณ (<strong>Dual Channel Output</strong>)
+โดยรองรับทั้งการสร้างสัญญาณมาตรฐานและสัญญาณ <strong>Arbitrary Waveform</strong></p>
+<p><strong>คุณสมบัติหลัก</strong></p>
+<ul>
+<li>ประเภทเครื่องมือ: <strong>Function / Arbitrary Waveform Generator</strong></li>
+<li>จำนวนช่องสัญญาณ: <strong>2 Channels</strong></li>
+<li>ความถี่เอาต์พุตสูงสุด: <strong>25 MHz</strong></li>
+<li>ความละเอียดแนวตั้ง (<strong>Vertical Resolution</strong>): <strong>16-bit (DAC Resolution)</strong></li>
+<li>หน่วยความจำสำหรับ <strong>Arbitrary Waveform</strong>:<ul>
+<li><strong>2 Mpts/CH</strong> (Default)</li>
+<li><strong>8 Mpts/CH</strong> (Optional)</li>
+</ul>
+</li>
+<li>หน้าจอ: <strong>7-inch Color Touchscreen</strong></li>
+<li><strong>Harmonic Generator</strong>: รองรับสูงสุด <strong>20th Harmonic</strong></li>
+<li><strong>Frequency Counter</strong>: สูงสุด <strong>500 MHz</strong></li>
+<li>อินเทอร์เฟซ:<ul>
+<li><strong>USB Device / USB Host</strong></li>
+<li><strong>LAN</strong></li>
+<li><strong>Web Control</strong> (Built-in web server on port 80)</li>
+</ul>
+</li>
+<li>แหล่งจ่ายไฟ: รองรับ <strong>USB Type-C Power Input</strong></li>
+<li>รองรับ <strong>Arbitrary Waveform</strong></li>
+<li>รองรับ <strong>LXI (LAN eXtensions for Instrumentation) / SCPI (Standard Commands for Programmable Instruments) Command</strong> ผ่าน <strong>USB/LAN</strong></li>
+<li>ดูคู่มือการเขียนโปรแกรมได้จาก <a href="https://www.rigol.com/dam/global/downloads/brochures/en/program-guide/waveform-generators/DG800ProDG900Pro_ProgrammingGuide_EN.pdf"><strong>RIGOL Waveform Generators DG800 Pro - Programming Guide</strong></a></li>
+</ul>
+<p><strong>รูปแบบสัญญาณมาตรฐานที่รองรับ</strong></p>
+<ul>
+<li><strong>Sine</strong></li>
+<li><strong>Square</strong></li>
+<li><strong>Ramp</strong></li>
+<li><strong>Pulse</strong></li>
+<li><strong>Noise</strong></li>
+<li><strong>DC</strong></li>
+<li><strong>Arb (Arbitrary)</strong></li>
+<li><strong>Harmonic</strong></li>
+</ul>
+<p>โหมดการทำงาน</p>
+<ul>
+<li><strong>Continuous</strong></li>
+<li><strong>Sweep</strong></li>
+<li><strong>Burst</strong></li>
+<li><strong>Modulation</strong> (AM, FM, ASK, FSK, PSK, ...)</li>
+<li><strong>Sequence</strong></li>
+</ul>
+<p><img alt="" src="scpi_source_cmd.jpg" /></p>
+<p>รูป: ช่วงความถี่และแรงดันเอาต์พุต สำหรับการใช้คำสั่ง <code>:SOURce</code> สำหรับ <strong>DG822 Pro</strong> สร้างสัญญาณแบบต่อเนื่อง (<strong>Continuous Waveform</strong>)</p>
+<p><img alt="" src="scpi_source_func.jpg" /></p>
+<p>รูป: ตัวอย่างคำสั่ง <code>:SOURce&lt;n&gt;:FUNCtion</code> เพื่อเลือกรูปแบบของฟังก์ชันสำหรับเอาต์พุต</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-single-channel-sine-wave-output"><strong>ตัวอย่างโค้ด Python: Single-Channel Sine Wave Output</strong><a class="headerlink" href="#python-single-channel-sine-wave-output" title="Permanent link">#</a></h2>
+<p>ตัวอย่างโค้ดภาษา <strong>Python</strong> นี้สาธิตการเชื่อมต่อกับอุปกรณ์ <strong>DG822 Pro</strong>
+โดยจะต้องมีการตั้งค่าการเชื่อมต่อผ่านเครือข่าย <strong>LAN</strong> และเปิดใช้งาน <strong>DHCP Server</strong>
+เพื่อให้อุปกรณ์ได้รับ <strong>IP Address</strong> โดยอัตโนมัติ</p>
+<p>การเชื่อมต่อกับอุปกรณ์ใช้วิธีสร้าง <strong>TCP Socket</strong> และส่งคำสั่งควบคุมในรูปแบบ <strong>SCPI</strong>
+ไปยังอุปกรณ์ ตัวอย่างเช่น เริ่มต้นด้วยคำสั่ง <code>*IDN?</code>
+ซึ่งหากเชื่อมต่อได้ถูกต้อง อุปกรณ์จะตอบกลับด้วยข้อความแสดงข้อมูลของอุปกรณ์</p>
+<p>หลังจากนั้นโปรแกรมจะส่งคำสั่งเพื่อตั้งค่าให้ช่องเอาต์พุต <strong>CH1</strong> สร้างสัญญาณคลื่นไซน์ที่มีความถี่ <strong>1kHz</strong>,
+ขนาดสัญญาณ <strong>3Vpp (Peak-to-Peak Voltage)</strong> และค่า <strong>Voffset (DC Offset Voltage) = 1.5V</strong></p>
+<p>ในโค้ดตัวอย่างนี้มีการใช้คำสั่ง <strong>SCPI</strong> สำหรับ <strong>DG822 Pro</strong> ดังนี้</p>
+<ul>
+<li><code>:SOUR1:FUNC SIN</code>: เลือก <strong>Source Channel 1</strong> และสร้างสัญญาณตามฟังก์ชันรูปไซน์ (<strong>Sine Wave</strong>)</li>
+<li><code>:SOUR1:FREQ 1000</code>: ตั้งค่าความถี่ ให้ช่องเอาต์พุต <strong>Source Channel 1</strong> เท่ากับ <strong>1 kHz</strong></li>
+<li><code>:SOUR1:VOLT 2.0</code>:  ตั้งค่าแอมพลิจูด ให้ช่องเอาต์พุต <strong>Source Channel 1</strong> เท่ากับ <strong>2Vpp</strong> (Peak-to-Peak Voltage)</li>
+<li><code>:SOUR1:VOLT:OFFS 0</code>: ตั้งค่า <strong>DC Offset</strong> ให้ช่องเอาต์พุต <strong>Source Channel 1</strong> เท่ากับ <strong>0V</strong></li>
+<li><code>:SOUR1:PHAS 0</code>: ตั้งค่า <strong>Phase</strong> ให้ช่องเอาต์พุต <strong>Source Channel 1</strong> เท่ากับ <strong>0°</strong></li>
+<li><code>:OUTP1 ON</code>: เปิดเอาต์พุต <strong>Source Channel 1</strong></li>
+</ul>
+<pre><code class="language-python">&quot;&quot;&quot;
+This script tests communication with a Rigol DG822 Pro waveform generator
+using raw TCP sockets over LXI/LAN.
+
+Default SCPI Port: 5025
+
+Functions:
+    - Connect to instrument
+    - Query *IDN?
+    - Configure CH1
+    - Generate sine wave
+    - Enable output
+
+Tested using:
+    Python 3.x
+    LXI / Ethernet
+    TCP socket SCPI
+&quot;&quot;&quot;
+
+import socket
+import time
+
+DG822_IP   = &quot;10.42.0.166&quot;  # Set the IP address of the instrument
+DG822_PORT = 5025
+
+SOCKET_TIMEOUT = 3.0
+
+sock = None
+
+def scpi_write(sock, cmd):
+    if not cmd.endswith(&quot;\n&quot;):
+        cmd += &quot;\n&quot;
+    print(f&quot;Send SCPI command: {cmd.strip()}&quot;)
+    sock.sendall(cmd.encode())
+
+def scpi_query(sock, cmd):
+    scpi_write(sock, cmd)
+    response = sock.recv(1024).decode().strip()
+    return response
+
+try:
+    print(&quot;Connecting to DG822 Pro...&quot;)
+    sock = socket.socket(
+        socket.AF_INET,
+        socket.SOCK_STREAM
+    )
+    sock.settimeout(SOCKET_TIMEOUT)
+    sock.connect((DG822_IP, DG822_PORT))
+    print(&quot;Connected.&quot;)
+
+    # Query Instrument Identification
+    idn = scpi_query(sock, &quot;*IDN?&quot;)
+    print(idn)
+
+    # Configure CH1 to output a sine wave signal
+    # (1kHz, Vpp=3V, Voffset=1.5V)
+    scpi_write(sock, &quot;:SOUR1:FUNC SIN&quot;)
+
+    # Frequency = 1kHz
+    scpi_write(sock, &quot;:SOUR1:FREQ 1000&quot;)
+
+    # Amplitude = 3Vpp
+    scpi_write(sock, &quot;:SOUR1:VOLT 3.0&quot;)
+
+    # Offset = 1.5V
+    scpi_write(sock, &quot;:SOUR1:VOLT:OFFS 1.5&quot;)
+
+    # Phase = 0.0 degree
+    scpi_write(sock, &quot;:SOUR1:PHAS 0.0&quot;)
+
+    # Enable CH1 Output
+    scpi_write(sock, &quot;:OUTP1 ON&quot;)
+
+    print(&quot;\nCH1 enabled.&quot;)
+
+except Exception as e:
+    print(f&quot;\nERROR: {e}&quot;)
+
+finally:
+    try:
+        # Disable output before exit (optional)
+        #scpi_write(sock, &quot;:OUTP1 OFF&quot;)
+
+        if sock is not None:
+            # Close the TCP socket
+            sock.close()
+
+    except:
+        pass
+    print(&quot;TCP Socket closed.&quot;)
+</code></pre>
+<p><img alt="" src="ch1_sine_1khz_wave.jpg" /></p>
+<p>รูป: การใช้ออสซิลโลสโคปแสงดรูปคลื่นสัญญาณเอาต์พุตที่ได้จาก <strong>DG822 Pro</strong></p>
+<hr />
+<h2 id="python-dual-sine-wave-output-with-phase-difference"><strong>ตัวอย่างโค้ด Python: Dual Sine Wave Output with Phase Difference</strong><a class="headerlink" href="#python-dual-sine-wave-output-with-phase-difference" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการสร้างสัญญาณรูปไซน์สำหรับเอาต์พุตทั้งสองช่องของอุปกรณ์
+โดยกำหนดให้สัญญาณทั้งสองมีความต่างเฟส (<strong>Phase Difference</strong>) เช่น 90 องศา</p>
+<p>คำสั่งที่สำคัญในตัวอย่างนี้ คือ <code>:PHAS:SYNC</code> ซึ่งใช้สำหรับซิงโครไนซ์การทำงานของทั้งสองช่องสัญญาณ
+โดยทำให้จุดเริ่มต้นเฟสของสัญญาณทั้งสองช่องสอดคล้องกัน (<strong>Synchronized</strong>)
+ดังนั้น ความสัมพันธ์ของเฟสระหว่าง <strong>CH1</strong> และ <strong>CH2</strong> จะเป็นไปตามค่าที่กำหนดไว้ เช่น <strong>0°</strong> และ <strong>+90°</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+Rigol DG822 Pro - Dual-Channel Sine Wave Example
+
+CH1: Sine wave, Frequency = 1 kHz, Vpp = 2 V, Offset = 0 V, Phase = 0 deg
+CH2: Sine wave, Frequency = 1 kHz, Vpp = 2 V, Offset = 0 V, Phase = +90 deg
+
+Communication:
+    LXI / TCP Socket / SCPI
+&quot;&quot;&quot;
+
+import socket
+
+DG822_IP   = &quot;10.42.0.166&quot;
+DG822_PORT = 5025
+
+SOCKET_TIMEOUT = 2.0
+
+FREQUENCY = 1000  # Hz
+AMPLITUDE = 2.0   # Vpp
+OFFSET    = 0.0   # V
+
+sock = None
+
+def scpi_write(sock, cmd):
+    if not cmd.endswith(&quot;\n&quot;):
+        cmd += &quot;\n&quot;
+
+    print(f&quot;Send SCPI command: {cmd.strip()}&quot;)
+    sock.sendall(cmd.encode())
+
+try:
+
+    print(&quot;Connecting to DG822 Pro...&quot;)
+    sock = socket.socket(
+        socket.AF_INET,
+        socket.SOCK_STREAM
+    )
+    sock.settimeout(SOCKET_TIMEOUT)
+    sock.connect((DG822_IP, DG822_PORT))
+    print(&quot;Connected.&quot;)
+
+    # Configure CH1
+    scpi_write(sock, &quot;:SOUR1:FUNC SIN&quot;)
+    scpi_write(sock, f&quot;:SOUR1:FREQ {FREQUENCY}&quot;)
+    scpi_write(sock, f&quot;:SOUR1:VOLT {AMPLITUDE}&quot;)
+    scpi_write(sock, f&quot;:SOUR1:VOLT:OFFS {OFFSET}&quot;)
+    scpi_write(sock, &quot;:SOUR1:PHAS 0&quot;)
+
+    # Configure CH2
+    scpi_write(sock, &quot;:SOUR2:FUNC SIN&quot;)
+    scpi_write(sock, f&quot;:SOUR2:FREQ {FREQUENCY}&quot;)
+    scpi_write(sock, f&quot;:SOUR2:VOLT {AMPLITUDE}&quot;)
+    scpi_write(sock, f&quot;:SOUR2:VOLT:OFFS {OFFSET}&quot;)
+
+    # CH2 phase offset = +90 degrees
+    # CH1 = reference and CH2 = lead by +90°
+    scpi_write(sock, &quot;:SOUR2:PHAS 90&quot;)
+
+    # Enable Outputs
+    scpi_write(sock, &quot;:OUTP1 ON&quot;)
+    scpi_write(sock, &quot;:OUTP2 ON&quot;)
+
+    # Synchronize both outputs
+    scpi_write(sock, &quot;:PHAS:SYNC&quot;)
+    print(&quot;\nCH1 and CH2 enabled.&quot;)
+
+    print(&quot;\nExpected:&quot;)
+    print(&quot;CH1 = reference sine wave&quot;)
+    print(&quot;CH2 = +90 degree phase shifted sine wave&quot;)
+
+except Exception as e:
+    print(f&quot;\nERROR: {e}&quot;)
+
+finally:
+    try:
+        # Turn both channels OFF (optional)
+        #scpi_write(sock, &quot;:OUTP1 OFF&quot;)
+        #scpi_write(sock, &quot;:OUTP2 OFF&quot;)
+
+        if sock is not None:
+            # Close the TCP socket
+            sock.close()
+    except:
+        pass
+    print(&quot;Socket closed.&quot;)
+</code></pre>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-harmonic-combination-output"><strong>ตัวอย่างโค้ด Python: Harmonic Combination Output</strong><a class="headerlink" href="#python-harmonic-combination-output" title="Permanent link">#</a></h2>
+<p>ตัวอย่างนี้ใช้ฟังก์ชันภายในของเครื่องกำเนิดสัญญาณที่เรียกว่า <strong>Harmonic Waveform Generator</strong>
+สำหรับสร้างสัญญาณที่ประกอบด้วยความถี่มูลฐาน (<strong>Fundamental Frequency</strong>)
+ร่วมกับฮาร์มอนิก (<strong>Harmonics</strong>) มีการตั้งค่าดังต่อไปนี้</p>
+<ul>
+<li>ความถี่มูลฐาน (<strong>Fundamental Frequency</strong>) กำหนดไว้ที่ <strong>50 Hz</strong></li>
+<li>เอาต์พุตใช้ <strong>CH1</strong></li>
+<li>มีการเพิ่มฮาร์มอนิก (<strong>Harmonic Components</strong>) อันดับที่ <strong>3</strong> และ <strong>5</strong>
+(<strong>3rd Harmonic = 150 Hz, 5th Harmonic = 250 Hz</strong>)</li>
+<li>สัญญาณเอาต์พุตถูกสร้างจากการรวมสัญญาณหลายความถี่เข้าด้วยกัน</li>
+</ul>
+<p>คำสั่ง <strong>SCPI</strong> ที่สำคัญ มีดังนี้</p>
+<ul>
+<li><code>:SOUR1:FUNC HARM</code>: คำสั่งนี้ใช้กำหนดให้ <strong>CH1</strong> ทำงานในโหมด <strong>Harmonic Function</strong></li>
+<li><code>:SOUR1:FREQ 50</code>: กำหนดความถี่มูลฐาน (Fundamental Frequency) ของสัญญาณเป็น 50 Hz</li>
+<li><code>:SOUR1:VOLT 5.0</code>: กำหนดขนาดแรงดันเอาต์พุตรูปไซน์ <strong>50Hz</strong> เป็น <strong>5 Vpp</strong></li>
+<li><code>:SOUR1:VOLT:OFFS 0.0</code>: กำหนดค่า <strong>DC Offset</strong> ของสัญญาณเป็น <strong>0V</strong></li>
+<li><code>:SOUR1:HARM:TYPE COMB</code> คำสั่งนี้กำหนดให้ใช้โหมด <strong>Harmonic Combination</strong></li>
+<li><code>:SOUR1:HARM:COMB X0101000000000000000</code>: คำสั่งนี้ใช้กำหนดชุดของฮาร์มอนิกที่จะเปิดใช้งาน
+(<code>1</code> หมายถึง "เลือก" และ <code>0</code> "ไม่เลือก" โดยเริ่มจากซ้ายไปขวาถัดจาก <code>X</code> เป็นฮาร์มอนิก อันดับที่ 2 ไปตามลำดับ )</li>
+<li><code>:SOUR1:HARM:COMB:AMPL 3,1.0</code>: กำหนดค่าแอมพลิจูดให้ฮาร์มอนิกอันดับที่ <strong>3</strong></li>
+<li><code>:SOUR1:HARM:COMB:AMPL 5,0.1</code>: กำหนดค่าแอมพลิจูดให้ฮาร์มอนิกอันดับที่ <strong>5</strong></li>
+</ul>
+<p><img alt="" src="scpi_source_harmonic.jpg" /></p>
+<p>รูป: คำสั่ง <code>:SOURce:HARMonic</code> สำหรับสร้างสัญญาณฮาร์มอนิก เช่น แบบผสม </p>
+<pre><code class="language-python">&quot;&quot;&quot;
+Rigol DG822 Pro - Use Internal HARMONIC Function
+
+This example uses the DG822 Pro built-in harmonic generator function.
+
+CH1 Output: Fundamental frequency = 50 Hz, Harmonic waveform enabled
+
+&quot;&quot;&quot;
+
+import socket
+import time
+
+# CONFIGURATION
+DG822_IP   = &quot;10.42.0.166&quot;
+DG822_PORT = 5025
+
+SOCKET_TIMEOUT = 2.0
+
+FUNDAMENTAL_FREQ = 50      # Hz
+OUTPUT_VPP = 5.0           # Vpp
+OUTPUT_OFFSET = 0.0        # V
+
+sock = None
+
+def scpi_write(sock, cmd):
+    if not cmd.endswith(&quot;\n&quot;):
+        cmd += &quot;\n&quot;
+    print(f&quot;Send SCPI command: {cmd.strip()}&quot;)
+    sock.sendall(cmd.encode())
+
+def scpi_query(sock, cmd):
+    scpi_write(sock, cmd)
+    response = sock.recv(1024).decode().strip()
+    return response
+
+try:
+    print(&quot;Connecting to DG822 Pro...&quot;)
+    sock = socket.socket(
+        socket.AF_INET,
+        socket.SOCK_STREAM
+    )
+    sock.settimeout(SOCKET_TIMEOUT)
+    sock.connect(
+        (DG822_IP, DG822_PORT)
+    )
+    print(&quot;Connected.&quot;)
+
+    # Select Harmonic Function
+    scpi_write(sock, &quot;:SOUR1:FUNC HARM&quot;)
+
+    # Fundamental frequency
+    scpi_write(sock, f&quot;:SOUR1:FREQ {FUNDAMENTAL_FREQ}&quot;)
+
+    # Output amplitude
+    scpi_write(sock, f&quot;:SOUR1:VOLT {OUTPUT_VPP}&quot;)
+
+    # DC offset
+    scpi_write(sock, f&quot;:SOUR1:VOLT:OFFS {OUTPUT_OFFSET}&quot;)
+
+    # Configure Harmonics
+    scpi_write(sock, &quot;:SOUR1:HARM:TYPE COMB&quot;)
+
+    # Combine 3rd and 5th harmonic
+    scpi_write(sock, &quot;:SOUR1:HARM:COMB X0101000000000000000&quot;)
+    scpi_write(sock, &quot;:SOUR1:HARM:COMB:AMPL 3,1.0&quot;) # 2Vpp
+    scpi_write(sock, &quot;:SOUR1:HARM:COMB:AMPL 5,0.1&quot;) # 1Vpp
+
+    # Enable Output
+    scpi_write(sock, &quot;:OUTP1 ON&quot;)
+    print(&quot;\nCH1 Harmonic waveform enabled.&quot;)
+
+except Exception as e:
+    print(f&quot;\nERROR: {e}&quot;)
+
+finally:
+    try:
+        #scpi_write(sock, &quot;:OUTP1 OFF&quot;)
+        if sock is not None:
+            # Close the TCP socket
+            sock.close()
+
+    except:
+        pass
+    print(&quot;Socket closed.&quot;)
+
+</code></pre>
+<p><img alt="" src="harmonic-output-setting.jpg" /></p>
+<p>รูป: หน้าจอของ <strong>DG822 Pro</strong> เมื่อมีการโปรแกรมให้สร้างสัญญาณเอาต์พุตในโหมด <strong>Harmonic</strong></p>
+<p><img alt="" src="harmonic-1.jpg" /></p>
+<p>รูป: รูปคลื่นสัญญาณเอาต์พุตที่ได้จากผลรวมคลื่นไซน์ <strong>50Hz</strong>, <strong>150Hz</strong> และ <strong>250Hz</strong></p>
+<p><img alt="" src="dho814_fft_setting-1.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าฟังก์ชัน <strong>MATH -&gt; FFT</strong> สำหรับออสซิลโลสโคป <strong>DHO814</strong></p>
+<p><img alt="" src="dho814-fft_setting-2.jpg" /></p>
+<p>รูป: การวัดคลื่นสัญญาณในโหมด <strong>Y-T</strong> พร้อมกับการแสดงผลในโหมด <strong>Math -&gt; FFT</strong> </p>
+<p>จากรูป <strong>FFT Spectrum</strong> จะเห็นได้ว่า ในช่วงความถี่ <strong>50Hz</strong>, <strong>150Hz</strong> และ <strong>250Hz</strong>
+มีแอมพลิจูดมากกว่า <strong>0V</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="python-arbitrary-waveform-output"><strong>ตัวอย่างโค้ด Python: Arbitrary Waveform Output</strong><a class="headerlink" href="#python-arbitrary-waveform-output" title="Permanent link">#</a></h2>
+<p>โค้ดตัวอย่างนี้สาธิตการโปรแกรมให้ <strong>Rigol DG822 Pro</strong> ทำงานในโหมด <strong>Arb (Arbitrary) Waveform</strong>
+โดยโปรแกรมจะสร้างชุดข้อมูลตัวอย่างของรูปคลื่นขึ้นมาในหน่วยความจำของคอมพิวเตอร์
+จากนั้นอัปโหลดข้อมูลดังกล่าวไปเก็บไว้ในหน่วยความจำภายในของอุปกรณ์ในรูปแบบไฟล์ <code>.arb</code></p>
+<p>ในตัวอย่างนี้ใช้คำสั่ง <code>:MMEM:TRAC:ARB:DATA:DAC</code> สำหรับส่งข้อมูลตัวอย่างของรูปคลื่นแบบ <strong>DAC Code</strong>
+โดยจะต้องมีการสร้างไฟล์ <code>.arb</code> เก็บไว้ในหน่วยความจำภายในเครื่องกำเนิดสัญญาณ
+จากนั้นจึงโหลดไฟล์ดังกล่าวเข้าสู่โหมด <strong>Advanced Arb</strong> ด้วยคำสั่ง <code>:SOUR1:FUNC:SEQ:ARB:LOAD</code>
+เพื่อสร้างสัญญาณเอาต์พุตช่องที่ 1</p>
+<p>หลังจากโหลดรูปคลื่นแล้ว โปรแกรมจะกำหนดอัตรา <strong>Sample Rate</strong> แอมพลิจูด และ <strong>DC Offset</strong> 
+ก่อนเปิดเอาต์พุตที่ช่อง <strong>CH1</strong> เพื่อสร้างสัญญาณ <strong>Arbitrary Waveform</strong> ตามข้อมูลที่อัปโหลดไว้</p>
+<p>ชุดข้อมูลที่ใช้สร้างไฟล์ <code>.arb</code> และมีจำนวนข้อมูลเท่ากับ <strong>2,000</strong> จะเป็นชุดของตัวเลขตัวอย่าง (<strong>Sample Data</strong>)
+ที่แทนค่าระดับแรงดันของรูปคลื่นในแต่ละช่วงเวลา โดยในตัวอย่างนี้ข้อมูลจะถูกเก็บในรูปของค่า <strong>16-bit signed integer</strong> 
+(หรือค่า <strong>DAC code</strong>) อยู่ในช่วง <script type="math/tex">-32767 \leq x < 32768</script>
+</p>
+<p>ในโค้ดนี้ มีการสร้างและใช้ฟังก์ชัน <code>make_harmonic_sum()</code> เพื่อจะสร้างข้อมูลตัวอย่างของรูปคลื่นที่เกิดจากการรวมกันของ
+คลื่นไซน์พื้นฐาน (<strong>Fundamental</strong>) และ ฮาร์มอนิกอันดับ 3 (<strong>3rd harmonic</strong>) เป็นตัวอย่าง
+จากนั้นจึงสเกลให้อยู่ในช่วง <strong>[-1, +1]</strong> แล้วแปลงเป็นค่า <strong>DAC Code</strong> แบบ <strong>Signed 16-bit</strong></p>
+<p>ชุดข้อมูลจะใช้กับอัตรา <strong>Sample Rate = 1MSa/sec</strong> ดังนั้นถ้ามีจำนวนข้อมูล <strong>2,000</strong> สำหรับข้อมูลหนึ่งคาบ
+จะได้ความถี่ของสัญญาณเอาต์พุตเท่ากับ <strong>1,000,000 / 2,000 = 500 Hz</strong> ดังนั้นจำนวนข้อมูลต่อหนึ่งคาบจึงส่งผลต่อความถี่ที่ได้
+ในตัวอย่างนี้ สัญญาณเอาต์พุตจะถูกกำหนดให้มีแอมพลิจูด <strong>3Vpp</strong> และมี <strong>DC Offset = 1.5V</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+Rigol DG822 Pro - LXI / TCP Socket SCPI Communication
+
+Loads a user-defined waveform into an internal-memory .arb file using
+:MMEM:TRAC:ARB:DATA:DAC, then plays it back on CH1.
+
+- Default SCPI raw socket port is 5025.
+
+&quot;&quot;&quot;
+
+import socket
+import time
+import numpy as np
+
+DG822_IP       = &quot;10.42.0.166&quot;
+DG822_PORT     = 5025
+SOCKET_TIMEOUT = 10.0
+
+ARB_FILE = r&quot;INT:\\USERWAVE.arb&quot;
+NPTS = 2000                # Number of samples in total
+CHUNK_SAMPLES = 500        # Number of samples per chunk
+PLAY_SRATE    = 1_000_000  # 1 MSa/s
+PLAY_VPP      = 3.0        # 3 Vpp
+PLAY_OFFSET   = 1.5        # 1.5 Vdc
+
+sock = None
+
+def make_harmonic_sum(n, k1=1, k2=3, a1=1.0, a2=0.4, phase2=0.0):
+    &quot;&quot;&quot;Sum of two harmonic sines over an n-point buffer.
+
+    k1 and k2 should be integers; k2 is typically an integer multiple of k1
+    (k2 = m*k1 -&gt; m-th harmonic of the fundamental).
+
+    Returns int16 DAC codes in [-32767, +32767].
+    &quot;&quot;&quot;
+    t = np.arange(n, dtype=np.float64) / n  # [0,1)
+    fund = a1 * np.sin(2.0 * np.pi * k1 * t)
+    harm = a2 * np.sin(2.0 * np.pi * k2 * t + phase2)
+    y = fund + harm
+    y /= np.max(np.abs(y))  # normalize to [-1, 1]
+    return np.int16(np.round(y * 32767))
+
+def make_waveform(n):
+    &quot;&quot;&quot;Default waveform: fundamental + 3rd harmonic at 40% amplitude.&quot;&quot;&quot;
+    return make_harmonic_sum(n, k1=1, k2=3, a1=1.0, a2=0.4)
+
+def scpi_write(sock, cmd):
+    if not cmd.endswith(&quot;\n&quot;):
+        cmd += &quot;\n&quot;
+    sock.sendall(cmd.encode(&quot;ascii&quot;))
+
+def scpi_write_quiet(sock, cmd):
+    if not cmd.endswith(&quot;\n&quot;):
+        cmd += &quot;\n&quot;
+    sock.sendall(cmd.encode(&quot;ascii&quot;))
+
+def scpi_query(sock, cmd):
+    scpi_write(sock, cmd)
+    # Catalog replies can exceed one recv() and always end with newline.
+    buf = b&quot;&quot;
+    while b&quot;\n&quot; not in buf:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        buf += chunk
+    response = buf.decode(errors=&quot;replace&quot;).strip()
+    print(f&quot;RX: {response}&quot;)
+    return response
+
+def send_dac_chunks(sock, arb_path, samples, chunk):
+    n = len(samples)
+    i = 0
+    while i &lt; n:
+        end_i = min(i + chunk, n)
+        if i == 0 and end_i == n:
+            flag = &quot;END&quot;
+        elif i == 0:
+            flag = &quot;HEAD&quot;
+        elif end_i == n:
+            flag = &quot;END&quot;
+        else:
+            flag = &quot;CONT&quot;
+        csv = &quot;,&quot;.join(str(int(v)) for v in samples[i:end_i])
+        scpi_write_quiet(sock, f&quot;:MMEM:TRAC:ARB:DATA:DAC {arb_path},{flag},{csv}&quot;)
+        print(f&quot;TX: :MMEM:TRAC:ARB:DATA:DAC {arb_path},{flag},&quot;
+              f&quot;&lt;{end_i - i} samples&gt; #{i}&quot;)
+        i = end_i
+        time.sleep(0.5)
+
+try:
+    print(&quot;Connecting to DG822 Pro...&quot;)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(SOCKET_TIMEOUT)
+    sock.connect((DG822_IP, DG822_PORT))
+    print(&quot;Connected.&quot;)
+
+    scpi_query(sock, &quot;*IDN?&quot;)
+    scpi_write(sock, &quot;*CLS&quot;)
+    scpi_write(sock, &quot;*RST&quot;)
+    time.sleep(1.0)
+
+    # Build the user-defined waveform and upload it as a .arb file.
+    samples = make_waveform(NPTS)
+    print(f&quot;\nUploading {len(samples)} samples to {ARB_FILE} ...&quot;)
+    send_dac_chunks(sock, ARB_FILE, samples, CHUNK_SAMPLES)
+    scpi_query(sock, &quot;*OPC?&quot;)  # block until write completes
+    scpi_query(sock, &quot;:SYST:ERR?&quot;)
+
+    # Enable Advanced Arb mode on CH1, then load the .arb file.
+    scpi_write(sock, &quot;:SOUR1:FUNC:SEQ:ARB:STAT ON&quot;)
+    scpi_query(sock, &quot;*OPC?&quot;)
+    scpi_write(sock, f&quot;:SOUR1:FUNC:SEQ:ARB:LOAD {ARB_FILE}&quot;)
+    scpi_query(sock, &quot;*OPC?&quot;)
+    scpi_query(sock, &quot;:SYST:ERR?&quot;)
+    time.sleep(1.0)
+
+    # Configure playback and enable output.
+    scpi_write(sock, f&quot;:SOUR1:FUNC:SEQ:ARB:SRAT {PLAY_SRATE}&quot;)
+    scpi_write(sock, &quot;:SOUR1:FUNC:SEQ:ARB:FILT NORM&quot;)
+    scpi_write(sock, f&quot;:SOUR1:VOLT {PLAY_VPP}&quot;)
+    scpi_write(sock, f&quot;:SOUR1:VOLT:OFFS {PLAY_OFFSET}&quot;)
+    scpi_write(sock, &quot;:OUTP1 ON&quot;)
+    scpi_query(sock, &quot;:SYST:ERR?&quot;)
+    print(&quot;\nCH1 enabled with user-defined Arb waveform.&quot;)
+
+except Exception as e:
+    print(f&quot;\nERROR: {e}&quot;)
+
+finally:
+    try:
+        if sock is not None:
+            # Close the TCP socket
+            sock.close()
+
+    except Exception:
+        pass
+    print(&quot;Socket closed.&quot;)
+</code></pre>
+<p><img alt="" src="arb_wave-1.jpg" /></p>
+<p>รูป: การวัดคลื่นสัญญาณเอาต์พุตด้วยออสซิลโลสโคป</p>
+<p><img alt="" src="arb_wave-2.jpg" /></p>
+<p>รูป: การวัดคลื่นสัญญาณในโหมด  <strong>Math -&gt; FFT</strong> </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>บทความนี้สาธิตการเขียนโค้ด <strong>Python</strong> เพื่อเชื่อมต่อกับ <strong>DG822 Pro Waveform Generator</strong>
+ผ่านทางเครือข่าย <strong>LAN</strong> และใช้คำสั่ง <strong>SCPI</strong> เช่น การตั้งค่าและสร้างสัญญาณเอาต์พุต</p>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-05-24 | Last Updated: 2026-05-24</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
