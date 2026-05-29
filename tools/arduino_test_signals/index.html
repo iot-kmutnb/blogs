@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="RSP">
+        <link rel="canonical" href="https://iot-kmutnb.github.io/blogs/tools/arduino_test_signals/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino เพื่อฝึกวัดสัญญาณและตั้งค่าทริกเกอร์ด้วยออสซิลโลสโคป - IoT Engineering Education</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/arduino.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/vhdl.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/verilog.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/text.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/plaintext.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/matlab.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-966FQ6RN6W"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', "G-966FQ6RN6W");
+        </script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IoT Engineering Education</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#arduino" class="nav-link">การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino เพื่อฝึกวัดสัญญาณและตั้งค่าทริกเกอร์ด้วยออสซิลโลสโคป</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#oscilloscopes-trigger-types" class="nav-link">ออสซิลโลสโคปและประเภทของทริกเกอร์ (Oscilloscopes &amp; Trigger Types)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#arduino_1" class="nav-link">การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino ให้เหมาะกับประเภทของทริกเกอร์</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">ตัวอย่างสัญญาณทดสอบการทำงานของทริกเกอร์</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="3"><a href="#1" class="nav-link">สัญญาณทดสอบกรณีที่ 1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#2" class="nav-link">สัญญาณทดสอบกรณีที่ 2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#3" class="nav-link">สัญญาณทดสอบกรณีที่ 3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#4" class="nav-link">สัญญาณทดสอบกรณีที่ 4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="3"><a href="#5" class="nav-link">สัญญาณทดสอบกรณีที่ 5</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">&#9655; กล่าวสรุป</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="arduino">การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino เพื่อฝึกวัดสัญญาณและตั้งค่าทริกเกอร์ด้วยออสซิลโลสโคป<a class="headerlink" href="#arduino" title="Permanent link">#</a></h1>
+<p><strong>Keywords</strong>: <em>Arduino</em>, <em>Test Signal Generation</em>, <em>Digital Oscilloscope</em>, <em>Trigger Types</em></p>
+<ul>
+<li><a href="#oscilloscopes-trigger-types"><strong>ออสซิลโลสโคปและประเภทของทริกเกอร์ (Oscilloscopes &amp; Trigger Types)</strong></a></li>
+<li><a href="#1"><strong>สัญญาณทดสอบกรณีที่ 1</strong></a></li>
+<li><a href="#2"><strong>สัญญาณทดสอบกรณีที่ 2</strong></a></li>
+<li><a href="#3"><strong>สัญญาณทดสอบกรณีที่ 3</strong></a></li>
+<li><a href="#4"><strong>สัญญาณทดสอบกรณีที่ 4</strong></a></li>
+<li><a href="#5"><strong>สัญญาณทดสอบกรณีที่ 5</strong></a></li>
+</ul>
+<hr />
+<h2 id="oscilloscopes-trigger-types"><strong>ออสซิลโลสโคปและประเภทของทริกเกอร์ (Oscilloscopes &amp; Trigger Types)</strong><a class="headerlink" href="#oscilloscopes-trigger-types" title="Permanent link">#</a></h2>
+<p>ออสซิลโลสโคปแบบดิจิทัล (<strong>Digital Oscilloscope</strong>) เป็นเครื่องมือวัดที่สำคัญในการวิเคราะห์สัญญาณทางไฟฟ้า
+โดยสามารถแสดงรูปคลื่นของสัญญาณไฟฟ้าในโดเมนเวลา (<strong>Time Domain</strong>)
+ทำให้ผู้ใช้งานสามารถตรวจสอบลักษณะของสัญญาณ เช่น แอมพลิจูด ความถี่ คาบเวลา เฟส และสัญญาณรบกวนได้</p>
+<p>หนึ่งในฟังก์ชันสำคัญของออสซิลโลสโคปคือ "ทริกเกอร์" (<strong>Trigger</strong>)
+ซึ่งจะต้องมีการกำหนดเงื่อนไขในการเริ่มต้นจับและแสดงผลรูปคลื่น เพื่อให้รูปคลื่นมีความนิ่ง
+และสามารถสังเกตรายละเอียดของสัญญาณได้อย่างชัดเจน
+หากไม่มีการตั้งค่าทริกเกอร์ที่เหมาะสม รูปคลื่นที่แสดงบนหน้าจออาจเลื่อนหรือไม่เสถียร ทำให้วิเคราะห์สัญญาณได้ยาก</p>
+<p>ในปัจจุบัน ออสซิลโลสโคปแบบดิจิทัลรองรับการทำงานของทริกเกอร์หลายรูปแบบ
+เพื่อให้เหมาะกับลักษณะของสัญญาณและงานวิเคราะห์ที่แตกต่างกัน ตัวอย่างประเภทของทริกเกอร์ที่ใช้งานบ่อย ได้แก่</p>
+<ul>
+<li><strong>Edge Trigger</strong>:
+เป็นประเภทของทริกเกอร์พื้นฐานที่นิยมใช้งานมากที่สุด และใช้ตรวจจับขอบสัญญาณขาขึ้น (<strong>Rising Edge</strong>)
+หรือขาลง (<strong>Falling Edge</strong>) หรือ ขาขึ้นขาลง (<strong>Any Edge</strong>)</li>
+<li><strong>Pulse Width Trigger</strong>:
+ใช้ตรวจจับพัลส์ที่มีความกว้างมากกว่าหรือน้อยกว่าค่าที่กำหนด เหมาะสำหรับการค้นหาพัลส์ผิดปกติ</li>
+<li><strong>Slope Trigger</strong>: 
+เป็นทริกเกอร์ที่ใช้ตรวจจับ อัตราการเปลี่ยนแปลงของสัญญาณ (<strong>Slope</strong> หรือ <strong>Slew Rate</strong>)
+โดยออสซิลโลสโคปจะพิจารณาระยะเวลาที่สัญญาณเปลี่ยนจากระดับแรงดันหนึ่งไปยังอีกระดับแรงดันหนึ่ง หากสัญญาณเปลี่ยนเร็วหรือช้ากว่าค่าที่กำหนด จะเกิดการทริกเกอร์ขึ้น</li>
+<li><strong>Pattern Trigger</strong>:
+ใช้ตรวจจับรูปแบบลอจิกของหลายสัญญาณพร้อมกัน เช่น การกำหนดให้บางช่องสัญญาณเป็น <strong>HIGH</strong> หรือ <strong>LOW</strong>
+ตามเงื่อนไขที่กำหนด</li>
+<li><strong>Delay Trigger</strong>:
+เป็นทริกเกอร์ที่ใช้อ้างอิงจากเหตุการณ์ทริกเกอร์หลัก แล้วหน่วงเวลา (<strong>Delay</strong>) ก่อนเริ่มจับสัญญาณ หรือแสดงผลรูปคลื่น</li>
+<li><strong>Runt Trigger</strong>:
+ใช้ตรวจจับพัลส์ที่มีระดับแรงดันไม่ถึงค่าที่กำหนด ซึ่งอาจเกิดจากความผิดปกติของวงจรดิจิทัล</li>
+<li><strong>Timeout Trigger</strong>:
+ใช้ตรวจจับกรณีที่สัญญาณหยุดเปลี่ยนสถานะเป็นเวลานานกว่าที่กำหนด</li>
+</ul>
+<p>ออสซิลโลสโคปหลายรุ่นมีฟังก์ชันเสริมสำหรับช่วยวิเคราะห์และถอดรหัสสัญญาณการสื่อสารข้อมูล ซึ่งพบได้บ่อยในระบบสมองกลฝังตัวและวงจรไมโครคอนโทรลเลอร์ เช่น <strong>UART</strong>, <strong>I2C</strong> และ <strong>SPI</strong> รวมถึงการสื่อสารผ่านอินเทอร์เฟซอย่าง <strong>RS232</strong> และ <strong>RS485</strong></p>
+<p>การเลือกประเภททริกเกอร์และการตั้งค่าที่เหมาะสม มีความสำคัญอย่างมากต่อการวิเคราะห์สัญญาณ
+โดยเฉพาะในการตรวจจับสัญญาณผิดปกติที่เกิดขึ้นเพียงช่วงเวลาสั้น ๆ หรือเกิดขึ้นไม่สม่ำเสมอ
+ดังนั้น ผู้ใช้งานควรเข้าใจหลักการทำงานของทริกเกอร์แต่ละประเภท 
+เพื่อให้สามารถใช้ออสซิลโลสโคปได้อย่างมีประสิทธิภาพและเหมาะสมกับงานวัดสัญญาณแต่ละลักษณะ</p>
+<p><img alt="" src="ds1054z_trigger_types.jpg" /></p>
+<p>รูป: ตัวอย่างตัวเลือก <strong>Trigger Types</strong> สำหรับออสซิลโลสโคป <strong>RIGOL DS1054Z</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="arduino_1"><strong>การสร้างสัญญาณทดสอบด้วยบอร์ด Arduino ให้เหมาะกับประเภทของทริกเกอร์</strong><a class="headerlink" href="#arduino_1" title="Permanent link">#</a></h2>
+<p>การฝึกใช้งานออสซิลโลสโคปและการเรียนรู้ทริกเกอร์ประเภทต่าง ๆ จำเป็นต้องอาศัยสัญญาณทดสอบที่เหมาะสมกับลักษณะของทริกเกอร์ในแต่ละกรณี</p>
+<p>อุปกรณ์สำหรับสร้างสัญญาณ เช่น เครื่องกำเนิดสัญญาณ (<strong>Function Generator / Waveform Generator</strong>) สามารถนำมาใช้สร้างสัญญาณทดสอบได้ โดยอุปกรณ์สมัยใหม่ส่วนใหญ่สามารถกำหนดรูปแบบและพารามิเตอร์ของสัญญาณผ่านการโปรแกรมได้ อย่างไรก็ตาม อุปกรณ์ประเภทนี้มักมีราคาค่อนข้างสูง</p>
+<p>อีกทางเลือกหนึ่งคือ การใช้บอร์ดไมโครคอนโทรลเลอร์ราคาประหยัด และเขียนโปรแกรมด้วย <strong>Arduino</strong> ได้ 
+(เช่น <strong>Arduino Uno R3</strong> หรือ <strong>Arduino Nano</strong>) แล้วมาเขียนโปรแกรม
+เพื่อสร้างสัญญาณทดสอบสำหรับการเรียนรู้และทดลองใช้งานทริกเกอร์ของออสซิลโลสโคปในรูปแบบต่าง ๆ
+ซึ่งช่วยลดต้นทุนและสามารถปรับแต่งลักษณะของสัญญาณให้เหมาะสมกับการทดลองได้ง่าย</p>
+<p>นอกจากนี้ การสร้างสัญญาณด้วยไมโครคอนโทรลเลอร์ยังช่วยให้สามารถออกแบบสัญญาณผิดปกติ (<strong>Fault Injection</strong>) หรือเหตุการณ์เฉพาะ เช่น พัลส์แคบผิดปกติ สัญญาณรบกวน การหน่วงเวลา หรือสัญญาณที่เกิดขึ้นเป็นครั้งคราว เพื่อใช้ฝึกการตั้งค่าทริกเกอร์และการวิเคราะห์รูปคลื่นได้อย่างมีประสิทธิภาพ</p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_1"><strong>ตัวอย่างสัญญาณทดสอบการทำงานของทริกเกอร์</strong><a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<p>ถัดไปเป็นตัวอย่างรูปแบบของสัญญาณทดสอบแบบดิจิทัลที่สามารถสร้างได้โดยใช้บอร์ด <strong>Arduino Uno R3 / R4</strong>
+และการเขียนโปรแกรม <strong>Arduino Sketch</strong> ตามรูปแบบของสัญญาณทดสอบ</p>
+<h3 id="1"><strong>สัญญาณทดสอบกรณีที่ 1</strong><a class="headerlink" href="#1" title="Permanent link">#</a></h3>
+<p>สัญญาณทดสอบแบบแรกเป็นสัญญาณ <strong>PWM</strong> (<strong>Pulse Width Modulation</strong>) โดยแนะนำให้สร้างอย่างน้อย 2 สัญญาณ ที่มีความถี่เท่ากัน แต่มีค่าความกว้างพัลส์ หรือ <strong>Duty Cycle</strong> แตกต่างกัน</p>
+<p>เมื่อนำสัญญาณลักษณะนี้มาใช้เป็นสัญญาณอินพุตสำหรับออสซิลโลสโคป ผู้ใช้งานสามารถวัดค่าพารามิเตอร์ต่าง ๆ ของสัญญาณได้ เช่น</p>
+<ul>
+<li>ความถี่ (<strong>Frequency</strong>)</li>
+<li>คาบเวลา (<strong>Period</strong>)</li>
+<li>ความกว้างพัลส์ช่วง <strong>HIGH</strong></li>
+<li>ความกว้างพัลส์ช่วง <strong>LOW</strong></li>
+<li>ค่า <strong>Duty Cycle</strong></li>
+</ul>
+<p>สำหรับการตั้งค่า <strong>Trigger</strong> แนะนำให้เลือกใช้ <strong>Edge Trigger</strong> ทั้งแบบ <strong>Rising Edge</strong> หรือ <strong>Falling Edge</strong> โดยเลือกช่องสัญญาณใดช่องสัญญาณหนึ่งเป็น <strong>Trigger Source</strong> เพื่อให้การแสดงผลรูปคลื่นมีความนิ่งและสามารถวัดค่าได้อย่างถูกต้อง</p>
+<p>นอกจากนี้ การใช้สัญญาณ <strong>PWM</strong> หลายช่องที่มี <strong>Duty Cycle</strong> แตกต่างกัน ยังช่วยให้สามารถฝึกการเปรียบเทียบรูปคลื่น การวิเคราะห์ความสัมพันธ์ของสัญญาณ และการตั้งค่า <strong>Time Base</strong> ของออสซิลโลสโคปได้อีกด้วย</p>
+<p>ตัวอย่างสัญญาณ <strong>PWM</strong> แบบ 4 ช่อง</p>
+<ul>
+<li>สัญญาณ <strong>PWM</strong> จำนวน 4 ช่องสัญญาณ ที่มีความถี่เท่ากัน มีขอบขาขึ้นตรงหรือใกล้เคียงกัน แต่มีค่า <strong>Duty Cycle</strong> ต่างกัน <ul>
+<li><a href="code/test-case-1a.py">โค้ด <strong>Python</strong> ที่ใช้ในการสร้างรูปสัญญาณอ้างอิง</a></li>
+</ul>
+</li>
+<li>สัญญาณ <strong>PWM</strong> ที่มีขอบขาขึ้นไม่ตรงกัน และมีลักษณะตรงกับสัญญาณ <strong>Phase-Correct PWM</strong> ของ <strong>Arduino Uno R3 / Nano</strong> <ul>
+<li><a href="code/test-case-1b.py">โค้ด <strong>Python</strong> ที่ใช้ในการสร้างรูปสัญญาณอ้างอิง</a></li>
+<li><a href="code/test-case-1.ino">โค้ด <strong>Arduino</strong> สำหรับสร้างสัญญาณทดสอบ</a></li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="test-case-1a.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณ <strong>PWM</strong> จำนวน 4 ช่องสัญญาณ ที่มีความถี่เท่ากัน มีขอบขาขึ้นตรงหรือใกล้เคียงกัน แต่มีค่า <strong>Duty Cycle</strong> ต่างกัน</p>
+<p><img alt="" src="test-case-1b.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณ <strong>PWM</strong> ที่มีขอบขาขึ้นไม่ตรงกัน และมีลักษณะตรงกับสัญญาณ <strong>Phase-Correct PWM</strong> ของ <strong>Arduino Uno R3 / Nano</strong></p>
+<p><img alt="" src="arduino_pwm_4ch.jpg" /></p>
+<p>รูป: คลื่นสัญญาณ <strong>PWM</strong> จำนวน 4 ช่อง วัดสัญญาณโดยใช้ออสซิลโลสโคป</p>
+<p>&nbsp;</p>
+<hr />
+<h3 id="2"><strong>สัญญาณทดสอบกรณีที่ 2</strong><a class="headerlink" href="#2" title="Permanent link">#</a></h3>
+<p>รูปแบบสัญญาณทดสอบถัดไป เป็นสัญญาณที่มีคาบเวลาคงที่และมีพัลส์ที่มีความกว้างคงที่ แต่ในบางคาบเวลาอาจเกิดพัลส์ที่มีความกว้างมากกว่าปกติ ซึ่งถือเป็นลักษณะความผิดปกติของสัญญาณ</p>
+<ul>
+<li><a href="code/test-case-2.py">โค้ด <strong>Python</strong> ที่ใช้ในการสร้างรูปสัญญาณอ้างอิง</a></li>
+<li><a href="code/test-case-2.ino">โค้ด <strong>Arduino</strong> สำหรับสร้างสัญญาณทดสอบ</a></li>
+</ul>
+<p>การตั้งค่าทริกเกอร์ของออสซิลโลสโคปเพื่อใช้ตรวจจับเหตุการณ์ลักษณะนี้ สามารถเลือกใช้ <strong>Pulse Trigger</strong> โดยกำหนดเงื่อนไขให้ตรวจสอบว่า มีพัลส์ช่วงที่มีลอจิกเป็น <strong>HIGH</strong> กว้างเกินค่าที่กำหนดไว้หรือไม่ หากตรวจพบพัลส์ที่เข้าเงื่อนไข ออสซิลโลสโคปจะทำการ <strong>Trigger</strong> และแสดงรูปคลื่นในช่วงเวลาที่เกิดเหตุการณ์ดังกล่าว</p>
+<p><strong>Trigger</strong> ลักษณะนี้เหมาะสำหรับการตรวจจับพัลส์ผิดปกติ เช่น</p>
+<ul>
+<li>พัลส์ที่กว้างเกินค่าที่กำหนด</li>
+<li>พัลส์ที่แคบผิดปกติ</li>
+<li>"กลิตช์" (<strong>Glitch</strong>)</li>
+</ul>
+<p><img alt="" src="test-case-2.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณ <strong>Periodic Pulse Train</strong> ที่มีบางช่วงเวลาซึ่งพัลส์มีความกว้างมากกว่าค่าที่กำหนดไว้</p>
+<p>ตัวอย่างการวัดสัญญาณด้วยออสซิลโลสโคป <strong>RIGOL</strong> โดยเลือกทริกเกอร์เป็นแบบ <strong>Pulse</strong></p>
+<p><img alt="" src="trigger_pulse_width-1.jpg" /></p>
+<p>รูป: สัญญาณทดสอบที่มีบางช่วงเวลาเกิดพัลส์ที่มีความกว้างกว่าปกติ</p>
+<p><img alt="" src="trigger_pulse_width-2.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าทริกเกอร์แบบ <strong>Pulse Width</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h3 id="3"><strong>สัญญาณทดสอบกรณีที่ 3</strong><a class="headerlink" href="#3" title="Permanent link">#</a></h3>
+<p>รูปแบบสัญญาณทดสอบถัดไป เป็นสัญญาณที่มีคาบเวลาคงที่และมีพัลส์ที่มีความกว้างคงที่ แต่ในบางคาบเวลา
+อาจเกิดพัลส์หลายพัลส์ติดกันภายในช่วงเวลาที่ปกติควรมีเพียงหนึ่งพัลส์ ซึ่งถือเป็นตัวอย่างของสัญญาณที่เกิดความผิดพลาด</p>
+<ul>
+<li><a href="code/test-case-3.py">โค้ด <strong>Python</strong> ที่ใช้ในการสร้างรูปสัญญาณอ้างอิง</a></li>
+<li><a href="code/test-case-3.ino">โค้ด <strong>Arduino</strong> สำหรับสร้างสัญญาณทดสอบ</a></li>
+</ul>
+<p>การตั้งค่า <strong>Trigger</strong> สำหรับตรวจจับเหตุการณ์ลักษณะนี้ อาจใช้วิธีตรวจสอบความกว้างของช่วงสัญญาณที่เป็น <strong>LOW</strong> เนื่องจากเมื่อเกิด <strong>Pulse Burst</strong> จะทำให้ช่วงเวลา <strong>LOW</strong> สั้นกว่าค่าปกติ</p>
+<p>ในกรณีนี้สามารถใช้ <strong>Pulse Width Trigger</strong> หรือ <strong>Pulse Trigger</strong> โดยกำหนดเงื่อนไขให้ทริกเกอร์ ทำงานเมื่อช่วงสัญญาณ <strong>LOW</strong> มีความกว้างน้อยกว่าค่าที่กำหนดไว้ ซึ่งช่วยให้สามารถตรวจจับเหตุการณ์ที่เกิดพัลส์แทรกหรือพัลส์ซ้ำได้ง่ายขึ้น
+ในกรณีนี้ ทริกเกอร์ไม่ได้ตรวจจับ “จำนวนพัลส์” แต่ตรวจจับ “ช่วงเวลาระหว่างพัลส์” ที่ผิดปกติ</p>
+<p><img alt="" src="test-case-3.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณ <strong>Random Pulse Burst</strong></p>
+<p>ตัวอย่างการวัดสัญญาณด้วยออสซิลโลสโคป <strong>RIGOL</strong></p>
+<p><img alt="" src="trigger_pulse-1.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าทริกเกอร์เพื่อตรวจหา <strong>Pulse Burst</strong></p>
+<p><img alt="" src="trigger_pulse-2.jpg" /></p>
+<p>รูป: การใช้ฟังก์ชัน <strong>Cursors</strong> ลองวัดควากว้างของพัลส์ช่วงที่เป็น <strong>LOW</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h3 id="4"><strong>สัญญาณทดสอบกรณีที่ 4</strong><a class="headerlink" href="#4" title="Permanent link">#</a></h3>
+<p>รูปแบบสัญญาณทดสอบถัดไป เป็นสัญญาณดิจิทัลจำนวนสองสัญญาณที่ทำงานแบบ <strong>Complementary Signals (A &amp; B)</strong> โดยมีคาบเวลาคงที่ ในสภาวะปกติจะมีเพียงหนึ่งสัญญาณเท่านั้นที่มีลอจิกเป็น <strong>HIGH</strong> ขณะที่อีกสัญญาณจะมีลอจิกเป็นค่าตรงข้าม และทั้งสองสัญญาณจะสลับสถานะลอจิกสลับกันตามคาบเวลา</p>
+<p>ระหว่างการสลับสถานะของสัญญาณ อาจมีช่วงเวลาสั้น ๆ ที่ทั้งสองสัญญาณเป็นลอจิก <strong>LOW</strong> พร้อมกัน ซึ่งเรียกว่า <strong>Dead Time</strong> โดยมีจุดประสงค์เพื่อป้องกันไม่ให้ทั้งสองสัญญาณเป็นลอจิก <strong>HIGH</strong> พร้อมกัน</p>
+<p>หากเกิดกรณีที่ทั้งสองสัญญาณเป็นลอจิก<strong> HIGH</strong> พร้อมกัน (<strong>Overlap Condition</strong>) จะถือเป็นความผิดพลาดของสัญญาณ และในวงจรกำลังอาจทำให้เกิดกระแสลัดวงจร (<strong>Shoot-Through Current</strong>) ได้</p>
+<ul>
+<li><a href="code/test-case-4.py">โค้ด <strong>Python</strong> ที่ใช้ในการสร้างรูปสัญญาณอ้างอิง</a></li>
+<li><a href="code/test-case-4.ino">โค้ด <strong>Arduino</strong> สำหรับสร้างสัญญาณทดสอบ</a></li>
+</ul>
+<p>การตั้งค่าทริกเกอร์ เพื่อตรวจจับข้อผิดพลาดลักษณะ <strong>Overlap Condition</strong> สามารถใช้ Pattern <strong>Trigger</strong> ได้ โดยกำหนดเงื่อนไขให้สัญญาณ <strong>A</strong> และ <strong>B</strong> มีลอจิกเป็น <strong>HIGH</strong> พร้อมกัน เมื่อเกิดเหตุการณ์ดังกล่าว ออสซิลโลสโคปจะทำการ <strong>Trigger</strong> และแสดงรูปคลื่นในช่วงเวลาที่เกิดความผิดพลาด</p>
+<p><img alt="" src="test-case-4.png" /></p>
+<p>รูป: ตัวอย่างสัญญาณ <strong>Complementary Signals with Random Overlap</strong></p>
+<p>ตัวอย่างการวัดสัญญาณจริงจากบอร์ด <strong>Arduino</strong> ด้วยออสซิลโลสโคป <strong>RIGOL</strong></p>
+<p><img alt="" src="trigger_pattern-1.jpg" /></p>
+<p>รูป: สัญญาณ <strong>A &amp; B Complementary (with Dead Times)</strong></p>
+<p><img alt="" src="trigger_pattern-2.jpg" /></p>
+<p>รูป: ช่วงเกิด <strong>Transition</strong> (<strong>A falling, B rising</strong>) ที่ไม่มี <strong>Overlap</strong></p>
+<p><img alt="" src="trigger_pattern-3.jpg" /></p>
+<p>รูป: ช่วงเกิด <strong>Transition</strong> (<strong>A rising, B falling</strong>) ที่ไม่มี <strong>Overlap</strong></p>
+<p><img alt="" src="trigger_pattern-4.jpg" /></p>
+<p>รูป: ช่วงเวลาที่มี <strong>Overlap fault</strong> (สัญญาณทั้งสองเป็น <strong>HIGH</strong>) และการเลือกใช้ทริกเกอร์ <strong>Pattern</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h3 id="5"><strong>สัญญาณทดสอบกรณีที่ 5</strong><a class="headerlink" href="#5" title="Permanent link">#</a></h3>
+<p>สัญญาณทดสอบรูปแบบถัดไป เป็นสัญญาณ 2 ช่อง (<strong>A</strong> และ <strong>B</strong>) ที่มีลักษณะเป็นพัลส์เกิดซ้ำด้วยอัตราคงที่ และมีความกว้างพัลส์คงที่ โดยกำหนดเงื่อนไขว่า หลังจากเกิดพัลส์ที่สัญญาณ <strong>A</strong> แล้ว สัญญาณ <strong>B</strong> จะต้องเกิดพัลส์ตามภายในช่วงเวลาที่กำหนด หากสัญญาณ B ไม่เกิดขึ้นภายในช่วงเวลาดังกล่าว ให้ถือว่าเป็นเหตุการณ์ผิดพลาด</p>
+<p>ในกรณีนี้ สามารถใช้ <strong>Trigger</strong> ของออสซิลโลสโคปที่อาศัยความสัมพันธ์เชิงเวลาระหว่างสองสัญญาณ (<strong>Timing / Delay Trigger</strong>) เพื่อตรวจจับเหตุการณ์ผิดพลาดได้ โดยกำหนดให้สัญญาณ <strong>A</strong> เป็นเหตุการณ์อ้างอิง และตรวจสอบว่าสัญญาณ <strong>B</strong> เกิดขึ้นภายในช่วงเวลาที่กำหนดหรือไม่</p>
+<p><img alt="" src="test-case-5.png" /></p>
+<p>รูป: สัญญาณที่เกิดพัลส์ <strong>A</strong> (CH1) แล้วตามด้วยพัลส์ <strong>B</strong> (CH2)</p>
+<p><img alt="" src="trigger_delay-1.jpg" /></p>
+<p>รูป: ตัวอย่างการตั้งค่าทริกเกอร์ <strong>Delay</strong></p>
+<p><img alt="" src="trigger_delay-2.jpg" /></p>
+<p>รูป: ทริกเกอร์ทำงานเมื่อระยะเวลาระหว่างพัลส์ของสัญญาณทั้งสอง มากกว่าค่าที่กำหนดไว้ </p>
+<p>&nbsp;</p>
+<hr />
+<h2 id="_2">&#9655; <strong>กล่าวสรุป</strong><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>บทความนี้ได้นำเสนอแนวทางการใช้บอร์ด <strong>Arduino</strong> เพื่อเขียนโปรแกรมสร้างสัญญาณทดสอบ และนำไปใช้ฝึกการตั้งค่า
+<strong>Trigger</strong> รวมถึงการวัดและวิเคราะห์สัญญาณด้วยออสซิลโลสโคป ซึ่งเป็นอีกทางเลือกหนึ่งนอกเหนือจากการใช้อุปกรณ์เฉพาะทาง เช่น เครื่องกำเนิดสัญญาณ (<strong>Function Generator</strong>)</p>
+<p>แม้ว่าโค้ดตัวอย่างที่นำเสนอในบทความนี้จะพัฒนาสำหรับบอร์ด <strong>Arduino Uno R3</strong> และ <strong>Arduino Nano</strong> แต่แนวคิดและรูปแบบการสร้างสัญญาณทดสอบสามารถนำไปประยุกต์ใช้กับบอร์ดไมโครคอนโทรลเลอร์ประเภทอื่นได้เช่นกัน</p>
+<p>การสร้างสัญญาณทดสอบด้วยไมโครคอนโทรลเลอร์ หรืออาจจะใช้บอร์ด <strong>FPGA</strong> เขียนโค้ดด้วย <strong>VHDL / Verilog</strong> ก็ได้ ช่วยให้สามารถปรับแต่งลักษณะของสัญญาณและสร้างเหตุการณ์ผิดปกติสำหรับการทดลองได้อย่างยืดหยุ่น อีกทั้งยังช่วยลดต้นทุนในการจัดเตรียมอุปกรณ์สำหรับการเรียนรู้และการทดลองด้านออสซิลโลสโคปและระบบดิจิทัลอีกด้วย</p>
+<p><strong>บทความที่เกี่ยวข้อง</strong></p>
+<ul>
+<li>การสร้างสัญญาณทดสอบด้วยบอร์ด <strong>Arduino Uno / Nano</strong> เพื่อการฝึกใช้ออสซิลโลสโคป <a href="../../electronics/arduino_test_signals/">**Arduino-based Test Signal Generation)</a></li>
+</ul>
+<hr />
+<p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
+<p>Created: 2026-05-28 | Last Updated: 2026-05-28</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2021-2026 IoT Engineering Education, Bangkok/Thailand</a></p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
