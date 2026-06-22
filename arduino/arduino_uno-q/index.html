@@ -132,7 +132,7 @@
 ซึ่งเป็นช่วงเวลาเดียวกับข่าวการเข้าซื้อกิจการของบริษัท <strong>Arduino.cc</strong> โดยบริษัท <strong>Qualcomm Technologies, Inc.</strong></p>
 <p>บอร์ด <strong>Arduino Uno Q</strong> มาพร้อมหน่วยประมวลผลหลักสองประเภท ได้แก่</p>
 <ul>
-<li><strong>MPU</strong>: <strong>Qualcomm Dragonwing QRB2210</strong> (Quad-core 64-bit ARM Cortex-A53, 2.0GHz)</li>
+<li><strong>MPU</strong>: <strong>Qualcomm Dragonwing QRB2210</strong> (Qualcomm Kryo Quad-core 64-bit, 2.0GHz) แต่ไม่มี <strong>NPU (Neural Processing Unit)</strong></li>
 <li><strong>MCU</strong>: <strong>STMicroelectronics STM32U585</strong> (32-bit ARM Cortex-M33, up to 160 MHz, 2Mbyte Flash, 786KB RAM)</li>
 </ul>
 <p>ดังนั้นจึงกล่าวได้ว่า <strong>Uno Q</strong> เป็นบอร์ด <strong>SBC (Single-Board Computer)</strong>
@@ -141,7 +141,7 @@
 (<strong>Real-time Tasks and Peripheral control</strong>) หรือ
 เชื่อมต่อกับวงจรหรือโมดูลเซ็นเซอร์ประเภทต่าง ๆ </p>
 <p>หากเปรียบเทียบกับบอร์ด <strong>SBC</strong> เช่น <strong>Raspberry Pi (RPi) 4B / RPi 5</strong> 
-โดยทั่วไปมีเฉพาะ <strong>MPU</strong> (โปรเซสเซอร์หลัก) สำหรับรันระบบ <strong>Linux</strong> แต่ไม่มี <strong>MCU</strong> อยู่บนบอร์ด</p>
+โดยทั่วไปมีเฉพาะ <strong>MPU</strong> (โปรเซสเซอร์หลัก) สำหรับรันระบบ <strong>Linux</strong> แต่ไม่มี <strong>MCU</strong> อยู่บนบอร์ดเดียวกัน</p>
 <p><img alt="" src="uno-q.jpg" /></p>
 <p><strong>รูป:</strong> บอร์ด <strong>Arduino Uno Q</strong> (Source: arduino.cc)</p>
 <h3 id="board-variants"><strong>Board Variants</strong><a class="headerlink" href="#board-variants" title="Permanent link">#</a></h3>
@@ -189,7 +189,7 @@
 </li>
 <li>ไม่มีพอร์ต <strong>HDMI</strong> โดยตรง </li>
 <li>มีพอร์ต <strong>USB Type-C</strong> เพียงพอร์ตเดียว ใช้สำหรับการจ่ายไฟเลี้ยงให้บอร์ด รวมถึงการเชื่อมต่อข้อมูล
-แต่ต้องใช้อุปกรณ์เสริมคือ <strong>USB Type-C Adapter / Dongle)</strong> ที่รองรับ 
+แต่ต้องใช้อุปกรณ์เสริมคือ <strong>USB Type-C Adapter / Dongle</strong> ที่รองรับ 
 <strong>USB-C Power Delivery (PD)</strong> สำหรับการจ่ายไฟ จึงจะต่ออุปกรณ์เสริมได้</li>
 <li>แรงดัน <strong>I/O</strong> สำหรับ <strong>QRB2210 (MPU)</strong> คือ <strong>+1.8V</strong> แต่สำหรับ 
 <strong>STM32U585 (MCU)</strong> คือ <strong>+3.3V</strong> ดังนั้นจึงต้องมีวงจรแปลงระดับแรงดัน
@@ -197,7 +197,7 @@
 สำหรับสัญญาณไฟฟ้าที่เชื่อมต่อระหว่าง <strong>MPU-MCU</strong></li>
 <li>มีวงจร <strong>13x8 LED Matrix</strong> คล้ายกับบอร์ด <strong>Uno R4 WiFi</strong></li>
 <li>มีคอนเนกเตอร์ขนาด 2x30 พิน (<strong>Female Pins</strong>) ใต้บอร์ด ได้แก่ <code>JMEDIA</code>
-สำหรับการต่อวงจรหรืออุปกรณ์เสริม  <strong>High-speed camera &amp; display interfaces (MIPI CSI/DSI)</strong>
+สำหรับการต่อวงจรหรืออุปกรณ์เสริม <strong>High-speed Camera &amp; Display Interfaces (MIPI CSI/DSI)</strong>
 และ <code>JMISC</code> สำหรับอุปกรณ์ประเภทอื่น (<strong>1.8V GPIO, SDIO, Audio</strong>)</li>
 </ul>
 <h2 id="zephyr-based-arduino-core"><strong>Zephyr-based Arduino Core</strong><a class="headerlink" href="#zephyr-based-arduino-core" title="Permanent link">#</a></h2>
@@ -227,10 +227,9 @@
 </ul>
 </li>
 <li><a href="https://github.com/arduino-libraries/Arduino_RouterBridge"><strong>Arduino Bridge / RPC Library</strong></a><ul>
-<li>เป็นไลบรารีสำหรับการเชื่อมต่อข้อมูลระหว่าง <strong>MPU-MCU</strong> ด้วยวิธีที่เรียกว่า <strong>"Remote Procedure Call (RPC)"</strong>
-(ทาง <strong>Arduino.cc</strong> เรียกว่า <strong>"Bridge"</strong> เพื่อให้ฝั่ง <strong>MPU</strong> สามารถเรียกฟังก์ชัน <strong>MCU</strong> และกลับกันได้) ทำงานตามสถาปัตยกรรม <strong>Client / Server</strong></li>
-<li>ใช้ไลบรารี <a href="https://github.com/arduino-libraries/Arduino_RPClite"><strong>Arduino RPClite</strong></a> และ
-ไลบรารี <a href="https://github.com/arduino/arduino-router"><strong>MessagePack RPC Router</strong></a> เป็นพื้นฐานในการทำงาน</li>
+<li>เป็นไลบรารีสำหรับการเชื่อมต่อข้อมูลระหว่าง <strong>MPU-MCU</strong> ด้วยวิธีที่เรียกว่า <strong>"Remote Procedure Call (RPC)"</strong> ทำงานตามสถาปัตยกรรม <strong>Client / Server</strong>
+และทาง <strong>Arduino.cc</strong> เรียกว่า <strong>"Bridge"</strong> เพื่อให้ฝั่ง <strong>MPU</strong> สามารถเรียกฟังก์ชัน <strong>MCU</strong> และกลับกันได้</li>
+<li>ใช้ไลบรารี <a href="https://github.com/arduino-libraries/Arduino_RPClite"><strong>Arduino RPClite</strong></a> และไลบรารี <a href="https://github.com/arduino/arduino-router"><strong>MessagePack RPC Router</strong></a> เป็นพื้นฐานในการทำงาน</li>
 <li>ข้อมูลจะถูกส่งตามรูปแบบของ <strong>MessagePack-RPC Serialization</strong></li>
 </ul>
 </li>
@@ -245,25 +244,21 @@
 <ul>
 <li>บนบอร์ด <strong>Arduino Uno Q</strong> การทำงานของแอปพลิเคชันจะอยู่ภายใน <strong>Docker Container</strong> ซึ่งรวมซอฟต์แวร์หลักสองส่วน</li>
 <li><strong>Arduino Sketch</strong> ที่รันบน <strong>MCU (STM32U585)</strong></li>
-<li>
-<p><strong>Python Code</strong> ที่รันบน <strong>MPU (QRB2210 Linux)</strong><br />
-  ทั้งสองส่วนสื่อสารกันผ่านระบบ <strong>RPC (MessagePack)</strong> เพื่อให้โค้ดบน MCU และ MPU ทำงานร่วมกันได้อย่างราบรื่น</p>
-</li>
-<li>
-<p><strong>Arduino Bricks</strong> คือ <strong>หน่วยซอฟต์แวร์แบบโมดูลาร์ (Modular Software Component)</strong> ที่ถูกกำหนดโครงสร้างและรูปแบบการจัดการโดย Arduino<br />
-  Bricks ถูกออกแบบมาให้ใช้งานได้ทันที โดยเน้นด้าน <strong>AI / Machine Learning</strong> และงานเชื่อมต่อระบบ เช่น</p>
-</li>
+<li><strong>Python Code</strong> ที่รันบน <strong>MPU (QRB2210 Linux)</strong>
+  ทั้งสองส่วนสื่อสารกันผ่านระบบ <strong>RPC (MessagePack)</strong> เพื่อให้โค้ดบนฝั่ง
+<strong>MCU</strong> และ <strong>MPU</strong> ทำงานร่วมกันได้อย่างราบรื่น</li>
+<li><strong>Arduino Bricks</strong> คือ หน่วยซอฟต์แวร์แบบโมดูลาร์ (<strong>Modular Software Component</strong>)
+ที่ถูกกำหนดโครงสร้างและรูปแบบการจัดการโดย <strong>Arduino</strong> และถูกออกแบบมาให้ใช้งานได้ทันที
+โดยเน้นด้าน <strong>AI / Machine Learning</strong> และงานเชื่อมต่อระบบ เช่น<ul>
 <li><strong>Face Recognition / Machine Vision</strong></li>
 <li><strong>Audio / Sound Recognition</strong></li>
 <li><strong>Cloud / Data Storage</strong></li>
-<li>ไลบรารีหลักสำหรับ Bricks → <a href="https://github.com/arduino/app-bricks-py/"><code>app-bricks-py</code></a></li>
-<li>
-<p>ตัวอย่างการใช้งาน Bricks → <a href="https://github.com/arduino/app-bricks-examples"><code>app-bricks-examples</code></a></p>
+<li>ไลบรารีหลักสำหรับ <strong>*Bricks</strong>: <a href="https://github.com/arduino/app-bricks-py/"><code>app-bricks-py</code></a></li>
+<li>ตัวอย่างการใช้งาน <strong>Bricks</strong>: <a href="https://github.com/arduino/app-bricks-examples"><code>app-bricks-examples</code></a></li>
+</ul>
 </li>
-<li>
-<p>ภายใน <strong>App Lab</strong> แต่ละ <strong>Brick</strong> จะมีไฟล์กำหนดค่ารูปแบบ <strong>YAML</strong> และโค้ด <strong>Python / Sketch</strong> ที่พร้อมใช้งานภายใน <strong>Docker Container</strong> บน <strong>Uno Q</strong><br />
-  ผู้ใช้สามารถนำ Bricks เหล่านี้มาผสานเข้ากับ <strong>App</strong> ได้โดยตรง ทั้งผ่าน <strong>App Lab GUI</strong> หรือ <strong>CLI</strong></p>
-</li>
+<li>ภายใน <strong>App Lab</strong> แต่ละ <strong>Brick</strong> จะมีไฟล์กำหนดค่ารูปแบบ <strong>YAML</strong> และโค้ด <strong>Python / Sketch</strong>
+ที่พร้อมใช้งานภายใน <strong>Docker Container</strong> บน <strong>Uno Q</strong> ผู้ใช้สามารถนำ Bricks เหล่านี้มาผสานเข้ากับ <strong>App</strong> ได้โดยตรง ทั้งผ่าน <strong>App Lab GUI</strong> หรือ <strong>CLI</strong></li>
 </ul>
 <p>ตัวอย่างการทำคำสั่งบน <strong>MPU</strong></p>
 <ul>
@@ -276,7 +271,7 @@
 <p>ตัวอย่าง <strong>Background Services</strong> ที่เกี่ยวข้องกับ <strong>Uno Q</strong> ทำงานอยู่บน <strong>MPU</strong></p>
 <ul>
 <li><code>arduino-app-cli</code><ul>
-<li>ไม่ได้เป็นเพียงแค่คำสั่งแบบ <strong>CLI</strong> (<code>/usr/bin/arduino-app-cli</code>) แต่ยังทำหน้าที่เป็นบริการ (<strong>Daemon</strong>) ที่เป็นศูนย์กลางการจัดการสำหรับแอปพลิเคชัน (<strong>Apps</strong>) บนบอร์ด <strong>Uno Q</strong> เช่น การเริ่ม / หยุด หรือ ดูสถานะการทำงานของ <strong>Uno Q App</strong> (โดยทั่วไปประกอบด้วยสองส่วนคือ <strong>Arduino Sketch</strong> และ <strong>Python Code</strong> ซึ่งทำงานด้วย <strong>Docker Container</strong>)</li>
+<li>ไม่ได้เป็นเพียงแค่คำสั่งแบบ <strong>CLI</strong> (<code>/usr/bin/arduino-app-cli</code>) แต่ยังทำหน้าที่เป็น <strong>Daemon</strong> ที่เป็นศูนย์กลางการจัดการสำหรับแอปพลิเคชัน (<strong>Apps</strong>) บนบอร์ด <strong>Uno Q</strong> เช่น การเริ่ม / หยุด หรือ ดูสถานะการทำงานของ <strong>Uno Q App</strong> (โดยทั่วไปประกอบด้วยสองส่วนคือ <strong>Arduino Sketch</strong> และ <strong>Python Code</strong> ซึ่งทำงานด้วย <strong>Docker Container</strong>)</li>
 <li>เปิด พอร์ต <strong>TCP</strong> หมายเลข <code>8800</code> ที่อนุญาตให้ส่วนต่อประสานผู้ใช้ (เช่น <strong>Arduino App Lab</strong>) หรือเครื่องมืออื่นๆ สามารถเชื่อมต่อและ สื่อสารกับ <strong>Daemon</strong> เพื่อสั่งงาน</li>
 </ul>
 </li>
@@ -309,7 +304,7 @@
 <p>&nbsp;</p>
 <hr />
 <p><em>This work is licensed under a</em> <strong><em>Creative Commons Attribution-ShareAlike 4.0 International License</em></strong>.</p>
-<p>Created: 2025-11-12 | Last Updated: 2025-11-12</p></div>
+<p>Created: 2025-11-12 | Last Updated: 2026-06-19</p></div>
             </div>
         </div>
 
